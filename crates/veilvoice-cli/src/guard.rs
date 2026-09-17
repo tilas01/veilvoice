@@ -89,6 +89,8 @@ fn sealed_path(base: &Path) -> PathBuf {
     veilvoice_crypto::container::veil_path(base)
 }
 
+/// Say what the integrity record detects and what it cannot, before it is
+/// used.
 fn print_scope() {
     println!("{}", paint(colour::MUTED, "  What this is worth:"));
     for line in crate::lock::wrap(SCOPE, 66) {
@@ -124,6 +126,11 @@ pub fn run(action: Action, path: Option<PathBuf>) -> Result<(), String> {
     }
 }
 
+/// `veilvoice guard init`: record what these files are now.
+///
+/// Everything afterwards compares against this moment, so a record taken on a
+/// machine that was already interfered with records the interference as
+/// normal. That is printed rather than left to be discovered.
 fn init(store: &Path, files: Vec<PathBuf>, sealed: bool) -> Result<(), String> {
     let targets = if files.is_empty() {
         default_targets()
@@ -200,6 +207,10 @@ fn load(store: &Path) -> Result<Manifest, String> {
     Err("no record here yet - run `veilvoice guard init` first".into())
 }
 
+/// `veilvoice guard check`: compare the files against the record and report.
+///
+/// Where the platform allows it, a changed file comes with a best-effort guess
+/// at what changed it, and the guess is labelled as one.
 fn check(store: &Path, watch_dir: Option<PathBuf>) -> Result<(), String> {
     let manifest = load(store)?;
     let sealed = sealed_path(store);
@@ -269,6 +280,7 @@ fn check(store: &Path, watch_dir: Option<PathBuf>) -> Result<(), String> {
     Err("integrity check failed - see the changes above".into())
 }
 
+/// `veilvoice guard status`: what the record covers, and when it was taken.
 fn status(store: &Path) -> Result<(), String> {
     let sealed = sealed_path(store);
     let state = if sealed.exists() {

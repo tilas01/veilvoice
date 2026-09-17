@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-cli/src/mandate.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 330 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 339 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs)
 
 ## Contents
 
@@ -57,19 +57,19 @@ when you did.
 
 ## What this file contains
 
-330 lines defining **11 functions** (5 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+339 lines defining **11 functions** (5 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `status` (line 81) -- What is required now, and how it got that way.
+- `status` (line 84) -- What is required now, and how it got that way.
   - reaches: `describe`, `load`, `sealed_also_requires`, `path`
-- `history` (line 121) -- The log of every change, oldest first.
+- `history` (line 124) -- The log of every change, oldest first.
   - reaches: `load`, `path`
-- `relax` (line 149) -- Stop insisting on one or both requirements.
+- `relax` (line 152) -- Stop insisting on one or both requirements.
   - reaches: `change`, `describe`, `load`, `sealed_also_requires`, `wanted`, `path`
-- `insist` (line 154) -- Insist on one or both requirements again.
+- `insist` (line 157) -- Insist on one or both requirements again.
   - reaches: `change`, `describe`, `load`, `sealed_also_requires`, `wanted`, `path`
-- `reset` (line 268) -- Back to insisting on both.
+- `reset` (line 277) -- Back to insisting on both.
   - reaches: `load`, `path`
 
 ## What calls what
@@ -93,16 +93,16 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_path["path<br/>line 41"]
-    n_load["load<br/>line 49"]
-    n_sealed_also_requires["sealed_also_requires<br/>line 62"]
-    n_describe["describe<br/>line 73"]
-    n_status(["status<br/>line 81"])
-    n_history(["history<br/>line 121"])
-    n_relax(["relax<br/>line 149"])
-    n_insist(["insist<br/>line 154"])
-    n_wanted["wanted<br/>line 158"]
-    n_change["change<br/>line 172"]
-    n_reset(["reset<br/>line 268"])
+    n_load["load<br/>line 51"]
+    n_sealed_also_requires["sealed_also_requires<br/>line 64"]
+    n_describe["describe<br/>line 76"]
+    n_status(["status<br/>line 84"])
+    n_history(["history<br/>line 124"])
+    n_relax(["relax<br/>line 152"])
+    n_insist(["insist<br/>line 157"])
+    n_wanted["wanted<br/>line 166"]
+    n_change["change<br/>line 181"]
+    n_reset(["reset<br/>line 277"])
     n_change --> n_describe
     n_change --> n_load
     n_change --> n_sealed_also_requires
@@ -116,16 +116,16 @@ flowchart TD
     n_status --> n_load
     n_status --> n_sealed_also_requires
     click n_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L41" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L49" "open the source"
-    click n_sealed_also_requires href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L62" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L73" "open the source"
-    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L81" "open the source"
-    click n_history href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L121" "open the source"
-    click n_relax href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L149" "open the source"
-    click n_insist href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L154" "open the source"
-    click n_wanted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L158" "open the source"
-    click n_change href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L172" "open the source"
-    click n_reset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L268" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L51" "open the source"
+    click n_sealed_also_requires href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L64" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L76" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L84" "open the source"
+    click n_history href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L124" "open the source"
+    click n_relax href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L152" "open the source"
+    click n_insist href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L157" "open the source"
+    click n_wanted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L166" "open the source"
+    click n_change href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L181" "open the source"
+    click n_reset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L277" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_history,n_relax,n_insist,n_reset entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -139,16 +139,16 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `path` <sub>fn</sub> | [41](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L41) | Where the mandate file lives. |
-| `load` <sub>fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L49) |  |
-| `sealed_also_requires` <sub>fn</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L62) | Whether the sealed policy independently fixes this requirement on. |
-| `describe` <sub>fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L73) |  |
-| `status` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L81) | What is required now, and how it got that way. |
-| `history` <sub>pub fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L121) | The log of every change, oldest first. |
-| `relax` <sub>pub fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L149) | Stop insisting on one or both requirements. |
-| `insist` <sub>pub fn</sub> | [154](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L154) | Insist on one or both requirements again. |
-| `wanted` <sub>fn</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L158) |  |
-| `change` <sub>fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L172) |  |
-| `reset` <sub>pub fn</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L268) | Back to insisting on both. |
+| `load` <sub>fn</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L51) | The sealed policy and where it was read from, so an error can name the file. |
+| `sealed_also_requires` <sub>fn</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L64) | Whether the sealed policy independently fixes this requirement on. |
+| `describe` <sub>fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L76) | One requirement in the words a person would use for it, not the field name. |
+| `status` <sub>pub fn</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L84) | What is required now, and how it got that way. |
+| `history` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L124) | The log of every change, oldest first. |
+| `relax` <sub>pub fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L152) | Stop insisting on one or both requirements. |
+| `insist` <sub>pub fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L157) | Insist on one or both requirements again. |
+| `wanted` <sub>fn</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L166) | The fields the flags name, refusing when they name none. |
+| `change` <sub>fn</sub> | [181](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L181) | Tighten or release the sealed policy, after saying what that means. |
+| `reset` <sub>pub fn</sub> | [277](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs#L277) | Back to insisting on both. |
 
 ---
 

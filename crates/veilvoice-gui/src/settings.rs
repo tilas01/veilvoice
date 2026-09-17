@@ -155,6 +155,7 @@ impl Settings {
         self.first_run
     }
 
+    /// Write the settings out, encrypted and obfuscated as they are at rest.
     fn persist(&mut self) {
         let Some(path) = &self.path else {
             self.save_error = Some(
@@ -816,6 +817,7 @@ impl Settings {
         picker.response.rect
     }
 
+    /// The appearance page: palette, and what each one changes.
     fn appearance_page(&mut self, ui: &mut Ui, ctx: &egui::Context) {
         section(
             ui,
@@ -853,6 +855,8 @@ impl Settings {
         }
     }
 
+    /// The motion page, including honouring the system's reduced-motion
+    /// setting.
     fn motion_page(&mut self, ui: &mut Ui, ctx: &egui::Context) {
         let motion = self.motion(ctx);
 
@@ -1089,6 +1093,7 @@ impl Settings {
         }
     }
 
+    /// The storage page: where files go, and the portable or installed choice.
     fn storage_page(&mut self, ui: &mut Ui) {
         section(
             ui,

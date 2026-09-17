@@ -101,15 +101,15 @@ flowchart TD
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>286 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
-    n_capture["capture.rs<br/>336 lines"]
+    n_capture["capture.rs<br/>339 lines"]
     n_conversation["conversation.rs<br/>1090 lines"]
     n_decoy["decoy.rs<br/>58 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
-    n_guard["guard.rs<br/>347 lines"]
+    n_guard["guard.rs<br/>359 lines"]
     n_gui["gui.rs<br/>247 lines"]
     n_input["input.rs<br/>120 lines"]
-    n_lock["lock.rs<br/>330 lines"]
-    n_mandate["mandate.rs<br/>330 lines"]
+    n_lock["lock.rs<br/>347 lines"]
+    n_mandate["mandate.rs<br/>339 lines"]
     n_meter["meter.rs<br/>259 lines"]
     n_policy["policy.rs<br/>243 lines"]
     n_priv_mode["priv_mode.rs<br/>46 lines"]
@@ -182,16 +182,16 @@ flowchart TD
 | [[`accel.rs`|File-veilvoice-cli-accel]] | 90 | veilvoice accel reports the graphics hardware here, and what it is good for. |
 | [[`appctl.rs`|File-veilvoice-cli-appctl]] | 286 | veilvoice appctl learns what normally runs, so it can notice what does not. |
 | [[`atrest.rs`|File-veilvoice-cli-atrest]] | 455 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
-| [[`capture.rs`|File-veilvoice-cli-capture]] | 336 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
+| [[`capture.rs`|File-veilvoice-cli-capture]] | 339 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [[`conversation.rs`|File-veilvoice-cli-conversation]] | 1090 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [[`decoy.rs`|File-veilvoice-cli-decoy]] | 58 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
 | [[`failsafe.rs`|File-veilvoice-cli-failsafe]] | 112 | veilvoice failsafe is the safety catch. |
-| [[`guard.rs`|File-veilvoice-cli-guard]] | 347 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [[`guard.rs`|File-veilvoice-cli-guard]] | 359 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [[`gui.rs`|File-veilvoice-cli-gui]] | 247 | veilvoice gui opens the desktop application from the command line. |
 | [[`input.rs`|File-veilvoice-cli-input]] | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
-| [[`lock.rs`|File-veilvoice-cli-lock]] | 330 | veilvoice lock manages the application lock from the command line. |
+| [[`lock.rs`|File-veilvoice-cli-lock]] | 347 | veilvoice lock manages the application lock from the command line. |
 | [[`main.rs`|File-veilvoice-cli-main]] | 3461 | veilvoice, the command-line interface. |
-| [[`mandate.rs`|File-veilvoice-cli-mandate]] | 330 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
+| [[`mandate.rs`|File-veilvoice-cli-mandate]] | 339 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
 | [[`meter.rs`|File-veilvoice-cli-meter]] | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [[`policy.rs`|File-veilvoice-cli-policy]] | 243 | veilvoice policy -- settings that can only be tightened. |
 | [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |

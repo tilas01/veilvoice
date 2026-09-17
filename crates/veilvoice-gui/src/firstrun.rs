@@ -69,6 +69,7 @@ pub enum Step {
 }
 
 impl Step {
+    /// The step after this one, or `None` at the end of the tour.
     fn next(self) -> Option<Self> {
         match self {
             Self::Appearance => Some(Self::AppLock),
@@ -196,6 +197,7 @@ impl FirstRun {
         }
     }
 
+    /// The appearance step: pick a palette and see it applied immediately.
     fn appearance(&mut self, ui: &mut Ui, prefs: &mut crate::settings::Settings) -> bool {
         card(ui, "How it should look", |ui| {
             ui.label(
@@ -211,6 +213,8 @@ impl FirstRun {
         buttons(ui, "continue", None).0
     }
 
+    /// The app-lock step: set a passphrase for VeilVoice itself, or decline
+    /// it.
     fn app_lock(&mut self, ui: &mut Ui, security: &mut crate::security::Security) -> bool {
         let mut advance = false;
         card(ui, "A password for VeilVoice itself", |ui| {
@@ -281,6 +285,8 @@ impl FirstRun {
         advance || next
     }
 
+    /// The recording step: the at-rest passphrase, and what it is separate
+    /// from.
     fn recording(&mut self, ui: &mut Ui, security: &mut crate::security::Security) -> bool {
         let mut advance = false;
         card(ui, "A password for your recordings", |ui| {
@@ -467,6 +473,7 @@ impl FirstRun {
         buttons(ui, "finish", None).0
     }
 
+    /// The auto-lock step: how long idle before the window locks itself.
     fn autolock(&mut self, ui: &mut Ui, prefs: &mut crate::settings::Settings) -> bool {
         card(ui, "Locking itself when you walk away", |ui| {
             ui.label(RichText::new(

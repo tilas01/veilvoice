@@ -53,6 +53,8 @@ enum Site {
 }
 
 impl Site {
+    /// Where the lock is kept: the path given on the command line, or the
+    /// platform default.
     fn resolve(explicit: Option<PathBuf>) -> Result<Self, String> {
         match explicit {
             Some(p) => Ok(Self::Explicit(p)),
@@ -89,6 +91,8 @@ impl Site {
         }
     }
 
+    /// Make a lock here for the first time, deriving the verifier from
+    /// `password`.
     fn create(&self, password: &[u8]) -> Result<(), String> {
         let params = kdf::KdfParams::default();
         match self {
@@ -141,6 +145,10 @@ pub fn run(action: Action, path: Option<PathBuf>) -> Result<(), String> {
     }
 }
 
+/// `veilvoice lock status`: whether a lock is set, and where it lives.
+///
+/// Says nothing about the passphrase, not even how long it is. What a reader
+/// learns here is what somebody holding the machine already knows.
 fn status(site: &Site) -> Result<(), String> {
     let (store, restored) = site.open()?;
     match store {
@@ -192,6 +200,12 @@ fn status(site: &Site) -> Result<(), String> {
     Ok(())
 }
 
+/// `veilvoice lock set`: make a lock, asking for the passphrase twice.
+///
+/// Refuses if one is already set rather than replacing it. Overwriting a lock
+/// is `change`, which asks for the old passphrase first, and the difference
+/// matters: a `set` that silently replaced would lock somebody out of their
+/// own vault.
 fn set(site: &Site) -> Result<(), String> {
     if site.open()?.0.is_some() {
         return Err("a lock is already set here, so use `veilvoice lock change`".into());
@@ -234,6 +248,7 @@ fn set(site: &Site) -> Result<(), String> {
     Ok(())
 }
 
+/// `veilvoice lock change`: replace the passphrase, after proving the old one.
 fn change(site: &Site) -> Result<(), String> {
     let mut store = open_or_explain(site)?;
     let current = prompt_secret("Current password: ")?;
@@ -246,6 +261,7 @@ fn change(site: &Site) -> Result<(), String> {
     Ok(())
 }
 
+/// `veilvoice lock remove`: take the lock off, after proving the passphrase.
 fn remove(site: &Site) -> Result<(), String> {
     let store = open_or_explain(site)?;
     let current = prompt_secret("Current password: ")?;
@@ -257,6 +273,7 @@ fn remove(site: &Site) -> Result<(), String> {
     Ok(())
 }
 
+/// The lock store, or a message saying what to do rather than a bare error.
 fn open_or_explain(site: &Site) -> Result<LockStore, String> {
     site.open()?
         .0

@@ -46,6 +46,8 @@ fn path() -> Result<PathBuf, String> {
     })
 }
 
+/// The sealed policy and where it was read from, so an error can name the
+/// file.
 fn load() -> Result<(PathBuf, Mandate), String> {
     let path = path()?;
     let mandate = Mandate::load(&path)?;
@@ -70,6 +72,7 @@ fn sealed_also_requires(f: MField) -> bool {
     matches!(Policy::load(&dir), Ok(Some(p)) if p.requires(&requirement))
 }
 
+/// One requirement in the words a person would use for it, not the field name.
 fn describe(f: MField) -> &'static str {
     match f {
         MField::AppLock => "a password for VeilVoice itself, asked for at launch",
@@ -155,6 +158,11 @@ pub fn insist(app_lock: bool, encryption: bool) -> Result<(), String> {
     change(app_lock, encryption, true, true)
 }
 
+/// The fields the flags name, refusing when they name none.
+///
+/// An empty selection is an error rather than a no-op, because `veilvoice
+/// mandate release` with no flag reads as "release everything" and must not
+/// quietly do nothing instead.
 fn wanted(app_lock: bool, encryption: bool) -> Result<Vec<MField>, String> {
     let mut fields = Vec::new();
     if app_lock {
@@ -169,6 +177,7 @@ fn wanted(app_lock: bool, encryption: bool) -> Result<Vec<MField>, String> {
     Ok(fields)
 }
 
+/// Tighten or release the sealed policy, after saying what that means.
 fn change(app_lock: bool, encryption: bool, to: bool, yes: bool) -> Result<(), String> {
     let fields = wanted(app_lock, encryption)?;
     println!(

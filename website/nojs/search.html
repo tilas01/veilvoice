@@ -59,7 +59,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice, 390 files and 18670 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice, 390 files and 18672 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -3653,7 +3653,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/capture.rs</code> <span class="meta">&middot; veilvoice-cli, 337 lines, 21 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/capture.rs</code> <span class="meta">&middot; veilvoice-cli, 340 lines, 21 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/capture.rs">open capture.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice capture` -- which screen recorders are running, and which of them you have said you meant to run. The command-line front end to [`veilvoice_watch::capture`]. That crate holds the table, the allowlist and the honest account of</span></li>
@@ -3663,20 +3663,20 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">see is not a check that passed, but neither is it a reason to fail a script. The difference is in the words, and the words are printed. # In plain words Tells you which screen recorders are running, and lets you say you meant to start one</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">so it stops being mentioned. It cannot tell whether a program is actually recording, only that it is open, and it says so. A meeting application being open is not somebody watching your screen.</span></li>
 <li><span class="sec">fn capture_dir</span> <span class="meta">line 48</span><br><span class="x">Where the allowlist is kept. Derived from the app lock&#x27;s location rather than resolved again, so there is one answer to &quot;where does VeilVoice keep things&quot;.</span></li>
-<li><span class="sec">fn allow_path</span> <span class="meta">line 52</span><br><span class="x"></span></li>
-<li><span class="sec">fn load</span> <span class="meta">line 62</span><br><span class="x"></span></li>
-<li><span class="sec">fn save</span> <span class="meta">line 67</span><br><span class="x"></span></li>
-<li><span class="sec">fn status</span> <span class="meta">line 75</span><br><span class="x">What is running, what is allowed, and what this cannot see.</span></li>
-<li><span class="sec">fn calls</span> <span class="meta">line 127</span><br><span class="x">Every program in the table, whether it is running or not. Where to point a calling program so your voice goes through VeilVoice. Prints the route, which program to change and where, and -- as plainly as the rest -- the two things it does</span></li>
-<li><span class="sec">fn calls</span> <span class="meta">line 127</span><br><span class="x">not do.</span></li>
-<li><span class="sec">fn list</span> <span class="meta">line 210</span><br><span class="x">`veilvoice capture list`: the screen recorders this build knows how to name. Prints the limit with the list, because a program not on it is not reported and a reader who does not know that would take an empty result for an all-clear.</span></li>
-<li><span class="sec">fn allow</span> <span class="meta">line 243</span><br><span class="x">Stop notifying about one program.</span></li>
-<li><span class="sec">fn deny</span> <span class="meta">line 260</span><br><span class="x">Start notifying about one program again.</span></li>
-<li><span class="sec">fn check</span> <span class="meta">line 276</span><br><span class="x">Look now, and let the exit code answer. Returns `true` when something not allowed is running.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 300</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_capture_directory_sits_beside_the_app_lock</span> <span class="meta">line 304</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_state_directory_is_distinct</span> <span class="meta">line 316</span><br><span class="x">Every state directory this program keeps must be its own, or two features share a folder and each other&#x27;s filenames.</span></li>
-<li><span class="sec">fn the_program_list_prints_every_entry</span> <span class="meta">line 333</span><br><span class="x">Both listings must render without touching the allowlist on disk.</span></li>
+<li><span class="sec">fn allow_path</span> <span class="meta">line 53</span><br><span class="x">Where the screen-recorder allowlist is kept for this user.</span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 64</span><br><span class="x">The allowlist, or an empty one when none has been written yet.</span></li>
+<li><span class="sec">fn save</span> <span class="meta">line 70</span><br><span class="x">Write the allowlist back, readable by its owner and nobody else.</span></li>
+<li><span class="sec">fn status</span> <span class="meta">line 78</span><br><span class="x">What is running, what is allowed, and what this cannot see.</span></li>
+<li><span class="sec">fn calls</span> <span class="meta">line 130</span><br><span class="x">Every program in the table, whether it is running or not. Where to point a calling program so your voice goes through VeilVoice. Prints the route, which program to change and where, and -- as plainly as the rest -- the two things it does</span></li>
+<li><span class="sec">fn calls</span> <span class="meta">line 130</span><br><span class="x">not do.</span></li>
+<li><span class="sec">fn list</span> <span class="meta">line 213</span><br><span class="x">`veilvoice capture list`: the screen recorders this build knows how to name. Prints the limit with the list, because a program not on it is not reported and a reader who does not know that would take an empty result for an all-clear.</span></li>
+<li><span class="sec">fn allow</span> <span class="meta">line 246</span><br><span class="x">Stop notifying about one program.</span></li>
+<li><span class="sec">fn deny</span> <span class="meta">line 263</span><br><span class="x">Start notifying about one program again.</span></li>
+<li><span class="sec">fn check</span> <span class="meta">line 279</span><br><span class="x">Look now, and let the exit code answer. Returns `true` when something not allowed is running.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 303</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_capture_directory_sits_beside_the_app_lock</span> <span class="meta">line 307</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_state_directory_is_distinct</span> <span class="meta">line 319</span><br><span class="x">Every state directory this program keeps must be its own, or two features share a folder and each other&#x27;s filenames.</span></li>
+<li><span class="sec">fn the_program_list_prints_every_entry</span> <span class="meta">line 336</span><br><span class="x">Both listings must render without touching the allowlist on disk.</span></li>
 </ul>
 </details>
 <details open>
@@ -3759,7 +3759,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/guard.rs</code> <span class="meta">&middot; veilvoice-cli, 348 lines, 24 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/guard.rs</code> <span class="meta">&middot; veilvoice-cli, 360 lines, 25 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs">open guard.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice guard` -- record what VeilVoice&#x27;s files should be, and check them. Detection, not prevention. See [`veilvoice_guard::SCOPE`], which every path through this module prints, for the same reason the app lock prints its own: a</span></li>
@@ -3774,18 +3774,19 @@ nav.top a{margin-right:14px}
 <li><span class="sec">enum Action</span> <span class="meta">line 54</span><br><span class="x"></span></li>
 <li><span class="sec">fn manifest_path</span> <span class="meta">line 75</span><br><span class="x">Where the manifest lives, beside the app lock.</span></li>
 <li><span class="sec">fn sealed_path</span> <span class="meta">line 88</span><br><span class="x">A sealed manifest sits beside the plain one, with a different suffix.</span></li>
-<li><span class="sec">fn print_scope</span> <span class="meta">line 92</span><br><span class="x"></span></li>
-<li><span class="sec">fn default_targets</span> <span class="meta">line 101</span><br><span class="x">The files worth watching when the user names none: the running binary, and the app lock beside it.</span></li>
-<li><span class="sec">fn run</span> <span class="meta">line 115</span><br><span class="x">Dispatch `veilvoice guard` to the subcommand that was asked for.</span></li>
-<li><span class="sec">fn init</span> <span class="meta">line 127</span><br><span class="x"></span></li>
-<li><span class="sec">fn load</span> <span class="meta">line 190</span><br><span class="x">Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there.</span></li>
-<li><span class="sec">fn check</span> <span class="meta">line 203</span><br><span class="x"></span></li>
-<li><span class="sec">fn status</span> <span class="meta">line 272</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 304</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_sealed_record_sits_beside_the_plain_one</span> <span class="meta">line 308</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_explicit_path_wins_over_the_platform_default</span> <span class="meta">line 317</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_record_notices_a_changed_file</span> <span class="meta">line 326</span><br><span class="x">The end-to-end flow, through the same manifest the subcommands drive. The passphrase prompts need a terminal, so the sealed path is covered by the crate&#x27;s own tests instead.</span></li>
-<li><span class="sec">fn checking_without_a_record_explains_rather_than_panicking</span> <span class="meta">line 342</span><br><span class="x"></span></li>
+<li><span class="sec">fn print_scope</span> <span class="meta">line 94</span><br><span class="x">Say what the integrity record detects and what it cannot, before it is used.</span></li>
+<li><span class="sec">fn default_targets</span> <span class="meta">line 103</span><br><span class="x">The files worth watching when the user names none: the running binary, and the app lock beside it.</span></li>
+<li><span class="sec">fn run</span> <span class="meta">line 117</span><br><span class="x">Dispatch `veilvoice guard` to the subcommand that was asked for.</span></li>
+<li><span class="sec">fn init</span> <span class="meta">line 134</span><br><span class="x">`veilvoice guard init`: record what these files are now. Everything afterwards compares against this moment, so a record taken on a machine that was already interfered with records the interference as normal. That is printed rather than</span></li>
+<li><span class="sec">fn init</span> <span class="meta">line 134</span><br><span class="x">left to be discovered.</span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 197</span><br><span class="x">Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there.</span></li>
+<li><span class="sec">fn check</span> <span class="meta">line 214</span><br><span class="x">`veilvoice guard check`: compare the files against the record and report. Where the platform allows it, a changed file comes with a best-effort guess at what changed it, and the guess is labelled as one.</span></li>
+<li><span class="sec">fn status</span> <span class="meta">line 284</span><br><span class="x">`veilvoice guard status`: what the record covers, and when it was taken.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 316</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_sealed_record_sits_beside_the_plain_one</span> <span class="meta">line 320</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_explicit_path_wins_over_the_platform_default</span> <span class="meta">line 329</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_record_notices_a_changed_file</span> <span class="meta">line 338</span><br><span class="x">The end-to-end flow, through the same manifest the subcommands drive. The passphrase prompts need a terminal, so the sealed path is covered by the crate&#x27;s own tests instead.</span></li>
+<li><span class="sec">fn checking_without_a_record_explains_rather_than_panicking</span> <span class="meta">line 354</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -3827,7 +3828,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/lock.rs</code> <span class="meta">&middot; veilvoice-cli, 331 lines, 27 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/lock.rs</code> <span class="meta">&middot; veilvoice-cli, 348 lines, 28 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/lock.rs">open lock.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice lock` manages the application lock from the command line. The lock guards the desktop app: with one set, VeilVoice asks for a password before it will show anything or start a live scramble. Managing it from here exists because a</span></li>
@@ -3839,24 +3840,25 @@ nav.top a{margin-right:14px}
 <li><span class="sec">enum Site</span> <span class="meta">line 50</span><br><span class="x">plain file at the path given, which is what a script or a test wants and what this command has always done. The two are kept apart rather than blended, because a command that silently wrote somewhere other than the path it was handed would</span></li>
 <li><span class="sec">enum Site</span> <span class="meta">line 50</span><br><span class="x">be worse than either.</span></li>
 <li><span class="sec">impl Site</span> <span class="meta">line 55</span><br><span class="x"></span></li>
-<li><span class="sec">fn resolve</span> <span class="meta">line 56</span><br><span class="x"></span></li>
-<li><span class="sec">fn describe</span> <span class="meta">line 72</span><br><span class="x">What to print as the location. The vault&#x27;s own file names are derived and would mean nothing to a reader, so the directory is what is shown.</span></li>
-<li><span class="sec">fn open</span> <span class="meta">line 83</span><br><span class="x">Open the lock, and say whether a missing copy had to be rebuilt.</span></li>
-<li><span class="sec">fn create</span> <span class="meta">line 92</span><br><span class="x"></span></li>
-<li><span class="sec">fn print_scope</span> <span class="meta">line 103</span><br><span class="x">Print the honest scope note, wrapped for a terminal.</span></li>
-<li><span class="sec">fn wrap</span> <span class="meta">line 112</span><br><span class="x">Greedy word wrap. The scope note is single-sourced from the crypto crate, so it arrives as one long string and has to be broken here rather than there.</span></li>
-<li><span class="sec">fn run</span> <span class="meta">line 131</span><br><span class="x">Dispatch `veilvoice lock` to the subcommand that was asked for.</span></li>
-<li><span class="sec">fn status</span> <span class="meta">line 144</span><br><span class="x"></span></li>
-<li><span class="sec">fn set</span> <span class="meta">line 195</span><br><span class="x"></span></li>
-<li><span class="sec">fn change</span> <span class="meta">line 237</span><br><span class="x"></span></li>
-<li><span class="sec">fn remove</span> <span class="meta">line 249</span><br><span class="x"></span></li>
-<li><span class="sec">fn open_or_explain</span> <span class="meta">line 260</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 267</span><br><span class="x"></span></li>
-<li><span class="sec">fn wrapping_keeps_every_word_and_respects_the_width</span> <span class="meta">line 271</span><br><span class="x"></span></li>
-<li><span class="sec">fn wrapping_handles_an_empty_string</span> <span class="meta">line 281</span><br><span class="x"></span></li>
-<li><span class="sec">fn an_explicit_path_wins_over_the_platform_default</span> <span class="meta">line 286</span><br><span class="x"></span></li>
-<li><span class="sec">fn no_path_means_the_vault_rather_than_one_named_file</span> <span class="meta">line 297</span><br><span class="x">Without `--path` the command must go to the vault, not to the single file the vault replaced. Getting this wrong would leave the CLI and the window looking at two different locks.</span></li>
-<li><span class="sec">fn a_lock_can_be_set_proven_and_removed</span> <span class="meta">line 309</span><br><span class="x">The lock lifecycle through the same store the subcommands drive. The prompts themselves need a terminal, so this exercises the layer beneath.</span></li>
+<li><span class="sec">fn resolve</span> <span class="meta">line 58</span><br><span class="x">Where the lock is kept: the path given on the command line, or the platform default.</span></li>
+<li><span class="sec">fn describe</span> <span class="meta">line 74</span><br><span class="x">What to print as the location. The vault&#x27;s own file names are derived and would mean nothing to a reader, so the directory is what is shown.</span></li>
+<li><span class="sec">fn open</span> <span class="meta">line 85</span><br><span class="x">Open the lock, and say whether a missing copy had to be rebuilt.</span></li>
+<li><span class="sec">fn create</span> <span class="meta">line 96</span><br><span class="x">Make a lock here for the first time, deriving the verifier from `password`.</span></li>
+<li><span class="sec">fn print_scope</span> <span class="meta">line 107</span><br><span class="x">Print the honest scope note, wrapped for a terminal.</span></li>
+<li><span class="sec">fn wrap</span> <span class="meta">line 116</span><br><span class="x">Greedy word wrap. The scope note is single-sourced from the crypto crate, so it arrives as one long string and has to be broken here rather than there.</span></li>
+<li><span class="sec">fn run</span> <span class="meta">line 135</span><br><span class="x">Dispatch `veilvoice lock` to the subcommand that was asked for.</span></li>
+<li><span class="sec">fn status</span> <span class="meta">line 152</span><br><span class="x">`veilvoice lock status`: whether a lock is set, and where it lives. Says nothing about the passphrase, not even how long it is. What a reader learns here is what somebody holding the machine already knows.</span></li>
+<li><span class="sec">fn set</span> <span class="meta">line 209</span><br><span class="x">`veilvoice lock set`: make a lock, asking for the passphrase twice. Refuses if one is already set rather than replacing it. Overwriting a lock is `change`, which asks for the old passphrase first, and the difference matters: a `set` that</span></li>
+<li><span class="sec">fn set</span> <span class="meta">line 209</span><br><span class="x">silently replaced would lock somebody out of their own vault.</span></li>
+<li><span class="sec">fn change</span> <span class="meta">line 252</span><br><span class="x">`veilvoice lock change`: replace the passphrase, after proving the old one.</span></li>
+<li><span class="sec">fn remove</span> <span class="meta">line 265</span><br><span class="x">`veilvoice lock remove`: take the lock off, after proving the passphrase.</span></li>
+<li><span class="sec">fn open_or_explain</span> <span class="meta">line 277</span><br><span class="x">The lock store, or a message saying what to do rather than a bare error.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 284</span><br><span class="x"></span></li>
+<li><span class="sec">fn wrapping_keeps_every_word_and_respects_the_width</span> <span class="meta">line 288</span><br><span class="x"></span></li>
+<li><span class="sec">fn wrapping_handles_an_empty_string</span> <span class="meta">line 298</span><br><span class="x"></span></li>
+<li><span class="sec">fn an_explicit_path_wins_over_the_platform_default</span> <span class="meta">line 303</span><br><span class="x"></span></li>
+<li><span class="sec">fn no_path_means_the_vault_rather_than_one_named_file</span> <span class="meta">line 314</span><br><span class="x">Without `--path` the command must go to the vault, not to the single file the vault replaced. Getting this wrong would leave the CLI and the window looking at two different locks.</span></li>
+<li><span class="sec">fn a_lock_can_be_set_proven_and_removed</span> <span class="meta">line 326</span><br><span class="x">The lock lifecycle through the same store the subcommands drive. The prompts themselves need a terminal, so this exercises the layer beneath.</span></li>
 </ul>
 </details>
 <details open>
@@ -3973,7 +3975,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-cli/src/mandate.rs</code> <span class="meta">&middot; veilvoice-cli, 331 lines, 24 sections</span></summary>
+<summary><code>crates/veilvoice-cli/src/mandate.rs</code> <span class="meta">&middot; veilvoice-cli, 340 lines, 24 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/mandate.rs">open mandate.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">`veilvoice mandate` -- the two things VeilVoice insists on, and how to stop. The command-line front end to [`veilvoice_policy::Mandate`]. That module holds the data and the history; this file decides what is printed, and makes relaxing a</span></li>
@@ -3984,22 +3986,22 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">may have real reasons to make, so it is offered, but it is not offered casually, and it is written down with the date. # In plain words VeilVoice asks for a password for itself and encrypts your recordings unless you tell it not to. This</span></li>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">is where you tell it not to, and where you can see when you did.</span></li>
 <li><span class="sec">fn path</span> <span class="meta">line 41</span><br><span class="x">Where the mandate file lives.</span></li>
-<li><span class="sec">fn load</span> <span class="meta">line 49</span><br><span class="x"></span></li>
-<li><span class="sec">fn sealed_also_requires</span> <span class="meta">line 62</span><br><span class="x">Whether the sealed policy independently fixes this requirement on. Read so that `status` can tell the difference between &quot;you are insisting on this&quot; and &quot;you stopped insisting, and it is required anyway&quot;. Reporting the second as though it</span></li>
-<li><span class="sec">fn sealed_also_requires</span> <span class="meta">line 62</span><br><span class="x">were &quot;not required&quot; would be the more dangerous error in the opposite direction: a user relaxing a requirement and being told it is off when it is not.</span></li>
-<li><span class="sec">fn describe</span> <span class="meta">line 73</span><br><span class="x"></span></li>
-<li><span class="sec">fn status</span> <span class="meta">line 81</span><br><span class="x">What is required now, and how it got that way.</span></li>
-<li><span class="sec">fn history</span> <span class="meta">line 121</span><br><span class="x">The log of every change, oldest first.</span></li>
-<li><span class="sec">fn relax</span> <span class="meta">line 149</span><br><span class="x">Stop insisting on one or both requirements.</span></li>
-<li><span class="sec">fn insist</span> <span class="meta">line 154</span><br><span class="x">Insist on one or both requirements again.</span></li>
-<li><span class="sec">fn wanted</span> <span class="meta">line 158</span><br><span class="x"></span></li>
-<li><span class="sec">fn change</span> <span class="meta">line 172</span><br><span class="x"></span></li>
-<li><span class="sec">fn reset</span> <span class="meta">line 268</span><br><span class="x">Back to insisting on both.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 285</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_mandate_sits_beside_the_app_lock</span> <span class="meta">line 289</span><br><span class="x"></span></li>
-<li><span class="sec">fn naming_no_field_is_refused_rather_than_treated_as_all_of_them</span> <span class="meta">line 300</span><br><span class="x"></span></li>
-<li><span class="sec">fn naming_one_field_selects_only_that_one</span> <span class="meta">line 310</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_field_has_a_sentence_saying_what_it_costs</span> <span class="meta">line 320</span><br><span class="x"></span></li>
+<li><span class="sec">fn load</span> <span class="meta">line 51</span><br><span class="x">The sealed policy and where it was read from, so an error can name the file.</span></li>
+<li><span class="sec">fn sealed_also_requires</span> <span class="meta">line 64</span><br><span class="x">Whether the sealed policy independently fixes this requirement on. Read so that `status` can tell the difference between &quot;you are insisting on this&quot; and &quot;you stopped insisting, and it is required anyway&quot;. Reporting the second as though it</span></li>
+<li><span class="sec">fn sealed_also_requires</span> <span class="meta">line 64</span><br><span class="x">were &quot;not required&quot; would be the more dangerous error in the opposite direction: a user relaxing a requirement and being told it is off when it is not.</span></li>
+<li><span class="sec">fn describe</span> <span class="meta">line 76</span><br><span class="x">One requirement in the words a person would use for it, not the field name.</span></li>
+<li><span class="sec">fn status</span> <span class="meta">line 84</span><br><span class="x">What is required now, and how it got that way.</span></li>
+<li><span class="sec">fn history</span> <span class="meta">line 124</span><br><span class="x">The log of every change, oldest first.</span></li>
+<li><span class="sec">fn relax</span> <span class="meta">line 152</span><br><span class="x">Stop insisting on one or both requirements.</span></li>
+<li><span class="sec">fn insist</span> <span class="meta">line 157</span><br><span class="x">Insist on one or both requirements again.</span></li>
+<li><span class="sec">fn wanted</span> <span class="meta">line 166</span><br><span class="x">The fields the flags name, refusing when they name none. An empty selection is an error rather than a no-op, because `veilvoice mandate release` with no flag reads as &quot;release everything&quot; and must not quietly do nothing instead.</span></li>
+<li><span class="sec">fn change</span> <span class="meta">line 181</span><br><span class="x">Tighten or release the sealed policy, after saying what that means.</span></li>
+<li><span class="sec">fn reset</span> <span class="meta">line 277</span><br><span class="x">Back to insisting on both.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 294</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_mandate_sits_beside_the_app_lock</span> <span class="meta">line 298</span><br><span class="x"></span></li>
+<li><span class="sec">fn naming_no_field_is_refused_rather_than_treated_as_all_of_them</span> <span class="meta">line 309</span><br><span class="x"></span></li>
+<li><span class="sec">fn naming_one_field_selects_only_that_one</span> <span class="meta">line 319</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_field_has_a_sentence_saying_what_it_costs</span> <span class="meta">line 329</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -7206,7 +7208,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/firstrun.rs</code> <span class="meta">&middot; veilvoice-gui, 687 lines, 41 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/firstrun.rs</code> <span class="meta">&middot; veilvoice-gui, 694 lines, 41 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs">open firstrun.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The first run: the four things worth deciding before anything else. # What this replaced Two checkboxes about animation. Everything that actually matters -- the app lock, the passphrase recordings are encrypted with, whether the window</span></li>
@@ -7219,37 +7221,37 @@ nav.top a{margin-right:14px}
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">In plain words The first time you open VeilVoice it offers you a password for the app, a password for your recordings, and a timer that locks the window when you walk away. You can skip any of them and set them later.</span></li>
 <li><span class="sec">enum Step</span> <span class="meta">line 49</span><br><span class="x">Which card is showing.</span></li>
 <li><span class="sec">impl Step</span> <span class="meta">line 71</span><br><span class="x"></span></li>
-<li><span class="sec">fn next</span> <span class="meta">line 72</span><br><span class="x"></span></li>
-<li><span class="sec">fn position</span> <span class="meta">line 83</span><br><span class="x">One-based position, for &quot;step 2 of 4&quot;.</span></li>
-<li><span class="sec">const COUNT</span> <span class="meta">line 93</span><br><span class="x"></span></li>
-<li><span class="sec">struct FirstRun</span> <span class="meta">line 98</span><br><span class="x">What the setup is holding while it runs.</span></li>
-<li><span class="sec">enum Outcome</span> <span class="meta">line 115</span><br><span class="x">What the panel wants the application to do after drawing.</span></li>
-<li><span class="sec">impl FirstRun</span> <span class="meta">line 123</span><br><span class="x"></span></li>
-<li><span class="sec">fn panel</span> <span class="meta">line 129</span><br><span class="x">Draw the current card. Takes the settings and the security state because it changes both, and returns whether it is done rather than deciding that itself: the caller owns what happens next, which is the tour.</span></li>
-<li><span class="sec">fn should_skip</span> <span class="meta">line 191</span><br><span class="x">Whether a card has nothing left to ask. The app lock and the recording passphrase can both be set already -- from the command line, from a previous run, or from a copied configuration. Asking somebody to set a thing they have set is how a</span></li>
-<li><span class="sec">fn should_skip</span> <span class="meta">line 191</span><br><span class="x">setup flow teaches people to click through it without reading.</span></li>
-<li><span class="sec">fn appearance</span> <span class="meta">line 199</span><br><span class="x"></span></li>
-<li><span class="sec">fn app_lock</span> <span class="meta">line 214</span><br><span class="x"></span></li>
-<li><span class="sec">fn recording</span> <span class="meta">line 284</span><br><span class="x"></span></li>
-<li><span class="sec">fn machine</span> <span class="meta">line 367</span><br><span class="x">What this machine says about itself, and the one choice that follows. **Roadmap item 135.** Every number here is read from the machine at the moment the card is drawn. None of it is a default written into this program: a setup screen that</span></li>
-<li><span class="sec">fn machine</span> <span class="meta">line 367</span><br><span class="x">asserts how much room there is, or that the graphics will be fine, is guessing on somebody else&#x27;s hardware and sounding certain about it. Where the machine will not say, the card says that instead. &quot;This system would not tell us&quot; is a real</span></li>
-<li><span class="sec">fn machine</span> <span class="meta">line 367</span><br><span class="x">answer and is a different one from a number.</span></li>
-<li><span class="sec">fn autolock</span> <span class="meta">line 470</span><br><span class="x"></span></li>
-<li><span class="sec">fn card</span> <span class="meta">line 494</span><br><span class="x">A bordered card, so each step reads as one thing rather than a page of text.</span></li>
-<li><span class="sec">fn device_counts</span> <span class="meta">line 527</span><br><span class="x">How many recording and playback devices this machine has. Counted rather than listed on the setup card: the names are long, the list belongs in Settings where it can be chosen from, and the question at first run is &quot;is there one at all&quot;,</span></li>
-<li><span class="sec">fn device_counts</span> <span class="meta">line 527</span><br><span class="x">which a number answers. A platform that will not enumerate reports zero of each, which the card reads the same way as a machine with no sound card. That is the right reading here: from the person&#x27;s side, &quot;we cannot see a microphone&quot; and</span></li>
-<li><span class="sec">fn device_counts</span> <span class="meta">line 527</span><br><span class="x">&quot;there is no microphone&quot; have the same consequence. # Not called by any test, and that is deliberate This asks the platform for its real devices, and a test that did so was **F-165**: the desktop crate&#x27;s test binary already enumerates</span></li>
-<li><span class="sec">fn device_counts</span> <span class="meta">line 527</span><br><span class="x">once, on purpose, in `app`, and a second enumerator running beside it killed the process on Windows. One enumeration, in one place, is what this crate does. What can be checked without a device is that the card calls this rather than</span></li>
-<li><span class="sec">fn device_counts</span> <span class="meta">line 527</span><br><span class="x">carrying a number, and a test reads the card&#x27;s source for exactly that.</span></li>
-<li><span class="sec">fn field</span> <span class="meta">line 540</span><br><span class="x">A password field with its label, laid out like the rest of the application.</span></li>
-<li><span class="sec">fn buttons</span> <span class="meta">line 552</span><br><span class="x">The row that moves on. Returns whether it was pressed.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 562</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_steps_run_in_order_and_then_stop</span> <span class="meta">line 566</span><br><span class="x"></span></li>
-<li><span class="sec">fn every_step_knows_where_it_is</span> <span class="meta">line 587</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_question_already_answered_is_not_asked_again</span> <span class="meta">line 604</span><br><span class="x"></span></li>
-<li><span class="sec">fn appearance_and_autolock_are_always_shown</span> <span class="meta">line 619</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_machine_card_measures_rather_than_asserts</span> <span class="meta">line 632</span><br><span class="x">**Roadmap item 135&#x27;s whole point.** The card has to read the machine rather than carry numbers written here. A constant would be a claim about somebody else&#x27;s hardware, stated with the confidence of a measurement.</span></li>
-<li><span class="sec">fn nothing_here_is_a_gate</span> <span class="meta">line 660</span><br><span class="x"></span></li>
+<li><span class="sec">fn next</span> <span class="meta">line 73</span><br><span class="x">The step after this one, or `None` at the end of the tour.</span></li>
+<li><span class="sec">fn position</span> <span class="meta">line 84</span><br><span class="x">One-based position, for &quot;step 2 of 4&quot;.</span></li>
+<li><span class="sec">const COUNT</span> <span class="meta">line 94</span><br><span class="x"></span></li>
+<li><span class="sec">struct FirstRun</span> <span class="meta">line 99</span><br><span class="x">What the setup is holding while it runs.</span></li>
+<li><span class="sec">enum Outcome</span> <span class="meta">line 116</span><br><span class="x">What the panel wants the application to do after drawing.</span></li>
+<li><span class="sec">impl FirstRun</span> <span class="meta">line 124</span><br><span class="x"></span></li>
+<li><span class="sec">fn panel</span> <span class="meta">line 130</span><br><span class="x">Draw the current card. Takes the settings and the security state because it changes both, and returns whether it is done rather than deciding that itself: the caller owns what happens next, which is the tour.</span></li>
+<li><span class="sec">fn should_skip</span> <span class="meta">line 192</span><br><span class="x">Whether a card has nothing left to ask. The app lock and the recording passphrase can both be set already -- from the command line, from a previous run, or from a copied configuration. Asking somebody to set a thing they have set is how a</span></li>
+<li><span class="sec">fn should_skip</span> <span class="meta">line 192</span><br><span class="x">setup flow teaches people to click through it without reading.</span></li>
+<li><span class="sec">fn appearance</span> <span class="meta">line 201</span><br><span class="x">The appearance step: pick a palette and see it applied immediately.</span></li>
+<li><span class="sec">fn app_lock</span> <span class="meta">line 218</span><br><span class="x">The app-lock step: set a passphrase for VeilVoice itself, or decline it.</span></li>
+<li><span class="sec">fn recording</span> <span class="meta">line 290</span><br><span class="x">The recording step: the at-rest passphrase, and what it is separate from.</span></li>
+<li><span class="sec">fn machine</span> <span class="meta">line 373</span><br><span class="x">What this machine says about itself, and the one choice that follows. **Roadmap item 135.** Every number here is read from the machine at the moment the card is drawn. None of it is a default written into this program: a setup screen that</span></li>
+<li><span class="sec">fn machine</span> <span class="meta">line 373</span><br><span class="x">asserts how much room there is, or that the graphics will be fine, is guessing on somebody else&#x27;s hardware and sounding certain about it. Where the machine will not say, the card says that instead. &quot;This system would not tell us&quot; is a real</span></li>
+<li><span class="sec">fn machine</span> <span class="meta">line 373</span><br><span class="x">answer and is a different one from a number.</span></li>
+<li><span class="sec">fn autolock</span> <span class="meta">line 477</span><br><span class="x">The auto-lock step: how long idle before the window locks itself.</span></li>
+<li><span class="sec">fn card</span> <span class="meta">line 501</span><br><span class="x">A bordered card, so each step reads as one thing rather than a page of text.</span></li>
+<li><span class="sec">fn device_counts</span> <span class="meta">line 534</span><br><span class="x">How many recording and playback devices this machine has. Counted rather than listed on the setup card: the names are long, the list belongs in Settings where it can be chosen from, and the question at first run is &quot;is there one at all&quot;,</span></li>
+<li><span class="sec">fn device_counts</span> <span class="meta">line 534</span><br><span class="x">which a number answers. A platform that will not enumerate reports zero of each, which the card reads the same way as a machine with no sound card. That is the right reading here: from the person&#x27;s side, &quot;we cannot see a microphone&quot; and</span></li>
+<li><span class="sec">fn device_counts</span> <span class="meta">line 534</span><br><span class="x">&quot;there is no microphone&quot; have the same consequence. # Not called by any test, and that is deliberate This asks the platform for its real devices, and a test that did so was **F-165**: the desktop crate&#x27;s test binary already enumerates</span></li>
+<li><span class="sec">fn device_counts</span> <span class="meta">line 534</span><br><span class="x">once, on purpose, in `app`, and a second enumerator running beside it killed the process on Windows. One enumeration, in one place, is what this crate does. What can be checked without a device is that the card calls this rather than</span></li>
+<li><span class="sec">fn device_counts</span> <span class="meta">line 534</span><br><span class="x">carrying a number, and a test reads the card&#x27;s source for exactly that.</span></li>
+<li><span class="sec">fn field</span> <span class="meta">line 547</span><br><span class="x">A password field with its label, laid out like the rest of the application.</span></li>
+<li><span class="sec">fn buttons</span> <span class="meta">line 559</span><br><span class="x">The row that moves on. Returns whether it was pressed.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 569</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_steps_run_in_order_and_then_stop</span> <span class="meta">line 573</span><br><span class="x"></span></li>
+<li><span class="sec">fn every_step_knows_where_it_is</span> <span class="meta">line 594</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_question_already_answered_is_not_asked_again</span> <span class="meta">line 611</span><br><span class="x"></span></li>
+<li><span class="sec">fn appearance_and_autolock_are_always_shown</span> <span class="meta">line 626</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_machine_card_measures_rather_than_asserts</span> <span class="meta">line 639</span><br><span class="x">**Roadmap item 135&#x27;s whole point.** The card has to read the machine rather than carry numbers written here. A constant would be a claim about somebody else&#x27;s hardware, stated with the confidence of a measurement.</span></li>
+<li><span class="sec">fn nothing_here_is_a_gate</span> <span class="meta">line 667</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
@@ -7955,7 +7957,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/security.rs</code> <span class="meta">&middot; veilvoice-gui, 2270 lines, 131 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/security.rs</code> <span class="meta">&middot; veilvoice-gui, 2286 lines, 131 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs">open security.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The application lock, and the at-rest encryption of what VeilVoice writes. # Two passwords, and why There are two, deliberately: - the **app lock**, which decides whether VeilVoice will open at all, and - the **recording passphrase**,</span></li>
@@ -7998,101 +8000,101 @@ nav.top a{margin-right:14px}
 <li><span class="sec">fn lock_now</span> <span class="meta">line 405</span><br><span class="x">Lock the app now, wiping the session passphrase with it. This is the deliberate one: somebody pressed Lock. The screen says nothing about how it got there, because the person reading it already knows.</span></li>
 <li><span class="sec">fn lock_after_idle</span> <span class="meta">line 415</span><br><span class="x">Lock because nobody has touched the window for a while. Identical to [`Self::lock_now`] except that the lock screen says so. Coming back to a locked window you did not lock is the moment to wonder whether somebody else has been at the</span></li>
 <li><span class="sec">fn lock_after_idle</span> <span class="meta">line 415</span><br><span class="x">machine, and answering that costs nothing and saves a bad minute.</span></li>
-<li><span class="sec">fn lock_inner</span> <span class="meta">line 419</span><br><span class="x"></span></li>
-<li><span class="sec">fn wipe_secrets</span> <span class="meta">line 428</span><br><span class="x">Wipe every plaintext secret this struct is holding.</span></li>
-<li><span class="sec">fn ready_to_write</span> <span class="meta">line 459</span><br><span class="x">Whether a job may start: either encryption is off, or there is something to encrypt with.</span></li>
-<li><span class="sec">fn blocked_reason</span> <span class="meta">line 471</span><br><span class="x">Why a job cannot start yet, for the button&#x27;s tooltip.</span></li>
-<li><span class="sec">fn plan</span> <span class="meta">line 489</span><br><span class="x">How the next job should protect its output. Returns the material by value so the worker thread owns it; the copy held here stays for the next file.</span></li>
-<li><span class="sec">fn spawn</span> <span class="meta">line 516</span><br><span class="x"></span></li>
-<li><span class="sec">fn poll</span> <span class="meta">line 531</span><br><span class="x">Collect a finished lock operation. Returns true if anything changed.</span></li>
-<li><span class="sec">fn wipe_form</span> <span class="meta">line 621</span><br><span class="x"></span></li>
-<li><span class="sec">fn busy</span> <span class="meta">line 627</span><br><span class="x"></span></li>
-<li><span class="sec">fn is_busy</span> <span class="meta">line 633</span><br><span class="x">Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.</span></li>
-<li><span class="sec">fn unlock_screen</span> <span class="meta">line 638</span><br><span class="x">The full-window unlock screen. Nothing else is drawn while this is up.</span></li>
-<li><span class="sec">fn interference_banner</span> <span class="meta">line 791</span><br><span class="x">The standing report that the lock file was interfered with. **Roadmap item 76.** It is drawn here rather than on the lock screen, and the distinction matters. The lock screen is read by whoever is holding the machine, and telling them</span></li>
-<li><span class="sec">fn interference_banner</span> <span class="meta">line 791</span><br><span class="x">their edit was noticed tells them to try something else. This side of the lock is read only by somebody who has already produced the passphrase. It will not go away on its own. Clearing it runs [`veilvoice_crypto::LockStore::acknowledge`],</span></li>
-<li><span class="sec">fn interference_banner</span> <span class="meta">line 791</span><br><span class="x">which asks for the passphrase again, so the only person who can dismiss the report is the one who could have opened the lock anyway.</span></li>
-<li><span class="sec">fn tab</span> <span class="meta">line 847</span><br><span class="x">The security tab: manage the lock, and see what it is worth.</span></li>
-<li><span class="sec">fn load_mandate</span> <span class="meta">line 1024</span><br><span class="x">Read the baseline from disk and apply it to the checkbox. Called once at startup by the running app. A file that will not parse leaves the strict default in place and records why, because the safe direction and the silent direction are not</span></li>
-<li><span class="sec">fn load_mandate</span> <span class="meta">line 1024</span><br><span class="x">the same thing.</span></li>
-<li><span class="sec">fn mandate_requires_app_lock</span> <span class="meta">line 1039</span><br><span class="x">Whether the baseline insists on the app lock.</span></li>
-<li><span class="sec">fn mandate_requires_encryption</span> <span class="meta">line 1044</span><br><span class="x">Whether the baseline insists on encryption at rest.</span></li>
-<li><span class="sec">fn mandate_history</span> <span class="meta">line 1049</span><br><span class="x">The change log, for the panel that shows it.</span></li>
-<li><span class="sec">fn record</span> <span class="meta">line 1059</span><br><span class="x">Record a change to the baseline, and write it down. A no-op when the value is already that, so re-drawing a frame cannot fill the history with entries nobody made. Failing to write is reported rather than swallowed: a relaxation the user</span></li>
-<li><span class="sec">fn record</span> <span class="meta">line 1059</span><br><span class="x">believes is recorded, and is not, is the failure this whole module exists to avoid.</span></li>
-<li><span class="sec">fn recording_controls</span> <span class="meta">line 1072</span><br><span class="x">The at-rest controls that sit inside the file tab.</span></li>
-<li><span class="sec">fn mandate_history_panel</span> <span class="meta">line 1262</span><br><span class="x">The log of every time a requirement was turned off or back on. The same history the CLI prints from `veilvoice mandate history`, shown here so that a relaxation made in this window is not a change with no visible record. Collapsed by</span></li>
-<li><span class="sec">fn mandate_history_panel</span> <span class="meta">line 1262</span><br><span class="x">default, because on a machine nobody has relaxed anything on it says only &quot;none&quot;, and that is the common case.</span></li>
-<li><span class="sec">fn mandate_history_rows</span> <span class="meta">line 1281</span><br><span class="x">One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off. Split from the header so a test can read the rows without opening a collapsed section.</span></li>
-<li><span class="sec">fn disable_dialogue</span> <span class="meta">line 1292</span><br><span class="x">The dialogue shown when the user turns at-rest encryption off. Returns true while it is open, so the caller can disable the rest of the window rather than let a click land behind it.</span></li>
-<li><span class="sec">const DISABLE_WARNING</span> <span class="meta">line 1334</span><br><span class="x">What the user is told before recordings stop being encrypted. Kept as data so the test suite can assert it still says the uncomfortable part, exactly as the CLI&#x27;s equivalent does.</span></li>
-<li><span class="sec">enum Plan</span> <span class="meta">line 1350</span><br><span class="x">What a finished job should do with its bytes.</span></li>
-<li><span class="sec">impl Plan</span> <span class="meta">line 1362</span><br><span class="x"></span></li>
-<li><span class="sec">fn write</span> <span class="meta">line 1375</span><br><span class="x">Seal `wav` if the plan says to, and write it. Returns where it landed. Runs on the job thread, never the UI thread: Argon2id is meant to be slow. `wav` is the in-memory encoding, so an encrypted recording never exists on disk in the clear.</span></li>
-<li><span class="sec">fn write</span> <span class="meta">line 1375</span><br><span class="x">`params` is the caller&#x27;s, rather than being read from [`kdf::KdfParams::default`] in here. The app passes the default; the tests pass a cheap profile, because a unit test that allocates 256 MiB and runs three passes of Argon2 is not</span></li>
-<li><span class="sec">fn write</span> <span class="meta">line 1375</span><br><span class="x">testing the thing it claims to, it is testing the runner&#x27;s memory, and on a CI machine running several such tests at once it stops being a test at all.</span></li>
-<li><span class="sec">impl std::fmt::Debug for Plan</span> <span class="meta">line 1421</span><br><span class="x">Deliberately opaque about the passphrase, so a plan cannot reach a log line through `{:?}`, the same rule [`veilvoice_crypto::Secret`] follows.</span></li>
-<li><span class="sec">fn fmt</span> <span class="meta">line 1422</span><br><span class="x"></span></li>
-<li><span class="sec">fn run_op</span> <span class="meta">line 1433</span><br><span class="x">Run one lock operation, off the UI thread.</span></li>
-<li><span class="sec">fn reopen</span> <span class="meta">line 1501</span><br><span class="x"></span></li>
-<li><span class="sec">const PASSWORD_LABEL_WIDTH</span> <span class="meta">line 1508</span><br><span class="x">The width every passphrase label is given, so every field starts level. Wide enough for &quot;passphrase&quot;, which is the longest of them.</span></li>
-<li><span class="sec">fn button_column</span> <span class="meta">line 1542</span><br><span class="x">One labelled passphrase field, with the field in the same place every time. # Why the label gets a column of its own These labels used to be padded with trailing spaces to line the fields up: `&quot;current&quot;`, `&quot;new&quot;`, `&quot;repeat&quot;`, `&quot;password&quot;`,</span></li>
-<li><span class="sec">fn button_column</span> <span class="meta">line 1542</span><br><span class="x">against a bare `&quot;passphrase&quot;`. That aligns nothing outside a terminal. The interface font is proportional, so a space is not the width of a letter and eight letters plus two spaces is not the width of ten letters; and egui gives trailing</span></li>
-<li><span class="sec">fn button_column</span> <span class="meta">line 1542</span><br><span class="x">whitespace no reliable width at all. The visible result was that fields sat at slightly different places on different screens, and the screens that differed most were the ones drawn only after setup, because those carry the labels that</span></li>
-<li><span class="sec">fn button_column</span> <span class="meta">line 1542</span><br><span class="x">needed the most padding. Buttons underneath inherited the same drift. Giving the label a fixed column puts every field, and everything lined up beneath it, at one x on every screen. Returns the field itself, so a caller, or a test, can ask</span></li>
-<li><span class="sec">fn button_column</span> <span class="meta">line 1542</span><br><span class="x">where it landed. Draw `contents` in the same column the passphrase fields occupy. The buttons under a passphrase field act on that field, and they were starting at the panel&#x27;s left edge while the fields they belong to started one</span></li>
-<li><span class="sec">fn button_column</span> <span class="meta">line 1542</span><br><span class="x">label-width in. The eye reads a left edge as a grouping, so the buttons looked like they belonged to the section rather than to the fields directly above them, and the further down the tab you went the more obviously the two columns</span></li>
-<li><span class="sec">fn button_column</span> <span class="meta">line 1542</span><br><span class="x">disagreed. Indented by the same [`PASSWORD_LABEL_WIDTH`] the labels reserve, so there is one column rather than two. Taking the width from that constant rather than repeating the number is what keeps them in step: changing the label column</span></li>
-<li><span class="sec">fn button_column</span> <span class="meta">line 1542</span><br><span class="x">moves the buttons with it.</span></li>
-<li><span class="sec">fn password_row</span> <span class="meta">line 1556</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 1580</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_lock_button_lines_up_with_the_field_above_it</span> <span class="meta">line 1588</span><br><span class="x">The buttons under the passphrase fields start where the fields do. Measured rather than eyeballed: this renders a real `password_row` and a real button in the same column and compares where each begins.</span></li>
-<li><span class="sec">fn every_passphrase_field_starts_in_the_same_place</span> <span class="meta">line 1625</span><br><span class="x">Every passphrase field starts at the same x, whatever its label says. The defect: the labels were padded with trailing spaces to fake a column, which lines nothing up in a proportional font. Screens drawn only after setup carry the labels</span></li>
-<li><span class="sec">fn every_passphrase_field_starts_in_the_same_place</span> <span class="meta">line 1625</span><br><span class="x">that needed the most padding, so their fields, and the buttons under them, sat at a different place from the ones present at launch. The shortest and the longest label in use are drawn here. If the fields ever part company again this fails</span></li>
-<li><span class="sec">fn every_passphrase_field_starts_in_the_same_place</span> <span class="meta">line 1625</span><br><span class="x">with both positions.</span></li>
-<li><span class="sec">fn no_passphrase_label_is_padded_with_spaces</span> <span class="meta">line 1665</span><br><span class="x">No passphrase label is padded with spaces to fake its width. The column is what aligns these now. A label that comes back padded is somebody reaching for the old trick, and it would drift again the first time the font changed.</span></li>
-<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1701</span><br><span class="x">**Roadmap item 74.** The locked window explains nothing. It used to explain a great deal: what the lock is and is not worth, where its file lives, and that deleting that file starts over. All true, all addressed to the wrong person. The</span></li>
-<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1701</span><br><span class="x">reader of a locked window is either its owner, who does not need any of it at that moment, or somebody who picked the machine up. This reads the source of `unlock_screen` rather than rendering it, because what is being held is that certain</span></li>
-<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1701</span><br><span class="x">sentences are not reachable from that function at all. A rendering test would only prove they were absent from one frame. Roadmap item 86. The passphrase is kept only for the mode that needs it. A user who has not asked for app-lock</span></li>
-<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1701</span><br><span class="x">sealing must keep the old behaviour exactly: the passphrase is wiped the instant it has been checked. Holding it &quot;just in case&quot; would be a security regression paid for by everybody, to make a feature nobody switched on slightly more</span></li>
-<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1701</span><br><span class="x">convenient.</span></li>
-<li><span class="sec">fn changing_the_password_drops_the_passphrase_that_was_sealing_with_it</span> <span class="meta">line 1721</span><br><span class="x">F-94. Changing the app-lock password must not leave the old one sealing new recordings. A user who changes their password and keeps working would otherwise produce files that open with a password they have just replaced, and be told</span></li>
-<li><span class="sec">fn changing_the_password_drops_the_passphrase_that_was_sealing_with_it</span> <span class="meta">line 1721</span><br><span class="x">nothing.</span></li>
-<li><span class="sec">fn locking_the_window_drops_the_sealing_passphrase</span> <span class="meta">line 1754</span><br><span class="x">Roadmap item 86. Locking the window must put the state back where a fresh launch would leave it, or the lock is a picture of a lock.</span></li>
-<li><span class="sec">fn app_lock_sealing_produces_a_container_that_outlives_the_lock</span> <span class="meta">line 1771</span><br><span class="x">Roadmap item 86. The plan has to be a password plan, because that is what keeps the recordings openable after the lock is gone.</span></li>
-<li><span class="sec">fn app_lock_sealing_is_not_offered_without_a_lock</span> <span class="meta">line 1795</span><br><span class="x">The mode is only offered where there is a lock to seal with.</span></li>
-<li><span class="sec">fn the_interference_report_is_behind_the_lock_and_behind_the_passphrase</span> <span class="meta">line 1808</span><br><span class="x">Roadmap item 76. The report has to be reachable from the tab and only from the tab, and clearing it has to go through the passphrase rather than through a flag the drawing code can set.</span></li>
-<li><span class="sec">fn the_locked_window_tells_a_stranger_nothing</span> <span class="meta">line 1842</span><br><span class="x"></span></li>
-<li><span class="sec">fn weak</span> <span class="meta">line 1891</span><br><span class="x">Cheap on purpose: these tests exercise the plan, not Argon2.</span></li>
-<li><span class="sec">fn encryption_at_rest_is_the_default</span> <span class="meta">line 1896</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_job_is_blocked_until_there_is_something_to_encrypt_with</span> <span class="meta">line 1909</span><br><span class="x">A job must not be able to start with encryption on and nothing to encrypt with, or the &quot;default&quot; would silently degrade to plaintext.</span></li>
-<li><span class="sec">fn disabling_encryption_needs_the_dialogue_to_be_answered</span> <span class="meta">line 1931</span><br><span class="x">Unticking the box must not take effect until the warning is answered.</span></li>
-<li><span class="sec">fn the_warning_states_the_actual_consequence</span> <span class="meta">line 1945</span><br><span class="x"></span></li>
-<li><span class="sec">fn turning_encryption_off_in_the_window_is_written_down_and_survives_a_restart</span> <span class="meta">line 1959</span><br><span class="x"></span></li>
-<li><span class="sec">fn redrawing_the_frame_does_not_fill_the_history_with_entries_nobody_made</span> <span class="meta">line 1992</span><br><span class="x"></span></li>
-<li><span class="sec">fn rendered_text</span> <span class="meta">line 2009</span><br><span class="x">The text a panel renders, gathered by walking egui&#x27;s output.</span></li>
-<li><span class="sec">fn the_window_shows_the_history_the_command_line_would_print</span> <span class="meta">line 2035</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_baseline_that_would_not_parse_is_said_in_the_window</span> <span class="meta">line 2062</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_clean_baseline_shows_no_history_and_no_problem</span> <span class="meta">line 2076</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_test_built_security_never_writes_to_the_real_configuration</span> <span class="meta">line 2087</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_plan_with_nothing_set_refuses_rather_than_writing_plaintext</span> <span class="meta">line 2099</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_password_plan_seals_beside_the_recording_and_leaves_no_plaintext</span> <span class="meta">line 2107</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_plaintext_plan_writes_the_file_as_asked</span> <span class="meta">line 2129</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_plaintext_plan_still_writes_owner_only</span> <span class="meta">line 2148</span><br><span class="x">An unencrypted recording is still readable only by this account. `veilvoice anonymise --encrypt false` had written 0600 since it was written. This, the window&#x27;s version of the same decision, wrote 0644, so turning encryption off in the</span></li>
-<li><span class="sec">fn a_plaintext_plan_still_writes_owner_only</span> <span class="meta">line 2148</span><br><span class="x">interface left the recording readable by every other account on the machine and turning it off on the command line did not.</span></li>
-<li><span class="sec">fn the_confirmed_passphrase_leaves_no_plaintext_buffer_behind</span> <span class="meta">line 2167</span><br><span class="x">The confirmed passphrase must not linger as ordinary heap bytes. It used to be kept as a `String` for the whole session; it is now moved into a page-locked `Secret` the moment it is confirmed, and the typing buffer is wiped.</span></li>
-<li><span class="sec">fn the_plan_carries_page_locked_material_not_a_string</span> <span class="meta">line 2182</span><br><span class="x">And the plan handed to the worker thread carries the `Secret`, not a copy of the text.</span></li>
-<li><span class="sec">fn locked_security</span> <span class="meta">line 2201</span><br><span class="x">Locking must take the session passphrase with it, or &quot;locked&quot; would be a screen rather than a state. A real lock in a temporary directory, at test cost. `lock_now` refuses to lock when there is nothing to unlock with, which is the right</span></li>
-<li><span class="sec">fn locked_security</span> <span class="meta">line 2201</span><br><span class="x">behaviour and means these tests need an actual store.</span></li>
-<li><span class="sec">fn a_deliberate_lock_and_an_idle_one_are_told_apart</span> <span class="meta">line 2212</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_auto_lock_note_is_not_shown_once_typing_starts</span> <span class="meta">line 2228</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_lock_screen_shows_the_mark_in_its_badge</span> <span class="meta">line 2242</span><br><span class="x"></span></li>
-<li><span class="sec">fn locking_wipes_the_session_passphrase</span> <span class="meta">line 2253</span><br><span class="x"></span></li>
-<li><span class="sec">fn locking_does_nothing_when_no_lock_is_configured</span> <span class="meta">line 2264</span><br><span class="x"></span></li>
+<li><span class="sec">fn lock_inner</span> <span class="meta">line 424</span><br><span class="x">Lock, remembering whether the person did it or the idle timer did. The distinction is carried because the lock screen says which, and &quot;locked after twenty minutes idle&quot; answers a question that &quot;locked&quot; leaves open.</span></li>
+<li><span class="sec">fn wipe_secrets</span> <span class="meta">line 433</span><br><span class="x">Wipe every plaintext secret this struct is holding.</span></li>
+<li><span class="sec">fn ready_to_write</span> <span class="meta">line 464</span><br><span class="x">Whether a job may start: either encryption is off, or there is something to encrypt with.</span></li>
+<li><span class="sec">fn blocked_reason</span> <span class="meta">line 476</span><br><span class="x">Why a job cannot start yet, for the button&#x27;s tooltip.</span></li>
+<li><span class="sec">fn plan</span> <span class="meta">line 494</span><br><span class="x">How the next job should protect its output. Returns the material by value so the worker thread owns it; the copy held here stays for the next file.</span></li>
+<li><span class="sec">fn spawn</span> <span class="meta">line 526</span><br><span class="x">Run a lock operation on a thread, so the window keeps drawing. Argon2id at 256 MiB takes long enough to be felt. Doing it on the drawing thread would freeze the window for the duration, which reads as a crash.</span></li>
+<li><span class="sec">fn poll</span> <span class="meta">line 541</span><br><span class="x">Collect a finished lock operation. Returns true if anything changed.</span></li>
+<li><span class="sec">fn wipe_form</span> <span class="meta">line 633</span><br><span class="x">Clear what was typed, so a passphrase does not sit in a field after use.</span></li>
+<li><span class="sec">fn busy</span> <span class="meta">line 641</span><br><span class="x">Whether an operation is in flight, so the panel can refuse a second one.</span></li>
+<li><span class="sec">fn is_busy</span> <span class="meta">line 647</span><br><span class="x">Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.</span></li>
+<li><span class="sec">fn unlock_screen</span> <span class="meta">line 652</span><br><span class="x">The full-window unlock screen. Nothing else is drawn while this is up.</span></li>
+<li><span class="sec">fn interference_banner</span> <span class="meta">line 805</span><br><span class="x">The standing report that the lock file was interfered with. **Roadmap item 76.** It is drawn here rather than on the lock screen, and the distinction matters. The lock screen is read by whoever is holding the machine, and telling them</span></li>
+<li><span class="sec">fn interference_banner</span> <span class="meta">line 805</span><br><span class="x">their edit was noticed tells them to try something else. This side of the lock is read only by somebody who has already produced the passphrase. It will not go away on its own. Clearing it runs [`veilvoice_crypto::LockStore::acknowledge`],</span></li>
+<li><span class="sec">fn interference_banner</span> <span class="meta">line 805</span><br><span class="x">which asks for the passphrase again, so the only person who can dismiss the report is the one who could have opened the lock anyway.</span></li>
+<li><span class="sec">fn tab</span> <span class="meta">line 861</span><br><span class="x">The security tab: manage the lock, and see what it is worth.</span></li>
+<li><span class="sec">fn load_mandate</span> <span class="meta">line 1038</span><br><span class="x">Read the baseline from disk and apply it to the checkbox. Called once at startup by the running app. A file that will not parse leaves the strict default in place and records why, because the safe direction and the silent direction are not</span></li>
+<li><span class="sec">fn load_mandate</span> <span class="meta">line 1038</span><br><span class="x">the same thing.</span></li>
+<li><span class="sec">fn mandate_requires_app_lock</span> <span class="meta">line 1053</span><br><span class="x">Whether the baseline insists on the app lock.</span></li>
+<li><span class="sec">fn mandate_requires_encryption</span> <span class="meta">line 1058</span><br><span class="x">Whether the baseline insists on encryption at rest.</span></li>
+<li><span class="sec">fn mandate_history</span> <span class="meta">line 1063</span><br><span class="x">The change log, for the panel that shows it.</span></li>
+<li><span class="sec">fn record</span> <span class="meta">line 1073</span><br><span class="x">Record a change to the baseline, and write it down. A no-op when the value is already that, so re-drawing a frame cannot fill the history with entries nobody made. Failing to write is reported rather than swallowed: a relaxation the user</span></li>
+<li><span class="sec">fn record</span> <span class="meta">line 1073</span><br><span class="x">believes is recorded, and is not, is the failure this whole module exists to avoid.</span></li>
+<li><span class="sec">fn recording_controls</span> <span class="meta">line 1086</span><br><span class="x">The at-rest controls that sit inside the file tab.</span></li>
+<li><span class="sec">fn mandate_history_panel</span> <span class="meta">line 1276</span><br><span class="x">The log of every time a requirement was turned off or back on. The same history the CLI prints from `veilvoice mandate history`, shown here so that a relaxation made in this window is not a change with no visible record. Collapsed by</span></li>
+<li><span class="sec">fn mandate_history_panel</span> <span class="meta">line 1276</span><br><span class="x">default, because on a machine nobody has relaxed anything on it says only &quot;none&quot;, and that is the common case.</span></li>
+<li><span class="sec">fn mandate_history_rows</span> <span class="meta">line 1295</span><br><span class="x">One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off. Split from the header so a test can read the rows without opening a collapsed section.</span></li>
+<li><span class="sec">fn disable_dialogue</span> <span class="meta">line 1306</span><br><span class="x">The dialogue shown when the user turns at-rest encryption off. Returns true while it is open, so the caller can disable the rest of the window rather than let a click land behind it.</span></li>
+<li><span class="sec">const DISABLE_WARNING</span> <span class="meta">line 1348</span><br><span class="x">What the user is told before recordings stop being encrypted. Kept as data so the test suite can assert it still says the uncomfortable part, exactly as the CLI&#x27;s equivalent does.</span></li>
+<li><span class="sec">enum Plan</span> <span class="meta">line 1364</span><br><span class="x">What a finished job should do with its bytes.</span></li>
+<li><span class="sec">impl Plan</span> <span class="meta">line 1376</span><br><span class="x"></span></li>
+<li><span class="sec">fn write</span> <span class="meta">line 1389</span><br><span class="x">Seal `wav` if the plan says to, and write it. Returns where it landed. Runs on the job thread, never the UI thread: Argon2id is meant to be slow. `wav` is the in-memory encoding, so an encrypted recording never exists on disk in the clear.</span></li>
+<li><span class="sec">fn write</span> <span class="meta">line 1389</span><br><span class="x">`params` is the caller&#x27;s, rather than being read from [`kdf::KdfParams::default`] in here. The app passes the default; the tests pass a cheap profile, because a unit test that allocates 256 MiB and runs three passes of Argon2 is not</span></li>
+<li><span class="sec">fn write</span> <span class="meta">line 1389</span><br><span class="x">testing the thing it claims to, it is testing the runner&#x27;s memory, and on a CI machine running several such tests at once it stops being a test at all.</span></li>
+<li><span class="sec">impl std::fmt::Debug for Plan</span> <span class="meta">line 1435</span><br><span class="x">Deliberately opaque about the passphrase, so a plan cannot reach a log line through `{:?}`, the same rule [`veilvoice_crypto::Secret`] follows.</span></li>
+<li><span class="sec">fn fmt</span> <span class="meta">line 1436</span><br><span class="x"></span></li>
+<li><span class="sec">fn run_op</span> <span class="meta">line 1447</span><br><span class="x">Run one lock operation, off the UI thread.</span></li>
+<li><span class="sec">fn reopen</span> <span class="meta">line 1516</span><br><span class="x">Re-open the lock store from disk, or `None` when there is nothing to open.</span></li>
+<li><span class="sec">const PASSWORD_LABEL_WIDTH</span> <span class="meta">line 1523</span><br><span class="x">The width every passphrase label is given, so every field starts level. Wide enough for &quot;passphrase&quot;, which is the longest of them.</span></li>
+<li><span class="sec">fn button_column</span> <span class="meta">line 1557</span><br><span class="x">One labelled passphrase field, with the field in the same place every time. # Why the label gets a column of its own These labels used to be padded with trailing spaces to line the fields up: `&quot;current&quot;`, `&quot;new&quot;`, `&quot;repeat&quot;`, `&quot;password&quot;`,</span></li>
+<li><span class="sec">fn button_column</span> <span class="meta">line 1557</span><br><span class="x">against a bare `&quot;passphrase&quot;`. That aligns nothing outside a terminal. The interface font is proportional, so a space is not the width of a letter and eight letters plus two spaces is not the width of ten letters; and egui gives trailing</span></li>
+<li><span class="sec">fn button_column</span> <span class="meta">line 1557</span><br><span class="x">whitespace no reliable width at all. The visible result was that fields sat at slightly different places on different screens, and the screens that differed most were the ones drawn only after setup, because those carry the labels that</span></li>
+<li><span class="sec">fn button_column</span> <span class="meta">line 1557</span><br><span class="x">needed the most padding. Buttons underneath inherited the same drift. Giving the label a fixed column puts every field, and everything lined up beneath it, at one x on every screen. Returns the field itself, so a caller, or a test, can ask</span></li>
+<li><span class="sec">fn button_column</span> <span class="meta">line 1557</span><br><span class="x">where it landed. Draw `contents` in the same column the passphrase fields occupy. The buttons under a passphrase field act on that field, and they were starting at the panel&#x27;s left edge while the fields they belong to started one</span></li>
+<li><span class="sec">fn button_column</span> <span class="meta">line 1557</span><br><span class="x">label-width in. The eye reads a left edge as a grouping, so the buttons looked like they belonged to the section rather than to the fields directly above them, and the further down the tab you went the more obviously the two columns</span></li>
+<li><span class="sec">fn button_column</span> <span class="meta">line 1557</span><br><span class="x">disagreed. Indented by the same [`PASSWORD_LABEL_WIDTH`] the labels reserve, so there is one column rather than two. Taking the width from that constant rather than repeating the number is what keeps them in step: changing the label column</span></li>
+<li><span class="sec">fn button_column</span> <span class="meta">line 1557</span><br><span class="x">moves the buttons with it.</span></li>
+<li><span class="sec">fn password_row</span> <span class="meta">line 1572</span><br><span class="x">One passphrase field with its label, at the shared width.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 1596</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_lock_button_lines_up_with_the_field_above_it</span> <span class="meta">line 1604</span><br><span class="x">The buttons under the passphrase fields start where the fields do. Measured rather than eyeballed: this renders a real `password_row` and a real button in the same column and compares where each begins.</span></li>
+<li><span class="sec">fn every_passphrase_field_starts_in_the_same_place</span> <span class="meta">line 1641</span><br><span class="x">Every passphrase field starts at the same x, whatever its label says. The defect: the labels were padded with trailing spaces to fake a column, which lines nothing up in a proportional font. Screens drawn only after setup carry the labels</span></li>
+<li><span class="sec">fn every_passphrase_field_starts_in_the_same_place</span> <span class="meta">line 1641</span><br><span class="x">that needed the most padding, so their fields, and the buttons under them, sat at a different place from the ones present at launch. The shortest and the longest label in use are drawn here. If the fields ever part company again this fails</span></li>
+<li><span class="sec">fn every_passphrase_field_starts_in_the_same_place</span> <span class="meta">line 1641</span><br><span class="x">with both positions.</span></li>
+<li><span class="sec">fn no_passphrase_label_is_padded_with_spaces</span> <span class="meta">line 1681</span><br><span class="x">No passphrase label is padded with spaces to fake its width. The column is what aligns these now. A label that comes back padded is somebody reaching for the old trick, and it would drift again the first time the font changed.</span></li>
+<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1717</span><br><span class="x">**Roadmap item 74.** The locked window explains nothing. It used to explain a great deal: what the lock is and is not worth, where its file lives, and that deleting that file starts over. All true, all addressed to the wrong person. The</span></li>
+<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1717</span><br><span class="x">reader of a locked window is either its owner, who does not need any of it at that moment, or somebody who picked the machine up. This reads the source of `unlock_screen` rather than rendering it, because what is being held is that certain</span></li>
+<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1717</span><br><span class="x">sentences are not reachable from that function at all. A rendering test would only prove they were absent from one frame. Roadmap item 86. The passphrase is kept only for the mode that needs it. A user who has not asked for app-lock</span></li>
+<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1717</span><br><span class="x">sealing must keep the old behaviour exactly: the passphrase is wiped the instant it has been checked. Holding it &quot;just in case&quot; would be a security regression paid for by everybody, to make a feature nobody switched on slightly more</span></li>
+<li><span class="sec">fn the_app_lock_passphrase_is_kept_only_when_it_is_going_to_be_used</span> <span class="meta">line 1717</span><br><span class="x">convenient.</span></li>
+<li><span class="sec">fn changing_the_password_drops_the_passphrase_that_was_sealing_with_it</span> <span class="meta">line 1737</span><br><span class="x">F-94. Changing the app-lock password must not leave the old one sealing new recordings. A user who changes their password and keeps working would otherwise produce files that open with a password they have just replaced, and be told</span></li>
+<li><span class="sec">fn changing_the_password_drops_the_passphrase_that_was_sealing_with_it</span> <span class="meta">line 1737</span><br><span class="x">nothing.</span></li>
+<li><span class="sec">fn locking_the_window_drops_the_sealing_passphrase</span> <span class="meta">line 1770</span><br><span class="x">Roadmap item 86. Locking the window must put the state back where a fresh launch would leave it, or the lock is a picture of a lock.</span></li>
+<li><span class="sec">fn app_lock_sealing_produces_a_container_that_outlives_the_lock</span> <span class="meta">line 1787</span><br><span class="x">Roadmap item 86. The plan has to be a password plan, because that is what keeps the recordings openable after the lock is gone.</span></li>
+<li><span class="sec">fn app_lock_sealing_is_not_offered_without_a_lock</span> <span class="meta">line 1811</span><br><span class="x">The mode is only offered where there is a lock to seal with.</span></li>
+<li><span class="sec">fn the_interference_report_is_behind_the_lock_and_behind_the_passphrase</span> <span class="meta">line 1824</span><br><span class="x">Roadmap item 76. The report has to be reachable from the tab and only from the tab, and clearing it has to go through the passphrase rather than through a flag the drawing code can set.</span></li>
+<li><span class="sec">fn the_locked_window_tells_a_stranger_nothing</span> <span class="meta">line 1858</span><br><span class="x"></span></li>
+<li><span class="sec">fn weak</span> <span class="meta">line 1907</span><br><span class="x">Cheap on purpose: these tests exercise the plan, not Argon2.</span></li>
+<li><span class="sec">fn encryption_at_rest_is_the_default</span> <span class="meta">line 1912</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_job_is_blocked_until_there_is_something_to_encrypt_with</span> <span class="meta">line 1925</span><br><span class="x">A job must not be able to start with encryption on and nothing to encrypt with, or the &quot;default&quot; would silently degrade to plaintext.</span></li>
+<li><span class="sec">fn disabling_encryption_needs_the_dialogue_to_be_answered</span> <span class="meta">line 1947</span><br><span class="x">Unticking the box must not take effect until the warning is answered.</span></li>
+<li><span class="sec">fn the_warning_states_the_actual_consequence</span> <span class="meta">line 1961</span><br><span class="x"></span></li>
+<li><span class="sec">fn turning_encryption_off_in_the_window_is_written_down_and_survives_a_restart</span> <span class="meta">line 1975</span><br><span class="x"></span></li>
+<li><span class="sec">fn redrawing_the_frame_does_not_fill_the_history_with_entries_nobody_made</span> <span class="meta">line 2008</span><br><span class="x"></span></li>
+<li><span class="sec">fn rendered_text</span> <span class="meta">line 2025</span><br><span class="x">The text a panel renders, gathered by walking egui&#x27;s output.</span></li>
+<li><span class="sec">fn the_window_shows_the_history_the_command_line_would_print</span> <span class="meta">line 2051</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_baseline_that_would_not_parse_is_said_in_the_window</span> <span class="meta">line 2078</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_clean_baseline_shows_no_history_and_no_problem</span> <span class="meta">line 2092</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_test_built_security_never_writes_to_the_real_configuration</span> <span class="meta">line 2103</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_plan_with_nothing_set_refuses_rather_than_writing_plaintext</span> <span class="meta">line 2115</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_password_plan_seals_beside_the_recording_and_leaves_no_plaintext</span> <span class="meta">line 2123</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_plaintext_plan_writes_the_file_as_asked</span> <span class="meta">line 2145</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_plaintext_plan_still_writes_owner_only</span> <span class="meta">line 2164</span><br><span class="x">An unencrypted recording is still readable only by this account. `veilvoice anonymise --encrypt false` had written 0600 since it was written. This, the window&#x27;s version of the same decision, wrote 0644, so turning encryption off in the</span></li>
+<li><span class="sec">fn a_plaintext_plan_still_writes_owner_only</span> <span class="meta">line 2164</span><br><span class="x">interface left the recording readable by every other account on the machine and turning it off on the command line did not.</span></li>
+<li><span class="sec">fn the_confirmed_passphrase_leaves_no_plaintext_buffer_behind</span> <span class="meta">line 2183</span><br><span class="x">The confirmed passphrase must not linger as ordinary heap bytes. It used to be kept as a `String` for the whole session; it is now moved into a page-locked `Secret` the moment it is confirmed, and the typing buffer is wiped.</span></li>
+<li><span class="sec">fn the_plan_carries_page_locked_material_not_a_string</span> <span class="meta">line 2198</span><br><span class="x">And the plan handed to the worker thread carries the `Secret`, not a copy of the text.</span></li>
+<li><span class="sec">fn locked_security</span> <span class="meta">line 2217</span><br><span class="x">Locking must take the session passphrase with it, or &quot;locked&quot; would be a screen rather than a state. A real lock in a temporary directory, at test cost. `lock_now` refuses to lock when there is nothing to unlock with, which is the right</span></li>
+<li><span class="sec">fn locked_security</span> <span class="meta">line 2217</span><br><span class="x">behaviour and means these tests need an actual store.</span></li>
+<li><span class="sec">fn a_deliberate_lock_and_an_idle_one_are_told_apart</span> <span class="meta">line 2228</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_auto_lock_note_is_not_shown_once_typing_starts</span> <span class="meta">line 2244</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_lock_screen_shows_the_mark_in_its_badge</span> <span class="meta">line 2258</span><br><span class="x"></span></li>
+<li><span class="sec">fn locking_wipes_the_session_passphrase</span> <span class="meta">line 2269</span><br><span class="x"></span></li>
+<li><span class="sec">fn locking_does_nothing_when_no_lock_is_configured</span> <span class="meta">line 2280</span><br><span class="x"></span></li>
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/settings.rs</code> <span class="meta">&middot; veilvoice-gui, 1425 lines, 77 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/settings.rs</code> <span class="meta">&middot; veilvoice-gui, 1430 lines, 77 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs">open settings.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The settings panel: a menu of pages, each a titled group of choices. # Why a menu rather than one long list There are three kinds of setting here and they answer different questions: what the app *looks* like, how it *moves*, and what it</span></li>
@@ -8112,70 +8114,70 @@ nav.top a{margin-right:14px}
 <li><span class="sec">fn load</span> <span class="meta">line 121</span><br><span class="x">Load preferences from this platform&#x27;s config directory and apply the chosen theme to `ctx`. Never fails: an unreadable or unparseable file leaves the defaults in force, and the panel says so.</span></li>
 <li><span class="sec">fn motion</span> <span class="meta">line 149</span><br><span class="x">How much movement is allowed this frame. Takes `&amp;egui::Context` for symmetry with the rest of the UI even though it does not need it: the platform answer is cached from startup, since reading it costs a subprocess.</span></li>
 <li><span class="sec">fn needs_first_run</span> <span class="meta">line 154</span><br><span class="x">Whether the first-run choice has still to be made.</span></li>
-<li><span class="sec">fn persist</span> <span class="meta">line 158</span><br><span class="x"></span></li>
-<li><span class="sec">fn save_error</span> <span class="meta">line 179</span><br><span class="x">Whether the app should open in group mode, and a way to change it. Exposed as a pair of methods rather than as a public field so the group panel can ask to have a choice remembered without knowing where preferences live or what happens</span></li>
-<li><span class="sec">fn save_error</span> <span class="meta">line 179</span><br><span class="x">when the platform will not say. A failed write is not fatal here either: the tick applies for this session and the settings page reports why it was not kept. Why the last write failed, if it did.</span></li>
-<li><span class="sec">fn show_install_tab</span> <span class="meta">line 190</span><br><span class="x">Whether the install tab should be offered at all. Two conditions, and the first is not a preference: an installed copy never offers to install itself, because a program that does that is telling its user something untrue about what it is.</span></li>
-<li><span class="sec">fn show_install_tab</span> <span class="meta">line 190</span><br><span class="x">The preference only covers the other case -- a portable copy, run on purpose, by somebody who does not want to be asked again.</span></li>
-<li><span class="sec">fn hide_install_tab</span> <span class="meta">line 195</span><br><span class="x">Whether the install tab is hidden by preference.</span></li>
-<li><span class="sec">fn set_hide_install_tab</span> <span class="meta">line 200</span><br><span class="x">Record whether to hide the install tab on a portable copy.</span></li>
-<li><span class="sec">fn acceleration</span> <span class="meta">line 213</span><br><span class="x">Whether the window asks the platform for a hardware-drawn context. **Roadmap item 137.** Read once, before the window is made, because it decides how the window is made. Changing it therefore takes effect at the next launch, and the panel</span></li>
-<li><span class="sec">fn acceleration</span> <span class="meta">line 213</span><br><span class="x">says so rather than appearing to do nothing.</span></li>
-<li><span class="sec">fn set_acceleration</span> <span class="meta">line 218</span><br><span class="x">Record whether to ask for acceleration.</span></li>
-<li><span class="sec">fn frame_target</span> <span class="meta">line 227</span><br><span class="x">How often the window draws while something in it is moving.</span></li>
-<li><span class="sec">fn set_frame_target</span> <span class="meta">line 232</span><br><span class="x">Record a new frame-rate target.</span></li>
-<li><span class="sec">fn show_frame_rate</span> <span class="meta">line 242</span><br><span class="x">Whether the header carries a live frame-rate readout.</span></li>
-<li><span class="sec">fn always_group</span> <span class="meta">line 247</span><br><span class="x">Whether the app should open in group mode.</span></li>
-<li><span class="sec">fn autolock</span> <span class="meta">line 252</span><br><span class="x">How the autolock is configured, brought into range.</span></li>
-<li><span class="sec">fn set_autolock</span> <span class="meta">line 263</span><br><span class="x">Remember an autolock setting.</span></li>
-<li><span class="sec">fn seal_with_app_lock</span> <span class="meta">line 276</span><br><span class="x">Whether every recording is sealed with the app-lock passphrase.</span></li>
-<li><span class="sec">fn destination</span> <span class="meta">line 281</span><br><span class="x">The remembered encrypted destination, rebuilt from the settings file.</span></li>
-<li><span class="sec">fn set_destination</span> <span class="meta">line 290</span><br><span class="x">Remember a destination, including the answer to the hidden question.</span></li>
-<li><span class="sec">fn failsafe</span> <span class="meta">line 307</span><br><span class="x">The Failsafe posture in force.</span></li>
-<li><span class="sec">fn set_failsafe</span> <span class="meta">line 312</span><br><span class="x">Record the Failsafe posture.</span></li>
-<li><span class="sec">fn notify_style</span> <span class="meta">line 321</span><br><span class="x">How notifications should be shown.</span></li>
-<li><span class="sec">fn set_notify_style</span> <span class="meta">line 326</span><br><span class="x">Record how notifications should be shown.</span></li>
-<li><span class="sec">fn live_monitor</span> <span class="meta">line 335</span><br><span class="x">Where the live monitor sits, or whether it is shown.</span></li>
-<li><span class="sec">fn set_live_monitor</span> <span class="meta">line 340</span><br><span class="x">Record where the live monitor sits.</span></li>
-<li><span class="sec">fn set_always_group</span> <span class="meta">line 349</span><br><span class="x">Record whether the app should open in group mode.</span></li>
-<li><span class="sec">fn set_seal_with_app_lock</span> <span class="meta">line 363</span><br><span class="x">Remember, or stop remembering, that recordings are sealed with the app-lock passphrase. Roadmap item 86. Same pair-of-methods shape as `always_group` and for the same reason: the security tab asks for a choice to be kept without knowing</span></li>
-<li><span class="sec">fn set_seal_with_app_lock</span> <span class="meta">line 363</span><br><span class="x">where preferences live or what happens when the platform will not say.</span></li>
-<li><span class="sec">fn interface_page</span> <span class="meta">line 372</span><br><span class="x">Which tabs the window offers.</span></li>
-<li><span class="sec">fn toured_tabs</span> <span class="meta">line 578</span><br><span class="x">The tabs the tour has already covered.</span></li>
-<li><span class="sec">fn mark_toured</span> <span class="meta">line 589</span><br><span class="x">Record that the tour has covered these tabs, and save.</span></li>
-<li><span class="sec">fn first_run_appearance</span> <span class="meta">line 603</span><br><span class="x">The first-run panel: offered once, with animation already on. Shown as a page rather than a modal because it is not urgent and does not gate anything -- the legal notice is the thing that gates, and two blocking dialogues before a user has</span></li>
-<li><span class="sec">fn first_run_appearance</span> <span class="meta">line 603</span><br><span class="x">seen the app is one too many. The two appearance choices, for the first-run setup to place. Placed by `crate::firstrun`, which owns the first-run flow, so there is one copy of this wording rather than one per caller.</span></li>
-<li><span class="sec">fn first_run_autolock</span> <span class="meta">line 630</span><br><span class="x">The autolock switch and delay, for the first-run setup to place.</span></li>
-<li><span class="sec">fn finish_first_run</span> <span class="meta">line 658</span><br><span class="x">Mark the first run answered.</span></li>
-<li><span class="sec">fn tab</span> <span class="meta">line 665</span><br><span class="x">The settings tab.</span></li>
-<li><span class="sec">fn custom_palette_help</span> <span class="meta">line 720</span><br><span class="x">Explain where custom palettes go, and say what was refused and why. The refusals are the important half. A user who writes a palette file, puts it in the right place and sees nothing happen has no way to tell whether the application never</span></li>
-<li><span class="sec">fn custom_palette_help</span> <span class="meta">line 720</span><br><span class="x">looked, or looked and disliked it. Every complaint from the loader is shown verbatim, including the measured contrast ratio, because &quot;muted on bg is 2.4:1 and needs 3.0:1&quot; tells somebody exactly what to change and by roughly how much.</span></li>
-<li><span class="sec">fn theme_picker</span> <span class="meta">line 794</span><br><span class="x">The colour scheme, as a compact control for the window header. The same list the appearance page offers and the same effect; what it does not carry is the swatches and the custom-palette help, which need room and belong on the page. Two</span></li>
-<li><span class="sec">fn theme_picker</span> <span class="meta">line 794</span><br><span class="x">controls for one setting is worth it here: the header is where the website puts this, and a reader who has used the site looks in the same place. Returns the picker&#x27;s own rectangle. The controls beside it in the header take their height</span></li>
-<li><span class="sec">fn theme_picker</span> <span class="meta">line 794</span><br><span class="x">from it rather than working one out separately, which is what left them a pixel apart (finding F-178).</span></li>
-<li><span class="sec">fn appearance_page</span> <span class="meta">line 819</span><br><span class="x"></span></li>
-<li><span class="sec">fn motion_page</span> <span class="meta">line 856</span><br><span class="x"></span></li>
-<li><span class="sec">fn security_page</span> <span class="meta">line 993</span><br><span class="x">Roadmap item 92. The autolock, and the range it offers.</span></li>
-<li><span class="sec">fn storage_page</span> <span class="meta">line 1092</span><br><span class="x"></span></li>
-<li><span class="sec">fn section</span> <span class="meta">line 1153</span><br><span class="x">A titled group with a one-line explanation under it.</span></li>
-<li><span class="sec">fn swatches</span> <span class="meta">line 1161</span><br><span class="x">The active palette, as a row of swatches, so the choice can be seen rather than only read.</span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 1191</span><br><span class="x"></span></li>
-<li><span class="sec">fn render</span> <span class="meta">line 1195</span><br><span class="x">Drive the settings tab once, with no window.</span></li>
-<li><span class="sec">fn every_page_renders_without_a_window</span> <span class="meta">line 1206</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_first_run_appearance_choices_render</span> <span class="meta">line 1215</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_menu_lists_every_page_exactly_once</span> <span class="meta">line 1226</span><br><span class="x">The menu has to cover the pages and the pages have to cover the menu, or a page becomes unreachable.</span></li>
-<li><span class="sec">fn the_first_run_is_offered_once</span> <span class="meta">line 1239</span><br><span class="x">A first run has not been configured; answering it must stick.</span></li>
-<li><span class="sec">fn animation_is_on_by_default_and_can_be_turned_off</span> <span class="meta">line 1255</span><br><span class="x">Defaults are what the request asked for: animation on, offered at the start, switchable afterwards.</span></li>
-<li><span class="sec">fn choosing_a_theme_applies_and_records_it</span> <span class="meta">line 1272</span><br><span class="x">Choosing a theme must apply it and record it.</span></li>
-<li><span class="sec">fn a_failed_save_is_reported_rather_than_swallowed</span> <span class="meta">line 1301</span><br><span class="x">A save that cannot happen must not be silent, and must not lose the choice for this session either.</span></li>
-<li><span class="sec">fn the_install_tab_is_never_offered_by_an_installed_copy</span> <span class="meta">line 1318</span><br><span class="x">Reset must not touch anything that is not a presentation choice. An installed copy never offers to install itself, whatever the preference says. The preference is only about the portable case.</span></li>
-<li><span class="sec">fn hiding_the_install_tab_survives_a_reload</span> <span class="meta">line 1343</span><br><span class="x">The tick is remembered. A preference that has to be set on every launch is not a preference.</span></li>
-<li><span class="sec">fn reset_leaves_the_first_run_answered</span> <span class="meta">line 1360</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_corrupt_file_leaves_a_usable_panel_that_says_so</span> <span class="meta">line 1409</span><br><span class="x">Loading must survive a settings file full of nonsense.</span></li>
+<li><span class="sec">fn persist</span> <span class="meta">line 159</span><br><span class="x">Write the settings out, encrypted and obfuscated as they are at rest.</span></li>
+<li><span class="sec">fn save_error</span> <span class="meta">line 180</span><br><span class="x">Whether the app should open in group mode, and a way to change it. Exposed as a pair of methods rather than as a public field so the group panel can ask to have a choice remembered without knowing where preferences live or what happens</span></li>
+<li><span class="sec">fn save_error</span> <span class="meta">line 180</span><br><span class="x">when the platform will not say. A failed write is not fatal here either: the tick applies for this session and the settings page reports why it was not kept. Why the last write failed, if it did.</span></li>
+<li><span class="sec">fn show_install_tab</span> <span class="meta">line 191</span><br><span class="x">Whether the install tab should be offered at all. Two conditions, and the first is not a preference: an installed copy never offers to install itself, because a program that does that is telling its user something untrue about what it is.</span></li>
+<li><span class="sec">fn show_install_tab</span> <span class="meta">line 191</span><br><span class="x">The preference only covers the other case -- a portable copy, run on purpose, by somebody who does not want to be asked again.</span></li>
+<li><span class="sec">fn hide_install_tab</span> <span class="meta">line 196</span><br><span class="x">Whether the install tab is hidden by preference.</span></li>
+<li><span class="sec">fn set_hide_install_tab</span> <span class="meta">line 201</span><br><span class="x">Record whether to hide the install tab on a portable copy.</span></li>
+<li><span class="sec">fn acceleration</span> <span class="meta">line 214</span><br><span class="x">Whether the window asks the platform for a hardware-drawn context. **Roadmap item 137.** Read once, before the window is made, because it decides how the window is made. Changing it therefore takes effect at the next launch, and the panel</span></li>
+<li><span class="sec">fn acceleration</span> <span class="meta">line 214</span><br><span class="x">says so rather than appearing to do nothing.</span></li>
+<li><span class="sec">fn set_acceleration</span> <span class="meta">line 219</span><br><span class="x">Record whether to ask for acceleration.</span></li>
+<li><span class="sec">fn frame_target</span> <span class="meta">line 228</span><br><span class="x">How often the window draws while something in it is moving.</span></li>
+<li><span class="sec">fn set_frame_target</span> <span class="meta">line 233</span><br><span class="x">Record a new frame-rate target.</span></li>
+<li><span class="sec">fn show_frame_rate</span> <span class="meta">line 243</span><br><span class="x">Whether the header carries a live frame-rate readout.</span></li>
+<li><span class="sec">fn always_group</span> <span class="meta">line 248</span><br><span class="x">Whether the app should open in group mode.</span></li>
+<li><span class="sec">fn autolock</span> <span class="meta">line 253</span><br><span class="x">How the autolock is configured, brought into range.</span></li>
+<li><span class="sec">fn set_autolock</span> <span class="meta">line 264</span><br><span class="x">Remember an autolock setting.</span></li>
+<li><span class="sec">fn seal_with_app_lock</span> <span class="meta">line 277</span><br><span class="x">Whether every recording is sealed with the app-lock passphrase.</span></li>
+<li><span class="sec">fn destination</span> <span class="meta">line 282</span><br><span class="x">The remembered encrypted destination, rebuilt from the settings file.</span></li>
+<li><span class="sec">fn set_destination</span> <span class="meta">line 291</span><br><span class="x">Remember a destination, including the answer to the hidden question.</span></li>
+<li><span class="sec">fn failsafe</span> <span class="meta">line 308</span><br><span class="x">The Failsafe posture in force.</span></li>
+<li><span class="sec">fn set_failsafe</span> <span class="meta">line 313</span><br><span class="x">Record the Failsafe posture.</span></li>
+<li><span class="sec">fn notify_style</span> <span class="meta">line 322</span><br><span class="x">How notifications should be shown.</span></li>
+<li><span class="sec">fn set_notify_style</span> <span class="meta">line 327</span><br><span class="x">Record how notifications should be shown.</span></li>
+<li><span class="sec">fn live_monitor</span> <span class="meta">line 336</span><br><span class="x">Where the live monitor sits, or whether it is shown.</span></li>
+<li><span class="sec">fn set_live_monitor</span> <span class="meta">line 341</span><br><span class="x">Record where the live monitor sits.</span></li>
+<li><span class="sec">fn set_always_group</span> <span class="meta">line 350</span><br><span class="x">Record whether the app should open in group mode.</span></li>
+<li><span class="sec">fn set_seal_with_app_lock</span> <span class="meta">line 364</span><br><span class="x">Remember, or stop remembering, that recordings are sealed with the app-lock passphrase. Roadmap item 86. Same pair-of-methods shape as `always_group` and for the same reason: the security tab asks for a choice to be kept without knowing</span></li>
+<li><span class="sec">fn set_seal_with_app_lock</span> <span class="meta">line 364</span><br><span class="x">where preferences live or what happens when the platform will not say.</span></li>
+<li><span class="sec">fn interface_page</span> <span class="meta">line 373</span><br><span class="x">Which tabs the window offers.</span></li>
+<li><span class="sec">fn toured_tabs</span> <span class="meta">line 579</span><br><span class="x">The tabs the tour has already covered.</span></li>
+<li><span class="sec">fn mark_toured</span> <span class="meta">line 590</span><br><span class="x">Record that the tour has covered these tabs, and save.</span></li>
+<li><span class="sec">fn first_run_appearance</span> <span class="meta">line 604</span><br><span class="x">The first-run panel: offered once, with animation already on. Shown as a page rather than a modal because it is not urgent and does not gate anything -- the legal notice is the thing that gates, and two blocking dialogues before a user has</span></li>
+<li><span class="sec">fn first_run_appearance</span> <span class="meta">line 604</span><br><span class="x">seen the app is one too many. The two appearance choices, for the first-run setup to place. Placed by `crate::firstrun`, which owns the first-run flow, so there is one copy of this wording rather than one per caller.</span></li>
+<li><span class="sec">fn first_run_autolock</span> <span class="meta">line 631</span><br><span class="x">The autolock switch and delay, for the first-run setup to place.</span></li>
+<li><span class="sec">fn finish_first_run</span> <span class="meta">line 659</span><br><span class="x">Mark the first run answered.</span></li>
+<li><span class="sec">fn tab</span> <span class="meta">line 666</span><br><span class="x">The settings tab.</span></li>
+<li><span class="sec">fn custom_palette_help</span> <span class="meta">line 721</span><br><span class="x">Explain where custom palettes go, and say what was refused and why. The refusals are the important half. A user who writes a palette file, puts it in the right place and sees nothing happen has no way to tell whether the application never</span></li>
+<li><span class="sec">fn custom_palette_help</span> <span class="meta">line 721</span><br><span class="x">looked, or looked and disliked it. Every complaint from the loader is shown verbatim, including the measured contrast ratio, because &quot;muted on bg is 2.4:1 and needs 3.0:1&quot; tells somebody exactly what to change and by roughly how much.</span></li>
+<li><span class="sec">fn theme_picker</span> <span class="meta">line 795</span><br><span class="x">The colour scheme, as a compact control for the window header. The same list the appearance page offers and the same effect; what it does not carry is the swatches and the custom-palette help, which need room and belong on the page. Two</span></li>
+<li><span class="sec">fn theme_picker</span> <span class="meta">line 795</span><br><span class="x">controls for one setting is worth it here: the header is where the website puts this, and a reader who has used the site looks in the same place. Returns the picker&#x27;s own rectangle. The controls beside it in the header take their height</span></li>
+<li><span class="sec">fn theme_picker</span> <span class="meta">line 795</span><br><span class="x">from it rather than working one out separately, which is what left them a pixel apart (finding F-178).</span></li>
+<li><span class="sec">fn appearance_page</span> <span class="meta">line 821</span><br><span class="x">The appearance page: palette, and what each one changes.</span></li>
+<li><span class="sec">fn motion_page</span> <span class="meta">line 860</span><br><span class="x">The motion page, including honouring the system&#x27;s reduced-motion setting.</span></li>
+<li><span class="sec">fn security_page</span> <span class="meta">line 997</span><br><span class="x">Roadmap item 92. The autolock, and the range it offers.</span></li>
+<li><span class="sec">fn storage_page</span> <span class="meta">line 1097</span><br><span class="x">The storage page: where files go, and the portable or installed choice.</span></li>
+<li><span class="sec">fn section</span> <span class="meta">line 1158</span><br><span class="x">A titled group with a one-line explanation under it.</span></li>
+<li><span class="sec">fn swatches</span> <span class="meta">line 1166</span><br><span class="x">The active palette, as a row of swatches, so the choice can be seen rather than only read.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 1196</span><br><span class="x"></span></li>
+<li><span class="sec">fn render</span> <span class="meta">line 1200</span><br><span class="x">Drive the settings tab once, with no window.</span></li>
+<li><span class="sec">fn every_page_renders_without_a_window</span> <span class="meta">line 1211</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_first_run_appearance_choices_render</span> <span class="meta">line 1220</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_menu_lists_every_page_exactly_once</span> <span class="meta">line 1231</span><br><span class="x">The menu has to cover the pages and the pages have to cover the menu, or a page becomes unreachable.</span></li>
+<li><span class="sec">fn the_first_run_is_offered_once</span> <span class="meta">line 1244</span><br><span class="x">A first run has not been configured; answering it must stick.</span></li>
+<li><span class="sec">fn animation_is_on_by_default_and_can_be_turned_off</span> <span class="meta">line 1260</span><br><span class="x">Defaults are what the request asked for: animation on, offered at the start, switchable afterwards.</span></li>
+<li><span class="sec">fn choosing_a_theme_applies_and_records_it</span> <span class="meta">line 1277</span><br><span class="x">Choosing a theme must apply it and record it.</span></li>
+<li><span class="sec">fn a_failed_save_is_reported_rather_than_swallowed</span> <span class="meta">line 1306</span><br><span class="x">A save that cannot happen must not be silent, and must not lose the choice for this session either.</span></li>
+<li><span class="sec">fn the_install_tab_is_never_offered_by_an_installed_copy</span> <span class="meta">line 1323</span><br><span class="x">Reset must not touch anything that is not a presentation choice. An installed copy never offers to install itself, whatever the preference says. The preference is only about the portable case.</span></li>
+<li><span class="sec">fn hiding_the_install_tab_survives_a_reload</span> <span class="meta">line 1348</span><br><span class="x">The tick is remembered. A preference that has to be set on every launch is not a preference.</span></li>
+<li><span class="sec">fn reset_leaves_the_first_run_answered</span> <span class="meta">line 1365</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_corrupt_file_leaves_a_usable_panel_that_says_so</span> <span class="meta">line 1414</span><br><span class="x">Loading must survive a settings file full of nonsense.</span></li>
 </ul>
 </details>
 <details open>
-<summary><code>crates/veilvoice-gui/src/setup.rs</code> <span class="meta">&middot; veilvoice-gui, 1032 lines, 59 sections</span></summary>
+<summary><code>crates/veilvoice-gui/src/setup.rs</code> <span class="meta">&middot; veilvoice-gui, 1039 lines, 59 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs">open setup.rs</a></p>
 <ul>
 <li><span class="sec">(module)</span> <span class="meta">line 1</span><br><span class="x">The setup tab: install this copy, undo that, and the optional companions. This is the graphical front end to [`veilvoice_setup`], and it is a *front end* in the strict sense: it holds no installation logic of its own. Every change to the</span></li>
@@ -8203,40 +8205,40 @@ nav.top a{margin-right:14px}
 <li><span class="sec">fn tab</span> <span class="meta">line 191</span><br><span class="x">Draw the tab.</span></li>
 <li><span class="sec">fn visibility_note</span> <span class="meta">line 219</span><br><span class="x">Why this tab is here, and how to make it not be. Under the header rather than buried in settings, because the question &quot;why is this program asking to install itself&quot; is asked *here*, while looking at the tab. The control that answers it</span></li>
 <li><span class="sec">fn visibility_note</span> <span class="meta">line 219</span><br><span class="x">lives in settings -- a tab that could hide itself and nothing else could bring it back would be a one-way door.</span></li>
-<li><span class="sec">fn where_this_copy_lives</span> <span class="meta">line 236</span><br><span class="x"></span></li>
-<li><span class="sec">fn install_controls</span> <span class="meta">line 303</span><br><span class="x"></span></li>
-<li><span class="sec">fn carry_question</span> <span class="meta">line 437</span><br><span class="x">Ask whether an install should take the settings with it. A question rather than a default, because the two right answers point in opposite directions and nothing here can tell which one applies. Somebody moving off a memory stick onto</span></li>
-<li><span class="sec">fn carry_question</span> <span class="meta">line 437</span><br><span class="x">their own machine wants their settings and vaults carried over. Somebody installing on a shared or borrowed machine wants them left exactly where they are, and guessing wrong there copies their vault onto a computer that is not theirs.</span></li>
-<li><span class="sec">fn start</span> <span class="meta">line 483</span><br><span class="x">Start a worker, and remember what it is doing so the strip can say.</span></li>
-<li><span class="sec">fn progress</span> <span class="meta">line 507</span><br><span class="x">The progress strip: a travelling highlight, or a plain bar when motion is off.</span></li>
-<li><span class="sec">fn companion_rows</span> <span class="meta">line 552</span><br><span class="x"></span></li>
-<li><span class="sec">fn detect_all</span> <span class="meta">line 727</span><br><span class="x">Probe for every companion that applies to this platform.</span></li>
-<li><span class="sec">fn can_install</span> <span class="meta">line 751</span><br><span class="x">Exactly what an install changes, in the order it changes it. Written out beside the button rather than in a manual. An installer that says &quot;install?&quot; and nothing else is asking somebody to consent to something they have not been told.</span></li>
-<li><span class="sec">fn can_install</span> <span class="meta">line 751</span><br><span class="x">Whether the install button is live. A function rather than four conditions in a closure, so the rule that matters can be asserted: **a portable copy cannot be installed until the question about its settings has been answered**. An install</span></li>
-<li><span class="sec">fn can_install</span> <span class="meta">line 751</span><br><span class="x">that ran on the first click would have taken one of the two answers by default, and the wrong one either copies a vault onto somebody else&#x27;s machine or leaves a person wondering where their recordings went.</span></li>
-<li><span class="sec">fn install_changes</span> <span class="meta">line 760</span><br><span class="x"></span></li>
-<li><span class="sec">fn field</span> <span class="meta">line 772</span><br><span class="x"></span></li>
-<li><span class="sec">mod tests</span> <span class="meta">line 780</span><br><span class="x"></span></li>
-<li><span class="sec">fn a_portable_copy_is_not_installed_until_the_question_is_answered</span> <span class="meta">line 785</span><br><span class="x">The tab reads the machine on construction and must not change it.</span></li>
-<li><span class="sec">fn nothing_installs_where_there_is_nowhere_to_install_it</span> <span class="meta">line 799</span><br><span class="x"></span></li>
-<li><span class="sec">fn opening_the_tab_changes_nothing</span> <span class="meta">line 809</span><br><span class="x"></span></li>
-<li><span class="sec">fn render</span> <span class="meta">line 829</span><br><span class="x">Drive the tab once with no window, in both motion states. The progress strip does arithmetic on a rectangle, and a rectangle in a headless context can be zero-width. A panic there would only ever be seen on somebody&#x27;s desktop, mid-install.</span></li>
-<li><span class="sec">fn motion</span> <span class="meta">line 836</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_tab_renders_without_a_window</span> <span class="meta">line 845</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_uninstall_confirmation_renders_and_does_nothing_by_itself</span> <span class="meta">line 855</span><br><span class="x">The uninstall confirmation is drawn, and drawing it must not act.</span></li>
-<li><span class="sec">fn a_worker_that_disappears_is_reported</span> <span class="meta">line 866</span><br><span class="x">A report from a worker that vanished must say so rather than leaving the strip running for ever.</span></li>
-<li><span class="sec">fn every_row_has_been_probed</span> <span class="meta">line 882</span><br><span class="x">Every companion shown is one that applies here, with a probe result.</span></li>
-<li><span class="sec">fn the_consent_text_names_what_install_changes</span> <span class="meta">line 895</span><br><span class="x">The list of changes is what the user consents to, so it must name the three things `veilvoice_setup::install` actually does, and must not stop mentioning that it asks for no administrator rights.</span></li>
-<li><span class="sec">fn no_button_is_drawn_for_a_command_that_cannot_be_run</span> <span class="meta">line 913</span><br><span class="x">A front end must not offer a button for anything the library refuses to run. This is the same rule as `companions::run`, checked from the side that draws the button.</span></li>
-<li><span class="sec">mod companion_tests</span> <span class="meta">line 931</span><br><span class="x"></span></li>
-<li><span class="sec">fn looking_again_does_not_probe_on_the_paint_thread</span> <span class="meta">line 940</span><br><span class="x">The probe runs off the paint thread. `detect_all` runs a command per companion, and on Windows one of them enumerates sound devices through PowerShell. On the paint thread that is hundreds of milliseconds inside a single frame, which is</span></li>
-<li><span class="sec">fn looking_again_does_not_probe_on_the_paint_thread</span> <span class="meta">line 940</span><br><span class="x">the window going white and the pointer becoming a spinner. Pressing &quot;look again&quot; did exactly that.</span></li>
-<li><span class="sec">fn a_missing_ffmpeg_always_says_where_it_can_be_installed</span> <span class="meta">line 971</span><br><span class="x">Every message that names a missing ffmpeg says where to get it. Naming a thing somebody cannot act on from where they are standing is the failure this guards: the render said &quot;ffmpeg is not on this machine&quot; and the tab that installs</span></li>
-<li><span class="sec">fn a_missing_ffmpeg_always_says_where_it_can_be_installed</span> <span class="meta">line 971</span><br><span class="x">software had never heard of it.</span></li>
-<li><span class="sec">mod typeface_tests</span> <span class="meta">line 989</span><br><span class="x"></span></li>
-<li><span class="sec">fn the_capture_script_will_not_photograph_in_the_fallback_face</span> <span class="meta">line 998</span><br><span class="x">The capture script refuses to photograph in the wrong face. The window prefers JetBrains Mono and falls back to the built-in monospace. That fallback is right for somebody running the program and wrong for a screenshot: a capture in the</span></li>
-<li><span class="sec">fn the_capture_script_will_not_photograph_in_the_fallback_face</span> <span class="meta">line 998</span><br><span class="x">wrong face looks subtly unlike every other picture in the set and nothing about the run says so, so half a set could be published before anybody noticed.</span></li>
-<li><span class="sec">fn the_typeface_flag_is_documented_where_it_is_answered</span> <span class="meta">line 1020</span><br><span class="x">The flag exists and is documented in the usage text. A flag the capture script depends on and the help does not mention is one somebody removes as unused.</span></li>
+<li><span class="sec">fn where_this_copy_lives</span> <span class="meta">line 238</span><br><span class="x">Say whether this copy is portable or installed, and where its files are.</span></li>
+<li><span class="sec">fn install_controls</span> <span class="meta">line 307</span><br><span class="x">The install and uninstall buttons, and what each will do before it is pressed.</span></li>
+<li><span class="sec">fn carry_question</span> <span class="meta">line 441</span><br><span class="x">Ask whether an install should take the settings with it. A question rather than a default, because the two right answers point in opposite directions and nothing here can tell which one applies. Somebody moving off a memory stick onto</span></li>
+<li><span class="sec">fn carry_question</span> <span class="meta">line 441</span><br><span class="x">their own machine wants their settings and vaults carried over. Somebody installing on a shared or borrowed machine wants them left exactly where they are, and guessing wrong there copies their vault onto a computer that is not theirs.</span></li>
+<li><span class="sec">fn start</span> <span class="meta">line 487</span><br><span class="x">Start a worker, and remember what it is doing so the strip can say.</span></li>
+<li><span class="sec">fn progress</span> <span class="meta">line 511</span><br><span class="x">The progress strip: a travelling highlight, or a plain bar when motion is off.</span></li>
+<li><span class="sec">fn companion_rows</span> <span class="meta">line 557</span><br><span class="x">One row per companion: whether it is here, and how to get it if not.</span></li>
+<li><span class="sec">fn detect_all</span> <span class="meta">line 732</span><br><span class="x">Probe for every companion that applies to this platform.</span></li>
+<li><span class="sec">fn can_install</span> <span class="meta">line 756</span><br><span class="x">Exactly what an install changes, in the order it changes it. Written out beside the button rather than in a manual. An installer that says &quot;install?&quot; and nothing else is asking somebody to consent to something they have not been told.</span></li>
+<li><span class="sec">fn can_install</span> <span class="meta">line 756</span><br><span class="x">Whether the install button is live. A function rather than four conditions in a closure, so the rule that matters can be asserted: **a portable copy cannot be installed until the question about its settings has been answered**. An install</span></li>
+<li><span class="sec">fn can_install</span> <span class="meta">line 756</span><br><span class="x">that ran on the first click would have taken one of the two answers by default, and the wrong one either copies a vault onto somebody else&#x27;s machine or leaves a person wondering where their recordings went.</span></li>
+<li><span class="sec">fn install_changes</span> <span class="meta">line 766</span><br><span class="x">Everything installing alters, listed so the button is never a surprise.</span></li>
+<li><span class="sec">fn field</span> <span class="meta">line 779</span><br><span class="x">One labelled read-only value, in the shape this tab uses throughout.</span></li>
+<li><span class="sec">mod tests</span> <span class="meta">line 787</span><br><span class="x"></span></li>
+<li><span class="sec">fn a_portable_copy_is_not_installed_until_the_question_is_answered</span> <span class="meta">line 792</span><br><span class="x">The tab reads the machine on construction and must not change it.</span></li>
+<li><span class="sec">fn nothing_installs_where_there_is_nowhere_to_install_it</span> <span class="meta">line 806</span><br><span class="x"></span></li>
+<li><span class="sec">fn opening_the_tab_changes_nothing</span> <span class="meta">line 816</span><br><span class="x"></span></li>
+<li><span class="sec">fn render</span> <span class="meta">line 836</span><br><span class="x">Drive the tab once with no window, in both motion states. The progress strip does arithmetic on a rectangle, and a rectangle in a headless context can be zero-width. A panic there would only ever be seen on somebody&#x27;s desktop, mid-install.</span></li>
+<li><span class="sec">fn motion</span> <span class="meta">line 843</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_tab_renders_without_a_window</span> <span class="meta">line 852</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_uninstall_confirmation_renders_and_does_nothing_by_itself</span> <span class="meta">line 862</span><br><span class="x">The uninstall confirmation is drawn, and drawing it must not act.</span></li>
+<li><span class="sec">fn a_worker_that_disappears_is_reported</span> <span class="meta">line 873</span><br><span class="x">A report from a worker that vanished must say so rather than leaving the strip running for ever.</span></li>
+<li><span class="sec">fn every_row_has_been_probed</span> <span class="meta">line 889</span><br><span class="x">Every companion shown is one that applies here, with a probe result.</span></li>
+<li><span class="sec">fn the_consent_text_names_what_install_changes</span> <span class="meta">line 902</span><br><span class="x">The list of changes is what the user consents to, so it must name the three things `veilvoice_setup::install` actually does, and must not stop mentioning that it asks for no administrator rights.</span></li>
+<li><span class="sec">fn no_button_is_drawn_for_a_command_that_cannot_be_run</span> <span class="meta">line 920</span><br><span class="x">A front end must not offer a button for anything the library refuses to run. This is the same rule as `companions::run`, checked from the side that draws the button.</span></li>
+<li><span class="sec">mod companion_tests</span> <span class="meta">line 938</span><br><span class="x"></span></li>
+<li><span class="sec">fn looking_again_does_not_probe_on_the_paint_thread</span> <span class="meta">line 947</span><br><span class="x">The probe runs off the paint thread. `detect_all` runs a command per companion, and on Windows one of them enumerates sound devices through PowerShell. On the paint thread that is hundreds of milliseconds inside a single frame, which is</span></li>
+<li><span class="sec">fn looking_again_does_not_probe_on_the_paint_thread</span> <span class="meta">line 947</span><br><span class="x">the window going white and the pointer becoming a spinner. Pressing &quot;look again&quot; did exactly that.</span></li>
+<li><span class="sec">fn a_missing_ffmpeg_always_says_where_it_can_be_installed</span> <span class="meta">line 978</span><br><span class="x">Every message that names a missing ffmpeg says where to get it. Naming a thing somebody cannot act on from where they are standing is the failure this guards: the render said &quot;ffmpeg is not on this machine&quot; and the tab that installs</span></li>
+<li><span class="sec">fn a_missing_ffmpeg_always_says_where_it_can_be_installed</span> <span class="meta">line 978</span><br><span class="x">software had never heard of it.</span></li>
+<li><span class="sec">mod typeface_tests</span> <span class="meta">line 996</span><br><span class="x"></span></li>
+<li><span class="sec">fn the_capture_script_will_not_photograph_in_the_fallback_face</span> <span class="meta">line 1005</span><br><span class="x">The capture script refuses to photograph in the wrong face. The window prefers JetBrains Mono and falls back to the built-in monospace. That fallback is right for somebody running the program and wrong for a screenshot: a capture in the</span></li>
+<li><span class="sec">fn the_capture_script_will_not_photograph_in_the_fallback_face</span> <span class="meta">line 1005</span><br><span class="x">wrong face looks subtly unlike every other picture in the set and nothing about the run says so, so half a set could be published before anybody noticed.</span></li>
+<li><span class="sec">fn the_typeface_flag_is_documented_where_it_is_answered</span> <span class="meta">line 1027</span><br><span class="x">The flag exists and is documented in the usage text. A flag the capture script depends on and the help does not mention is one somebody removes as unused.</span></li>
 </ul>
 </details>
 <details open>

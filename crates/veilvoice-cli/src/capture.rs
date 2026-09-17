@@ -49,6 +49,7 @@ pub fn capture_dir() -> Option<PathBuf> {
     veilvoice_crypto::lock::default_path().map(|lock| lock.with_file_name("").join("capture"))
 }
 
+/// Where the screen-recorder allowlist is kept for this user.
 fn allow_path() -> Result<PathBuf, String> {
     Ok(capture_dir()
         .ok_or_else(|| {
@@ -59,11 +60,13 @@ fn allow_path() -> Result<PathBuf, String> {
         .join("allow.txt"))
 }
 
+/// The allowlist, or an empty one when none has been written yet.
 fn load() -> Result<Allowlist, String> {
     let path = allow_path()?;
     Allowlist::load(&path).map_err(|error| format!("{}: {error}", path.display()))
 }
 
+/// Write the allowlist back, readable by its owner and nobody else.
 fn save(allowlist: &Allowlist) -> Result<(), String> {
     let path = allow_path()?;
     allowlist
