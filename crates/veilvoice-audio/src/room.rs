@@ -171,13 +171,13 @@ impl Shared {
     /// The same shape as the single-microphone path's, and not a realtime
     /// callback: cpal calls this when something has gone wrong rather than
     /// every block.
-    fn report(&self, side: crate::live::Side, error: &cpal::StreamError) {
+    fn report(&self, side: crate::live::Side, error: &cpal::Error) {
         let count = self.troubles.fetch_add(1, Ordering::Relaxed) + 1;
         eprintln!("veilvoice: {} stream error: {error}", side.word());
         if let Ok(mut held) = self.trouble.lock() {
             *held = Some(crate::live::Interference {
                 side,
-                device_gone: matches!(error, cpal::StreamError::DeviceNotAvailable),
+                device_gone: matches!(error.kind(), cpal::ErrorKind::DeviceNotAvailable),
                 said: error.to_string(),
                 count,
             });
@@ -228,7 +228,7 @@ impl RoomSession {
         let devices: Vec<&cpal::Device> = guests.iter().map(|guest| guest.device).collect();
         let (in_cfgs, out_cfg) = crate::live::agree_on_a_rate_for(&devices, output)?;
 
-        let sample_rate = out_cfg.sample_rate().0;
+        let sample_rate = out_cfg.sample_rate();
         let out_channels = out_cfg.channels() as usize;
         let capacity =
             ((sample_rate as f32 * crate::live::RING_MILLIS / 1000.0) as usize).max(2048);
@@ -277,7 +277,7 @@ impl RoomSession {
             let stream = guest
                 .device
                 .build_input_stream(
-                    &in_cfg.config(),
+                    in_cfg.config(),
                     move |data: &[f32], _| {
                         let mut peak = 0.0f32;
                         let mut dropped = 0u64;
@@ -339,7 +339,7 @@ impl RoomSession {
 
         let output_stream = output
             .build_output_stream(
-                &out_cfg.config(),
+                out_cfg.config(),
                 move |data: &mut [f32], _| {
                     let frames = (data.len() / out_channels.max(1)).min(max_frames);
                     mix[..frames].fill(0.0);

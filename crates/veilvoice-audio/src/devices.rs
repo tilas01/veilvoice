@@ -108,12 +108,21 @@ fn looks_virtual(name: &str) -> bool {
     VIRTUAL_CABLE_HINTS.iter().any(|h| lower.contains(h))
 }
 
+/// A device's name as the platform reports it, or `None` when it will not say.
+///
+/// `cpal` 0.18 replaced `Device::name` with a whole `DeviceDescription`, of
+/// which the name is the only field anything here wants. Unwrapping it once
+/// keeps that detail in one place rather than at all five call sites.
+fn name_of_opt(device: &cpal::Device) -> Option<String> {
+    device.description().ok().map(|d| d.name().to_string())
+}
+
 /// List the devices available in one direction.
 pub fn list(direction: Direction) -> Result<Vec<DeviceInfo>, Error> {
     let host = cpal::default_host();
     let default_name = match direction {
-        Direction::Input => host.default_input_device().and_then(|d| d.name().ok()),
-        Direction::Output => host.default_output_device().and_then(|d| d.name().ok()),
+        Direction::Input => host.default_input_device().and_then(|d| name_of_opt(&d)),
+        Direction::Output => host.default_output_device().and_then(|d| name_of_opt(&d)),
     };
 
     let devices: Vec<cpal::Device> = match direction {
@@ -129,7 +138,7 @@ pub fn list(direction: Direction) -> Result<Vec<DeviceInfo>, Error> {
 
     Ok(devices
         .into_iter()
-        .filter_map(|d| d.name().ok())
+        .filter_map(|d| name_of_opt(&d))
         .map(|name| DeviceInfo {
             is_default: Some(&name) == default_name.as_ref(),
             is_virtual_cable: looks_virtual(&name),
@@ -153,7 +162,7 @@ pub fn find_virtual_cable() -> Option<DeviceInfo> {
 ///
 /// Saves every caller from depending on `cpal` just to print a device name.
 pub fn name_of(device: &cpal::Device) -> String {
-    device.name().unwrap_or_else(|_| "<unnamed device>".into())
+    name_of_opt(device).unwrap_or_else(|| "<unnamed device>".into())
 }
 
 /// Look up a device by exact name, or the host default when `name` is `None`.
@@ -177,7 +186,7 @@ pub fn open(direction: Direction, name: Option<&str>) -> Result<cpal::Device, Er
                 ),
             };
             devices
-                .find(|d| d.name().map(|n| n == wanted).unwrap_or(false))
+                .find(|d| name_of_opt(d).map(|n| n == wanted).unwrap_or(false))
                 .ok_or_else(|| Error::Device(format!("no device named {wanted:?}")))
         }
     }

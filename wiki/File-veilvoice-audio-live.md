@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/live.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 860 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 859 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
 
 ## Contents
 
@@ -57,7 +57,7 @@ cannot.
 
 ## What this file contains
 
-860 lines defining **12 functions** (6 public), **7 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+859 lines defining **12 functions** (6 public), **7 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
