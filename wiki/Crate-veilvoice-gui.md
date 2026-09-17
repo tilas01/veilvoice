@@ -113,7 +113,7 @@ flowchart TD
     n_tour["tour.rs<br/>299 lines"]
     n_updates["updates.rs<br/>246 lines"]
     n_vault_store["vault_store.rs<br/>589 lines"]
-    n_verify["verify.rs<br/>1598 lines"]
+    n_verify["verify.rs<br/>1651 lines"]
     n_watchfeed["watchfeed.rs<br/>412 lines"]
     n_window["window.rs<br/>244 lines"]
     n_app --> n_avnotice
@@ -282,11 +282,11 @@ flowchart TD
 | [[`tour.rs`|File-veilvoice-gui-tour]] | 299 | The short tour on a first run, and after an upgrade. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 246 | The manual update check, as the window shows it. |
 | [[`vault_store.rs`|File-veilvoice-gui-vault_store]] | 589 | Where the desktop application keeps its own files, and what the app lock buys for them. |
-| [[`verify.rs`|File-veilvoice-gui-verify]] | 1598 | The verify tab: drop a download on the window and be told what it is. |
+| [[`verify.rs`|File-veilvoice-gui-verify]] | 1651 | The verify tab: drop a download on the window and be told what it is. |
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 412 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 244 | How big the window opens, and why it is not a constant. |
 
-**18,430 functional lines of Rust** in this crate. A functional line is a line
+**18,456 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
