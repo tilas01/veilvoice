@@ -73,6 +73,9 @@ DOCUMENTS = [
     ("docs/INSTALL.md", "Installing",
      "Per operating system, with the verification step in place rather than "
      "bolted on"),
+    ("docs/COMMANDS.md", "Every command",
+     "All thirty-two, what each is for, and where the same job is in the "
+     "window"),
     ("docs/FAQ.md", "Questions",
      "The questions people actually ask"),
     ("docs/WHITEPAPER.md", "How the veiling works",
@@ -90,6 +93,9 @@ DOCUMENTS = [
      "The crates, and what depending on one commits you to"),
     ("docs/WEBSITE.md", "The website",
      "Both editions, what generates each page, and the twelve scripts"),
+    ("docs/DEVELOPERS.md", "Working on the code",
+     "The shape of the repository: the crates, where to start reading, what "
+     "a build enforces and how to run every check"),
     ("docs/CONTRIBUTING.md", "Contributing",
      "Building, the standing rules, the house style and what a change has to "
      "pass"),

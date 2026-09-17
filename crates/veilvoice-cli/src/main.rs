@@ -3156,6 +3156,45 @@ mod tests {
     /// long flag belongs to the subcommand it is shown with. That is the half
     /// a machine can settle. Whether the example *works* is not checkable
     /// here and is what running it is for: F-110 needed somebody to type it.
+    /// And the other direction: every command the program has is documented.
+    ///
+    /// The test above stops the documentation naming a command that does not
+    /// exist. It says nothing about a command that exists and is named
+    /// nowhere, which is the more likely of the two: a subcommand is added
+    /// because somebody wanted it, and the moment it works there is no
+    /// further pressure to write about it.
+    ///
+    /// There was a lot of it. The user guide's command-line section showed
+    /// twelve of thirty-two, and the twenty it left out included every one of
+    /// the monitoring commands, the mandate, the decoy and the safety catch.
+    /// `docs/COMMANDS.md` is the whole list now, and this is what keeps it
+    /// whole: clap's own tree against that document, so a command added
+    /// tomorrow fails a build rather than being found by nobody.
+    ///
+    /// `help` is clap's own: it is printed in the command list and is not in
+    /// the tree this walks, so it needs no section and gets none.
+    #[test]
+    fn every_command_the_program_has_is_documented() {
+        let text = include_str!("../../../docs/COMMANDS.md").replace("\r\n", "\n");
+        let missing: Vec<String> = Cli::command()
+            .get_subcommands()
+            .map(|sub| sub.get_name().to_string())
+            .filter(|name| !text.contains(&format!("## `veilvoice {name}`")))
+            .collect();
+        assert!(
+            Cli::command().get_subcommands().count() >= 10,
+            "clap reported {} subcommands, so this checked nothing",
+            Cli::command().get_subcommands().count()
+        );
+        assert!(
+            missing.is_empty(),
+            "these commands exist and docs/COMMANDS.md has no section for \
+             them: {}. Add each to NOTES in tools/docs/commands.py and run \
+             the generator, which is what writes that document.",
+            missing.join(", ")
+        );
+    }
+
     #[test]
     fn every_command_the_documentation_shows_exists() {
         let docs = [
@@ -3165,6 +3204,15 @@ mod tests {
                 include_str!("../../../docs/USER_GUIDE.md"),
             ),
             ("docs/INSTALL.md", include_str!("../../../docs/INSTALL.md")),
+            // Every command, with a line to copy under most of them. Those
+            // lines are exactly what this test exists for: they are written
+            // by hand in `tools/docs/commands.py`, and a flag that has been
+            // renamed since would otherwise be published thirty-two times
+            // over, on this page, in the wiki and on the website.
+            (
+                "docs/COMMANDS.md",
+                include_str!("../../../docs/COMMANDS.md"),
+            ),
         ];
 
         let root = Cli::command();

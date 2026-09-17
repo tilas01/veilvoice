@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 3461 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="main.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 3509 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -3308,309 +3308,357 @@
 <span class="ln" id="L3156">    <span class="tok-com">/// long flag belongs to the subcommand it is shown with. That is the half</span></span>
 <span class="ln" id="L3157">    <span class="tok-com">/// a machine can settle. Whether the example *works* is not checkable</span></span>
 <span class="ln" id="L3158">    <span class="tok-com">/// here and is what running it is for: F-110 needed somebody to type it.</span></span>
-<span class="ln" id="L3159">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3160">    <span class="tok-kw">fn</span> <span class="tok-fn">every_command_the_documentation_shows_exists</span>() {</span>
-<span class="ln" id="L3161">        <span class="tok-kw">let</span> docs = [</span>
-<span class="ln" id="L3162">            (<span class="tok-str">&quot;README.md&quot;</span>, include_str!(<span class="tok-str">&quot;../../../README.md&quot;</span>)),</span>
-<span class="ln" id="L3163">            (</span>
-<span class="ln" id="L3164">                <span class="tok-str">&quot;docs/USER_GUIDE.md&quot;</span>,</span>
-<span class="ln" id="L3165">                include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>),</span>
-<span class="ln" id="L3166">            ),</span>
-<span class="ln" id="L3167">            (<span class="tok-str">&quot;docs/INSTALL.md&quot;</span>, include_str!(<span class="tok-str">&quot;../../../docs/INSTALL.md&quot;</span>)),</span>
-<span class="ln" id="L3168">        ];</span>
-<span class="ln" id="L3169"></span>
-<span class="ln" id="L3170">        <span class="tok-kw">let</span> root = Cli::<span class="tok-fn">command</span>();</span>
-<span class="ln" id="L3171">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> problems: Vec&lt;String&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L3172">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> checked = 0_usize;</span>
-<span class="ln" id="L3173"></span>
-<span class="ln" id="L3174">        <span class="tok-kw">for</span> (name, text) <span class="tok-kw">in</span> docs {</span>
-<span class="ln" id="L3175">            <span class="tok-kw">let</span> text = text.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L3176">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fenced = false;</span>
-<span class="ln" id="L3177">            <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L3178">                <span class="tok-kw">if</span> line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;```&quot;</span>) {</span>
-<span class="ln" id="L3179">                    fenced = !fenced;</span>
-<span class="ln" id="L3180">                    continue;</span>
-<span class="ln" id="L3181">                }</span>
-<span class="ln" id="L3182"></span>
-<span class="ln" id="L3183">                <span class="tok-com">// Everything a reader could copy and run, from this line.</span></span>
-<span class="ln" id="L3184">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> candidates: Vec&lt;&amp;str&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L3185">                <span class="tok-kw">if</span> fenced {</span>
-<span class="ln" id="L3186">                    <span class="tok-kw">let</span> bare = line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&quot;$ &quot;</span>).<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L3187">                    candidates.<span class="tok-fn">push</span>(bare);</span>
-<span class="ln" id="L3188">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L3189">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rest = line;</span>
-<span class="ln" id="L3190">                    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(open) = rest.<span class="tok-fn">find</span>(<span class="tok-str">&#x27;`&#x27;</span>) {</span>
-<span class="ln" id="L3191">                        <span class="tok-kw">let</span> after = &amp;rest[open + <span class="tok-num">1</span>..];</span>
-<span class="ln" id="L3192">                        <span class="tok-kw">match</span> after.<span class="tok-fn">find</span>(<span class="tok-str">&#x27;`&#x27;</span>) {</span>
-<span class="ln" id="L3193">                            <span class="tok-fn">Some</span>(close) =&gt; {</span>
-<span class="ln" id="L3194">                                candidates.<span class="tok-fn">push</span>(&amp;after[..close]);</span>
-<span class="ln" id="L3195">                                rest = &amp;after[close + <span class="tok-num">1</span>..];</span>
-<span class="ln" id="L3196">                            }</span>
-<span class="ln" id="L3197">                            None =&gt; break,</span>
-<span class="ln" id="L3198">                        }</span>
-<span class="ln" id="L3199">                    }</span>
-<span class="ln" id="L3200">                }</span>
-<span class="ln" id="L3201"></span>
-<span class="ln" id="L3202">                <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> candidates {</span>
-<span class="ln" id="L3203">                    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(after) = candidate.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;veilvoice&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L3204">                        continue;</span>
-<span class="ln" id="L3205">                    };</span>
-<span class="ln" id="L3206">                    <span class="tok-kw">if</span> !after.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27; &#x27;</span>) {</span>
-<span class="ln" id="L3207">                        <span class="tok-com">// `veilvoice-verify` and `veilvoice-gui` are other</span></span>
-<span class="ln" id="L3208">                        <span class="tok-com">// programs, with arguments of their own.</span></span>
-<span class="ln" id="L3209">                        continue;</span>
-<span class="ln" id="L3210">                    }</span>
-<span class="ln" id="L3211">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> words = after.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">peekable</span>();</span>
-<span class="ln" id="L3212">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> node = &amp;root;</span>
-<span class="ln" id="L3213">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> path: Vec&lt;String&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L3214"></span>
-<span class="ln" id="L3215">                    <span class="tok-com">// `verify` hands everything after it to the verifier,</span></span>
-<span class="ln" id="L3216">                    <span class="tok-com">// which has its own parser, so clap cannot answer for the</span></span>
-<span class="ln" id="L3217">                    <span class="tok-com">// words that follow. Checking them against clap would</span></span>
-<span class="ln" id="L3218">                    <span class="tok-com">// report every one of them missing; skipping them would</span></span>
-<span class="ln" id="L3219">                    <span class="tok-com">// leave the most safety-critical commands in the whole</span></span>
-<span class="ln" id="L3220">                    <span class="tok-com">// documentation unchecked. So they are checked against the</span></span>
-<span class="ln" id="L3221">                    <span class="tok-com">// verifier&#x27;s own help, which is the thing that defines</span></span>
-<span class="ln" id="L3222">                    <span class="tok-com">// them.</span></span>
-<span class="ln" id="L3223">                    <span class="tok-kw">if</span> words.<span class="tok-fn">peek</span>().<span class="tok-fn">copied</span>() == <span class="tok-fn">Some</span>(<span class="tok-str">&quot;verify&quot;</span>) {</span>
-<span class="ln" id="L3224">                        words.<span class="tok-fn">next</span>();</span>
-<span class="ln" id="L3225">                        checked += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L3226">                        <span class="tok-kw">let</span> help = veilvoice_verify::<span class="tok-fn">help_text</span>();</span>
-<span class="ln" id="L3227">                        <span class="tok-com">// A `#` starts a trailing comment in every shell</span></span>
-<span class="ln" id="L3228">                        <span class="tok-com">// example here, so the comment is cut off first --</span></span>
-<span class="ln" id="L3229">                        <span class="tok-com">// reading past one turns English prose into a list of</span></span>
-<span class="ln" id="L3230">                        <span class="tok-com">// commands nobody wrote. Of what is left, only the</span></span>
-<span class="ln" id="L3231">                        <span class="tok-com">// first word is a command; the rest are its arguments,</span></span>
-<span class="ln" id="L3232">                        <span class="tok-com">// and the flags among them are checked below.</span></span>
-<span class="ln" id="L3233">                        <span class="tok-kw">let</span> real: Vec&lt;&amp;str&gt; = words.<span class="tok-fn">take_while</span>(|w| !w.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>)).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L3234">                        <span class="tok-kw">let</span> vetted: Vec&lt;&amp;str&gt; = real</span>
-<span class="ln" id="L3235">                            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L3236">                            .<span class="tok-fn">copied</span>()</span>
-<span class="ln" id="L3237">                            .<span class="tok-fn">enumerate</span>()</span>
-<span class="ln" id="L3238">                            .<span class="tok-fn">filter</span>(|(i, w)| *i == <span class="tok-num">0</span> || w.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>))</span>
-<span class="ln" id="L3239">                            .<span class="tok-fn">map</span>(|(_, w)| w)</span>
-<span class="ln" id="L3240">                            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L3241">                        <span class="tok-kw">for</span> word <span class="tok-kw">in</span> vetted {</span>
-<span class="ln" id="L3242">                            <span class="tok-kw">let</span> known = <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(flag) = word.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;--&quot;</span>) {</span>
-<span class="ln" id="L3243">                                <span class="tok-kw">let</span> flag: String = flag</span>
-<span class="ln" id="L3244">                                    .<span class="tok-fn">chars</span>()</span>
-<span class="ln" id="L3245">                                    .<span class="tok-fn">take_while</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || *c == <span class="tok-str">&#x27;-&#x27;</span>)</span>
-<span class="ln" id="L3246">                                    .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L3247">                                flag.<span class="tok-fn">is_empty</span>()</span>
-<span class="ln" id="L3248">                                    || flag == <span class="tok-str">&quot;help&quot;</span></span>
-<span class="ln" id="L3249">                                    || flag == <span class="tok-str">&quot;version&quot;</span></span>
-<span class="ln" id="L3250">                                    <span class="tok-com">// This command&#x27;s own flags, which clap owns.</span></span>
-<span class="ln" id="L3251">                                    || root</span>
-<span class="ln" id="L3252">                                        .<span class="tok-fn">find_subcommand</span>(<span class="tok-str">&quot;verify&quot;</span>)</span>
-<span class="ln" id="L3253">                                        .<span class="tok-fn">map</span>(|v| {</span>
-<span class="ln" id="L3254">                                            v.<span class="tok-fn">get_arguments</span>()</span>
-<span class="ln" id="L3255">                                                .<span class="tok-fn">any</span>(|a| a.<span class="tok-fn">get_long</span>() == <span class="tok-fn">Some</span>(flag.<span class="tok-fn">as_str</span>()))</span>
-<span class="ln" id="L3256">                                        })</span>
-<span class="ln" id="L3257">                                        .<span class="tok-fn">unwrap_or</span>(false)</span>
-<span class="ln" id="L3258">                                    || help.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;--{flag}&quot;</span>))</span>
-<span class="ln" id="L3259">                            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> word.<span class="tok-fn">chars</span>().<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || c == <span class="tok-str">&#x27;-&#x27;</span>)</span>
-<span class="ln" id="L3260">                                &amp;&amp; !word.<span class="tok-fn">is_empty</span>()</span>
-<span class="ln" id="L3261">                            {</span>
-<span class="ln" id="L3262">                                help.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;veilvoice verify {word}&quot;</span>))</span>
-<span class="ln" id="L3263">                            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L3264">                                <span class="tok-com">// A path, a hash, a placeholder: an argument</span></span>
-<span class="ln" id="L3265">                                <span class="tok-com">// rather than something to look up.</span></span>
-<span class="ln" id="L3266">                                true</span>
-<span class="ln" id="L3267">                            };</span>
-<span class="ln" id="L3268">                            <span class="tok-kw">if</span> !known {</span>
-<span class="ln" id="L3269">                                problems.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L3270">                                    <span class="tok-str">&quot;{name}:{}: `veilvoice verify {word}` is documented, \</span></span>
-<span class="ln" id="L3271"><span class="tok-str">                                     and the verifier&#x27;s own help does not mention it&quot;</span>,</span>
-<span class="ln" id="L3272">                                    number + <span class="tok-num">1</span>,</span>
-<span class="ln" id="L3273">                                ));</span>
-<span class="ln" id="L3274">                            }</span>
-<span class="ln" id="L3275">                        }</span>
-<span class="ln" id="L3276">                        continue;</span>
-<span class="ln" id="L3277">                    }</span>
-<span class="ln" id="L3278"></span>
-<span class="ln" id="L3279">                    <span class="tok-com">// The leading words are subcommands until one is not.</span></span>
-<span class="ln" id="L3280">                    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(word) = words.<span class="tok-fn">peek</span>().<span class="tok-fn">copied</span>() {</span>
-<span class="ln" id="L3281">                        <span class="tok-kw">if</span> word.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;-&#x27;</span>)</span>
-<span class="ln" id="L3282">                            || word.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;.&#x27;</span>)</span>
-<span class="ln" id="L3283">                            || word.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;/&#x27;</span>)</span>
-<span class="ln" id="L3284">                            || word.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&lt;&#x27;</span>)</span>
-<span class="ln" id="L3285">                            || !word.<span class="tok-fn">chars</span>().<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || c == <span class="tok-str">&#x27;-&#x27;</span>)</span>
-<span class="ln" id="L3286">                        {</span>
-<span class="ln" id="L3287">                            break;</span>
-<span class="ln" id="L3288">                        }</span>
-<span class="ln" id="L3289">                        <span class="tok-kw">match</span> node.<span class="tok-fn">find_subcommand</span>(word) {</span>
-<span class="ln" id="L3290">                            <span class="tok-fn">Some</span>(next) =&gt; {</span>
-<span class="ln" id="L3291">                                path.<span class="tok-fn">push</span>(word.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L3292">                                node = next;</span>
-<span class="ln" id="L3293">                                words.<span class="tok-fn">next</span>();</span>
-<span class="ln" id="L3294">                            }</span>
-<span class="ln" id="L3295">                            None =&gt; {</span>
-<span class="ln" id="L3296">                                problems.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L3297">                                    <span class="tok-str">&quot;{name}:{}: `veilvoice {}{word}` is documented, and \</span></span>
-<span class="ln" id="L3298"><span class="tok-str">                                     there is no such command&quot;</span>,</span>
-<span class="ln" id="L3299">                                    number + <span class="tok-num">1</span>,</span>
-<span class="ln" id="L3300">                                    path.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|p| format!(<span class="tok-str">&quot;{p} &quot;</span>)).collect::&lt;String&gt;()</span>
-<span class="ln" id="L3301">                                ));</span>
-<span class="ln" id="L3302">                                break;</span>
-<span class="ln" id="L3303">                            }</span>
-<span class="ln" id="L3304">                        }</span>
-<span class="ln" id="L3305">                    }</span>
-<span class="ln" id="L3306">                    <span class="tok-kw">if</span> path.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L3307">                        continue;</span>
-<span class="ln" id="L3308">                    }</span>
-<span class="ln" id="L3309">                    checked += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L3310"></span>
-<span class="ln" id="L3311">                    <span class="tok-kw">for</span> word <span class="tok-kw">in</span> words {</span>
-<span class="ln" id="L3312">                        <span class="tok-kw">if</span> !word.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>) {</span>
-<span class="ln" id="L3313">                            continue;</span>
-<span class="ln" id="L3314">                        }</span>
-<span class="ln" id="L3315">                        <span class="tok-kw">let</span> flag: String = word</span>
-<span class="ln" id="L3316">                            .<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&quot;--&quot;</span>)</span>
-<span class="ln" id="L3317">                            .<span class="tok-fn">chars</span>()</span>
-<span class="ln" id="L3318">                            .<span class="tok-fn">take_while</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || *c == <span class="tok-str">&#x27;-&#x27;</span>)</span>
-<span class="ln" id="L3319">                            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L3320">                        <span class="tok-kw">if</span> flag.<span class="tok-fn">is_empty</span>() || flag == <span class="tok-str">&quot;help&quot;</span> || flag == <span class="tok-str">&quot;version&quot;</span> {</span>
-<span class="ln" id="L3321">                            continue;</span>
-<span class="ln" id="L3322">                        }</span>
-<span class="ln" id="L3323">                        <span class="tok-kw">let</span> known = node.<span class="tok-fn">get_arguments</span>().<span class="tok-fn">any</span>(|a| {</span>
-<span class="ln" id="L3324">                            a.<span class="tok-fn">get_long</span>() == <span class="tok-fn">Some</span>(flag.<span class="tok-fn">as_str</span>())</span>
-<span class="ln" id="L3325">                                || a.<span class="tok-fn">get_all_aliases</span>()</span>
-<span class="ln" id="L3326">                                    .<span class="tok-fn">map</span>(|all| all.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|x| *x == flag))</span>
-<span class="ln" id="L3327">                                    .<span class="tok-fn">unwrap_or</span>(false)</span>
-<span class="ln" id="L3328">                        });</span>
-<span class="ln" id="L3329">                        <span class="tok-kw">if</span> !known {</span>
-<span class="ln" id="L3330">                            problems.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L3331">                                <span class="tok-str">&quot;{name}:{}: `veilvoice {} --{flag}` is documented, and \</span></span>
-<span class="ln" id="L3332"><span class="tok-str">                                 `{}` has no `--{flag}`&quot;</span>,</span>
-<span class="ln" id="L3333">                                number + <span class="tok-num">1</span>,</span>
-<span class="ln" id="L3334">                                path.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>),</span>
-<span class="ln" id="L3335">                                path.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>)</span>
-<span class="ln" id="L3336">                            ));</span>
-<span class="ln" id="L3337">                        }</span>
-<span class="ln" id="L3338">                    }</span>
-<span class="ln" id="L3339">                }</span>
-<span class="ln" id="L3340">            }</span>
-<span class="ln" id="L3341">        }</span>
-<span class="ln" id="L3342"></span>
-<span class="ln" id="L3343">        assert!(</span>
-<span class="ln" id="L3344">            checked &gt; <span class="tok-num">20</span>,</span>
-<span class="ln" id="L3345">            <span class="tok-str">&quot;only {checked} documented invocations were found, which means this \</span></span>
-<span class="ln" id="L3346"><span class="tok-str">             test has stopped reading the documentation rather than that the \</span></span>
-<span class="ln" id="L3347"><span class="tok-str">             documentation stopped showing commands&quot;</span></span>
-<span class="ln" id="L3348">        );</span>
-<span class="ln" id="L3349">        assert!(</span>
-<span class="ln" id="L3350">            problems.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L3351">            <span class="tok-str">&quot;the documentation shows commands this program does not have:\n  {}&quot;</span>,</span>
-<span class="ln" id="L3352">            problems.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n  &quot;</span>)</span>
-<span class="ln" id="L3353">        );</span>
-<span class="ln" id="L3354">    }</span>
-<span class="ln" id="L3355"></span>
-<span class="ln" id="L3356">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3357">    <span class="tok-kw">fn</span> <span class="tok-fn">cli_definition_is_valid</span>() {</span>
-<span class="ln" id="L3358">        Cli::<span class="tok-fn">command</span>().<span class="tok-fn">debug_assert</span>();</span>
-<span class="ln" id="L3359">    }</span>
-<span class="ln" id="L3360"></span>
-<span class="ln" id="L3361">    <span class="tok-kw">fn</span> <span class="tok-fn">tuning</span>(intensity: f32, keep_accent: bool, reseed_secs: f32) -&gt; Tuning {</span>
-<span class="ln" id="L3362">        Tuning {</span>
-<span class="ln" id="L3363">            intensity,</span>
-<span class="ln" id="L3364">            keep_accent,</span>
-<span class="ln" id="L3365">            reseed_secs,</span>
-<span class="ln" id="L3366">            <span class="tok-com">// The fixed interval, so these tests stay deterministic. The</span></span>
-<span class="ln" id="L3367">            <span class="tok-com">// randomised range has its own tests in veilvoice-core.</span></span>
-<span class="ln" id="L3368">            reseed_range: None,</span>
-<span class="ln" id="L3369">        }</span>
-<span class="ln" id="L3370">    }</span>
-<span class="ln" id="L3371"></span>
-<span class="ln" id="L3372">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3373">    <span class="tok-kw">fn</span> <span class="tok-fn">intensity_is_clamped_into_range</span>() {</span>
-<span class="ln" id="L3374">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">5.0</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L3375">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(-<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L3376">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">0.5</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">0.5</span>);</span>
-<span class="ln" id="L3377">    }</span>
-<span class="ln" id="L3378"></span>
-<span class="ln" id="L3379">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3380">    <span class="tok-kw">fn</span> <span class="tok-fn">keep_accent_disables_neutralisation</span>() {</span>
-<span class="ln" id="L3381">        assert!(!<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, true, <span class="tok-num">2.0</span>)).accent.enabled);</span>
-<span class="ln" id="L3382">        assert!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>)).accent.enabled);</span>
-<span class="ln" id="L3383">    }</span>
-<span class="ln" id="L3384"></span>
-<span class="ln" id="L3385">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3386">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_interval_reaches_the_engine_and_cannot_go_negative</span>() {</span>
-<span class="ln" id="L3387">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">0.5</span>)).reseed_secs, <span class="tok-num">0.5</span>);</span>
-<span class="ln" id="L3388">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">0.0</span>)).reseed_secs, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L3389">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, -<span class="tok-num">3.0</span>)).reseed_secs, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L3390">    }</span>
-<span class="ln" id="L3391"></span>
-<span class="ln" id="L3392">    <span class="tok-com">/// Encryption at rest is a *default*, not a flag the careful user has to</span></span>
-<span class="ln" id="L3393">    <span class="tok-com">/// find. If someone ever flips this, this test is what stops it shipping.</span></span>
-<span class="ln" id="L3394">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3395">    <span class="tok-kw">fn</span> <span class="tok-fn">recordings_are_encrypted_at_rest_by_default</span>() {</span>
-<span class="ln" id="L3396">        <span class="tok-kw">let</span> cli = Cli::<span class="tok-fn">try_parse_from</span>([<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;anonymise&quot;</span>, <span class="tok-str">&quot;in.wav&quot;</span>]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L3397">        <span class="tok-kw">let</span> Command::Anonymise {</span>
-<span class="ln" id="L3398">            encrypt,</span>
-<span class="ln" id="L3399">            encrypt_to,</span>
-<span class="ln" id="L3400">            yes,</span>
-<span class="ln" id="L3401">            ..</span>
-<span class="ln" id="L3402">        } = cli.command</span>
-<span class="ln" id="L3403">        <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L3404">            panic!(<span class="tok-str">&quot;expected anonymise&quot;</span>);</span>
-<span class="ln" id="L3405">        };</span>
-<span class="ln" id="L3406">        assert!(encrypt, <span class="tok-str">&quot;at-rest encryption must default on&quot;</span>);</span>
-<span class="ln" id="L3407">        assert!(encrypt_to.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L3408">        assert!(!yes, <span class="tok-str">&quot;the confirmation must not be pre-answered&quot;</span>);</span>
-<span class="ln" id="L3409"></span>
-<span class="ln" id="L3410">        <span class="tok-kw">let</span> off = Cli::<span class="tok-fn">try_parse_from</span>([<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;anonymise&quot;</span>, <span class="tok-str">&quot;in.wav&quot;</span>, <span class="tok-str">&quot;--encrypt&quot;</span>, <span class="tok-str">&quot;false&quot;</span>])</span>
-<span class="ln" id="L3411">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L3412">        <span class="tok-kw">let</span> Command::Anonymise { encrypt, .. } = off.command <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L3413">            panic!(<span class="tok-str">&quot;expected anonymise&quot;</span>);</span>
-<span class="ln" id="L3414">        };</span>
-<span class="ln" id="L3415">        assert!(!encrypt, <span class="tok-str">&quot;it must still be possible to opt out&quot;</span>);</span>
-<span class="ln" id="L3416">    }</span>
-<span class="ln" id="L3417"></span>
-<span class="ln" id="L3418">    <span class="tok-com">/// Refused before anything is read or written, so a contradictory command</span></span>
-<span class="ln" id="L3419">    <span class="tok-com">/// line cannot half-happen.</span></span>
+<span class="ln" id="L3159">    <span class="tok-com">/// And the other direction: every command the program has is documented.</span></span>
+<span class="ln" id="L3160">    <span class="tok-com">///</span></span>
+<span class="ln" id="L3161">    <span class="tok-com">/// The test above stops the documentation naming a command that does not</span></span>
+<span class="ln" id="L3162">    <span class="tok-com">/// exist. It says nothing about a command that exists and is named</span></span>
+<span class="ln" id="L3163">    <span class="tok-com">/// nowhere, which is the more likely of the two: a subcommand is added</span></span>
+<span class="ln" id="L3164">    <span class="tok-com">/// because somebody wanted it, and the moment it works there is no</span></span>
+<span class="ln" id="L3165">    <span class="tok-com">/// further pressure to write about it.</span></span>
+<span class="ln" id="L3166">    <span class="tok-com">///</span></span>
+<span class="ln" id="L3167">    <span class="tok-com">/// There was a lot of it. The user guide&#x27;s command-line section showed</span></span>
+<span class="ln" id="L3168">    <span class="tok-com">/// twelve of thirty-two, and the twenty it left out included every one of</span></span>
+<span class="ln" id="L3169">    <span class="tok-com">/// the monitoring commands, the mandate, the decoy and the safety catch.</span></span>
+<span class="ln" id="L3170">    <span class="tok-com">/// `docs/COMMANDS.md` is the whole list now, and this is what keeps it</span></span>
+<span class="ln" id="L3171">    <span class="tok-com">/// whole: clap&#x27;s own tree against that document, so a command added</span></span>
+<span class="ln" id="L3172">    <span class="tok-com">/// tomorrow fails a build rather than being found by nobody.</span></span>
+<span class="ln" id="L3173">    <span class="tok-com">///</span></span>
+<span class="ln" id="L3174">    <span class="tok-com">/// `help` is clap&#x27;s own: it is printed in the command list and is not in</span></span>
+<span class="ln" id="L3175">    <span class="tok-com">/// the tree this walks, so it needs no section and gets none.</span></span>
+<span class="ln" id="L3176">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3177">    <span class="tok-kw">fn</span> <span class="tok-fn">every_command_the_program_has_is_documented</span>() {</span>
+<span class="ln" id="L3178">        <span class="tok-kw">let</span> text = include_str!(<span class="tok-str">&quot;../../../docs/COMMANDS.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L3179">        <span class="tok-kw">let</span> missing: Vec&lt;String&gt; = Cli::<span class="tok-fn">command</span>()</span>
+<span class="ln" id="L3180">            .<span class="tok-fn">get_subcommands</span>()</span>
+<span class="ln" id="L3181">            .<span class="tok-fn">map</span>(|sub| sub.<span class="tok-fn">get_name</span>().<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L3182">            .<span class="tok-fn">filter</span>(|name| !text.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;## `veilvoice {name}`&quot;</span>)))</span>
+<span class="ln" id="L3183">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L3184">        assert!(</span>
+<span class="ln" id="L3185">            Cli::<span class="tok-fn">command</span>().<span class="tok-fn">get_subcommands</span>().<span class="tok-fn">count</span>() &gt;= <span class="tok-num">10</span>,</span>
+<span class="ln" id="L3186">            <span class="tok-str">&quot;clap reported {} subcommands, so this checked nothing&quot;</span>,</span>
+<span class="ln" id="L3187">            Cli::<span class="tok-fn">command</span>().<span class="tok-fn">get_subcommands</span>().<span class="tok-fn">count</span>()</span>
+<span class="ln" id="L3188">        );</span>
+<span class="ln" id="L3189">        assert!(</span>
+<span class="ln" id="L3190">            missing.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L3191">            <span class="tok-str">&quot;these commands exist and docs/COMMANDS.md has no section for \</span></span>
+<span class="ln" id="L3192"><span class="tok-str">             them: {}. Add each to NOTES in tools/docs/commands.py and run \</span></span>
+<span class="ln" id="L3193"><span class="tok-str">             the generator, which is what writes that document.&quot;</span>,</span>
+<span class="ln" id="L3194">            missing.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>)</span>
+<span class="ln" id="L3195">        );</span>
+<span class="ln" id="L3196">    }</span>
+<span class="ln" id="L3197"></span>
+<span class="ln" id="L3198">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3199">    <span class="tok-kw">fn</span> <span class="tok-fn">every_command_the_documentation_shows_exists</span>() {</span>
+<span class="ln" id="L3200">        <span class="tok-kw">let</span> docs = [</span>
+<span class="ln" id="L3201">            (<span class="tok-str">&quot;README.md&quot;</span>, include_str!(<span class="tok-str">&quot;../../../README.md&quot;</span>)),</span>
+<span class="ln" id="L3202">            (</span>
+<span class="ln" id="L3203">                <span class="tok-str">&quot;docs/USER_GUIDE.md&quot;</span>,</span>
+<span class="ln" id="L3204">                include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>),</span>
+<span class="ln" id="L3205">            ),</span>
+<span class="ln" id="L3206">            (<span class="tok-str">&quot;docs/INSTALL.md&quot;</span>, include_str!(<span class="tok-str">&quot;../../../docs/INSTALL.md&quot;</span>)),</span>
+<span class="ln" id="L3207">            <span class="tok-com">// Every command, with a line to copy under most of them. Those</span></span>
+<span class="ln" id="L3208">            <span class="tok-com">// lines are exactly what this test exists for: they are written</span></span>
+<span class="ln" id="L3209">            <span class="tok-com">// by hand in `tools/docs/commands.py`, and a flag that has been</span></span>
+<span class="ln" id="L3210">            <span class="tok-com">// renamed since would otherwise be published thirty-two times</span></span>
+<span class="ln" id="L3211">            <span class="tok-com">// over, on this page, in the wiki and on the website.</span></span>
+<span class="ln" id="L3212">            (</span>
+<span class="ln" id="L3213">                <span class="tok-str">&quot;docs/COMMANDS.md&quot;</span>,</span>
+<span class="ln" id="L3214">                include_str!(<span class="tok-str">&quot;../../../docs/COMMANDS.md&quot;</span>),</span>
+<span class="ln" id="L3215">            ),</span>
+<span class="ln" id="L3216">        ];</span>
+<span class="ln" id="L3217"></span>
+<span class="ln" id="L3218">        <span class="tok-kw">let</span> root = Cli::<span class="tok-fn">command</span>();</span>
+<span class="ln" id="L3219">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> problems: Vec&lt;String&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L3220">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> checked = 0_usize;</span>
+<span class="ln" id="L3221"></span>
+<span class="ln" id="L3222">        <span class="tok-kw">for</span> (name, text) <span class="tok-kw">in</span> docs {</span>
+<span class="ln" id="L3223">            <span class="tok-kw">let</span> text = text.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L3224">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fenced = false;</span>
+<span class="ln" id="L3225">            <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L3226">                <span class="tok-kw">if</span> line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;```&quot;</span>) {</span>
+<span class="ln" id="L3227">                    fenced = !fenced;</span>
+<span class="ln" id="L3228">                    continue;</span>
+<span class="ln" id="L3229">                }</span>
+<span class="ln" id="L3230"></span>
+<span class="ln" id="L3231">                <span class="tok-com">// Everything a reader could copy and run, from this line.</span></span>
+<span class="ln" id="L3232">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> candidates: Vec&lt;&amp;str&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L3233">                <span class="tok-kw">if</span> fenced {</span>
+<span class="ln" id="L3234">                    <span class="tok-kw">let</span> bare = line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&quot;$ &quot;</span>).<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L3235">                    candidates.<span class="tok-fn">push</span>(bare);</span>
+<span class="ln" id="L3236">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L3237">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rest = line;</span>
+<span class="ln" id="L3238">                    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(open) = rest.<span class="tok-fn">find</span>(<span class="tok-str">&#x27;`&#x27;</span>) {</span>
+<span class="ln" id="L3239">                        <span class="tok-kw">let</span> after = &amp;rest[open + <span class="tok-num">1</span>..];</span>
+<span class="ln" id="L3240">                        <span class="tok-kw">match</span> after.<span class="tok-fn">find</span>(<span class="tok-str">&#x27;`&#x27;</span>) {</span>
+<span class="ln" id="L3241">                            <span class="tok-fn">Some</span>(close) =&gt; {</span>
+<span class="ln" id="L3242">                                candidates.<span class="tok-fn">push</span>(&amp;after[..close]);</span>
+<span class="ln" id="L3243">                                rest = &amp;after[close + <span class="tok-num">1</span>..];</span>
+<span class="ln" id="L3244">                            }</span>
+<span class="ln" id="L3245">                            None =&gt; break,</span>
+<span class="ln" id="L3246">                        }</span>
+<span class="ln" id="L3247">                    }</span>
+<span class="ln" id="L3248">                }</span>
+<span class="ln" id="L3249"></span>
+<span class="ln" id="L3250">                <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> candidates {</span>
+<span class="ln" id="L3251">                    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(after) = candidate.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;veilvoice&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L3252">                        continue;</span>
+<span class="ln" id="L3253">                    };</span>
+<span class="ln" id="L3254">                    <span class="tok-kw">if</span> !after.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27; &#x27;</span>) {</span>
+<span class="ln" id="L3255">                        <span class="tok-com">// `veilvoice-verify` and `veilvoice-gui` are other</span></span>
+<span class="ln" id="L3256">                        <span class="tok-com">// programs, with arguments of their own.</span></span>
+<span class="ln" id="L3257">                        continue;</span>
+<span class="ln" id="L3258">                    }</span>
+<span class="ln" id="L3259">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> words = after.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">peekable</span>();</span>
+<span class="ln" id="L3260">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> node = &amp;root;</span>
+<span class="ln" id="L3261">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> path: Vec&lt;String&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L3262"></span>
+<span class="ln" id="L3263">                    <span class="tok-com">// `verify` hands everything after it to the verifier,</span></span>
+<span class="ln" id="L3264">                    <span class="tok-com">// which has its own parser, so clap cannot answer for the</span></span>
+<span class="ln" id="L3265">                    <span class="tok-com">// words that follow. Checking them against clap would</span></span>
+<span class="ln" id="L3266">                    <span class="tok-com">// report every one of them missing; skipping them would</span></span>
+<span class="ln" id="L3267">                    <span class="tok-com">// leave the most safety-critical commands in the whole</span></span>
+<span class="ln" id="L3268">                    <span class="tok-com">// documentation unchecked. So they are checked against the</span></span>
+<span class="ln" id="L3269">                    <span class="tok-com">// verifier&#x27;s own help, which is the thing that defines</span></span>
+<span class="ln" id="L3270">                    <span class="tok-com">// them.</span></span>
+<span class="ln" id="L3271">                    <span class="tok-kw">if</span> words.<span class="tok-fn">peek</span>().<span class="tok-fn">copied</span>() == <span class="tok-fn">Some</span>(<span class="tok-str">&quot;verify&quot;</span>) {</span>
+<span class="ln" id="L3272">                        words.<span class="tok-fn">next</span>();</span>
+<span class="ln" id="L3273">                        checked += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L3274">                        <span class="tok-kw">let</span> help = veilvoice_verify::<span class="tok-fn">help_text</span>();</span>
+<span class="ln" id="L3275">                        <span class="tok-com">// A `#` starts a trailing comment in every shell</span></span>
+<span class="ln" id="L3276">                        <span class="tok-com">// example here, so the comment is cut off first --</span></span>
+<span class="ln" id="L3277">                        <span class="tok-com">// reading past one turns English prose into a list of</span></span>
+<span class="ln" id="L3278">                        <span class="tok-com">// commands nobody wrote. Of what is left, only the</span></span>
+<span class="ln" id="L3279">                        <span class="tok-com">// first word is a command; the rest are its arguments,</span></span>
+<span class="ln" id="L3280">                        <span class="tok-com">// and the flags among them are checked below.</span></span>
+<span class="ln" id="L3281">                        <span class="tok-kw">let</span> real: Vec&lt;&amp;str&gt; = words.<span class="tok-fn">take_while</span>(|w| !w.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;#&#x27;</span>)).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L3282">                        <span class="tok-kw">let</span> vetted: Vec&lt;&amp;str&gt; = real</span>
+<span class="ln" id="L3283">                            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L3284">                            .<span class="tok-fn">copied</span>()</span>
+<span class="ln" id="L3285">                            .<span class="tok-fn">enumerate</span>()</span>
+<span class="ln" id="L3286">                            .<span class="tok-fn">filter</span>(|(i, w)| *i == <span class="tok-num">0</span> || w.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>))</span>
+<span class="ln" id="L3287">                            .<span class="tok-fn">map</span>(|(_, w)| w)</span>
+<span class="ln" id="L3288">                            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L3289">                        <span class="tok-kw">for</span> word <span class="tok-kw">in</span> vetted {</span>
+<span class="ln" id="L3290">                            <span class="tok-kw">let</span> known = <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(flag) = word.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;--&quot;</span>) {</span>
+<span class="ln" id="L3291">                                <span class="tok-kw">let</span> flag: String = flag</span>
+<span class="ln" id="L3292">                                    .<span class="tok-fn">chars</span>()</span>
+<span class="ln" id="L3293">                                    .<span class="tok-fn">take_while</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || *c == <span class="tok-str">&#x27;-&#x27;</span>)</span>
+<span class="ln" id="L3294">                                    .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L3295">                                flag.<span class="tok-fn">is_empty</span>()</span>
+<span class="ln" id="L3296">                                    || flag == <span class="tok-str">&quot;help&quot;</span></span>
+<span class="ln" id="L3297">                                    || flag == <span class="tok-str">&quot;version&quot;</span></span>
+<span class="ln" id="L3298">                                    <span class="tok-com">// This command&#x27;s own flags, which clap owns.</span></span>
+<span class="ln" id="L3299">                                    || root</span>
+<span class="ln" id="L3300">                                        .<span class="tok-fn">find_subcommand</span>(<span class="tok-str">&quot;verify&quot;</span>)</span>
+<span class="ln" id="L3301">                                        .<span class="tok-fn">map</span>(|v| {</span>
+<span class="ln" id="L3302">                                            v.<span class="tok-fn">get_arguments</span>()</span>
+<span class="ln" id="L3303">                                                .<span class="tok-fn">any</span>(|a| a.<span class="tok-fn">get_long</span>() == <span class="tok-fn">Some</span>(flag.<span class="tok-fn">as_str</span>()))</span>
+<span class="ln" id="L3304">                                        })</span>
+<span class="ln" id="L3305">                                        .<span class="tok-fn">unwrap_or</span>(false)</span>
+<span class="ln" id="L3306">                                    || help.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;--{flag}&quot;</span>))</span>
+<span class="ln" id="L3307">                            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> word.<span class="tok-fn">chars</span>().<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || c == <span class="tok-str">&#x27;-&#x27;</span>)</span>
+<span class="ln" id="L3308">                                &amp;&amp; !word.<span class="tok-fn">is_empty</span>()</span>
+<span class="ln" id="L3309">                            {</span>
+<span class="ln" id="L3310">                                help.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;veilvoice verify {word}&quot;</span>))</span>
+<span class="ln" id="L3311">                            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L3312">                                <span class="tok-com">// A path, a hash, a placeholder: an argument</span></span>
+<span class="ln" id="L3313">                                <span class="tok-com">// rather than something to look up.</span></span>
+<span class="ln" id="L3314">                                true</span>
+<span class="ln" id="L3315">                            };</span>
+<span class="ln" id="L3316">                            <span class="tok-kw">if</span> !known {</span>
+<span class="ln" id="L3317">                                problems.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L3318">                                    <span class="tok-str">&quot;{name}:{}: `veilvoice verify {word}` is documented, \</span></span>
+<span class="ln" id="L3319"><span class="tok-str">                                     and the verifier&#x27;s own help does not mention it&quot;</span>,</span>
+<span class="ln" id="L3320">                                    number + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L3321">                                ));</span>
+<span class="ln" id="L3322">                            }</span>
+<span class="ln" id="L3323">                        }</span>
+<span class="ln" id="L3324">                        continue;</span>
+<span class="ln" id="L3325">                    }</span>
+<span class="ln" id="L3326"></span>
+<span class="ln" id="L3327">                    <span class="tok-com">// The leading words are subcommands until one is not.</span></span>
+<span class="ln" id="L3328">                    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(word) = words.<span class="tok-fn">peek</span>().<span class="tok-fn">copied</span>() {</span>
+<span class="ln" id="L3329">                        <span class="tok-kw">if</span> word.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;-&#x27;</span>)</span>
+<span class="ln" id="L3330">                            || word.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;.&#x27;</span>)</span>
+<span class="ln" id="L3331">                            || word.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;/&#x27;</span>)</span>
+<span class="ln" id="L3332">                            || word.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&lt;&#x27;</span>)</span>
+<span class="ln" id="L3333">                            || !word.<span class="tok-fn">chars</span>().<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || c == <span class="tok-str">&#x27;-&#x27;</span>)</span>
+<span class="ln" id="L3334">                        {</span>
+<span class="ln" id="L3335">                            break;</span>
+<span class="ln" id="L3336">                        }</span>
+<span class="ln" id="L3337">                        <span class="tok-kw">match</span> node.<span class="tok-fn">find_subcommand</span>(word) {</span>
+<span class="ln" id="L3338">                            <span class="tok-fn">Some</span>(next) =&gt; {</span>
+<span class="ln" id="L3339">                                path.<span class="tok-fn">push</span>(word.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L3340">                                node = next;</span>
+<span class="ln" id="L3341">                                words.<span class="tok-fn">next</span>();</span>
+<span class="ln" id="L3342">                            }</span>
+<span class="ln" id="L3343">                            None =&gt; {</span>
+<span class="ln" id="L3344">                                problems.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L3345">                                    <span class="tok-str">&quot;{name}:{}: `veilvoice {}{word}` is documented, and \</span></span>
+<span class="ln" id="L3346"><span class="tok-str">                                     there is no such command&quot;</span>,</span>
+<span class="ln" id="L3347">                                    number + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L3348">                                    path.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|p| format!(<span class="tok-str">&quot;{p} &quot;</span>)).collect::&lt;String&gt;()</span>
+<span class="ln" id="L3349">                                ));</span>
+<span class="ln" id="L3350">                                break;</span>
+<span class="ln" id="L3351">                            }</span>
+<span class="ln" id="L3352">                        }</span>
+<span class="ln" id="L3353">                    }</span>
+<span class="ln" id="L3354">                    <span class="tok-kw">if</span> path.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L3355">                        continue;</span>
+<span class="ln" id="L3356">                    }</span>
+<span class="ln" id="L3357">                    checked += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L3358"></span>
+<span class="ln" id="L3359">                    <span class="tok-kw">for</span> word <span class="tok-kw">in</span> words {</span>
+<span class="ln" id="L3360">                        <span class="tok-kw">if</span> !word.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>) {</span>
+<span class="ln" id="L3361">                            continue;</span>
+<span class="ln" id="L3362">                        }</span>
+<span class="ln" id="L3363">                        <span class="tok-kw">let</span> flag: String = word</span>
+<span class="ln" id="L3364">                            .<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&quot;--&quot;</span>)</span>
+<span class="ln" id="L3365">                            .<span class="tok-fn">chars</span>()</span>
+<span class="ln" id="L3366">                            .<span class="tok-fn">take_while</span>(|c| c.<span class="tok-fn">is_ascii_lowercase</span>() || *c == <span class="tok-str">&#x27;-&#x27;</span>)</span>
+<span class="ln" id="L3367">                            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L3368">                        <span class="tok-kw">if</span> flag.<span class="tok-fn">is_empty</span>() || flag == <span class="tok-str">&quot;help&quot;</span> || flag == <span class="tok-str">&quot;version&quot;</span> {</span>
+<span class="ln" id="L3369">                            continue;</span>
+<span class="ln" id="L3370">                        }</span>
+<span class="ln" id="L3371">                        <span class="tok-kw">let</span> known = node.<span class="tok-fn">get_arguments</span>().<span class="tok-fn">any</span>(|a| {</span>
+<span class="ln" id="L3372">                            a.<span class="tok-fn">get_long</span>() == <span class="tok-fn">Some</span>(flag.<span class="tok-fn">as_str</span>())</span>
+<span class="ln" id="L3373">                                || a.<span class="tok-fn">get_all_aliases</span>()</span>
+<span class="ln" id="L3374">                                    .<span class="tok-fn">map</span>(|all| all.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|x| *x == flag))</span>
+<span class="ln" id="L3375">                                    .<span class="tok-fn">unwrap_or</span>(false)</span>
+<span class="ln" id="L3376">                        });</span>
+<span class="ln" id="L3377">                        <span class="tok-kw">if</span> !known {</span>
+<span class="ln" id="L3378">                            problems.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L3379">                                <span class="tok-str">&quot;{name}:{}: `veilvoice {} --{flag}` is documented, and \</span></span>
+<span class="ln" id="L3380"><span class="tok-str">                                 `{}` has no `--{flag}`&quot;</span>,</span>
+<span class="ln" id="L3381">                                number + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L3382">                                path.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>),</span>
+<span class="ln" id="L3383">                                path.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>)</span>
+<span class="ln" id="L3384">                            ));</span>
+<span class="ln" id="L3385">                        }</span>
+<span class="ln" id="L3386">                    }</span>
+<span class="ln" id="L3387">                }</span>
+<span class="ln" id="L3388">            }</span>
+<span class="ln" id="L3389">        }</span>
+<span class="ln" id="L3390"></span>
+<span class="ln" id="L3391">        assert!(</span>
+<span class="ln" id="L3392">            checked &gt; <span class="tok-num">20</span>,</span>
+<span class="ln" id="L3393">            <span class="tok-str">&quot;only {checked} documented invocations were found, which means this \</span></span>
+<span class="ln" id="L3394"><span class="tok-str">             test has stopped reading the documentation rather than that the \</span></span>
+<span class="ln" id="L3395"><span class="tok-str">             documentation stopped showing commands&quot;</span></span>
+<span class="ln" id="L3396">        );</span>
+<span class="ln" id="L3397">        assert!(</span>
+<span class="ln" id="L3398">            problems.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L3399">            <span class="tok-str">&quot;the documentation shows commands this program does not have:\n  {}&quot;</span>,</span>
+<span class="ln" id="L3400">            problems.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n  &quot;</span>)</span>
+<span class="ln" id="L3401">        );</span>
+<span class="ln" id="L3402">    }</span>
+<span class="ln" id="L3403"></span>
+<span class="ln" id="L3404">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3405">    <span class="tok-kw">fn</span> <span class="tok-fn">cli_definition_is_valid</span>() {</span>
+<span class="ln" id="L3406">        Cli::<span class="tok-fn">command</span>().<span class="tok-fn">debug_assert</span>();</span>
+<span class="ln" id="L3407">    }</span>
+<span class="ln" id="L3408"></span>
+<span class="ln" id="L3409">    <span class="tok-kw">fn</span> <span class="tok-fn">tuning</span>(intensity: f32, keep_accent: bool, reseed_secs: f32) -&gt; Tuning {</span>
+<span class="ln" id="L3410">        Tuning {</span>
+<span class="ln" id="L3411">            intensity,</span>
+<span class="ln" id="L3412">            keep_accent,</span>
+<span class="ln" id="L3413">            reseed_secs,</span>
+<span class="ln" id="L3414">            <span class="tok-com">// The fixed interval, so these tests stay deterministic. The</span></span>
+<span class="ln" id="L3415">            <span class="tok-com">// randomised range has its own tests in veilvoice-core.</span></span>
+<span class="ln" id="L3416">            reseed_range: None,</span>
+<span class="ln" id="L3417">        }</span>
+<span class="ln" id="L3418">    }</span>
+<span class="ln" id="L3419"></span>
 <span class="ln" id="L3420">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3421">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span>() {</span>
-<span class="ln" id="L3422">        <span class="tok-kw">let</span> result = <span class="tok-fn">anonymise</span>(</span>
-<span class="ln" id="L3423">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;does-not-need-to-exist.wav&quot;</span>),</span>
-<span class="ln" id="L3424">            None,</span>
-<span class="ln" id="L3425">            <span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>),</span>
-<span class="ln" id="L3426">            true,</span>
-<span class="ln" id="L3427">            AtRest {</span>
-<span class="ln" id="L3428">                encrypt: false,</span>
-<span class="ln" id="L3429">                to: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;someone.pub&quot;</span>)),</span>
-<span class="ln" id="L3430">                yes: true,</span>
-<span class="ln" id="L3431">            },</span>
-<span class="ln" id="L3432">        );</span>
-<span class="ln" id="L3433">        assert!(result.<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L3434">    }</span>
-<span class="ln" id="L3435"></span>
-<span class="ln" id="L3436">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3437">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_setting_reads_clearly</span>() {</span>
-<span class="ln" id="L3438">        assert!(<span class="tok-fn">describe_reseed</span>(<span class="tok-num">0.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;off&quot;</span>));</span>
-<span class="ln" id="L3439">        assert!(<span class="tok-fn">describe_reseed</span>(<span class="tok-num">2.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;2&quot;</span>));</span>
-<span class="ln" id="L3440">    }</span>
-<span class="ln" id="L3441"></span>
-<span class="ln" id="L3442">    <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
-<span class="ln" id="L3443">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L3444">    <span class="tok-kw">fn</span> <span class="tok-fn">meter_scales_and_never_panics</span>() {</span>
-<span class="ln" id="L3445">        <span class="tok-com">// The meter itself, its scale and its edge cases, are tested in</span></span>
-<span class="ln" id="L3446">        <span class="tok-com">// `meter.rs` beside the code. What is worth checking from here is that</span></span>
-<span class="ln" id="L3447">        <span class="tok-com">// the two are still connected: a level a person would call loud must</span></span>
-<span class="ln" id="L3448">        <span class="tok-com">// not draw as an empty bar, which is what the linear meter this</span></span>
-<span class="ln" id="L3449">        <span class="tok-com">// replaced did to ordinary speech.</span></span>
-<span class="ln" id="L3450">        <span class="tok-kw">for</span> peak <span class="tok-kw">in</span> [-<span class="tok-num">1</span>.0f32, <span class="tok-num">0.0</span>, <span class="tok-num">0.25</span>, <span class="tok-num">0.5</span>, <span class="tok-num">1.0</span>, <span class="tok-num">4.0</span>] {</span>
-<span class="ln" id="L3451">            <span class="tok-kw">let</span> bar = meter::<span class="tok-fn">render</span>(peak, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>);</span>
-<span class="ln" id="L3452">            assert!(bar.<span class="tok-fn">chars</span>().<span class="tok-fn">count</span>() &gt;= <span class="tok-num">12</span>);</span>
-<span class="ln" id="L3453">        }</span>
-<span class="ln" id="L3454">        assert!(meter::<span class="tok-fn">render</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&#183;&#x27;</span>));</span>
-<span class="ln" id="L3455">        assert!(meter::<span class="tok-fn">render</span>(<span class="tok-num">1.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&#9608;&#x27;</span>));</span>
-<span class="ln" id="L3456">        assert!(</span>
-<span class="ln" id="L3457">            meter::<span class="tok-fn">render</span>(<span class="tok-num">0.251</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&#9608;&#x27;</span>).<span class="tok-fn">count</span>() &gt;= <span class="tok-num">8</span>,</span>
-<span class="ln" id="L3458">            <span class="tok-str">&quot;speech at -12 dBFS must fill most of the bar&quot;</span></span>
-<span class="ln" id="L3459">        );</span>
-<span class="ln" id="L3460">    }</span>
-<span class="ln" id="L3461">}</span>
+<span class="ln" id="L3421">    <span class="tok-kw">fn</span> <span class="tok-fn">intensity_is_clamped_into_range</span>() {</span>
+<span class="ln" id="L3422">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">5.0</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L3423">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(-<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L3424">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">0.5</span>, false, <span class="tok-num">2.0</span>)).intensity, <span class="tok-num">0.5</span>);</span>
+<span class="ln" id="L3425">    }</span>
+<span class="ln" id="L3426"></span>
+<span class="ln" id="L3427">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3428">    <span class="tok-kw">fn</span> <span class="tok-fn">keep_accent_disables_neutralisation</span>() {</span>
+<span class="ln" id="L3429">        assert!(!<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, true, <span class="tok-num">2.0</span>)).accent.enabled);</span>
+<span class="ln" id="L3430">        assert!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>)).accent.enabled);</span>
+<span class="ln" id="L3431">    }</span>
+<span class="ln" id="L3432"></span>
+<span class="ln" id="L3433">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3434">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_interval_reaches_the_engine_and_cannot_go_negative</span>() {</span>
+<span class="ln" id="L3435">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">0.5</span>)).reseed_secs, <span class="tok-num">0.5</span>);</span>
+<span class="ln" id="L3436">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">0.0</span>)).reseed_secs, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L3437">        assert_eq!(<span class="tok-fn">config</span>(<span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, -<span class="tok-num">3.0</span>)).reseed_secs, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L3438">    }</span>
+<span class="ln" id="L3439"></span>
+<span class="ln" id="L3440">    <span class="tok-com">/// Encryption at rest is a *default*, not a flag the careful user has to</span></span>
+<span class="ln" id="L3441">    <span class="tok-com">/// find. If someone ever flips this, this test is what stops it shipping.</span></span>
+<span class="ln" id="L3442">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3443">    <span class="tok-kw">fn</span> <span class="tok-fn">recordings_are_encrypted_at_rest_by_default</span>() {</span>
+<span class="ln" id="L3444">        <span class="tok-kw">let</span> cli = Cli::<span class="tok-fn">try_parse_from</span>([<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;anonymise&quot;</span>, <span class="tok-str">&quot;in.wav&quot;</span>]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L3445">        <span class="tok-kw">let</span> Command::Anonymise {</span>
+<span class="ln" id="L3446">            encrypt,</span>
+<span class="ln" id="L3447">            encrypt_to,</span>
+<span class="ln" id="L3448">            yes,</span>
+<span class="ln" id="L3449">            ..</span>
+<span class="ln" id="L3450">        } = cli.command</span>
+<span class="ln" id="L3451">        <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L3452">            panic!(<span class="tok-str">&quot;expected anonymise&quot;</span>);</span>
+<span class="ln" id="L3453">        };</span>
+<span class="ln" id="L3454">        assert!(encrypt, <span class="tok-str">&quot;at-rest encryption must default on&quot;</span>);</span>
+<span class="ln" id="L3455">        assert!(encrypt_to.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L3456">        assert!(!yes, <span class="tok-str">&quot;the confirmation must not be pre-answered&quot;</span>);</span>
+<span class="ln" id="L3457"></span>
+<span class="ln" id="L3458">        <span class="tok-kw">let</span> off = Cli::<span class="tok-fn">try_parse_from</span>([<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;anonymise&quot;</span>, <span class="tok-str">&quot;in.wav&quot;</span>, <span class="tok-str">&quot;--encrypt&quot;</span>, <span class="tok-str">&quot;false&quot;</span>])</span>
+<span class="ln" id="L3459">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L3460">        <span class="tok-kw">let</span> Command::Anonymise { encrypt, .. } = off.command <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L3461">            panic!(<span class="tok-str">&quot;expected anonymise&quot;</span>);</span>
+<span class="ln" id="L3462">        };</span>
+<span class="ln" id="L3463">        assert!(!encrypt, <span class="tok-str">&quot;it must still be possible to opt out&quot;</span>);</span>
+<span class="ln" id="L3464">    }</span>
+<span class="ln" id="L3465"></span>
+<span class="ln" id="L3466">    <span class="tok-com">/// Refused before anything is read or written, so a contradictory command</span></span>
+<span class="ln" id="L3467">    <span class="tok-com">/// line cannot half-happen.</span></span>
+<span class="ln" id="L3468">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3469">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_for_a_recipient_and_for_plaintext_at_once_is_refused</span>() {</span>
+<span class="ln" id="L3470">        <span class="tok-kw">let</span> result = <span class="tok-fn">anonymise</span>(</span>
+<span class="ln" id="L3471">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;does-not-need-to-exist.wav&quot;</span>),</span>
+<span class="ln" id="L3472">            None,</span>
+<span class="ln" id="L3473">            <span class="tok-fn">tuning</span>(<span class="tok-num">1.0</span>, false, <span class="tok-num">2.0</span>),</span>
+<span class="ln" id="L3474">            true,</span>
+<span class="ln" id="L3475">            AtRest {</span>
+<span class="ln" id="L3476">                encrypt: false,</span>
+<span class="ln" id="L3477">                to: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;someone.pub&quot;</span>)),</span>
+<span class="ln" id="L3478">                yes: true,</span>
+<span class="ln" id="L3479">            },</span>
+<span class="ln" id="L3480">        );</span>
+<span class="ln" id="L3481">        assert!(result.<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L3482">    }</span>
+<span class="ln" id="L3483"></span>
+<span class="ln" id="L3484">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3485">    <span class="tok-kw">fn</span> <span class="tok-fn">reseed_setting_reads_clearly</span>() {</span>
+<span class="ln" id="L3486">        assert!(<span class="tok-fn">describe_reseed</span>(<span class="tok-num">0.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;off&quot;</span>));</span>
+<span class="ln" id="L3487">        assert!(<span class="tok-fn">describe_reseed</span>(<span class="tok-num">2.0</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;2&quot;</span>));</span>
+<span class="ln" id="L3488">    }</span>
+<span class="ln" id="L3489"></span>
+<span class="ln" id="L3490">    <span class="tok-attr">#[cfg</span>(feature = <span class="tok-str">&quot;live&quot;</span>)]</span>
+<span class="ln" id="L3491">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L3492">    <span class="tok-kw">fn</span> <span class="tok-fn">meter_scales_and_never_panics</span>() {</span>
+<span class="ln" id="L3493">        <span class="tok-com">// The meter itself, its scale and its edge cases, are tested in</span></span>
+<span class="ln" id="L3494">        <span class="tok-com">// `meter.rs` beside the code. What is worth checking from here is that</span></span>
+<span class="ln" id="L3495">        <span class="tok-com">// the two are still connected: a level a person would call loud must</span></span>
+<span class="ln" id="L3496">        <span class="tok-com">// not draw as an empty bar, which is what the linear meter this</span></span>
+<span class="ln" id="L3497">        <span class="tok-com">// replaced did to ordinary speech.</span></span>
+<span class="ln" id="L3498">        <span class="tok-kw">for</span> peak <span class="tok-kw">in</span> [-<span class="tok-num">1</span>.0f32, <span class="tok-num">0.0</span>, <span class="tok-num">0.25</span>, <span class="tok-num">0.5</span>, <span class="tok-num">1.0</span>, <span class="tok-num">4.0</span>] {</span>
+<span class="ln" id="L3499">            <span class="tok-kw">let</span> bar = meter::<span class="tok-fn">render</span>(peak, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>);</span>
+<span class="ln" id="L3500">            assert!(bar.<span class="tok-fn">chars</span>().<span class="tok-fn">count</span>() &gt;= <span class="tok-num">12</span>);</span>
+<span class="ln" id="L3501">        }</span>
+<span class="ln" id="L3502">        assert!(meter::<span class="tok-fn">render</span>(<span class="tok-num">0.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&#183;&#x27;</span>));</span>
+<span class="ln" id="L3503">        assert!(meter::<span class="tok-fn">render</span>(<span class="tok-num">1.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;&#9608;&#x27;</span>));</span>
+<span class="ln" id="L3504">        assert!(</span>
+<span class="ln" id="L3505">            meter::<span class="tok-fn">render</span>(<span class="tok-num">0.251</span>, <span class="tok-num">0.0</span>, <span class="tok-num">12</span>).<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&#9608;&#x27;</span>).<span class="tok-fn">count</span>() &gt;= <span class="tok-num">8</span>,</span>
+<span class="ln" id="L3506">            <span class="tok-str">&quot;speech at -12 dBFS must fill most of the bar&quot;</span></span>
+<span class="ln" id="L3507">        );</span>
+<span class="ln" id="L3508">    }</span>
+<span class="ln" id="L3509">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

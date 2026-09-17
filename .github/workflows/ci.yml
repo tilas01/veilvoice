@@ -398,6 +398,19 @@ jobs:
       - name: The per-program guides must match the user guide
         run: python tools/docs/guides.py --check
 
+      # Thirty-two commands, of which the user guide showed twelve. This
+      # document is the whole list, and the generator refuses to write it
+      # while any command has nothing said about it or names a tab the
+      # window does not have.
+      - name: Every command must be documented
+        run: python tools/docs/commands.py --check
+
+      # The developer's way in, whose every list is read from the tree: the
+      # crates, the guards in tools/audit/ and the checks this file runs. A
+      # guard added without a word said about it fails here.
+      - name: The developer guide must match the tree
+        run: python tools/docs/developers.py --check
+
       # The wiki is the same documents with their links rewritten for a flat
       # namespace, so it can go stale the same way. This also walks every
       # `[[link]]` in all 202 pages: a wiki link to a page that does not
