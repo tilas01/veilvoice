@@ -703,6 +703,11 @@ impl VeilVoiceApp {
         );
     }
 
+    /// The tab `--tab=` asks for, so a capture can open one screen directly.
+    ///
+    /// Read here rather than through the argument parser the command-line
+    /// program uses, because the window takes no other arguments and pulling
+    /// that dependency in for one flag would be the larger cost.
     fn tab_from_arguments() -> Option<Tab> {
         let mut args = std::env::args().skip(1);
         while let Some(arg) = args.next() {
@@ -849,6 +854,7 @@ impl VeilVoiceApp {
         })
     }
 
+    /// The de-identification settings the panels currently describe.
     fn config(&self) -> DeidConfig {
         let posture = self.posture();
         DeidConfig {
@@ -1492,6 +1498,11 @@ impl eframe::App for VeilVoiceApp {
 }
 
 impl VeilVoiceApp {
+    /// Take the result of a finished job without ever waiting for one.
+    ///
+    /// Called once a frame from the drawing thread, so it uses `try_recv`:
+    /// blocking here would hand the window's responsiveness to however long
+    /// the job takes.
     fn poll_job(&mut self) {
         let Some(rx) = &self.job else { return };
         match rx.try_recv() {
@@ -1526,6 +1537,8 @@ impl VeilVoiceApp {
         }
     }
 
+    /// Draw the settings panel, with a policy floor shown as a floor rather
+    /// than as a value somebody can move.
     fn settings(&mut self, ui: &mut egui::Ui) {
         ui.label(RichText::new("Settings").color(p::blue()).small());
 
@@ -1637,6 +1650,7 @@ impl VeilVoiceApp {
         }
     }
 
+    /// Draw the File tab: pick a recording, veil it, write it somewhere else.
     fn file_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
         ui.label(RichText::new("Input").color(p::blue()).small());
@@ -1746,6 +1760,7 @@ impl VeilVoiceApp {
         );
     }
 
+    /// Hand the work to a thread, so the window keeps drawing while it runs.
     fn start_job(&mut self) {
         let Some(input) = self.input.clone() else {
             return;
@@ -1933,6 +1948,7 @@ impl VeilVoiceApp {
         );
     }
 
+    /// Draw the Recording Studio: record into the vault, veiled on the way in.
     fn studio_tab(&mut self, ui: &mut egui::Ui) {
         let veiling = self.studio.is_veiling();
 
@@ -2454,6 +2470,8 @@ impl VeilVoiceApp {
         }
     }
 
+    /// Draw the Watch tab: what is recording the screen, and what is allowed
+    /// to.
     fn watch_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
         ui.label(RichText::new("What is listening").color(p::blue()).small());
@@ -2560,6 +2578,7 @@ impl VeilVoiceApp {
         });
     }
 
+    /// Draw the About tab: versions, where files live, and the companion list.
     fn about_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
         field(ui, "app", env!("CARGO_PKG_VERSION"));
@@ -2749,6 +2768,7 @@ fn paths_section(ui: &mut egui::Ui) {
     }
 }
 
+/// A dropdown of devices that keeps working when the chosen one disappears.
 fn device_picker(
     ui: &mut egui::Ui,
     label: &str,
@@ -2774,6 +2794,7 @@ fn device_picker(
     });
 }
 
+/// One labelled read-only value, in the shape the About tab uses throughout.
 fn field(ui: &mut egui::Ui, label: &str, value: &str) {
     ui.horizontal(|ui| {
         ui.label(RichText::new(format!("{label:<18}")).color(p::muted()));

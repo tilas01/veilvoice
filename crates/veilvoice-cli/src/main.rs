@@ -1319,6 +1319,7 @@ fn explain_verification(
     println!("  installs neither.");
 }
 
+/// Parse the command line and turn a failure into an exit code and a message.
 fn main() -> ExitCode {
     let cli = Cli::parse();
 
@@ -1356,6 +1357,11 @@ fn main() -> ExitCode {
     }
 }
 
+/// Carry out one subcommand.
+///
+/// Everything the command line can ask for arrives here already parsed and
+/// validated, so this is a dispatch rather than a place where input is
+/// checked.
 fn run(command: Command) -> Result<(), String> {
     match command {
         Command::Anonymise {
@@ -2221,6 +2227,11 @@ fn reseed_range_from(flag: Option<&str>) -> Result<Option<(f32, f32)>, String> {
     }
 }
 
+/// The de-identification settings a `Tuning` describes, with every figure
+/// clamped.
+///
+/// Clamping here rather than at each flag is deliberate: these flags are the
+/// only way in, so one place that cannot be bypassed beats a check per flag.
 fn config(t: Tuning) -> DeidConfig {
     DeidConfig {
         intensity: t.intensity.clamp(0.0, 1.0),
@@ -2268,6 +2279,7 @@ struct AtRest {
     yes: bool,
 }
 
+/// `veilvoice anonymise`: veil a recording and write it somewhere else.
 fn anonymise(
     input: PathBuf,
     output: Option<PathBuf>,
@@ -2409,6 +2421,8 @@ fn anonymise(
 }
 
 #[cfg(feature = "live")]
+/// `veilvoice live`: veil the microphone as it is heard, with an optional
+/// preview.
 fn live(
     input: Option<String>,
     output: Option<String>,
@@ -2640,6 +2654,7 @@ fn live(
 }
 
 #[cfg(feature = "live")]
+/// `veilvoice devices`: every input and output this machine reports.
 fn list_devices() -> Result<(), String> {
     for (label, direction) in [
         ("Inputs", devices::Direction::Input),
@@ -2727,6 +2742,7 @@ pub(crate) fn write_named(path: &std::path::Path, bytes: &[u8]) -> Result<(), St
     std::fs::write(path, bytes).map_err(|e| format!("{}: {e}", path.display()))
 }
 
+/// `veilvoice clean`: strip the metadata a file carries, in place.
 fn clean(file: PathBuf, policy: Policy) -> Result<(), String> {
     let bytes = read_named(&file)?;
     let report = if veilvoice_meta::ImageKind::sniff(&bytes).is_some() {
@@ -2744,6 +2760,7 @@ fn clean(file: PathBuf, policy: Policy) -> Result<(), String> {
     Ok(())
 }
 
+/// `veilvoice encrypt`: seal a file, to a passphrase or to a public key.
 fn encrypt(input: PathBuf, output: Option<PathBuf>, to: Option<PathBuf>) -> Result<(), String> {
     let out_path = output.unwrap_or_else(|| container::veil_path(&input));
     let plaintext = read_named(&input)?;
@@ -2773,6 +2790,8 @@ fn encrypt(input: PathBuf, output: Option<PathBuf>, to: Option<PathBuf>) -> Resu
     Ok(())
 }
 
+/// `veilvoice decrypt`: open a sealed file, given the passphrase or the secret
+/// key.
 fn decrypt(input: PathBuf, output: PathBuf, key: Option<PathBuf>) -> Result<(), String> {
     let sealed = read_named(&input)?;
 
@@ -2813,6 +2832,8 @@ fn load_secret_key(path: &std::path::Path) -> Result<hybrid::SecretKey, String> 
     hybrid::SecretKey::from_bytes(&encoded).map_err(|e| e.to_string())
 }
 
+/// `veilvoice keygen`: write a new key pair, refusing to overwrite either
+/// file.
 fn keygen(public: PathBuf, secret: PathBuf) -> Result<(), String> {
     // Reported early so the user is not asked for a passphrase before being
     // told the file is in the way. The *refusal* that matters is not this one
@@ -3047,6 +3068,7 @@ fn shred(file: PathBuf, passes: u8, yes: bool) -> Result<(), String> {
     Ok(())
 }
 
+/// `veilvoice info`: the versions, and what this build was compiled to do.
 fn info() {
     println!("{}", heading("VeilVoice"));
     println!("{}", field("Version", env!("CARGO_PKG_VERSION")));

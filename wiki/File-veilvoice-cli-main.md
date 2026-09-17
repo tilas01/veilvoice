@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/main.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 3439 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 3461 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs)
 
 ## Contents
 
@@ -85,7 +85,7 @@ thousand times.
 
 ## What this file contains
 
-3439 lines defining **29 functions** (0 public), **13 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+3461 lines defining **29 functions** (0 public), **13 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -100,8 +100,8 @@ thousand times.
 - `enum PolicyCommand` (line 1089) -- What veilvoice policy can do.
 - `enum SentryCommand` (line 1142) -- What veilvoice sentry can do.
 - `enum CleanPolicy` (line 1203)
-- `struct Tuning` (line 2190) -- The engine settings a user can reach from the command line.
-- `struct AtRest` (line 2262) -- What to do with the result once it exists.
+- `struct Tuning` (line 2196) -- The engine settings a user can reach from the command line.
+- `struct AtRest` (line 2273) -- What to do with the result once it exists.
 
 ## What calls what
 
@@ -121,26 +121,26 @@ _Colour key: **helper** -- private to this file._
 flowchart TD
     n_flavour_for["flavour_for<br/>line 1225"]
     n_explain_verification["explain_verification<br/>line 1245"]
-    n_main["main<br/>line 1322"]
-    n_run["run<br/>line 1359"]
-    n_run_ffmpeg["run_ffmpeg<br/>line 1927"]
-    n_list_volumes["list_volumes<br/>line 2002"]
-    n_list_companions["list_companions<br/>line 2050"]
-    n_offer_line["offer_line<br/>line 2083"]
-    n_install_companion["install_companion<br/>line 2107"]
-    n_reseed_range_from["reseed_range_from<br/>line 2209"]
-    n_config["config<br/>line 2224"]
-    n_describe_reseed_range["describe_reseed_range<br/>line 2243"]
-    n_describe_reseed["describe_reseed<br/>line 2253"]
-    n_anonymise["anonymise<br/>line 2271"]
-    n_live["live<br/>line 2412"]
-    n_list_devices["list_devices<br/>line 2643"]
-    n_read_named["read_named<br/>line 2694"]
-    n_video_plan["video_plan<br/>line 2709"]
-    n_write_named["write_named<br/>line 2726"]
-    n_clean["clean<br/>line 2730"]
-    n_encrypt["encrypt<br/>line 2747"]
-    n_decrypt["decrypt<br/>line 2776"]
+    n_main["main<br/>line 1323"]
+    n_run["run<br/>line 1365"]
+    n_run_ffmpeg["run_ffmpeg<br/>line 1933"]
+    n_list_volumes["list_volumes<br/>line 2008"]
+    n_list_companions["list_companions<br/>line 2056"]
+    n_offer_line["offer_line<br/>line 2089"]
+    n_install_companion["install_companion<br/>line 2113"]
+    n_reseed_range_from["reseed_range_from<br/>line 2215"]
+    n_config["config<br/>line 2235"]
+    n_describe_reseed_range["describe_reseed_range<br/>line 2254"]
+    n_describe_reseed["describe_reseed<br/>line 2264"]
+    n_anonymise["anonymise<br/>line 2283"]
+    n_live["live<br/>line 2426"]
+    n_list_devices["list_devices<br/>line 2658"]
+    n_read_named["read_named<br/>line 2709"]
+    n_video_plan["video_plan<br/>line 2724"]
+    n_write_named["write_named<br/>line 2741"]
+    n_clean["clean<br/>line 2746"]
+    n_encrypt["encrypt<br/>line 2764"]
+    n_decrypt["decrypt<br/>line 2795"]
     n_anonymise --> n_config
     n_anonymise --> n_describe_reseed_range
     n_clean --> n_read_named
@@ -170,26 +170,26 @@ flowchart TD
     n_run --> n_video_plan
     click n_flavour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1225" "open the source"
     click n_explain_verification href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1245" "open the source"
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1322" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1359" "open the source"
-    click n_run_ffmpeg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1927" "open the source"
-    click n_list_volumes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2002" "open the source"
-    click n_list_companions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2050" "open the source"
-    click n_offer_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2083" "open the source"
-    click n_install_companion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2107" "open the source"
-    click n_reseed_range_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2209" "open the source"
-    click n_config href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2224" "open the source"
-    click n_describe_reseed_range href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2243" "open the source"
-    click n_describe_reseed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2253" "open the source"
-    click n_anonymise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2271" "open the source"
-    click n_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2412" "open the source"
-    click n_list_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2643" "open the source"
-    click n_read_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2694" "open the source"
-    click n_video_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2709" "open the source"
-    click n_write_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2726" "open the source"
-    click n_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2730" "open the source"
-    click n_encrypt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2747" "open the source"
-    click n_decrypt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2776" "open the source"
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1323" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1365" "open the source"
+    click n_run_ffmpeg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1933" "open the source"
+    click n_list_volumes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2008" "open the source"
+    click n_list_companions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2056" "open the source"
+    click n_offer_line href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2089" "open the source"
+    click n_install_companion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2113" "open the source"
+    click n_reseed_range_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2215" "open the source"
+    click n_config href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2235" "open the source"
+    click n_describe_reseed_range href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2254" "open the source"
+    click n_describe_reseed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2264" "open the source"
+    click n_anonymise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2283" "open the source"
+    click n_live href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2426" "open the source"
+    click n_list_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2658" "open the source"
+    click n_read_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2709" "open the source"
+    click n_video_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2724" "open the source"
+    click n_write_named href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2741" "open the source"
+    click n_clean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2746" "open the source"
+    click n_encrypt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2764" "open the source"
+    click n_decrypt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2795" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_flavour_for,n_explain_verification,n_main,n_run,n_run_ffmpeg,n_list_volumes,n_list_companions,n_offer_line,n_install_companion,n_reseed_range_from,n_config,n_describe_reseed_range,n_describe_reseed,n_anonymise,n_live,n_list_devices,n_read_named,n_video_plan,n_write_named,n_clean,n_encrypt,n_decrypt helper
 ```
@@ -215,30 +215,30 @@ flowchart TD
 | `Policy::from` <sub>fn</sub> | [1211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1211) |  |
 | `flavour_for` <sub>fn</sub> | [1225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1225) | The verification script's spelling for a system, in one place. |
 | `explain_verification` <sub>fn</sub> | [1245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1245) | What checking a release actually involves, and who does which part. |
-| `main` <sub>fn</sub> | [1322](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1322) |  |
-| `run` <sub>fn</sub> | [1359](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1359) |  |
-| `run_ffmpeg` <sub>fn</sub> | [1927](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1927) | Roadmap items 87 and 88. |
-| `list_volumes` <sub>fn</sub> | [2002](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2002) | Report the encrypted volumes this machine is offering. |
-| `list_companions` <sub>fn</sub> | [2050](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2050) | Report every companion that means anything on this platform. |
-| `offer_line` <sub>fn</sub> | [2083](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2083) | One line describing what VeilVoice can do about a missing companion. |
-| `install_companion` <sub>fn</sub> | [2107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2107) | Act on one named companion. |
-| `Tuning` <sub>struct</sub> | [2190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2190) | The engine settings a user can reach from the command line. |
-| `reseed_range_from` <sub>fn</sub> | [2209](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2209) | Turn --reseed-range into a range, or into the reason it was not one. |
-| `config` <sub>fn</sub> | [2224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2224) |  |
-| `describe_reseed_range` <sub>fn</sub> | [2243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2243) | How a randomised roll range reads in the output. |
-| `describe_reseed` <sub>fn</sub> | [2253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2253) | How the seed-rolling setting reads in the output. |
-| `AtRest` <sub>struct</sub> | [2262](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2262) | What to do with the result once it exists. |
-| `anonymise` <sub>fn</sub> | [2271](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2271) |  |
-| `live` <sub>fn</sub> | [2412](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2412) |  |
-| `list_devices` <sub>fn</sub> | [2643](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2643) |  |
-| `read_named` <sub>pub(crate) fn</sub> | [2694](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2694) | Read a file, naming it if that fails. |
-| `video_plan` <sub>pub(crate) fn</sub> | [2709](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2709) | Read a --size and an --fps into a render plan, saying what was decided. |
-| `write_named` <sub>pub(crate) fn</sub> | [2726](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2726) | Write a file, naming it if that fails. |
-| `clean` <sub>fn</sub> | [2730](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2730) |  |
-| `encrypt` <sub>fn</sub> | [2747](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2747) |  |
-| `decrypt` <sub>fn</sub> | [2776](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2776) |  |
-| `load_secret_key` <sub>fn</sub> | [2808](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2808) | Load a private key file, which is itself a password-locked container. |
-| `keygen` <sub>fn</sub> | [2816](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2816) |  |
-| `watch` <sub>fn</sub> | [2892](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2892) | Report, and keep reporting, what is using the microphone and camera. |
-| `shred` <sub>fn</sub> | [2982](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2982) | Destroy a file's contents, then delete it. |
-| `info` <sub>fn</sub> | [3050](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L3050) |  |
+| `main` <sub>fn</sub> | [1323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1323) | Parse the command line and turn a failure into an exit code and a message. |
+| `run` <sub>fn</sub> | [1365](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1365) | Carry out one subcommand. |
+| `run_ffmpeg` <sub>fn</sub> | [1933](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1933) | Roadmap items 87 and 88. |
+| `list_volumes` <sub>fn</sub> | [2008](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2008) | Report the encrypted volumes this machine is offering. |
+| `list_companions` <sub>fn</sub> | [2056](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2056) | Report every companion that means anything on this platform. |
+| `offer_line` <sub>fn</sub> | [2089](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2089) | One line describing what VeilVoice can do about a missing companion. |
+| `install_companion` <sub>fn</sub> | [2113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2113) | Act on one named companion. |
+| `Tuning` <sub>struct</sub> | [2196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2196) | The engine settings a user can reach from the command line. |
+| `reseed_range_from` <sub>fn</sub> | [2215](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2215) | Turn --reseed-range into a range, or into the reason it was not one. |
+| `config` <sub>fn</sub> | [2235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2235) | The de-identification settings a Tuning describes, with every figure clamped. |
+| `describe_reseed_range` <sub>fn</sub> | [2254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2254) | How a randomised roll range reads in the output. |
+| `describe_reseed` <sub>fn</sub> | [2264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2264) | How the seed-rolling setting reads in the output. |
+| `AtRest` <sub>struct</sub> | [2273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2273) | What to do with the result once it exists. |
+| `anonymise` <sub>fn</sub> | [2283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2283) | veilvoice anonymise: veil a recording and write it somewhere else. |
+| `live` <sub>fn</sub> | [2426](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2426) | veilvoice live: veil the microphone as it is heard, with an optional preview. |
+| `list_devices` <sub>fn</sub> | [2658](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2658) | veilvoice devices: every input and output this machine reports. |
+| `read_named` <sub>pub(crate) fn</sub> | [2709](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2709) | Read a file, naming it if that fails. |
+| `video_plan` <sub>pub(crate) fn</sub> | [2724](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2724) | Read a --size and an --fps into a render plan, saying what was decided. |
+| `write_named` <sub>pub(crate) fn</sub> | [2741](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2741) | Write a file, naming it if that fails. |
+| `clean` <sub>fn</sub> | [2746](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2746) | veilvoice clean: strip the metadata a file carries, in place. |
+| `encrypt` <sub>fn</sub> | [2764](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2764) | veilvoice encrypt: seal a file, to a passphrase or to a public key. |
+| `decrypt` <sub>fn</sub> | [2795](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2795) | veilvoice decrypt: open a sealed file, given the passphrase or the secret key. |
+| `load_secret_key` <sub>fn</sub> | [2827](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2827) | Load a private key file, which is itself a password-locked container. |
+| `keygen` <sub>fn</sub> | [2837](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2837) | veilvoice keygen: write a new key pair, refusing to overwrite either file. |
+| `watch` <sub>fn</sub> | [2913](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2913) | Report, and keep reporting, what is using the microphone and camera. |
+| `shred` <sub>fn</sub> | [3003](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L3003) | Destroy a file's contents, then delete it. |
+| `info` <sub>fn</sub> | [3072](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L3072) | veilvoice info: the versions, and what this build was compiled to do. |
