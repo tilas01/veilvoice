@@ -147,6 +147,44 @@ pub fn column<R>(ui: &mut Ui, width: f32, add: impl FnOnce(&mut Ui) -> R) -> R {
     .inner
 }
 
+/// The width of every control that locks or unlocks the application.
+///
+/// **Finding F-196.** The header draws the theme picker and, beside it, the
+/// button that locks the window; the lock screen draws the password field and,
+/// beside it, the button that unlocks it. Each button was written where it was
+/// needed and sized by whatever its own text happened to measure, so the two
+/// halves of one idea, lock and unlock, were 46 and 98 points wide and neither
+/// matched the control it sat next to.
+///
+/// One number, used by the picker and by both buttons. It is the picker's
+/// width because the picker is the one of the three that has a list of theme
+/// names to fit; a button is happy at any width and a dropdown is not.
+pub const LOCK_WIDTH: f32 = 132.0;
+
+/// The height this style gives a button: its own text, plus its own padding.
+///
+/// Needed because a row has to agree on a height *before* the taller of its
+/// controls has been drawn. The password field is asked for this height, so
+/// the field grows to the button rather than the button shrinking to the
+/// field: both stay a comfortable target that way, and a button squeezed to a
+/// text field's height reads as a link rather than as something to press.
+///
+/// The test below draws a real button and fails if this stops agreeing with
+/// it, so it is checked against egui rather than assumed to match.
+pub fn button_height(ui: &Ui) -> f32 {
+    ui.text_style_height(&egui::TextStyle::Button) + 2.0 * ui.spacing().button_padding.y
+}
+
+/// A button that locks or unlocks: one width, and the height of its neighbour.
+///
+/// The height is passed in rather than worked out, because what it has to
+/// match differs by where it is drawn: the theme picker in the header, the
+/// password field on the lock screen. The width does not differ, which is the
+/// point of [`LOCK_WIDTH`].
+pub fn lock_button<'a>(text: egui::RichText, height: f32) -> egui::Button<'a> {
+    egui::Button::new(text).min_size(egui::vec2(LOCK_WIDTH, height))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -276,5 +314,160 @@ mod tests {
             });
         }
         assert_eq!(runs, 3, "the body ran {runs} times across three frames");
+    }
+
+    /// [`button_height`] is what the toolkit actually makes a button.
+    ///
+    /// It is arithmetic over the style rather than a number read out of egui,
+    /// which is fine while the two agree and silently wrong the day they stop.
+    /// So a real button is drawn and measured.
+    #[test]
+    fn the_height_a_button_is_predicted_to_be_is_the_height_it_is() {
+        let ctx = egui::Context::default();
+        crate::theme::install(&ctx);
+        let mut drawn = 0.0_f32;
+        let mut predicted = 0.0_f32;
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
+                predicted = button_height(ui);
+                drawn = ui.button("unlock").rect.height();
+            });
+        });
+        assert!(drawn > 0.0, "nothing was drawn");
+        assert!(
+            (drawn - predicted).abs() < 0.5,
+            "a button is {drawn:.2} tall and this predicts {predicted:.2}"
+        );
+    }
+
+    /// **Finding F-196.** The two buttons are one size, and each is the size
+    /// of what it stands beside.
+    ///
+    /// Both rows are laid out here, in one frame, with this application's own
+    /// theme installed: without the theme every control is the same height by
+    /// default and the test would pass while measuring nothing.
+    #[test]
+    fn the_lock_and_unlock_buttons_are_one_size() {
+        let ctx = egui::Context::default();
+        crate::theme::install(&ctx);
+        let mut entry = String::from("a passphrase");
+        let (mut picker, mut lock) = (egui::Rect::NOTHING, egui::Rect::NOTHING);
+        let (mut field, mut unlock) = (egui::Rect::NOTHING, egui::Rect::NOTHING);
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    picker = egui::ComboBox::from_id_salt("header-theme")
+                        .selected_text(egui::RichText::new("Tokyo Night").small())
+                        .width(LOCK_WIDTH)
+                        .show_ui(ui, |_| {})
+                        .response
+                        .rect;
+                    lock = ui
+                        .add(lock_button(
+                            egui::RichText::new("lock").small(),
+                            picker.height(),
+                        ))
+                        .rect;
+                });
+                let row = button_height(ui);
+                ui.horizontal(|ui| {
+                    field = ui
+                        .add(
+                            egui::TextEdit::singleline(&mut entry)
+                                .password(true)
+                                .desired_width(260.0)
+                                .min_size(egui::vec2(260.0, row))
+                                .vertical_align(egui::Align::Center),
+                        )
+                        .rect;
+                    unlock = ui
+                        .add(lock_button(egui::RichText::new("unlock").strong(), row))
+                        .rect;
+                });
+            });
+        });
+
+        for (name, rect) in [
+            ("picker", picker),
+            ("lock", lock),
+            ("field", field),
+            ("unlock", unlock),
+        ] {
+            assert!(rect.height() > 0.0, "{name} was not drawn");
+        }
+        // One size, both of them, which is what somebody looking at the two
+        // screens in turn actually sees.
+        assert!(
+            (lock.width() - unlock.width()).abs() < 0.5,
+            "the lock button is {:.1} wide and the unlock button {:.1}",
+            lock.width(),
+            unlock.width()
+        );
+        // And each in its place: the same height as its neighbour, on the same
+        // middle. Height alone was what the earlier fix checked, and two boxes
+        // of one height whose centres differ still read as out of place.
+        for (what, button, beside) in [("lock", lock, picker), ("unlock", unlock, field)] {
+            assert!(
+                (button.height() - beside.height()).abs() < 0.5,
+                "the {what} button is {:.1} tall beside a control {:.1} tall",
+                button.height(),
+                beside.height()
+            );
+            assert!(
+                (button.center().y - beside.center().y).abs() < 0.5,
+                "the {what} button sits {:.1} points off its neighbour's middle",
+                button.center().y - beside.center().y
+            );
+        }
+    }
+
+    /// And the shape all of that corrects, so none of it can pass by accident:
+    /// left to themselves, a button beside a password field is neither the
+    /// field's height nor the other button's width.
+    #[test]
+    fn buttons_left_to_size_themselves_match_nothing() {
+        let ctx = egui::Context::default();
+        crate::theme::install(&ctx);
+        let mut entry = String::from("a passphrase");
+        let (mut field, mut unlock, mut lock) = (
+            egui::Rect::NOTHING,
+            egui::Rect::NOTHING,
+            egui::Rect::NOTHING,
+        );
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    field = ui
+                        .add(
+                            egui::TextEdit::singleline(&mut entry)
+                                .password(true)
+                                .desired_width(260.0),
+                        )
+                        .rect;
+                    unlock = ui
+                        .add(egui::Button::new(
+                            egui::RichText::new("  unlock  ").strong(),
+                        ))
+                        .rect;
+                    lock = ui
+                        .add(egui::Button::new(egui::RichText::new("lock").small()))
+                        .rect;
+                });
+            });
+        });
+        assert!(
+            (unlock.height() - field.height()).abs() >= 0.5,
+            "a button and a password field are the same height with nothing \
+             making them match, so the test above would pass either way: \
+             {:.1} against {:.1}",
+            unlock.height(),
+            field.height()
+        );
+        assert!(
+            (unlock.width() - lock.width()).abs() >= 0.5,
+            "the two buttons are already one width: {:.1} against {:.1}",
+            unlock.width(),
+            lock.width()
+        );
     }
 }

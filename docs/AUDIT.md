@@ -501,6 +501,67 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-196: two halves of one idea, at three different sizes
+
+Reported by the person who uses the window, after F-178: the unlock button on
+the lock screen does not line up with the password field, and the lock button in
+the header still does not line up with the theme picker.
+
+**Half of that was already fixed and half of it was never looked at, and the
+useful part of this entry is which.** Measured in a headless frame with this
+application's own theme installed, laying out each row exactly as it ships:
+
+| control | width | height | middle |
+| --- | --- | --- | --- |
+| theme picker | 132.0 | 26.00 | 21.00 |
+| lock button | 46.5 | 26.00 | 21.00 |
+| password field | 260.0 | 19.12 | 17.56 |
+| unlock button | 98.3 | 27.00 | 21.50 |
+
+So F-178 did what it said: the lock button is the picker's height, on the
+picker's middle, exactly. What it explicitly decided not to do was the width,
+on the reasoning that "a button as wide as the picker would be a different
+complaint". It was the same complaint. A 46-point button against a 132-point
+dropdown, sharing a middle and agreeing on nothing else, is what somebody
+looking at the header is describing when they say the two do not line up.
+
+The lock screen had never been measured at all. Its field and its button
+differ by nearly eight points of height and their middles by four, and the
+button was sized by writing `"  unlock  "`: the word padded with two literal
+spaces at each end. **That is the mistake `crate::layout::column` already
+exists to stop somebody making**, in a proportional font, for the second time
+in this repository. A space is not a fixed fraction of a letter, egui gives
+trailing whitespace no reliable width, and the result is a control whose size
+depends on the typeface the reader has installed.
+
+The repair is one number and one rule. `crate::layout::LOCK_WIDTH` is the width
+of the theme picker, the lock button and the unlock button, so the control that
+locks the window and the control that unlocks it are one control to a reader
+rather than two sizes. The rule is that each button takes its *height* from
+whatever it stands beside, because that differs by where it is drawn: the
+picker in the header, the password field on the lock screen. The field is grown
+to the button rather than the button squashed to the field, since a button at a
+text field's height reads as a link.
+
+| control | width | height | middle |
+| --- | --- | --- | --- |
+| theme picker | 132.0 | 26.00 | 21.00 |
+| lock button | 132.0 | 26.00 | 21.00 |
+| password field | 260.0 | 27.12 | 55.56 |
+| unlock button | 132.0 | 27.12 | 55.56 |
+
+Four tests hold it. Two measure the rows as they ship, one for each screen,
+and check height, middle and width. One draws the same controls with nothing
+made to match and fails if they agree anyway, so the first two cannot pass by
+accident. The fourth checks that `layout::button_height`, which is arithmetic
+over the style, is still what egui actually makes a button: it is the one piece
+of this that could go quietly wrong when the toolkit is upgraded.
+
+The lock screen's row was lifted out of `unlock_screen` into a function of its
+own for the first two of those. A test that measures a replica of a row proves
+something about the replica, which is the same class of mistake as F-178's
+first measurement reading a photograph instead of a widget.
+
 ### F-195: a generator that wrote what was current and never took away what was not
 
 Found by doing something that had not been done before: deleting a crate.
@@ -6001,7 +6062,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1654 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1659 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -7649,7 +7710,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and ninety-five defects found and fixed (F-1 to F-195), across
+**One hundred and ninety-six defects found and fixed (F-1 to F-196), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

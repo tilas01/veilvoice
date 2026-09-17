@@ -742,20 +742,13 @@ impl Security {
         // each child it is given, and a `horizontal` row counts as one child,
         // so the label, the field and the button move together as a group.
         crate::layout::centred_row(ui, |ui| {
-            ui.label(RichText::new("password").color(p::muted()));
-            let field = ui.add_enabled(
-                !busy && cooldown.is_none(),
-                egui::TextEdit::singleline(&mut self.entry)
-                    .password(true)
-                    .desired_width(260.0),
-            );
+            // Worked out before the row borrows the field it reads, which is
+            // the same condition either way.
+            let ready = !busy && cooldown.is_none();
+            let pressable = ready && !self.entry.is_empty();
+            let (field, button) = unlock_row(ui, &mut self.entry, ready, pressable);
             let submitted = field.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter));
-            let clicked = ui
-                .add_enabled(
-                    !busy && cooldown.is_none() && !self.entry.is_empty(),
-                    egui::Button::new(RichText::new("  unlock  ").strong()),
-                )
-                .clicked();
+            let clicked = button.clicked();
             if (submitted || clicked) && !self.entry.is_empty() && cooldown.is_none() && !busy {
                 let entry = std::mem::take(&mut self.entry);
                 self.spawn(Op::Unlock, entry, String::new());
@@ -1522,6 +1515,11 @@ fn reopen(path: Option<&std::path::Path>) -> Option<LockStore> {
 /// Wide enough for "passphrase", which is the longest of them.
 const PASSWORD_LABEL_WIDTH: f32 = 82.0;
 
+/// How wide every passphrase field is drawn, on this tab and on the lock
+/// screen. One number, because two fields that are nearly the same width read
+/// as a mistake rather than as two sizes.
+const PASSWORD_FIELD_WIDTH: f32 = 260.0;
+
 /// One labelled passphrase field, with the field in the same place every time.
 ///
 /// # Why the label gets a column of its own
@@ -1586,10 +1584,61 @@ fn password_row(ui: &mut egui::Ui, label: &str, value: &mut String) -> egui::Res
         ui.add(
             egui::TextEdit::singleline(value)
                 .password(true)
-                .desired_width(260.0),
+                .desired_width(PASSWORD_FIELD_WIDTH),
         )
     })
     .inner
+}
+
+/// The password row on the lock screen: the label, the field and the button.
+///
+/// **Finding F-196.** Split out of `unlock_screen` so that a test can draw
+/// exactly what ships rather than a replica of it. The measurements that
+/// justify the sizes below are only worth something if they are measurements
+/// of this row.
+///
+/// The three sizes are one size. The field was a default `TextEdit`, 19.1
+/// points tall, and the button was the word "unlock" padded with two literal
+/// spaces on each side, 27.0 tall and 98.3 wide: nearly eight points of height
+/// between them, their middles four points apart, and a width that depended on
+/// how wide a space happens to be in the interface font. Padding a label with
+/// spaces to size a control is the mistake [`crate::layout::column`] already
+/// exists to stop somebody making, in a proportional font, for the second
+/// time.
+///
+/// So the row agrees on a height first, from
+/// [`crate::layout::button_height`], and the field is grown to it rather than
+/// the button squashed down to the field. The button is
+/// [`crate::layout::LOCK_WIDTH`] wide, which is what the lock button in the
+/// header is drawn at: the control that locks the window and the control that
+/// unlocks it are the same control to a reader, and were two different sizes.
+fn unlock_row(
+    ui: &mut egui::Ui,
+    entry: &mut String,
+    typeable: bool,
+    pressable: bool,
+) -> (egui::Response, egui::Response) {
+    let row = crate::layout::button_height(ui);
+    ui.label(RichText::new("password").color(p::muted()));
+    let field = ui.add_enabled(
+        typeable,
+        egui::TextEdit::singleline(entry)
+            .password(true)
+            .desired_width(PASSWORD_FIELD_WIDTH)
+            // `min_size` rather than a margin: the margin that would make this
+            // frame the right height is whole points, and the height to reach
+            // is not, so a margin lands near it and this lands on it.
+            .min_size(egui::vec2(PASSWORD_FIELD_WIDTH, row))
+            // Which leaves the text at the top of a frame that is now taller
+            // than the text. Centred, or the field is the button's height and
+            // still looks wrong.
+            .vertical_align(egui::Align::Center),
+    );
+    let button = ui.add_enabled(
+        pressable,
+        crate::layout::lock_button(RichText::new("unlock").strong(), row),
+    );
+    (field, button)
 }
 
 #[cfg(test)]
@@ -2262,6 +2311,75 @@ mod tests {
         assert!(
             body.contains("soundbar::badge"),
             "a locked window has one thing in it and it should be the logo"
+        );
+    }
+
+    /// **Finding F-196.** The row that ships, measured: the field and the
+    /// button are one height, on one middle, and the button is the width every
+    /// other lock control is drawn at.
+    ///
+    /// The theme is installed first. Without it the default style makes a
+    /// button and a text field the same height anyway, and this would pass
+    /// while measuring nothing about this application.
+    #[test]
+    fn the_password_field_and_the_unlock_button_are_one_size() {
+        let ctx = egui::Context::default();
+        crate::theme::install(&ctx);
+        let mut entry = String::from("a passphrase");
+        let (mut field, mut button) = (egui::Rect::NOTHING, egui::Rect::NOTHING);
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    let (a, b) = unlock_row(ui, &mut entry, true, true);
+                    field = a.rect;
+                    button = b.rect;
+                });
+            });
+        });
+
+        assert!(
+            field.height() > 0.0 && button.height() > 0.0,
+            "nothing drawn"
+        );
+        assert!(
+            (field.height() - button.height()).abs() < 0.5,
+            "the field is {:.1} tall and the button {:.1}",
+            field.height(),
+            button.height()
+        );
+        assert!(
+            (field.center().y - button.center().y).abs() < 0.5,
+            "the button sits {:.1} points off the field's middle",
+            field.center().y - button.center().y
+        );
+        assert!(
+            (button.width() - crate::layout::LOCK_WIDTH).abs() < 0.5,
+            "the unlock button is {:.1} wide, not the {:.1} every lock control \
+             is drawn at",
+            button.width(),
+            crate::layout::LOCK_WIDTH
+        );
+        assert!(
+            (field.width() - PASSWORD_FIELD_WIDTH).abs() < 1.0,
+            "growing the field's height changed its width: {:.1}",
+            field.width()
+        );
+    }
+
+    /// The row is not padded with spaces, which is how it was sized before and
+    /// is not a width in a proportional font.
+    #[test]
+    fn nothing_in_the_unlock_row_is_sized_with_spaces() {
+        let source = include_str!("security.rs").replace("\r\n", "\n");
+        let start = source.find("fn unlock_row").unwrap();
+        let body = &source[start..start + 1600];
+        assert!(
+            !body.contains("\"  unlock  \""),
+            "the button is padded with literal spaces again"
+        );
+        assert!(
+            body.contains("layout::lock_button"),
+            "the button has to be the shared one, or it is one size by accident"
         );
     }
 

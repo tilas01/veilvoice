@@ -124,20 +124,20 @@
 <text x="226.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::unlock_screen</text>
 <text x="226.2" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 652</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L861" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L854" target="_blank" rel="noopener noreferrer">
 <rect x="358.9" y="637.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="425.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::tab</text>
-<text x="425.3" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 861</text>
+<text x="425.3" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 854</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1086" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1079" target="_blank" rel="noopener noreferrer">
 <rect x="47.0" y="737.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="173.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::recording_controls</text>
-<text x="173.8" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1086</text>
+<text x="173.8" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1079</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1306" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1299" target="_blank" rel="noopener noreferrer">
 <rect x="326.7" y="737.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="445.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::disable_dialogue</text>
-<text x="445.5" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1306</text>
+<text x="445.5" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1299</text>
 </a>
 <rect x="20.0" y="1021.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1030.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -149,5 +149,5 @@
 <text x="35.0" y="1078.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="1100.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions security.rs defines, and the calls between them. An edge means the</text>
 <text x="20.0" y="1115.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body: a syntactic reading, not a</text>
-<text x="20.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 44 are drawn, so the picture stays readable.</text>
+<text x="20.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 45 are drawn, so the picture stays readable.</text>
 </svg>

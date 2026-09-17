@@ -16,6 +16,7 @@
 <path d="M359.6 74.0 C 359.6 94.0, 233.0 300.0, 233.0 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M359.6 74.0 C 359.6 94.0, 371.7 300.0, 371.7 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M359.6 74.0 C 359.6 94.0, 514.3 300.0, 514.3 317.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M359.6 74.0 C 359.6 94.0, 102.5 700.0, 102.5 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M359.6 74.0 C 359.6 94.0, 233.0 700.0, 233.0 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M359.6 74.0 C 359.6 94.0, 110.5 400.0, 110.5 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M359.6 74.0 C 359.6 94.0, 237.1 400.0, 237.1 417.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
@@ -50,6 +51,7 @@
 <path d="M371.7 374.0 C 371.7 394.0, 233.0 700.0, 233.0 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M371.7 374.0 C 371.7 394.0, 308.4 800.0, 308.4 817.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M371.7 374.0 C 371.7 394.0, 304.4 1000.0, 304.4 1017.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M102.5 774.0 C 102.5 794.0, 304.4 1000.0, 304.4 1017.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M233.0 774.0 C 233.0 794.0, 304.4 1000.0, 304.4 1017.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M110.5 474.0 C 110.5 494.0, 371.7 700.0, 371.7 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M110.5 474.0 C 110.5 494.0, 304.4 1000.0, 304.4 1017.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
@@ -72,6 +74,7 @@
 <path d="M165.7 874.0 C 165.7 894.0, 300.3 900.0, 300.3 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M165.7 874.0 C 165.7 894.0, 304.4 1000.0, 304.4 1017.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M366.7 847.0 C 578.5 847.0, 578.5 47.0, 559.5 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M366.7 847.0 C 388.7 847.0, 388.7 747.0, 155.7 747.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M366.7 847.0 C 388.7 847.0, 388.7 747.0, 290.3 747.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M366.7 847.0 C 388.7 847.0, 388.7 447.0, 163.8 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M366.7 847.0 C 388.7 847.0, 388.7 447.0, 290.3 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
@@ -112,7 +115,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs" target="_blank" rel="noopener noreferrer">
 <rect x="305.3" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="359.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">app.rs</text>
-<text x="359.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">3569 lines</text>
+<text x="359.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">3584 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs" target="_blank" rel="noopener noreferrer">
 <rect x="439.9" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -167,7 +170,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs" target="_blank" rel="noopener noreferrer">
 <rect x="52.2" y="720.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="102.5" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">layout.rs</text>
-<text x="102.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">280 lines</text>
+<text x="102.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">473 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs" target="_blank" rel="noopener noreferrer">
 <rect x="178.7" y="720.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -212,12 +215,12 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" target="_blank" rel="noopener noreferrer">
 <rect x="107.4" y="820.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="165.7" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">security.rs</text>
-<text x="165.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">2285 lines</text>
+<text x="165.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">2403 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" target="_blank" rel="noopener noreferrer">
 <rect x="250.1" y="820.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="308.4" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">settings.rs</text>
-<text x="308.4" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1429 lines</text>
+<text x="308.4" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1434 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" target="_blank" rel="noopener noreferrer">
 <rect x="439.9" y="420.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>

@@ -792,12 +792,17 @@ impl Settings {
     /// Returns the picker's own rectangle. The controls beside it in the
     /// header take their height from it rather than working one out
     /// separately, which is what left them a pixel apart (finding F-178).
+    ///
+    /// Its width is [`crate::layout::LOCK_WIDTH`], which the lock button and
+    /// the unlock button are also drawn at, so the picker and the button
+    /// beside it are one box repeated rather than two boxes that nearly agree
+    /// (finding F-196).
     pub fn theme_picker(&mut self, ui: &mut Ui, ctx: &egui::Context) -> egui::Rect {
         let current = crate::theme::active();
         let mut chosen = None;
         let picker = egui::ComboBox::from_id_salt("header-theme")
             .selected_text(RichText::new(current.name).small())
-            .width(132.0)
+            .width(crate::layout::LOCK_WIDTH)
             .show_ui(ui, |ui| {
                 for theme in themes() {
                     if ui
