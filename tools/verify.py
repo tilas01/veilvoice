@@ -109,6 +109,12 @@ GENERATORS = [
     ("screenshot sizes on the pages", [sys.executable, "tools/shots/attrs.py"]),
     ("terminal drawings", [sys.executable, "tools/shots/terminal.py"]),
     ("documentation", [sys.executable, "tools/docs/generate.py"]),
+    # Before the wiki, which carries this document as a page of its own.
+    ("every command, and its place in the window",
+     [sys.executable, "tools/docs/commands.py"]),
+    # Reads the workspace, tools/audit/ and this file's own lists, so it goes
+    # after the documentation and before the wiki that carries it.
+    ("the developer guide", [sys.executable, "tools/docs/developers.py"]),
     # After the documentation generator, which owns the wiki directory:
     # these are per-program views of the user guide and land in it too.
     ("per-program guides", [sys.executable, "tools/docs/guides.py"]),
@@ -253,6 +259,10 @@ CHECKS = [
      [sys.executable, "tools/docs/wiki.py", "--check"]),
     ("website source pages match their files",
      [sys.executable, "tools/docs/sources.py", "--check"]),
+    ("every command is documented, and its window location exists",
+     [sys.executable, "tools/docs/commands.py", "--check"]),
+    ("the developer guide matches the tree",
+     [sys.executable, "tools/docs/developers.py", "--check"]),
     ("the website's wiki matches the wiki",
      [sys.executable, "tools/site/wiki_site.py", "--check"]),
     ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),

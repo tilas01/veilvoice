@@ -6,8 +6,8 @@
 - [[What VeilVoice is|Doc-README]]
 - [[User guide|Doc-USER-GUIDE]]
 - [[Installing|Doc-INSTALL]]
+- [[Every command|Doc-COMMANDS]]
 - [[Questions|Doc-FAQ]]
-- [[How the veiling works|Doc-WHITEPAPER]]
 
 **Per program**
 
@@ -17,15 +17,17 @@
 
 **Check and build**
 
+- [[How the veiling works|Doc-WHITEPAPER]]
 - [[Checking a download|Doc-GUIDE-VERIFY]]
 - [[Building it yourself|Doc-REPRODUCIBLE-BUILDS]]
 - [[The code-signing certificate|Doc-SELF-SIGNING]]
 - [[Packaging|Doc-PACKAGING]]
 - [[Using it as a library|Doc-USING-THE-CRATES]]
-- [[The website|Doc-WEBSITE]]
 
 **Work on it**
 
+- [[The website|Doc-WEBSITE]]
+- [[Working on the code|Doc-DEVELOPERS]]
 - [[Contributing|Doc-CONTRIBUTING]]
 - [[Reporting a vulnerability|Doc-SECURITY]]
 - [[Audit history|Doc-AUDIT]]

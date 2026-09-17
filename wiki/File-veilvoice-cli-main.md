@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/main.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 3461 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 3509 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs)
 
 ## Contents
 
@@ -85,7 +85,7 @@ thousand times.
 
 ## What this file contains
 
-3461 lines defining **29 functions** (0 public), **13 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+3509 lines defining **29 functions** (0 public), **13 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
