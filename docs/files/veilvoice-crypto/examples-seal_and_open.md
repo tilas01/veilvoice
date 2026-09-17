@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-crypto/examples-seal_and_open.svg" alt="seal_and_open.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-crypto/examples-seal_and_open.svg" alt="seal_and_open.rs" width="62%">
 </p>
 
 # `crates/veilvoice-crypto/examples/seal_and_open.rs`

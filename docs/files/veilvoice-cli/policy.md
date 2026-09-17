@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-cli/policy.svg" alt="policy.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-cli/policy.svg" alt="policy.rs" width="62%">
 </p>
 
 # `crates/veilvoice-cli/src/policy.rs`

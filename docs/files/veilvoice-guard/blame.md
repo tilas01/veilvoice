@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-guard/blame.svg" alt="blame.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-guard/blame.svg" alt="blame.rs" width="62%">
 </p>
 
 # `crates/veilvoice-guard/src/blame.rs`

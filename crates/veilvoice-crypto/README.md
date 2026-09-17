@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../assets/banners/veilvoice-crypto.svg" alt="veilvoice-crypto" width="100%">
+  <img src="../../assets/banners/veilvoice-crypto.svg" alt="veilvoice-crypto" width="62%">
 </p>
 
 # veilvoice-crypto

@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/fuzz/fuzz_targets-hybrid_keys.svg" alt="hybrid_keys.rs" width="100%">
+  <img src="../../../assets/banners/fuzz/fuzz_targets-hybrid_keys.svg" alt="hybrid_keys.rs" width="62%">
 </p>
 
 # `fuzz/fuzz_targets/hybrid_keys.rs`

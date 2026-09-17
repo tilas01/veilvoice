@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/fuzz/fuzz_targets-guard_manifest.svg" alt="guard_manifest.rs" width="100%">
+  <img src="../../../assets/banners/fuzz/fuzz_targets-guard_manifest.svg" alt="guard_manifest.rs" width="62%">
 </p>
 
 # `fuzz/fuzz_targets/guard_manifest.rs`

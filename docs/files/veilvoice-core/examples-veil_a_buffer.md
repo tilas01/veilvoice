@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-core/examples-veil_a_buffer.svg" alt="veil_a_buffer.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-core/examples-veil_a_buffer.svg" alt="veil_a_buffer.rs" width="62%">
 </p>
 
 # `crates/veilvoice-core/examples/veil_a_buffer.rs`

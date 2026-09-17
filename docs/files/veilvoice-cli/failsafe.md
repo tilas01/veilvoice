@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-cli/failsafe.svg" alt="failsafe.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-cli/failsafe.svg" alt="failsafe.rs" width="62%">
 </p>
 
 # `crates/veilvoice-cli/src/failsafe.rs`

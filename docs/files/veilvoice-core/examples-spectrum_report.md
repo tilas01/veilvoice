@@ -6,7 +6,7 @@
 -->
 
 <p align="center">
-  <img src="../../../assets/banners/veilvoice-core/examples-spectrum_report.svg" alt="spectrum_report.rs" width="100%">
+  <img src="../../../assets/banners/veilvoice-core/examples-spectrum_report.svg" alt="spectrum_report.rs" width="62%">
 </p>
 
 # `crates/veilvoice-core/examples/spectrum_report.rs`
