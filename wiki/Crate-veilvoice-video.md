@@ -78,7 +78,7 @@ none -- so it prints the command that would do it with `ffmpeg`, if you have
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>168 lines"])
-    n_accel["accel.rs<br/>647 lines"]
+    n_accel["accel.rs<br/>648 lines"]
     n_ffmpeg["ffmpeg.rs<br/>718 lines"]
     n_font["font.rs<br/>418 lines"]
     n_frames["frames.rs<br/>686 lines"]
@@ -115,7 +115,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`accel.rs`|File-veilvoice-video-accel]] | 647 | What hardware this machine has, and the one place VeilVoice can use it. |
+| [[`accel.rs`|File-veilvoice-video-accel]] | 648 | What hardware this machine has, and the one place VeilVoice can use it. |
 | [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 718 | The video file, which needs a codec this project does not ship. |
 | [[`font.rs`|File-veilvoice-video-font]] | 418 | A monospace face, five pixels by seven, drawn here. |
 | [[`frames.rs`|File-veilvoice-video-frames]] | 686 | The video's pictures, and how many of them there really are. |
