@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Photograph every tab of the desktop application, on Linux, with no display.
+# Photograph the desktop application, on Linux, with no display: every tab,
+# every page of the Settings tab, and the locked window.
 #
 #     tools/shots/gui.sh
 #
@@ -207,48 +208,128 @@ CONF
 
 problems=()
 declare -A prints=()
+taken=0
 
-for tab in "${tabs[@]}"; do
-  DISPLAY="$display" XDG_CONFIG_HOME="$work/config" LIBGL_ALWAYS_SOFTWARE=1 \
-    "$exe" --tab "$tab" --size "${width}x${height}" >"$work/$tab.log" 2>&1 &
-  gui=$!
+# Photograph the window once.
+#
+#     shoot <name> <config dir> <argument>...
+#
+# Writes `gui-<name>.png`. Everything that was once written out per tab is
+# here, because there are three passes over this now rather than one: the
+# tabs, the pages inside the Settings tab, and the lock screen. Three copies
+# of a capture-and-check block is three places for one of them to stop
+# checking something.
+shoot() {
+  local name="$1" conf="$2"
+  shift 2
+
+  DISPLAY="$display" XDG_CONFIG_HOME="$conf" LIBGL_ALWAYS_SOFTWARE=1 \
+    "$exe" "$@" --size "${width}x${height}" >"$work/$name.log" 2>&1 &
+  local gui=$!
 
   # Long enough for the window to appear, the layout to settle and the first
   # frames to be drawn. Software rendering, so this is not quick.
   sleep 14
 
   if ! kill -0 "$gui" 2>/dev/null; then
-    problems+=("$tab : the application exited before it was photographed")
-    continue
+    problems+=("$name : the application exited before it was photographed")
+    return 0
   fi
 
-  if ! DISPLAY="$display" xwd -root -silent > "$work/$tab.xwd" 2>/dev/null; then
-    problems+=("$tab : xwd could not read the screen")
+  if ! DISPLAY="$display" xwd -root -silent > "$work/$name.xwd" 2>/dev/null; then
+    problems+=("$name : xwd could not read the screen")
     kill "$gui" 2>/dev/null || true
     wait "$gui" 2>/dev/null || true
-    continue
+    return 0
   fi
 
   kill "$gui" 2>/dev/null || true
   wait "$gui" 2>/dev/null || true
 
-  if ! python3 "$here/tools/shots/xwd.py" "$work/$tab.xwd" "$out/gui-$tab.png"; then
-    problems+=("$tab : the capture could not be converted")
-    continue
+  if ! python3 "$here/tools/shots/xwd.py" "$work/$name.xwd" "$out/gui-$name.png"; then
+    problems+=("$name : the capture could not be converted")
+    return 0
   fi
 
-  # A cheap fingerprint, so two tabs coming out identical is caught rather than
-  # published. That is the failure the clicking versions of the Windows script
-  # kept producing, and it is invisible in a directory listing.
-  print="$(python3 "$here/tools/shots/xwd.py" --fingerprint "$out/gui-$tab.png")"
+  # A cheap fingerprint, so two captures coming out identical is caught rather
+  # than published. That is the failure the clicking versions of the Windows
+  # script kept producing, and it is invisible in a directory listing. It
+  # matters more now than it did: a settings page that ignored
+  # `--settings-page` would photograph the page before it, and the picture
+  # would look perfectly correct under the wrong name.
+  local print
+  print="$(python3 "$here/tools/shots/xwd.py" --fingerprint "$out/gui-$name.png")"
   if [ -n "${prints[$print]:-}" ]; then
-    problems+=("$tab : identical to ${prints[$print]} -- the tab did not change")
+    problems+=("$name : identical to ${prints[$print]} -- the screen did not change")
   else
-    prints[$print]="$tab"
+    prints[$print]="$name"
   fi
 
-  echo "wrote gui-$tab.png  (${width}x${height})"
+  taken=$((taken + 1))
+  echo "wrote gui-$name.png  (${width}x${height})"
+}
+
+for tab in "${tabs[@]}"; do
+  shoot "$tab" "$work/config" --tab "$tab"
 done
+
+# Every page of the Settings tab, which one picture of the tab cannot show.
+#
+# The tab has five pages behind a menu down its left side, and photographing
+# the tab photographs whichever one the window opens on. The other four hold
+# the autolock delay, which tabs are offered, where the settings are kept and
+# what a reset does: settings somebody would go looking for a picture of.
+#
+# `--settings-page` is how they are reached, for the same reason `--tab` is:
+# nothing here clicks. The list is asked of the application rather than
+# written here, and the page the window opens on is skipped because
+# `gui-settings.png` already is that page. Which one that is comes from the
+# order rather than from a name typed twice.
+mapfile -t pages < <("$exe" --settings-pages)
+if [ "${#pages[@]}" -eq 0 ]; then
+  echo "the application listed no settings pages" >&2
+  exit 1
+fi
+for page in "${pages[@]:1}"; do
+  shoot "settings-$page" "$work/config" --tab settings --settings-page "$page"
+done
+
+# The lock screen, which needs a lock to exist before there is one to show.
+#
+# Every capture above is taken with no app lock set, and that is right for
+# them: it is what a first run looks like. It does mean the two controls
+# somebody asks about most, the lock screen and the lock button the header
+# grows once a lock exists, appear in none of them.
+#
+# So one more pass, with a lock set by the command line program under a
+# configuration directory of its own. The passphrase is drawn here, used
+# twice and never written down; the directory holding the lock goes when this
+# script exits, so nothing is left behind that anybody has to know a password
+# for. The window opens locked because a lock exists, which is the whole
+# behaviour being photographed.
+cli="${VEILVOICE_CLI:-$here/target/release/veilvoice}"
+if [ ! -x "$cli" ]; then
+  echo "no build at $cli -- run: cargo build --release -p veilvoice-cli" >&2
+  echo "  it is needed to set the app lock the locked-window capture shows" >&2
+  exit 1
+fi
+locked="$work/locked"
+mkdir -p "$locked/veilvoice"
+cp "$work/config/veilvoice/settings.conf" "$locked/veilvoice/settings.conf"
+throwaway="$(head -c 24 /dev/urandom | base64 | tr -d '\n=/+')"
+# `script` because the lock deliberately refuses to read a passphrase from
+# anything but a terminal, which is a property worth keeping rather than
+# working around: it is what stops a passphrase arriving from a pipe in a log
+# somewhere. This gives it a real one.
+if ! printf '%s\n%s\n' "$throwaway" "$throwaway" \
+  | XDG_CONFIG_HOME="$locked" script -qec "$cli lock set" /dev/null \
+    >"$work/lock-set.log" 2>&1; then
+  echo "could not set an app lock for the locked-window capture:" >&2
+  sed 's/^/  /' "$work/lock-set.log" >&2
+  exit 1
+fi
+unset throwaway
+shoot "locked" "$locked"
 
 if [ "${#problems[@]}" -gt 0 ]; then
   echo
@@ -256,4 +337,4 @@ if [ "${#problems[@]}" -gt 0 ]; then
   exit 1
 fi
 echo
-echo "${#tabs[@]} captures in $out"
+echo "$taken captures in $out"

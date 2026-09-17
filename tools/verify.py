@@ -118,6 +118,11 @@ GENERATORS = [
     # Rust doc comments, and these are JavaScript and CSS. Imports the same
     # module for the palette and the drawing code, so it goes after it.
     ("website source pages", [sys.executable, "tools/docs/sources.py"]),
+    # After every page of the reference exists, including the source pages
+    # above: this publishes the wiki on the website and works out which of its
+    # pages are already here by walking `website/reference/`. Before the
+    # addresses and the index, which walk what it writes.
+    ("the wiki on the website", [sys.executable, "tools/site/wiki_site.py"]),
     # Derived from website/index.html, so it must run after anything that could
     # edit that file and before the index walks the result.
     ("section pages", [sys.executable, "tools/site/split.py"]),
@@ -248,6 +253,8 @@ CHECKS = [
      [sys.executable, "tools/docs/wiki.py", "--check"]),
     ("website source pages match their files",
      [sys.executable, "tools/docs/sources.py", "--check"]),
+    ("the website's wiki matches the wiki",
+     [sys.executable, "tools/site/wiki_site.py", "--check"]),
     ("section pages match index.html", [sys.executable, "tools/site/split.py", "--check"]),
     ("the roadmap page matches ROADMAP.md",
      [sys.executable, "tools/site/roadmap.py", "--check"]),

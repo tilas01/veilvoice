@@ -427,6 +427,12 @@ jobs:
           node-version: '22'
       - name: Characters, structure, rendering, hostile input, scroll reveal
         run: node tools/site-tests/run.js
+      # The whole GitHub wiki, published as pages of this site. It is in this
+      # job rather than beside the other documentation checks because it
+      # renders its Markdown with `website/js/markdown.js`, the renderer the
+      # front page already uses, and node is set up here.
+      - name: The website's wiki must match the wiki
+        run: python tools/site/wiki_site.py --check
       # The local host script, which is the site's fallback if GitHub Pages is
       # not there. It starts the server, fetches every page and stops. It was
       # in `tools/verify.py` and not here, so the fallback was checked only by

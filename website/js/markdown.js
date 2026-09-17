@@ -362,6 +362,9 @@ window.MD = (function () {
     var lines = String(source).replace(/\r\n?/g, "\n").split("\n");
     var html = [];
     var i = 0;
+    // How many `<details>` are open, so none is left open at the end and none
+    // is closed that was never opened. See the note beside the tags below.
+    var open = 0;
 
     function tableRow(line) {
       return line.trim().indexOf("|") === 0 || /\s\|\s/.test(line);
@@ -465,18 +468,79 @@ window.MD = (function () {
       }
       if (/^\s*<\/?(p|div|img|br|hr|center|table|h[1-6])\b/i.test(line)) { i++; continue; }
 
+      // `<details>`, which is the one piece of raw HTML these documents use
+      // and the one the rule above must not simply drop.
+      //
+      // Dropping the tags would leave every collapsed section open: the
+      // README puts the install instructions for six operating systems in
+      // them, and a reader who wanted one would get all six. Escaping them,
+      // which is what happened before this, is worse still -- the page showed
+      // the reader the literal text `<details>` and `<summary>` twenty-two
+      // times.
+      //
+      // So three exact shapes are allowed through and nothing else. A whole
+      // line, trimmed, matching one of these patterns, with no attributes of
+      // any kind: an attribute is where markup gets in, and `<details>` needs
+      // none. The summary's own text goes through `inline` like any other
+      // text, so it is escaped before anything is put around it; `<b>`, which
+      // is what the README writes in a summary, is turned into `<strong>`
+      // afterwards, on already-escaped text, which is the only reason that is
+      // safe to do.
+      var summary = /^<summary>([^<>]{0,512}|(?:<\/?b>|[^<>]){0,512})<\/summary>$/
+        .exec(line.trim());
+      //
+      // Balanced here rather than trusted to be balanced. This renderer also
+      // draws the README *as fetched from GitHub over the network*, and a
+      // stray `<details>` with no close would fold the whole rest of the page
+      // into a collapsed block, while a stray `</details>` would close one
+      // this did not open. Neither can run anything, and both would look like
+      // the page had broken, so an unmatched close is dropped and anything
+      // still open is closed at the end.
+      if (line.trim() === "<details>") {
+        open += 1;
+        html.push("<details>");
+        i++;
+        continue;
+      }
+      if (line.trim() === "</details>") {
+        if (open > 0) {
+          open -= 1;
+          html.push("</details>");
+        }
+        i++;
+        continue;
+      }
+      if (summary) {
+        html.push("<summary>" +
+                  inline(summary[1])
+                    .replace(/&lt;b&gt;/g, "<strong>")
+                    .replace(/&lt;\/b&gt;/g, "</strong>") +
+                  "</summary>");
+        i++;
+        continue;
+      }
+
       if (line.trim() === "") { i++; continue; }
 
       // paragraph
       var para = [];
       while (i < lines.length && lines[i].trim() !== "" &&
-             !/^(#{1,6}\s|```|>|\s*(?:[-*+]|\d+\.)\s)/.test(lines[i])) {
+             !/^(#{1,6}\s|```|>|\s*(?:[-*+]|\d+\.)\s)/.test(lines[i]) &&
+             // A `<details>` tag ends a paragraph as surely as a heading does.
+             // Without this the closing tag of a section whose last line is
+             // prose is read as more of that prose, and the block is never
+             // closed where it was written.
+             !/^\s*(<details>|<\/details>|<summary>)/.test(lines[i])) {
         para.push(lines[i]);
         i++;
       }
       if (para.length) { html.push("<p>" + inline(para.join(" ")) + "</p>"); }
     }
 
+    while (open > 0) {
+      html.push("</details>");
+      open -= 1;
+    }
     return html.join("\n");
   }
 

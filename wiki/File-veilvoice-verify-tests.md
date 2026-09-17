@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/tests.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1373 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1388 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
 
 ## Contents
 
@@ -38,7 +38,7 @@ whether it says no.
 
 ## What this file contains
 
-1373 lines defining **33 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1388 lines defining **33 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -140,7 +140,7 @@ flowchart TD
 | `every_tab_has_a_picture_in_the_readme_and_on_the_website` <sub>fn</sub> | [684](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L684) | Every tab the window shows has a picture in the README and on the website. |
 | `the_readme_counts_the_window_tabs_the_window_actually_has` <sub>fn</sub> | [736](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L736) | The README's count of the window's tabs is the number of tabs there are. |
 | `no_page_tells_a_reader_to_run_a_program_that_no_longer_exists` <sub>fn</sub> | [789](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L789) |  |
-| `no_desktop_test_opens_a_device_a_dialog_or_a_window` <sub>fn</sub> | [929](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L929) | No test in the desktop crate may open a device, a dialog or a window. |
-| `only_the_session_builds_a_recorder` <sub>fn</sub> | [1053](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1053) | F-166. |
-| `the_desktop_starts_a_live_session_in_exactly_one_place` <sub>fn</sub> | [1127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1127) | Roadmap item 130. |
-| `no_audio_callback_allocates_or_blocks` <sub>fn</sub> | [1235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1235) | Roadmap item 126. |
+| `no_desktop_test_opens_a_device_a_dialog_or_a_window` <sub>fn</sub> | [944](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L944) | No test in the desktop crate may open a device, a dialog or a window. |
+| `only_the_session_builds_a_recorder` <sub>fn</sub> | [1068](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1068) | F-166. |
+| `the_desktop_starts_a_live_session_in_exactly_one_place` <sub>fn</sub> | [1142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1142) | Roadmap item 130. |
+| `no_audio_callback_allocates_or_blocks` <sub>fn</sub> | [1250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1250) | Roadmap item 126. |

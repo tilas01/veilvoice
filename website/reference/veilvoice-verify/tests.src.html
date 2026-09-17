@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1373 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1388 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -917,593 +917,608 @@
 <span class="ln" id="L792">    <span class="tok-kw">let</span> root = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;../../&quot;</span>);</span>
 <span class="ln" id="L793"></span>
 <span class="ln" id="L794">    <span class="tok-com">// Records of the past, which are allowed to describe it.</span></span>
-<span class="ln" id="L795">    <span class="tok-kw">let</span> history = [</span>
-<span class="ln" id="L796">        <span class="tok-str">&quot;AUDIT.md&quot;</span>,</span>
-<span class="ln" id="L797">        <span class="tok-str">&quot;CHANGELOG.md&quot;</span>,</span>
-<span class="ln" id="L798">        <span class="tok-str">&quot;releases.html&quot;</span>,</span>
-<span class="ln" id="L799">        <span class="tok-str">&quot;search.html&quot;</span>,</span>
-<span class="ln" id="L800">        <span class="tok-str">&quot;search-index.json&quot;</span>,</span>
-<span class="ln" id="L801">    ];</span>
-<span class="ln" id="L802"></span>
-<span class="ln" id="L803">    <span class="tok-com">// What follows the name when it is being run rather than named.</span></span>
-<span class="ln" id="L804">    <span class="tok-kw">let</span> invoked = [</span>
-<span class="ln" id="L805">        <span class="tok-str">&quot; --&quot;</span>,</span>
-<span class="ln" id="L806">        <span class="tok-str">&quot; -q&quot;</span>,</span>
-<span class="ln" id="L807">        <span class="tok-str">&quot; auto&quot;</span>,</span>
-<span class="ln" id="L808">        <span class="tok-str">&quot; file&quot;</span>,</span>
-<span class="ln" id="L809">        <span class="tok-str">&quot; deps&quot;</span>,</span>
-<span class="ln" id="L810">        <span class="tok-str">&quot; gnupg&quot;</span>,</span>
-<span class="ln" id="L811">        <span class="tok-str">&quot; hash&quot;</span>,</span>
-<span class="ln" id="L812">        <span class="tok-str">&quot; reproduce&quot;</span>,</span>
-<span class="ln" id="L813">        <span class="tok-str">&quot; help&quot;</span>,</span>
-<span class="ln" id="L814">    ];</span>
-<span class="ln" id="L815"></span>
-<span class="ln" id="L816">    <span class="tok-kw">fn</span> <span class="tok-fn">gather</span>(dir: &amp;Path, into: &amp;<span class="tok-kw">mut</span> Vec&lt;PathBuf&gt;) {</span>
-<span class="ln" id="L817">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(dir) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L818">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L819">        };</span>
-<span class="ln" id="L820">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L821">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L822">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L823">                <span class="tok-fn">gather</span>(&amp;path, into);</span>
-<span class="ln" id="L824">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| {</span>
-<span class="ln" id="L825">                [<span class="tok-str">&quot;md&quot;</span>, <span class="tok-str">&quot;html&quot;</span>, <span class="tok-str">&quot;txt&quot;</span>, <span class="tok-str">&quot;py&quot;</span>, <span class="tok-str">&quot;sh&quot;</span>, <span class="tok-str">&quot;ps1&quot;</span>, <span class="tok-str">&quot;bat&quot;</span>, <span class="tok-str">&quot;rs&quot;</span>]</span>
-<span class="ln" id="L826">                    .<span class="tok-fn">contains</span>(&amp;e.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">as_ref</span>())</span>
-<span class="ln" id="L827">            }) {</span>
-<span class="ln" id="L828">                into.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L829">            }</span>
-<span class="ln" id="L830">        }</span>
-<span class="ln" id="L831">    }</span>
-<span class="ln" id="L832"></span>
-<span class="ln" id="L833">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> files = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L834">    <span class="tok-kw">for</span> place <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L835">        <span class="tok-str">&quot;README.md&quot;</span>,</span>
-<span class="ln" id="L836">        <span class="tok-str">&quot;docs&quot;</span>,</span>
-<span class="ln" id="L837">        <span class="tok-str">&quot;website&quot;</span>,</span>
-<span class="ln" id="L838">        <span class="tok-str">&quot;packaging&quot;</span>,</span>
-<span class="ln" id="L839">        <span class="tok-str">&quot;tools&quot;</span>,</span>
-<span class="ln" id="L840">        <span class="tok-str">&quot;assets/screenshots&quot;</span>,</span>
-<span class="ln" id="L841">    ] {</span>
-<span class="ln" id="L842">        <span class="tok-kw">let</span> path = root.<span class="tok-fn">join</span>(place);</span>
-<span class="ln" id="L843">        <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L844">            <span class="tok-fn">gather</span>(&amp;path, &amp;<span class="tok-kw">mut</span> files);</span>
-<span class="ln" id="L845">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L846">            files.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L847">        }</span>
-<span class="ln" id="L848">    }</span>
-<span class="ln" id="L849">    assert!(files.<span class="tok-fn">len</span>() &gt; <span class="tok-num">50</span>, <span class="tok-str">&quot;only {} files were read&quot;</span>, files.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L850"></span>
-<span class="ln" id="L851">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wrong = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L852">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;files {</span>
-<span class="ln" id="L853">        <span class="tok-kw">let</span> name = path</span>
-<span class="ln" id="L854">            .<span class="tok-fn">file_name</span>()</span>
-<span class="ln" id="L855">            .<span class="tok-fn">unwrap_or_default</span>()</span>
-<span class="ln" id="L856">            .<span class="tok-fn">to_string_lossy</span>()</span>
-<span class="ln" id="L857">            .<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L858">        <span class="tok-kw">if</span> history.<span class="tok-fn">contains</span>(&amp;name.<span class="tok-fn">as_str</span>()) {</span>
-<span class="ln" id="L859">            continue;</span>
-<span class="ln" id="L860">        }</span>
-<span class="ln" id="L861">        <span class="tok-com">// This test&#x27;s own explanation names the thing it forbids.</span></span>
-<span class="ln" id="L862">        <span class="tok-kw">if</span> path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;tests.rs&quot;</span>) {</span>
-<span class="ln" id="L863">            continue;</span>
-<span class="ln" id="L864">        }</span>
-<span class="ln" id="L865">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = std::fs::<span class="tok-fn">read_to_string</span>(path) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L866">            continue;</span>
-<span class="ln" id="L867">        };</span>
-<span class="ln" id="L868">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>).<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L869">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(<span class="tok-str">&quot;veilvoice-verify&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L870">                continue;</span>
-<span class="ln" id="L871">            };</span>
-<span class="ln" id="L872">            <span class="tok-kw">let</span> rest = &amp;line[at + <span class="tok-str">&quot;veilvoice-verify&quot;</span>.<span class="tok-fn">len</span>()..];</span>
-<span class="ln" id="L873">            <span class="tok-com">// A path in front of it only counts when the name ends there.</span></span>
-<span class="ln" id="L874">            <span class="tok-com">// With another segment after it the line is naming a source file</span></span>
-<span class="ln" id="L875">            <span class="tok-com">// inside the crate; with nothing after it, a leading `./` or an</span></span>
-<span class="ln" id="L876">            <span class="tok-com">// absolute path makes it a command somebody is told to run.</span></span>
-<span class="ln" id="L877">            <span class="tok-kw">let</span> ends_here =</span>
-<span class="ln" id="L878">                rest.<span class="tok-fn">is_empty</span>() || rest.<span class="tok-fn">starts_with</span>([<span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&#x27;`&#x27;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&#x27;\&#x27;&#x27;</span>, <span class="tok-str">&#x27;,&#x27;</span>, <span class="tok-str">&#x27;.&#x27;</span>, <span class="tok-str">&#x27;)&#x27;</span>]);</span>
-<span class="ln" id="L879">            <span class="tok-kw">let</span> run = invoked.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|form| rest.<span class="tok-fn">starts_with</span>(form))</span>
-<span class="ln" id="L880">                || (line[..at].<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;/&#x27;</span>) &amp;&amp; ends_here &amp;&amp; !rest.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;.&#x27;</span>));</span>
-<span class="ln" id="L881">            <span class="tok-kw">if</span> run {</span>
-<span class="ln" id="L882">                wrong.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{}:{}: {}&quot;</span>, name, number + <span class="tok-num">1</span>, line.<span class="tok-fn">trim</span>()));</span>
-<span class="ln" id="L883">            }</span>
-<span class="ln" id="L884">        }</span>
-<span class="ln" id="L885">    }</span>
-<span class="ln" id="L886"></span>
-<span class="ln" id="L887">    assert!(</span>
-<span class="ln" id="L888">        wrong.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L889">        <span class="tok-str">&quot;these tell a reader to run `veilvoice-verify`, which has not been a \</span></span>
-<span class="ln" id="L890"><span class="tok-str">         program since 0.1.18. It is `veilvoice verify`, and the desktop \</span></span>
-<span class="ln" id="L891"><span class="tok-str">         application&#x27;s Verify tab:\n{}&quot;</span>,</span>
-<span class="ln" id="L892">        wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L893">    );</span>
-<span class="ln" id="L894">}</span>
+<span class="ln" id="L795">    <span class="tok-com">//</span></span>
+<span class="ln" id="L796">    <span class="tok-com">// The wiki&#x27;s own copy of each is the same record rendered, so it is</span></span>
+<span class="ln" id="L797">    <span class="tok-com">// exempted by deriving its name from this list rather than by adding a</span></span>
+<span class="ln" id="L798">    <span class="tok-com">// second one: `docs/CHANGELOG.md` becomes `wiki/Doc-CHANGELOG.md` and</span></span>
+<span class="ln" id="L799">    <span class="tok-com">// `website/wiki/Doc-CHANGELOG.html`, and a record that stops being</span></span>
+<span class="ln" id="L800">    <span class="tok-com">// exempt here has to stop being exempt everywhere at once.</span></span>
+<span class="ln" id="L801">    <span class="tok-kw">let</span> history = [</span>
+<span class="ln" id="L802">        <span class="tok-str">&quot;AUDIT.md&quot;</span>,</span>
+<span class="ln" id="L803">        <span class="tok-str">&quot;CHANGELOG.md&quot;</span>,</span>
+<span class="ln" id="L804">        <span class="tok-str">&quot;ROADMAP.md&quot;</span>,</span>
+<span class="ln" id="L805">        <span class="tok-str">&quot;releases.html&quot;</span>,</span>
+<span class="ln" id="L806">        <span class="tok-str">&quot;search.html&quot;</span>,</span>
+<span class="ln" id="L807">        <span class="tok-str">&quot;search-index.json&quot;</span>,</span>
+<span class="ln" id="L808">    ];</span>
+<span class="ln" id="L809">    <span class="tok-kw">let</span> rendered: Vec&lt;String&gt; = history</span>
+<span class="ln" id="L810">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L811">        .<span class="tok-fn">filter</span>(|name| name.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;.md&quot;</span>))</span>
+<span class="ln" id="L812">        .<span class="tok-fn">flat_map</span>(|name| {</span>
+<span class="ln" id="L813">            <span class="tok-kw">let</span> stem = name.<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&quot;.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;_&#x27;</span>, <span class="tok-str">&quot;-&quot;</span>);</span>
+<span class="ln" id="L814">            [format!(<span class="tok-str">&quot;Doc-{stem}.md&quot;</span>), format!(<span class="tok-str">&quot;Doc-{stem}.html&quot;</span>)]</span>
+<span class="ln" id="L815">        })</span>
+<span class="ln" id="L816">        .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L817"></span>
+<span class="ln" id="L818">    <span class="tok-com">// What follows the name when it is being run rather than named.</span></span>
+<span class="ln" id="L819">    <span class="tok-kw">let</span> invoked = [</span>
+<span class="ln" id="L820">        <span class="tok-str">&quot; --&quot;</span>,</span>
+<span class="ln" id="L821">        <span class="tok-str">&quot; -q&quot;</span>,</span>
+<span class="ln" id="L822">        <span class="tok-str">&quot; auto&quot;</span>,</span>
+<span class="ln" id="L823">        <span class="tok-str">&quot; file&quot;</span>,</span>
+<span class="ln" id="L824">        <span class="tok-str">&quot; deps&quot;</span>,</span>
+<span class="ln" id="L825">        <span class="tok-str">&quot; gnupg&quot;</span>,</span>
+<span class="ln" id="L826">        <span class="tok-str">&quot; hash&quot;</span>,</span>
+<span class="ln" id="L827">        <span class="tok-str">&quot; reproduce&quot;</span>,</span>
+<span class="ln" id="L828">        <span class="tok-str">&quot; help&quot;</span>,</span>
+<span class="ln" id="L829">    ];</span>
+<span class="ln" id="L830"></span>
+<span class="ln" id="L831">    <span class="tok-kw">fn</span> <span class="tok-fn">gather</span>(dir: &amp;Path, into: &amp;<span class="tok-kw">mut</span> Vec&lt;PathBuf&gt;) {</span>
+<span class="ln" id="L832">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(entries) = std::fs::<span class="tok-fn">read_dir</span>(dir) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L833">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L834">        };</span>
+<span class="ln" id="L835">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
+<span class="ln" id="L836">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L837">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L838">                <span class="tok-fn">gather</span>(&amp;path, into);</span>
+<span class="ln" id="L839">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| {</span>
+<span class="ln" id="L840">                [<span class="tok-str">&quot;md&quot;</span>, <span class="tok-str">&quot;html&quot;</span>, <span class="tok-str">&quot;txt&quot;</span>, <span class="tok-str">&quot;py&quot;</span>, <span class="tok-str">&quot;sh&quot;</span>, <span class="tok-str">&quot;ps1&quot;</span>, <span class="tok-str">&quot;bat&quot;</span>, <span class="tok-str">&quot;rs&quot;</span>]</span>
+<span class="ln" id="L841">                    .<span class="tok-fn">contains</span>(&amp;e.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">as_ref</span>())</span>
+<span class="ln" id="L842">            }) {</span>
+<span class="ln" id="L843">                into.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L844">            }</span>
+<span class="ln" id="L845">        }</span>
+<span class="ln" id="L846">    }</span>
+<span class="ln" id="L847"></span>
+<span class="ln" id="L848">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> files = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L849">    <span class="tok-kw">for</span> place <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L850">        <span class="tok-str">&quot;README.md&quot;</span>,</span>
+<span class="ln" id="L851">        <span class="tok-str">&quot;docs&quot;</span>,</span>
+<span class="ln" id="L852">        <span class="tok-str">&quot;website&quot;</span>,</span>
+<span class="ln" id="L853">        <span class="tok-str">&quot;packaging&quot;</span>,</span>
+<span class="ln" id="L854">        <span class="tok-str">&quot;tools&quot;</span>,</span>
+<span class="ln" id="L855">        <span class="tok-str">&quot;assets/screenshots&quot;</span>,</span>
+<span class="ln" id="L856">    ] {</span>
+<span class="ln" id="L857">        <span class="tok-kw">let</span> path = root.<span class="tok-fn">join</span>(place);</span>
+<span class="ln" id="L858">        <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L859">            <span class="tok-fn">gather</span>(&amp;path, &amp;<span class="tok-kw">mut</span> files);</span>
+<span class="ln" id="L860">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L861">            files.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L862">        }</span>
+<span class="ln" id="L863">    }</span>
+<span class="ln" id="L864">    assert!(files.<span class="tok-fn">len</span>() &gt; <span class="tok-num">50</span>, <span class="tok-str">&quot;only {} files were read&quot;</span>, files.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L865"></span>
+<span class="ln" id="L866">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wrong = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L867">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;files {</span>
+<span class="ln" id="L868">        <span class="tok-kw">let</span> name = path</span>
+<span class="ln" id="L869">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L870">            .<span class="tok-fn">unwrap_or_default</span>()</span>
+<span class="ln" id="L871">            .<span class="tok-fn">to_string_lossy</span>()</span>
+<span class="ln" id="L872">            .<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L873">        <span class="tok-kw">if</span> history.<span class="tok-fn">contains</span>(&amp;name.<span class="tok-fn">as_str</span>()) || rendered.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|it| it == &amp;name) {</span>
+<span class="ln" id="L874">            continue;</span>
+<span class="ln" id="L875">        }</span>
+<span class="ln" id="L876">        <span class="tok-com">// This test&#x27;s own explanation names the thing it forbids.</span></span>
+<span class="ln" id="L877">        <span class="tok-kw">if</span> path.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;tests.rs&quot;</span>) {</span>
+<span class="ln" id="L878">            continue;</span>
+<span class="ln" id="L879">        }</span>
+<span class="ln" id="L880">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = std::fs::<span class="tok-fn">read_to_string</span>(path) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L881">            continue;</span>
+<span class="ln" id="L882">        };</span>
+<span class="ln" id="L883">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>).<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L884">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(<span class="tok-str">&quot;veilvoice-verify&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L885">                continue;</span>
+<span class="ln" id="L886">            };</span>
+<span class="ln" id="L887">            <span class="tok-kw">let</span> rest = &amp;line[at + <span class="tok-str">&quot;veilvoice-verify&quot;</span>.<span class="tok-fn">len</span>()..];</span>
+<span class="ln" id="L888">            <span class="tok-com">// A path in front of it only counts when the name ends there.</span></span>
+<span class="ln" id="L889">            <span class="tok-com">// With another segment after it the line is naming a source file</span></span>
+<span class="ln" id="L890">            <span class="tok-com">// inside the crate; with nothing after it, a leading `./` or an</span></span>
+<span class="ln" id="L891">            <span class="tok-com">// absolute path makes it a command somebody is told to run.</span></span>
+<span class="ln" id="L892">            <span class="tok-kw">let</span> ends_here =</span>
+<span class="ln" id="L893">                rest.<span class="tok-fn">is_empty</span>() || rest.<span class="tok-fn">starts_with</span>([<span class="tok-str">&#x27; &#x27;</span>, <span class="tok-str">&#x27;`&#x27;</span>, <span class="tok-str">&#x27;&quot;&#x27;</span>, <span class="tok-str">&#x27;\&#x27;&#x27;</span>, <span class="tok-str">&#x27;,&#x27;</span>, <span class="tok-str">&#x27;.&#x27;</span>, <span class="tok-str">&#x27;)&#x27;</span>]);</span>
+<span class="ln" id="L894">            <span class="tok-kw">let</span> run = invoked.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|form| rest.<span class="tok-fn">starts_with</span>(form))</span>
+<span class="ln" id="L895">                || (line[..at].<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;/&#x27;</span>) &amp;&amp; ends_here &amp;&amp; !rest.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;.&#x27;</span>));</span>
+<span class="ln" id="L896">            <span class="tok-kw">if</span> run {</span>
+<span class="ln" id="L897">                wrong.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{}:{}: {}&quot;</span>, name, number + <span class="tok-num">1</span>, line.<span class="tok-fn">trim</span>()));</span>
+<span class="ln" id="L898">            }</span>
+<span class="ln" id="L899">        }</span>
+<span class="ln" id="L900">    }</span>
+<span class="ln" id="L901"></span>
+<span class="ln" id="L902">    assert!(</span>
+<span class="ln" id="L903">        wrong.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L904">        <span class="tok-str">&quot;these tell a reader to run `veilvoice-verify`, which has not been a \</span></span>
+<span class="ln" id="L905"><span class="tok-str">         program since 0.1.18. It is `veilvoice verify`, and the desktop \</span></span>
+<span class="ln" id="L906"><span class="tok-str">         application&#x27;s Verify tab:\n{}&quot;</span>,</span>
+<span class="ln" id="L907">        wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L908">    );</span>
+<span class="ln" id="L909">}</span>
 </span>
-<span class="ln" id="L895"></span>
+<span class="ln" id="L910"></span>
 <span class="src-item" id="fn-no_desktop_test_opens_a_device_a_dialog_or_a_window">
-<span class="ln" id="L896"><span class="tok-com">/// **No test in the desktop crate may open a device, a dialog or a window.**</span></span>
-<span class="ln" id="L897"><span class="tok-com">///</span></span>
-<span class="ln" id="L898"><span class="tok-com">/// # Two access violations, a day apart, from the same mistake</span></span>
-<span class="ln" id="L899"><span class="tok-com">///</span></span>
-<span class="ln" id="L900"><span class="tok-com">/// **F-163.** A Studio test played a recording and then locked the window, to</span></span>
-<span class="ln" id="L901"><span class="tok-com">/// assert that locking releases what is playing. Its comment said in as many</span></span>
-<span class="ln" id="L902"><span class="tok-com">/// words: no audio device in a test runner, so `play` will not start a stream.</span></span>
-<span class="ln" id="L903"><span class="tok-com">/// The Windows runner has one. A stream started, tearing it down took the whole</span></span>
-<span class="ln" id="L904"><span class="tok-com">/// test binary with it, and every test in the crate had already passed.</span></span>
-<span class="ln" id="L905"><span class="tok-com">///</span></span>
-<span class="ln" id="L906"><span class="tok-com">/// **F-165.** A setup-card test asked the machine how many audio devices it</span></span>
-<span class="ln" id="L907"><span class="tok-com">/// has, twice, to check the answer was stable. The crate&#x27;s test binary already</span></span>
-<span class="ln" id="L908"><span class="tok-com">/// enumerates once, deliberately, and a second enumerator beside it killed the</span></span>
-<span class="ln" id="L909"><span class="tok-com">/// process the same way.</span></span>
-<span class="ln" id="L910"><span class="tok-com">///</span></span>
-<span class="ln" id="L911"><span class="tok-com">/// Both were fixed one at a time. This is the guard, so the third is caught</span></span>
-<span class="ln" id="L912"><span class="tok-com">/// here rather than on a build machine somebody has to go and read.</span></span>
-<span class="ln" id="L913"><span class="tok-com">///</span></span>
-<span class="ln" id="L914"><span class="tok-com">/// # Why this crate and not every crate</span></span>
-<span class="ln" id="L915"><span class="tok-com">///</span></span>
-<span class="ln" id="L916"><span class="tok-com">/// The desktop crate&#x27;s test binary is the one that links cpal, `rfd`, egui and</span></span>
-<span class="ln" id="L917"><span class="tok-com">/// winit together, and it is where both crashes happened. A narrower guard that</span></span>
-<span class="ln" id="L918"><span class="tok-com">/// is exactly right is worth more than a wide one that has to be argued with;</span></span>
-<span class="ln" id="L919"><span class="tok-com">/// widen it the day another binary does the same thing.</span></span>
+<span class="ln" id="L911"><span class="tok-com">/// **No test in the desktop crate may open a device, a dialog or a window.**</span></span>
+<span class="ln" id="L912"><span class="tok-com">///</span></span>
+<span class="ln" id="L913"><span class="tok-com">/// # Two access violations, a day apart, from the same mistake</span></span>
+<span class="ln" id="L914"><span class="tok-com">///</span></span>
+<span class="ln" id="L915"><span class="tok-com">/// **F-163.** A Studio test played a recording and then locked the window, to</span></span>
+<span class="ln" id="L916"><span class="tok-com">/// assert that locking releases what is playing. Its comment said in as many</span></span>
+<span class="ln" id="L917"><span class="tok-com">/// words: no audio device in a test runner, so `play` will not start a stream.</span></span>
+<span class="ln" id="L918"><span class="tok-com">/// The Windows runner has one. A stream started, tearing it down took the whole</span></span>
+<span class="ln" id="L919"><span class="tok-com">/// test binary with it, and every test in the crate had already passed.</span></span>
 <span class="ln" id="L920"><span class="tok-com">///</span></span>
-<span class="ln" id="L921"><span class="tok-com">/// # What a test may do instead</span></span>
-<span class="ln" id="L922"><span class="tok-com">///</span></span>
-<span class="ln" id="L923"><span class="tok-com">/// Read the source of the function it is about, which is how</span></span>
-<span class="ln" id="L924"><span class="tok-com">/// `locking_the_window_stops_a_take_that_is_playing` asserts the one line in</span></span>
-<span class="ln" id="L925"><span class="tok-com">/// `close` that matters, and how the setup card is checked to be measuring the</span></span>
-<span class="ln" id="L926"><span class="tok-com">/// machine rather than carrying a number. A test whose correctness depends on</span></span>
-<span class="ln" id="L927"><span class="tok-com">/// the machine it runs on is not testing the thing it names.</span></span>
-<span class="ln" id="L928"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L929"><span class="tok-kw">fn</span> <span class="tok-fn">no_desktop_test_opens_a_device_a_dialog_or_a_window</span>() {</span>
-<span class="ln" id="L930">    <span class="tok-kw">let</span> gui = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
-<span class="ln" id="L931">        .<span class="tok-fn">parent</span>()</span>
-<span class="ln" id="L932">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
-<span class="ln" id="L933">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>)</span>
-<span class="ln" id="L934">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;src&quot;</span>);</span>
-<span class="ln" id="L935"></span>
-<span class="ln" id="L936">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L937">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![gui.<span class="tok-fn">clone</span>()];</span>
-<span class="ln" id="L938">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
-<span class="ln" id="L939">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the desktop crate&#x27;s source&quot;</span>) {</span>
-<span class="ln" id="L940">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
-<span class="ln" id="L941">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L942">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L943">                pending.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L944">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
-<span class="ln" id="L945">                sources.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L946">            }</span>
-<span class="ln" id="L947">        }</span>
-<span class="ln" id="L948">    }</span>
-<span class="ln" id="L949">    assert!(</span>
-<span class="ln" id="L950">        sources.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>,</span>
-<span class="ln" id="L951">        <span class="tok-str">&quot;the walk found {} files, so it is not looking at the desktop crate&quot;</span>,</span>
-<span class="ln" id="L952">        sources.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L953">    );</span>
-<span class="ln" id="L954"></span>
-<span class="ln" id="L955">    <span class="tok-com">/// What reaches the platform. Each of these opens something the machine</span></span>
-<span class="ln" id="L956">    <span class="tok-com">/// owns: a sound card, a file panel, or a stream on either.</span></span>
-<span class="ln" id="L957">    <span class="tok-kw">const</span> REACHES_THE_PLATFORM: &amp;[&amp;str] = &amp;[</span>
-<span class="ln" id="L958">        <span class="tok-str">&quot;devices::list(&quot;</span>,</span>
-<span class="ln" id="L959">        <span class="tok-str">&quot;devices::open(&quot;</span>,</span>
-<span class="ln" id="L960">        <span class="tok-str">&quot;playback::start(&quot;</span>,</span>
-<span class="ln" id="L961">        <span class="tok-str">&quot;LiveSession::start(&quot;</span>,</span>
-<span class="ln" id="L962">        <span class="tok-str">&quot;LiveSession::start_recording(&quot;</span>,</span>
-<span class="ln" id="L963">        <span class="tok-str">&quot;rfd::FileDialog&quot;</span>,</span>
-<span class="ln" id="L964">    ];</span>
-<span class="ln" id="L965"></span>
-<span class="ln" id="L966">    <span class="tok-com">/// The one deliberate exception, and it is one call in one test.</span></span>
-<span class="ln" id="L967">    <span class="tok-com">///</span></span>
-<span class="ln" id="L968">    <span class="tok-com">/// Enumerating once, on purpose, is how the window&#x27;s device pickers are</span></span>
-<span class="ln" id="L969">    <span class="tok-com">/// known to survive a machine with no sound card. A second enumerator is</span></span>
-<span class="ln" id="L970">    <span class="tok-com">/// what F-165 was, so the exception is the test&#x27;s name rather than the</span></span>
-<span class="ln" id="L971">    <span class="tok-com">/// call: another test may not borrow it.</span></span>
-<span class="ln" id="L972">    <span class="tok-kw">const</span> ALLOWED: &amp;str = <span class="tok-str">&quot;building_the_app_with_real_device_enumeration_does_not_panic&quot;</span>;</span>
-<span class="ln" id="L973"></span>
-<span class="ln" id="L974">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L975">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
-<span class="ln" id="L976">        <span class="tok-kw">let</span> name = path</span>
-<span class="ln" id="L977">            .<span class="tok-fn">file_name</span>()</span>
-<span class="ln" id="L978">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file&quot;</span>)</span>
-<span class="ln" id="L979">            .<span class="tok-fn">to_string_lossy</span>()</span>
-<span class="ln" id="L980">            .<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L981">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
-<span class="ln" id="L982">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
-<span class="ln" id="L983">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L984"></span>
-<span class="ln" id="L985">        <span class="tok-com">// A file under `src/&lt;module&gt;/tests.rs` is test code whole; anything</span></span>
-<span class="ln" id="L986">        <span class="tok-com">// else is test code only after its `#[cfg(test)]`.</span></span>
-<span class="ln" id="L987">        <span class="tok-kw">let</span> is_test_file = name == <span class="tok-str">&quot;tests.rs&quot;</span>;</span>
-<span class="ln" id="L988">        <span class="tok-kw">let</span> body = <span class="tok-kw">if</span> is_test_file {</span>
-<span class="ln" id="L989">            text.<span class="tok-fn">as_str</span>()</span>
-<span class="ln" id="L990">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L991">            <span class="tok-kw">match</span> text.<span class="tok-fn">split_once</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>) {</span>
-<span class="ln" id="L992">                <span class="tok-fn">Some</span>((_, tests)) =&gt; tests,</span>
-<span class="ln" id="L993">                None =&gt; continue,</span>
-<span class="ln" id="L994">            }</span>
-<span class="ln" id="L995">        };</span>
-<span class="ln" id="L996"></span>
-<span class="ln" id="L997">        <span class="tok-com">// Which test each line belongs to, so the exception can be by name.</span></span>
-<span class="ln" id="L998">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L999">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> body.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L1000">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L1001">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rest) = trimmed.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;fn &quot;</span>) {</span>
-<span class="ln" id="L1002">                current = rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;(&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L1003">            }</span>
-<span class="ln" id="L1004">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
-<span class="ln" id="L1005">                continue;</span>
-<span class="ln" id="L1006">            }</span>
-<span class="ln" id="L1007">            <span class="tok-kw">if</span> current == ALLOWED {</span>
-<span class="ln" id="L1008">                continue;</span>
+<span class="ln" id="L921"><span class="tok-com">/// **F-165.** A setup-card test asked the machine how many audio devices it</span></span>
+<span class="ln" id="L922"><span class="tok-com">/// has, twice, to check the answer was stable. The crate&#x27;s test binary already</span></span>
+<span class="ln" id="L923"><span class="tok-com">/// enumerates once, deliberately, and a second enumerator beside it killed the</span></span>
+<span class="ln" id="L924"><span class="tok-com">/// process the same way.</span></span>
+<span class="ln" id="L925"><span class="tok-com">///</span></span>
+<span class="ln" id="L926"><span class="tok-com">/// Both were fixed one at a time. This is the guard, so the third is caught</span></span>
+<span class="ln" id="L927"><span class="tok-com">/// here rather than on a build machine somebody has to go and read.</span></span>
+<span class="ln" id="L928"><span class="tok-com">///</span></span>
+<span class="ln" id="L929"><span class="tok-com">/// # Why this crate and not every crate</span></span>
+<span class="ln" id="L930"><span class="tok-com">///</span></span>
+<span class="ln" id="L931"><span class="tok-com">/// The desktop crate&#x27;s test binary is the one that links cpal, `rfd`, egui and</span></span>
+<span class="ln" id="L932"><span class="tok-com">/// winit together, and it is where both crashes happened. A narrower guard that</span></span>
+<span class="ln" id="L933"><span class="tok-com">/// is exactly right is worth more than a wide one that has to be argued with;</span></span>
+<span class="ln" id="L934"><span class="tok-com">/// widen it the day another binary does the same thing.</span></span>
+<span class="ln" id="L935"><span class="tok-com">///</span></span>
+<span class="ln" id="L936"><span class="tok-com">/// # What a test may do instead</span></span>
+<span class="ln" id="L937"><span class="tok-com">///</span></span>
+<span class="ln" id="L938"><span class="tok-com">/// Read the source of the function it is about, which is how</span></span>
+<span class="ln" id="L939"><span class="tok-com">/// `locking_the_window_stops_a_take_that_is_playing` asserts the one line in</span></span>
+<span class="ln" id="L940"><span class="tok-com">/// `close` that matters, and how the setup card is checked to be measuring the</span></span>
+<span class="ln" id="L941"><span class="tok-com">/// machine rather than carrying a number. A test whose correctness depends on</span></span>
+<span class="ln" id="L942"><span class="tok-com">/// the machine it runs on is not testing the thing it names.</span></span>
+<span class="ln" id="L943"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L944"><span class="tok-kw">fn</span> <span class="tok-fn">no_desktop_test_opens_a_device_a_dialog_or_a_window</span>() {</span>
+<span class="ln" id="L945">    <span class="tok-kw">let</span> gui = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
+<span class="ln" id="L946">        .<span class="tok-fn">parent</span>()</span>
+<span class="ln" id="L947">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
+<span class="ln" id="L948">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>)</span>
+<span class="ln" id="L949">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;src&quot;</span>);</span>
+<span class="ln" id="L950"></span>
+<span class="ln" id="L951">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L952">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![gui.<span class="tok-fn">clone</span>()];</span>
+<span class="ln" id="L953">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L954">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the desktop crate&#x27;s source&quot;</span>) {</span>
+<span class="ln" id="L955">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
+<span class="ln" id="L956">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L957">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L958">                pending.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L959">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L960">                sources.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L961">            }</span>
+<span class="ln" id="L962">        }</span>
+<span class="ln" id="L963">    }</span>
+<span class="ln" id="L964">    assert!(</span>
+<span class="ln" id="L965">        sources.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>,</span>
+<span class="ln" id="L966">        <span class="tok-str">&quot;the walk found {} files, so it is not looking at the desktop crate&quot;</span>,</span>
+<span class="ln" id="L967">        sources.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L968">    );</span>
+<span class="ln" id="L969"></span>
+<span class="ln" id="L970">    <span class="tok-com">/// What reaches the platform. Each of these opens something the machine</span></span>
+<span class="ln" id="L971">    <span class="tok-com">/// owns: a sound card, a file panel, or a stream on either.</span></span>
+<span class="ln" id="L972">    <span class="tok-kw">const</span> REACHES_THE_PLATFORM: &amp;[&amp;str] = &amp;[</span>
+<span class="ln" id="L973">        <span class="tok-str">&quot;devices::list(&quot;</span>,</span>
+<span class="ln" id="L974">        <span class="tok-str">&quot;devices::open(&quot;</span>,</span>
+<span class="ln" id="L975">        <span class="tok-str">&quot;playback::start(&quot;</span>,</span>
+<span class="ln" id="L976">        <span class="tok-str">&quot;LiveSession::start(&quot;</span>,</span>
+<span class="ln" id="L977">        <span class="tok-str">&quot;LiveSession::start_recording(&quot;</span>,</span>
+<span class="ln" id="L978">        <span class="tok-str">&quot;rfd::FileDialog&quot;</span>,</span>
+<span class="ln" id="L979">    ];</span>
+<span class="ln" id="L980"></span>
+<span class="ln" id="L981">    <span class="tok-com">/// The one deliberate exception, and it is one call in one test.</span></span>
+<span class="ln" id="L982">    <span class="tok-com">///</span></span>
+<span class="ln" id="L983">    <span class="tok-com">/// Enumerating once, on purpose, is how the window&#x27;s device pickers are</span></span>
+<span class="ln" id="L984">    <span class="tok-com">/// known to survive a machine with no sound card. A second enumerator is</span></span>
+<span class="ln" id="L985">    <span class="tok-com">/// what F-165 was, so the exception is the test&#x27;s name rather than the</span></span>
+<span class="ln" id="L986">    <span class="tok-com">/// call: another test may not borrow it.</span></span>
+<span class="ln" id="L987">    <span class="tok-kw">const</span> ALLOWED: &amp;str = <span class="tok-str">&quot;building_the_app_with_real_device_enumeration_does_not_panic&quot;</span>;</span>
+<span class="ln" id="L988"></span>
+<span class="ln" id="L989">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L990">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
+<span class="ln" id="L991">        <span class="tok-kw">let</span> name = path</span>
+<span class="ln" id="L992">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L993">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file&quot;</span>)</span>
+<span class="ln" id="L994">            .<span class="tok-fn">to_string_lossy</span>()</span>
+<span class="ln" id="L995">            .<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L996">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
+<span class="ln" id="L997">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
+<span class="ln" id="L998">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L999"></span>
+<span class="ln" id="L1000">        <span class="tok-com">// A file under `src/&lt;module&gt;/tests.rs` is test code whole; anything</span></span>
+<span class="ln" id="L1001">        <span class="tok-com">// else is test code only after its `#[cfg(test)]`.</span></span>
+<span class="ln" id="L1002">        <span class="tok-kw">let</span> is_test_file = name == <span class="tok-str">&quot;tests.rs&quot;</span>;</span>
+<span class="ln" id="L1003">        <span class="tok-kw">let</span> body = <span class="tok-kw">if</span> is_test_file {</span>
+<span class="ln" id="L1004">            text.<span class="tok-fn">as_str</span>()</span>
+<span class="ln" id="L1005">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1006">            <span class="tok-kw">match</span> text.<span class="tok-fn">split_once</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>) {</span>
+<span class="ln" id="L1007">                <span class="tok-fn">Some</span>((_, tests)) =&gt; tests,</span>
+<span class="ln" id="L1008">                None =&gt; continue,</span>
 <span class="ln" id="L1009">            }</span>
-<span class="ln" id="L1010">            <span class="tok-kw">for</span> reaching <span class="tok-kw">in</span> REACHES_THE_PLATFORM {</span>
-<span class="ln" id="L1011">                <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(reaching) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1012">                    continue;</span>
-<span class="ln" id="L1013">                };</span>
-<span class="ln" id="L1014">                <span class="tok-com">// A needle is not a call. `dialog.rs`&#x27;s own guard searches the</span></span>
-<span class="ln" id="L1015">                <span class="tok-com">// source for `rfd::FileDialog`, and the string it searches for</span></span>
-<span class="ln" id="L1016">                <span class="tok-com">// is not an opened dialog. An odd number of quotes before the</span></span>
-<span class="ln" id="L1017">                <span class="tok-com">// match means it is inside one.</span></span>
-<span class="ln" id="L1018">                <span class="tok-kw">if</span> line[..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L1019">                    continue;</span>
-<span class="ln" id="L1020">                }</span>
-<span class="ln" id="L1021">                offenders.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L1022">                    <span class="tok-str">&quot;{name}:{}: {} (in {current})&quot;</span>,</span>
-<span class="ln" id="L1023">                    number + <span class="tok-num">1</span>,</span>
-<span class="ln" id="L1024">                    line.<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L1025">                ));</span>
-<span class="ln" id="L1026">            }</span>
-<span class="ln" id="L1027">        }</span>
-<span class="ln" id="L1028">    }</span>
-<span class="ln" id="L1029"></span>
-<span class="ln" id="L1030">    assert!(</span>
-<span class="ln" id="L1031">        offenders.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1032">        <span class="tok-str">&quot;these tests open something the machine owns, which is how F-163 and \</span></span>
-<span class="ln" id="L1033"><span class="tok-str">         F-165 killed the desktop test binary on Windows after every test had \</span></span>
-<span class="ln" id="L1034"><span class="tok-str">         passed. Assert the thing the test names instead, by reading the source \</span></span>
-<span class="ln" id="L1035"><span class="tok-str">         of the function it is about:\n{}&quot;</span>,</span>
-<span class="ln" id="L1036">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L1037">    );</span>
-<span class="ln" id="L1038">}</span>
+<span class="ln" id="L1010">        };</span>
+<span class="ln" id="L1011"></span>
+<span class="ln" id="L1012">        <span class="tok-com">// Which test each line belongs to, so the exception can be by name.</span></span>
+<span class="ln" id="L1013">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1014">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> body.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1015">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1016">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rest) = trimmed.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;fn &quot;</span>) {</span>
+<span class="ln" id="L1017">                current = rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;(&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1018">            }</span>
+<span class="ln" id="L1019">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
+<span class="ln" id="L1020">                continue;</span>
+<span class="ln" id="L1021">            }</span>
+<span class="ln" id="L1022">            <span class="tok-kw">if</span> current == ALLOWED {</span>
+<span class="ln" id="L1023">                continue;</span>
+<span class="ln" id="L1024">            }</span>
+<span class="ln" id="L1025">            <span class="tok-kw">for</span> reaching <span class="tok-kw">in</span> REACHES_THE_PLATFORM {</span>
+<span class="ln" id="L1026">                <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(reaching) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1027">                    continue;</span>
+<span class="ln" id="L1028">                };</span>
+<span class="ln" id="L1029">                <span class="tok-com">// A needle is not a call. `dialog.rs`&#x27;s own guard searches the</span></span>
+<span class="ln" id="L1030">                <span class="tok-com">// source for `rfd::FileDialog`, and the string it searches for</span></span>
+<span class="ln" id="L1031">                <span class="tok-com">// is not an opened dialog. An odd number of quotes before the</span></span>
+<span class="ln" id="L1032">                <span class="tok-com">// match means it is inside one.</span></span>
+<span class="ln" id="L1033">                <span class="tok-kw">if</span> line[..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L1034">                    continue;</span>
+<span class="ln" id="L1035">                }</span>
+<span class="ln" id="L1036">                offenders.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1037">                    <span class="tok-str">&quot;{name}:{}: {} (in {current})&quot;</span>,</span>
+<span class="ln" id="L1038">                    number + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1039">                    line.<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L1040">                ));</span>
+<span class="ln" id="L1041">            }</span>
+<span class="ln" id="L1042">        }</span>
+<span class="ln" id="L1043">    }</span>
+<span class="ln" id="L1044"></span>
+<span class="ln" id="L1045">    assert!(</span>
+<span class="ln" id="L1046">        offenders.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1047">        <span class="tok-str">&quot;these tests open something the machine owns, which is how F-163 and \</span></span>
+<span class="ln" id="L1048"><span class="tok-str">         F-165 killed the desktop test binary on Windows after every test had \</span></span>
+<span class="ln" id="L1049"><span class="tok-str">         passed. Assert the thing the test names instead, by reading the source \</span></span>
+<span class="ln" id="L1050"><span class="tok-str">         of the function it is about:\n{}&quot;</span>,</span>
+<span class="ln" id="L1051">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1052">    );</span>
+<span class="ln" id="L1053">}</span>
 </span>
-<span class="ln" id="L1039"></span>
+<span class="ln" id="L1054"></span>
 <span class="src-item" id="fn-only_the_session_builds_a_recorder">
-<span class="ln" id="L1040"><span class="tok-com">/// **F-166.** Nothing outside the session builds a recorder.</span></span>
-<span class="ln" id="L1041"><span class="tok-com">///</span></span>
-<span class="ln" id="L1042"><span class="tok-com">/// The rate a recorder is built with is written into the WAV header, and it has</span></span>
-<span class="ln" id="L1043"><span class="tok-com">/// to be the rate the device agreed to. Only `LiveSession::start_recording`</span></span>
-<span class="ln" id="L1044"><span class="tok-com">/// knows that, because it is the function that asks the device. Both front ends</span></span>
-<span class="ln" id="L1045"><span class="tok-com">/// used to build their own from `config.sample_rate`, which is the rate that</span></span>
-<span class="ln" id="L1046"><span class="tok-com">/// was asked for, and on any machine not running at 48 kHz the take came out</span></span>
-<span class="ln" id="L1047"><span class="tok-com">/// fast and sharp.</span></span>
-<span class="ln" id="L1048"><span class="tok-com">///</span></span>
-<span class="ln" id="L1049"><span class="tok-com">/// The signature no longer carries a rate, so a third caller cannot repeat it</span></span>
-<span class="ln" id="L1050"><span class="tok-com">/// by passing the wrong one. This is the other half: a third caller cannot</span></span>
-<span class="ln" id="L1051"><span class="tok-com">/// repeat it by going around the session either.</span></span>
-<span class="ln" id="L1052"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1053"><span class="tok-kw">fn</span> <span class="tok-fn">only_the_session_builds_a_recorder</span>() {</span>
-<span class="ln" id="L1054">    <span class="tok-kw">let</span> crates = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
-<span class="ln" id="L1055">        .<span class="tok-fn">parent</span>()</span>
-<span class="ln" id="L1056">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
-<span class="ln" id="L1057">        .<span class="tok-fn">to_path_buf</span>();</span>
-<span class="ln" id="L1058"></span>
-<span class="ln" id="L1059">    <span class="tok-com">/// Where the rate is known, and therefore the one place this may appear.</span></span>
-<span class="ln" id="L1060">    <span class="tok-kw">const</span> HOME: &amp;str = <span class="tok-str">&quot;veilvoice-audio&quot;</span>;</span>
-<span class="ln" id="L1061"></span>
-<span class="ln" id="L1062">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1063">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![crates.<span class="tok-fn">clone</span>()];</span>
-<span class="ln" id="L1064">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
-<span class="ln" id="L1065">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a crate directory&quot;</span>) {</span>
-<span class="ln" id="L1066">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
-<span class="ln" id="L1067">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L1068">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L1069">                pending.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L1070">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
-<span class="ln" id="L1071">                sources.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L1072">            }</span>
-<span class="ln" id="L1073">        }</span>
-<span class="ln" id="L1074">    }</span>
-<span class="ln" id="L1075">    assert!(</span>
-<span class="ln" id="L1076">        sources.<span class="tok-fn">len</span>() &gt; <span class="tok-num">100</span>,</span>
-<span class="ln" id="L1077">        <span class="tok-str">&quot;the walk found {} files, so it is not looking at the workspace&quot;</span>,</span>
-<span class="ln" id="L1078">        sources.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L1079">    );</span>
-<span class="ln" id="L1080"></span>
-<span class="ln" id="L1081">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1082">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
-<span class="ln" id="L1083">        <span class="tok-kw">if</span> path.<span class="tok-fn">components</span>().<span class="tok-fn">any</span>(|c| c.<span class="tok-fn">as_os_str</span>() == HOME) {</span>
-<span class="ln" id="L1084">            continue;</span>
-<span class="ln" id="L1085">        }</span>
-<span class="ln" id="L1086">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
-<span class="ln" id="L1087">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
-<span class="ln" id="L1088">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1089">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L1090">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L1091">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) || trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>) {</span>
-<span class="ln" id="L1092">                continue;</span>
-<span class="ln" id="L1093">            }</span>
-<span class="ln" id="L1094">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(<span class="tok-str">&quot;record::start(&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1095">                continue;</span>
-<span class="ln" id="L1096">            };</span>
-<span class="ln" id="L1097">            <span class="tok-com">// A needle is not a call: this guard names the string it looks for.</span></span>
-<span class="ln" id="L1098">            <span class="tok-kw">if</span> line[..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L1099">                continue;</span>
-<span class="ln" id="L1100">            }</span>
-<span class="ln" id="L1101">            offenders.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L1102">                <span class="tok-str">&quot;{}:{}: {}&quot;</span>,</span>
-<span class="ln" id="L1103">                path.<span class="tok-fn">display</span>(),</span>
-<span class="ln" id="L1104">                number + <span class="tok-num">1</span>,</span>
-<span class="ln" id="L1105">                line.<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L1106">            ));</span>
-<span class="ln" id="L1107">        }</span>
-<span class="ln" id="L1108">    }</span>
-<span class="ln" id="L1109"></span>
-<span class="ln" id="L1110">    assert!(</span>
-<span class="ln" id="L1111">        offenders.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1112">        <span class="tok-str">&quot;these build a recorder outside `{HOME}`, so they choose the rate its \</span></span>
-<span class="ln" id="L1113"><span class="tok-str">         WAV header is written with, and the only correct answer is the one the \</span></span>
-<span class="ln" id="L1114"><span class="tok-str">         device gave `LiveSession::start_recording`. Ask that function for the \</span></span>
-<span class="ln" id="L1115"><span class="tok-str">         recorders instead, with a `Keeping`:\n{}&quot;</span>,</span>
-<span class="ln" id="L1116">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L1117">    );</span>
-<span class="ln" id="L1118">}</span>
+<span class="ln" id="L1055"><span class="tok-com">/// **F-166.** Nothing outside the session builds a recorder.</span></span>
+<span class="ln" id="L1056"><span class="tok-com">///</span></span>
+<span class="ln" id="L1057"><span class="tok-com">/// The rate a recorder is built with is written into the WAV header, and it has</span></span>
+<span class="ln" id="L1058"><span class="tok-com">/// to be the rate the device agreed to. Only `LiveSession::start_recording`</span></span>
+<span class="ln" id="L1059"><span class="tok-com">/// knows that, because it is the function that asks the device. Both front ends</span></span>
+<span class="ln" id="L1060"><span class="tok-com">/// used to build their own from `config.sample_rate`, which is the rate that</span></span>
+<span class="ln" id="L1061"><span class="tok-com">/// was asked for, and on any machine not running at 48 kHz the take came out</span></span>
+<span class="ln" id="L1062"><span class="tok-com">/// fast and sharp.</span></span>
+<span class="ln" id="L1063"><span class="tok-com">///</span></span>
+<span class="ln" id="L1064"><span class="tok-com">/// The signature no longer carries a rate, so a third caller cannot repeat it</span></span>
+<span class="ln" id="L1065"><span class="tok-com">/// by passing the wrong one. This is the other half: a third caller cannot</span></span>
+<span class="ln" id="L1066"><span class="tok-com">/// repeat it by going around the session either.</span></span>
+<span class="ln" id="L1067"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1068"><span class="tok-kw">fn</span> <span class="tok-fn">only_the_session_builds_a_recorder</span>() {</span>
+<span class="ln" id="L1069">    <span class="tok-kw">let</span> crates = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
+<span class="ln" id="L1070">        .<span class="tok-fn">parent</span>()</span>
+<span class="ln" id="L1071">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
+<span class="ln" id="L1072">        .<span class="tok-fn">to_path_buf</span>();</span>
+<span class="ln" id="L1073"></span>
+<span class="ln" id="L1074">    <span class="tok-com">/// Where the rate is known, and therefore the one place this may appear.</span></span>
+<span class="ln" id="L1075">    <span class="tok-kw">const</span> HOME: &amp;str = <span class="tok-str">&quot;veilvoice-audio&quot;</span>;</span>
+<span class="ln" id="L1076"></span>
+<span class="ln" id="L1077">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1078">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![crates.<span class="tok-fn">clone</span>()];</span>
+<span class="ln" id="L1079">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L1080">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a crate directory&quot;</span>) {</span>
+<span class="ln" id="L1081">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
+<span class="ln" id="L1082">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L1083">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L1084">                pending.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L1085">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L1086">                sources.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L1087">            }</span>
+<span class="ln" id="L1088">        }</span>
+<span class="ln" id="L1089">    }</span>
+<span class="ln" id="L1090">    assert!(</span>
+<span class="ln" id="L1091">        sources.<span class="tok-fn">len</span>() &gt; <span class="tok-num">100</span>,</span>
+<span class="ln" id="L1092">        <span class="tok-str">&quot;the walk found {} files, so it is not looking at the workspace&quot;</span>,</span>
+<span class="ln" id="L1093">        sources.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L1094">    );</span>
+<span class="ln" id="L1095"></span>
+<span class="ln" id="L1096">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1097">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
+<span class="ln" id="L1098">        <span class="tok-kw">if</span> path.<span class="tok-fn">components</span>().<span class="tok-fn">any</span>(|c| c.<span class="tok-fn">as_os_str</span>() == HOME) {</span>
+<span class="ln" id="L1099">            continue;</span>
+<span class="ln" id="L1100">        }</span>
+<span class="ln" id="L1101">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
+<span class="ln" id="L1102">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
+<span class="ln" id="L1103">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1104">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1105">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1106">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) || trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>) {</span>
+<span class="ln" id="L1107">                continue;</span>
+<span class="ln" id="L1108">            }</span>
+<span class="ln" id="L1109">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(<span class="tok-str">&quot;record::start(&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1110">                continue;</span>
+<span class="ln" id="L1111">            };</span>
+<span class="ln" id="L1112">            <span class="tok-com">// A needle is not a call: this guard names the string it looks for.</span></span>
+<span class="ln" id="L1113">            <span class="tok-kw">if</span> line[..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L1114">                continue;</span>
+<span class="ln" id="L1115">            }</span>
+<span class="ln" id="L1116">            offenders.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1117">                <span class="tok-str">&quot;{}:{}: {}&quot;</span>,</span>
+<span class="ln" id="L1118">                path.<span class="tok-fn">display</span>(),</span>
+<span class="ln" id="L1119">                number + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1120">                line.<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L1121">            ));</span>
+<span class="ln" id="L1122">        }</span>
+<span class="ln" id="L1123">    }</span>
+<span class="ln" id="L1124"></span>
+<span class="ln" id="L1125">    assert!(</span>
+<span class="ln" id="L1126">        offenders.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1127">        <span class="tok-str">&quot;these build a recorder outside `{HOME}`, so they choose the rate its \</span></span>
+<span class="ln" id="L1128"><span class="tok-str">         WAV header is written with, and the only correct answer is the one the \</span></span>
+<span class="ln" id="L1129"><span class="tok-str">         device gave `LiveSession::start_recording`. Ask that function for the \</span></span>
+<span class="ln" id="L1130"><span class="tok-str">         recorders instead, with a `Keeping`:\n{}&quot;</span>,</span>
+<span class="ln" id="L1131">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1132">    );</span>
+<span class="ln" id="L1133">}</span>
 </span>
-<span class="ln" id="L1119"></span>
+<span class="ln" id="L1134"></span>
 <span class="src-item" id="fn-the_desktop_starts_a_live_session_in_exactly_one_place">
-<span class="ln" id="L1120"><span class="tok-com">/// **Roadmap item 130.** One place in the window starts a live session.</span></span>
-<span class="ln" id="L1121"><span class="tok-com">///</span></span>
-<span class="ln" id="L1122"><span class="tok-com">/// There were two: the live tab and the Studio, each with a session of its own,</span></span>
-<span class="ln" id="L1123"><span class="tok-com">/// so veiling on one and recording on the other opened the same microphone</span></span>
-<span class="ln" id="L1124"><span class="tok-com">/// twice. Live scramble is the Studio now, and `start_session` is the only</span></span>
-<span class="ln" id="L1125"><span class="tok-com">/// starter, which is most of what moving it was worth.</span></span>
-<span class="ln" id="L1126"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1127"><span class="tok-kw">fn</span> <span class="tok-fn">the_desktop_starts_a_live_session_in_exactly_one_place</span>() {</span>
-<span class="ln" id="L1128">    <span class="tok-kw">let</span> gui = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
-<span class="ln" id="L1129">        .<span class="tok-fn">parent</span>()</span>
-<span class="ln" id="L1130">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
-<span class="ln" id="L1131">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>)</span>
-<span class="ln" id="L1132">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;src&quot;</span>);</span>
-<span class="ln" id="L1133"></span>
-<span class="ln" id="L1134">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1135">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![gui.<span class="tok-fn">clone</span>()];</span>
-<span class="ln" id="L1136">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
-<span class="ln" id="L1137">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the desktop crate&#x27;s source&quot;</span>) {</span>
-<span class="ln" id="L1138">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
-<span class="ln" id="L1139">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L1140">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L1141">                pending.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L1142">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
-<span class="ln" id="L1143">                sources.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L1144">            }</span>
-<span class="ln" id="L1145">        }</span>
-<span class="ln" id="L1146">    }</span>
-<span class="ln" id="L1147"></span>
-<span class="ln" id="L1148">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> starters = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1149">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
-<span class="ln" id="L1150">        <span class="tok-kw">let</span> name = path</span>
-<span class="ln" id="L1151">            .<span class="tok-fn">file_name</span>()</span>
-<span class="ln" id="L1152">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file&quot;</span>)</span>
-<span class="ln" id="L1153">            .<span class="tok-fn">to_string_lossy</span>()</span>
-<span class="ln" id="L1154">            .<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L1155">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
-<span class="ln" id="L1156">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
-<span class="ln" id="L1157">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1158">        <span class="tok-com">// Which function each line is in, so the message names it.</span></span>
-<span class="ln" id="L1159">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1160">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L1161">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L1162">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rest) = trimmed.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;fn &quot;</span>) {</span>
-<span class="ln" id="L1163">                current = rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;(&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L1164">            }</span>
-<span class="ln" id="L1165">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
-<span class="ln" id="L1166">                continue;</span>
-<span class="ln" id="L1167">            }</span>
-<span class="ln" id="L1168">            <span class="tok-com">// **Roadmap item 147.** A room is a session too, and is under the same</span></span>
-<span class="ln" id="L1169">            <span class="tok-com">// rule: the microphone it opens is opened once or not at all.</span></span>
-<span class="ln" id="L1170">            <span class="tok-kw">for</span> needle <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1171">                <span class="tok-str">&quot;LiveSession::start(&quot;</span>,</span>
-<span class="ln" id="L1172">                <span class="tok-str">&quot;LiveSession::start_recording(&quot;</span>,</span>
-<span class="ln" id="L1173">                <span class="tok-str">&quot;RoomSession::start(&quot;</span>,</span>
-<span class="ln" id="L1174">            ] {</span>
-<span class="ln" id="L1175">                <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(needle) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1176">                    continue;</span>
-<span class="ln" id="L1177">                };</span>
-<span class="ln" id="L1178">                <span class="tok-kw">if</span> line[..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L1179">                    continue;</span>
-<span class="ln" id="L1180">                }</span>
-<span class="ln" id="L1181">                starters.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{name}:{}: in {current}&quot;</span>, number + <span class="tok-num">1</span>));</span>
+<span class="ln" id="L1135"><span class="tok-com">/// **Roadmap item 130.** One place in the window starts a live session.</span></span>
+<span class="ln" id="L1136"><span class="tok-com">///</span></span>
+<span class="ln" id="L1137"><span class="tok-com">/// There were two: the live tab and the Studio, each with a session of its own,</span></span>
+<span class="ln" id="L1138"><span class="tok-com">/// so veiling on one and recording on the other opened the same microphone</span></span>
+<span class="ln" id="L1139"><span class="tok-com">/// twice. Live scramble is the Studio now, and `start_session` is the only</span></span>
+<span class="ln" id="L1140"><span class="tok-com">/// starter, which is most of what moving it was worth.</span></span>
+<span class="ln" id="L1141"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1142"><span class="tok-kw">fn</span> <span class="tok-fn">the_desktop_starts_a_live_session_in_exactly_one_place</span>() {</span>
+<span class="ln" id="L1143">    <span class="tok-kw">let</span> gui = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
+<span class="ln" id="L1144">        .<span class="tok-fn">parent</span>()</span>
+<span class="ln" id="L1145">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
+<span class="ln" id="L1146">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>)</span>
+<span class="ln" id="L1147">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;src&quot;</span>);</span>
+<span class="ln" id="L1148"></span>
+<span class="ln" id="L1149">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1150">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![gui.<span class="tok-fn">clone</span>()];</span>
+<span class="ln" id="L1151">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L1152">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the desktop crate&#x27;s source&quot;</span>) {</span>
+<span class="ln" id="L1153">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
+<span class="ln" id="L1154">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L1155">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L1156">                pending.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L1157">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L1158">                sources.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L1159">            }</span>
+<span class="ln" id="L1160">        }</span>
+<span class="ln" id="L1161">    }</span>
+<span class="ln" id="L1162"></span>
+<span class="ln" id="L1163">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> starters = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1164">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
+<span class="ln" id="L1165">        <span class="tok-kw">let</span> name = path</span>
+<span class="ln" id="L1166">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L1167">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file&quot;</span>)</span>
+<span class="ln" id="L1168">            .<span class="tok-fn">to_string_lossy</span>()</span>
+<span class="ln" id="L1169">            .<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L1170">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
+<span class="ln" id="L1171">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
+<span class="ln" id="L1172">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1173">        <span class="tok-com">// Which function each line is in, so the message names it.</span></span>
+<span class="ln" id="L1174">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1175">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1176">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1177">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rest) = trimmed.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;fn &quot;</span>) {</span>
+<span class="ln" id="L1178">                current = rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;(&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1179">            }</span>
+<span class="ln" id="L1180">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
+<span class="ln" id="L1181">                continue;</span>
 <span class="ln" id="L1182">            }</span>
-<span class="ln" id="L1183">        }</span>
-<span class="ln" id="L1184">    }</span>
-<span class="ln" id="L1185"></span>
-<span class="ln" id="L1186">    <span class="tok-com">// Two: one microphone and a room, both in `Studio::start_session`, which</span></span>
-<span class="ln" id="L1187">    <span class="tok-com">// is the function that chooses between them. They are counted rather than</span></span>
-<span class="ln" id="L1188">    <span class="tok-com">// capped at one because a room is a different call with different</span></span>
-<span class="ln" id="L1189">    <span class="tok-com">// arguments; what the guard is about is that neither is reachable from a</span></span>
-<span class="ln" id="L1190">    <span class="tok-com">// second place, and both being in one function is how &quot;never both&quot; holds.</span></span>
-<span class="ln" id="L1191">    assert_eq!(</span>
-<span class="ln" id="L1192">        starters.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L1193">        <span class="tok-num">2</span>,</span>
-<span class="ln" id="L1194">        <span class="tok-str">&quot;a session is started in {} places in the desktop crate. Two starters \</span></span>
-<span class="ln" id="L1195"><span class="tok-str">         for the same kind is two opens of the same microphone, which is what \</span></span>
-<span class="ln" id="L1196"><span class="tok-str">         having a live tab beside the Studio was:\n{}&quot;</span>,</span>
-<span class="ln" id="L1197">        starters.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L1198">        starters.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L1199">    );</span>
-<span class="ln" id="L1200">    <span class="tok-kw">for</span> starter <span class="tok-kw">in</span> &amp;starters {</span>
-<span class="ln" id="L1201">        assert!(</span>
-<span class="ln" id="L1202">            starter.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;studio.rs:&quot;</span>),</span>
-<span class="ln" id="L1203">            <span class="tok-str">&quot;the starters should all be the Studio&#x27;s, and one is {starter}&quot;</span></span>
-<span class="ln" id="L1204">        );</span>
-<span class="ln" id="L1205">        assert!(</span>
-<span class="ln" id="L1206">            starter.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;in start_session&quot;</span>),</span>
-<span class="ln" id="L1207">            <span class="tok-str">&quot;a session is started outside `Studio::start_session`, so the \</span></span>
-<span class="ln" id="L1208"><span class="tok-str">             Studio can hold a room and a single session at once: {starter}&quot;</span></span>
-<span class="ln" id="L1209">        );</span>
-<span class="ln" id="L1210">    }</span>
-<span class="ln" id="L1211">}</span>
+<span class="ln" id="L1183">            <span class="tok-com">// **Roadmap item 147.** A room is a session too, and is under the same</span></span>
+<span class="ln" id="L1184">            <span class="tok-com">// rule: the microphone it opens is opened once or not at all.</span></span>
+<span class="ln" id="L1185">            <span class="tok-kw">for</span> needle <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1186">                <span class="tok-str">&quot;LiveSession::start(&quot;</span>,</span>
+<span class="ln" id="L1187">                <span class="tok-str">&quot;LiveSession::start_recording(&quot;</span>,</span>
+<span class="ln" id="L1188">                <span class="tok-str">&quot;RoomSession::start(&quot;</span>,</span>
+<span class="ln" id="L1189">            ] {</span>
+<span class="ln" id="L1190">                <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = line.<span class="tok-fn">find</span>(needle) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1191">                    continue;</span>
+<span class="ln" id="L1192">                };</span>
+<span class="ln" id="L1193">                <span class="tok-kw">if</span> line[..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L1194">                    continue;</span>
+<span class="ln" id="L1195">                }</span>
+<span class="ln" id="L1196">                starters.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{name}:{}: in {current}&quot;</span>, number + <span class="tok-num">1</span>));</span>
+<span class="ln" id="L1197">            }</span>
+<span class="ln" id="L1198">        }</span>
+<span class="ln" id="L1199">    }</span>
+<span class="ln" id="L1200"></span>
+<span class="ln" id="L1201">    <span class="tok-com">// Two: one microphone and a room, both in `Studio::start_session`, which</span></span>
+<span class="ln" id="L1202">    <span class="tok-com">// is the function that chooses between them. They are counted rather than</span></span>
+<span class="ln" id="L1203">    <span class="tok-com">// capped at one because a room is a different call with different</span></span>
+<span class="ln" id="L1204">    <span class="tok-com">// arguments; what the guard is about is that neither is reachable from a</span></span>
+<span class="ln" id="L1205">    <span class="tok-com">// second place, and both being in one function is how &quot;never both&quot; holds.</span></span>
+<span class="ln" id="L1206">    assert_eq!(</span>
+<span class="ln" id="L1207">        starters.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L1208">        <span class="tok-num">2</span>,</span>
+<span class="ln" id="L1209">        <span class="tok-str">&quot;a session is started in {} places in the desktop crate. Two starters \</span></span>
+<span class="ln" id="L1210"><span class="tok-str">         for the same kind is two opens of the same microphone, which is what \</span></span>
+<span class="ln" id="L1211"><span class="tok-str">         having a live tab beside the Studio was:\n{}&quot;</span>,</span>
+<span class="ln" id="L1212">        starters.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L1213">        starters.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1214">    );</span>
+<span class="ln" id="L1215">    <span class="tok-kw">for</span> starter <span class="tok-kw">in</span> &amp;starters {</span>
+<span class="ln" id="L1216">        assert!(</span>
+<span class="ln" id="L1217">            starter.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;studio.rs:&quot;</span>),</span>
+<span class="ln" id="L1218">            <span class="tok-str">&quot;the starters should all be the Studio&#x27;s, and one is {starter}&quot;</span></span>
+<span class="ln" id="L1219">        );</span>
+<span class="ln" id="L1220">        assert!(</span>
+<span class="ln" id="L1221">            starter.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;in start_session&quot;</span>),</span>
+<span class="ln" id="L1222">            <span class="tok-str">&quot;a session is started outside `Studio::start_session`, so the \</span></span>
+<span class="ln" id="L1223"><span class="tok-str">             Studio can hold a room and a single session at once: {starter}&quot;</span></span>
+<span class="ln" id="L1224">        );</span>
+<span class="ln" id="L1225">    }</span>
+<span class="ln" id="L1226">}</span>
 </span>
-<span class="ln" id="L1212"></span>
+<span class="ln" id="L1227"></span>
 <span class="src-item" id="fn-no_audio_callback_allocates_or_blocks">
-<span class="ln" id="L1213"><span class="tok-com">/// **Roadmap item 126.** Nothing in an audio callback allocates, locks or prints.</span></span>
-<span class="ln" id="L1214"><span class="tok-com">///</span></span>
-<span class="ln" id="L1215"><span class="tok-com">/// A callback runs on the operating system&#x27;s audio thread with a deadline</span></span>
-<span class="ln" id="L1216"><span class="tok-com">/// measured in milliseconds. Allocating in one takes a global lock in the</span></span>
-<span class="ln" id="L1217"><span class="tok-com">/// allocator, blocking on a mutex hands the thread to whoever holds it, and</span></span>
-<span class="ln" id="L1218"><span class="tok-com">/// printing takes the lock on standard output. Each of those is somebody</span></span>
-<span class="ln" id="L1219"><span class="tok-com">/// else&#x27;s schedule deciding when this thread runs again, and missing the</span></span>
-<span class="ln" id="L1220"><span class="tok-com">/// deadline is an audible click in the veiled voice, or a dropped block in a</span></span>
-<span class="ln" id="L1221"><span class="tok-com">/// recording.</span></span>
-<span class="ln" id="L1222"><span class="tok-com">///</span></span>
-<span class="ln" id="L1223"><span class="tok-com">/// Every buffer these callbacks use is sized once, before the stream starts.</span></span>
-<span class="ln" id="L1224"><span class="tok-com">/// That is a fact about how they are written, and until now it was a fact</span></span>
-<span class="ln" id="L1225"><span class="tok-com">/// nothing checked: the comments say &quot;sized once, here, so the callback never</span></span>
-<span class="ln" id="L1226"><span class="tok-com">/// allocates&quot;, and a comment is not a guard. This reads the callbacks</span></span>
-<span class="ln" id="L1227"><span class="tok-com">/// themselves.</span></span>
-<span class="ln" id="L1228"><span class="tok-com">///</span></span>
-<span class="ln" id="L1229"><span class="tok-com">/// Written rather than measured, deliberately. A test that counted</span></span>
-<span class="ln" id="L1230"><span class="tok-com">/// allocations would need a global allocator hook and a running stream, which</span></span>
-<span class="ln" id="L1231"><span class="tok-com">/// means a machine with a sound card, which is what F-163 and F-165 were about.</span></span>
-<span class="ln" id="L1232"><span class="tok-com">/// Reading the source finds the same mistake on a build machine with no audio</span></span>
-<span class="ln" id="L1233"><span class="tok-com">/// at all.</span></span>
-<span class="ln" id="L1234"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1235"><span class="tok-kw">fn</span> <span class="tok-fn">no_audio_callback_allocates_or_blocks</span>() {</span>
-<span class="ln" id="L1236">    <span class="tok-kw">let</span> crates = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
-<span class="ln" id="L1237">        .<span class="tok-fn">parent</span>()</span>
-<span class="ln" id="L1238">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
-<span class="ln" id="L1239">        .<span class="tok-fn">to_path_buf</span>();</span>
-<span class="ln" id="L1240"></span>
-<span class="ln" id="L1241">    <span class="tok-com">/// Where a realtime callback is handed to the platform. The closure that</span></span>
-<span class="ln" id="L1242">    <span class="tok-com">/// follows one of these is the body with the deadline on it.</span></span>
-<span class="ln" id="L1243">    <span class="tok-kw">const</span> OPENS_A_STREAM: &amp;[&amp;str] = &amp;[<span class="tok-str">&quot;build_input_stream(&quot;</span>, <span class="tok-str">&quot;build_output_stream(&quot;</span>];</span>
-<span class="ln" id="L1244"></span>
-<span class="ln" id="L1245">    <span class="tok-com">/// What may not appear inside one, and what each would cost.</span></span>
-<span class="ln" id="L1246">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1247">    <span class="tok-com">/// `try_lock` and `try_push` are the non-blocking forms and are what this</span></span>
-<span class="ln" id="L1248">    <span class="tok-com">/// code already uses, so a needle that is a prefix of one is matched on the</span></span>
-<span class="ln" id="L1249">    <span class="tok-com">/// call rather than on the name: see `reaches` below.</span></span>
-<span class="ln" id="L1250">    <span class="tok-kw">const</span> FORBIDDEN: &amp;[(&amp;str, &amp;str)] = &amp;[</span>
-<span class="ln" id="L1251">        (<span class="tok-str">&quot;vec![&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1252">        (<span class="tok-str">&quot;Vec::&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1253">        (<span class="tok-str">&quot;.to_vec()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1254">        (<span class="tok-str">&quot;.to_owned()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1255">        (<span class="tok-str">&quot;.to_string()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1256">        (<span class="tok-str">&quot;String::&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1257">        (<span class="tok-str">&quot;format!&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1258">        (<span class="tok-str">&quot;.collect()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1259">        (<span class="tok-str">&quot;Box::new&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1260">        (<span class="tok-str">&quot;.clone()&quot;</span>, <span class="tok-str">&quot;may allocate&quot;</span>),</span>
-<span class="ln" id="L1261">        (<span class="tok-str">&quot;.push(&quot;</span>, <span class="tok-str">&quot;may reallocate; the ring&#x27;s `try_push` does not&quot;</span>),</span>
-<span class="ln" id="L1262">        (<span class="tok-str">&quot;.insert(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
-<span class="ln" id="L1263">        (<span class="tok-str">&quot;.extend(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
-<span class="ln" id="L1264">        (<span class="tok-str">&quot;.resize(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
-<span class="ln" id="L1265">        (<span class="tok-str">&quot;.reserve(&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
-<span class="ln" id="L1266">        (<span class="tok-str">&quot;.lock()&quot;</span>, <span class="tok-str">&quot;blocks; `try_lock` is what this code uses&quot;</span>),</span>
-<span class="ln" id="L1267">        (<span class="tok-str">&quot;println!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard output&quot;</span>),</span>
-<span class="ln" id="L1268">        (<span class="tok-str">&quot;eprintln!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard error&quot;</span>),</span>
-<span class="ln" id="L1269">        (<span class="tok-str">&quot;print!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard output&quot;</span>),</span>
-<span class="ln" id="L1270">    ];</span>
-<span class="ln" id="L1271"></span>
-<span class="ln" id="L1272">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1273">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![crates.<span class="tok-fn">clone</span>()];</span>
-<span class="ln" id="L1274">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
-<span class="ln" id="L1275">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a crate directory&quot;</span>) {</span>
-<span class="ln" id="L1276">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
-<span class="ln" id="L1277">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L1278">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
-<span class="ln" id="L1279">                pending.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L1280">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
-<span class="ln" id="L1281">                sources.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L1282">            }</span>
-<span class="ln" id="L1283">        }</span>
-<span class="ln" id="L1284">    }</span>
-<span class="ln" id="L1285"></span>
-<span class="ln" id="L1286">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> callbacks = <span class="tok-num">0</span>;</span>
-<span class="ln" id="L1287">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1288">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
-<span class="ln" id="L1289">        <span class="tok-kw">let</span> name = path</span>
-<span class="ln" id="L1290">            .<span class="tok-fn">file_name</span>()</span>
-<span class="ln" id="L1291">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file&quot;</span>)</span>
-<span class="ln" id="L1292">            .<span class="tok-fn">to_string_lossy</span>()</span>
-<span class="ln" id="L1293">            .<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L1294">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
-<span class="ln" id="L1295">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
-<span class="ln" id="L1296">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1297"></span>
-<span class="ln" id="L1298">        <span class="tok-kw">for</span> opener <span class="tok-kw">in</span> OPENS_A_STREAM {</span>
-<span class="ln" id="L1299">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> from = <span class="tok-num">0</span>;</span>
-<span class="ln" id="L1300">            while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = text[from..].<span class="tok-fn">find</span>(opener) {</span>
-<span class="ln" id="L1301">                <span class="tok-kw">let</span> at = from + at;</span>
-<span class="ln" id="L1302">                from = at + opener.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L1303">                <span class="tok-com">// A needle is not a call: this guard names what it looks for.</span></span>
-<span class="ln" id="L1304">                <span class="tok-kw">let</span> line_start = text[..at].<span class="tok-fn">rfind</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">map_or</span>(<span class="tok-num">0</span>, |n| n + <span class="tok-num">1</span>);</span>
-<span class="ln" id="L1305">                <span class="tok-kw">if</span> text[line_start..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L1306">                    continue;</span>
-<span class="ln" id="L1307">                }</span>
-<span class="ln" id="L1308"></span>
-<span class="ln" id="L1309">                <span class="tok-com">// The data callback is the first closure after the opener, and</span></span>
-<span class="ln" id="L1310">                <span class="tok-com">// its body is from its `{` to the matching `}`.</span></span>
-<span class="ln" id="L1311">                <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(brace) = text[at..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;| {&quot;</span>).<span class="tok-fn">map</span>(|n| at + n + <span class="tok-num">2</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1312">                    continue;</span>
-<span class="ln" id="L1313">                };</span>
-<span class="ln" id="L1314">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> depth = 0usize;</span>
-<span class="ln" id="L1315">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> end = brace;</span>
-<span class="ln" id="L1316">                <span class="tok-kw">for</span> (offset, byte) <span class="tok-kw">in</span> text[brace..].<span class="tok-fn">char_indices</span>() {</span>
-<span class="ln" id="L1317">                    <span class="tok-kw">match</span> byte {</span>
-<span class="ln" id="L1318">                        <span class="tok-str">&#x27;{&#x27;</span> =&gt; depth += <span class="tok-num">1</span>,</span>
-<span class="ln" id="L1319">                        <span class="tok-str">&#x27;}&#x27;</span> =&gt; {</span>
-<span class="ln" id="L1320">                            depth -= <span class="tok-num">1</span>;</span>
-<span class="ln" id="L1321">                            <span class="tok-kw">if</span> depth == <span class="tok-num">0</span> {</span>
-<span class="ln" id="L1322">                                end = brace + offset;</span>
-<span class="ln" id="L1323">                                break;</span>
-<span class="ln" id="L1324">                            }</span>
-<span class="ln" id="L1325">                        }</span>
-<span class="ln" id="L1326">                        _ =&gt; {}</span>
-<span class="ln" id="L1327">                    }</span>
-<span class="ln" id="L1328">                }</span>
-<span class="ln" id="L1329">                callbacks += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L1330"></span>
-<span class="ln" id="L1331">                <span class="tok-kw">let</span> before = text[..brace].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L1332">                <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text[brace..end].<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L1333">                    <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L1334">                    <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
-<span class="ln" id="L1335">                        continue;</span>
-<span class="ln" id="L1336">                    }</span>
-<span class="ln" id="L1337">                    <span class="tok-kw">for</span> (needle, cost) <span class="tok-kw">in</span> FORBIDDEN {</span>
-<span class="ln" id="L1338">                        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(hit) = line.<span class="tok-fn">find</span>(needle) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1339">                            continue;</span>
-<span class="ln" id="L1340">                        };</span>
-<span class="ln" id="L1341">                        <span class="tok-com">// `try_lock()` and `try_push(` end in the needle and are</span></span>
-<span class="ln" id="L1342">                        <span class="tok-com">// the non-blocking forms. Only the bare call counts.</span></span>
-<span class="ln" id="L1343">                        <span class="tok-kw">if</span> line[..hit].<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;try_&quot;</span>) {</span>
-<span class="ln" id="L1344">                            continue;</span>
-<span class="ln" id="L1345">                        }</span>
-<span class="ln" id="L1346">                        <span class="tok-kw">if</span> line[..hit].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L1347">                            continue;</span>
-<span class="ln" id="L1348">                        }</span>
-<span class="ln" id="L1349">                        offenders.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L1350">                            <span class="tok-str">&quot;{name}:{}: {} ({needle} {cost})&quot;</span>,</span>
-<span class="ln" id="L1351">                            before + number + <span class="tok-num">1</span>,</span>
-<span class="ln" id="L1352">                            line.<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L1353">                        ));</span>
-<span class="ln" id="L1354">                    }</span>
-<span class="ln" id="L1355">                }</span>
-<span class="ln" id="L1356">            }</span>
-<span class="ln" id="L1357">        }</span>
-<span class="ln" id="L1358">    }</span>
-<span class="ln" id="L1359"></span>
-<span class="ln" id="L1360">    assert!(</span>
-<span class="ln" id="L1361">        callbacks &gt;= <span class="tok-num">3</span>,</span>
-<span class="ln" id="L1362">        <span class="tok-str">&quot;the walk found {callbacks} audio callbacks, and there are at least \</span></span>
-<span class="ln" id="L1363"><span class="tok-str">         three: the live path&#x27;s input and output, and playback&#x27;s. A guard that \</span></span>
-<span class="ln" id="L1364"><span class="tok-str">         finds none passes for the wrong reason&quot;</span></span>
-<span class="ln" id="L1365">    );</span>
-<span class="ln" id="L1366">    assert!(</span>
-<span class="ln" id="L1367">        offenders.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1368">        <span class="tok-str">&quot;these lines run on an audio thread with a deadline in milliseconds, \</span></span>
-<span class="ln" id="L1369"><span class="tok-str">         and each of them can miss it. Do the work before the stream starts, \</span></span>
-<span class="ln" id="L1370"><span class="tok-str">         into a buffer sized once:\n{}&quot;</span>,</span>
-<span class="ln" id="L1371">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L1372">    );</span>
-<span class="ln" id="L1373">}</span>
+<span class="ln" id="L1228"><span class="tok-com">/// **Roadmap item 126.** Nothing in an audio callback allocates, locks or prints.</span></span>
+<span class="ln" id="L1229"><span class="tok-com">///</span></span>
+<span class="ln" id="L1230"><span class="tok-com">/// A callback runs on the operating system&#x27;s audio thread with a deadline</span></span>
+<span class="ln" id="L1231"><span class="tok-com">/// measured in milliseconds. Allocating in one takes a global lock in the</span></span>
+<span class="ln" id="L1232"><span class="tok-com">/// allocator, blocking on a mutex hands the thread to whoever holds it, and</span></span>
+<span class="ln" id="L1233"><span class="tok-com">/// printing takes the lock on standard output. Each of those is somebody</span></span>
+<span class="ln" id="L1234"><span class="tok-com">/// else&#x27;s schedule deciding when this thread runs again, and missing the</span></span>
+<span class="ln" id="L1235"><span class="tok-com">/// deadline is an audible click in the veiled voice, or a dropped block in a</span></span>
+<span class="ln" id="L1236"><span class="tok-com">/// recording.</span></span>
+<span class="ln" id="L1237"><span class="tok-com">///</span></span>
+<span class="ln" id="L1238"><span class="tok-com">/// Every buffer these callbacks use is sized once, before the stream starts.</span></span>
+<span class="ln" id="L1239"><span class="tok-com">/// That is a fact about how they are written, and until now it was a fact</span></span>
+<span class="ln" id="L1240"><span class="tok-com">/// nothing checked: the comments say &quot;sized once, here, so the callback never</span></span>
+<span class="ln" id="L1241"><span class="tok-com">/// allocates&quot;, and a comment is not a guard. This reads the callbacks</span></span>
+<span class="ln" id="L1242"><span class="tok-com">/// themselves.</span></span>
+<span class="ln" id="L1243"><span class="tok-com">///</span></span>
+<span class="ln" id="L1244"><span class="tok-com">/// Written rather than measured, deliberately. A test that counted</span></span>
+<span class="ln" id="L1245"><span class="tok-com">/// allocations would need a global allocator hook and a running stream, which</span></span>
+<span class="ln" id="L1246"><span class="tok-com">/// means a machine with a sound card, which is what F-163 and F-165 were about.</span></span>
+<span class="ln" id="L1247"><span class="tok-com">/// Reading the source finds the same mistake on a build machine with no audio</span></span>
+<span class="ln" id="L1248"><span class="tok-com">/// at all.</span></span>
+<span class="ln" id="L1249"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1250"><span class="tok-kw">fn</span> <span class="tok-fn">no_audio_callback_allocates_or_blocks</span>() {</span>
+<span class="ln" id="L1251">    <span class="tok-kw">let</span> crates = Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>))</span>
+<span class="ln" id="L1252">        .<span class="tok-fn">parent</span>()</span>
+<span class="ln" id="L1253">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the crates directory&quot;</span>)</span>
+<span class="ln" id="L1254">        .<span class="tok-fn">to_path_buf</span>();</span>
+<span class="ln" id="L1255"></span>
+<span class="ln" id="L1256">    <span class="tok-com">/// Where a realtime callback is handed to the platform. The closure that</span></span>
+<span class="ln" id="L1257">    <span class="tok-com">/// follows one of these is the body with the deadline on it.</span></span>
+<span class="ln" id="L1258">    <span class="tok-kw">const</span> OPENS_A_STREAM: &amp;[&amp;str] = &amp;[<span class="tok-str">&quot;build_input_stream(&quot;</span>, <span class="tok-str">&quot;build_output_stream(&quot;</span>];</span>
+<span class="ln" id="L1259"></span>
+<span class="ln" id="L1260">    <span class="tok-com">/// What may not appear inside one, and what each would cost.</span></span>
+<span class="ln" id="L1261">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1262">    <span class="tok-com">/// `try_lock` and `try_push` are the non-blocking forms and are what this</span></span>
+<span class="ln" id="L1263">    <span class="tok-com">/// code already uses, so a needle that is a prefix of one is matched on the</span></span>
+<span class="ln" id="L1264">    <span class="tok-com">/// call rather than on the name: see `reaches` below.</span></span>
+<span class="ln" id="L1265">    <span class="tok-kw">const</span> FORBIDDEN: &amp;[(&amp;str, &amp;str)] = &amp;[</span>
+<span class="ln" id="L1266">        (<span class="tok-str">&quot;vec![&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1267">        (<span class="tok-str">&quot;Vec::&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1268">        (<span class="tok-str">&quot;.to_vec()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1269">        (<span class="tok-str">&quot;.to_owned()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1270">        (<span class="tok-str">&quot;.to_string()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1271">        (<span class="tok-str">&quot;String::&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1272">        (<span class="tok-str">&quot;format!&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1273">        (<span class="tok-str">&quot;.collect()&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1274">        (<span class="tok-str">&quot;Box::new&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1275">        (<span class="tok-str">&quot;.clone()&quot;</span>, <span class="tok-str">&quot;may allocate&quot;</span>),</span>
+<span class="ln" id="L1276">        (<span class="tok-str">&quot;.push(&quot;</span>, <span class="tok-str">&quot;may reallocate; the ring&#x27;s `try_push` does not&quot;</span>),</span>
+<span class="ln" id="L1277">        (<span class="tok-str">&quot;.insert(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
+<span class="ln" id="L1278">        (<span class="tok-str">&quot;.extend(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
+<span class="ln" id="L1279">        (<span class="tok-str">&quot;.resize(&quot;</span>, <span class="tok-str">&quot;may reallocate&quot;</span>),</span>
+<span class="ln" id="L1280">        (<span class="tok-str">&quot;.reserve(&quot;</span>, <span class="tok-str">&quot;allocates&quot;</span>),</span>
+<span class="ln" id="L1281">        (<span class="tok-str">&quot;.lock()&quot;</span>, <span class="tok-str">&quot;blocks; `try_lock` is what this code uses&quot;</span>),</span>
+<span class="ln" id="L1282">        (<span class="tok-str">&quot;println!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard output&quot;</span>),</span>
+<span class="ln" id="L1283">        (<span class="tok-str">&quot;eprintln!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard error&quot;</span>),</span>
+<span class="ln" id="L1284">        (<span class="tok-str">&quot;print!&quot;</span>, <span class="tok-str">&quot;takes the lock on standard output&quot;</span>),</span>
+<span class="ln" id="L1285">    ];</span>
+<span class="ln" id="L1286"></span>
+<span class="ln" id="L1287">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sources = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1288">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pending = vec![crates.<span class="tok-fn">clone</span>()];</span>
+<span class="ln" id="L1289">    while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(directory) = pending.<span class="tok-fn">pop</span>() {</span>
+<span class="ln" id="L1290">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;directory).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a crate directory&quot;</span>) {</span>
+<span class="ln" id="L1291">            <span class="tok-kw">let</span> entry = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable directory entry&quot;</span>);</span>
+<span class="ln" id="L1292">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L1293">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_dir</span>() {</span>
+<span class="ln" id="L1294">                pending.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L1295">            } <span class="tok-kw">else</span> <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">is_some_and</span>(|e| e == <span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L1296">                sources.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L1297">            }</span>
+<span class="ln" id="L1298">        }</span>
+<span class="ln" id="L1299">    }</span>
+<span class="ln" id="L1300"></span>
+<span class="ln" id="L1301">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> callbacks = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L1302">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1303">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;sources {</span>
+<span class="ln" id="L1304">        <span class="tok-kw">let</span> name = path</span>
+<span class="ln" id="L1305">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L1306">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file&quot;</span>)</span>
+<span class="ln" id="L1307">            .<span class="tok-fn">to_string_lossy</span>()</span>
+<span class="ln" id="L1308">            .<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L1309">        <span class="tok-kw">let</span> text = std::fs::<span class="tok-fn">read_to_string</span>(path)</span>
+<span class="ln" id="L1310">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable source file&quot;</span>)</span>
+<span class="ln" id="L1311">            .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1312"></span>
+<span class="ln" id="L1313">        <span class="tok-kw">for</span> opener <span class="tok-kw">in</span> OPENS_A_STREAM {</span>
+<span class="ln" id="L1314">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> from = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L1315">            while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = text[from..].<span class="tok-fn">find</span>(opener) {</span>
+<span class="ln" id="L1316">                <span class="tok-kw">let</span> at = from + at;</span>
+<span class="ln" id="L1317">                from = at + opener.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L1318">                <span class="tok-com">// A needle is not a call: this guard names what it looks for.</span></span>
+<span class="ln" id="L1319">                <span class="tok-kw">let</span> line_start = text[..at].<span class="tok-fn">rfind</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">map_or</span>(<span class="tok-num">0</span>, |n| n + <span class="tok-num">1</span>);</span>
+<span class="ln" id="L1320">                <span class="tok-kw">if</span> text[line_start..at].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L1321">                    continue;</span>
+<span class="ln" id="L1322">                }</span>
+<span class="ln" id="L1323"></span>
+<span class="ln" id="L1324">                <span class="tok-com">// The data callback is the first closure after the opener, and</span></span>
+<span class="ln" id="L1325">                <span class="tok-com">// its body is from its `{` to the matching `}`.</span></span>
+<span class="ln" id="L1326">                <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(brace) = text[at..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;| {&quot;</span>).<span class="tok-fn">map</span>(|n| at + n + <span class="tok-num">2</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1327">                    continue;</span>
+<span class="ln" id="L1328">                };</span>
+<span class="ln" id="L1329">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> depth = 0usize;</span>
+<span class="ln" id="L1330">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> end = brace;</span>
+<span class="ln" id="L1331">                <span class="tok-kw">for</span> (offset, byte) <span class="tok-kw">in</span> text[brace..].<span class="tok-fn">char_indices</span>() {</span>
+<span class="ln" id="L1332">                    <span class="tok-kw">match</span> byte {</span>
+<span class="ln" id="L1333">                        <span class="tok-str">&#x27;{&#x27;</span> =&gt; depth += <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1334">                        <span class="tok-str">&#x27;}&#x27;</span> =&gt; {</span>
+<span class="ln" id="L1335">                            depth -= <span class="tok-num">1</span>;</span>
+<span class="ln" id="L1336">                            <span class="tok-kw">if</span> depth == <span class="tok-num">0</span> {</span>
+<span class="ln" id="L1337">                                end = brace + offset;</span>
+<span class="ln" id="L1338">                                break;</span>
+<span class="ln" id="L1339">                            }</span>
+<span class="ln" id="L1340">                        }</span>
+<span class="ln" id="L1341">                        _ =&gt; {}</span>
+<span class="ln" id="L1342">                    }</span>
+<span class="ln" id="L1343">                }</span>
+<span class="ln" id="L1344">                callbacks += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L1345"></span>
+<span class="ln" id="L1346">                <span class="tok-kw">let</span> before = text[..brace].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;\n&#x27;</span>).<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L1347">                <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> text[brace..end].<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1348">                    <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1349">                    <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
+<span class="ln" id="L1350">                        continue;</span>
+<span class="ln" id="L1351">                    }</span>
+<span class="ln" id="L1352">                    <span class="tok-kw">for</span> (needle, cost) <span class="tok-kw">in</span> FORBIDDEN {</span>
+<span class="ln" id="L1353">                        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(hit) = line.<span class="tok-fn">find</span>(needle) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1354">                            continue;</span>
+<span class="ln" id="L1355">                        };</span>
+<span class="ln" id="L1356">                        <span class="tok-com">// `try_lock()` and `try_push(` end in the needle and are</span></span>
+<span class="ln" id="L1357">                        <span class="tok-com">// the non-blocking forms. Only the bare call counts.</span></span>
+<span class="ln" id="L1358">                        <span class="tok-kw">if</span> line[..hit].<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;try_&quot;</span>) {</span>
+<span class="ln" id="L1359">                            continue;</span>
+<span class="ln" id="L1360">                        }</span>
+<span class="ln" id="L1361">                        <span class="tok-kw">if</span> line[..hit].<span class="tok-fn">matches</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">count</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L1362">                            continue;</span>
+<span class="ln" id="L1363">                        }</span>
+<span class="ln" id="L1364">                        offenders.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1365">                            <span class="tok-str">&quot;{name}:{}: {} ({needle} {cost})&quot;</span>,</span>
+<span class="ln" id="L1366">                            before + number + <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1367">                            line.<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L1368">                        ));</span>
+<span class="ln" id="L1369">                    }</span>
+<span class="ln" id="L1370">                }</span>
+<span class="ln" id="L1371">            }</span>
+<span class="ln" id="L1372">        }</span>
+<span class="ln" id="L1373">    }</span>
+<span class="ln" id="L1374"></span>
+<span class="ln" id="L1375">    assert!(</span>
+<span class="ln" id="L1376">        callbacks &gt;= <span class="tok-num">3</span>,</span>
+<span class="ln" id="L1377">        <span class="tok-str">&quot;the walk found {callbacks} audio callbacks, and there are at least \</span></span>
+<span class="ln" id="L1378"><span class="tok-str">         three: the live path&#x27;s input and output, and playback&#x27;s. A guard that \</span></span>
+<span class="ln" id="L1379"><span class="tok-str">         finds none passes for the wrong reason&quot;</span></span>
+<span class="ln" id="L1380">    );</span>
+<span class="ln" id="L1381">    assert!(</span>
+<span class="ln" id="L1382">        offenders.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1383">        <span class="tok-str">&quot;these lines run on an audio thread with a deadline in milliseconds, \</span></span>
+<span class="ln" id="L1384"><span class="tok-str">         and each of them can miss it. Do the work before the stream starts, \</span></span>
+<span class="ln" id="L1385"><span class="tok-str">         into a buffer sized once:\n{}&quot;</span>,</span>
+<span class="ln" id="L1386">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1387">    );</span>
+<span class="ln" id="L1388">}</span>
 </span>
 </code></pre>
 </main>

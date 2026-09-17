@@ -188,7 +188,15 @@ def document_pages():
 
 
 def home():
-    """The landing page: everything, grouped by what a reader came to do."""
+    """The landing page: everything, grouped by what a reader came to do.
+
+    The separator between a title and its sentence is the character itself
+    rather than `&middot;`. GitHub renders the entity and the website's own
+    renderer escapes it, correctly: a Markdown renderer that passed `&` through
+    would be a renderer that lets a document write markup. The page on the
+    website therefore showed readers the letters `&middot;` twenty times, which
+    is what publishing the wiki as pages of this site found.
+    """
     out = [BANNER, "# VeilVoice", ""]
     out.append("![VeilVoice](%s/raw/main/assets/banner.png)" % REPO)
     out.append("")
@@ -204,25 +212,25 @@ def home():
     out.append("## Start here")
     out.append("")
     for source, title, blurb in DOCUMENTS[:5]:
-        out.append("- **[[%s|%s]]** &middot; %s" % (title, page_name(source), blurb))
+        out.append("- **[[%s|%s]]** \u00b7 %s" % (title, page_name(source), blurb))
     out.append("")
 
     out.append("## One program at a time")
     out.append("")
     for page, title, blurb in GUIDES:
-        out.append("- **[[%s|%s]]** &middot; %s" % (title, page, blurb))
+        out.append("- **[[%s|%s]]** \u00b7 %s" % (title, page, blurb))
     out.append("")
 
     out.append("## Checking it, building it, packaging it")
     out.append("")
     for source, title, blurb in DOCUMENTS[5:11]:
-        out.append("- **[[%s|%s]]** &middot; %s" % (title, page_name(source), blurb))
+        out.append("- **[[%s|%s]]** \u00b7 %s" % (title, page_name(source), blurb))
     out.append("")
 
     out.append("## Working on it")
     out.append("")
     for source, title, blurb in DOCUMENTS[11:]:
-        out.append("- **[[%s|%s]]** &middot; %s" % (title, page_name(source), blurb))
+        out.append("- **[[%s|%s]]** \u00b7 %s" % (title, page_name(source), blurb))
     out.append("")
 
     out.append("## Every crate and every file")

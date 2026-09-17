@@ -3,7 +3,7 @@
 
 # `website/js/markdown.js`
 
-[[The website's source|Source-index]] &middot; 489 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/markdown.js)
+[[The website's source|Source-index]] &middot; 553 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/markdown.js)
 
 ## What it does
 
@@ -44,5 +44,5 @@ resolved one.
 | `isExternal` | 231 |
 | `inline` | 307 |
 | `render` | 360 |
-| `tableRow` | 366 |
-| `cells` | 419 |
+| `tableRow` | 369 |
+| `cells` | 422 |

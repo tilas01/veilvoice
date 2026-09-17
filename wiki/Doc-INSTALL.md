@@ -12,7 +12,7 @@ checking rather than in what you end up with.
 |---|---|---|
 | [By hand](#1-by-hand) | four commands | **you**, and you can see each one |
 | [With the install script](#2-with-the-install-script) | one command | the script, which refuses if anything fails |
-| [With the portable verifier](#2b-with-the-portable-verifier) | one command, no GnuPG needed | a binary carrying the key |
+| [With the built-in verifier](#2b-with-the-built-in-verifier) | one command, no GnuPG needed | a binary carrying the key |
 | [From source](#3-from-source) | `cargo build` | the compiler, plus whatever you read |
 
 The by-hand route is first on purpose. The install script does exactly what it

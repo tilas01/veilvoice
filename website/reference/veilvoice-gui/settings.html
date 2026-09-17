@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/settings.svg" alt="settings.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/settings.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1434 lines &middot; <a href="settings.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1518 lines &middot; <a href="settings.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-menu-rather-than-one-long-list">Why a menu rather than one long list</a>
@@ -91,59 +91,60 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1434 lines defining <strong>43 functions</strong> (33 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1518 lines defining <strong>45 functions</strong> (34 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Page</code> <span style="color:var(--muted)">line 46</span> &middot; Which page of the settings menu is showing.</li>
-<li><code>struct Settings</code> <span style="color:var(--muted)">line 71</span> &middot; The settings tab&#x27;s own state.</li>
+<li><code>struct Settings</code> <span style="color:var(--muted)">line 111</span> &middot; The settings tab&#x27;s own state.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Settings::load</code> <span style="color:var(--muted)">line 121</span> &middot; Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.
+<li><code>Settings::load</code> <span style="color:var(--muted)">line 161</span> &middot; Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>from_arguments</code>, <code>from_key</code></span>
 </li>
-<li><code>Settings::needs_first_run</code> <span style="color:var(--muted)">line 154</span> &middot; Whether the first-run choice has still to be made.
+<li><code>Settings::needs_first_run</code> <span style="color:var(--muted)">line 194</span> &middot; Whether the first-run choice has still to be made.
 </li>
-<li><code>Settings::save_error</code> <span style="color:var(--muted)">line 180</span> &middot; Whether the app should open in group mode, and a way to change it.
+<li><code>Settings::save_error</code> <span style="color:var(--muted)">line 220</span> &middot; Whether the app should open in group mode, and a way to change it.
 </li>
-<li><code>Settings::show_install_tab</code> <span style="color:var(--muted)">line 191</span> &middot; Whether the install tab should be offered at all.
+<li><code>Settings::show_install_tab</code> <span style="color:var(--muted)">line 231</span> &middot; Whether the install tab should be offered at all.
 </li>
-<li><code>Settings::hide_install_tab</code> <span style="color:var(--muted)">line 196</span> &middot; Whether the install tab is hidden by preference.
+<li><code>Settings::hide_install_tab</code> <span style="color:var(--muted)">line 236</span> &middot; Whether the install tab is hidden by preference.
 </li>
-<li><code>Settings::acceleration</code> <span style="color:var(--muted)">line 214</span> &middot; Whether the window asks the platform for a hardware-drawn context.
+<li><code>Settings::acceleration</code> <span style="color:var(--muted)">line 254</span> &middot; Whether the window asks the platform for a hardware-drawn context.
 </li>
-<li><code>Settings::show_frame_rate</code> <span style="color:var(--muted)">line 243</span> &middot; Whether the header carries a live frame-rate readout.
+<li><code>Settings::show_frame_rate</code> <span style="color:var(--muted)">line 283</span> &middot; Whether the header carries a live frame-rate readout.
 </li>
-<li><code>Settings::always_group</code> <span style="color:var(--muted)">line 248</span> &middot; Whether the app should open in group mode.
+<li><code>Settings::always_group</code> <span style="color:var(--muted)">line 288</span> &middot; Whether the app should open in group mode.
 </li>
-<li><code>Settings::seal_with_app_lock</code> <span style="color:var(--muted)">line 277</span> &middot; Whether every recording is sealed with the app-lock passphrase.
+<li><code>Settings::seal_with_app_lock</code> <span style="color:var(--muted)">line 317</span> &middot; Whether every recording is sealed with the app-lock passphrase.
 </li>
-<li><code>Settings::destination</code> <span style="color:var(--muted)">line 282</span> &middot; The remembered encrypted destination, rebuilt from the settings file.
+<li><code>Settings::destination</code> <span style="color:var(--muted)">line 322</span> &middot; The remembered encrypted destination, rebuilt from the settings file.
 </li>
-<li><code>Settings::set_destination</code> <span style="color:var(--muted)">line 291</span> &middot; Remember a destination, including the answer to the hidden question.
+<li><code>Settings::set_destination</code> <span style="color:var(--muted)">line 331</span> &middot; Remember a destination, including the answer to the hidden question.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::set_always_group</code> <span style="color:var(--muted)">line 350</span> &middot; Record whether the app should open in group mode.
+<li><code>Settings::set_always_group</code> <span style="color:var(--muted)">line 390</span> &middot; Record whether the app should open in group mode.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::set_seal_with_app_lock</code> <span style="color:var(--muted)">line 364</span> &middot; Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.
+<li><code>Settings::set_seal_with_app_lock</code> <span style="color:var(--muted)">line 404</span> &middot; Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::toured_tabs</code> <span style="color:var(--muted)">line 579</span> &middot; The tabs the tour has already covered.
+<li><code>Settings::toured_tabs</code> <span style="color:var(--muted)">line 619</span> &middot; The tabs the tour has already covered.
 </li>
-<li><code>Settings::mark_toured</code> <span style="color:var(--muted)">line 590</span> &middot; Record that the tour has covered these tabs, and save.
+<li><code>Settings::mark_toured</code> <span style="color:var(--muted)">line 630</span> &middot; Record that the tour has covered these tabs, and save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::first_run_appearance</code> <span style="color:var(--muted)">line 604</span> &middot; The first-run panel: offered once, with animation already on.
+<li><code>Settings::first_run_appearance</code> <span style="color:var(--muted)">line 644</span> &middot; The first-run panel: offered once, with animation already on.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::first_run_autolock</code> <span style="color:var(--muted)">line 631</span> &middot; The autolock switch and delay, for the first-run setup to place.
+<li><code>Settings::first_run_autolock</code> <span style="color:var(--muted)">line 671</span> &middot; The autolock switch and delay, for the first-run setup to place.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::finish_first_run</code> <span style="color:var(--muted)">line 659</span> &middot; Mark the first run answered.
+<li><code>Settings::finish_first_run</code> <span style="color:var(--muted)">line 699</span> &middot; Mark the first run answered.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::tab</code> <span style="color:var(--muted)">line 666</span> &middot; The settings tab.
+<li><code>Settings::tab</code> <span style="color:var(--muted)">line 706</span> &middot; The settings tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>appearance_page</code>, <code>interface_page</code>, <code>motion_page</code>, <code>security_page</code>, <code>storage_page</code>, <code>custom_palette_help</code>, <code>persist</code>, <code>section</code>, <code>swatches</code>, <code>failsafe</code>, <code>live_monitor</code>, <code>notify_style</code></span>
 </li>
-<li><code>Settings::theme_picker</code> <span style="color:var(--muted)">line 800</span> &middot; The colour scheme, as a compact control for the window header.
+<li><code>Settings::theme_picker</code> <span style="color:var(--muted)">line 840</span> &middot; The colour scheme, as a compact control for the window header.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
 </ul>
@@ -151,7 +152,7 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 557 1247" width="557" height="1247" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 589 1247" width="589" height="1247" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -160,121 +161,121 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="557" height="1247" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M253.5 347.0 C 518.9 347.0, 518.9 247.0, 499.9 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M480.8 447.0 C 502.8 447.0, 502.8 447.0, 252.5 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M513.1 647.0 C 535.1 647.0, 535.1 647.0, 252.5 647.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M513.1 547.0 C 535.1 547.0, 535.1 547.0, 252.5 547.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<rect x="0" y="0" width="589" height="1247" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M496.9 347.0 C 518.9 347.0, 518.9 347.0, 268.6 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M281.7 547.0 C 531.0 547.0, 531.0 447.0, 512.0 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M281.7 747.0 C 551.2 747.0, 551.2 647.0, 532.2 647.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M297.9 647.0 C 535.1 647.0, 535.1 547.0, 516.1 547.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<a href="settings.src.html#fn-page-from_key">
+<rect x="49.4" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="119.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Page::from_key</text>
+<text x="119.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 80</text>
+</a>
+<a href="settings.src.html#fn-settings-load">
+<rect x="216.3" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="286.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::load</text>
+<text x="286.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
+</a>
 <a href="settings.src.html#fn-settings-motion">
-<rect x="52.2" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="130.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::motion</text>
-<text x="130.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 149</text>
+<rect x="383.1" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="461.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::motion</text>
+<text x="461.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 189</text>
 </a>
 <a href="settings.src.html#fn-settings-set_hide_install_tab">
-<rect x="235.2" y="20.0" width="269.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="370.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_hide_install_tab</text>
-<text x="370.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 201</text>
+<rect x="28.1" y="120.0" width="269.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="163.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_hide_install_tab</text>
+<text x="163.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 241</text>
 </a>
 <a href="settings.src.html#fn-settings-set_acceleration">
-<rect x="44.2" y="120.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="163.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_acceleration</text>
-<text x="163.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 219</text>
+<rect x="323.9" y="120.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="442.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_acceleration</text>
+<text x="442.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 259</text>
 </a>
 <a href="settings.src.html#fn-settings-frame_target">
-<rect x="307.7" y="120.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="410.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::frame_target</text>
-<text x="410.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
+<rect x="60.3" y="220.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="163.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::frame_target</text>
+<text x="163.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
 </a>
 <a href="settings.src.html#fn-settings-set_frame_target">
-<rect x="60.3" y="220.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="179.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_frame_target</text>
-<text x="179.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 233</text>
+<rect x="291.6" y="220.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="410.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_frame_target</text>
+<text x="410.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
 </a>
 <a href="settings.src.html#fn-settings-autolock">
-<rect x="323.9" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="410.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::autolock</text>
-<text x="410.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 253</text>
+<rect x="92.5" y="320.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="179.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::autolock</text>
+<text x="179.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 293</text>
 </a>
 <a href="settings.src.html#fn-settings-set_autolock">
-<rect x="48.2" y="320.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="150.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_autolock</text>
-<text x="150.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 264</text>
+<rect x="291.6" y="320.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="394.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_autolock</text>
+<text x="394.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 304</text>
 </a>
 <a href="settings.src.html#fn-settings-set_destination">
-<rect x="279.5" y="320.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="394.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_destination</text>
-<text x="394.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 291</text>
+<rect x="80.4" y="420.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="195.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_destination</text>
+<text x="195.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 331</text>
 </a>
 <a href="settings.src.html#fn-settings-failsafe">
-<rect x="76.4" y="420.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="163.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::failsafe</text>
-<text x="163.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
+<rect x="335.9" y="420.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="422.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::failsafe</text>
+<text x="422.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 348</text>
 </a>
 <a href="settings.src.html#fn-settings-set_failsafe">
-<rect x="275.5" y="420.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="378.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_failsafe</text>
-<text x="378.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 313</text>
+<rect x="76.4" y="520.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="179.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_failsafe</text>
+<text x="179.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 353</text>
 </a>
 <a href="settings.src.html#fn-settings-notify_style">
-<rect x="44.2" y="520.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="146.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::notify_style</text>
-<text x="146.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 322</text>
+<rect x="307.7" y="520.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="410.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::notify_style</text>
+<text x="410.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 362</text>
 </a>
 <a href="settings.src.html#fn-settings-set_notify_style">
-<rect x="275.5" y="520.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="394.3" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_notify_style</text>
-<text x="394.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
+<rect x="60.3" y="620.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="179.1" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_notify_style</text>
+<text x="179.1" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 367</text>
 </a>
 <a href="settings.src.html#fn-settings-live_monitor">
-<rect x="44.2" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="146.8" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::live_monitor</text>
-<text x="146.8" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 336</text>
+<rect x="323.9" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="426.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::live_monitor</text>
+<text x="426.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 376</text>
 </a>
 <a href="settings.src.html#fn-settings-set_live_monitor">
-<rect x="275.5" y="620.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="394.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_live_monitor</text>
-<text x="394.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 341</text>
+<rect x="44.2" y="720.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="163.0" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_live_monitor</text>
+<text x="163.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 381</text>
 </a>
 <a href="settings.src.html#fn-settings-set_always_group">
-<rect x="44.2" y="728.5" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="163.0" y="751.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_always_group</text>
-<text x="163.0" y="768.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 350</text>
+<rect x="307.7" y="720.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="426.5" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::set_always_group</text>
+<text x="426.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
 </a>
 <a href="settings.src.html#fn-settings-set_seal_with_app_lock">
-<rect x="307.7" y="720.0" width="205.3" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="410.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::</text>
-<text x="410.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">set_seal_with_app_lock</text>
-<text x="410.4" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 364</text>
+<rect x="80.4" y="820.0" width="205.3" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="183.1" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::</text>
+<text x="183.1" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">set_seal_with_app_lock</text>
+<text x="183.1" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 404</text>
 </a>
 <a href="settings.src.html#fn-settings-mark_toured">
-<rect x="32.1" y="837.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="130.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::mark_toured</text>
-<text x="130.7" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 590</text>
+<rect x="311.8" y="828.5" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="410.4" y="851.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::mark_toured</text>
+<text x="410.4" y="868.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 630</text>
 </a>
 <a href="settings.src.html#fn-settings-first_run_appearance">
-<rect x="255.3" y="837.0" width="269.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="390.2" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::first_run_appearance</text>
-<text x="390.2" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 604</text>
+<rect x="20.0" y="937.0" width="269.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="154.9" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::first_run_appearance</text>
+<text x="154.9" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 644</text>
 </a>
 <a href="settings.src.html#fn-settings-first_run_autolock">
-<rect x="20.0" y="937.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="146.8" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::first_run_autolock</text>
-<text x="146.8" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 631</text>
+<rect x="315.8" y="937.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="442.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::first_run_autolock</text>
+<text x="442.6" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 671</text>
 </a>
 <a href="settings.src.html#fn-settings-finish_first_run">
-<rect x="299.7" y="937.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="418.5" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::finish_first_run</text>
-<text x="418.5" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 659</text>
-</a>
-<a href="settings.src.html#fn-settings-tab">
-<rect x="96.6" y="1037.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="163.0" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::tab</text>
-<text x="163.0" y="1076.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 666</text>
-</a>
-<a href="settings.src.html#fn-settings-theme_picker">
-<rect x="255.3" y="1037.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="358.0" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::theme_picker</text>
-<text x="358.0" y="1076.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 800</text>
+<rect x="176.0" y="1037.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="294.7" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::finish_first_run</text>
+<text x="294.7" y="1076.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 699</text>
 </a>
 <rect x="20.0" y="1121.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -282,68 +283,68 @@
 <text x="35.0" y="1146.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
 <path d="M20.0 1157.5 L29.0 1157.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="1162.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="1184.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
-<text x="20.0" y="1199.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
-<text x="20.0" y="1214.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one. 22 of 43 functions are drawn;</text>
-<text x="20.0" y="1229.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the diagram is bounded at 22 so it stays readable.</text>
+<text x="20.0" y="1184.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="1199.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="1214.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 45 functions are drawn; the diagram is</text>
+<text x="20.0" y="1229.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 43 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 45 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_motion[&quot;Settings::motion&lt;br/&gt;line 149&quot;]
-    n_set_hide_install_tab[&quot;Settings::set_hide_install_tab&lt;br/&gt;line 201&quot;]
-    n_set_acceleration[&quot;Settings::set_acceleration&lt;br/&gt;line 219&quot;]
-    n_frame_target[&quot;Settings::frame_target&lt;br/&gt;line 228&quot;]
-    n_set_frame_target[&quot;Settings::set_frame_target&lt;br/&gt;line 233&quot;]
-    n_autolock[&quot;Settings::autolock&lt;br/&gt;line 253&quot;]
-    n_set_autolock[&quot;Settings::set_autolock&lt;br/&gt;line 264&quot;]
-    n_set_destination([&quot;Settings::set_destination&lt;br/&gt;line 291&quot;])
-    n_failsafe[&quot;Settings::failsafe&lt;br/&gt;line 308&quot;]
-    n_set_failsafe[&quot;Settings::set_failsafe&lt;br/&gt;line 313&quot;]
-    n_notify_style[&quot;Settings::notify_style&lt;br/&gt;line 322&quot;]
-    n_set_notify_style[&quot;Settings::set_notify_style&lt;br/&gt;line 327&quot;]
-    n_live_monitor[&quot;Settings::live_monitor&lt;br/&gt;line 336&quot;]
-    n_set_live_monitor[&quot;Settings::set_live_monitor&lt;br/&gt;line 341&quot;]
-    n_set_always_group([&quot;Settings::set_always_group&lt;br/&gt;line 350&quot;])
-    n_set_seal_with_app_lock([&quot;Settings::&lt;br/&gt;set_seal_with_app_lock&lt;br/&gt;line 364&quot;])
-    n_mark_toured([&quot;Settings::mark_toured&lt;br/&gt;line 590&quot;])
-    n_first_run_appearance([&quot;Settings::first_run_appearance&lt;br/&gt;line 604&quot;])
-    n_first_run_autolock([&quot;Settings::first_run_autolock&lt;br/&gt;line 631&quot;])
-    n_finish_first_run([&quot;Settings::finish_first_run&lt;br/&gt;line 659&quot;])
-    n_tab([&quot;Settings::tab&lt;br/&gt;line 666&quot;])
-    n_theme_picker([&quot;Settings::theme_picker&lt;br/&gt;line 800&quot;])
+    n_from_key[&quot;Page::from_key&lt;br/&gt;line 80&quot;]
+    n_load([&quot;Settings::load&lt;br/&gt;line 161&quot;])
+    n_motion[&quot;Settings::motion&lt;br/&gt;line 189&quot;]
+    n_set_hide_install_tab[&quot;Settings::set_hide_install_tab&lt;br/&gt;line 241&quot;]
+    n_set_acceleration[&quot;Settings::set_acceleration&lt;br/&gt;line 259&quot;]
+    n_frame_target[&quot;Settings::frame_target&lt;br/&gt;line 268&quot;]
+    n_set_frame_target[&quot;Settings::set_frame_target&lt;br/&gt;line 273&quot;]
+    n_autolock[&quot;Settings::autolock&lt;br/&gt;line 293&quot;]
+    n_set_autolock[&quot;Settings::set_autolock&lt;br/&gt;line 304&quot;]
+    n_set_destination([&quot;Settings::set_destination&lt;br/&gt;line 331&quot;])
+    n_failsafe[&quot;Settings::failsafe&lt;br/&gt;line 348&quot;]
+    n_set_failsafe[&quot;Settings::set_failsafe&lt;br/&gt;line 353&quot;]
+    n_notify_style[&quot;Settings::notify_style&lt;br/&gt;line 362&quot;]
+    n_set_notify_style[&quot;Settings::set_notify_style&lt;br/&gt;line 367&quot;]
+    n_live_monitor[&quot;Settings::live_monitor&lt;br/&gt;line 376&quot;]
+    n_set_live_monitor[&quot;Settings::set_live_monitor&lt;br/&gt;line 381&quot;]
+    n_set_always_group([&quot;Settings::set_always_group&lt;br/&gt;line 390&quot;])
+    n_set_seal_with_app_lock([&quot;Settings::&lt;br/&gt;set_seal_with_app_lock&lt;br/&gt;line 404&quot;])
+    n_mark_toured([&quot;Settings::mark_toured&lt;br/&gt;line 630&quot;])
+    n_first_run_appearance([&quot;Settings::first_run_appearance&lt;br/&gt;line 644&quot;])
+    n_first_run_autolock([&quot;Settings::first_run_autolock&lt;br/&gt;line 671&quot;])
+    n_finish_first_run([&quot;Settings::finish_first_run&lt;br/&gt;line 699&quot;])
     n_set_autolock --&gt; n_autolock
     n_set_failsafe --&gt; n_failsafe
     n_set_live_monitor --&gt; n_live_monitor
     n_set_notify_style --&gt; n_notify_style
-    click n_motion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L149&quot; &quot;open the source&quot;
-    click n_set_hide_install_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L201&quot; &quot;open the source&quot;
-    click n_set_acceleration href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L219&quot; &quot;open the source&quot;
-    click n_frame_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L228&quot; &quot;open the source&quot;
-    click n_set_frame_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L233&quot; &quot;open the source&quot;
-    click n_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L253&quot; &quot;open the source&quot;
-    click n_set_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L264&quot; &quot;open the source&quot;
-    click n_set_destination href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L291&quot; &quot;open the source&quot;
-    click n_failsafe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L308&quot; &quot;open the source&quot;
-    click n_set_failsafe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L313&quot; &quot;open the source&quot;
-    click n_notify_style href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L322&quot; &quot;open the source&quot;
-    click n_set_notify_style href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L327&quot; &quot;open the source&quot;
-    click n_live_monitor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L336&quot; &quot;open the source&quot;
-    click n_set_live_monitor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L341&quot; &quot;open the source&quot;
-    click n_set_always_group href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L350&quot; &quot;open the source&quot;
-    click n_set_seal_with_app_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L364&quot; &quot;open the source&quot;
-    click n_mark_toured href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L590&quot; &quot;open the source&quot;
-    click n_first_run_appearance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L604&quot; &quot;open the source&quot;
-    click n_first_run_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L631&quot; &quot;open the source&quot;
-    click n_finish_first_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L659&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L666&quot; &quot;open the source&quot;
-    click n_theme_picker href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L800&quot; &quot;open the source&quot;
+    click n_from_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L80&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L161&quot; &quot;open the source&quot;
+    click n_motion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L189&quot; &quot;open the source&quot;
+    click n_set_hide_install_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L241&quot; &quot;open the source&quot;
+    click n_set_acceleration href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L259&quot; &quot;open the source&quot;
+    click n_frame_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L268&quot; &quot;open the source&quot;
+    click n_set_frame_target href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L273&quot; &quot;open the source&quot;
+    click n_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L293&quot; &quot;open the source&quot;
+    click n_set_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L304&quot; &quot;open the source&quot;
+    click n_set_destination href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L331&quot; &quot;open the source&quot;
+    click n_failsafe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L348&quot; &quot;open the source&quot;
+    click n_set_failsafe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L353&quot; &quot;open the source&quot;
+    click n_notify_style href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L362&quot; &quot;open the source&quot;
+    click n_set_notify_style href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L367&quot; &quot;open the source&quot;
+    click n_live_monitor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L376&quot; &quot;open the source&quot;
+    click n_set_live_monitor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L381&quot; &quot;open the source&quot;
+    click n_set_always_group href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L390&quot; &quot;open the source&quot;
+    click n_set_seal_with_app_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L404&quot; &quot;open the source&quot;
+    click n_mark_toured href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L630&quot; &quot;open the source&quot;
+    click n_first_run_appearance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L644&quot; &quot;open the source&quot;
+    click n_first_run_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L671&quot; &quot;open the source&quot;
+    click n_finish_first_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L699&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_set_destination,n_set_always_group,n_set_seal_with_app_lock,n_mark_toured,n_first_run_appearance,n_first_run_autolock,n_finish_first_run,n_tab,n_theme_picker entry
+    class n_load,n_set_destination,n_set_always_group,n_set_seal_with_app_lock,n_mark_toured,n_first_run_appearance,n_first_run_autolock,n_finish_first_run entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_motion,n_set_hide_install_tab,n_set_acceleration,n_frame_target,n_set_frame_target,n_autolock,n_set_autolock,n_failsafe,n_set_failsafe,n_notify_style,n_set_notify_style,n_live_monitor,n_set_live_monitor api</code></pre>
+    class n_from_key,n_motion,n_set_hide_install_tab,n_set_acceleration,n_frame_target,n_set_frame_target,n_autolock,n_set_autolock,n_failsafe,n_set_failsafe,n_notify_style,n_set_notify_style,n_live_monitor,n_set_live_monitor api</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -352,50 +353,53 @@ flowchart TD
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Page</code> <sub>pub enum</sub></td><td><a href="settings.src.html#fn-page">46</a></td><td>Which page of the settings menu is showing.</td></tr>
 <tr><td><code>Page::ALL</code> <sub>pub const</sub></td><td><a href="settings.src.html#fn-page-all">61</a></td><td>Every page, in menu order, with its label and one-line summary.</td></tr>
-<tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="settings.src.html#fn-settings">71</a></td><td>The settings tab&#x27;s own state.</td></tr>
-<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-default">100</a></td><td></td></tr>
-<tr><td><code>Settings::load</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-load">121</a></td><td>Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.</td></tr>
-<tr><td><code>Settings::motion</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-motion">149</a></td><td>How much movement is allowed this frame.</td></tr>
-<tr><td><code>Settings::needs_first_run</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-needs_first_run">154</a></td><td>Whether the first-run choice has still to be made.</td></tr>
-<tr><td><code>Settings::persist</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-persist">159</a></td><td>Write the settings out, encrypted and obfuscated as they are at rest.</td></tr>
-<tr><td><code>Settings::save_error</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-save_error">180</a></td><td>Whether the app should open in group mode, and a way to change it.</td></tr>
-<tr><td><code>Settings::show_install_tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-show_install_tab">191</a></td><td>Whether the install tab should be offered at all.</td></tr>
-<tr><td><code>Settings::hide_install_tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-hide_install_tab">196</a></td><td>Whether the install tab is hidden by preference.</td></tr>
-<tr><td><code>Settings::set_hide_install_tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_hide_install_tab">201</a></td><td>Record whether to hide the install tab on a portable copy.</td></tr>
-<tr><td><code>Settings::acceleration</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-acceleration">214</a></td><td>Whether the window asks the platform for a hardware-drawn context.</td></tr>
-<tr><td><code>Settings::set_acceleration</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_acceleration">219</a></td><td>Record whether to ask for acceleration.</td></tr>
-<tr><td><code>Settings::frame_target</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-frame_target">228</a></td><td>How often the window draws while something in it is moving.</td></tr>
-<tr><td><code>Settings::set_frame_target</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_frame_target">233</a></td><td>Record a new frame-rate target.</td></tr>
-<tr><td><code>Settings::show_frame_rate</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-show_frame_rate">243</a></td><td>Whether the header carries a live frame-rate readout.</td></tr>
-<tr><td><code>Settings::always_group</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-always_group">248</a></td><td>Whether the app should open in group mode.</td></tr>
-<tr><td><code>Settings::autolock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-autolock">253</a></td><td>How the autolock is configured, brought into range.</td></tr>
-<tr><td><code>Settings::set_autolock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_autolock">264</a></td><td>Remember an autolock setting.</td></tr>
-<tr><td><code>Settings::seal_with_app_lock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-seal_with_app_lock">277</a></td><td>Whether every recording is sealed with the app-lock passphrase.</td></tr>
-<tr><td><code>Settings::destination</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-destination">282</a></td><td>The remembered encrypted destination, rebuilt from the settings file.</td></tr>
-<tr><td><code>Settings::set_destination</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_destination">291</a></td><td>Remember a destination, including the answer to the hidden question.</td></tr>
-<tr><td><code>Settings::failsafe</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-failsafe">308</a></td><td>The Failsafe posture in force.</td></tr>
-<tr><td><code>Settings::set_failsafe</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_failsafe">313</a></td><td>Record the Failsafe posture.</td></tr>
-<tr><td><code>Settings::notify_style</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-notify_style">322</a></td><td>How notifications should be shown.</td></tr>
-<tr><td><code>Settings::set_notify_style</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_notify_style">327</a></td><td>Record how notifications should be shown.</td></tr>
-<tr><td><code>Settings::live_monitor</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-live_monitor">336</a></td><td>Where the live monitor sits, or whether it is shown.</td></tr>
-<tr><td><code>Settings::set_live_monitor</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_live_monitor">341</a></td><td>Record where the live monitor sits.</td></tr>
-<tr><td><code>Settings::set_always_group</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_always_group">350</a></td><td>Record whether the app should open in group mode.</td></tr>
-<tr><td><code>Settings::set_seal_with_app_lock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_seal_with_app_lock">364</a></td><td>Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.</td></tr>
-<tr><td><code>Settings::interface_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-interface_page">373</a></td><td>Which tabs the window offers.</td></tr>
-<tr><td><code>Settings::toured_tabs</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-toured_tabs">579</a></td><td>The tabs the tour has already covered.</td></tr>
-<tr><td><code>Settings::mark_toured</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-mark_toured">590</a></td><td>Record that the tour has covered these tabs, and save.</td></tr>
-<tr><td><code>Settings::first_run_appearance</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-first_run_appearance">604</a></td><td>The first-run panel: offered once, with animation already on.</td></tr>
-<tr><td><code>Settings::first_run_autolock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-first_run_autolock">631</a></td><td>The autolock switch and delay, for the first-run setup to place.</td></tr>
-<tr><td><code>Settings::finish_first_run</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-finish_first_run">659</a></td><td>Mark the first run answered.</td></tr>
-<tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-tab">666</a></td><td>The settings tab.</td></tr>
-<tr><td><code>Settings::custom_palette_help</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-custom_palette_help">721</a></td><td>Explain where custom palettes go, and say what was refused and why.</td></tr>
-<tr><td><code>Settings::theme_picker</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-theme_picker">800</a></td><td>The colour scheme, as a compact control for the window header.</td></tr>
-<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-appearance_page">826</a></td><td>The appearance page: palette, and what each one changes.</td></tr>
-<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-motion_page">865</a></td><td>The motion page, including honouring the system&#x27;s reduced-motion setting.</td></tr>
-<tr><td><code>Settings::security_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-security_page">1002</a></td><td>Roadmap item 92.</td></tr>
-<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-storage_page">1102</a></td><td>The storage page: where files go, and the portable or installed choice.</td></tr>
-<tr><td><code>section</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-section">1163</a></td><td>A titled group with a one-line explanation under it.</td></tr>
-<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-swatches">1171</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
+<tr><td><code>Page::OPENS_ON</code> <sub>pub const</sub></td><td><a href="settings.src.html#fn-page-opens_on">74</a></td><td>The page the window opens Settings on when nobody has said otherwise.</td></tr>
+<tr><td><code>Page::from_key</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-page-from_key">80</a></td><td>The page a name asks for, or nothing.</td></tr>
+<tr><td><code>Page::from_arguments</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-page-from_arguments">96</a></td><td>Which page the command line asked to open on, if it asked.</td></tr>
+<tr><td><code>Settings</code> <sub>pub struct</sub></td><td><a href="settings.src.html#fn-settings">111</a></td><td>The settings tab&#x27;s own state.</td></tr>
+<tr><td><code>Settings::default</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-default">140</a></td><td></td></tr>
+<tr><td><code>Settings::load</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-load">161</a></td><td>Load preferences from this platform&#x27;s config directory and apply the chosen theme to ctx.</td></tr>
+<tr><td><code>Settings::motion</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-motion">189</a></td><td>How much movement is allowed this frame.</td></tr>
+<tr><td><code>Settings::needs_first_run</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-needs_first_run">194</a></td><td>Whether the first-run choice has still to be made.</td></tr>
+<tr><td><code>Settings::persist</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-persist">199</a></td><td>Write the settings out, encrypted and obfuscated as they are at rest.</td></tr>
+<tr><td><code>Settings::save_error</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-save_error">220</a></td><td>Whether the app should open in group mode, and a way to change it.</td></tr>
+<tr><td><code>Settings::show_install_tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-show_install_tab">231</a></td><td>Whether the install tab should be offered at all.</td></tr>
+<tr><td><code>Settings::hide_install_tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-hide_install_tab">236</a></td><td>Whether the install tab is hidden by preference.</td></tr>
+<tr><td><code>Settings::set_hide_install_tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_hide_install_tab">241</a></td><td>Record whether to hide the install tab on a portable copy.</td></tr>
+<tr><td><code>Settings::acceleration</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-acceleration">254</a></td><td>Whether the window asks the platform for a hardware-drawn context.</td></tr>
+<tr><td><code>Settings::set_acceleration</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_acceleration">259</a></td><td>Record whether to ask for acceleration.</td></tr>
+<tr><td><code>Settings::frame_target</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-frame_target">268</a></td><td>How often the window draws while something in it is moving.</td></tr>
+<tr><td><code>Settings::set_frame_target</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_frame_target">273</a></td><td>Record a new frame-rate target.</td></tr>
+<tr><td><code>Settings::show_frame_rate</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-show_frame_rate">283</a></td><td>Whether the header carries a live frame-rate readout.</td></tr>
+<tr><td><code>Settings::always_group</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-always_group">288</a></td><td>Whether the app should open in group mode.</td></tr>
+<tr><td><code>Settings::autolock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-autolock">293</a></td><td>How the autolock is configured, brought into range.</td></tr>
+<tr><td><code>Settings::set_autolock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_autolock">304</a></td><td>Remember an autolock setting.</td></tr>
+<tr><td><code>Settings::seal_with_app_lock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-seal_with_app_lock">317</a></td><td>Whether every recording is sealed with the app-lock passphrase.</td></tr>
+<tr><td><code>Settings::destination</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-destination">322</a></td><td>The remembered encrypted destination, rebuilt from the settings file.</td></tr>
+<tr><td><code>Settings::set_destination</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_destination">331</a></td><td>Remember a destination, including the answer to the hidden question.</td></tr>
+<tr><td><code>Settings::failsafe</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-failsafe">348</a></td><td>The Failsafe posture in force.</td></tr>
+<tr><td><code>Settings::set_failsafe</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_failsafe">353</a></td><td>Record the Failsafe posture.</td></tr>
+<tr><td><code>Settings::notify_style</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-notify_style">362</a></td><td>How notifications should be shown.</td></tr>
+<tr><td><code>Settings::set_notify_style</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_notify_style">367</a></td><td>Record how notifications should be shown.</td></tr>
+<tr><td><code>Settings::live_monitor</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-live_monitor">376</a></td><td>Where the live monitor sits, or whether it is shown.</td></tr>
+<tr><td><code>Settings::set_live_monitor</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_live_monitor">381</a></td><td>Record where the live monitor sits.</td></tr>
+<tr><td><code>Settings::set_always_group</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_always_group">390</a></td><td>Record whether the app should open in group mode.</td></tr>
+<tr><td><code>Settings::set_seal_with_app_lock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_seal_with_app_lock">404</a></td><td>Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.</td></tr>
+<tr><td><code>Settings::interface_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-interface_page">413</a></td><td>Which tabs the window offers.</td></tr>
+<tr><td><code>Settings::toured_tabs</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-toured_tabs">619</a></td><td>The tabs the tour has already covered.</td></tr>
+<tr><td><code>Settings::mark_toured</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-mark_toured">630</a></td><td>Record that the tour has covered these tabs, and save.</td></tr>
+<tr><td><code>Settings::first_run_appearance</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-first_run_appearance">644</a></td><td>The first-run panel: offered once, with animation already on.</td></tr>
+<tr><td><code>Settings::first_run_autolock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-first_run_autolock">671</a></td><td>The autolock switch and delay, for the first-run setup to place.</td></tr>
+<tr><td><code>Settings::finish_first_run</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-finish_first_run">699</a></td><td>Mark the first run answered.</td></tr>
+<tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-tab">706</a></td><td>The settings tab.</td></tr>
+<tr><td><code>Settings::custom_palette_help</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-custom_palette_help">761</a></td><td>Explain where custom palettes go, and say what was refused and why.</td></tr>
+<tr><td><code>Settings::theme_picker</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-theme_picker">840</a></td><td>The colour scheme, as a compact control for the window header.</td></tr>
+<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-appearance_page">866</a></td><td>The appearance page: palette, and what each one changes.</td></tr>
+<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-motion_page">905</a></td><td>The motion page, including honouring the system&#x27;s reduced-motion setting.</td></tr>
+<tr><td><code>Settings::security_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-security_page">1042</a></td><td>Roadmap item 92.</td></tr>
+<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-storage_page">1142</a></td><td>The storage page: where files go, and the portable or installed choice.</td></tr>
+<tr><td><code>section</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-section">1203</a></td><td>A titled group with a one-line explanation under it.</td></tr>
+<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-swatches">1211</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
 </tbody></table>
 </section>
 </div></div>
