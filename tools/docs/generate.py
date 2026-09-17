@@ -3185,7 +3185,8 @@ def is_ours(path):
 # The wiki is one flat namespace, so the exclusion there is a prefix on a file
 # name rather than a directory. That is the price of the wiki's shape, and it
 # is why those pages are named `Source-` and `Guide-` and nothing else is.
-NOT_OURS = ("website/reference/source/", "wiki/Source-", "wiki/Guide-")
+NOT_OURS = ("website/reference/source/", "wiki/Source-", "wiki/Guide-",
+            "wiki/Doc-", "wiki/Home.md", "wiki/_Sidebar.md")
 
 OWNED = ("docs/files", "website/reference", "assets/banners",
          "website/assets/banners", "wiki")
@@ -3298,6 +3299,17 @@ def check(root, files):
     # `wiki/Guide-` is `tools/docs/guides.py`: per-program views of the user
     # guide, which this tool cannot produce because it reads Rust doc
     # comments and those are Markdown. That tool has its own `--check`.
+    #
+    # `wiki/Doc-`, `wiki/Home.md` and `wiki/_Sidebar.md` are
+    # `tools/docs/wiki.py`: the landing page, the sidebar, and the prose
+    # documents converted for a flat namespace. Same reason again, and it is
+    # worth saying how this was found rather than reasoned out. The
+    # regeneration order runs this tool before that one, so the sweep ran
+    # while those pages did not yet exist and nothing complained; `--check`
+    # runs after both and reported all eighteen as pages this generator had
+    # stopped producing. An order that hides a conflict during the write and
+    # reveals it during the check is the right way round, and is why the
+    # check is not a formality.
     for rel in orphans(root, files):
         problems.append("%s: not produced by the generator any more" % rel)
 

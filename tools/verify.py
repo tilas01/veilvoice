@@ -272,6 +272,14 @@ CARGO = [
 def main():
     root = repo_root()
     check_only = "--check" in sys.argv
+    # `--quick` runs everything except the three cargo steps. Those are most of
+    # the wall time and almost none of the failures: what actually reaches CI
+    # red, twice in one afternoon, is a generated file left behind by a commit
+    # that added a source file. The search index walks every text file in the
+    # tree, so adding one and not regenerating is enough. This is the check to
+    # run before a push that touches no Rust; `tools/verify.py` whole is still
+    # the one to run before a release.
+    quick = "--quick" in sys.argv
     failed = []
 
     if not check_only:
@@ -286,8 +294,8 @@ def main():
         stage(root)
         print()
 
-    print("checking")
-    for label, command in CHECKS + CARGO:
+    print("checking" + (", without the cargo steps" if quick else ""))
+    for label, command in CHECKS + ([] if quick else CARGO):
         ok, output = run(root, label, command)
         print("  %-34s %s" % (label, "ok" if ok else "FAILED"))
         if not ok:

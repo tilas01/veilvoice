@@ -59,7 +59,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice, 389 files and 18617 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice, 390 files and 18640 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -68,7 +68,7 @@ nav.top a{margin-right:14px}
 <li><a href="#k-rust">Rust source</a> <span class="meta">161 files</span></li>
 <li><a href="#k-test">Tests and fuzzing</a> <span class="meta">12 files</span></li>
 <li><a href="#k-web">Website</a> <span class="meta">28 files</span></li>
-<li><a href="#k-tool">Tools and generators</a> <span class="meta">91 files</span></li>
+<li><a href="#k-tool">Tools and generators</a> <span class="meta">92 files</span></li>
 <li><a href="#k-build">Build and CI</a> <span class="meta">28 files</span></li>
 <li><a href="#k-legal">Licence and legal</a> <span class="meta">4 files</span></li>
 <li><a href="#k-other">Other</a> <span class="meta">27 files</span></li>
@@ -14452,7 +14452,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">FAQ</span> <span class="meta">line 348</span><br><span class="x">8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A Written and maintained by tilas01 , who holds the copyright. Every change is reviewed, built and tested before release.</span></li>
 </ul>
 </details>
-<h2 id="k-tool">Tools and generators <span class="meta">(91)</span></h2>
+<h2 id="k-tool">Tools and generators <span class="meta">(92)</span></h2>
 <details open>
 <summary><code>assets/generate.py</code> <span class="meta">&middot; assets, 1317 lines, 212 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/assets/generate.py">open generate.py</a></p>
@@ -15204,7 +15204,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>tools/docs/generate.py</code> <span class="meta">&middot; tools, 3327 lines, 400 sections</span></summary>
+<summary><code>tools/docs/generate.py</code> <span class="meta">&middot; tools, 3339 lines, 400 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/tools/docs/generate.py">open generate.py</a></p>
 <ul>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">#!/usr/bin/env python3 # SPDX-License-Identifier: GPL-3.0-or-later &quot;&quot;&quot;Generate a README for every crate, a page for every source file, and the website mirror of both. python tools/docs/generate.py # write the documentation python</span></li>
@@ -16344,7 +16344,27 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>tools/repo/tidy.py</code> <span class="meta">&middot; tools, 134 lines, 20 sections</span></summary>
+<summary><code>tools/repo/message_filter.py</code> <span class="meta">&middot; tools, 71 lines, 14 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/tools/repo/message_filter.py">open message_filter.py</a></p>
+<ul>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">#!/usr/bin/env python3 # SPDX-License-Identifier: GPL-3.0-or-later &quot;&quot;&quot; Rewrite one commit message: roadmap &quot;markers&quot; become &quot;roadmap items&quot;. git filter-branch -f --msg-filter &#x27;python3 tools/repo/message_filter.py&#x27; \ --tag-name-filter cat</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">-- --all # What this is for The roadmap called its entries &quot;markers&quot; for a long time and now calls them roadmap items. The documents were changed; the commit messages describing that work still said marker, and so did the tags pointing at</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">them. It also drops the `Co-Authored-By:` and `Claude-Session:` trailers that survive on the pre-rewrite history a few release tags still point at. This repository&#x27;s commits have one author, and those trailers make GitHub show a second. #</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">What it deliberately does not touch &quot;marker&quot; is a real word and this repository uses it for real things: the session marker written in `app::new`, the hidden-volume marker, and the markers a picture drops. Renaming those would be a wrong</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">answer that looks like a right one, so the test is narrow. A number has to follow, or the phrase has to be one of the counted forms the roadmap commits used (&quot;Nine markers for the recording studio&quot;). Everything else is left exactly as it</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">was. # Why this is a file rather than a one-liner Because it has to be run twice and produce the same thing both times: once in the container where the branches were rewritten, and once on a machine that can push tags, since a proxy that</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">refuses to move a ref refuses to move a tag. Two subtly different sed expressions would produce two different histories. Pure standard library. &quot;&quot;&quot; import re, sys COUNTS =</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">r&quot;(?:One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|Eleven|Twelve|\d+)&quot;</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">def fix(text): # `ROADMAP markers 30 and 31` reads wrong as `ROADMAP roadmap items`. text = re.sub(r&quot;\bROADMAP markers(?=\s+\d)&quot;, &quot;ROADMAP items&quot;, text) text = re.sub(r&quot;\bROADMAP marker(?=\s+\d)&quot;, &quot;ROADMAP item&quot;, text) # A number follows:</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">unambiguously a roadmap entry. text = re.sub(r&quot;\bMarkers(?=\s+\d)&quot;, &quot;Roadmap items&quot;, text) text = re.sub(r&quot;\bmarkers(?=\s+\d)&quot;, &quot;roadmap items&quot;, text) text = re.sub(r&quot;\bMarker(?=\s+\d)&quot;, &quot;Roadmap item&quot;, text) text =</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">re.sub(r&quot;\bmarker(?=\s+\d)&quot;, &quot;roadmap item&quot;, text) # `Nine markers for the recording studio`: counted, so a roadmap entry too. text = re.sub(r&quot;(\b%s)\s+markers\b&quot; % COUNTS, r&quot;\1 roadmap items&quot;, text) text = re.sub(r&quot;(\b%s)\s+Markers\b&quot; %</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">COUNTS, r&quot;\1 Roadmap items&quot;, text) # Attribution trailers that survive only on the pre-rewrite tagged history. out = [] for line in text.split(&quot;\n&quot;): s = line.strip() if s.lower().startswith((&quot;co-authored-by:&quot;, &quot;claude-session:&quot;)):</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">continue if s.startswith(&quot;\U0001F916 Generated with&quot;) or s.startswith(&quot;Generated with [Claude Code]&quot;): continue if s.startswith(&quot;https://claude.ai/code/session_&quot;): continue out.append(line) text = &quot;\n&quot;.join(out) # Collapse the blank lines</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">a stripped trailer leaves at the end. return re.sub(r&quot;\n{3,}$&quot;, &quot;\n&quot;, text.rstrip(&quot;\n&quot;)) + &quot;\n&quot; if __name__ == &quot;__main__&quot;: sys.stdout.write(fix(sys.stdin.read()))</span></li>
+</ul>
+</details>
+<details open>
+<summary><code>tools/repo/tidy.py</code> <span class="meta">&middot; tools, 163 lines, 27 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/tools/repo/tidy.py">open tidy.py</a></p>
 <ul>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">#!/usr/bin/env python3 # SPDX-License-Identifier: GPL-3.0-or-later &quot;&quot;&quot; Branch housekeeping for this repository, run from a machine that can push. # Why this exists rather than a note in a checklist Two things accumulate on the remote and</span></li>
@@ -16361,12 +16381,19 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">[&quot;git&quot;, &quot;merge-base&quot;, &quot;--is-ancestor&quot;, &quot;%s/%s&quot; % (remote, branch), &quot;%s/main&quot; % remote], capture_output=True, text=True) return done.returncode == 0 def last_commit(remote, branch): &quot;&quot;&quot;When this branch was last touched, for the report.&quot;&quot;&quot;</span></li>
 <li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">return git(&quot;log&quot;, &quot;-1&quot;, &quot;--format=%cs %h %s&quot;, &quot;%s/%s&quot; % (remote, branch))</span></li>
 <li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">def main(): parser = argparse.ArgumentParser(description=__doc__.split(&quot;\n&quot;)[1]) parser.add_argument(&quot;--remote&quot;, default=&quot;origin&quot;, help=&quot;the remote to work on&quot;) parser.add_argument(&quot;--go&quot;, action=&quot;store_true&quot;, help=&quot;actually delete;</span></li>
-<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">without it, only say what would go&quot;) args = parser.parse_args() print(&quot;fetching %s&quot; % args.remote) git(&quot;fetch&quot;, args.remote, &quot;--prune&quot;) branches = remote_branches(args.remote) if not branches: print(&quot;nothing but the protected branches on</span></li>
-<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">%s&quot; % args.remote) return 0 merged, unmerged = [], [] for branch in branches: (merged if contained_in_main(args.remote, branch) else unmerged).append(branch) if unmerged: print(&quot;\nleft alone, because they are not contained in main:&quot;) for</span></li>
-<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">branch in sorted(unmerged): print(&quot; %-46s %s&quot; % (branch, last_commit(args.remote, branch))) if not merged: print(&quot;\nnothing to delete&quot;) return 0 print(&quot;\ncontained in main, so deleting loses nothing:&quot;) for branch in sorted(merged): print(&quot;</span></li>
-<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">%-46s %s&quot; % (branch, last_commit(args.remote, branch))) if not args.go: print(&quot;\n%d branch(es) would go. Pass --go to delete them.&quot; % len(merged)) return 0 print() failed = 0</span></li>
-<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">for branch in sorted(merged): done = subprocess.run([&quot;git&quot;, &quot;push&quot;, args.remote, &quot;--delete&quot;, branch], capture_output=True, text=True) if done.returncode == 0: print(&quot; deleted %s&quot; % branch) else: failed += 1 print(&quot; FAILED %s: %s&quot; %</span></li>
-<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">(branch, done.stderr.strip().split(&quot;\n&quot;)[-1])) return 1 if failed else 0 if __name__ == &quot;__main__&quot;: sys.exit(main())</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">without it, only say what would go&quot;) parser.add_argument(&quot;--including&quot;, metavar=&quot;BRANCH&quot;, action=&quot;append&quot;, default=[], help=&quot;also delete this branch even though it is not &quot; &quot;contained in main, naming it explicitly. Repeatable. &quot; &quot;What it</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">would lose is printed first.&quot;) args = parser.parse_args() print(&quot;fetching %s&quot; % args.remote) git(&quot;fetch&quot;, args.remote, &quot;--prune&quot;) branches = remote_branches(args.remote) if not branches: print(&quot;nothing but the protected branches on %s&quot; %</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">args.remote) return 0 merged, unmerged = [], [] for branch in branches: (merged if contained_in_main(args.remote, branch) else unmerged).append(branch) # A branch named explicitly moves from the left-alone list to the delete # list, and</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">what deleting it loses is printed rather than implied. This is # the escape hatch for a branch whose work arrived by another route: a # Dependabot branch whose upgrade was applied by hand, for instance, is # never contained in `main` and</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">is still finished with. named = set(args.including) unknown = named - set(branches) if unknown: print(&quot;no such branch on %s: %s&quot; % (args.remote, &quot;, &quot;.join(sorted(unknown)))) return 1 chosen = [b for b in unmerged if b in named] unmerged =</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">[b for b in unmerged if b not in named] merged += chosen if chosen:</span></li>
+<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">print(&quot;\nnamed explicitly, and NOT contained in main. Deleting these&quot;) print(&quot;loses the commits listed, which exist nowhere else:&quot;) for branch in sorted(chosen): ahead = git(&quot;rev-list&quot;, &quot;--count&quot;, &quot;%s/main..%s/%s&quot; % (args.remote,</span></li>
+<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">args.remote, branch)) print(&quot; %-46s %s commit(s) not in main&quot; % (branch, ahead)) print(&quot; %-46s %s&quot; % (&quot;&quot;, last_commit(args.remote, branch))) if unmerged: print(&quot;\nleft alone, because they are not contained in main:&quot;) for branch in</span></li>
+<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">sorted(unmerged): print(&quot; %-46s %s&quot; % (branch, last_commit(args.remote, branch))) if not merged: print(&quot;\nnothing to delete&quot;) return 0 contained = [b for b in merged if b not in named] if contained: print(&quot;\ncontained in main, so deleting</span></li>
+<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">loses nothing:&quot;) for branch in sorted(contained): print(&quot; %-46s %s&quot; % (branch, last_commit(args.remote, branch))) if not args.go: print(&quot;\n%d branch(es) would go. Pass --go to delete them.&quot; % len(merged)) return 0 print() failed = 0 for</span></li>
+<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">branch in sorted(merged): done = subprocess.run([&quot;git&quot;, &quot;push&quot;, args.remote, &quot;--delete&quot;, branch], capture_output=True, text=True) if done.returncode == 0: print(&quot; deleted %s&quot; % branch) else: failed += 1 print(&quot; FAILED %s: %s&quot; % (branch,</span></li>
+<li><span class="sec">line 121</span> <span class="meta">line 121</span><br><span class="x">done.stderr.strip().split(&quot;\n&quot;)[-1])) return 1 if failed else 0</span></li>
+<li><span class="sec">line 161</span> <span class="meta">line 161</span><br><span class="x">if __name__ == &quot;__main__&quot;: sys.exit(main())</span></li>
 </ul>
 </details>
 <details open>
@@ -18808,7 +18835,7 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
-<summary><code>tools/verify.py</code> <span class="meta">&middot; tools, 308 lines, 69 sections</span></summary>
+<summary><code>tools/verify.py</code> <span class="meta">&middot; tools, 316 lines, 71 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/tools/verify.py">open verify.py</a></p>
 <ul>
 <li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">#!/usr/bin/env python3 # SPDX-License-Identifier: GPL-3.0-or-later &quot;&quot;&quot;Regenerate everything generated, then run every check, in the right order. python tools/verify.py # regenerate, then check python tools/verify.py --check # check only,</span></li>
@@ -18875,11 +18902,13 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">page says where it lives, and the sitemap lists it&quot;, [sys.executable, &quot;tools/site/seo.py&quot;, &quot;--check&quot;]), (&quot;search index matches the tree&quot;, [sys.executable, &quot;tools/search-index/generate.py&quot;, &quot;--check&quot;]), (&quot;measured numbers match the tree&quot;,</span></li>
 <li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">[sys.executable, &quot;tools/measured/generate.py&quot;, &quot;--check&quot;]), (&quot;the line counter is right about what a line is&quot;, [sys.executable, &quot;tools/loc/count.py&quot;, &quot;--self-test&quot;]), (&quot;website suites&quot;, [&quot;node&quot;, &quot;tools/site-tests/run.js&quot;]), (&quot;the local</span></li>
 <li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">site serves every page&quot;, [sys.executable, &quot;tools/site/serve.py&quot;, &quot;--check&quot;]), ] CARGO = [ (&quot;formatting&quot;, [&quot;cargo&quot;, &quot;fmt&quot;, &quot;--all&quot;, &quot;--check&quot;]), (&quot;clippy&quot;, [&quot;cargo&quot;, &quot;clippy&quot;, &quot;--workspace&quot;, &quot;--all-targets&quot;]), (&quot;tests&quot;, [&quot;cargo&quot;, &quot;test&quot;,</span></li>
-<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">&quot;--workspace&quot;]), ] def main(): root = repo_root() check_only = &quot;--check&quot; in sys.argv failed = [] if not check_only: print(&quot;regenerating, in dependency order&quot;) for label, command in GENERATORS: stage(root) # so the walk sees anything</span></li>
-<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">written by the step before</span></li>
-<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">ok, output = run(root, label, command) print(&quot; %-16s %s&quot; % (label, &quot;ok&quot; if ok else &quot;FAILED&quot;)) if not ok: print(output) failed.append(label) stage(root) print() print(&quot;checking&quot;) for label, command in CHECKS + CARGO: ok, output = run(root,</span></li>
-<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">label, command) print(&quot; %-34s %s&quot; % (label, &quot;ok&quot; if ok else &quot;FAILED&quot;)) if not ok: failed.append(label) for line in output.strip().splitlines()[-25:]: print(&quot; &quot; + line) print() if failed: print(&quot;%d check(s) failed: %s&quot; % (len(failed), &quot;,</span></li>
-<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">&quot;.join(failed))) return 1 print(&quot;everything regenerated and every check passed&quot;) return 0 if __name__ == &quot;__main__&quot;: sys.exit(main())</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">&quot;--workspace&quot;]), ] def main(): root = repo_root() check_only = &quot;--check&quot; in sys.argv # `--quick` runs everything except the three cargo steps. Those are most of # the wall time and almost none of the failures: what actually reaches CI #</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">red, twice in one afternoon, is a generated file left behind by a commit # that added a source file. The search index walks every text file in the # tree, so adding one and not regenerating is enough. This is the check to # run before a</span></li>
+<li><span class="sec">line 241</span> <span class="meta">line 241</span><br><span class="x">push that touches no Rust; `tools/verify.py` whole is still</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x"># the one to run before a release. quick = &quot;--quick&quot; in sys.argv failed = [] if not check_only: print(&quot;regenerating, in dependency order&quot;) for label, command in GENERATORS: stage(root) # so the walk sees anything written by the step before</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">ok, output = run(root, label, command) print(&quot; %-16s %s&quot; % (label, &quot;ok&quot; if ok else &quot;FAILED&quot;)) if not ok: print(output) failed.append(label) stage(root) print() print(&quot;checking&quot; + (&quot;, without the cargo steps&quot; if quick else &quot;&quot;)) for label,</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">command in CHECKS + ([] if quick else CARGO): ok, output = run(root, label, command) print(&quot; %-34s %s&quot; % (label, &quot;ok&quot; if ok else &quot;FAILED&quot;)) if not ok: failed.append(label) for line in output.strip().splitlines()[-25:]: print(&quot; &quot; + line)</span></li>
+<li><span class="sec">line 281</span> <span class="meta">line 281</span><br><span class="x">print() if failed: print(&quot;%d check(s) failed: %s&quot; % (len(failed), &quot;, &quot;.join(failed))) return 1 print(&quot;everything regenerated and every check passed&quot;) return 0 if __name__ == &quot;__main__&quot;: sys.exit(main())</span></li>
 </ul>
 </details>
 <h2 id="k-build">Build and CI <span class="meta">(28)</span></h2>
