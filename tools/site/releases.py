@@ -140,6 +140,10 @@ DOCS = [
     ("PACKAGING.md", "The deb, the RPM, the AUR recipe and the rest", None),
     ("USING_THE_CRATES.md", "Using VeilVoice as a library", None),
     ("AUDIT.md", "Every defect found and fixed, in order", None),
+    # GitHub reads a security policy from the root, `.github/` or `docs/`, and
+    # this is the one of the three where the rest of the documents already live,
+    # so the table below needs no exception for it.
+    ("SECURITY.md", "Reporting a vulnerability, and what counts as one", None),
 ]
 FIGURE_HTML = (
     '<figure class="shot">'

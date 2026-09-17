@@ -777,6 +777,12 @@ side of that line they fall on rather than leaving the claim to do the work. Eve
 the ones earlier rounds had declared clean, in
 [`docs/AUDIT.md`](docs/AUDIT.md).
 
+**Found something?** Report it privately through
+[GitHub's security advisories](https://github.com/tilas01/veilvoice/security/advisories/new)
+rather than as a public issue. [`docs/SECURITY.md`](docs/SECURITY.md) says what
+counts as a vulnerability here, what is a documented limitation rather than
+one, and why there is no PGP address to send it to.
+
 Using it: [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), or
 [the wiki](https://tilas01.github.io/veilvoice/wiki.html).
 Roadmap and open work: [`ROADMAP.md`](ROADMAP.md).

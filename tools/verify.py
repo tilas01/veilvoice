@@ -192,6 +192,12 @@ CHECKS = [
     # build rather than in a pass somebody runs before every commit.
     ("every feature selection a release builds is still declared",
      [sys.executable, "tools/audit/features.py"]),
+    # A tag is a label, not a version: whoever owns the action can move it, and
+    # two of the ones here were branches rather than tags. An unpinned action
+    # runs whatever it points at that morning, on a runner holding a checkout
+    # and a token.
+    ("every action a workflow runs is pinned to a commit",
+     [sys.executable, "tools/audit/actions.py"]),
     # F-170. The tag a release publishes must name the commit that was built,
     # or the reproducibility every other check exists to support is a claim
     # about a different tree than the one somebody would check out.
