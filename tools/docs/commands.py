@@ -159,8 +159,16 @@ NOTES = {
         "use": "Writes down what VeilVoice's own files should look like, then "
                "checks later that they still do. It notices changes and does "
                "not prevent them, and says so on every path through it.",
-        "window": ("lock", "the integrity report under the **Lock** tab, "
-                   "which reads the same record"),
+        "window": ("lock", "the **Lock** tab, and the window does this for "
+                   "itself: a record is taken at the first launch that finds "
+                   "none, checked at every launch after, and sealed under the "
+                   "app-lock passphrase when there is one, which is the one "
+                   "moment that passphrase exists. With no app lock the record "
+                   "is written in the clear and the tab says so, because "
+                   "sealing it under a key kept beside it would be a "
+                   "decoration rather than a protection. This command is how "
+                   "you take one deliberately, seal it with a passphrase of "
+                   "its own, and check it from a script"),
         "example": "veilvoice guard init --sealed",
     },
     "lock": {

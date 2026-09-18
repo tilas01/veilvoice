@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/tour.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 299 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 329 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs)
 
 ## Contents
 
@@ -60,19 +60,19 @@ to anything.
 
 ## What this file contains
 
-299 lines defining **6 functions** (6 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+329 lines defining **6 functions** (6 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Tour` (line 119) -- Where the tour is up to.
+- `struct Tour` (line 122) -- Where the tour is up to.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `all_keys` (line 127) -- Every tab key the tour knows, for storing once it has run.
-- `Tour::start` (line 133) -- Start the tour from the beginning, showing every card.
-- `Tour::start_new_only` (line 142) -- Start it showing only the cards whose tabs are not in known.
-- `Tour::running` (line 157) -- Whether the tour is on screen.
-- `Tour::panel` (line 171) -- Draw the current card.
+- `all_keys` (line 130) -- Every tab key the tour knows, for storing once it has run.
+- `Tour::start` (line 136) -- Start the tour from the beginning, showing every card.
+- `Tour::start_new_only` (line 145) -- Start it showing only the cards whose tabs are not in known.
+- `Tour::running` (line 160) -- Whether the tour is on screen.
+- `Tour::panel` (line 174) -- Draw the current card.
   - reaches: `stop`
 
 ## What calls what
@@ -95,19 +95,19 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_all_keys(["all_keys<br/>line 127"])
-    n_start(["Tour::start<br/>line 133"])
-    n_start_new_only(["Tour::start_new_only<br/>line 142"])
-    n_running(["Tour::running<br/>line 157"])
-    n_stop["Tour::stop<br/>line 162"]
-    n_panel(["Tour::panel<br/>line 171"])
+    n_all_keys(["all_keys<br/>line 130"])
+    n_start(["Tour::start<br/>line 136"])
+    n_start_new_only(["Tour::start_new_only<br/>line 145"])
+    n_running(["Tour::running<br/>line 160"])
+    n_stop["Tour::stop<br/>line 165"]
+    n_panel(["Tour::panel<br/>line 174"])
     n_panel --> n_stop
-    click n_all_keys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L127" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L133" "open the source"
-    click n_start_new_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L142" "open the source"
-    click n_running href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L157" "open the source"
-    click n_stop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L162" "open the source"
-    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L171" "open the source"
+    click n_all_keys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L130" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L136" "open the source"
+    click n_start_new_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L145" "open the source"
+    click n_running href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L160" "open the source"
+    click n_stop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L165" "open the source"
+    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L174" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_all_keys,n_start,n_start_new_only,n_running,n_panel entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -121,13 +121,13 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `CARDS` <sub>pub const</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L46) | One card: the tab it is about, and what that tab is for. |
-| `Tour` <sub>pub struct</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L119) | Where the tour is up to. |
-| `all_keys` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L127) | Every tab key the tour knows, for storing once it has run. |
-| `Tour::start` <sub>pub fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L133) | Start the tour from the beginning, showing every card. |
-| `Tour::start_new_only` <sub>pub fn</sub> | [142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L142) | Start it showing only the cards whose tabs are not in known. |
-| `Tour::running` <sub>pub fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L157) | Whether the tour is on screen. |
-| `Tour::stop` <sub>pub fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L162) | Stop it. |
-| `Tour::panel` <sub>pub fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L171) | Draw the current card. |
+| `Tour` <sub>pub struct</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L122) | Where the tour is up to. |
+| `all_keys` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L130) | Every tab key the tour knows, for storing once it has run. |
+| `Tour::start` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L136) | Start the tour from the beginning, showing every card. |
+| `Tour::start_new_only` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L145) | Start it showing only the cards whose tabs are not in known. |
+| `Tour::running` <sub>pub fn</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L160) | Whether the tour is on screen. |
+| `Tour::stop` <sub>pub fn</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L165) | Stop it. |
+| `Tour::panel` <sub>pub fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L174) | Draw the current card. |
 
 ---
 
