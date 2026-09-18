@@ -1382,6 +1382,68 @@ are recorded here rather than edited out of history.
 
 ---
 
+## The order the rest is being done in, and when a version is cut
+
+Fourteen items are planned. They are not independent, and doing them in
+roadmap-number order would be wrong: some are plumbing everything else rides
+on, two families have to be built bottom-up, and two cannot be finished on this
+side of the maintainer's own machine at all. So the order is written down.
+
+**A version is cut when a group below is finished and audited**, not on a date.
+That means the items in the group are done, `tools/verify.py` passes whole
+rather than `--quick`, the screenshots and the recorded sessions have been
+retaken if the interface moved, `CHANGELOG.md` has the notes, and an audit
+round has read what changed and written itself up in `docs/AUDIT.md`. Then
+`dev` merges into `main`, the tag is made at that commit, and the release
+workflow builds it.
+
+### Next: v0.1.23, the documentation and the two buttons
+
+Roadmap item 165 first, because it is plumbing rather than a feature and everything
+after it wants to be testable by somebody who is not waiting for a release: the
+same reproducible signed archives from `dev` under a prerelease tag. The first
+such build is the proof that it works.
+
+Then roadmap item 142's shape of thing, the small corrections that have been waiting:
+the integrity record taken at first run, and the last of the functions with no
+doc comment. Cut v0.1.23 when the audit round over everything since v0.1.22
+is written up.
+
+### Then: v0.1.24, verification for anybody
+
+Roadmap items 164, then 163, then 155, in that order and for one reason: **163 and 155
+are the same mechanism**. Fetching a named build of somebody else's software
+and checking it against a published hash before running it is what 163 does at
+launch for ffmpeg and GnuPG, and what 155 does per platform for every companion.
+Building 163 as the front end of that mechanism means 155 is the rest of the
+table rather than a second implementation. 164 comes first because it needs
+nothing from either and is the one a reader feels immediately.
+
+### Then: v0.1.25, the window everywhere, and less of it
+
+Roadmap items 162 and 149. The first gives `veilvoice-gui` the `live` feature the
+command line already has, so the window builds where `cpal` has no backend, and
+adds the FreeBSD job. The second takes a whole OpenPGP implementation out of
+the dependency graph for the sake of one signature check. Both are build-level
+changes that want one audit round between them and a release.
+
+### Then: v0.2.0, memory
+
+Roadmap items 113, 114, 115, 118, 119 and 120, bottom-up and in that order, because each
+is built on the one before it: state sealed in memory, then a layout that
+differs per build, then noticing a process that reads it, then reporting every
+attempt rather than every success, then a verdict the person decides on, then
+an allowlist that a name alone cannot satisfy. Six items and a family of
+platform-specific code is a minor version rather than a patch, and it deserves
+an audit round of its own.
+
+### Waiting on something other than effort
+
+Roadmap item 107, VeilVoice on a phone, needs an NDK in the release build and a signing
+key; roadmap item 146 is the audited release itself, which is the process above rather
+than a separate piece of work. Both are named in *The things that are not just
+work* below.
+
 ## How to read the estimates
 
 They assume one person, working days, and no interruptions, so the calendar
