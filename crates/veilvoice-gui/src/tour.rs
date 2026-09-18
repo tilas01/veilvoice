@@ -86,7 +86,10 @@ pub const CARDS: &[(&str, &str, &str)] = &[
         "Lock",
         "A passphrase on this application, separate from the one on any \
          recording. Worth what a lock on a drawer is worth: it stops somebody \
-         at your keyboard, not somebody with your disk.",
+         at your keyboard, not somebody with your disk. This tab also shows \
+         what VeilVoice's own files looked like when it first ran, and whether \
+         they still do. That record is taken without being asked for, and is \
+         sealed with your passphrase if you set one here.",
     ),
     (
         "verify",
@@ -240,6 +243,33 @@ impl Tour {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The lock card says the integrity record is taken for you, and the
+    /// window is what takes it.
+    ///
+    /// Both halves, because a sentence in a tour is a promise about behaviour
+    /// and this one was written the day the behaviour it describes had been
+    /// there for four releases with nothing telling anybody. If the start in
+    /// `app.rs` is ever removed, the card is left claiming something untrue to
+    /// every new reader, which is the failure this checks for.
+    #[test]
+    fn the_lock_card_promises_what_the_window_actually_does() {
+        let card = CARDS
+            .iter()
+            .find(|(tab, _, _)| *tab == "lock")
+            .expect("a card for the lock tab");
+        assert!(
+            card.2.contains("record"),
+            "the lock card no longer mentions the integrity record: {}",
+            card.2
+        );
+        let app = include_str!("app.rs");
+        assert!(
+            app.contains("app.integrity.start(None)"),
+            "nothing starts the integrity record at launch any more, and the \
+             tour still tells every new reader that one was taken"
+        );
+    }
 
     #[test]
     fn every_card_has_a_sentence_and_no_two_share_a_tab() {
