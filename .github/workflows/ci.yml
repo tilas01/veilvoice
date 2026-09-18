@@ -7,7 +7,16 @@ name: ci
 
 on:
   push:
-    branches: [main]
+    # Both branches, and `dev` is the one that matters day to day.
+    #
+    # Development moved off `main` (roadmap item 125) and this list did not move
+    # with it, so for as long as that was true every push of actual work ran
+    # **no CI at all**: the only things checked were a pull request and the
+    # merge that cuts a release, which is the last moment anybody wants to
+    # discover that Windows does not build. A branch policy that turns the
+    # checks off is not a branch policy, and nothing reported it because a
+    # workflow that does not run produces no failure.
+    branches: [main, dev]
   pull_request:
   workflow_dispatch:
 
