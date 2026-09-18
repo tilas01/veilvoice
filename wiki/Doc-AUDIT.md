@@ -504,6 +504,42 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-197: a branch policy that turned the checks off
+
+Development moved off `main` onto `dev`, which is roadmap item 125 and is right: a
+public branch should hold what has been released rather than whatever is
+half-finished. `ci.yml` said:
+
+    on:
+      push:
+        branches: [main]
+
+and nothing moved it. So from the moment development moved, **every push of
+real work ran no continuous integration at all.** What still ran was a pull
+request, and the merge that cuts a release, which is the last moment anybody
+wants to find out that Windows does not build or that a generated file is
+stale.
+
+**Nothing reported it, and nothing could.** A workflow that does not run
+produces no failure, no red cross and no notification; the commit list simply
+has no checks beside it, which looks the same as a repository that has none.
+This is the second time this shape has been written up here, and it is worth
+naming as a shape rather than as an instance: F-176 and F-177 were checks that
+existed and were not wired into CI, and this is CI itself wired to the wrong
+branch. The common property is that the *absence* of a check is invisible,
+where the failure of one is loud.
+
+The branch list is `[main, dev]` now, with the reason written beside it so the
+next person to change a branch policy sees what else has to change with it.
+
+The two workflows that were right to leave alone are `pages.yml` and
+`wiki.yml`, which publish from `main` only: what is published describes what
+has been released, and the site also redeploys after a successful release run
+because a release changes the download page, the releases page and the verify
+page at once. That is deliberate, and it is now written in
+`docs/CONTRIBUTING.md` beside the branch policy rather than being a property
+somebody would have to infer from two workflow files.
+
 ### F-196: two halves of one idea, at three different sizes
 
 Reported by the person who uses the window, after F-178: the unlock button on
@@ -7713,7 +7749,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and ninety-six defects found and fixed (F-1 to F-196), across
+**One hundred and ninety-seven defects found and fixed (F-1 to F-197), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

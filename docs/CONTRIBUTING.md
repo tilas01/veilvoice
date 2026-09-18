@@ -104,6 +104,36 @@ is written as a habit and the others are guards.
   place by recording the decision somebody would otherwise have to re-derive,
   and the reason a plausible alternative was not taken.
 
+## Branches, and when a version is cut
+
+**Two branches, and there is never a third.** `dev` is where development
+happens; `main` is what has been released.
+
+| | `dev` | `main` |
+|---|---|---|
+| What it holds | every change, as it is made | the released program |
+| Who pushes to it | anybody working on VeilVoice | only a release merge |
+| CI | runs on every push | runs on every push |
+| The website and the wiki | not published from here | published from here |
+| Tags | `v0.1.23-beta.1`, marked prerelease | `v0.1.23` |
+
+Work is committed and pushed to `dev`. `main` moves when a release is cut, by
+merging `dev` into it and tagging that merge; the release workflow builds the
+tag, and the site redeploys when it finishes.
+
+An early build is a tag rather than a branch: the same source, the same
+workflow, the same signing and the same hash lists, published as a prerelease
+so the download page never offers it by default. Roadmap item 165 is the rest
+of that work.
+
+**A version is cut when a group of changes is finished and audited**, not on a
+date. In practice that means: the roadmap items in the group are done, a
+`tools/verify.py` run passes whole rather than `--quick`, the screenshots and
+the recorded sessions have been retaken if the interface moved, `CHANGELOG.md`
+has the notes, and an audit round has read what changed. `docs/AUDIT.md`
+records that round; the release notes are derived from `CHANGELOG.md` and
+nothing hand-copies them anywhere.
+
 ## Commits
 
 Write the message for somebody reading it in two years with no memory of the
