@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/app.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 3584 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 3593 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
 
 ## Contents
 
@@ -155,7 +155,7 @@ started on another thread and the answer is collected later.
 
 ## What this file contains
 
-3584 lines defining **34 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+3593 lines defining **34 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -306,10 +306,10 @@ flowchart TD
 | `VeilVoiceApp::watch_tab` <sub>fn</sub> | [2482](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2482) | Draw the Watch tab: what is recording the screen, and what is allowed to. |
 | `VeilVoiceApp::report_a_fault` <sub>fn</sub> | [2572](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2572) | Say so if the last run ended badly, and offer the file. |
 | `VeilVoiceApp::about_tab` <sub>fn</sub> | [2589](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2589) | Draw the About tab: versions, where files live, and the companion list. |
-| `paths_section` <sub>fn</sub> | [2719](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2719) | Where this copy is keeping things, on this machine. |
-| `device_picker` <sub>fn</sub> | [2779](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2779) | A dropdown of devices that keeps working when the chosen one disappears. |
-| `field` <sub>fn</sub> | [2805](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2805) | One labelled read-only value, in the shape the About tab uses throughout. |
-| `header_layout_tests` <sub>mod</sub> | [2813](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2813) |  |
+| `paths_section` <sub>fn</sub> | [2728](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2728) | Where this copy is keeping things, on this machine. |
+| `device_picker` <sub>fn</sub> | [2788](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2788) | A dropdown of devices that keeps working when the chosen one disappears. |
+| `field` <sub>fn</sub> | [2814](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2814) | One labelled read-only value, in the shape the About tab uses throughout. |
+| `header_layout_tests` <sub>mod</sub> | [2822](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2822) |  |
 
 ---
 

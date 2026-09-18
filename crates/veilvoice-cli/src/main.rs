@@ -3072,6 +3072,20 @@ fn shred(file: PathBuf, passes: u8, yes: bool) -> Result<(), String> {
 fn info() {
     println!("{}", heading("VeilVoice"));
     println!("{}", field("Version", env!("CARGO_PKG_VERSION")));
+    // **Roadmap item 165.** Which stream this build came from, read from the version
+    // it carries rather than from anything compiled in: a prerelease version
+    // *is* a prerelease, so the binary stays a pure function of its source and
+    // the reproducibility instructions need no extra input.
+    {
+        let channel = veilvoice_setup::update::Channel::of(env!("CARGO_PKG_VERSION"));
+        println!(
+            "{}",
+            field(
+                "Release channel",
+                &format!("{} ({})", channel.label(), channel.describe())
+            )
+        );
+    }
     println!("{}", field("Engine", veilvoice_core::VERSION));
     println!("{}", field("Crypto", veilvoice_crypto::VERSION));
     println!("{}", field("Audio", veilvoice_audio::VERSION));

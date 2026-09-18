@@ -2589,6 +2589,15 @@ impl VeilVoiceApp {
     fn about_tab(&mut self, ui: &mut egui::Ui) {
         ui.add_space(4.0);
         field(ui, "app", env!("CARGO_PKG_VERSION"));
+        // **Roadmap item 165.** Which stream this build came from. Read from the
+        // version it carries: a prerelease version *is* a prerelease, so
+        // nothing is compiled in for this and a rebuilder needs no extra
+        // input to reproduce the binary. The update check reads the same
+        // thing and looks along the same stream.
+        {
+            let channel = veilvoice_setup::update::Channel::of(env!("CARGO_PKG_VERSION"));
+            field(ui, "channel", channel.label());
+        }
         field(ui, "engine", veilvoice_core::VERSION);
         field(ui, "audio", veilvoice_audio::VERSION);
         field(ui, "metadata", veilvoice_meta::VERSION);

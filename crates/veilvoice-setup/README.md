@@ -107,7 +107,7 @@ flowchart TD
     n_companions["companions.rs<br/>1088 lines"]
     n_install["install.rs<br/>594 lines"]
     n_space["space.rs<br/>171 lines"]
-    n_update["update.rs<br/>581 lines"]
+    n_update["update.rs<br/>893 lines"]
     n_volumes["volumes.rs<br/>580 lines"]
     n_volumes --> n_companions
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
@@ -128,10 +128,10 @@ flowchart TD
 | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 594 | Put this program somewhere the system can find it. |
 | [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 171 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | 171 | How much room is actually free where VeilVoice keeps things. |
-| [`update.rs`](../../docs/files/veilvoice-setup/update.md) | 581 | Ask, only when told to, whether a newer VeilVoice release exists. |
+| [`update.rs`](../../docs/files/veilvoice-setup/update.md) | 893 | Ask, only when told to, whether a newer VeilVoice release exists. |
 | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**2,073 functional lines of Rust** in this crate. A functional line is a line
+**2,264 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -165,6 +165,7 @@ counts blank lines and comments too. Both are produced by
 | `const LATEST_URL` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | The page fetched. |
 | `const RELEASES_URL` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | Where releases are listed, for somebody doing this by hand. |
 | `const TIMEOUT` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | How long the transfer tool is given before it is given up on. |
+| `enum Channel` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | Which stream of releases a build came from. |
 | `enum Verdict` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | How this build's version compares with the newest published one. |
 | `struct Report` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | What a check found. |
 | `enum Error` | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | Why a check could not be completed. |

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/updates.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 246 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 268 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs)
 
 ## Contents
 
@@ -57,7 +57,7 @@ release page says.
 
 ## What this file contains
 
-246 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+268 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -93,7 +93,7 @@ flowchart TD
     n_drain(["Updates::drain<br/>line 60"])
     n_start["Updates::start<br/>line 78"]
     n_section(["Updates::section<br/>line 95"])
-    n_verdict["Updates::verdict<br/>line 144"]
+    n_verdict["Updates::verdict<br/>line 151"]
     n_section --> n_is_busy
     n_section --> n_start
     n_section --> n_verdict
@@ -101,7 +101,7 @@ flowchart TD
     click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L60" "open the source"
     click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L78" "open the source"
     click n_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L95" "open the source"
-    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L144" "open the source"
+    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L151" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_drain,n_section entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -121,7 +121,7 @@ flowchart TD
 | `Updates::drain` <sub>pub fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L60) | Take the worker's answer if it has one. |
 | `Updates::start` <sub>fn</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L78) | Start a check. |
 | `Updates::section` <sub>pub fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L95) | The whole section, as it appears under "about". |
-| `Updates::verdict` <sub>fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L144) | The answer itself, in the colour it deserves. |
+| `Updates::verdict` <sub>fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L151) | The answer itself, in the colour it deserves. |
 
 ---
 

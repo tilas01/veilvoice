@@ -187,6 +187,27 @@ system's own transfer tool to fetch one small file, and reads a version number
 out of what it printed. It is a button, it is never automatic, and the command
 line has no such feature at all.
 
+**It looks along the stream this copy came from**, and says which. There are
+two, and they are the same program built the same way:
+
+| | Stable | Early |
+|---|---|---|
+| Version looks like | `0.1.23` | `0.1.23-beta.1` |
+| Cut from | `main` | `dev` |
+| On the releases page | a release | marked a prerelease |
+| Offered by the download page | yes | no, deliberately |
+
+An early build is the same reproducible archive, signed with the same key, with
+the same hash lists and the same contents manifest; it is newer and it has been
+used by fewer people. Nothing about it is less checkable. The check never moves
+you from one stream to the other: a stable copy is not told about a prerelease,
+and an early copy is compared against the newest release of either kind, so the
+day `0.1.23` is published somebody running `0.1.23-beta.1` is told about it.
+
+Which stream a copy belongs to is read from the version it carries rather than
+compiled in, so the binary stays a pure function of its source and rebuilding
+it needs nothing extra. `veilvoice info` prints it, and so does the About tab.
+
 The tool is found by **absolute path**, never through `PATH`. On Windows that
 is `%SystemRoot%\System32\curl.exe`, which has shipped with Windows since
 2018. Elsewhere it is `curl` at `/usr/bin`, `/bin` or `/usr/local/bin`, and

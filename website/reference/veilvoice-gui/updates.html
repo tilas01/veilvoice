@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/updates.svg" alt="updates.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/updates.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 246 lines &middot; <a href="updates.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 268 lines &middot; <a href="updates.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#it-runs-on-a-thread-and-the-window-never-waits-for-it">It runs on a thread, and the window never waits for it</a>
@@ -89,7 +89,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>246 lines defining <strong>5 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>268 lines defining <strong>5 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Updates</code> <span style="color:var(--muted)">line 42</span> &middot; The panel&#x27;s state.</li>
 </ul>
@@ -140,7 +140,7 @@
 <a href="updates.src.html#fn-updates-verdict">
 <rect x="194.8" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="273.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Updates::verdict</text>
-<text x="273.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 144</text>
+<text x="273.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 151</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -163,7 +163,7 @@ flowchart TD
     n_drain([&quot;Updates::drain&lt;br/&gt;line 60&quot;])
     n_start[&quot;Updates::start&lt;br/&gt;line 78&quot;]
     n_section([&quot;Updates::section&lt;br/&gt;line 95&quot;])
-    n_verdict[&quot;Updates::verdict&lt;br/&gt;line 144&quot;]
+    n_verdict[&quot;Updates::verdict&lt;br/&gt;line 151&quot;]
     n_section --&gt; n_is_busy
     n_section --&gt; n_start
     n_section --&gt; n_verdict
@@ -171,7 +171,7 @@ flowchart TD
     click n_drain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L60&quot; &quot;open the source&quot;
     click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L78&quot; &quot;open the source&quot;
     click n_section href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L95&quot; &quot;open the source&quot;
-    click n_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L144&quot; &quot;open the source&quot;
+    click n_verdict href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L151&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_drain,n_section entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -189,7 +189,7 @@ flowchart TD
 <tr><td><code>Updates::drain</code> <sub>pub fn</sub></td><td><a href="updates.src.html#fn-updates-drain">60</a></td><td>Take the worker&#x27;s answer if it has one.</td></tr>
 <tr><td><code>Updates::start</code> <sub>fn</sub></td><td><a href="updates.src.html#fn-updates-start">78</a></td><td>Start a check.</td></tr>
 <tr><td><code>Updates::section</code> <sub>pub fn</sub></td><td><a href="updates.src.html#fn-updates-section">95</a></td><td>The whole section, as it appears under &quot;about&quot;.</td></tr>
-<tr><td><code>Updates::verdict</code> <sub>fn</sub></td><td><a href="updates.src.html#fn-updates-verdict">144</a></td><td>The answer itself, in the colour it deserves.</td></tr>
+<tr><td><code>Updates::verdict</code> <sub>fn</sub></td><td><a href="updates.src.html#fn-updates-verdict">151</a></td><td>The answer itself, in the colour it deserves.</td></tr>
 </tbody></table>
 </section>
 </div></div>
