@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-setup/src/update.rs`
 
-[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 581 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs)
+[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 893 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs)
 
 ## Contents
 
@@ -82,20 +82,25 @@ anything.
 
 ## What this file contains
 
-581 lines defining **8 functions** (4 public), **4 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+893 lines defining **13 functions** (8 public), **6 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Verdict` (line 93) -- How this build's version compares with the newest published one.
-- `struct Report` (line 110) -- What a check found.
-- `enum Error` (line 134) -- Why a check could not be completed.
-- `struct Tool` (line 269) -- Where a transfer tool was found, and how to drive it.
+- `enum Channel` (line 106) -- Which stream of releases a build came from.
+- `enum Verdict` (line 163) -- How this build's version compares with the newest published one.
+- `struct Report` (line 180) -- What a check found.
+- `enum Error` (line 206) -- Why a check could not be completed.
+- `struct Version` (line 283) -- A version, in the only shape this project publishes.
+- `struct Tool` (line 433) -- Where a transfer tool was found, and how to drive it.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Report::caveat` (line 125) -- What this answer is worth, in the words the user should see.
-- `check` (line 171) -- Ask whether anything newer than current has been published.
-  - reaches: `fetch`, `find_tool`, `report`, `tag_in`, `parse`
+- `Channel::label` (line 124) -- The word for it, for a line somebody reads.
+- `Channel::describe` (line 132) -- One sentence saying what this stream is, shown beside the label.
+- `Channel::url` (line 153) -- The page an update check reads for this stream.
+- `Report::caveat` (line 197) -- What this answer is worth, in the words the user should see.
+- `check` (line 243) -- Ask whether anything newer than current has been published.
+  - reaches: `fetch`, `find_tool`, `of`, `report`, `tag_in`, `parse`, `precedence`
 
 ## What calls what
 
@@ -111,33 +116,47 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_caveat(["Report::caveat<br/>line 125"])
-    n_fmt["Error::fmt<br/>line 144"]
-    n_check(["check<br/>line 171"])
-    n_report["report<br/>line 182"]
-    n_parse["parse<br/>line 208"]
-    n_tag_in["tag_in<br/>line 243"]
-    n_find_tool["find_tool<br/>line 275"]
-    n_fetch["fetch<br/>line 313"]
+    n_of["Channel::of<br/>line 116"]
+    n_label(["Channel::label<br/>line 124"])
+    n_describe(["Channel::describe<br/>line 132"])
+    n_url(["Channel::url<br/>line 153"])
+    n_caveat(["Report::caveat<br/>line 197"])
+    n_fmt["Error::fmt<br/>line 216"]
+    n_check(["check<br/>line 243"])
+    n_report["report<br/>line 259"]
+    n_parse["parse<br/>line 301"]
+    n_precedence["precedence<br/>line 357"]
+    n_tag_in["tag_in<br/>line 407"]
+    n_find_tool["find_tool<br/>line 439"]
+    n_fetch["fetch<br/>line 480"]
     n_check --> n_fetch
     n_check --> n_find_tool
+    n_check --> n_of
     n_check --> n_report
     n_check --> n_tag_in
+    n_of --> n_parse
+    n_report --> n_of
     n_report --> n_parse
-    click n_caveat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L125" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L144" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L171" "open the source"
-    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L182" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L208" "open the source"
-    click n_tag_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L243" "open the source"
-    click n_find_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L275" "open the source"
-    click n_fetch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L313" "open the source"
+    n_report --> n_precedence
+    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L116" "open the source"
+    click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L124" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L132" "open the source"
+    click n_url href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L153" "open the source"
+    click n_caveat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L197" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L216" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L243" "open the source"
+    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L259" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L301" "open the source"
+    click n_precedence href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L357" "open the source"
+    click n_tag_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L407" "open the source"
+    click n_find_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L439" "open the source"
+    click n_fetch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L480" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_caveat,n_check entry
+    class n_label,n_describe,n_url,n_caveat,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_report,n_tag_in api
+    class n_of,n_report,n_tag_in api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_fmt,n_parse,n_find_tool,n_fetch helper
+    class n_fmt,n_parse,n_precedence,n_find_tool,n_fetch helper
 ```
 
 </details>
@@ -150,19 +169,26 @@ flowchart TD
 | `LATEST_URL` <sub>pub const</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L79) | The page fetched. |
 | `RELEASES_URL` <sub>pub const</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L82) | Where releases are listed, for somebody doing this by hand. |
 | `TIMEOUT` <sub>pub const</sub> | [89](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L89) | How long the transfer tool is given before it is given up on. |
-| `Verdict` <sub>pub enum</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L93) | How this build's version compares with the newest published one. |
-| `Report` <sub>pub struct</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L110) | What a check found. |
-| `Report::caveat` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L125) | What this answer is worth, in the words the user should see. |
-| `Error` <sub>pub enum</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L134) | Why a check could not be completed. |
-| `Error::fmt` <sub>fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L144) |  |
-| `VERSION` <sub>pub const</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L165) | The version this build was compiled as. |
-| `check` <sub>pub fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L171) | Ask whether anything newer than current has been published. |
-| `report` <sub>pub fn</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L182) | Compare two version strings and build the report. |
-| `parse` <sub>fn</sub> | [208](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L208) | 1.2.3 or v1.2.3 as three numbers. |
-| `tag_in` <sub>pub fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L243) | The tag in whatever the transfer tool printed. |
-| `NULL_DEVICE` <sub>const</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L263) | This platform's bit bucket, for a reply whose body is not wanted. |
-| `NULL_DEVICE` <sub>const</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L266) | This platform's bit bucket, for a reply whose body is not wanted. |
-| `Tool` <sub>struct</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L269) | Where a transfer tool was found, and how to drive it. |
-| `find_tool` <sub>fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L275) | Absolute paths only. |
-| `fetch` <sub>fn</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L313) | Run the tool and hand back what it printed. |
-| `SCOPE` <sub>pub const</sub> | [371](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L371) | What this crate does and does not do, in one paragraph, for a front end to show beside the button. |
+| `Channel` <sub>pub enum</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L106) | Which stream of releases a build came from. |
+| `Channel::of` <sub>pub fn</sub> | [116](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L116) | Which stream this version belongs to. |
+| `Channel::label` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L124) | The word for it, for a line somebody reads. |
+| `Channel::describe` <sub>pub fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L132) | One sentence saying what this stream is, shown beside the label. |
+| `Channel::url` <sub>pub fn</sub> | [153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L153) | The page an update check reads for this stream. |
+| `Verdict` <sub>pub enum</sub> | [163](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L163) | How this build's version compares with the newest published one. |
+| `Report` <sub>pub struct</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L180) | What a check found. |
+| `Report::caveat` <sub>pub fn</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L197) | What this answer is worth, in the words the user should see. |
+| `Error` <sub>pub enum</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L206) | Why a check could not be completed. |
+| `Error::fmt` <sub>fn</sub> | [216](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L216) |  |
+| `VERSION` <sub>pub const</sub> | [237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L237) | The version this build was compiled as. |
+| `check` <sub>pub fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L243) | Ask whether anything newer than current has been published. |
+| `report` <sub>pub fn</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L259) | Compare two version strings and build the report. |
+| `Version` <sub>struct</sub> | [283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L283) | A version, in the only shape this project publishes. |
+| `parse` <sub>fn</sub> | [301](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L301) | 1.2.3, v1.2.3 or v1.2.3-beta.1. |
+| `precedence` <sub>fn</sub> | [357](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L357) | Semantic versioning's precedence, section 11, implemented rather than approximated. |
+| `tag_in` <sub>pub fn</sub> | [407](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L407) | The tag in whatever the transfer tool printed. |
+| `NULL_DEVICE` <sub>const</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L427) | This platform's bit bucket, for a reply whose body is not wanted. |
+| `NULL_DEVICE` <sub>const</sub> | [430](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L430) | This platform's bit bucket, for a reply whose body is not wanted. |
+| `Tool` <sub>struct</sub> | [433](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L433) | Where a transfer tool was found, and how to drive it. |
+| `find_tool` <sub>fn</sub> | [439](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L439) | Absolute paths only. |
+| `fetch` <sub>fn</sub> | [480](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L480) | Run the tool and hand back what it printed. |
+| `SCOPE` <sub>pub const</sub> | [558](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L558) | What this crate does and does not do, in one paragraph, for a front end to show beside the button. |

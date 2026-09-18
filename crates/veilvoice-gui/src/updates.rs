@@ -35,7 +35,7 @@
 use crate::theme::palette as p;
 use eframe::egui::{self, RichText, Ui};
 use std::sync::mpsc;
-use veilvoice_setup::update::{Error, Report, Verdict};
+use veilvoice_setup::update::{Channel, Error, Report, Verdict};
 
 /// The panel's state.
 #[derive(Default)]
@@ -141,6 +141,13 @@ impl Updates {
     }
 
     /// The answer itself, in the colour it deserves.
+    ///
+    /// **Roadmap item 165.** A check looks along the stream this build came from and
+    /// says which, because the two answer different questions: a stable copy
+    /// is never told about a prerelease, and an early copy compared only
+    /// against stable releases would be told it is ahead of everything for
+    /// ever. Which stream is read off this build's own version rather than
+    /// baked in, so the binary stays a pure function of its source.
     fn verdict(&self, ui: &mut Ui, report: &Report) {
         let (text, colour) = match &report.verdict {
             Verdict::UpToDate => (
@@ -173,6 +180,21 @@ impl Updates {
             ),
         };
         ui.label(RichText::new(text).color(colour));
+        ui.label(
+            RichText::new(match report.channel {
+                Channel::Stable => {
+                    "Along the stable channel, which is what the \
+                                    download page offers."
+                }
+                Channel::Early => {
+                    "Along the early channel: builds from dev, \
+                                   marked prereleases, signed and checkable the \
+                                   same way."
+                }
+            })
+            .color(p::muted())
+            .small(),
+        );
         ui.add_space(4.0);
         ui.label(RichText::new(report.caveat()).color(p::muted()).small());
     }

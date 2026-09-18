@@ -3,7 +3,7 @@
 <style>.rm-square{transform-box:fill-box;transform-origin:center;animation:rm-in .45s cubic-bezier(.2,.8,.3,1) backwards;transition:filter .15s ease}.rm-square:hover{filter:brightness(1.35)}@keyframes rm-in{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){.rm-square{animation:none}}</style>
 <rect x="0" y="0" width="640" height="1268" rx="10" fill="var(--bg-inset, #16161e)"/>
 <text x="24.0" y="38.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="var(--fg, #c0caf5)">160 items</text>
-<text x="616.0" y="38.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)" text-anchor="end">146 done, 14 planned</text>
+<text x="616.0" y="38.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)" text-anchor="end">147 done, 13 planned</text>
 <text x="24.0" y="74.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">Shipped</text>
 <g opacity="1"><title>DSP engine: phase discard, many-to-one normalisation, CSPRNG modulation (done)</title><rect class="rm-square" style="animation-delay:0ms" x="24.0" y="88.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <g opacity="1"><title>Accent neutralisation, on by default (done)</title><rect class="rm-square" style="animation-delay:12ms" x="52.0" y="88.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
@@ -175,15 +175,15 @@
 <g opacity="0.85"><title>The window on the BSDs: FreeBSD, OpenBSD and NetBSD get the command line and no desktop ap (planned)</title><rect class="rm-square" style="animation-delay:588ms" x="220.0" y="1132.0" width="22.0" height="22.0" rx="4" fill="var(--warn, #e0af68)"/></g>
 <g opacity="0.85"><title>ffmpeg present before it is needed, and asked for rather than assumed: three commands need (planned)</title><rect class="rm-square" style="animation-delay:600ms" x="248.0" y="1132.0" width="22.0" height="22.0" rx="4" fill="var(--warn, #e0af68)"/></g>
 <g opacity="0.85"><title>Verifying any copy of VeilVoice, from anything, in one step: the verifier answers a precis (planned)</title><rect class="rm-square" style="animation-delay:600ms" x="276.0" y="1132.0" width="22.0" height="22.0" rx="4" fill="var(--warn, #e0af68)"/></g>
-<g opacity="0.85"><title>A build from dev, for anybody who wants one: development happens on dev and releases are c (planned)</title><rect class="rm-square" style="animation-delay:600ms" x="304.0" y="1132.0" width="22.0" height="22.0" rx="4" fill="var(--warn, #e0af68)"/></g>
+<g opacity="1"><title>A build from dev, for anybody who wants one: development happens on dev and releases are c (done)</title><rect class="rm-square" style="animation-delay:600ms" x="304.0" y="1132.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <g opacity="1"><title>The documentation a reader and a developer each arrive wanting: two documents that did not (done)</title><rect class="rm-square" style="animation-delay:600ms" x="332.0" y="1132.0" width="22.0" height="22.0" rx="4" fill="var(--ok, #9ece6a)"/></g>
 <g opacity="0.85"><title>VeilVoice on a phone: an Android package a person installs without developer tools, signed (planned)</title><rect class="rm-square" style="animation-delay:600ms" x="360.0" y="1132.0" width="22.0" height="22.0" rx="4" fill="var(--warn, #e0af68)"/></g>
 <rect x="24.0" y="1182.0" width="12" height="12" rx="3" fill="var(--ok, #9ece6a)"/>
-<text x="42.0" y="1192.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">done: 146</text>
+<text x="42.0" y="1192.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">done: 147</text>
 <rect x="320.0" y="1182.0" width="12" height="12" rx="3" fill="var(--accent, #7aa2f7)"/>
 <text x="338.0" y="1192.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">next: 0</text>
 <rect x="24.0" y="1202.0" width="12" height="12" rx="3" fill="var(--warn, #e0af68)"/>
-<text x="42.0" y="1212.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">planned: 14</text>
+<text x="42.0" y="1212.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">planned: 13</text>
 <rect x="320.0" y="1202.0" width="12" height="12" rx="3" fill="var(--err, #f7768e)"/>
 <text x="338.0" y="1212.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">blocked: 0</text>
 </svg>

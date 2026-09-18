@@ -88,6 +88,76 @@ pub const RELEASES_URL: &str = "https://github.com/tilas01/veilvoice/releases";
 /// one that says it could not reach anything.
 pub const TIMEOUT: Duration = Duration::from_secs(10);
 
+/// Which stream of releases a build came from.
+///
+/// **Roadmap item 165.** Releases are cut from `main` and development happens on
+/// `dev`, which used to leave somebody who wanted the newest work either
+/// building it themselves or waiting. An early build is the same reproducible,
+/// signed archive published from `dev` under a tag that says so, marked a
+/// prerelease on GitHub so it is never what the download page offers by
+/// default.
+///
+/// The channel is read from the version the build carries rather than from
+/// anything baked in at compile time, and that is the whole design: a
+/// prerelease version *is* a prerelease, by semantic versioning, so the binary
+/// stays a pure function of its source and the reproducibility instructions
+/// need no extra input. `0.1.23-beta.1` is early; `0.1.23` is stable.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Channel {
+    /// Cut from `main`. What the download page offers.
+    Stable,
+    /// Cut from `dev` under a prerelease tag. Newer, and checkable in exactly
+    /// the same way.
+    Early,
+}
+
+impl Channel {
+    /// Which stream this version belongs to.
+    pub fn of(version: &str) -> Channel {
+        match parse(version) {
+            Some(parsed) if !parsed.pre.is_empty() => Channel::Early,
+            _ => Channel::Stable,
+        }
+    }
+
+    /// The word for it, for a line somebody reads.
+    pub fn label(self) -> &'static str {
+        match self {
+            Channel::Stable => "stable",
+            Channel::Early => "early",
+        }
+    }
+
+    /// One sentence saying what this stream is, shown beside the label.
+    pub fn describe(self) -> &'static str {
+        match self {
+            Channel::Stable => {
+                "cut from main, signed, and what the download \
+                                page offers"
+            }
+            Channel::Early => {
+                "cut from dev under a prerelease tag: the same \
+                               build, the same signing and the same hash \
+                               lists, newer and less used"
+            }
+        }
+    }
+
+    /// The page an update check reads for this stream.
+    ///
+    /// `/releases/latest` never points at a prerelease, which is right for a
+    /// stable build and useless for an early one: it would report a version
+    /// older than the one running and call it an update. The list page names
+    /// every release newest first, so an early build reads that instead and
+    /// takes the first.
+    pub fn url(self) -> &'static str {
+        match self {
+            Channel::Stable => LATEST_URL,
+            Channel::Early => RELEASES_URL,
+        }
+    }
+}
+
 /// How this build's version compares with the newest published one.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Verdict {
@@ -112,6 +182,8 @@ pub struct Report {
     pub current: String,
     /// The newest version the page named.
     pub latest: String,
+    /// Which stream this build came from, and therefore which page was read.
+    pub channel: Channel,
     /// How the two compare.
     pub verdict: Verdict,
 }
@@ -170,7 +242,12 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// a network round trip on the UI thread is the freeze the user reports.
 pub fn check(current: &str) -> Result<Report, Error> {
     let tool = find_tool().ok_or(Error::NoTransferTool)?;
-    let body = fetch(&tool)?;
+    // Along this build's own stream, never across. Moving somebody from one to
+    // the other without being asked is the one thing an update check must not
+    // do: a stable copy should not be told about a prerelease, and an early
+    // copy told only about stable releases would be told it is ahead of
+    // everything for ever.
+    let body = fetch(&tool, Channel::of(current).url())?;
     let latest = tag_in(&body).ok_or(Error::NoVersionFound)?;
     Ok(report(current, &latest))
 }
@@ -180,41 +257,128 @@ pub fn check(current: &str) -> Result<Report, Error> {
 /// Split out from [`check`] so the comparison is testable without a network,
 /// a subprocess, or a machine that has either.
 pub fn report(current: &str, latest: &str) -> Report {
+    use std::cmp::Ordering;
     let verdict = match (parse(current), parse(latest)) {
-        (Some(here), Some(there)) => {
-            if there > here {
-                Verdict::Newer(latest.to_string())
-            } else if here > there {
-                Verdict::Ahead(latest.to_string())
-            } else {
-                Verdict::UpToDate
-            }
-        }
+        (Some(here), Some(there)) => match precedence(&here, &there) {
+            Ordering::Less => Verdict::Newer(latest.to_string()),
+            Ordering::Greater => Verdict::Ahead(latest.to_string()),
+            Ordering::Equal => Verdict::UpToDate,
+        },
         _ => Verdict::Unreadable(latest.to_string()),
     };
     Report {
         current: current.to_string(),
         latest: latest.to_string(),
+        channel: Channel::of(current),
         verdict,
     }
 }
 
-/// `1.2.3` or `v1.2.3` as three numbers.
+/// A version, in the only shape this project publishes.
 ///
-/// Anything else is `None` rather than a guess. A pre-release suffix makes the
-/// string unreadable on purpose: ordering `1.0.0-rc1` against `1.0.0` correctly
-/// needs the whole of semantic versioning's precedence rules, and a checker
-/// that gets it subtly wrong tells people to downgrade.
-fn parse(version: &str) -> Option<(u64, u64, u64)> {
+/// Three numbers and an optional prerelease, which is what a tag like
+/// `v0.1.23-beta.1` is. Build metadata after a `+` is accepted and dropped,
+/// because semantic versioning says it takes no part in precedence.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Version {
+    number: (u64, u64, u64),
+    /// The dot-separated identifiers after the `-`, empty for a release.
+    pre: Vec<String>,
+}
+
+/// `1.2.3`, `v1.2.3` or `v1.2.3-beta.1`.
+///
+/// Anything else is `None` rather than a guess.
+///
+/// **This used to refuse a prerelease outright**, and said why: ordering
+/// `1.0.0-rc1` against `1.0.0` correctly needs the whole of semantic
+/// versioning's precedence rules, and a checker that gets it subtly wrong
+/// tells people to downgrade. That was the right call while nothing published
+/// a prerelease. Roadmap item 165 publishes them, so refusing one now means an early
+/// build cannot be told anything about its own stream, which is worse. The
+/// rules are implemented in [`precedence`] rather than approximated, and the
+/// tests below are the examples from the specification itself.
+fn parse(version: &str) -> Option<Version> {
     let version = version.trim().trim_start_matches('v');
-    let mut parts = version.split('.');
+    // Build metadata is ignored for precedence, by the specification.
+    let version = version.split('+').next()?;
+    // A `-` with nothing after it is a typo, not a release: `1.0.0-` parsed as
+    // `1.0.0` until a test asked, which would have made a mangled tag look
+    // like the release it was mangled from.
+    let (numbers, pre, separated) = match version.split_once('-') {
+        Some((numbers, pre)) => (numbers, pre, true),
+        None => (version, "", false),
+    };
+    if separated && pre.is_empty() {
+        return None;
+    }
+    let mut parts = numbers.split('.');
     let major = parts.next()?.parse().ok()?;
     let minor = parts.next()?.parse().ok()?;
     let patch = parts.next()?.parse().ok()?;
     if parts.next().is_some() {
         return None;
     }
-    Some((major, minor, patch))
+    let identifiers: Vec<String> = if pre.is_empty() {
+        Vec::new()
+    } else {
+        pre.split('.').map(str::to_string).collect()
+    };
+    // An empty identifier is not a version, it is a typo: `1.0.0-` and
+    // `1.0.0-beta..1` are both refused rather than read as something.
+    if identifiers.iter().any(|part| part.is_empty()) {
+        return None;
+    }
+    if identifiers
+        .iter()
+        .any(|part| !part.chars().all(|c| c.is_ascii_alphanumeric() || c == '-'))
+    {
+        return None;
+    }
+    Some(Version {
+        number: (major, minor, patch),
+        pre: identifiers,
+    })
+}
+
+/// Semantic versioning's precedence, section 11, implemented rather than
+/// approximated.
+///
+/// The three rules that matter here, in the order they are applied:
+///
+/// 1. the numbers compare first, and decide it if they differ;
+/// 2. a version **with** a prerelease is lower than the same numbers without
+///    one, which is the rule an approximation gets wrong and the reason
+///    `0.1.23-beta.1` must not be read as newer than `0.1.23`;
+/// 3. otherwise the identifiers compare left to right: two numeric ones
+///    compare as numbers, a numeric one is always lower than an alphanumeric
+///    one, two alphanumeric ones compare as text, and if everything so far is
+///    equal the longer list wins.
+fn precedence(here: &Version, there: &Version) -> std::cmp::Ordering {
+    use std::cmp::Ordering;
+    match here.number.cmp(&there.number) {
+        Ordering::Equal => {}
+        other => return other,
+    }
+    match (here.pre.is_empty(), there.pre.is_empty()) {
+        (true, true) => return Ordering::Equal,
+        (true, false) => return Ordering::Greater,
+        (false, true) => return Ordering::Less,
+        (false, false) => {}
+    }
+    for (mine, yours) in here.pre.iter().zip(there.pre.iter()) {
+        let numbers = (mine.parse::<u64>().ok(), yours.parse::<u64>().ok());
+        let ordering = match numbers {
+            (Some(a), Some(b)) => a.cmp(&b),
+            (Some(_), None) => Ordering::Less,
+            (None, Some(_)) => Ordering::Greater,
+            (None, None) => mine.as_str().cmp(yours.as_str()),
+        };
+        if ordering != Ordering::Equal {
+            return ordering;
+        }
+    }
+    here.pre.len().cmp(&there.pre.len())
 }
 
 /// The tag in whatever the transfer tool printed.
@@ -310,8 +474,18 @@ fn find_tool() -> Option<Tool> {
 }
 
 /// Run the tool and hand back what it printed.
-fn fetch(tool: &Tool) -> Result<String, Error> {
+///
+/// `url` is the page for this build's own stream, and which page it is decides
+/// how curl is driven: see the note beside the two argument lists.
+fn fetch(tool: &Tool, url: &str) -> Result<String, Error> {
     let seconds = TIMEOUT.as_secs().to_string();
+    // `/releases/latest` answers with a redirect whose target *is* the tag, so
+    // the body can be thrown away. `/releases`, which an early build reads
+    // because the first page never names a prerelease, answers with itself:
+    // there is no redirect to read and the tag is in the body. Asking curl for
+    // the effective URL of that page would return the page's own address every
+    // time, which parses as no version at all, so the body is what is read.
+    let redirect_carries_the_answer = url == LATEST_URL;
     let mut command = Command::new(&tool.program);
     if tool.wget {
         command.args([
@@ -322,7 +496,20 @@ fn fetch(tool: &Tool) -> Result<String, Error> {
             "--tries=1",
             "-O",
             "-",
-            LATEST_URL,
+            url,
+        ]);
+    } else if !redirect_carries_the_answer {
+        command.args([
+            "-L",
+            "--max-redirs",
+            "5",
+            "--silent",
+            "--show-error",
+            "--max-time",
+            &seconds,
+            "--proto",
+            "=https",
+            url,
         ]);
     } else {
         // The body is thrown away and only the **final URL** is printed. The
@@ -346,7 +533,7 @@ fn fetch(tool: &Tool) -> Result<String, Error> {
             NULL_DEVICE,
             "-w",
             "%{url_effective}",
-            LATEST_URL,
+            url,
         ]);
     }
     let output = command.output().map_err(|e| Error::Failed(e.to_string()))?;
@@ -380,6 +567,116 @@ with `veilvoice verify` before running it.";
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
+    /// **Roadmap item 165.** Semantic versioning's own precedence examples, section
+    /// 11, taken from the specification rather than invented here.
+    ///
+    /// The one that matters to this project is the middle of the chain:
+    /// `1.0.0-rc.1` is **lower** than `1.0.0`. An approximation that compared
+    /// the numbers and ignored the suffix would call an early build newer
+    /// than the release it precedes and tell everybody on the stable channel
+    /// to downgrade, which is the reason this was refused outright until
+    /// there were prereleases to order.
+    #[test]
+    fn prerelease_precedence_is_the_specifications() {
+        let chain = [
+            "1.0.0-alpha",
+            "1.0.0-alpha.1",
+            "1.0.0-alpha.beta",
+            "1.0.0-beta",
+            "1.0.0-beta.2",
+            "1.0.0-beta.11",
+            "1.0.0-rc.1",
+            "1.0.0",
+        ];
+        for pair in chain.windows(2) {
+            let (lower, higher) = (parse(pair[0]).unwrap(), parse(pair[1]).unwrap());
+            assert_eq!(
+                precedence(&lower, &higher),
+                std::cmp::Ordering::Less,
+                "{} should be lower than {}",
+                pair[0],
+                pair[1]
+            );
+            assert_eq!(
+                precedence(&higher, &lower),
+                std::cmp::Ordering::Greater,
+                "and {} higher than {}",
+                pair[1],
+                pair[0]
+            );
+        }
+        // `1.0.0-beta.11` against `1.0.0-beta.2` is the case a text comparison
+        // gets wrong, and it is in the chain above for that reason. Stated
+        // again here so a rewrite that drops the chain still has it.
+        assert_eq!(
+            precedence(
+                &parse("1.0.0-beta.2").unwrap(),
+                &parse("1.0.0-beta.11").unwrap()
+            ),
+            std::cmp::Ordering::Less
+        );
+    }
+
+    /// Build metadata takes no part in precedence, and a malformed version is
+    /// refused rather than read as something.
+    #[test]
+    fn what_a_version_is_and_is_not() {
+        assert_eq!(parse("v0.1.23+build.5"), parse("0.1.23"));
+        for bad in [
+            "",
+            "1.0",
+            "1.0.0.0",
+            "1.0.0-",
+            "1.0.0-beta..1",
+            "banana",
+            "1.0.0-b^ta",
+        ] {
+            assert!(parse(bad).is_none(), "{bad:?} is not a version");
+        }
+    }
+
+    /// A build reports the stream it came from, read from its own version.
+    #[test]
+    fn the_channel_comes_from_the_version() {
+        assert_eq!(Channel::of("0.1.23"), Channel::Stable);
+        assert_eq!(Channel::of("v0.1.23"), Channel::Stable);
+        assert_eq!(Channel::of("0.1.23-beta.1"), Channel::Early);
+        // Unreadable is treated as stable rather than as early: a build whose
+        // version cannot be parsed has said nothing about its stream, and
+        // quietly moving somebody to the prerelease page on the strength of a
+        // string nobody could read is the wrong way round.
+        assert_eq!(Channel::of("nonsense"), Channel::Stable);
+        assert_eq!(Channel::Stable.url(), LATEST_URL);
+        assert_eq!(Channel::Early.url(), RELEASES_URL);
+    }
+
+    /// An update check looks along its own stream and says which.
+    #[test]
+    fn a_check_stays_on_its_own_channel() {
+        let early = report("0.1.23-beta.1", "0.1.23-beta.2");
+        assert_eq!(early.channel, Channel::Early);
+        assert_eq!(early.verdict, Verdict::Newer("0.1.23-beta.2".into()));
+
+        // The release this build precedes is newer than it, which is the
+        // answer somebody on an early build wants when the release lands.
+        let landed = report("0.1.23-beta.1", "0.1.23");
+        assert_eq!(landed.verdict, Verdict::Newer("0.1.23".into()));
+
+        // And a stable build is never told about a prerelease, because it
+        // never reads the page that names one.
+        let stable = report("0.1.23", "0.1.23");
+        assert_eq!(stable.channel, Channel::Stable);
+        assert_eq!(stable.verdict, Verdict::UpToDate);
+
+        // A source build ahead of everything published still says so.
+        assert_eq!(
+            report("0.2.0", "0.1.23").verdict,
+            Verdict::Ahead("0.1.23".into())
+        );
+    }
+
     /// The guide describes the tool this actually looks for.
     ///
     /// Written after the guide said "PowerShell's web request on Windows",
@@ -427,8 +724,6 @@ mod tests {
         );
     }
 
-    use super::*;
-
     #[test]
     fn a_higher_published_version_is_newer() {
         let report = report("0.1.12", "0.2.0");
@@ -452,20 +747,37 @@ mod tests {
         );
     }
 
-    /// Ordering is refused rather than guessed. A checker that gets
-    /// pre-release precedence subtly wrong tells people to downgrade.
+    /// Ordering is refused rather than guessed, and what counts as
+    /// unorderable has narrowed.
+    ///
+    /// This used to assert that **any** prerelease was unreadable, which was
+    /// right while nothing published one: a checker that gets prerelease
+    /// precedence subtly wrong tells people to downgrade. Roadmap item 165 publishes
+    /// them, so they are ordered now, by the specification's rules and against
+    /// the specification's own examples. A string that is not a version at all
+    /// is still refused, and that is the half worth keeping.
     #[test]
     fn a_version_that_cannot_be_compared_is_refused_rather_than_ordered() {
-        assert_eq!(
-            report("0.1.12", "0.2.0-rc1").verdict,
-            Verdict::Unreadable("0.2.0-rc1".into())
-        );
         assert_eq!(
             report("0.1.12", "nightly").verdict,
             Verdict::Unreadable("nightly".into())
         );
+        assert_eq!(
+            report("0.1.12", "0.2").verdict,
+            Verdict::Unreadable("0.2".into())
+        );
         assert!(parse("1.2").is_none(), "three numbers or nothing");
         assert!(parse("1.2.3.4").is_none(), "three numbers or nothing");
+        // And the one that changed: a prerelease is now ordered rather than
+        // refused, and ordered *below* the release it precedes.
+        assert_eq!(
+            report("0.1.12", "0.2.0-rc1").verdict,
+            Verdict::Newer("0.2.0-rc1".into())
+        );
+        assert_eq!(
+            report("0.2.0", "0.2.0-rc1").verdict,
+            Verdict::Ahead("0.2.0-rc1".into())
+        );
     }
 
     #[test]
