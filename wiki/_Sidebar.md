@@ -3,6 +3,7 @@
 
 **Start here**
 
+- [[Start here|Doc-START-HERE]]
 - [[What VeilVoice is|Doc-README]]
 - [[User guide|Doc-USER-GUIDE]]
 - [[Installing|Doc-INSTALL]]
@@ -14,6 +15,11 @@
 - [[The command line|Guide-command-line]]
 - [[The desktop application|Guide-desktop-app]]
 - [[The verifier|Guide-verifier]]
+
+**After installing**
+
+- [[Updating|Doc-UPDATING]]
+- [[When a file changes|Doc-GUARD]]
 
 **Check and build**
 

@@ -9,6 +9,7 @@ This wiki is generated from the repository. Every page here has a source file th
 
 ## Start here
 
+- **[[Start here|Doc-START-HERE]]** · You have just downloaded it and have not run it yet: the order to do things in, and why that order
 - **[[What VeilVoice is|Doc-README]]** · The whole project in one page: what it does, what it refuses to claim, and how to install it
 - **[[User guide|Doc-USER-GUIDE]]** · Every screen and every command, in order
 - **[[Installing|Doc-INSTALL]]** · Per operating system, with the verification step in place rather than bolted on
@@ -20,6 +21,11 @@ This wiki is generated from the repository. Every page here has a source file th
 - **[[The command line|Guide-command-line]]** · `veilvoice`, every command with worked examples
 - **[[The desktop application|Guide-desktop-app]]** · `veilvoice-gui`, screen by screen
 - **[[The verifier|Guide-verifier]]** · Checking a download, at length
+
+## After it is installed
+
+- **[[Updating|Doc-UPDATING]]** · Finding out something newer exists, moving to it, and why the window then reports that a file changed
+- **[[When a file changes|Doc-GUARD]]** · What VeilVoice records about its own files, and what a report of a change is and is not evidence of
 
 ## Checking it, building it, packaging it
 
