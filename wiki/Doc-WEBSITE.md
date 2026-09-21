@@ -41,6 +41,7 @@ is built last, after the SEO pass has edited the pages it indexes.
 | `tools/docs/sources.py` | The syntax-highlighted source pages under `website/reference/` |
 | `tools/docs/guides.py` | The per-program guides, assembled from `docs/USER_GUIDE.md` |
 | `tools/docs/wiki.py` | The wiki's landing page, sidebar and document pages |
+| `tools/site/wiki_site.py` | The whole wiki again, as pages of this site under `website/wiki/` |
 | `tools/site/split.py` | The section pages, split out of `index.html` |
 | `tools/site/roadmap.py` | `roadmap.html`, from `ROADMAP.md` |
 | `tools/site/faq.py` | `faq.html`, from `docs/FAQ.md` |
@@ -54,6 +55,41 @@ the matching `--check` run in CI regenerates into memory and compares.
 
 `website/nojs/index.html` is the one page written by hand rather than generated,
 because it is a summary of the project rather than a view of something else.
+
+## The wiki, in two places, from one source
+
+The manual is written once, in `docs/` and at the repository root, and read in
+three places: in the repository, on the GitHub wiki, and on this site. Two
+generators make the second and third from the first, and `--check` on each
+fails a build if they have parted company, so none of the three can say
+something the others do not.
+
+`tools/docs/wiki.py` writes `wiki/`, which is the GitHub wiki's own format: a
+flat set of Markdown pages, links rewritten for a namespace with no
+directories. `tools/site/wiki_site.py` renders those same pages here, in this
+site's style rather than GitHub's, through the renderer the front page already
+uses.
+
+`.github/workflows/wiki.yml` copies `wiki/` into the wiki repository. It checks
+on both branches and publishes from `main` only, for the reason `pages.yml`
+publishes from `main` only: what is published describes what has been released.
+
+**One step in this is not automatic and cannot be.** A GitHub wiki is a git
+repository of its own at `<repo>.wiki.git`, and enabling the wiki in Settings
+does not create it. It is created when a first page is saved through the web
+interface. Until somebody does that once, the publish step has nothing to push
+to, and it fails saying so. The workflow tries to create the repository itself
+first, by initialising one and pushing it, so this may never be needed; if
+GitHub refuses that, the one-time step is:
+
+1. Open the repository's **Wiki** tab.
+2. Create a page with any content at all, and save it.
+3. Re-run the `wiki` workflow.
+
+What that first page says does not matter. Everything the wiki holds is
+replaced from `wiki/` on the first successful run. See F-199 in
+[`AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-AUDIT), where this went unnoticed for seven consecutive failed
+runs.
 
 ## The scripts
 
