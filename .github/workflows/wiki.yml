@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Publish `wiki/` to the repository's GitHub wiki.
+# Check `wiki/`, on both branches, and publish it to the repository's GitHub
+# wiki from `main`.
 #
 # A GitHub wiki is a git repository of its own, at `<repo>.wiki.git`, holding
 # flat Markdown pages and nothing else. The pages in `wiki/` are generated into
@@ -11,55 +12,157 @@
 # Why a copy rather than a symlink or a submodule: the wiki repository cannot
 # contain either. It is flat Markdown, so the pages are written into it.
 #
-# The wiki repository does not exist until the first page is created through
-# the web interface. Enabling the wiki in Settings is not enough on its own, so
-# the clone below says exactly that when it fails, rather than leaving somebody
-# reading a git error about a repository that was never initialised.
+# # Why there are two jobs, and why one of them runs on `dev`
+#
+# Publishing stays on `main`, deliberately and for the same reason `pages.yml`
+# does: what is published describes what has been released.
+#
+# Checking must not. Until this job existed, this workflow did not run on `dev`
+# at all, so a change that would fail to publish failed on `main`, after the
+# merge that cuts a release, which is the worst moment to find out. Worse, it
+# looked fine: a workflow that does not run shows no red cross, and a branch
+# with no result beside it reads exactly like a branch that passed. That is
+# F-197's shape, and it is written up four times in `docs/AUDIT.md` now.
+#
+# So `check` runs everywhere and asserts what `publish` needs before `publish`
+# is the thing that finds out: the pages match their sources, every `[[link]]`
+# in them resolves, and every one of them is something a wiki can actually
+# hold. `tools/docs/wiki.py --check` is also run by `ci.yml` and by
+# `tools/verify.py`; running it here as well is what makes this workflow's own
+# result mean something on a branch it does not publish from.
 
 name: wiki
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths:
       - 'wiki/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'ROADMAP.md'
+      - 'CHANGELOG.md'
+      - 'tools/docs/**'
+      - 'tools/site/wiki_site.py'
+      - '.github/workflows/wiki.yml'
+  pull_request:
+    paths:
+      - 'wiki/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'ROADMAP.md'
+      - 'CHANGELOG.md'
+      - 'tools/docs/**'
+      - 'tools/site/wiki_site.py'
       - '.github/workflows/wiki.yml'
   workflow_dispatch:
 
-# Pushing to the wiki is a write to this repository's content.
+# Pushing to the wiki is a write to this repository's content. The check job
+# needs nothing but the code, and says so for itself.
 permissions:
-  contents: write
-
-# One at a time. Two runs racing to push to the same wiki repository is a
-# rejected push and a red workflow for no reason anybody can act on.
-concurrency:
-  group: wiki
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  publish:
-    name: publish the wiki
+  check:
+    name: check the wiki
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Clone the wiki repository
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+
+      # The same command `ci.yml` and `tools/verify.py` run. It regenerates
+      # every page into memory and compares, so a source edited without the
+      # generator being run fails here; it then walks every `[[link]]` in all
+      # of them, because a wiki renders a link to a missing page as an
+      # invitation to create it and nothing else would ever report one; and it
+      # refuses a file the wiki could not hold as a page.
+      - name: The pages must match their sources, and be publishable
+        run: python tools/docs/wiki.py --check
+
+      # The other half of the same claim: the website carries the whole wiki,
+      # rendered in the site's own style from the same Markdown. If these two
+      # disagree, one of the two copies a reader can find is wrong.
+      - name: The website's wiki must match the wiki
+        run: |
+          python tools/site/wiki_site.py --check
+
+  publish:
+    name: publish the wiki
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # One at a time, and on this job rather than on the workflow. Two runs
+    # racing to push to the same wiki repository is a rejected push and a red
+    # workflow for no reason anybody can act on. The check job has no such
+    # problem and must not queue behind a publish: it is the one that has to
+    # answer quickly, on every branch and every pull request.
+    concurrency:
+      group: wiki-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      # The wiki repository does not exist until the wiki has a first page.
+      # Enabling the wiki in Settings is not enough: the repository behind it
+      # is created when a page is first saved, and until then a clone of it
+      # answers "Repository not found". That is what this workflow did on
+      # every run from the day it was written until it was fixed, and the
+      # error it printed was right about the cause.
+      #
+      # So it tries to create the repository itself before asking a person to.
+      # A push to a wiki that has never been initialised may be refused, in
+      # which case nothing is lost and the message below is what a reader
+      # gets; where it is accepted, the manual step disappears for good. The
+      # attempt is cheap and it is the difference between a workflow that
+      # fixes itself and one that waits.
+      - name: Clone the wiki repository, creating it if it does not exist
         run: |
           set -euo pipefail
-          if ! git clone \
-              "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git" \
-              wiki-repo 2>/tmp/clone.log; then
-            cat /tmp/clone.log
-            echo "::error::Could not clone ${{ github.repository }}.wiki.git."
-            echo "A GitHub wiki repository is not created when the wiki is"
-            echo "enabled in Settings. It is created when the first page is"
-            echo "saved through the web interface. Open the repository's Wiki"
-            echo "tab, create a page with any content, save it, and re-run"
-            echo "this workflow: everything it holds is overwritten from"
-            echo "wiki/ on the first successful run, so what that first page"
-            echo "says does not matter."
-            exit 1
+          remote="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+
+          if git clone "$remote" wiki-repo 2>/tmp/clone.log; then
+            echo "cloned the existing wiki"
+            exit 0
           fi
+
+          cat /tmp/clone.log
+          echo "the wiki repository could not be cloned; trying to create it"
+
+          # An empty repository with one real page. `Home` is the page GitHub
+          # opens a wiki on, so if this succeeds a reader arriving before the
+          # copy step below has run still lands somewhere that makes sense.
+          # Everything here is replaced from `wiki/` in the next step either
+          # way.
+          mkdir wiki-repo
+          cd wiki-repo
+          git init --initial-branch=master
+          git config user.name  "tilas01"
+          git config user.email "tilas01@users.noreply.github.com"
+          cp ../wiki/Home.md .
+          git add Home.md
+          git commit -m "Create the wiki from the repository"
+          if git push "$remote" master 2>/tmp/create.log; then
+            echo "created the wiki repository"
+            git remote add origin "$remote" || git remote set-url origin "$remote"
+            exit 0
+          fi
+
+          cat /tmp/create.log
+          echo "::error::The wiki for ${{ github.repository }} has no repository behind it yet."
+          echo "A GitHub wiki repository is not created when the wiki is"
+          echo "enabled in Settings, and this workflow's attempt to create it"
+          echo "by pushing was refused. It is created when the first page is"
+          echo "saved through the web interface. Open the repository's Wiki"
+          echo "tab, create a page with any content, save it, and re-run this"
+          echo "workflow: everything the wiki holds is overwritten from wiki/"
+          echo "on the first successful run, so what that first page says does"
+          echo "not matter. This is a one-time step for the maintainer."
+          exit 1
 
       - name: Copy the generated pages in
         run: |
@@ -78,6 +181,12 @@ jobs:
           set -euo pipefail
           git config user.name  "tilas01"
           git config user.email "tilas01@users.noreply.github.com"
+          # The clone path already has an `origin`; the create path above made
+          # this repository locally, so it may not. Set it either way rather
+          # than assuming which path ran.
+          remote="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+          git remote set-url origin "$remote" 2>/dev/null \
+            || git remote add origin "$remote"
           git add -A
           if git diff --cached --quiet; then
             echo "the wiki already matches the repository, nothing to push"
@@ -88,5 +197,5 @@ jobs:
           Generated in the main repository and copied here. Every page has a
           source file there, and CI fails if the two disagree, so editing a
           page here would be overwritten by the next run."
-          git push
+          git push origin HEAD
           echo "pushed"

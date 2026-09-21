@@ -396,6 +396,47 @@ def dead_links():
     return dead
 
 
+# A page name a GitHub wiki can hold. The wiki is a flat repository of
+# Markdown files and the page name *is* the file name, so a character the wiki
+# treats specially produces a page under a name nobody linked to.
+#
+# A slash is the one that matters: `Doc/README.md` is not a page called
+# "Doc/README", it is a page GitHub shows at a path most links will not reach,
+# and a generator that derives a page name from a source path is one careless
+# `replace` away from writing one. The leading underscore is allowed because
+# `_Sidebar` is a name GitHub itself defines.
+PUBLISHABLE_NAME = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9._ -]*$")
+
+
+def unpublishable():
+    """Every file in `wiki/` that a GitHub wiki could not hold as a page.
+
+    Checked here rather than in the workflow that publishes, because the
+    workflow runs on `main` only and after the fact: a page named something
+    the wiki cannot take would reach a reader as a failed publish long after
+    the commit that wrote it, on the one branch where a failure is most
+    expensive. This fails the build that wrote it instead.
+
+    Three things are refused. A subdirectory, because a wiki is flat and `cp
+    wiki/*.md` would silently leave its contents behind. A file that is not
+    Markdown, for the same reason. And a name outside `PUBLISHABLE_NAME`.
+    """
+    out = []
+    for name in sorted(os.listdir(WIKI)):
+        full = os.path.join(WIKI, name)
+        if os.path.isdir(full):
+            out.append("%s: a wiki is flat, so a directory cannot be published"
+                       % name)
+            continue
+        if not name.endswith(".md"):
+            out.append("%s: every page of a wiki is a Markdown file" % name)
+            continue
+        page = name[: -len(".md")]
+        if not PUBLISHABLE_NAME.match(page):
+            out.append("%s: not a page name a GitHub wiki can hold" % name)
+    return out
+
+
 def unpublished():
     """Every prose document in the repository that no wiki page carries.
 
@@ -483,6 +524,12 @@ def main():
                 print("  " + line)
             print()
             print("Run 'python tools/docs/wiki.py' and commit the result.")
+            return 1
+        unholdable = unpublishable()
+        if unholdable:
+            print("  these could not be published as wiki pages:")
+            for line in unholdable:
+                print("    %s" % line)
             return 1
         dead = dead_links()
         if dead:
