@@ -124,6 +124,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/crate_tables.py`](../tools/audit/crate_tables.py) | Every crate in the workspace appears in every table that lists the crates |
 | [`tools/audit/dependabot.py`](../tools/audit/dependabot.py) | Every manifest in this tree is covered by a Dependabot entry |
 | [`tools/audit/dependencies.py`](../tools/audit/dependencies.py) | Every dependency says what it is for, where it is declared |
+| [`tools/audit/documented.py`](../tools/audit/documented.py) | Every item on a generated page has something written under it |
 | [`tools/audit/features.py`](../tools/audit/features.py) | Every feature selection a release builds is built here too |
 | [`tools/audit/publishing.py`](../tools/audit/publishing.py) | The step that publishes a release says which commit it is publishing |
 | [`tools/audit/randomness.py`](../tools/audit/randomness.py) | Every random number this project draws comes from a cryptographic source |
