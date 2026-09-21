@@ -1,0 +1,126 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+
+# Start here: the first half hour
+
+You have downloaded VeilVoice and have not run it yet. This page is the order
+to do things in, and nothing else. Every step here is one paragraph and a link
+to the document that has the detail, because the detail is written once and
+this is the way in to it.
+
+If you would rather read about what VeilVoice actually does to a voice before
+you install it, that is [`WHITEPAPER.md`](WHITEPAPER.md), and it does not
+assume you have installed anything.
+
+---
+
+## 1. Check the download before you run it
+
+Do this first, not last. A veiling tool is worth attacking precisely because
+the people who reach for one are the people worth attacking, and a swapped
+archive that records you is the obvious way to do it.
+
+Everything rests on one value, the OpenPGP fingerprint releases are signed
+with. It is printed in [`INSTALL.md`](INSTALL.md), in
+[`README.md`](../README.md), on the website and in every release's notes, and
+it is written into the install scripts rather than fetched, because a
+fingerprint you download beside the thing it is meant to authenticate is a
+formality rather than a check. If the value you see anywhere disagrees with the
+value in those places, stop.
+
+There are three ways to do the check and they answer the same question:
+
+- **By hand**, with GnuPG and a SHA-256 tool. Four commands, written out in
+  [`INSTALL.md`](INSTALL.md#1-by-hand).
+- **With the install script**, which does the same four things and refuses to
+  continue if any of them fails. [`INSTALL.md`](INSTALL.md#2-with-the-install-script).
+- **With VeilVoice itself**, once it is unpacked: `veilvoice verify` in the
+  folder you unpacked into, or the Verify tab in the window. The signing key is
+  compiled into the binary, so an archive that brings its own key and its own
+  signature cannot vouch for itself. [`GUIDE_VERIFY.md`](GUIDE_VERIFY.md) is
+  the whole account of what each verdict is worth.
+
+The third of those has an obvious circularity, and it is worth naming rather
+than stepping around: a copy of VeilVoice checking itself tells you nothing if
+that copy is the thing that was tampered with. It is a good check of an archive
+you downloaded afterwards, and a poor check of the binary doing the checking.
+The first two do not have that problem. Use one of them for your first copy.
+
+## 2. Install it, or do not
+
+VeilVoice runs from the folder you unpacked it into. Nothing installs a
+service, writes to a registry, or phones home; deleting the folder deletes the
+program. Installing it properly, so that it is on your path and has a menu
+entry, is a convenience and is described per operating system in
+[`INSTALL.md`](INSTALL.md).
+
+Two executables come out of a release, and which one you want depends only on
+what is in front of you:
+
+| Program | Reach for it when |
+|---|---|
+| `veilvoice` | You have a terminal. Everything the application does, over SSH, in a container, in a script, or on a machine with no graphics toolkit at all. |
+| `veilvoice-gui` | You have a screen. The same engine with somewhere to click, plus the live level meters, the app lock and the microphone monitor. |
+
+## 3. What happens the first time it runs
+
+Nothing is downloaded, nothing is registered, and nothing is sent anywhere. One
+thing does happen without being asked for: VeilVoice writes down what its own
+program file looks like, so that it can tell you later if that file changes.
+That record is taken at the first launch that finds none, rather than at
+install time, because installing a package runs as an administrator and the
+record belongs to the account that will actually run the program.
+
+That is the whole of it, and what it is worth is
+[`GUARD.md`](GUARD.md).
+
+## 4. Your first veiled recording
+
+The shortest path to seeing what this program is for:
+
+- **In the window**: open the Studio tab, record a few seconds, and play back
+  what comes out. The tabs, in the order you meet them, are section 3 of
+  [`USER_GUIDE.md`](USER_GUIDE.md).
+- **At the terminal**: `veilvoice anonymise` on a file you already have, or
+  `veilvoice record` to capture and veil in one step. Every command with a
+  worked example is [`GUIDE_CLI.md`](GUIDE_CLI.md), and the one-line summary of
+  each, with where the same job lives in the window, is
+  [`COMMANDS.md`](COMMANDS.md).
+
+Listen to the result before you rely on it. Veiling is not reversible and is
+not meant to be, which means there is no way to recover the original from the
+output: keep the original until you are sure you are happy with the veiled
+copy, then destroy it deliberately with `veilvoice shred`.
+
+## 5. Set the app lock, if the window is how you use it
+
+The app lock is a passphrase for VeilVoice itself. It is worth setting for a
+reason that is not obvious: with a lock set, the record described in step 3 is
+sealed under your passphrase, and is checked at the moment you unlock, which is
+the one moment that passphrase exists. Without one the record is written in the
+clear and catches accidents rather than attackers.
+
+Section 5 of [`USER_GUIDE.md`](USER_GUIDE.md) is the lock, what it protects and
+what it does not.
+
+## 6. Know what it will not do
+
+Section 6 of [`USER_GUIDE.md`](USER_GUIDE.md) is the list, and it is short and
+worth reading before you need it. The two that catch people out:
+
+- **Veiling a voice does not keep the words secret.** The words survive on
+  purpose. If the content matters as well as the speaker, encrypt what you
+  write, which VeilVoice will do for you.
+- **A veiled recording can still identify somebody by what they say.** A name,
+  a place, a date and a job title are not carried by the voiceprint, and
+  nothing here removes them.
+
+---
+
+## Where to go next
+
+- [`USER_GUIDE.md`](USER_GUIDE.md): every screen and every command, in the
+  order somebody meets them.
+- [`UPDATING.md`](UPDATING.md): getting a newer version, and what to expect
+  when you do.
+- [`GUARD.md`](GUARD.md): what a changed file means.
+- [`FAQ.md`](FAQ.md): the questions people actually arrive with.

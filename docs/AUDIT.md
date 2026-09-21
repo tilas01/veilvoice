@@ -1277,6 +1277,56 @@ The campaign is not yet part of any build. It takes twenty-three minutes over
 four files and there are twenty-seven crates; making it a check is the work,
 and roadmap item 151 carries it.
 
+### F-198: the wiki's own contents page decided what a document was by counting lines
+
+`tools/docs/wiki.py` writes the wiki's landing page and its sidebar from one
+list of documents. It grouped them by slicing that list:
+
+    for source, title, blurb in DOCUMENTS[:5]:      # "Start here"
+    ...
+    for source, title, blurb in DOCUMENTS[5:11]:    # "Checking it, building it"
+    ...
+    for source, title, blurb in DOCUMENTS[11:]:     # "Working on it"
+
+So which heading a page appeared under was a fact about where its line sat in
+a Python file, and the two failure modes are both silent.
+
+**Insert a document in the middle** and every document after it moves down one,
+which pushes the last of one group into the next. Nothing fails: the page is
+still generated, still linked and still correct, and it is simply filed under
+the wrong heading. **Append one past the end** of the last slice and it is not
+dropped from the wiki, which would at least be visible; it is dropped from the
+landing page and the sidebar, which are the only two things that link to it.
+The page exists, on the wiki and on the website both, and nothing reaches it.
+`dead_links()` does not report it, because a page nobody links to is not a link
+to a page that does not exist; those are opposite problems and this repository
+only had a guard for the second.
+
+Found while writing the three pages roadmap item 178 asked for, which is the
+first time in this file's life that a document has been added to the middle of
+that list rather than the end.
+
+**The group is named now**, as a key on each row against a `GROUPS` table, so
+a document's heading is written down beside it rather than inferred from
+arithmetic. That removes the first failure. The second needed a guard of its
+own, because a document can now name a group that does not exist and be
+dropped just as quietly, so `misgrouped()` fails a build on one, and on a group
+with nothing in it.
+
+**And the coverage question underneath it got the same treatment.** The claim
+roadmap item 178 makes is that the wiki is the whole manual, and that claim
+rested entirely on somebody remembering to add each new document to this list.
+`unpublished()` now walks `docs/` and the repository root and fails on any
+document that is in neither `DOCUMENTS` nor `NOT_A_WIKI_PAGE`, the latter
+carrying the reason each deliberate omission is not a gap. Three documents are
+in it: two written into the wiki by `tools/docs/guides.py` under their own
+names, and `docs/MEASURED.md`, which is a table other pages quote rather than a
+page to read.
+
+This is the same shape as F-176, F-177 and F-197, and that is now four times:
+the *absence* of a check is invisible where the failure of one is loud. A
+missing page and a page nobody wrote look identical from outside.
+
 ## The thirty-second round: the guard that failed and the two behind it
 
 The round after 0.1.20, covering the decoy vaults and everything they touched,
@@ -7746,7 +7796,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and ninety-seven defects found and fixed (F-1 to F-197), across
+**One hundred and ninety-eight defects found and fixed (F-1 to F-198), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

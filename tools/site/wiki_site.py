@@ -367,7 +367,7 @@ def title_of(name, html, source):
 
 def describe(name):
     """One sentence for the page's description, from the wiki's own tables."""
-    for source, title, blurb in wikigen.DOCUMENTS:
+    for source, title, _group, blurb in wikigen.DOCUMENTS:
         if wikigen.page_name(source) == name:
             return "%s. %s." % (title, blurb)
     for page, title, blurb in wikigen.GUIDES:
