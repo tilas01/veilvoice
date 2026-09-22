@@ -665,6 +665,17 @@ anybody who cloned it. No check that runs where the author is standing can see
 that class of defect, because the file is there. A release gate is the one
 place it is cheapest to catch and most expensive to miss.
 
+**One thing about it is not fixable from `dev`, and is written down rather
+than left to be met.** GitHub registers a `workflow_dispatch` workflow only
+from the repository's default branch. `promote.yml` lives on `dev`, so it is
+absent from the workflow listing and a dispatch of it answers 404; it becomes
+dispatchable when the first release merge carries it to `main`. That merge is
+therefore the one it cannot do, and `docs/CONTRIBUTING.md` says so beside the
+procedure rather than leaving a release to discover it. It is the same shape as
+F-197 and F-199 one more time, a workflow that cannot run where the work is,
+with the difference that this one is a property of the platform rather than a
+mistake, so the answer is to name it.
+
 **What is deliberately not automated.** There is no push trigger and no
 schedule. `docs/CONTRIBUTING.md` says a version is cut when a group of changes
 is finished and audited, not on a date, and "every green commit on `dev`
