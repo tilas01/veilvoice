@@ -41,6 +41,15 @@ python tools/verify.py
 
 If it fails, the message says which check and why. Nothing in it is advisory.
 
+**Then run `git status`, before you push and after the verify passes.** Most of
+those checks work by regenerating the derived file and comparing it, and the
+regenerated file is left where it was written, so a run that passes can still
+leave something uncommitted. `Cargo.lock` is the one that catches people:
+the site's search index reads it, so a dependency bump makes
+`website/search-index.json` and `website/nojs/search.html` stale, `verify.py`
+rewrites both in place, and the push then carries a lock file whose index is
+still describing the old one. A green run is not the same as a clean tree.
+
 ## Why so much of this is generated
 
 Anything stated in more than one place is derived from one source or checked
@@ -96,6 +105,16 @@ is written as a habit and the others are guards.
 - **British spelling.**
 - **No em dashes** anywhere a person reads: not in the interface, the
   documentation or the website. Use a comma, a full stop, or a pair of hyphens.
+- **Markdown where it is rendered, plain text where it is not.** Markdown is
+  formatting, so it belongs where something renders it and nowhere else. A
+  commit message is read as plain text by `git log`, by every terminal and by
+  GitHub's own commit view, so it is written as plain text: see *Commits*
+  below for the shape. The same goes for anything a release carries that is
+  written in a `.md` file and never rendered from one, such as a tag message
+  or a note read in a terminal. Where markdown genuinely is rendered, the
+  formatting stays: the release notes on the GitHub website are rendered
+  markdown, so they keep their headings, their links and their lists, and so
+  does everything in `docs/`, in `wiki/` and on the website.
 - **Every behavioural change carries a regression test.** A fix without one is a
   fix that comes back.
 - **`docs/AUDIT.md` gets the write-up when the change is a fix**, including what
@@ -143,11 +162,43 @@ has the notes, and an audit round has read what changed. `docs/AUDIT.md`
 records that round; the release notes are derived from `CHANGELOG.md` and
 nothing hand-copies them anywhere.
 
+**One gate on that list may still need a person, once.** The `wiki` workflow
+publishes from `main`, so a release merge is when it runs, and it has something
+to push to only if the wiki repository exists. It tries to create that
+repository itself, and where GitHub refuses, the one-time step in the web
+interface is written out in [`WEBSITE.md`](WEBSITE.md) under *The wiki, in two
+places, from one source*. It is named here so a release merge is not where it
+is discovered.
+
 ## Commits
 
 Write the message for somebody reading it in two years with no memory of the
 conversation that produced it: what changed, and why that rather than the
 obvious alternative. Long is fine. Vague is not.
+
+**The message is plain text, not markdown.** A title line on its own, a blank
+line, then the prose, and where the change is a list of changes, one line per
+change beginning with a hyphen and a space. No `#` headings, no `**bold**`, no
+backticks around a name for emphasis, no markdown links. Nothing renders a
+commit message, so markup in one is punctuation a reader has to read past:
+
+```
+Roadmap 169: one loading indicator, used everywhere
+
+Every worker roadmap item 167 created showed progress its own way, which
+is five spinners with five behaviours and no answer for a reader who has
+asked their system for less movement.
+
+- One indicator, drawn once, with the sentence beside it saying what is
+  happening
+- Reduced motion turns it into a static progress statement rather than a
+  spinning thing
+- The Browser, the verifier and the companion probes all use it
+```
+
+Backticks around a path or a command are fine where the name would otherwise
+be ambiguous, because a reader understands them and they are one character.
+The rule is against writing a document in the message, not against punctuation.
 
 Commits here have **one author**. Do not add `Co-Authored-By:` trailers, and do
 not put an assistant or model name in a commit message, a tag, a release note or
