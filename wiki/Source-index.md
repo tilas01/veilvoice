@@ -13,7 +13,7 @@ Every script and stylesheet this site is made of, each explained technically and
 | [[`website/js/reveal.js`|Source-website-js-reveal-js]] | 125 | Reveal-on-scroll, with one rule that outranks every other consideration: **content must never stay invisible.** |
 | [[`website/js/search.js`|Source-website-js-search-js]] | 496 | Search across the whole repository and this website |
 | [[`website/js/sessions.js`|Source-website-js-sessions-js]] | 219 | The command line, on the page, typed out |
-| [[`website/js/teleport.js`|Source-website-js-teleport-js]] | 310 | Following a link to a section of the page lands on that section's heading, with the heading visible |
+| [[`website/js/teleport.js`|Source-website-js-teleport-js]] | 346 | Following a link to a section of the page lands on that section's heading, with the heading visible |
 | [[`website/js/theme.js`|Source-website-js-theme-js]] | 104 | Theme switching |
 | [[`website/js/verify.js`|Source-website-js-verify-js]] | 211 | In-browser SHA-256 verification for downloaded release archives |
 | [[`website/js/walkthrough.js`|Source-website-js-walkthrough-js]] | 162 | Every screen of the application as a photograph you pick between, and the command line as a list of jobs rather than a list of flags |

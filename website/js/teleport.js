@@ -45,6 +45,26 @@
 // holding it are shown before the browser scrolls, while the click is still
 // being handled.
 //
+// # The landing that arrived only once
+//
+// The highlight is drawn when a landing is *cued*, and until F-205 the only
+// thing that cued one was `hashchange`. That covers arriving at a page with a
+// fragment already in the address bar, and it covers the first click on a
+// link into the page, because that click writes a hash where there was none
+// or a different one.
+//
+// It does not cover a click on a link naming the fragment that is already
+// there. No new hash is written, so no `hashchange` arrives, so nothing runs.
+// The link still works and the browser still scrolls, and the reader gets no
+// cue at all. On a page with a contents list that is most of the clicks after
+// the first one: pick an entry, read, come back, pick the same entry again,
+// and the second time nothing is marked.
+//
+// So the click handler below cues that one case itself, on the frame after
+// the browser has done its own scrolling. It is the only case it takes: every
+// other click writes a hash, and cueing it here as well would draw the
+// highlight twice.
+//
 // # What is deliberately left alone
 //
 // The navigation itself. Clicks are not prevented and no history entry is
@@ -276,13 +296,29 @@
     // are opened by `:target`, which follows real fragment navigation and not
     // a pushState, and the back button, the middle button and copying a link
     // all keep working because none of them has been taken over.
+    //
+    // A link naming the fragment that is already in the address bar writes no
+    // new hash, so no `hashchange` arrives and `fromHash` never runs. The link
+    // works and the page moves, but the landing is not cued: the same link
+    // highlights the first time it is followed and never again, and a contents
+    // page whose reader keeps coming back to it loses the cue after the first
+    // entry they pick. That case is landed here instead, on the frame after
+    // the browser has done its own scrolling so the two are not correcting the
+    // same pixels at once.
     document.addEventListener("click", function (event) {
       if (event.defaultPrevented || event.button !== 0) { return; }
+      // A held modifier means a new tab, a new window or a saved file. This
+      // page is not going anywhere, so there is nothing here to cue.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) { return; }
       var link = event.target.closest ? event.target.closest('a[href^="#"]') : null;
       if (!link) { return; }
       var id = decodeURIComponent(link.getAttribute("href").slice(1));
       var el = id && document.getElementById(id);
-      if (el) { settleReveal(el); }
+      if (!el) { return; }
+      settleReveal(el);
+      if (named() === id) {
+        window.requestAnimationFrame(function () { teleport(id, true); });
+      }
     }, true);
 
     // The browser has already jumped by the time this runs, using whatever the
