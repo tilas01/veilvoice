@@ -79,6 +79,35 @@ def stage(root):
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+def tree_state(root):
+    """Every path git has something to say about, and what it says.
+
+    Taken either side of the generators so the run can name what it wrote. It
+    stages as it goes, with `git add -A`, so by the end the output of every
+    generator is in the index and `git status` shows nothing unstaged. That is
+    right for the walk the search index does and it is silent: a run that
+    regenerated forty files and a run that regenerated none print the same
+    last line, and a commit made *before* this ran does not contain any of
+    them. Naming them is the difference between a side effect and a fact.
+    """
+    done = subprocess.run(["git", "status", "--porcelain", "-z"], cwd=root,
+                          stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    state = {}
+    fields = done.stdout.decode("utf-8", "replace").split("\0")
+    at = 0
+    while at < len(fields):
+        entry = fields[at]
+        at += 1
+        if len(entry) < 4:
+            continue
+        status, path = entry[:2], entry[3:]
+        # A rename or a copy carries the path it came from in the next field.
+        if "R" in status or "C" in status:
+            at += 1
+        state[path] = status
+    return state
+
+
 GENERATORS = [
     # First. It depends on nothing that is generated -- it runs the test suite
     # and reads Cargo.toml -- and everything after it may quote what it
@@ -339,6 +368,13 @@ CHECKS = [
     # the only one here that runs the programs rather than reading about them.
     ("recorded sessions match the programs",
      [sys.executable, "tools/shots/sessions.py", "--check"]),
+    # Every check above this one is about the pictures as pictures: no capture
+    # border, no empty space, one height, the right sizes on the page. A
+    # picture of last month's window passes all of them, which is how
+    # gui-about.png shipped a tab without its release-channel line. This is
+    # the one that asks what the pictures are pictures *of*.
+    ("the window captures are of this version",
+     [sys.executable, "tools/shots/taken.py", "--check"]),
     ("documentation matches the source", [sys.executable, "tools/docs/generate.py", "--check"]),
     ("per-program guides match the user guide",
      [sys.executable, "tools/docs/guides.py", "--check"]),
@@ -412,8 +448,14 @@ def main():
     quick = "--quick" in sys.argv
     failed = []
 
+    touched = []
     if not check_only:
         print("regenerating, in dependency order")
+        # The baseline is taken *after* a stage, so it is compared against the
+        # same shape: `git add -A` turns " M" into "M " and every path would
+        # otherwise read as changed by the first generator.
+        stage(root)
+        before = tree_state(root)
         for label, command in GENERATORS:
             stage(root)   # so the walk sees anything written by the step before
             ok, output = run(root, label, command)
@@ -422,6 +464,10 @@ def main():
                 print(output)
                 failed.append(label)
         stage(root)
+        after = tree_state(root)
+        touched = sorted(set(
+            [path for path in after if before.get(path) != after[path]]
+            + [path for path in before if path not in after]))
         print()
 
     print("checking" + (", without the cargo steps" if quick else ""))
@@ -434,6 +480,17 @@ def main():
                 print("      " + line)
 
     print()
+    if touched:
+        print("this run wrote %d file(s), and has staged them:" % len(touched))
+        for path in touched[:30]:
+            print("  %s" % path)
+        if len(touched) > 30:
+            print("  and %d more" % (len(touched) - 30))
+        print()
+        print("They are in the index and not in a commit. If you committed")
+        print("before running this, none of them is in that commit: commit")
+        print("again or amend, and read `git status` before you push.")
+        print()
     if failed:
         print("%d check(s) failed: %s" % (len(failed), ", ".join(failed)))
         return 1

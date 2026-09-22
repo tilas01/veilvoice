@@ -338,6 +338,11 @@ jobs:
       - name: The release cards must match CHANGELOG.md
         run: python tools/release/card.py --check
 
+      # The captures are pictures of a version of the window, and every other
+      # check about them is about the pictures rather than the window.
+      - name: The window captures must be of this version
+        run: python tools/shots/taken.py --check
+
       - name: The releases page must match CHANGELOG.md
         run: python tools/site/releases.py --check
 

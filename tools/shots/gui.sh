@@ -129,6 +129,38 @@ WHY
   esac
 fi
 
+# libxkbcommon-x11, asked for the same reason the typeface is.
+#
+# The window loads it at run time rather than linking against it, so `ldd`
+# says nothing and a machine without it gets
+#
+#   Library libxkbcommon-x11.so could not be loaded
+#
+# and an abort, at startup, before anything is drawn. That reads as the
+# program crashing rather than as a package that is not installed, and the
+# next thing somebody does is look for a defect in the window. `ci.yml`
+# installs it on the runner, so it is only a machine that has not had that
+# done to it that ever sees this.
+case "$(uname -s)" in
+  Linux)
+    if command -v ldconfig >/dev/null 2>&1 &&
+       ! ldconfig -p 2>/dev/null | grep -q 'libxkbcommon-x11\.so'; then
+      cat >&2 <<'WHY'
+libxkbcommon-x11 is not installed. The window loads it at startup and aborts
+with "Library libxkbcommon-x11.so could not be loaded", which reads like a
+crash and is a missing package.
+
+  Debian, Ubuntu    sudo apt-get install libxkbcommon-x11-0
+  Fedora            sudo dnf install libxkbcommon-x11
+  Arch              sudo pacman -S libxkbcommon-x11
+
+.github/workflows/ci.yml already installs it on the runner.
+WHY
+      exit 1
+    fi
+    ;;
+esac
+
 for tool in Xvfb xwd; do
   command -v "$tool" >/dev/null 2>&1 || {
     echo "missing $tool -- install xvfb and x11-apps" >&2
@@ -336,5 +368,19 @@ if [ "${#problems[@]}" -gt 0 ]; then
   for p in "${problems[@]}"; do echo "  PROBLEM $p"; done
   exit 1
 fi
+
+# Which version of the window these are pictures of, written here rather than
+# by hand and rather than by a generator.
+#
+# `tools/shots/taken.py --check` fails a build when that is not the version in
+# Cargo.toml, which is what stops a release publishing pictures of an older
+# window. Two captures had gone stale on `dev` before this existed and nothing
+# failed, because every check around them is about the pictures as pictures.
+#
+# It is written at the end of a run that took every capture and reported no
+# problem, so the only way to move the version forward is to take them again.
+# A record any run could rewrite would record nothing.
+python3 "$here/tools/shots/taken.py" --record
+
 echo
 echo "$taken captures in $out"
