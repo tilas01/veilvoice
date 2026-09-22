@@ -124,6 +124,15 @@ Work is committed and pushed to `dev`. `main` moves when a release is cut, by
 merging `dev` into it and tagging that merge; the release workflow builds the
 tag, and the site redeploys when it finishes.
 
+The one exception to "never a third" is a `dependabot/*` branch. Dependabot
+pushes one per pull request it opens, and it goes away when that pull request
+is merged or closed, so it is a temporary branch belonging to a bot rather than
+a place anybody works. Those pull requests target `dev`, like every other
+change: `.github/dependabot.yml` says `target-branch: dev` on each ecosystem
+and `tools/audit/dependabot.py` fails the build if one stops saying it, because
+a bump merged straight into `main` is a change `dev` does not have and the next
+release merge either loses it or conflicts with it.
+
 An early build is a tag rather than a branch: the same source, the same
 workflow, the same signing and the same hash lists, published as a prerelease
 so the download page never offers it by default. Roadmap item 165 is the rest

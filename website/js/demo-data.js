@@ -118,7 +118,7 @@ window.VEILVOICE_DEMO = {
       "programme": "veilvoice",
       "steps": [
         {
-          "output": "VeilVoice\n  Version                0.1.22\n  Engine                 0.1.22\n  Crypto                 0.1.22\n  Audio                  0.1.22\n  Metadata               0.1.22\n  Monitor                0.1.22\n  Licence                GPL-3.0-or-later\n  Network access         none, by construction\n  Live audio             available\n\n  VeilVoice destroys the voiceprint, not the words.\n  See docs/WHITEPAPER.md for what that does and does not\n  protect against.",
+          "output": "VeilVoice\n  Version                0.1.22\n  Release channel        stable (cut from main, signed, and what the download page offers)\n  Engine                 0.1.22\n  Crypto                 0.1.22\n  Audio                  0.1.22\n  Metadata               0.1.22\n  Monitor                0.1.22\n  Licence                GPL-3.0-or-later\n  Network access         none, by construction\n  Live audio             available\n\n  VeilVoice destroys the voiceprint, not the words.\n  See docs/WHITEPAPER.md for what that does and does not\n  protect against.",
           "typed": "veilvoice info"
         }
       ],

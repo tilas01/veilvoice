@@ -196,6 +196,13 @@ CHECKS = [
     # problem, because nobody is looking at it.
     ("every manifest is covered by a Dependabot entry",
      [sys.executable, "tools/audit/dependabot.py"]),
+    # And the half of that guard which cannot be proved by running it here: a
+    # check that reads only the file it guards is a check nobody has seen fail.
+    # F-200 was an entry aimed at the released branch, and the reader in place
+    # at the time stopped looking before `target-branch` and would have passed
+    # either way. These cases are text, so the failing shapes are exercised.
+    ("the Dependabot guard notices where a bump would land",
+     [sys.executable, "tools/audit/dependabot.py", "--self-test"]),
     # And the third question about dependencies, which is whether the code
     # still compiles without the optional ones. Nine of the twelve release
     # jobs turn `veilvoice-audio`'s `live` feature off because `cpal` has no

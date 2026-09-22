@@ -125,7 +125,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/actions.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/actions.py) | Every GitHub Action a workflow runs is pinned to a commit, not to a tag |
 | [`tools/audit/build_output.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/build_output.py) | No build output lives inside this repository except where it is expected |
 | [`tools/audit/crate_tables.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/crate_tables.py) | Every crate in the workspace appears in every table that lists the crates |
-| [`tools/audit/dependabot.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/dependabot.py) | Every manifest in this tree is covered by a Dependabot entry |
+| [`tools/audit/dependabot.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/dependabot.py) | Every manifest in this tree is covered by a Dependabot entry, aimed at `dev` |
 | [`tools/audit/dependencies.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/dependencies.py) | Every dependency says what it is for, where it is declared |
 | [`tools/audit/documented.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/documented.py) | Every item on a generated page has something written under it |
 | [`tools/audit/features.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/features.py) | Every feature selection a release builds is built here too |
@@ -188,6 +188,7 @@ And what it then checks:
 - **no build output lives outside the one directory at the root**: `python tools/audit/build_output.py`
 - **every argued-for surviving mutant still points at real code**: `python tools/mutants/check.py --lint`
 - **every manifest is covered by a Dependabot entry**: `python tools/audit/dependabot.py`
+- **the Dependabot guard notices where a bump would land**: `python tools/audit/dependabot.py --self-test`
 - **every feature selection a release builds is still declared**: `python tools/audit/features.py`
 - **no crate reaching pgp performs a private-key operation**: `python tools/audit/rsa_usage.py`
 - **every random draw comes from the OS CSPRNG**: `python tools/audit/randomness.py`
