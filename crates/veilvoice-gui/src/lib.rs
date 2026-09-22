@@ -76,8 +76,13 @@ pub fn tabs() -> impl Iterator<Item = &'static str> {
 /// read so that neither of them carries a copy of a list that would go stale
 /// the first time a page is added. That is the same failure `--tabs` exists to
 /// prevent, one level down.
+///
+/// These are the deep-link names rather than the headings the menu draws:
+/// lower case, and the same words a capture file is named after. A heading
+/// rewritten does not rename a published picture, which is the reason the two
+/// are separate at all.
 pub fn settings_pages() -> impl Iterator<Item = &'static str> {
-    settings::Page::ALL.iter().map(|(_, key, _)| *key)
+    settings::Page::ALL.iter().map(|(_, key, _, _)| *key)
 }
 
 /// Where JetBrains Mono is on this machine, if it is anywhere.

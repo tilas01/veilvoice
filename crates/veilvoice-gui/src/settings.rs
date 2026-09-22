@@ -57,13 +57,34 @@ pub enum Page {
 }
 
 impl Page {
-    /// Every page, in menu order, with its label and one-line summary.
-    pub const ALL: &'static [(Page, &'static str, &'static str)] = &[
-        (Page::Appearance, "appearance", "Colour scheme"),
-        (Page::Motion, "motion", "Animation, and the mark"),
-        (Page::Interface, "interface", "Which tabs are shown"),
-        (Page::Security, "security", "Locking"),
-        (Page::Storage, "storage", "Where this is kept"),
+    /// Every page, in menu order: its key, its heading, and a one-line
+    /// summary.
+    ///
+    /// The key and the heading are the same word and are still written out
+    /// separately, because they are read by different things and only one of
+    /// them is meant for a person. The heading is what the menu draws, and it
+    /// is capitalised because it is a title sitting among other titles. The
+    /// key is what `--settings-page` accepts, what `gui.sh` names the capture
+    /// after and therefore what the website's address for that picture is, and
+    /// none of those three should move because a heading was recapitalised. A
+    /// test asserts the key is the heading lowercased, so the pair is checked
+    /// rather than left to agree by habit.
+    pub const ALL: &'static [(Page, &'static str, &'static str, &'static str)] = &[
+        (
+            Page::Appearance,
+            "appearance",
+            "Appearance",
+            "Colour scheme",
+        ),
+        (Page::Motion, "motion", "Motion", "Animation, and the mark"),
+        (
+            Page::Interface,
+            "interface",
+            "Interface",
+            "Which tabs are shown",
+        ),
+        (Page::Security, "security", "Security", "Locking"),
+        (Page::Storage, "storage", "Storage", "Where this is kept"),
     ];
 
     /// The page the window opens Settings on when nobody has said otherwise.
@@ -75,14 +96,17 @@ impl Page {
 
     /// The page a name asks for, or nothing.
     ///
-    /// The names are the ones the menu shows, so `--settings-page motion`
-    /// names what a reader sees rather than an internal spelling.
+    /// The names are the menu's own headings in lower case, so
+    /// `--settings-page motion` names what a reader sees rather than an
+    /// internal spelling. Case is not significant: the argument is folded
+    /// before it is looked up, so `Motion` and `motion` are the same request
+    /// and somebody typing the heading as the menu draws it is not refused.
     pub fn from_key(name: &str) -> Option<Page> {
         let wanted = name.trim().to_ascii_lowercase();
         Self::ALL
             .iter()
-            .find(|(_, key, _)| *key == wanted)
-            .map(|(page, _, _)| *page)
+            .find(|(_, key, _, _)| *key == wanted)
+            .map(|(page, _, _, _)| *page)
     }
 
     /// Which page the command line asked to open on, if it asked.
@@ -719,10 +743,10 @@ impl Settings {
         // The menu, then the page. A row rather than a sidebar: there are three
         // pages, and a sidebar for three items is furniture.
         ui.horizontal(|ui| {
-            for (page, label, _) in Page::ALL {
+            for (page, _, heading, _) in Page::ALL {
                 let selected = self.page == *page;
                 let text =
-                    RichText::new(*label).color(if selected { p::blue() } else { p::muted() });
+                    RichText::new(*heading).color(if selected { p::blue() } else { p::muted() });
                 if ui.selectable_label(selected, text).clicked() {
                     self.page = *page;
                 }
@@ -1251,7 +1275,7 @@ mod tests {
     /// capture script therefore has no picture of.
     #[test]
     fn every_settings_page_answers_to_its_own_name() {
-        for (page, key, _) in Page::ALL {
+        for (page, key, _, _) in Page::ALL {
             assert_eq!(
                 Page::from_key(key),
                 Some(*page),
@@ -1301,7 +1325,7 @@ mod tests {
     #[test]
     fn every_page_renders_without_a_window() {
         let mut settings = Settings::default();
-        for (page, _, _) in Page::ALL {
+        for (page, _, _, _) in Page::ALL {
             settings.page = *page;
             render(&mut settings);
         }
@@ -1320,13 +1344,46 @@ mod tests {
     /// a page becomes unreachable.
     #[test]
     fn the_menu_lists_every_page_exactly_once() {
-        let mut seen: Vec<Page> = Page::ALL.iter().map(|(p, _, _)| *p).collect();
+        let mut seen: Vec<Page> = Page::ALL.iter().map(|(p, _, _, _)| *p).collect();
         let count = seen.len();
         seen.dedup();
         assert_eq!(seen.len(), count, "a page is listed twice");
         assert_eq!(count, 5, "a page was added without a menu entry");
-        for (_, label, blurb) in Page::ALL {
-            assert!(!label.is_empty() && !blurb.is_empty());
+        for (_, key, heading, blurb) in Page::ALL {
+            assert!(!key.is_empty() && !heading.is_empty() && !blurb.is_empty());
+        }
+    }
+
+    /// The menu's headings are titles, and the deep-link names are not.
+    ///
+    /// Two properties in one test because they are one decision. Every
+    /// heading starts with a capital, which is the whole of roadmap item 181:
+    /// the five pages were the only labels in the window written in lower
+    /// case, sitting in a menu where everything else is capitalised. And every
+    /// key is exactly its heading lowercased, which is what keeps
+    /// `--settings-page`, the capture file names and the addresses the website
+    /// publishes for those pictures from moving when a heading is rewritten.
+    ///
+    /// Without the second half the pair is two lists that happen to agree, and
+    /// the way that fails is quiet: a page renamed in one of them and not the
+    /// other leaves a menu entry nothing can deep-link to, which is exactly
+    /// the failure `every_settings_page_answers_to_its_own_name` exists to
+    /// catch one step earlier.
+    #[test]
+    fn every_heading_is_a_title_and_every_key_is_that_title_lowercased() {
+        for (_, key, heading, _) in Page::ALL {
+            let first = heading.chars().next().expect("a heading with no text");
+            assert!(
+                first.is_uppercase(),
+                "the menu heading {heading:?} is not capitalised, and it sits \
+                 among headings that are"
+            );
+            assert_eq!(
+                *key,
+                heading.to_lowercase(),
+                "the deep-link name for {heading:?} is {key:?}, which is not \
+                 that heading lowercased"
+            );
         }
     }
 

@@ -120,9 +120,19 @@ GENERATORS = [
     ("per-program guides", [sys.executable, "tools/docs/guides.py"]),
     # After the guides, because the wiki's landing page links to them.
     ("wiki landing and documents", [sys.executable, "tools/docs/wiki.py"]),
+    # Before the source pages below, which walk `website/js` and publish a page
+    # per file in it: this writes `website/js/demo-data.js`, so a run with the
+    # two the other way round publishes the previous demonstration and fails
+    # its own check. The comment on this line has said "before the source
+    # pages" since it was written; the order did not agree with it, and a
+    # single pass over a changed demonstration went red until somebody ran it
+    # twice. Nothing else here reads what this writes, so it moves rather than
+    # the source pages moving past the wiki that walks them.
+    ("demonstration data", [sys.executable, "tools/site/demo.py"]),
     # The website's own source, which `generate.py` does not cover: it reads
     # Rust doc comments, and these are JavaScript and CSS. Imports the same
-    # module for the palette and the drawing code, so it goes after it.
+    # module for the palette and the drawing code, so it goes after it, and
+    # after every generator that writes into `website/js`.
     ("website source pages", [sys.executable, "tools/docs/sources.py"]),
     # After every page of the reference exists, including the source pages
     # above: this publishes the wiki on the website and works out which of its
@@ -135,8 +145,6 @@ GENERATORS = [
     # After the split, because it borrows that tool's header, navigation and
     # footer from index.html, and before the index, which walks the result.
     ("roadmap page", [sys.executable, "tools/site/roadmap.py"]),
-    # Before the source pages walk website/js, since this writes one of them.
-    ("demonstration data", [sys.executable, "tools/site/demo.py"]),
     ("questions page", [sys.executable, "tools/site/faq.py"]),
     # After the split, whose header this borrows, and before the index walks it.
     ("releases page", [sys.executable, "tools/site/releases.py"]),
@@ -146,6 +154,53 @@ GENERATORS = [
     ("addresses and the sitemap", [sys.executable, "tools/site/seo.py"]),
     ("search index", [sys.executable, "tools/search-index/generate.py"]),
 ]
+
+# Which generator has to run before which, and why, for the pairs where one
+# writes a file the other reads or walks. Only those pairs: the list is not a
+# second copy of the order above, it is the handful of orderings that are load
+# bearing, and `ordering_faults` checks the order against them.
+#
+# This exists because the comment saying "before the source pages" sat on the
+# demonstration step while the demonstration step ran *after* the source pages,
+# and both were true-looking English. A comment cannot be run. A single pass
+# over a changed demonstration therefore failed, and passed on a second run,
+# which is the worst shape a build failure can have: it looks like a flake and
+# it is not one.
+MUST_RUN_BEFORE = [
+    ("demonstration data", "website source pages",
+     "it writes website/js/demo-data.js, which the source pages walk and "
+     "publish a page for"),
+    ("website source pages", "the wiki on the website",
+     "the wiki on the website works out which reference pages exist by "
+     "walking website/reference/, which the source pages write into"),
+    ("section pages", "roadmap page",
+     "the roadmap page borrows the header, navigation and footer the split "
+     "takes out of index.html"),
+    ("addresses and the sitemap", "search index",
+     "the index walks the pages the addresses step has finished writing"),
+]
+
+
+def ordering_faults():
+    """Every pair in MUST_RUN_BEFORE that the generator list has back to front.
+
+    Returns a list of sentences, empty when the order is right. Separate from
+    `main` so it can be exercised without running a single generator.
+    """
+    at = {label: n for n, (label, _) in enumerate(GENERATORS)}
+    faults = []
+    for earlier, later, why in MUST_RUN_BEFORE:
+        for label in (earlier, later):
+            if label not in at:
+                faults.append(
+                    "%r is named in MUST_RUN_BEFORE and is not a generator, so "
+                    "the ordering it describes is not being checked" % label)
+        if earlier in at and later in at and at[earlier] > at[later]:
+            faults.append(
+                "%r runs after %r and must run before it: %s"
+                % (earlier, later, why))
+    return faults
+
 
 CHECKS = [
     # First, because a release whose README tells people to download the
@@ -321,6 +376,21 @@ CARGO = [
 
 def main():
     root = repo_root()
+
+    # Before anything runs, because a generator order that is wrong wastes the
+    # whole run and then fails a check that names the wrong thing: what goes
+    # red is the file that was published stale, not the ordering that published
+    # it.
+    faults = ordering_faults()
+    if faults:
+        print("the generators are not in dependency order:")
+        for fault in faults:
+            print("  %s" % fault)
+        print()
+        print("Reorder GENERATORS, or correct MUST_RUN_BEFORE if the "
+              "dependency it describes is no longer real.")
+        return 1
+
     check_only = "--check" in sys.argv
     # `--quick` runs everything except the three cargo steps. Those are most of
     # the wall time and almost none of the failures: what actually reaches CI
