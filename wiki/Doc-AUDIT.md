@@ -504,6 +504,70 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-206: a test fixture the ignore rules swallowed, and a gate that failed for everybody
+
+Roadmap item 164 added `crates/veilvoice-verify/src/check/testdata/not-our-key.asc`,
+a public key that is deliberately not this project's, so `check::carried`'s
+tests can prove a download carrying somebody else's signing key is refused. It
+is reached with `include_str!`.
+
+`.gitignore` carries `*.asc`, which is there so a private key can never be
+committed by accident and is right to be there. So `git add -A` skipped the
+fixture, `git status` never mentioned it, every check passed on the machine
+that wrote it, and the commit went out with an `include_str!` pointing at a
+file that was not in the tree. On a fresh clone `veilvoice-verify` does not
+compile at all.
+
+**The gate did not merely miss this. It failed for every thread in the
+project.** `tools/verify.py` runs `tools/measured/generate.py` as a generator
+rather than as one of the cargo steps, so `--quick` does not skip it, and that
+generator runs the test suite to get a number to record. On a clean `dev` it
+exited 1 with `couldn't read .../not-our-key.asc`. For a few hours anybody
+running the pre-push check was watching it fail for a reason that had nothing
+to do with their own work, and the choice in front of them was to push without
+a gate or to stop. That is the expensive part of this defect, and it is worth
+separating from the missing file: one commit broke the shared instrument that
+every other commit is measured with.
+
+**Why `git status` could not help.** The habit this repository already has --
+run the checks, look at `git status`, commit what is there -- cannot catch it.
+A file git has never been offered is absent from that listing in both
+directions: it is not modified, not staged and not untracked, because it was
+never a candidate. So a clean tree after a run does not mean everything that
+was written is in the commit, and there is no amount of care at the terminal
+that turns it into one. Every check here reads the working tree; the working
+tree is not what CI clones.
+
+The file is allowed back in with a negation line beside the two already there,
+rather than with `git add -f`. A forced add leaves nothing behind for the next
+person: the rule still says the file is ignored, and the only record that
+somebody decided otherwise is in a shell history nobody has.
+
+The general fix is not a second rule in `.gitignore`. It is
+`tools/audit/fixtures.py` (F-204), which walks every `include_str!`,
+`include_bytes!` and `assets/` reference in the tree and fails on anything git
+does not track. That guard would have failed this commit before it was made,
+and it covers the whole class rather than the one extension that happened to
+bite. This finding points at it rather than adding a guard beside it.
+
+Reproduced, before and after, by cloning the branch into a temporary directory
+and looking, which is the only way to see what was actually pushed rather than
+what is on the machine that pushed it.
+
+**A note for anybody reading the history.** The commit that put the fixture
+back, `192bb7d`, says in its message that the write-up would go in as F-203.
+That number went to another thread's finding, which is about something else
+entirely. This write-up then moved twice more, because the audit's own guard
+forbids a gap in the numbering, so a finding number cannot be reserved ahead of
+time. `tools/site-tests/audit.test.js` fails on any gap between the write-ups
+present and the highest number used, which means findings have to land in
+ascending order rather than merely hold distinct numbers, and three other
+findings landed while this one was being written. The commit message cannot
+be corrected: five threads are working from
+`dev` and amending a pushed commit under them is not worth the confusion it
+would save. So the pointer is here instead, going the other way. The commit
+named F-203; the finding is this one.
+
 ### F-201: a recorded session that stopped matching the program it records
 
 Found while running `python tools/verify.py --quick` before a push, which is
@@ -6548,7 +6612,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1708 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1723 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -8196,7 +8260,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and five defects found and fixed (F-1 to F-205), across
+**Two hundred and six defects found and fixed (F-1 to F-206), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

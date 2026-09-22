@@ -58,7 +58,7 @@ gpg_secrets/
 # in for the same reason as the two above, and named here rather than added
 # with `git add -f` so the next person sees why it is tracked: an -f leaves no
 # record, and this rule is exactly the kind that swallows a file silently
-# (F-203).
+# (F-206).
 !crates/veilvoice-verify/src/check/testdata/*.asc
 
 # Python bytecode. Importing `assets/generate.py` from a check script -- which
