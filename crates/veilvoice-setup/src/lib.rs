@@ -2,9 +2,14 @@
 //! # veilvoice-setup
 //!
 //! Everything that puts VeilVoice on a machine, and everything that reports
-//! what is already on it. Two modules: [`install`] does the per-user install
-//! and its exact reversal, [`companions`] finds the optional third-party
-//! software that live mode is easier with and says who makes each piece.
+//! what is already on it. [`install`] does the per-user install and its exact
+//! reversal, [`companions`] finds the optional third-party software that live
+//! mode is easier with and says who makes each piece, [`update`] reports
+//! whether a newer release exists, [`space`] asks the system how much room is
+//! free, and [`volumes`] reports the encrypted volumes that are mounted.
+//!
+//! This paragraph said "two modules" while five were declared below it, which
+//! is the same class of thing as the spawn test naming three files out of six.
 //!
 //! # Why this is a library and not part of the command line
 //!
@@ -124,8 +129,21 @@ mod tests {
     /// which is precisely why the defect reached a release. A `Command::new`
     /// added later without the wrapper fails here rather than on a desktop.
     ///
-    /// It scans every module, not just this file, because the wrapper now
-    /// lives in one place and the spawns do not.
+    /// # The list is checked rather than kept up to date
+    ///
+    /// It scans every module, because the wrapper lives in one place and the
+    /// spawns do not. The list below used to be written by hand and said in its
+    /// own comment that it covered every module while naming three of the six.
+    /// `update.rs` spawned curl and `space.rs` spawned `df` and `fsutil.exe`
+    /// outside the wrapper for as long as they had existed, so the button that
+    /// checks for an update and the Storage tab's free-space reading each
+    /// flashed a console window on Windows: the exact defect of v0.1.10, in a
+    /// crate whose test for it passed. See F-210.
+    ///
+    /// `include_str!` takes a literal, so the list cannot be built from the
+    /// directory. What it can be is **checked**: every `mod` declared in this
+    /// file must appear below, and a module added without a line here fails
+    /// this test rather than going unscanned.
     ///
     /// Each file is cut at its `cfg(test)` marker first. A test module that
     /// searches for the name of a type necessarily contains that name, and a
@@ -136,15 +154,50 @@ mod tests {
         let sources = [
             // Normalised where they are read, for the reason in F-72: a
             // checkout with CRLF makes a search for "\n}\n" match nothing.
-            ("lib.rs", include_str!("lib.rs")),
-            ("install.rs", include_str!("install.rs")),
-            ("companions.rs", include_str!("companions.rs")),
+            ("lib.rs", include_str!("lib.rs").replace("\r\n", "\n")),
+            (
+                "install.rs",
+                include_str!("install.rs").replace("\r\n", "\n"),
+            ),
+            (
+                "companions.rs",
+                include_str!("companions.rs").replace("\r\n", "\n"),
+            ),
+            ("space.rs", include_str!("space.rs").replace("\r\n", "\n")),
+            ("update.rs", include_str!("update.rs").replace("\r\n", "\n")),
+            (
+                "volumes.rs",
+                include_str!("volumes.rs").replace("\r\n", "\n"),
+            ),
         ];
+
+        // Every module this crate declares is in the list above. Written as a
+        // check because the hand-kept version of that claim was false.
+        let lib = include_str!("lib.rs").replace("\r\n", "\n");
+        let declared: Vec<String> = lib
+            .lines()
+            .filter_map(|line| {
+                let line = line.trim();
+                let rest = line
+                    .strip_prefix("pub mod ")
+                    .or_else(|| line.strip_prefix("mod "))?;
+                rest.strip_suffix(';').map(|name| format!("{name}.rs"))
+            })
+            .collect();
+        for module in &declared {
+            assert!(
+                sources.iter().any(|(name, _)| name == module),
+                "{module} is declared in lib.rs but is not scanned for bare \
+                 spawns. Add it to the list above: a module left out of it is \
+                 a module where this rule is not enforced, which is F-210."
+            );
+        }
+
         let mut bare = Vec::new();
-        for (name, source) in sources {
+        for (name, source) in &sources {
             let shipped = match source.find("#[cfg(test)]") {
                 Some(at) => &source[..at],
-                None => source,
+                None => source.as_str(),
             };
             for (number, line) in shipped.lines().enumerate() {
                 let trimmed = line.trim_start();
@@ -155,7 +208,7 @@ mod tests {
                     continue;
                 }
                 // The one permitted occurrence is the wrapper's own.
-                if name == "lib.rs" && trimmed.starts_with("let command = ") {
+                if *name == "lib.rs" && trimmed.starts_with("let command = ") {
                     continue;
                 }
                 bare.push(format!("{}:{}: {}", name, number + 1, trimmed));

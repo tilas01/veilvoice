@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-setup/space.svg" alt="space.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-setup/src/space.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 171 lines &middot; <a href="space.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 170 lines &middot; <a href="space.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-measured-rather-than-assumed">Why this is measured rather than assumed</a>
@@ -88,9 +88,9 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>171 lines defining <strong>5 functions</strong> (3 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>170 lines defining <strong>5 functions</strong> (3 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>free_bytes</code> <span style="color:var(--muted)">line 45</span> &middot; Free space at path, in bytes, or None if the platform would not say.
+<li><code>free_bytes</code> <span style="color:var(--muted)">line 44</span> &middot; Free space at path, in bytes, or None if the platform would not say.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>unix_free</code>, <code>windows_free</code>, <code>parse_df</code>, <code>parse_fsutil</code></span>
 </li>
 </ul>
@@ -115,27 +115,27 @@
 <a href="space.src.html#fn-free_bytes">
 <rect x="171.0" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="225.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">free_bytes</text>
-<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 45</text>
+<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 44</text>
 </a>
 <a href="space.src.html#fn-unix_free">
 <rect x="99.7" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="149.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unix_free</text>
-<text x="149.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 63</text>
+<text x="149.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 62</text>
 </a>
 <a href="space.src.html#fn-parse_df">
 <rect x="103.7" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="149.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_df</text>
-<text x="149.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 91</text>
+<text x="149.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
 </a>
 <a href="space.src.html#fn-windows_free">
 <rect x="226.2" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="288.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">windows_free</text>
-<text x="288.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 115</text>
+<text x="288.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 114</text>
 </a>
 <a href="space.src.html#fn-parse_fsutil">
 <rect x="222.2" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="284.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_fsutil</text>
-<text x="284.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
+<text x="284.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 149</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -155,20 +155,20 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_free_bytes([&quot;free_bytes&lt;br/&gt;line 45&quot;])
-    n_unix_free[&quot;unix_free&lt;br/&gt;line 63&quot;]
-    n_parse_df[&quot;parse_df&lt;br/&gt;line 91&quot;]
-    n_windows_free[&quot;windows_free&lt;br/&gt;line 115&quot;]
-    n_parse_fsutil[&quot;parse_fsutil&lt;br/&gt;line 150&quot;]
+    n_free_bytes([&quot;free_bytes&lt;br/&gt;line 44&quot;])
+    n_unix_free[&quot;unix_free&lt;br/&gt;line 62&quot;]
+    n_parse_df[&quot;parse_df&lt;br/&gt;line 90&quot;]
+    n_windows_free[&quot;windows_free&lt;br/&gt;line 114&quot;]
+    n_parse_fsutil[&quot;parse_fsutil&lt;br/&gt;line 149&quot;]
     n_free_bytes --&gt; n_unix_free
     n_free_bytes --&gt; n_windows_free
     n_unix_free --&gt; n_parse_df
     n_windows_free --&gt; n_parse_fsutil
-    click n_free_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L45&quot; &quot;open the source&quot;
-    click n_unix_free href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L63&quot; &quot;open the source&quot;
-    click n_parse_df href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L91&quot; &quot;open the source&quot;
-    click n_windows_free href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L115&quot; &quot;open the source&quot;
-    click n_parse_fsutil href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L150&quot; &quot;open the source&quot;
+    click n_free_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L44&quot; &quot;open the source&quot;
+    click n_unix_free href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L62&quot; &quot;open the source&quot;
+    click n_parse_df href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L90&quot; &quot;open the source&quot;
+    click n_windows_free href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L114&quot; &quot;open the source&quot;
+    click n_parse_fsutil href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L149&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_free_bytes entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -181,11 +181,11 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>free_bytes</code> <sub>pub fn</sub></td><td><a href="space.src.html#fn-free_bytes">45</a></td><td>Free space at path, in bytes, or None if the platform would not say.</td></tr>
-<tr><td><code>unix_free</code> <sub>fn</sub></td><td><a href="space.src.html#fn-unix_free">63</a></td><td>df -Pk, parsed from the format POSIX specifies.</td></tr>
-<tr><td><code>parse_df</code> <sub>pub fn</sub></td><td><a href="space.src.html#fn-parse_df">91</a></td><td>The available column of a df -Pk report.</td></tr>
-<tr><td><code>windows_free</code> <sub>fn</sub></td><td><a href="space.src.html#fn-windows_free">115</a></td><td>fsutil volume diskfree, which is on every Windows since Vista.</td></tr>
-<tr><td><code>parse_fsutil</code> <sub>pub fn</sub></td><td><a href="space.src.html#fn-parse_fsutil">150</a></td><td>The free-bytes figure from fsutil volume diskfree.</td></tr>
+<tr><td><code>free_bytes</code> <sub>pub fn</sub></td><td><a href="space.src.html#fn-free_bytes">44</a></td><td>Free space at path, in bytes, or None if the platform would not say.</td></tr>
+<tr><td><code>unix_free</code> <sub>fn</sub></td><td><a href="space.src.html#fn-unix_free">62</a></td><td>df -Pk, parsed from the format POSIX specifies.</td></tr>
+<tr><td><code>parse_df</code> <sub>pub fn</sub></td><td><a href="space.src.html#fn-parse_df">90</a></td><td>The available column of a df -Pk report.</td></tr>
+<tr><td><code>windows_free</code> <sub>fn</sub></td><td><a href="space.src.html#fn-windows_free">114</a></td><td>fsutil volume diskfree, which is on every Windows since Vista.</td></tr>
+<tr><td><code>parse_fsutil</code> <sub>pub fn</sub></td><td><a href="space.src.html#fn-parse_fsutil">149</a></td><td>The free-bytes figure from fsutil volume diskfree.</td></tr>
 </tbody></table>
 </section>
 </div></div>

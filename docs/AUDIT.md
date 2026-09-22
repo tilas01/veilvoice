@@ -732,6 +732,58 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-210: the test that proved every spawn was wrapped scanned half the crate
+
+`veilvoice-setup` reaches the Windows registry, `df`, `fsutil.exe`, `curl` and
+the platform's own file manager as subprocesses, because
+`#![forbid(unsafe_code)]` holds in every crate here and the Win32 calls those
+would otherwise need are `unsafe` FFI. On Windows a `Command` for a console
+program creates a console, and when the caller is the desktop application that
+console flashes on screen. Three of those at startup were most of what "it
+flashes a command prompt and loads in an unusable state" meant in the v0.1.10
+report, and the fix was `crate::command`, a wrapper that sets
+`CREATE_NO_WINDOW`, plus a test reading the crate's own source to catch a spawn
+that forgets it.
+
+The test said, in its own doc comment, "It scans every module, not just this
+file, because the wrapper now lives in one place and the spawns do not." It
+then named `lib.rs`, `install.rs` and `companions.rs`. The crate declares five
+modules beside `lib.rs`. `space.rs` and `update.rs` were never read, and both
+spawn:
+
+- `space.rs` runs `df -Pk` and, on Windows, `fsutil.exe volume diskfree`. It is
+  what the Storage tab shows a free-space figure from, so opening that tab
+  flashed a console.
+- `update.rs` runs `curl` or `wget`. It is the check-for-updates button, which
+  is the one thing in VeilVoice that touches the network at all and therefore
+  the one button most likely to be pressed by somebody already wondering
+  whether this program is what it says it is. Pressing it flashed a console.
+
+Neither is cosmetic in the way the word suggests. The v0.1.10 report is the
+evidence for that, and this is the same defect in the same crate, shipped past
+the test written to prevent it, in code added after that test.
+
+**The general fault is the hand-kept list, not the two files.** A list of
+sources that has to be extended whenever a module is added will be wrong from
+the first module nobody thought about, and its own comment claiming
+completeness makes it worse: a reader checking whether the rule is enforced
+reads the sentence rather than counting the entries. `include_str!` takes a
+literal, so the list genuinely cannot be built from the directory. What it can
+be is **checked**. The test now reads the `mod` declarations out of `lib.rs`
+and asserts that each one appears in the list, so a module added without a line
+beside it fails here rather than on somebody's desktop. That is the same move
+as F-204 and `tools/audit/fixtures.py`: ask the thing that knows, rather than
+restate what it knows and hope the restatement keeps up.
+
+Both halves were confirmed by breaking them. Putting a bare `Command::new`
+back in `space.rs` fails with the file and line; removing `space.rs` from the
+list fails with the module name and what to do about it.
+
+The module documentation at the top of `lib.rs` had the same shape of error and
+is corrected in the same commit: it said "Two modules" and described two, above
+five declarations. Nothing depended on it, which is exactly why it had been
+allowed to drift.
+
 ### F-201: a recorded session that stopped matching the program it records
 
 Found while running `python tools/verify.py --quick` before a push, which is
@@ -8424,7 +8476,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and nine defects found and fixed (F-1 to F-209), across
+**Two hundred and ten defects found and fixed (F-1 to F-210), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

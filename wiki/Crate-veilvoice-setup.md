@@ -17,9 +17,14 @@
   - [The files](#the-files)
 
 Everything that puts VeilVoice on a machine, and everything that reports
-what is already on it. Two modules: `install` does the per-user install
-and its exact reversal, `companions` finds the optional third-party
-software that live mode is easier with and says who makes each piece.
+what is already on it. `install` does the per-user install and its exact
+reversal, `companions` finds the optional third-party software that live
+mode is easier with and says who makes each piece, `update` reports
+whether a newer release exists, `space` asks the system how much room is
+free, and `volumes` reports the encrypted volumes that are mounted.
+
+This paragraph said "two modules" while five were declared below it, which
+is the same class of thing as the spawn test naming three files out of six.
 
 # Why this is a library and not part of the command line
 
@@ -90,11 +95,11 @@ you who makes each one, and installs none of them unless you say so.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>171 lines"])
+    n_lib(["lib.rs<br/>224 lines"])
     n_companions["companions.rs<br/>1088 lines"]
     n_install["install.rs<br/>594 lines"]
-    n_space["space.rs<br/>171 lines"]
-    n_update["update.rs<br/>893 lines"]
+    n_space["space.rs<br/>170 lines"]
+    n_update["update.rs<br/>892 lines"]
     n_volumes["volumes.rs<br/>580 lines"]
     n_volumes --> n_companions
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
@@ -113,12 +118,12 @@ flowchart TD
 |---|---:|---|
 | [[`companions.rs`|File-veilvoice-setup-companions]] | 1088 | Optional third-party software, detected rather than assumed. |
 | [[`install.rs`|File-veilvoice-setup-install]] | 594 | Put this program somewhere the system can find it. |
-| [[`lib.rs`|File-veilvoice-setup-lib]] | 171 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
-| [[`space.rs`|File-veilvoice-setup-space]] | 171 | How much room is actually free where VeilVoice keeps things. |
-| [[`update.rs`|File-veilvoice-setup-update]] | 893 | Ask, only when told to, whether a newer VeilVoice release exists. |
+| [[`lib.rs`|File-veilvoice-setup-lib]] | 224 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [[`space.rs`|File-veilvoice-setup-space]] | 170 | How much room is actually free where VeilVoice keeps things. |
+| [[`update.rs`|File-veilvoice-setup-update]] | 892 | Ask, only when told to, whether a newer VeilVoice release exists. |
 | [[`volumes.rs`|File-veilvoice-setup-volumes]] | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**2,264 functional lines of Rust** in this crate. A functional line is a line
+**2,293 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
