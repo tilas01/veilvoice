@@ -1669,3 +1669,75 @@ fn tar_on_this_machine() -> Option<&'static str> {
             .is_ok()
     })
 }
+
+/// **Roadmap item 164.** The machine pass never runs anything it finds.
+///
+/// The promise `check::machine` makes for itself, and the one a reader has to
+/// be able to check. Asking a binary its version to decide whether that binary
+/// is the published one is asking the suspect: a tampered copy answers
+/// whatever looks right, and the answer arrives after it has already run.
+///
+/// It is a claim about code that does not exist, so nothing but reading the
+/// source can check it. And it cannot be caught by testing the behaviour: a
+/// version that shelled out would pass every test written against an honest
+/// machine, because on an honest machine the binary tells the truth.
+#[test]
+fn the_machine_pass_never_runs_a_program_it_finds() {
+    let source = include_str!("check/machine.rs").replace("\r\n", "\n");
+    let code: String = source
+        .lines()
+        .filter(|line| {
+            let trimmed = line.trim_start();
+            !trimmed.starts_with("//!") && !trimmed.starts_with("///") && !trimmed.starts_with("//")
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    // The tests at the foot of that file write files to hash; they start no
+    // processes either, but they are not the subject.
+    let code = code.split("mod tests").next().unwrap();
+
+    for forbidden in ["Command", "process::", "spawn", "exec"] {
+        assert!(
+            !code.contains(forbidden),
+            "check/machine.rs reaches {forbidden}: a copy under suspicion must \
+             never be run to ask it what it is"
+        );
+    }
+    // And it writes nothing where it looks. The record is `check::seen`'s
+    // business and goes to one known path; a pass that wrote into the
+    // directories it was searching would be changing what it is measuring.
+    for forbidden in ["fs::write", "fs::create_dir", "fs::remove", "fs::rename"] {
+        assert!(
+            !code.contains(forbidden),
+            "check/machine.rs reaches {forbidden}: finding copies must not \
+             change the machine it is looking at"
+        );
+    }
+}
+
+/// **Roadmap item 164.** The record of what was found says it is not evidence.
+///
+/// A file listing every copy of a program and its hash looks exactly like
+/// proof, and it is not: this program writes it, unsigned, and anything able
+/// to alter a copy of VeilVoice could alter it too. Somebody who finds that
+/// file years later has only what is written in it to go on, so the disclaimer
+/// lives in the file rather than in the documentation about the file.
+#[test]
+fn the_remembered_record_says_in_itself_that_it_is_not_evidence() {
+    let source = include_str!("check/seen.rs").replace("\r\n", "\n");
+    let preamble = source
+        .split("const PREAMBLE: &str = \"\\\n")
+        .nth(1)
+        .expect("the record's opening lines have to be findable")
+        .split("\";")
+        .next()
+        .unwrap();
+    assert!(
+        preamble.contains("NOT evidence"),
+        "the record must say so in its own first lines:\n{preamble}"
+    );
+    assert!(
+        preamble.contains("nothing signs it") || preamble.contains("nothing\n# signs it"),
+        "and say why:\n{preamble}"
+    );
+}

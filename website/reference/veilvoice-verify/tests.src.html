@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1671 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1743 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1814,6 +1814,82 @@
 <span class="ln" id="L1669">            .<span class="tok-fn">is_ok</span>()</span>
 <span class="ln" id="L1670">    })</span>
 <span class="ln" id="L1671">}</span>
+</span>
+<span class="ln" id="L1672"></span>
+<span class="src-item" id="fn-the_machine_pass_never_runs_a_program_it_finds">
+<span class="ln" id="L1673"><span class="tok-com">/// **Roadmap item 164.** The machine pass never runs anything it finds.</span></span>
+<span class="ln" id="L1674"><span class="tok-com">///</span></span>
+<span class="ln" id="L1675"><span class="tok-com">/// The promise `check::machine` makes for itself, and the one a reader has to</span></span>
+<span class="ln" id="L1676"><span class="tok-com">/// be able to check. Asking a binary its version to decide whether that binary</span></span>
+<span class="ln" id="L1677"><span class="tok-com">/// is the published one is asking the suspect: a tampered copy answers</span></span>
+<span class="ln" id="L1678"><span class="tok-com">/// whatever looks right, and the answer arrives after it has already run.</span></span>
+<span class="ln" id="L1679"><span class="tok-com">///</span></span>
+<span class="ln" id="L1680"><span class="tok-com">/// It is a claim about code that does not exist, so nothing but reading the</span></span>
+<span class="ln" id="L1681"><span class="tok-com">/// source can check it. And it cannot be caught by testing the behaviour: a</span></span>
+<span class="ln" id="L1682"><span class="tok-com">/// version that shelled out would pass every test written against an honest</span></span>
+<span class="ln" id="L1683"><span class="tok-com">/// machine, because on an honest machine the binary tells the truth.</span></span>
+<span class="ln" id="L1684"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1685"><span class="tok-kw">fn</span> <span class="tok-fn">the_machine_pass_never_runs_a_program_it_finds</span>() {</span>
+<span class="ln" id="L1686">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;check/machine.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1687">    <span class="tok-kw">let</span> code: String = source</span>
+<span class="ln" id="L1688">        .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L1689">        .<span class="tok-fn">filter</span>(|line| {</span>
+<span class="ln" id="L1690">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1691">            !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//!&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>)</span>
+<span class="ln" id="L1692">        })</span>
+<span class="ln" id="L1693">        .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L1694">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1695">    <span class="tok-com">// The tests at the foot of that file write files to hash; they start no</span></span>
+<span class="ln" id="L1696">    <span class="tok-com">// processes either, but they are not the subject.</span></span>
+<span class="ln" id="L1697">    <span class="tok-kw">let</span> code = code.<span class="tok-fn">split</span>(<span class="tok-str">&quot;mod tests&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1698"></span>
+<span class="ln" id="L1699">    <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;Command&quot;</span>, <span class="tok-str">&quot;process::&quot;</span>, <span class="tok-str">&quot;spawn&quot;</span>, <span class="tok-str">&quot;exec&quot;</span>] {</span>
+<span class="ln" id="L1700">        assert!(</span>
+<span class="ln" id="L1701">            !code.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L1702">            <span class="tok-str">&quot;check/machine.rs reaches {forbidden}: a copy under suspicion must \</span></span>
+<span class="ln" id="L1703"><span class="tok-str">             never be run to ask it what it is&quot;</span></span>
+<span class="ln" id="L1704">        );</span>
+<span class="ln" id="L1705">    }</span>
+<span class="ln" id="L1706">    <span class="tok-com">// And it writes nothing where it looks. The record is `check::seen`&#x27;s</span></span>
+<span class="ln" id="L1707">    <span class="tok-com">// business and goes to one known path; a pass that wrote into the</span></span>
+<span class="ln" id="L1708">    <span class="tok-com">// directories it was searching would be changing what it is measuring.</span></span>
+<span class="ln" id="L1709">    <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;fs::write&quot;</span>, <span class="tok-str">&quot;fs::create_dir&quot;</span>, <span class="tok-str">&quot;fs::remove&quot;</span>, <span class="tok-str">&quot;fs::rename&quot;</span>] {</span>
+<span class="ln" id="L1710">        assert!(</span>
+<span class="ln" id="L1711">            !code.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L1712">            <span class="tok-str">&quot;check/machine.rs reaches {forbidden}: finding copies must not \</span></span>
+<span class="ln" id="L1713"><span class="tok-str">             change the machine it is looking at&quot;</span></span>
+<span class="ln" id="L1714">        );</span>
+<span class="ln" id="L1715">    }</span>
+<span class="ln" id="L1716">}</span>
+</span>
+<span class="ln" id="L1717"></span>
+<span class="src-item" id="fn-the_remembered_record_says_in_itself_that_it_is_not_evidence">
+<span class="ln" id="L1718"><span class="tok-com">/// **Roadmap item 164.** The record of what was found says it is not evidence.</span></span>
+<span class="ln" id="L1719"><span class="tok-com">///</span></span>
+<span class="ln" id="L1720"><span class="tok-com">/// A file listing every copy of a program and its hash looks exactly like</span></span>
+<span class="ln" id="L1721"><span class="tok-com">/// proof, and it is not: this program writes it, unsigned, and anything able</span></span>
+<span class="ln" id="L1722"><span class="tok-com">/// to alter a copy of VeilVoice could alter it too. Somebody who finds that</span></span>
+<span class="ln" id="L1723"><span class="tok-com">/// file years later has only what is written in it to go on, so the disclaimer</span></span>
+<span class="ln" id="L1724"><span class="tok-com">/// lives in the file rather than in the documentation about the file.</span></span>
+<span class="ln" id="L1725"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1726"><span class="tok-kw">fn</span> <span class="tok-fn">the_remembered_record_says_in_itself_that_it_is_not_evidence</span>() {</span>
+<span class="ln" id="L1727">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;check/seen.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1728">    <span class="tok-kw">let</span> preamble = source</span>
+<span class="ln" id="L1729">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;const PREAMBLE: &amp;str = \&quot;\\\n&quot;</span>)</span>
+<span class="ln" id="L1730">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L1731">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the record&#x27;s opening lines have to be findable&quot;</span>)</span>
+<span class="ln" id="L1732">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;\&quot;;&quot;</span>)</span>
+<span class="ln" id="L1733">        .<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L1734">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1735">    assert!(</span>
+<span class="ln" id="L1736">        preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;NOT evidence&quot;</span>),</span>
+<span class="ln" id="L1737">        <span class="tok-str">&quot;the record must say so in its own first lines:\n{preamble}&quot;</span></span>
+<span class="ln" id="L1738">    );</span>
+<span class="ln" id="L1739">    assert!(</span>
+<span class="ln" id="L1740">        preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing signs it&quot;</span>) || preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing\n# signs it&quot;</span>),</span>
+<span class="ln" id="L1741">        <span class="tok-str">&quot;and say why:\n{preamble}&quot;</span></span>
+<span class="ln" id="L1742">    );</span>
+<span class="ln" id="L1743">}</span>
 </span>
 </code></pre>
 </main>

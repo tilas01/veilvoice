@@ -38,7 +38,7 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 | `veilvoice-meta` | Strip or spoof identifying metadata: audio tags, and image EXIF/GPS. | 696 | [`crates/veilvoice-meta/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/README.md) |
 | `veilvoice-policy` | Settings that can only be tightened, sealed with the project's own post-quantum cryptography. | 1,689 | [`crates/veilvoice-policy/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/README.md) |
 | `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,264 | [`crates/veilvoice-setup/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/README.md) |
-| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 7,822 | [`crates/veilvoice-verify/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/README.md) |
+| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 8,677 | [`crates/veilvoice-verify/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/README.md) |
 | `veilvoice-video` | A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg. | 4,470 | [`crates/veilvoice-video/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/README.md) |
 | `veilvoice-watch` | Detect which applications are currently using the microphone and camera, with alerts on change. | 3,917 | [`crates/veilvoice-watch/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/README.md) |
 

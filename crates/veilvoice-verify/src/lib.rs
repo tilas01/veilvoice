@@ -228,6 +228,37 @@ USAGE
 
       Entirely offline.
 
+  veilvoice verify machine
+      Every copy of VeilVoice on this computer, found and checked.
+
+      Installed, unpacked, old or current: it looks where an installation puts
+      programs, on your PATH, beside this program, and in your Downloads,
+      Desktop and home folder, plus the release directories inside those. It
+      says where each copy came from and whether it is exactly what was
+      published.
+
+      It NEVER runs anything it finds. The whole question is whether a program
+      is the published one, and running it to ask is asking the suspect: a
+      tampered copy answers whatever looks right, and by then it has run. A
+      version comes from the release directory holding the copy, or it is not
+      known and the report says so.
+
+      What it checks against is the signed lists already on this computer,
+      each one verified before it is read. A copy is looked up by its own
+      hash, so an installed copy with no version anywhere in its path still
+      gets an answer: it is the veilvoice that was published in v0.1.22.
+
+      A copy no signed list here covers is reported as NOT CHECKED, never as
+      a pass. To check those, fetch that release's files:
+        veilvoice verify release <TAG>
+
+      It writes down what it found, so the next run can tell you what has
+      changed: a copy that has appeared, one that has gone, and above all one
+      that was the published program last time and is not now. That record is
+      a note and not evidence, and it says so in its own first line.
+
+      Entirely offline.
+
   veilvoice verify gnupg [DIRECTORY]
       The same check through the GnuPG on this machine rather than the key
       built into VeilVoice. It adds the VeilVoice public key to your
@@ -1580,6 +1611,222 @@ fn command_archive(archive: &Path) -> ExitCode {
     Status::Success.into()
 }
 
+/// **Roadmap item 164.** Every signed contents list this machine can verify.
+///
+/// Gathered from the same places a release is looked for, and **verified
+/// before it is read**, by the same path everything else here takes: the
+/// signature over `SHA256SUMS` against the embedded key, then
+/// `CONTENTS.sha256` against that hash list. A list that does not survive that
+/// contributes nothing, because a hash out of an unverified list is a number
+/// somebody sent you and a machine pass built on those would be worse than no
+/// machine pass at all.
+fn published_on_this_machine() -> (check::machine::Published, usize) {
+    let mut published = check::machine::Published::default();
+    let mut refused = 0usize;
+    let (_, all) = discover::search(None);
+    for found in &all {
+        match manifest(found) {
+            Manifest::Ready(lists) => published.add_verified(lists),
+            // Counted rather than narrated. A downloads folder with a
+            // half-finished release in it is ordinary, and a page of
+            // explanation per stray file would bury the copies this command is
+            // about.
+            Manifest::Unusable(_) => refused += 1,
+            Manifest::None => {}
+        }
+    }
+    (published, refused)
+}
+
+/// **Roadmap item 164.** `veilvoice verify machine`: every copy on this computer.
+///
+/// Finds them, checks each against what the signed lists on this machine
+/// publish, remembers where they were, and says what has changed since the
+/// last pass.
+///
+/// Nothing it finds is ever run. See [`check::machine`] for why that is the
+/// whole design rather than a detail: the question is whether a binary is the
+/// published one, and asking that binary is asking the suspect.
+fn command_machine() -> ExitCode {
+    out!("Looking for copies of VeilVoice on this computer");
+    out!();
+
+    let copies = check::machine::find();
+    if copies.is_empty() {
+        return incomplete_deny(
+            "no copy of VeilVoice was found on this computer",
+            &[
+                "Looked in: where an installation puts programs, every directory on",
+                "your PATH, beside this program, and your Downloads, Desktop and home",
+                "folder, plus the release directories directly inside those.",
+                "",
+                "Nothing was checked, so nothing has been proven either way.",
+            ],
+        );
+    }
+
+    let (published, refused) = published_on_this_machine();
+    if published.is_empty() {
+        out!("  no signed list of published hashes was found on this computer,");
+        out!("  so the copies below can be listed and not checked");
+    } else {
+        good(&format!(
+            "signed lists found for {}: {}",
+            if published.releases() == 1 {
+                "one release".to_string()
+            } else {
+                format!("{} releases", published.releases())
+            },
+            published.versions().join(", ")
+        ));
+    }
+    if refused > 0 {
+        out!("  {refused} contents list(s) could not be verified and were not used");
+    }
+    out!();
+
+    let checked: Vec<check::machine::Checked> = copies
+        .iter()
+        .map(|copy| check::machine::examine(copy, &published))
+        .collect();
+
+    let mut changed = 0usize;
+    let mut unchecked = 0usize;
+    for one in &checked {
+        let name = one.copy.path.display();
+        match &one.verdict {
+            check::machine::Verdict::Published { release, .. } => {
+                good(&format!("{name}"));
+                out!(
+                    "        {}, and it is the copy published in {release}",
+                    one.copy.found.plainly()
+                );
+            }
+            check::machine::Verdict::Changed {
+                release,
+                found,
+                expected,
+            } => {
+                changed += 1;
+                verdict!("  NOT WHAT WAS PUBLISHED  {name}");
+                verdict!("        it says it is {release}, and {release}'s signed list does not");
+                verdict!("        publish these bytes under this name");
+                note!("found    {found}");
+                if let Some(expected) = expected {
+                    note!("expected {expected}");
+                }
+            }
+            check::machine::Verdict::NoSignedList => {
+                unchecked += 1;
+                // Not a failure, and said in words that cannot be read as one.
+                out!("  NOT CHECKED  {name}");
+                match &one.copy.claims {
+                    Some(release) => {
+                        out!(
+                            "        {}, and says it is {release}.",
+                            one.copy.found.plainly()
+                        );
+                        out!("        No signed list for {release} is on this computer.");
+                    }
+                    None => {
+                        out!("        {}.", one.copy.found.plainly());
+                        out!("        Nothing here says which version it is.");
+                    }
+                }
+                // The distinction this whole command turns on, spelled out
+                // every time rather than left to the words NOT CHECKED. A
+                // reader skimming a list of verdicts will read an absence of
+                // complaint as approval unless told otherwise.
+                out!("        It has not been found wanting. It has not been looked at.");
+            }
+            check::machine::Verdict::Unreadable(why) => {
+                unchecked += 1;
+                out!("  COULD NOT READ  {name}");
+                out!("        {why}");
+            }
+        }
+    }
+    out!();
+
+    // What moved since last time. Written after the report rather than before,
+    // because somebody running this for the first time has no last time and
+    // the copies themselves are what they came for.
+    let remembered = report_what_moved(&checked);
+
+    verdict!(
+        "  {} copy(s) found. {} are exactly what was published.",
+        checked.len(),
+        checked.iter().filter(|one| one.verdict.is_good()).count()
+    );
+    if unchecked > 0 {
+        verdict!("  {unchecked} could not be checked against any signed list here.");
+        out!();
+        out!("  To check those, put that release's SHA256SUMS, SHA256SUMS.asc and");
+        out!("  CONTENTS.sha256 in a folder this looks in, or fetch them with:");
+        out!("      veilvoice verify release <TAG>");
+    }
+    if let Some(where_written) = remembered {
+        out!();
+        out!("  Written down, so the next pass can say what has changed:");
+        out!("      {where_written}");
+        out!("  That file is a note rather than evidence. Nothing signs it, and");
+        out!("  whatever could change a copy of VeilVoice could change it too.");
+    }
+
+    if changed > 0 {
+        verdict!();
+        verdict!("  {changed} copy(s) above are not what was published. Do not run them.");
+        return Status::Refused.into();
+    }
+    if unchecked > 0 {
+        // Deliberately not a pass. Some copies were not examined, and an exit
+        // status that says "all clear" would be this program answering a
+        // question it did not ask.
+        return Status::Incomplete.into();
+    }
+    Status::Success.into()
+}
+
+/// **Roadmap item 164.** What has changed since the last machine pass.
+///
+/// Returns where the record was written, for the caller to mention.
+fn report_what_moved(checked: &[check::machine::Checked]) -> Option<String> {
+    let path = check::seen::path()?;
+    let before = check::seen::recall(&path);
+    // A first run has nothing to compare against, and reporting every copy on
+    // the machine as "newly appeared" would be noise on the one run where the
+    // reader has least idea what is normal.
+    if !before.is_empty() {
+        let changes = check::seen::compare(&before, checked);
+        if changes.any() {
+            out!("Since the last pass");
+            for path in &changes.altered {
+                // The line this record exists for, and the only one of the
+                // three that is a finding on its own.
+                verdict!("  CHANGED SINCE LAST TIME  {path}");
+            }
+            for path in &changes.appeared {
+                out!("  new    {path}");
+            }
+            for path in &changes.gone {
+                out!("  gone   {path}");
+            }
+            out!();
+        }
+    }
+
+    match check::seen::remember(&path, checked, check::seen::stamp()) {
+        Ok(()) => Some(path.display().to_string()),
+        Err(why) => {
+            // Never a failure of the check. The copies were found and checked;
+            // a read-only home says nothing about any of them.
+            out!("  could not write the record: {why}");
+            out!("  The copies above were still checked.");
+            None
+        }
+    }
+}
+
 /// Roadmap item 91. Print the commands that check this release with somebody else's
 /// GnuPG, and nothing else.
 ///
@@ -2052,6 +2299,8 @@ pub fn run(mut args: Vec<String>) -> ExitCode {
 
     match args[0].as_str() {
         "auto" => command_auto(args.get(1).map(Path::new)),
+
+        "machine" => command_machine(),
 
         "archive" => match args.get(1) {
             Some(path) => command_archive(Path::new(path)),

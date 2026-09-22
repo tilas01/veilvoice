@@ -54,7 +54,9 @@
 pub mod archive;
 pub mod carried;
 pub mod contents;
+pub mod machine;
 pub mod reproduce;
+pub mod seen;
 
 use std::fmt::Write as _;
 use std::path::Path;
