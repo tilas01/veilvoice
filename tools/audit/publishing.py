@@ -26,12 +26,17 @@ they actually published.
 
 # And the other half
 
-`release.yml` reads a release's notes out of `CHANGELOG.md` by matching
-`## v<version>` exactly. It used to print "No changelog section found" into the
-notes and publish anyway, which is how v0.1.21 went out describing nothing at
-all. The step must be able to fail, and this checks that the refusal is still
-there, because a guard that is deleted in an edit is a guard nobody notices
-the absence of.
+A release's notes are read out of `CHANGELOG.md` by matching `## v<version>`
+exactly. That used to print "No changelog section found" into the notes and
+publish anyway, which is how v0.1.21 went out describing nothing at all. The
+refusal must be able to fail a release, and this checks that it is still
+there, because a guard deleted in an edit is a guard nobody notices the
+absence of.
+
+The reading moved out of the workflow and into `tools/release/notes.py` with
+roadmap item 180, so this checks both halves of where it now lives: the tool
+still refuses, and the workflow still asks it to, waiving the refusal only on
+the path that publishes nothing.
 
 `tools/release/version.py` asks the matching question of the changelog itself,
 before a release is ever dispatched. This asks it of the workflow.
@@ -46,6 +51,10 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 WORKFLOW = os.path.join(ROOT, ".github", "workflows", "release.yml")
+
+# The tool that builds a release's notes, and therefore the thing that decides
+# whether a release has any.
+NOTES = os.path.join(ROOT, "tools", "release", "notes.py")
 
 # The action that creates the release. Named rather than matched loosely, so
 # swapping it for another one is a decision somebody makes here too, with this
@@ -95,19 +104,54 @@ def main():
 
     # ---- a release with no notes does not publish ---------------------------
     #
-    # The workflow still *writes* "No changelog section found" into the notes,
-    # and that is correct: a dry run publishes nothing, so it is allowed to
-    # report the gap and carry on. What must exist is the refusal on the path
-    # that does publish. That is what is checked, rather than the presence of
-    # the sentence, because forbidding the sentence would fail the dry run's
-    # honest report along with the defect.
+    # A dry run publishes nothing, so it is allowed to report a missing entry
+    # and carry on; that is what `--allow-missing` is for. What must exist is
+    # the refusal on the path that does publish, and the waiver must be
+    # reachable only from the dry run. Both halves are checked, because either
+    # one on its own is satisfied by the defect: a tool that refuses is no use
+    # if the workflow always waives it, and a workflow that waives carefully
+    # is no use if the tool never refuses.
     body = "\n".join(lines)
-    if "has no '## $tag' section" not in body:
+
+    if not os.path.isfile(NOTES):
         gaps.append(
-            "release.yml no longer refuses to publish when CHANGELOG.md has no "
-            "section for the version, so a heading written in the wrong shape "
-            "would silently produce an empty release"
+            "tools/release/notes.py is gone, so nothing decides whether a "
+            "release has notes at all"
         )
+    else:
+        with open(NOTES, "r", encoding="utf-8") as handle:
+            tool = handle.read()
+        if "has no '## %s' section" not in tool:
+            gaps.append(
+                "tools/release/notes.py no longer refuses when CHANGELOG.md "
+                "has no section for the version, so a heading written in the "
+                "wrong shape would silently produce an empty release"
+            )
+        elif "if not args.allow_missing:" not in tool:
+            gaps.append(
+                "tools/release/notes.py reports a missing changelog section "
+                "without a path that fails on it, so a release could publish "
+                "describing nothing"
+            )
+
+    if "tools/release/notes.py" not in body:
+        gaps.append(
+            "release.yml no longer builds its notes with "
+            "tools/release/notes.py, so the refusal above is not on the path "
+            "that publishes"
+        )
+    elif "--allow-missing" in body:
+        # The waiver has to be conditional on the dry run, which this workflow
+        # tells apart by whether a dispatch was given a version. A bare
+        # `--allow-missing` would turn the refusal off for every release.
+        waiver = re.search(
+            r"allow=\"\"\n(.*?)--allow-missing", body, re.S)
+        if not waiver or "github.event.inputs.tag" not in waiver.group(1):
+            gaps.append(
+                "release.yml passes --allow-missing to the notes tool without "
+                "tying it to the dry run, so a publishing release could go "
+                "out with no notes"
+            )
 
     if gaps:
         print("the release workflow would publish something it should not:")

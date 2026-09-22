@@ -660,6 +660,27 @@ jobs:
       - name: List what is inside each archive
         run: python tools/release/contents.py staging -o staging/CONTENTS.sha256
 
+      # **The technical document, staged before the checksums.**
+      #
+      # Same argument as `CONTENTS.sha256` above: a file staged before
+      # `SHA256SUMS` is computed is covered by the hash list, and therefore by
+      # the signature over it. A release's technical claims about itself ought
+      # to be inside the thing that is signed rather than beside it.
+      #
+      # The reproducibility reports are still in `staging/` at this point; the
+      # step below is what moves them out, because they are notes about the
+      # build rather than artefacts of it.
+      #
+      # Roadmap item 180.
+      - name: The technical document
+        run: |
+          set -euo pipefail
+          python tools/release/notes.py \
+            --tag "${{ env.VERSION_TAG }}" \
+            --repro staging \
+            --built-on "${{ runner.os }}" \
+            --technical staging/TECHNICAL.md
+
       - name: Checksums
         run: |
           cd staging
@@ -700,120 +721,55 @@ jobs:
           gpg --verify staging/SHA256SUMS.asc staging/SHA256SUMS
           echo "signed=true" >> "$GITHUB_OUTPUT"
 
+      # The notes are built by `tools/release/notes.py`, not here.
+      #
+      # This step was a hundred and twenty lines of `echo`, and the cost of
+      # that was not ugliness. It could not be run: a release's notes were
+      # seen for the first time when the release was published, or by
+      # dispatching a workflow that builds eleven platforms twice each to find
+      # out whether a sentence reads well. Nothing about them was ever
+      # checked, and v0.1.21 published with no notes at all.
+      #
+      # The tool runs on every push now, through `tools/verify.py` and CI,
+      # against the newest changelog entry. What is left here is the part that
+      # is genuinely about this run: where the reproducibility reports landed,
+      # what signed the archives, and what the runner was.
+      #
+      # Roadmap item 180: the notes open with the files, how to check them,
+      # and what changed. Everything technical moves to `TECHNICAL.md`, which
+      # is published beside the archives and folded into the notes as well.
       - name: Release notes
         run: |
-          # The changelog lives in the repository, so what a release claims to
-          # contain is reviewable in the same commit that contains it, rather
-          # than being written from memory at tag time.
+          set -euo pipefail
           tag="${{ env.VERSION_TAG }}"
-          changes=""
-          if [ -f CHANGELOG.md ]; then
-            changes="$(awk -v want="## $tag" '
-              $0 == want { taking = 1; next }
-              taking && /^## / { exit }
-              taking { print }
-            ' CHANGELOG.md)"
+
+          # A dry run publishes nothing, so it is allowed to report a missing
+          # changelog entry rather than stopping. A tag push always publishes,
+          # and a dispatch publishes when it was given a version; that is the
+          # same condition the gate below uses, written the same way.
+          allow=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] \
+             && [ -z "${{ github.event.inputs.tag }}" ]; then
+            allow="--allow-missing"
           fi
 
-          # **A release that could not read its own changelog does not publish.**
-          #
-          # This used to print "No changelog section found" into the notes and
-          # carry on, and v0.1.21 was published that way: the heading had been
-          # written `## 0.1.21 - 2026-09-10` while this reads `## v0.1.21`
-          # exactly, so the whole entry, seven hundred lines of it, was silently
-          # dropped and the release went out describing nothing.
-          #
-          # A note saying the notes are missing is not a smaller version of the
-          # notes. It is a published release nobody can tell the contents of,
-          # and this project's own rule is that a release's notes live in
-          # CHANGELOG.md and everything else derives from it. Deriving nothing
-          # is a failure, so it fails here rather than shipping.
-          #
-          # A dry run is exempt: it publishes nothing, so it is allowed to
-          # report the gap instead of stopping. That is the same condition the
-          # gate below uses, written the same way: a tag push always publishes,
-          # and a dispatch publishes when it was given a version.
-          publishing=""
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ] \
-             || [ -n "${{ github.event.inputs.tag }}" ]; then
-            publishing=yes
-          fi
-          if [ -z "$changes" ] && [ -n "$publishing" ]; then
-            echo "::error::CHANGELOG.md has no '## $tag' section, so this release would publish with no notes. The heading must be exactly '## $tag', matching every other entry in the file."
-            exit 1
+          # The fingerprint of the key that actually signed, which the tool
+          # compares against the one compiled into the binaries being shipped.
+          # A release signed by a key its own verifier rejects does not
+          # publish, and nothing was watching for that before.
+          fingerprint=""
+          if [ -f staging/SHA256SUMS.asc ]; then
+            fingerprint="$(gpg --show-keys --with-colons \
+              staging/veilvoice-signing-key.asc \
+              | awk -F: '/^fpr:/ {print $10; exit}')"
           fi
 
-          {
-            echo "## VeilVoice ${{ env.VERSION_TAG }}"
-            echo
-            echo "Irreversible voice de-identification, fully offline."
-            echo
-            if [ -n "$changes" ]; then
-              echo "$changes"
-              echo
-              echo "---"
-              echo
-            else
-              echo "> No changelog section found for \`$tag\` in \`CHANGELOG.md\`."
-              echo
-            fi
-            echo "### Verify what you downloaded"
-            echo
-            echo '```bash'
-            echo "sha256sum -c SHA256SUMS --ignore-missing"
-            echo '```'
-            echo
-            if [ -f staging/SHA256SUMS.asc ]; then
-              fpr="$(gpg --show-keys --with-colons staging/veilvoice-signing-key.asc                      | awk -F: '/^fpr:/ {print $10; exit}')"
-              echo "### Verify the signature"
-              echo
-              echo "\`SHA256SUMS.asc\` is a detached OpenPGP signature over the hash list."
-              echo "No binary is signed in place, so signing cannot disturb the bit-for-bit"
-              echo "reproducibility above."
-              echo
-              echo "**1. Import the key** (also on the [website](https://tilas01.github.io/veilvoice/#verify)):"
-              echo
-              echo '```bash'
-              echo "gpg --import veilvoice-signing-key.asc"
-              echo '```'
-              echo
-              echo "**2. Check the fingerprint is exactly this.** A \"Good signature\" from"
-              echo "some other key proves nothing. The fingerprint is the part that matters:"
-              echo
-              echo '```'
-              echo "$fpr"
-              echo '```'
-              echo
-              echo "**3. Verify the hash list, then the files against it:**"
-              echo
-              echo '```bash'
-              echo "gpg --verify SHA256SUMS.asc SHA256SUMS"
-              echo "sha256sum -c SHA256SUMS --ignore-missing"
-              echo '```'
-              echo
-              echo "Expect \`Good signature from \"tilas01\"\`. The key carries no e-mail"
-              echo "address by design. GnuPG will also warn that the key is not certified"
-              echo "with a trusted signature. That is normal and simply means you have not"
-              echo "personally signed it; the fingerprint check above is what establishes"
-              echo "that it is the right key."
-              echo
-              echo "On macOS use \`shasum -a 256 -c SHA256SUMS --ignore-missing\`."
-            else
-              echo "> This build is **unsigned**: no signing key is configured for this repository."
-            fi
-            echo
-            echo "### Reproducibility"
-            echo
-            echo "Every binary was built twice, in different directories, and compared:"
-            echo
-            for f in repro/repro-*.txt; do
-              [ -f "$f" ] && echo "- \`$(cat "$f")\`"
-            done
-            echo
-            echo "See \`docs/REPRODUCIBLE_BUILDS.md\` to reproduce a build yourself."
-            echo
-            echo "Built on: \`${{ runner.os }}\` runners, toolchain pinned by \`rust-toolchain.toml\`."
-          } > NOTES.md
+          python tools/release/notes.py \
+            --tag "$tag" \
+            --built-on "${{ runner.os }}" \
+            ${fingerprint:+--fingerprint "$fingerprint"} \
+            --out NOTES.md \
+            $allow
 
       # **What decides whether this publishes, and the two things checked
       # before it does.**

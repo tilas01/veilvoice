@@ -1400,6 +1400,44 @@ The campaign is not yet part of any build. It takes twenty-three minutes over
 four files and there are twenty-seven crates; making it a check is the work,
 and roadmap item 151 carries it.
 
+### F-203: nothing compared the key that signs a release against the key its binaries accept
+
+The release notes tell a reader to compare a fingerprint by eye, and say
+plainly that a "Good signature" from some other key proves nothing. That is
+correct advice and it was the only thing checking it.
+
+The same forty characters exist in five places: the notes, `README.md`,
+`docs/INSTALL.md`, the website, and `FINGERPRINT` in
+`crates/veilvoice-verify/src/check/mod.rs`, which is the value compiled into
+every shipped binary and the one a verifier refuses to accept anything else
+over. The first four are compared against each other by the site suite. **The
+fifth was compared against nothing.**
+
+So a release signed by a key other than the compiled-in one would have
+published normally. Every automated check would have passed: the signature is
+valid, the hash list is correct, the archives reproduce. And `veilvoice
+verify`, run by a reader on the release that contains it, would have rejected
+it, because the key it carries is not the key it was built to trust. A release
+its own verifier refuses is the worst shape this failure can take, since the
+program that says no is the program the reader downloaded to ask.
+
+This has not happened. It could not be *noticed* if it did, until somebody
+tried to verify a download and was told the signing key was wrong, which reads
+to that person as evidence of exactly the attack the fingerprint exists to
+detect.
+
+`tools/release/notes.py` now takes the fingerprint GnuPG reports for the key
+that actually signed the archives, compares it against the constant read out
+of the verifier's source, and fails the release if they differ. That is the
+right moment for it: after the signing, before the publish, in the step that
+was already writing the fingerprint into the notes for a person to compare.
+
+The finding is the missing comparison rather than any divergence, and it is
+the same shape as F-176, F-177, F-197 and F-199: five copies of a value, four
+of them checked against each other, and the fifth, the one that decides, in
+nobody's list. F-71 made the point about two hand-typed numbers only ever
+compared with each other. This is the same argument with the copy that matters
+left out of the circle entirely.
 ### F-202: a preference cleared on the first frame of every run that had no lock
 
 Roadmap item 86 gave the window a setting for sealing every recording with the
@@ -8040,7 +8078,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and two defects found and fixed (F-1 to F-202), across
+**Two hundred and three defects found and fixed (F-1 to F-203), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

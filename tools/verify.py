@@ -156,6 +156,15 @@ CHECKS = [
      [sys.executable, "tools/release/version.py", "--check"]),
     ("every package installs what the workspace builds",
      [sys.executable, "tools/release/packaging.py"]),
+    # Beside it, and for the same reason. A release's notes used to be a
+    # hundred and twenty lines of shell inside the release workflow, so they
+    # were seen for the first time when the release was published: v0.1.21
+    # went out with no notes at all because a changelog heading was written
+    # `## 0.1.21 - 2026-09-10` and the extraction wanted `## v0.1.21`. The
+    # notes are built by a tool now, and this runs that tool's reading of the
+    # newest entry on every push, which is the whole gain. Roadmap item 180.
+    ("the newest release notes can be built from the changelog",
+     [sys.executable, "tools/release/notes.py", "--check"]),
     ("no state file is written one place and read another",
      [sys.executable, "tools/audit/state_paths.py"]),
     # Roadmap item 126. A dependency is a decision, and a decision with no sentence

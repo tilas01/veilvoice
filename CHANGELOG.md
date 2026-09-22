@@ -6,6 +6,15 @@ The section matching a release tag is published at the top of that release's
 notes on GitHub, so this file is the source of truth for what changed rather
 than a summary written afterwards.
 
+An entry may carry a heading that reads exactly `### Technical detail`.
+Everything from that heading to the end of the entry is the technical half:
+the reproducibility result per platform, the audit findings, the dependency
+changes and the measurements. Everything above it is what is new and what was
+fixed. A release opens with the second, and the first moves behind a link and
+a fold, on GitHub and on the website both, from this one source. An entry with
+no such heading is read as all of it being what is new, which is how every
+entry below was published and is why none of them has been rewritten.
+
 ## v0.1.22
 
 **Twenty-seven crates became thirteen**
