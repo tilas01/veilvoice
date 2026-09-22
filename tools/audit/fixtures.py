@@ -51,7 +51,10 @@ first file to need it is the worst moment to find out.
 **`assets/` and every `testdata/` hold nothing git will not carry.** Those
 directories exist for committed material and for nothing else, so a file in
 one of them that is ignored, or simply untracked, is a file that will be
-missing from the next clone.
+missing from the next clone. `__pycache__` is skipped: that is the
+interpreter's own writing rather than anything the build reads, and it appears
+under `assets/` because importing `assets/generate.py` from a check script is
+a reasonable thing to do.
 
 # What this deliberately does not do
 
@@ -220,7 +223,14 @@ def data_files(cwd):
     out = []
     for root in roots:
         for current, directories, names in os.walk(root):
-            directories[:] = [d for d in directories if d != "target"]
+            # `__pycache__` is the interpreter's own writing, not material the
+            # build reads, and `.gitignore` excludes it deliberately: importing
+            # `assets/generate.py` from a check script drops one beside it. The
+            # first run of this guard reported that .pyc, which is the
+            # difference between "git will not carry this" and "git must carry
+            # this", and only the second is a fault.
+            directories[:] = [d for d in directories
+                              if d not in ("target", "__pycache__")]
             for name in sorted(names):
                 out.append(os.path.relpath(
                     os.path.join(current, name), cwd).replace(os.sep, "/"))

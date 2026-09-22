@@ -11,7 +11,7 @@
 
 # `website/css/main.css`
 
-[the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css) &middot; 2530 lines
+[the source](https://github.com/tilas01/veilvoice/blob/main/website/css/main.css) &middot; 2549 lines
 
 ## What it does
 
@@ -51,7 +51,7 @@ There is no framework and no font downloaded from anywhere else. Every remote th
 | wiki | 1679 |
 | a source file, on this site | 1770 |
 | the releases page | 1839 |
-| footer | 1874 |
-| welcome / legal gate | 1899 |
-| search | 2016 |
-| the JavaScript edition toggle | 2186 |
+| footer | 1893 |
+| welcome / legal gate | 1918 |
+| search | 2035 |
+| the JavaScript edition toggle | 2205 |

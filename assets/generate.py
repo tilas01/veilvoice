@@ -206,6 +206,19 @@ GLYPHS = {
     "/": ["00001", "00010", "00010", "00100", "01000", "01000", "10000"],
     "+": ["00000", "00100", "00100", "11111", "00100", "00100", "00000"],
     "*": ["00000", "10101", "01110", "11111", "01110", "10101", "00000"],
+    # Drawn for the release cards, which set a sentence written for a reader
+    # rather than a string chosen to fit the font. Defined as a set for the
+    # reason the digits above are: the alternative is finding out that a
+    # bracket drew a gap after the picture is on a release page. A character
+    # outside this set still refuses to draw rather than leaving a hole, which
+    # is what `check_glyphs` is for.
+    "(": ["00110", "01000", "01000", "01000", "01000", "01000", "00110"],
+    ")": ["01100", "00010", "00010", "00010", "00010", "00010", "01100"],
+    ";": ["00000", "01100", "01100", "00000", "01100", "01100", "01000"],
+    "?": ["01110", "10001", "00001", "00010", "00100", "00000", "00100"],
+    "!": ["00100", "00100", "00100", "00100", "00100", "00000", "00100"],
+    "%": ["11001", "11010", "00010", "00100", "01000", "01011", "10011"],
+    '"': ["01010", "01010", "00000", "00000", "00000", "00000", "00000"],
     " ": ["00000"] * 7,
 }
 

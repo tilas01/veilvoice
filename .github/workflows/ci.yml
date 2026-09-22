@@ -333,6 +333,11 @@ jobs:
       - name: Generated source pages must match the source
         run: python tools/docs/sources.py --check
 
+      # Roadmap item 183. A card is a release's own entry drawn as a picture,
+      # so it goes stale the moment the entry is edited.
+      - name: The release cards must match CHANGELOG.md
+        run: python tools/release/card.py --check
+
       - name: The releases page must match CHANGELOG.md
         run: python tools/site/releases.py --check
 
