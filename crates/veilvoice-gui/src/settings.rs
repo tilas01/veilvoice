@@ -151,6 +151,17 @@ pub struct Settings {
     /// startup. Every platform answers through a subprocess, so asking per
     /// frame is out of the question.
     system_motion: crate::reduced_motion::Query,
+    /// Set when somebody has asked for the tour again, and cleared by the
+    /// window when it starts one.
+    ///
+    /// **Roadmap item 171.** A flag rather than a call, because this panel has
+    /// no reach into the tour and should not be given one: Settings knows what
+    /// was asked for, `app.rs` owns what the window is showing, and the flag
+    /// is the whole of what passes between them.
+    ///
+    /// Never persisted. A request that survived a restart would start the tour
+    /// on the next launch of a machine whose owner had already sat through it.
+    tour_requested: bool,
     /// Complaints from reading the user's own palette files, shown verbatim.
     ///
     /// Carried here rather than logged because there is nowhere for a desktop
@@ -171,6 +182,7 @@ impl Default for Settings {
             autolock_typed: String::new(),
             autolock_error: None,
             system_motion: crate::reduced_motion::Query::Unknown,
+            tour_requested: false,
             palette_problems: Vec::new(),
         }
     }
@@ -201,6 +213,7 @@ impl Settings {
             autolock_typed: String::new(),
             autolock_error: None,
             system_motion: crate::reduced_motion::query(),
+            tour_requested: false,
             // Filled in by the caller, which reads the palettes before this
             // runs -- see `VeilVoiceApp::new` for why that order matters.
             palette_problems: Vec::new(),
@@ -219,6 +232,15 @@ impl Settings {
     /// Whether the first-run choice has still to be made.
     pub fn needs_first_run(&self) -> bool {
         self.first_run
+    }
+
+    /// Whether somebody asked for the tour, clearing the request as it answers.
+    ///
+    /// **Roadmap item 171.** Taken rather than read, so one press starts one
+    /// tour: `update` runs every frame, and a flag left set would restart the
+    /// tour on each of them for as long as it was up.
+    pub fn take_tour_request(&mut self) -> bool {
+        std::mem::take(&mut self.tour_requested)
     }
 
     /// Write the settings out, encrypted and obfuscated as they are at rest.
@@ -630,6 +652,32 @@ impl Settings {
                  other case: a portable copy, run on purpose, by somebody who does not \
                  want to be asked again. Nothing else changes: `veilvoice install` still \
                  works from the command line.",
+            )
+            .small()
+            .color(p::muted()),
+        );
+        ui.add_space(12.0);
+
+        // Roadmap item 171. The tour used to be reachable exactly once, on the
+        // run that offered it, and skipping it was permanent: there was no
+        // control anywhere that said "show me that again". That made the skip
+        // button a decision about the rest of the installation, taken in the
+        // first thirty seconds by somebody who had not yet seen what they were
+        // skipping.
+        section(
+            ui,
+            "The tour",
+            "What each tab is for, over the window, a card at a time.",
+        );
+        if ui.button("Show the tour again").clicked() {
+            self.tour_requested = true;
+        }
+        ui.label(
+            RichText::new(
+                "  Every card, including the ones you have seen: asking for it is not a \
+                 question about which tabs are new. It runs over the window rather than \
+                 instead of it, so the tab a card is describing is on screen while it \
+                 describes it, and Escape closes it.",
             )
             .small()
             .color(p::muted()),
@@ -1507,6 +1555,42 @@ mod tests {
             settings.save_error()
         );
         assert!(Prefs::load(&path).hide_install_tab);
+    }
+
+    /// Roadmap item 171. One press starts one tour.
+    ///
+    /// `update` runs every frame, so a flag that was read rather than taken
+    /// would restart the tour on every one of them for as long as it was on
+    /// screen, which is a tour that can never reach its second card.
+    #[test]
+    fn a_request_for_the_tour_is_answered_once() {
+        let mut settings = Settings::default();
+        assert!(!settings.take_tour_request(), "nobody has asked");
+
+        settings = Settings {
+            tour_requested: true,
+            ..settings
+        };
+        assert!(settings.take_tour_request(), "the press is reported");
+        assert!(
+            !settings.take_tour_request(),
+            "the same press was reported twice, so the tour restarts every frame"
+        );
+    }
+
+    /// And it is not remembered across a launch. A request that survived would
+    /// start the tour on the next launch of a machine whose owner had already
+    /// sat through it.
+    #[test]
+    fn a_request_for_the_tour_is_never_written_to_the_settings_file() {
+        let settings = Settings {
+            tour_requested: true,
+            ..Default::default()
+        };
+        assert!(
+            !settings.prefs.to_text().contains("tour_requested"),
+            "the request reached the file"
+        );
     }
 
     #[test]

@@ -96,7 +96,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>153 lines"])
     n_main(["main.rs<br/>254 lines"])
-    n_app["app.rs<br/>3626 lines"]
+    n_app["app.rs<br/>3643 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>298 lines"]
     n_crashlog["crashlog.rs<br/>447 lines"]
@@ -118,13 +118,13 @@ flowchart TD
     n_probe["probe.rs<br/>426 lines"]
     n_reduced_motion["reduced_motion.rs<br/>348 lines"]
     n_security["security.rs<br/>2550 lines"]
-    n_settings["settings.rs<br/>1578 lines"]
+    n_settings["settings.rs<br/>1662 lines"]
     n_setup["setup.rs<br/>1038 lines"]
     n_soundbar["soundbar.rs<br/>779 lines"]
     n_storage["storage.rs<br/>659 lines"]
     n_studio["studio.rs<br/>2406 lines"]
     n_theme["theme.rs<br/>802 lines"]
-    n_tour["tour.rs<br/>329 lines"]
+    n_tour["tour.rs<br/>579 lines"]
     n_updates["updates.rs<br/>268 lines"]
     n_vault_store["vault_store.rs<br/>589 lines"]
     n_verify["verify.rs<br/>1651 lines"]
@@ -222,6 +222,7 @@ flowchart TD
     n_studio --> n_theme
     n_theme --> n_palettes
     n_tour --> n_theme
+    n_tour --> n_window
     n_updates --> n_theme
     n_verify --> n_dialog
     n_verify --> n_layout
@@ -270,7 +271,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3626 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3643 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 298 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 447 | Make a failure that produces no output produce some. |
@@ -294,20 +295,20 @@ flowchart TD
 | [`probe.rs`](../../docs/files/veilvoice-gui/probe.md) | 426 | What this machine answers, so the settings it starts on were measured here. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 348 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 2550 | The application lock, and the at-rest encryption of what VeilVoice writes. |
-| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1578 | The settings panel: a menu of pages, each a titled group of choices. |
+| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1662 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1038 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 779 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2406 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 802 | Colour schemes for the desktop app. |
-| [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 329 | The short tour on a first run, and after an upgrade. |
+| [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 579 | The short tour on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 268 | The manual update check, as the window shows it. |
 | [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | 589 | Where the desktop application keeps its own files, and what the app lock buys for them. |
 | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1651 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**19,311 functional lines of Rust** in this crate. A functional line is a line
+**19,492 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

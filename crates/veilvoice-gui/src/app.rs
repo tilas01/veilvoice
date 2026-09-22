@@ -1205,12 +1205,15 @@ impl eframe::App for VeilVoiceApp {
                 if !offer_install && self.tab == Tab::Setup {
                     self.tab = Tab::File;
                 }
-                // Greyed out while a panel that takes over the whole body is
-                // up: the first-run choices, or the tour. Both of those draw
-                // instead of the tab and return, so a click on the strip moved
-                // the highlight and changed nothing underneath it, which looks
-                // exactly like a window that has stopped responding. Disabled
-                // is the honest version of what was already true.
+                // Greyed out while something in front of the window has the
+                // reader's attention: the first-run choices, which draw
+                // instead of the tab body and return, or the tour, which since
+                // roadmap item 171 is an overlay with a backdrop that takes the
+                // clicks. Either way a press on the strip moves nothing, and
+                // before this it moved the highlight and changed nothing
+                // underneath it, which looks exactly like a window that has
+                // stopped responding. Disabled is the honest version of what
+                // is already true.
                 let taken_over = self.preferences.needs_first_run() || self.tour.running();
                 ui.add_enabled_ui(!taken_over, |ui| {
                     ui.horizontal(|ui| {
@@ -1388,25 +1391,10 @@ impl eframe::App for VeilVoiceApp {
                     }
                     return;
                 }
-                // The tour, once the two choices are made. Considered once per
-                // launch: a first run sees every card, an upgrade sees only
-                // the tabs that did not exist when it last ran, and a version
-                // that has already toured sees nothing.
-                if !self.tour_considered {
-                    self.tour_considered = true;
-                    let seen = self.preferences.toured_tabs();
-                    if seen.is_empty() {
-                        self.tour.start();
-                    } else {
-                        self.tour.start_new_only(&seen);
-                    }
-                }
-                if self.tour.running() && self.tour.panel(ui, self.setup.running_installed()) {
-                    self.preferences.mark_toured(&crate::tour::all_keys());
-                }
-                if self.tour.running() {
-                    return;
-                }
+                // Roadmap item 171. The tour used to be drawn here, and it
+                // returned, so the tabs it was describing were not on screen
+                // while it described them. It is an overlay now and is drawn
+                // after this panel, over the window it is a tour of.
                 // Every tab, inside one scroller.
                 //
                 // This is what "nothing is ever out of reach" actually
@@ -1449,6 +1437,35 @@ impl eframe::App for VeilVoiceApp {
                     });
             });
         });
+
+        // Roadmap item 171. Over the window, after everything that draws it, so the
+        // tabs and the panel a card is talking about are on screen behind the
+        // card. The modal's own backdrop takes the clicks; the tab strip above
+        // is drawn disabled as well, so it looks as unavailable as it is.
+        //
+        // Considered once per launch: a first run sees every card, an upgrade
+        // sees only the tabs that did not exist when it last ran, and a
+        // version that has already toured sees nothing. Held back until the
+        // first-run cards are answered, because those are a decision and this
+        // is an explanation, and stacking one over the other is two things
+        // asking at once.
+        if !self.tour_considered && !self.preferences.needs_first_run() {
+            self.tour_considered = true;
+            let seen = self.preferences.toured_tabs();
+            if seen.is_empty() {
+                self.tour.start();
+            } else {
+                self.tour.start_new_only(&seen);
+            }
+        }
+        // Asked for from Settings, under Interface. Taken rather than read, so
+        // one press starts one tour: this runs every frame.
+        if self.preferences.take_tour_request() {
+            self.tour.restart();
+        }
+        if self.tour.running() && self.tour.overlay(ctx, self.setup.running_installed()) {
+            self.preferences.mark_toured(&crate::tour::all_keys());
+        }
 
         self.watch.drain();
         self.check_failsafe();
