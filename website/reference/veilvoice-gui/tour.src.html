@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/tour.rs</code></h1>
-<p style="color:var(--muted)"><a href="tour.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 329 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tour.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 579 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -102,315 +102,575 @@
 <span class="ln" id="L34"><span class="tok-com">//! menu&quot;. It is a statement rather than a prompt: `Install` is a tab, the</span></span>
 <span class="ln" id="L35"><span class="tok-com">//! decision is made there, and a tour is a bad place to ask somebody to commit</span></span>
 <span class="ln" id="L36"><span class="tok-com">//! to anything.</span></span>
-<span class="ln" id="L37"></span>
-<span class="ln" id="L38"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
-<span class="ln" id="L39"><span class="tok-kw">use</span> egui::{RichText, Ui};</span>
-<span class="ln" id="L40"></span>
+<span class="ln" id="L37"><span class="tok-com">//!</span></span>
+<span class="ln" id="L38"><span class="tok-com">//! # It is drawn over the window, not instead of it</span></span>
+<span class="ln" id="L39"><span class="tok-com">//!</span></span>
+<span class="ln" id="L40"><span class="tok-com">//! **Roadmap item 171.** This used to replace the whole body of the window:</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! `update` drew the card and returned, so the tabs it was describing were not</span></span>
+<span class="ln" id="L42"><span class="tok-com">//! on screen while it described them. A card saying what the Monitor tab is</span></span>
+<span class="ln" id="L43"><span class="tok-com">//! for, with no Monitor tab visible anywhere, is a paragraph from a manual</span></span>
+<span class="ln" id="L44"><span class="tok-com">//! rather than a tour of anything.</span></span>
+<span class="ln" id="L45"><span class="tok-com">//!</span></span>
+<span class="ln" id="L46"><span class="tok-com">//! Now it is an [`egui::Modal`]: the window draws normally underneath, dimmed,</span></span>
+<span class="ln" id="L47"><span class="tok-com">//! and the card sits over it. The reader can see the tab strip the card is</span></span>
+<span class="ln" id="L48"><span class="tok-com">//! talking about. The backdrop takes the clicks, so nothing behind it can be</span></span>
+<span class="ln" id="L49"><span class="tok-com">//! pressed by accident, and the tab strip is drawn disabled as well so that it</span></span>
+<span class="ln" id="L50"><span class="tok-com">//! looks as unavailable as it is.</span></span>
+<span class="ln" id="L51"><span class="tok-com">//!</span></span>
+<span class="ln" id="L52"><span class="tok-com">//! **Escape closes it and a click on the shade does not.** Those are usually</span></span>
+<span class="ln" id="L53"><span class="tok-com">//! the same gesture on a modal, and they should not be here: a modal asks a</span></span>
+<span class="ln" id="L54"><span class="tok-com">//! question and clicking away from it means &quot;not now&quot;, where a tour is</span></span>
+<span class="ln" id="L55"><span class="tok-com">//! something somebody is stepping through, and a misjudged click halfway along</span></span>
+<span class="ln" id="L56"><span class="tok-com">//! should not throw away the half they have not seen. Escape is deliberate and</span></span>
+<span class="ln" id="L57"><span class="tok-com">//! the buttons are deliberate. A stray click is not.</span></span>
+<span class="ln" id="L58"><span class="tok-com">//!</span></span>
+<span class="ln" id="L59"><span class="tok-com">//! # It can be asked for again</span></span>
+<span class="ln" id="L60"><span class="tok-com">//!</span></span>
+<span class="ln" id="L61"><span class="tok-com">//! Settings, under Interface. The stored tab list decides whether the tour</span></span>
+<span class="ln" id="L62"><span class="tok-com">//! *offers* itself; it has nothing to say about whether somebody may ask for</span></span>
+<span class="ln" id="L63"><span class="tok-com">//! it, and before this there was no way to ask. Somebody who skipped it on the</span></span>
+<span class="ln" id="L64"><span class="tok-com">//! day they installed VeilVoice had no route back to it at all, which made the</span></span>
+<span class="ln" id="L65"><span class="tok-com">//! skip button a permanent decision taken in the first thirty seconds.</span></span>
+<span class="ln" id="L66"><span class="tok-com">//!</span></span>
+<span class="ln" id="L67"><span class="tok-com">//! A person asking gets every card, including the ones they have seen, because</span></span>
+<span class="ln" id="L68"><span class="tok-com">//! &quot;show me that again&quot; is not a question about which tabs are new.</span></span>
+<span class="ln" id="L69"></span>
+<span class="ln" id="L70"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
+<span class="ln" id="L71"><span class="tok-kw">use</span> egui::{RichText, Ui};</span>
+<span class="ln" id="L72"></span>
+<span class="src-item" id="fn-card_width">
+<span class="ln" id="L73"><span class="tok-com">/// How wide the card is allowed to get.</span></span>
+<span class="ln" id="L74"><span class="tok-com">///</span></span>
+<span class="ln" id="L75"><span class="tok-com">/// A reading measure rather than the window&#x27;s width. At 1400 pixels a sentence</span></span>
+<span class="ln" id="L76"><span class="tok-com">/// runs the whole way across and the eye loses the line coming back; the usual</span></span>
+<span class="ln" id="L77"><span class="tok-com">/// advice is 60 to 80 characters and this is about 75 at the default size. The</span></span>
+<span class="ln" id="L78"><span class="tok-com">/// window can be any width and the card should not get harder to read as it</span></span>
+<span class="ln" id="L79"><span class="tok-com">/// grows.</span></span>
+<span class="ln" id="L80"><span class="tok-kw">const</span> CARD_WIDTH: f32 = <span class="tok-num">720.0</span>;</span>
+</span>
+<span class="ln" id="L81"></span>
+<span class="src-item" id="fn-card_height_share">
+<span class="ln" id="L82"><span class="tok-com">/// How much of the window&#x27;s height the card may occupy before its text</span></span>
+<span class="ln" id="L83"><span class="tok-com">/// scrolls.</span></span>
+<span class="ln" id="L84"><span class="tok-com">///</span></span>
+<span class="ln" id="L85"><span class="tok-com">/// A share rather than a number of pixels, because the thing being protected</span></span>
+<span class="ln" id="L86"><span class="tok-com">/// is the shade around the card: a card that reaches the edges is not an</span></span>
+<span class="ln" id="L87"><span class="tok-com">/// overlay any more, it is the replacement this stopped being. Below this the</span></span>
+<span class="ln" id="L88"><span class="tok-com">/// text scrolls inside the card, so a short window never hides the buttons,</span></span>
+<span class="ln" id="L89"><span class="tok-com">/// which is the same rule the tab bodies follow.</span></span>
+<span class="ln" id="L90"><span class="tok-kw">const</span> CARD_HEIGHT_SHARE: f32 = <span class="tok-num">0.8</span>;</span>
+</span>
+<span class="ln" id="L91"></span>
 <span class="src-item" id="fn-cards">
-<span class="ln" id="L41"><span class="tok-com">/// One card: the tab it is about, and what that tab is for.</span></span>
-<span class="ln" id="L42"><span class="tok-com">///</span></span>
-<span class="ln" id="L43"><span class="tok-com">/// The keys match `Tab::key`, and `app.rs` has a test that every tab has a</span></span>
-<span class="ln" id="L44"><span class="tok-com">/// card and every card has a tab, so a tab added without a sentence fails the</span></span>
-<span class="ln" id="L45"><span class="tok-com">/// build rather than shipping unexplained.</span></span>
-<span class="ln" id="L46"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CARDS: &amp;[(&amp;str, &amp;str, &amp;str)] = &amp;[</span>
-<span class="ln" id="L47">    (</span>
-<span class="ln" id="L48">        <span class="tok-str">&quot;file&quot;</span>,</span>
-<span class="ln" id="L49">        <span class="tok-str">&quot;Anonymise file&quot;</span>,</span>
-<span class="ln" id="L50">        <span class="tok-str">&quot;A recording in, the same words in a voice nobody owns out. Encrypted \</span></span>
-<span class="ln" id="L51"><span class="tok-str">         at rest by default, because the words survive on purpose and a file \</span></span>
-<span class="ln" id="L52"><span class="tok-str">         anybody can read is a transcript anybody can read.&quot;</span>,</span>
-<span class="ln" id="L53">    ),</span>
-<span class="ln" id="L54">    (</span>
-<span class="ln" id="L55">        <span class="tok-str">&quot;group&quot;</span>,</span>
-<span class="ln" id="L56">        <span class="tok-str">&quot;Group&quot;</span>,</span>
-<span class="ln" id="L57">        <span class="tok-str">&quot;One recording with several people in it. Each gets a different voice, \</span></span>
-<span class="ln" id="L58"><span class="tok-str">         so a listener can still follow who is who, and every voiceprint is \</span></span>
-<span class="ln" id="L59"><span class="tok-str">         destroyed just as thoroughly.&quot;</span>,</span>
-<span class="ln" id="L60">    ),</span>
-<span class="ln" id="L61">    (</span>
-<span class="ln" id="L62">        <span class="tok-str">&quot;studio&quot;</span>,</span>
-<span class="ln" id="L63">        <span class="tok-str">&quot;Studio&quot;</span>,</span>
-<span class="ln" id="L64">        <span class="tok-str">&quot;The same thing on a microphone as you speak, into a virtual cable \</span></span>
-<span class="ln" id="L65"><span class="tok-str">         that other programs can listen to, and a locked vault to keep what \</span></span>
-<span class="ln" id="L66"><span class="tok-str">         was said in if you want one. The vault opens with both of your \</span></span>
-<span class="ln" id="L67"><span class="tok-str">         passphrases at once, the one on this application and the one on your \</span></span>
-<span class="ln" id="L68"><span class="tok-str">         recordings, and neither on its own.&quot;</span>,</span>
-<span class="ln" id="L69">    ),</span>
-<span class="ln" id="L70">    (</span>
-<span class="ln" id="L71">        <span class="tok-str">&quot;browser&quot;</span>,</span>
-<span class="ln" id="L72">        <span class="tok-str">&quot;Browser&quot;</span>,</span>
-<span class="ln" id="L73">        <span class="tok-str">&quot;What is in the vault. The names and dates are sealed with the \</span></span>
-<span class="ln" id="L74"><span class="tok-str">         recordings, so a disk shows how many files there are and roughly how \</span></span>
-<span class="ln" id="L75"><span class="tok-str">         large, and nothing about what any of them is.&quot;</span>,</span>
-<span class="ln" id="L76">    ),</span>
-<span class="ln" id="L77">    (</span>
-<span class="ln" id="L78">        <span class="tok-str">&quot;monitor&quot;</span>,</span>
-<span class="ln" id="L79">        <span class="tok-str">&quot;Monitor&quot;</span>,</span>
-<span class="ln" id="L80">        <span class="tok-str">&quot;Not a level meter. It watches for another program picking up a real \</span></span>
-<span class="ln" id="L81"><span class="tok-str">         microphone while you are being veiled, which is the way this can \</span></span>
-<span class="ln" id="L82"><span class="tok-str">         quietly fail to protect you.&quot;</span>,</span>
-<span class="ln" id="L83">    ),</span>
-<span class="ln" id="L84">    (</span>
-<span class="ln" id="L85">        <span class="tok-str">&quot;lock&quot;</span>,</span>
-<span class="ln" id="L86">        <span class="tok-str">&quot;Lock&quot;</span>,</span>
-<span class="ln" id="L87">        <span class="tok-str">&quot;A passphrase on this application, separate from the one on any \</span></span>
-<span class="ln" id="L88"><span class="tok-str">         recording. Worth what a lock on a drawer is worth: it stops somebody \</span></span>
-<span class="ln" id="L89"><span class="tok-str">         at your keyboard, not somebody with your disk. This tab also shows \</span></span>
-<span class="ln" id="L90"><span class="tok-str">         what VeilVoice&#x27;s own files looked like when it first ran, and whether \</span></span>
-<span class="ln" id="L91"><span class="tok-str">         they still do. That record is taken without being asked for, and is \</span></span>
-<span class="ln" id="L92"><span class="tok-str">         sealed with your passphrase if you set one here.&quot;</span>,</span>
-<span class="ln" id="L93">    ),</span>
-<span class="ln" id="L94">    (</span>
-<span class="ln" id="L95">        <span class="tok-str">&quot;verify&quot;</span>,</span>
-<span class="ln" id="L96">        <span class="tok-str">&quot;Verify&quot;</span>,</span>
-<span class="ln" id="L97">        <span class="tok-str">&quot;Check that a VeilVoice download is the one that was published, using \</span></span>
-<span class="ln" id="L98"><span class="tok-str">         the signature and, if you have GnuPG, your own copy of it as well.&quot;</span>,</span>
-<span class="ln" id="L99">    ),</span>
-<span class="ln" id="L100">    (</span>
-<span class="ln" id="L101">        <span class="tok-str">&quot;settings&quot;</span>,</span>
-<span class="ln" id="L102">        <span class="tok-str">&quot;Settings&quot;</span>,</span>
-<span class="ln" id="L103">        <span class="tok-str">&quot;Theme, animation, autolock, and what the interface tells you. \</span></span>
-<span class="ln" id="L104"><span class="tok-str">         Everything here is stored beside the application and goes nowhere.&quot;</span>,</span>
-<span class="ln" id="L105">    ),</span>
-<span class="ln" id="L106">    (</span>
-<span class="ln" id="L107">        <span class="tok-str">&quot;install&quot;</span>,</span>
-<span class="ln" id="L108">        <span class="tok-str">&quot;Install&quot;</span>,</span>
-<span class="ln" id="L109">        <span class="tok-str">&quot;Put this copy somewhere permanent, or leave it where it is. Either \</span></span>
-<span class="ln" id="L110"><span class="tok-str">         works. The tab takes itself away once there is nothing left to do.&quot;</span>,</span>
+<span class="ln" id="L92"><span class="tok-com">/// One card: the tab it is about, and what that tab is for.</span></span>
+<span class="ln" id="L93"><span class="tok-com">///</span></span>
+<span class="ln" id="L94"><span class="tok-com">/// The keys match `Tab::key`, and `app.rs` has a test that every tab has a</span></span>
+<span class="ln" id="L95"><span class="tok-com">/// card and every card has a tab, so a tab added without a sentence fails the</span></span>
+<span class="ln" id="L96"><span class="tok-com">/// build rather than shipping unexplained.</span></span>
+<span class="ln" id="L97"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> CARDS: &amp;[(&amp;str, &amp;str, &amp;str)] = &amp;[</span>
+<span class="ln" id="L98">    (</span>
+<span class="ln" id="L99">        <span class="tok-str">&quot;file&quot;</span>,</span>
+<span class="ln" id="L100">        <span class="tok-str">&quot;Anonymise file&quot;</span>,</span>
+<span class="ln" id="L101">        <span class="tok-str">&quot;A recording in, the same words in a voice nobody owns out. Encrypted \</span></span>
+<span class="ln" id="L102"><span class="tok-str">         at rest by default, because the words survive on purpose and a file \</span></span>
+<span class="ln" id="L103"><span class="tok-str">         anybody can read is a transcript anybody can read.&quot;</span>,</span>
+<span class="ln" id="L104">    ),</span>
+<span class="ln" id="L105">    (</span>
+<span class="ln" id="L106">        <span class="tok-str">&quot;group&quot;</span>,</span>
+<span class="ln" id="L107">        <span class="tok-str">&quot;Group&quot;</span>,</span>
+<span class="ln" id="L108">        <span class="tok-str">&quot;One recording with several people in it. Each gets a different voice, \</span></span>
+<span class="ln" id="L109"><span class="tok-str">         so a listener can still follow who is who, and every voiceprint is \</span></span>
+<span class="ln" id="L110"><span class="tok-str">         destroyed just as thoroughly.&quot;</span>,</span>
 <span class="ln" id="L111">    ),</span>
 <span class="ln" id="L112">    (</span>
-<span class="ln" id="L113">        <span class="tok-str">&quot;about&quot;</span>,</span>
-<span class="ln" id="L114">        <span class="tok-str">&quot;About&quot;</span>,</span>
-<span class="ln" id="L115">        <span class="tok-str">&quot;Versions, what drew the window, what the lock covers, and somewhere \</span></span>
-<span class="ln" id="L116"><span class="tok-str">         to report a fault.&quot;</span>,</span>
-<span class="ln" id="L117">    ),</span>
-<span class="ln" id="L118">];</span>
+<span class="ln" id="L113">        <span class="tok-str">&quot;studio&quot;</span>,</span>
+<span class="ln" id="L114">        <span class="tok-str">&quot;Studio&quot;</span>,</span>
+<span class="ln" id="L115">        <span class="tok-str">&quot;The same thing on a microphone as you speak, into a virtual cable \</span></span>
+<span class="ln" id="L116"><span class="tok-str">         that other programs can listen to, and a locked vault to keep what \</span></span>
+<span class="ln" id="L117"><span class="tok-str">         was said in if you want one. The vault opens with both of your \</span></span>
+<span class="ln" id="L118"><span class="tok-str">         passphrases at once, the one on this application and the one on your \</span></span>
+<span class="ln" id="L119"><span class="tok-str">         recordings, and neither on its own.&quot;</span>,</span>
+<span class="ln" id="L120">    ),</span>
+<span class="ln" id="L121">    (</span>
+<span class="ln" id="L122">        <span class="tok-str">&quot;browser&quot;</span>,</span>
+<span class="ln" id="L123">        <span class="tok-str">&quot;Browser&quot;</span>,</span>
+<span class="ln" id="L124">        <span class="tok-str">&quot;What is in the vault. The names and dates are sealed with the \</span></span>
+<span class="ln" id="L125"><span class="tok-str">         recordings, so a disk shows how many files there are and roughly how \</span></span>
+<span class="ln" id="L126"><span class="tok-str">         large, and nothing about what any of them is.&quot;</span>,</span>
+<span class="ln" id="L127">    ),</span>
+<span class="ln" id="L128">    (</span>
+<span class="ln" id="L129">        <span class="tok-str">&quot;monitor&quot;</span>,</span>
+<span class="ln" id="L130">        <span class="tok-str">&quot;Monitor&quot;</span>,</span>
+<span class="ln" id="L131">        <span class="tok-str">&quot;Not a level meter. It watches for another program picking up a real \</span></span>
+<span class="ln" id="L132"><span class="tok-str">         microphone while you are being veiled, which is the way this can \</span></span>
+<span class="ln" id="L133"><span class="tok-str">         quietly fail to protect you.&quot;</span>,</span>
+<span class="ln" id="L134">    ),</span>
+<span class="ln" id="L135">    (</span>
+<span class="ln" id="L136">        <span class="tok-str">&quot;lock&quot;</span>,</span>
+<span class="ln" id="L137">        <span class="tok-str">&quot;Lock&quot;</span>,</span>
+<span class="ln" id="L138">        <span class="tok-str">&quot;A passphrase on this application, separate from the one on any \</span></span>
+<span class="ln" id="L139"><span class="tok-str">         recording. Worth what a lock on a drawer is worth: it stops somebody \</span></span>
+<span class="ln" id="L140"><span class="tok-str">         at your keyboard, not somebody with your disk. This tab also shows \</span></span>
+<span class="ln" id="L141"><span class="tok-str">         what VeilVoice&#x27;s own files looked like when it first ran, and whether \</span></span>
+<span class="ln" id="L142"><span class="tok-str">         they still do. That record is taken without being asked for, and is \</span></span>
+<span class="ln" id="L143"><span class="tok-str">         sealed with your passphrase if you set one here.&quot;</span>,</span>
+<span class="ln" id="L144">    ),</span>
+<span class="ln" id="L145">    (</span>
+<span class="ln" id="L146">        <span class="tok-str">&quot;verify&quot;</span>,</span>
+<span class="ln" id="L147">        <span class="tok-str">&quot;Verify&quot;</span>,</span>
+<span class="ln" id="L148">        <span class="tok-str">&quot;Check that a VeilVoice download is the one that was published, using \</span></span>
+<span class="ln" id="L149"><span class="tok-str">         the signature and, if you have GnuPG, your own copy of it as well.&quot;</span>,</span>
+<span class="ln" id="L150">    ),</span>
+<span class="ln" id="L151">    (</span>
+<span class="ln" id="L152">        <span class="tok-str">&quot;settings&quot;</span>,</span>
+<span class="ln" id="L153">        <span class="tok-str">&quot;Settings&quot;</span>,</span>
+<span class="ln" id="L154">        <span class="tok-str">&quot;Theme, animation, autolock, and what the interface tells you. \</span></span>
+<span class="ln" id="L155"><span class="tok-str">         Everything here is stored beside the application and goes nowhere.&quot;</span>,</span>
+<span class="ln" id="L156">    ),</span>
+<span class="ln" id="L157">    (</span>
+<span class="ln" id="L158">        <span class="tok-str">&quot;install&quot;</span>,</span>
+<span class="ln" id="L159">        <span class="tok-str">&quot;Install&quot;</span>,</span>
+<span class="ln" id="L160">        <span class="tok-str">&quot;Put this copy somewhere permanent, or leave it where it is. Either \</span></span>
+<span class="ln" id="L161"><span class="tok-str">         works. The tab takes itself away once there is nothing left to do.&quot;</span>,</span>
+<span class="ln" id="L162">    ),</span>
+<span class="ln" id="L163">    (</span>
+<span class="ln" id="L164">        <span class="tok-str">&quot;about&quot;</span>,</span>
+<span class="ln" id="L165">        <span class="tok-str">&quot;About&quot;</span>,</span>
+<span class="ln" id="L166">        <span class="tok-str">&quot;Versions, what drew the window, what the lock covers, and somewhere \</span></span>
+<span class="ln" id="L167"><span class="tok-str">         to report a fault.&quot;</span>,</span>
+<span class="ln" id="L168">    ),</span>
+<span class="ln" id="L169">];</span>
 </span>
-<span class="ln" id="L119"></span>
+<span class="ln" id="L170"></span>
 <span class="src-item" id="fn-tour">
-<span class="ln" id="L120"><span class="tok-com">/// Where the tour is up to.</span></span>
-<span class="ln" id="L121"><span class="tok-attr">#[derive</span>(Default)]</span>
-<span class="ln" id="L122"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Tour {</span>
-<span class="ln" id="L123">    <span class="tok-com">/// Which card is showing. `None` means it is not running.</span></span>
-<span class="ln" id="L124">    at: Option&lt;usize&gt;,</span>
-<span class="ln" id="L125">    <span class="tok-com">/// The cards this run is showing, as indices into [`CARDS`].</span></span>
-<span class="ln" id="L126">    showing: Vec&lt;usize&gt;,</span>
-<span class="ln" id="L127">}</span>
+<span class="ln" id="L171"><span class="tok-com">/// Where the tour is up to.</span></span>
+<span class="ln" id="L172"><span class="tok-attr">#[derive</span>(Default)]</span>
+<span class="ln" id="L173"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Tour {</span>
+<span class="ln" id="L174">    <span class="tok-com">/// Which card is showing. `None` means it is not running.</span></span>
+<span class="ln" id="L175">    at: Option&lt;usize&gt;,</span>
+<span class="ln" id="L176">    <span class="tok-com">/// The cards this run is showing, as indices into [`CARDS`].</span></span>
+<span class="ln" id="L177">    showing: Vec&lt;usize&gt;,</span>
+<span class="ln" id="L178">}</span>
 </span>
-<span class="ln" id="L128"></span>
+<span class="ln" id="L179"></span>
 <span class="src-item" id="fn-all_keys">
-<span class="ln" id="L129"><span class="tok-com">/// Every tab key the tour knows, for storing once it has run.</span></span>
-<span class="ln" id="L130"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">all_keys</span>() -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L131">    CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| (*key).<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L132">}</span>
+<span class="ln" id="L180"><span class="tok-com">/// Every tab key the tour knows, for storing once it has run.</span></span>
+<span class="ln" id="L181"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">all_keys</span>() -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L182">    CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| (*key).<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L183">}</span>
 </span>
-<span class="ln" id="L133"></span>
-<span class="ln" id="L134"><span class="tok-kw">impl</span> Tour {</span>
+<span class="ln" id="L184"></span>
+<span class="ln" id="L185"><span class="tok-kw">impl</span> Tour {</span>
 <span class="src-item" id="fn-tour-start">
-<span class="ln" id="L135">    <span class="tok-com">/// Start the tour from the beginning, showing every card.</span></span>
-<span class="ln" id="L136">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">start</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L137">        <span class="tok-kw">self</span>.showing = (<span class="tok-num">0</span>..CARDS.<span class="tok-fn">len</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L138">        <span class="tok-kw">self</span>.at = <span class="tok-fn">Some</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L139">    }</span>
+<span class="ln" id="L186">    <span class="tok-com">/// Start the tour from the beginning, showing every card.</span></span>
+<span class="ln" id="L187">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">start</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L188">        <span class="tok-kw">self</span>.showing = (<span class="tok-num">0</span>..CARDS.<span class="tok-fn">len</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L189">        <span class="tok-kw">self</span>.at = <span class="tok-fn">Some</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L190">    }</span>
 </span>
-<span class="ln" id="L140"></span>
+<span class="ln" id="L191"></span>
 <span class="src-item" id="fn-tour-start_new_only">
-<span class="ln" id="L141">    <span class="tok-com">/// Start it showing only the cards whose tabs are not in `known`.</span></span>
-<span class="ln" id="L142">    <span class="tok-com">///</span></span>
-<span class="ln" id="L143">    <span class="tok-com">/// Used after an upgrade: somebody who has been using this for months is</span></span>
-<span class="ln" id="L144">    <span class="tok-com">/// shown what is new and nothing else. If nothing is new, nothing runs.</span></span>
-<span class="ln" id="L145">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">start_new_only</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, known: &amp;[String]) {</span>
-<span class="ln" id="L146">        <span class="tok-kw">self</span>.showing = CARDS</span>
-<span class="ln" id="L147">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L148">            .<span class="tok-fn">enumerate</span>()</span>
-<span class="ln" id="L149">            .<span class="tok-fn">filter</span>(|(_, (key, _, _))| !known.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|seen| seen == key))</span>
-<span class="ln" id="L150">            .<span class="tok-fn">map</span>(|(index, _)| index)</span>
-<span class="ln" id="L151">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L152">        <span class="tok-kw">self</span>.at = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.showing.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L153">            None</span>
-<span class="ln" id="L154">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L155">            <span class="tok-fn">Some</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L156">        };</span>
-<span class="ln" id="L157">    }</span>
+<span class="ln" id="L192">    <span class="tok-com">/// Start it showing only the cards whose tabs are not in `known`.</span></span>
+<span class="ln" id="L193">    <span class="tok-com">///</span></span>
+<span class="ln" id="L194">    <span class="tok-com">/// Used after an upgrade: somebody who has been using this for months is</span></span>
+<span class="ln" id="L195">    <span class="tok-com">/// shown what is new and nothing else. If nothing is new, nothing runs.</span></span>
+<span class="ln" id="L196">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">start_new_only</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, known: &amp;[String]) {</span>
+<span class="ln" id="L197">        <span class="tok-kw">self</span>.showing = CARDS</span>
+<span class="ln" id="L198">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L199">            .<span class="tok-fn">enumerate</span>()</span>
+<span class="ln" id="L200">            .<span class="tok-fn">filter</span>(|(_, (key, _, _))| !known.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|seen| seen == key))</span>
+<span class="ln" id="L201">            .<span class="tok-fn">map</span>(|(index, _)| index)</span>
+<span class="ln" id="L202">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L203">        <span class="tok-kw">self</span>.at = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.showing.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L204">            None</span>
+<span class="ln" id="L205">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L206">            <span class="tok-fn">Some</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L207">        };</span>
+<span class="ln" id="L208">    }</span>
 </span>
-<span class="ln" id="L158"></span>
+<span class="ln" id="L209"></span>
 <span class="src-item" id="fn-tour-running">
-<span class="ln" id="L159">    <span class="tok-com">/// Whether the tour is on screen.</span></span>
-<span class="ln" id="L160">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">running</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L161">        <span class="tok-kw">self</span>.at.<span class="tok-fn">is_some</span>()</span>
-<span class="ln" id="L162">    }</span>
+<span class="ln" id="L210">    <span class="tok-com">/// Whether the tour is on screen.</span></span>
+<span class="ln" id="L211">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">running</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L212">        <span class="tok-kw">self</span>.at.<span class="tok-fn">is_some</span>()</span>
+<span class="ln" id="L213">    }</span>
 </span>
-<span class="ln" id="L163"></span>
+<span class="ln" id="L214"></span>
 <span class="src-item" id="fn-tour-stop">
-<span class="ln" id="L164">    <span class="tok-com">/// Stop it.</span></span>
-<span class="ln" id="L165">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">stop</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L166">        <span class="tok-kw">self</span>.at = None;</span>
-<span class="ln" id="L167">        <span class="tok-kw">self</span>.showing.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L168">    }</span>
+<span class="ln" id="L215">    <span class="tok-com">/// Stop it.</span></span>
+<span class="ln" id="L216">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">stop</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L217">        <span class="tok-kw">self</span>.at = None;</span>
+<span class="ln" id="L218">        <span class="tok-kw">self</span>.showing.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L219">    }</span>
 </span>
-<span class="ln" id="L169"></span>
-<span class="src-item" id="fn-tour-panel">
-<span class="ln" id="L170">    <span class="tok-com">/// Draw the current card. Returns true once the tour has finished.</span></span>
-<span class="ln" id="L171">    <span class="tok-com">///</span></span>
-<span class="ln" id="L172">    <span class="tok-com">/// `installed` decides the sentence on the last card, and it is a fact</span></span>
-<span class="ln" id="L173">    <span class="tok-com">/// about where this binary is rather than a preference.</span></span>
-<span class="ln" id="L174">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">panel</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, installed: bool) -&gt; bool {</span>
-<span class="ln" id="L175">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = <span class="tok-kw">self</span>.at <span class="tok-kw">else</span> { <span class="tok-kw">return</span> false };</span>
-<span class="ln" id="L176">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(&amp;card) = <span class="tok-kw">self</span>.showing.<span class="tok-fn">get</span>(at) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L177">            <span class="tok-kw">self</span>.<span class="tok-fn">stop</span>();</span>
-<span class="ln" id="L178">            <span class="tok-kw">return</span> true;</span>
-<span class="ln" id="L179">        };</span>
-<span class="ln" id="L180">        <span class="tok-kw">let</span> (_, title, body) = CARDS[card];</span>
-<span class="ln" id="L181">        <span class="tok-kw">let</span> last = at + <span class="tok-num">1</span> &gt;= <span class="tok-kw">self</span>.showing.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L182"></span>
-<span class="ln" id="L183">        <span class="tok-com">// A reading measure rather than the window&#x27;s width. At 1400 pixels a</span></span>
-<span class="ln" id="L184">        <span class="tok-com">// sentence runs the whole way across and the eye loses the line coming</span></span>
-<span class="ln" id="L185">        <span class="tok-com">// back; the usual advice is 60 to 80 characters and this is about 75 at</span></span>
-<span class="ln" id="L186">        <span class="tok-com">// the default size. The window can be any width and the card should not</span></span>
-<span class="ln" id="L187">        <span class="tok-com">// get harder to read as it grows.</span></span>
-<span class="ln" id="L188">        ui.<span class="tok-fn">set_max_width</span>(<span class="tok-num">720.0</span>);</span>
-<span class="ln" id="L189">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">18.0</span>);</span>
-<span class="ln" id="L190">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L191">            RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{} of {}&quot;</span>, at + <span class="tok-num">1</span>, <span class="tok-kw">self</span>.showing.<span class="tok-fn">len</span>()))</span>
-<span class="ln" id="L192">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L193">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L194">        );</span>
-<span class="ln" id="L195">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L196">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(title).<span class="tok-fn">size</span>(<span class="tok-num">18.0</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
-<span class="ln" id="L197">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L198">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(body).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
-<span class="ln" id="L199"></span>
-<span class="ln" id="L200">        <span class="tok-kw">if</span> last {</span>
-<span class="ln" id="L201">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
-<span class="ln" id="L202">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;This copy&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()).<span class="tok-fn">strong</span>());</span>
-<span class="ln" id="L203">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L204">                RichText::<span class="tok-fn">new</span>(<span class="tok-kw">if</span> installed {</span>
-<span class="ln" id="L205">                    <span class="tok-str">&quot;Installed. It is on this machine for good, it is on your \</span></span>
-<span class="ln" id="L206"><span class="tok-str">                     menu or path, and its settings live in your account. \</span></span>
-<span class="ln" id="L207"><span class="tok-str">                     Removing it is the same as removing any other program.&quot;</span></span>
-<span class="ln" id="L208">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L209">                    <span class="tok-str">&quot;Portable. It runs from wherever you put it and installs \</span></span>
-<span class="ln" id="L210"><span class="tok-str">                     nothing: move the folder and VeilVoice moves with it, \</span></span>
-<span class="ln" id="L211"><span class="tok-str">                     delete the folder and it is gone. That is a perfectly \</span></span>
-<span class="ln" id="L212"><span class="tok-str">                     good way to keep using it. The Install tab is there if \</span></span>
-<span class="ln" id="L213"><span class="tok-str">                     you would rather it were permanent.&quot;</span></span>
-<span class="ln" id="L214">                })</span>
-<span class="ln" id="L215">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
-<span class="ln" id="L216">            );</span>
-<span class="ln" id="L217">        }</span>
-<span class="ln" id="L218"></span>
-<span class="ln" id="L219">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">18.0</span>);</span>
-<span class="ln" id="L220">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> finished = false;</span>
-<span class="ln" id="L221">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L222">            <span class="tok-kw">let</span> next = <span class="tok-kw">if</span> last { <span class="tok-str">&quot;done&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;next&quot;</span> };</span>
-<span class="ln" id="L223">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(next).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L224">                <span class="tok-kw">if</span> last {</span>
-<span class="ln" id="L225">                    <span class="tok-kw">self</span>.<span class="tok-fn">stop</span>();</span>
-<span class="ln" id="L226">                    finished = true;</span>
-<span class="ln" id="L227">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L228">                    <span class="tok-kw">self</span>.at = <span class="tok-fn">Some</span>(at + <span class="tok-num">1</span>);</span>
-<span class="ln" id="L229">                }</span>
-<span class="ln" id="L230">            }</span>
-<span class="ln" id="L231">            <span class="tok-kw">if</span> at &gt; <span class="tok-num">0</span> &amp;&amp; ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;back&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L232">                <span class="tok-kw">self</span>.at = <span class="tok-fn">Some</span>(at - <span class="tok-num">1</span>);</span>
-<span class="ln" id="L233">            }</span>
-<span class="ln" id="L234">            <span class="tok-kw">if</span> !last &amp;&amp; ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;skip the rest&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L235">                <span class="tok-kw">self</span>.<span class="tok-fn">stop</span>();</span>
-<span class="ln" id="L236">                finished = true;</span>
-<span class="ln" id="L237">            }</span>
-<span class="ln" id="L238">        });</span>
-<span class="ln" id="L239">        finished</span>
-<span class="ln" id="L240">    }</span>
+<span class="ln" id="L220"></span>
+<span class="src-item" id="fn-tour-restart">
+<span class="ln" id="L221">    <span class="tok-com">/// Start it again from the beginning, because somebody asked.</span></span>
+<span class="ln" id="L222">    <span class="tok-com">///</span></span>
+<span class="ln" id="L223">    <span class="tok-com">/// The same thing [`start`](Self::start) does, and a separate name because</span></span>
+<span class="ln" id="L224">    <span class="tok-com">/// the two mean different things: `start` is the window deciding that a</span></span>
+<span class="ln" id="L225">    <span class="tok-com">/// reader has not seen this, and this is a reader saying &quot;show me that</span></span>
+<span class="ln" id="L226">    <span class="tok-com">/// again&quot;. The second one is not a question about which tabs are new, so</span></span>
+<span class="ln" id="L227">    <span class="tok-com">/// it shows every card whatever is stored.</span></span>
+<span class="ln" id="L228">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">restart</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L229">        <span class="tok-kw">self</span>.<span class="tok-fn">start</span>();</span>
+<span class="ln" id="L230">    }</span>
 </span>
-<span class="ln" id="L241">}</span>
-<span class="ln" id="L242"></span>
-<span class="ln" id="L243"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L244"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L245">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L246"></span>
-<span class="ln" id="L247">    <span class="tok-com">/// The lock card says the integrity record is taken for you, and the</span></span>
-<span class="ln" id="L248">    <span class="tok-com">/// window is what takes it.</span></span>
-<span class="ln" id="L249">    <span class="tok-com">///</span></span>
-<span class="ln" id="L250">    <span class="tok-com">/// Both halves, because a sentence in a tour is a promise about behaviour</span></span>
-<span class="ln" id="L251">    <span class="tok-com">/// and this one was written the day the behaviour it describes had been</span></span>
-<span class="ln" id="L252">    <span class="tok-com">/// there for four releases with nothing telling anybody. If the start in</span></span>
-<span class="ln" id="L253">    <span class="tok-com">/// `app.rs` is ever removed, the card is left claiming something untrue to</span></span>
-<span class="ln" id="L254">    <span class="tok-com">/// every new reader, which is the failure this checks for.</span></span>
-<span class="ln" id="L255">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L256">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_card_promises_what_the_window_actually_does</span>() {</span>
-<span class="ln" id="L257">        <span class="tok-kw">let</span> card = CARDS</span>
-<span class="ln" id="L258">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L259">            .<span class="tok-fn">find</span>(|(tab, _, _)| *tab == <span class="tok-str">&quot;lock&quot;</span>)</span>
-<span class="ln" id="L260">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a card for the lock tab&quot;</span>);</span>
-<span class="ln" id="L261">        assert!(</span>
-<span class="ln" id="L262">            card.<span class="tok-num">2</span>.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;record&quot;</span>),</span>
-<span class="ln" id="L263">            <span class="tok-str">&quot;the lock card no longer mentions the integrity record: {}&quot;</span>,</span>
-<span class="ln" id="L264">            card.<span class="tok-num">2</span></span>
-<span class="ln" id="L265">        );</span>
-<span class="ln" id="L266">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>);</span>
-<span class="ln" id="L267">        assert!(</span>
-<span class="ln" id="L268">            app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;app.integrity.start(None)&quot;</span>),</span>
-<span class="ln" id="L269">            <span class="tok-str">&quot;nothing starts the integrity record at launch any more, and the \</span></span>
-<span class="ln" id="L270"><span class="tok-str">             tour still tells every new reader that one was taken&quot;</span></span>
-<span class="ln" id="L271">        );</span>
-<span class="ln" id="L272">    }</span>
-<span class="ln" id="L273"></span>
-<span class="ln" id="L274">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L275">    <span class="tok-kw">fn</span> <span class="tok-fn">every_card_has_a_sentence_and_no_two_share_a_tab</span>() {</span>
-<span class="ln" id="L276">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| *key).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L277">        <span class="tok-kw">let</span> before = keys.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L278">        keys.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L279">        keys.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L280">        assert_eq!(keys.<span class="tok-fn">len</span>(), before, <span class="tok-str">&quot;two cards claim the same tab&quot;</span>);</span>
-<span class="ln" id="L281">        <span class="tok-kw">for</span> (key, title, body) <span class="tok-kw">in</span> CARDS {</span>
-<span class="ln" id="L282">            assert!(!key.<span class="tok-fn">is_empty</span>() &amp;&amp; !title.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L283">            assert!(</span>
-<span class="ln" id="L284">                body.<span class="tok-fn">len</span>() &gt; <span class="tok-num">60</span>,</span>
-<span class="ln" id="L285">                <span class="tok-str">&quot;{key} has a sentence too short to explain anything&quot;</span></span>
-<span class="ln" id="L286">            );</span>
-<span class="ln" id="L287">        }</span>
-<span class="ln" id="L288">    }</span>
-<span class="ln" id="L289"></span>
-<span class="ln" id="L290">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L291">    <span class="tok-kw">fn</span> <span class="tok-fn">a_first_run_sees_everything</span>() {</span>
-<span class="ln" id="L292">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L293">        assert!(!tour.<span class="tok-fn">running</span>());</span>
-<span class="ln" id="L294">        tour.<span class="tok-fn">start</span>();</span>
-<span class="ln" id="L295">        assert!(tour.<span class="tok-fn">running</span>());</span>
-<span class="ln" id="L296">        assert_eq!(tour.showing.<span class="tok-fn">len</span>(), CARDS.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L297">    }</span>
-<span class="ln" id="L298"></span>
-<span class="ln" id="L299">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L300">    <span class="tok-kw">fn</span> <span class="tok-fn">an_upgrade_shows_only_what_is_new</span>() {</span>
-<span class="ln" id="L301">        <span class="tok-kw">let</span> known: Vec&lt;String&gt; = CARDS</span>
-<span class="ln" id="L302">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L303">            .<span class="tok-fn">take</span>(CARDS.<span class="tok-fn">len</span>() - <span class="tok-num">2</span>)</span>
-<span class="ln" id="L304">            .<span class="tok-fn">map</span>(|(key, _, _)| (*key).<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L305">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L306">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L307">        tour.<span class="tok-fn">start_new_only</span>(&amp;known);</span>
-<span class="ln" id="L308">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;two new tabs should start a tour&quot;</span>);</span>
-<span class="ln" id="L309">        assert_eq!(tour.showing.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L310">    }</span>
-<span class="ln" id="L311"></span>
-<span class="ln" id="L312">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L313">    <span class="tok-kw">fn</span> <span class="tok-fn">what_is_stored_is_every_tab_the_tour_covered</span>() {</span>
-<span class="ln" id="L314">        <span class="tok-com">// The stored list is what &quot;which of these is new to you&quot; is answered</span></span>
-<span class="ln" id="L315">        <span class="tok-com">// against, so it has to be complete when the tour finishes.</span></span>
-<span class="ln" id="L316">        assert_eq!(<span class="tok-fn">all_keys</span>().<span class="tok-fn">len</span>(), CARDS.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L317">    }</span>
-<span class="ln" id="L318"></span>
-<span class="ln" id="L319">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L320">    <span class="tok-kw">fn</span> <span class="tok-fn">an_upgrade_that_adds_no_tabs_shows_nothing</span>() {</span>
-<span class="ln" id="L321">        <span class="tok-kw">let</span> known: Vec&lt;String&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| (*key).<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L322">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L323">        tour.<span class="tok-fn">start_new_only</span>(&amp;known);</span>
-<span class="ln" id="L324">        assert!(</span>
-<span class="ln" id="L325">            !tour.<span class="tok-fn">running</span>(),</span>
-<span class="ln" id="L326">            <span class="tok-str">&quot;a tour with nothing new to say must not run&quot;</span></span>
-<span class="ln" id="L327">        );</span>
-<span class="ln" id="L328">    }</span>
-<span class="ln" id="L329">}</span>
+<span class="ln" id="L231"></span>
+<span class="src-item" id="fn-tour-overlay">
+<span class="ln" id="L232">    <span class="tok-com">/// Draw the current card over the window. Returns true once it finished.</span></span>
+<span class="ln" id="L233">    <span class="tok-com">///</span></span>
+<span class="ln" id="L234">    <span class="tok-com">/// `installed` decides the sentence on the last card, and it is a fact</span></span>
+<span class="ln" id="L235">    <span class="tok-com">/// about where this binary is rather than a preference.</span></span>
+<span class="ln" id="L236">    <span class="tok-com">///</span></span>
+<span class="ln" id="L237">    <span class="tok-com">/// Takes the context rather than a `Ui`, because it is no longer drawn</span></span>
+<span class="ln" id="L238">    <span class="tok-com">/// inside anything: the window paints its tabs as usual and this goes on</span></span>
+<span class="ln" id="L239">    <span class="tok-com">/// top of all of it. See the module note for why that is the whole point</span></span>
+<span class="ln" id="L240">    <span class="tok-com">/// of roadmap item 171 and not a presentational change.</span></span>
+<span class="ln" id="L241">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">overlay</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context, installed: bool) -&gt; bool {</span>
+<span class="ln" id="L242">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = <span class="tok-kw">self</span>.at <span class="tok-kw">else</span> { <span class="tok-kw">return</span> false };</span>
+<span class="ln" id="L243">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(&amp;card) = <span class="tok-kw">self</span>.showing.<span class="tok-fn">get</span>(at) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L244">            <span class="tok-kw">self</span>.<span class="tok-fn">stop</span>();</span>
+<span class="ln" id="L245">            <span class="tok-kw">return</span> true;</span>
+<span class="ln" id="L246">        };</span>
+<span class="ln" id="L247">        <span class="tok-kw">let</span> (_, title, body) = CARDS[card];</span>
+<span class="ln" id="L248">        <span class="tok-kw">let</span> last = at + <span class="tok-num">1</span> &gt;= <span class="tok-kw">self</span>.showing.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L249">        <span class="tok-kw">let</span> total = <span class="tok-kw">self</span>.showing.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L250">        <span class="tok-com">// `content_rect` rather than the whole window: it is the area inside</span></span>
+<span class="ln" id="L251">        <span class="tok-com">// the panels, which is what the modal&#x27;s own backdrop covers, and it is</span></span>
+<span class="ln" id="L252">        <span class="tok-com">// what the card has to fit inside.</span></span>
+<span class="ln" id="L253">        <span class="tok-kw">let</span> height = ctx.<span class="tok-fn">content_rect</span>().<span class="tok-fn">height</span>() * CARD_HEIGHT_SHARE;</span>
+<span class="ln" id="L254"></span>
+<span class="ln" id="L255">        <span class="tok-kw">let</span> modal = egui::Modal::<span class="tok-fn">new</span>(egui::Id::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-tour&quot;</span>))</span>
+<span class="ln" id="L256">            .<span class="tok-fn">frame</span>(</span>
+<span class="ln" id="L257">                egui::Frame::<span class="tok-fn">new</span>()</span>
+<span class="ln" id="L258">                    .<span class="tok-fn">fill</span>(p::<span class="tok-fn">surface</span>())</span>
+<span class="ln" id="L259">                    .<span class="tok-fn">stroke</span>(egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()))</span>
+<span class="ln" id="L260">                    .<span class="tok-fn">corner_radius</span>(<span class="tok-num">10</span>)</span>
+<span class="ln" id="L261">                    .<span class="tok-fn">inner_margin</span>(egui::Margin::<span class="tok-fn">symmetric</span>(<span class="tok-num">24</span>, <span class="tok-num">20</span>)),</span>
+<span class="ln" id="L262">            )</span>
+<span class="ln" id="L263">            .<span class="tok-fn">show</span>(ctx, |ui| {</span>
+<span class="ln" id="L264">                ui.<span class="tok-fn">set_max_width</span>(CARD_WIDTH);</span>
+<span class="ln" id="L265">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::Stay;</span>
+<span class="ln" id="L266"></span>
+<span class="ln" id="L267">                <span class="tok-com">// The text scrolls and the buttons do not. On a window shorter</span></span>
+<span class="ln" id="L268">                <span class="tok-com">// than the card, a single scroller around the whole thing puts</span></span>
+<span class="ln" id="L269">                <span class="tok-com">// &quot;next&quot; below the fold, and a tour whose only way forward has</span></span>
+<span class="ln" id="L270">                <span class="tok-com">// to be scrolled to is a tour that looks stuck.</span></span>
+<span class="ln" id="L271">                egui::ScrollArea::<span class="tok-fn">vertical</span>()</span>
+<span class="ln" id="L272">                    .<span class="tok-fn">max_height</span>(height)</span>
+<span class="ln" id="L273">                    .<span class="tok-fn">auto_shrink</span>([false, true])</span>
+<span class="ln" id="L274">                    .<span class="tok-fn">show</span>(ui, |ui| {</span>
+<span class="ln" id="L275">                        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L276">                            RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{} of {total}&quot;</span>, at + <span class="tok-num">1</span>))</span>
+<span class="ln" id="L277">                                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L278">                                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L279">                        );</span>
+<span class="ln" id="L280">                        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L281">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(title).<span class="tok-fn">size</span>(<span class="tok-num">18.0</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
+<span class="ln" id="L282">                        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L283">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(body).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
+<span class="ln" id="L284">                        <span class="tok-kw">if</span> last {</span>
+<span class="ln" id="L285">                            <span class="tok-fn">this_copy</span>(ui, installed);</span>
+<span class="ln" id="L286">                        }</span>
+<span class="ln" id="L287">                    });</span>
+<span class="ln" id="L288"></span>
+<span class="ln" id="L289">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">18.0</span>);</span>
+<span class="ln" id="L290">                ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L291">                    <span class="tok-kw">let</span> next = <span class="tok-kw">if</span> last { <span class="tok-str">&quot;done&quot;</span> } <span class="tok-kw">else</span> { <span class="tok-str">&quot;next&quot;</span> };</span>
+<span class="ln" id="L292">                    <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(next).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L293">                        step = <span class="tok-kw">if</span> last { Step::Finish } <span class="tok-kw">else</span> { Step::Forward };</span>
+<span class="ln" id="L294">                    }</span>
+<span class="ln" id="L295">                    <span class="tok-kw">if</span> at &gt; <span class="tok-num">0</span> &amp;&amp; ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;back&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L296">                        step = Step::Back;</span>
+<span class="ln" id="L297">                    }</span>
+<span class="ln" id="L298">                    <span class="tok-kw">if</span> !last &amp;&amp; ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;skip the rest&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L299">                        step = Step::Finish;</span>
+<span class="ln" id="L300">                    }</span>
+<span class="ln" id="L301">                });</span>
+<span class="ln" id="L302">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L303">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L304">                    RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L305">                        <span class="tok-str">&quot;  Escape closes this. Settings, under Interface, brings it back.&quot;</span>,</span>
+<span class="ln" id="L306">                    )</span>
+<span class="ln" id="L307">                    .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L308">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L309">                );</span>
+<span class="ln" id="L310">                step</span>
+<span class="ln" id="L311">            });</span>
+<span class="ln" id="L312"></span>
+<span class="ln" id="L313">        <span class="tok-com">// Escape, and deliberately not a click on the shade. `should_close`</span></span>
+<span class="ln" id="L314">        <span class="tok-com">// treats the two as one gesture, which is right for a dialogue asking</span></span>
+<span class="ln" id="L315">        <span class="tok-com">// a question and wrong for something somebody is stepping through: a</span></span>
+<span class="ln" id="L316">        <span class="tok-com">// misjudged click should not throw away the half they have not read.</span></span>
+<span class="ln" id="L317">        <span class="tok-com">// The other two conditions are `should_close`&#x27;s own, and they matter:</span></span>
+<span class="ln" id="L318">        <span class="tok-com">// Escape belongs to whatever is on top, and to an open dropdown before</span></span>
+<span class="ln" id="L319">        <span class="tok-com">// this.</span></span>
+<span class="ln" id="L320">        <span class="tok-kw">let</span> escaped = modal.is_top_modal</span>
+<span class="ln" id="L321">            &amp;&amp; !modal.any_popup_open</span>
+<span class="ln" id="L322">            &amp;&amp; ctx.<span class="tok-fn">input_mut</span>(|i| i.<span class="tok-fn">consume_key</span>(egui::Modifiers::NONE, egui::Key::Escape));</span>
+<span class="ln" id="L323"></span>
+<span class="ln" id="L324">        <span class="tok-kw">match</span> modal.inner {</span>
+<span class="ln" id="L325">            Step::Stay <span class="tok-kw">if</span> escaped =&gt; {</span>
+<span class="ln" id="L326">                <span class="tok-kw">self</span>.<span class="tok-fn">stop</span>();</span>
+<span class="ln" id="L327">                true</span>
+<span class="ln" id="L328">            }</span>
+<span class="ln" id="L329">            Step::Stay =&gt; false,</span>
+<span class="ln" id="L330">            Step::Forward =&gt; {</span>
+<span class="ln" id="L331">                <span class="tok-kw">self</span>.at = <span class="tok-fn">Some</span>(at + <span class="tok-num">1</span>);</span>
+<span class="ln" id="L332">                false</span>
+<span class="ln" id="L333">            }</span>
+<span class="ln" id="L334">            Step::Back =&gt; {</span>
+<span class="ln" id="L335">                <span class="tok-kw">self</span>.at = <span class="tok-fn">Some</span>(at.<span class="tok-fn">saturating_sub</span>(<span class="tok-num">1</span>));</span>
+<span class="ln" id="L336">                false</span>
+<span class="ln" id="L337">            }</span>
+<span class="ln" id="L338">            Step::Finish =&gt; {</span>
+<span class="ln" id="L339">                <span class="tok-kw">self</span>.<span class="tok-fn">stop</span>();</span>
+<span class="ln" id="L340">                true</span>
+<span class="ln" id="L341">            }</span>
+<span class="ln" id="L342">        }</span>
+<span class="ln" id="L343">    }</span>
+</span>
+<span class="ln" id="L344">}</span>
+<span class="ln" id="L345"></span>
+<span class="src-item" id="fn-step">
+<span class="ln" id="L346"><span class="tok-com">/// What a frame of the card asked for.</span></span>
+<span class="ln" id="L347"><span class="tok-com">///</span></span>
+<span class="ln" id="L348"><span class="tok-com">/// Returned out of the modal rather than acted on inside it, because the</span></span>
+<span class="ln" id="L349"><span class="tok-com">/// closure holds `&amp;mut self` for as long as it runs and the Escape key cannot</span></span>
+<span class="ln" id="L350"><span class="tok-com">/// be read until it has finished. One value out, one decision made, in one</span></span>
+<span class="ln" id="L351"><span class="tok-com">/// place.</span></span>
+<span class="ln" id="L352"><span class="tok-attr">#[derive</span>(Clone, Copy, PartialEq, Eq)]</span>
+<span class="ln" id="L353"><span class="tok-kw">enum</span> Step {</span>
+<span class="ln" id="L354">    <span class="tok-com">/// Nothing was pressed.</span></span>
+<span class="ln" id="L355">    Stay,</span>
+<span class="ln" id="L356">    <span class="tok-com">/// The next card.</span></span>
+<span class="ln" id="L357">    Forward,</span>
+<span class="ln" id="L358">    <span class="tok-com">/// The one before.</span></span>
+<span class="ln" id="L359">    Back,</span>
+<span class="ln" id="L360">    <span class="tok-com">/// Done, or skipped: the two end the tour the same way, because both mean</span></span>
+<span class="ln" id="L361">    <span class="tok-com">/// the reader is finished with it and neither should bring it back on the</span></span>
+<span class="ln" id="L362">    <span class="tok-com">/// next launch.</span></span>
+<span class="ln" id="L363">    Finish,</span>
+<span class="ln" id="L364">}</span>
+</span>
+<span class="ln" id="L365"></span>
+<span class="src-item" id="fn-this_copy">
+<span class="ln" id="L366"><span class="tok-com">/// The closing paragraph on the last card: which kind of copy this is.</span></span>
+<span class="ln" id="L367"><span class="tok-kw">fn</span> <span class="tok-fn">this_copy</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, installed: bool) {</span>
+<span class="ln" id="L368">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
+<span class="ln" id="L369">    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;This copy&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()).<span class="tok-fn">strong</span>());</span>
+<span class="ln" id="L370">    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L371">        RichText::<span class="tok-fn">new</span>(<span class="tok-kw">if</span> installed {</span>
+<span class="ln" id="L372">            <span class="tok-str">&quot;Installed. It is on this machine for good, it is on your \</span></span>
+<span class="ln" id="L373"><span class="tok-str">             menu or path, and its settings live in your account. \</span></span>
+<span class="ln" id="L374"><span class="tok-str">             Removing it is the same as removing any other program.&quot;</span></span>
+<span class="ln" id="L375">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L376">            <span class="tok-str">&quot;Portable. It runs from wherever you put it and installs \</span></span>
+<span class="ln" id="L377"><span class="tok-str">             nothing: move the folder and VeilVoice moves with it, \</span></span>
+<span class="ln" id="L378"><span class="tok-str">             delete the folder and it is gone. That is a perfectly \</span></span>
+<span class="ln" id="L379"><span class="tok-str">             good way to keep using it. The Install tab is there if \</span></span>
+<span class="ln" id="L380"><span class="tok-str">             you would rather it were permanent.&quot;</span></span>
+<span class="ln" id="L381">        })</span>
+<span class="ln" id="L382">        .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
+<span class="ln" id="L383">    );</span>
+<span class="ln" id="L384">}</span>
+</span>
+<span class="ln" id="L385"></span>
+<span class="ln" id="L386"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L387"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L388">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L389"></span>
+<span class="ln" id="L390">    <span class="tok-com">/// The lock card says the integrity record is taken for you, and the</span></span>
+<span class="ln" id="L391">    <span class="tok-com">/// window is what takes it.</span></span>
+<span class="ln" id="L392">    <span class="tok-com">///</span></span>
+<span class="ln" id="L393">    <span class="tok-com">/// Both halves, because a sentence in a tour is a promise about behaviour</span></span>
+<span class="ln" id="L394">    <span class="tok-com">/// and this one was written the day the behaviour it describes had been</span></span>
+<span class="ln" id="L395">    <span class="tok-com">/// there for four releases with nothing telling anybody. If the start in</span></span>
+<span class="ln" id="L396">    <span class="tok-com">/// `app.rs` is ever removed, the card is left claiming something untrue to</span></span>
+<span class="ln" id="L397">    <span class="tok-com">/// every new reader, which is the failure this checks for.</span></span>
+<span class="ln" id="L398">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L399">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_card_promises_what_the_window_actually_does</span>() {</span>
+<span class="ln" id="L400">        <span class="tok-kw">let</span> card = CARDS</span>
+<span class="ln" id="L401">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L402">            .<span class="tok-fn">find</span>(|(tab, _, _)| *tab == <span class="tok-str">&quot;lock&quot;</span>)</span>
+<span class="ln" id="L403">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a card for the lock tab&quot;</span>);</span>
+<span class="ln" id="L404">        assert!(</span>
+<span class="ln" id="L405">            card.<span class="tok-num">2</span>.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;record&quot;</span>),</span>
+<span class="ln" id="L406">            <span class="tok-str">&quot;the lock card no longer mentions the integrity record: {}&quot;</span>,</span>
+<span class="ln" id="L407">            card.<span class="tok-num">2</span></span>
+<span class="ln" id="L408">        );</span>
+<span class="ln" id="L409">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>);</span>
+<span class="ln" id="L410">        assert!(</span>
+<span class="ln" id="L411">            app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;app.integrity.start(None)&quot;</span>),</span>
+<span class="ln" id="L412">            <span class="tok-str">&quot;nothing starts the integrity record at launch any more, and the \</span></span>
+<span class="ln" id="L413"><span class="tok-str">             tour still tells every new reader that one was taken&quot;</span></span>
+<span class="ln" id="L414">        );</span>
+<span class="ln" id="L415">    }</span>
+<span class="ln" id="L416"></span>
+<span class="ln" id="L417">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L418">    <span class="tok-kw">fn</span> <span class="tok-fn">every_card_has_a_sentence_and_no_two_share_a_tab</span>() {</span>
+<span class="ln" id="L419">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| *key).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L420">        <span class="tok-kw">let</span> before = keys.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L421">        keys.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L422">        keys.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L423">        assert_eq!(keys.<span class="tok-fn">len</span>(), before, <span class="tok-str">&quot;two cards claim the same tab&quot;</span>);</span>
+<span class="ln" id="L424">        <span class="tok-kw">for</span> (key, title, body) <span class="tok-kw">in</span> CARDS {</span>
+<span class="ln" id="L425">            assert!(!key.<span class="tok-fn">is_empty</span>() &amp;&amp; !title.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L426">            assert!(</span>
+<span class="ln" id="L427">                body.<span class="tok-fn">len</span>() &gt; <span class="tok-num">60</span>,</span>
+<span class="ln" id="L428">                <span class="tok-str">&quot;{key} has a sentence too short to explain anything&quot;</span></span>
+<span class="ln" id="L429">            );</span>
+<span class="ln" id="L430">        }</span>
+<span class="ln" id="L431">    }</span>
+<span class="ln" id="L432"></span>
+<span class="ln" id="L433">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L434">    <span class="tok-kw">fn</span> <span class="tok-fn">a_first_run_sees_everything</span>() {</span>
+<span class="ln" id="L435">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L436">        assert!(!tour.<span class="tok-fn">running</span>());</span>
+<span class="ln" id="L437">        tour.<span class="tok-fn">start</span>();</span>
+<span class="ln" id="L438">        assert!(tour.<span class="tok-fn">running</span>());</span>
+<span class="ln" id="L439">        assert_eq!(tour.showing.<span class="tok-fn">len</span>(), CARDS.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L440">    }</span>
+<span class="ln" id="L441"></span>
+<span class="ln" id="L442">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L443">    <span class="tok-kw">fn</span> <span class="tok-fn">an_upgrade_shows_only_what_is_new</span>() {</span>
+<span class="ln" id="L444">        <span class="tok-kw">let</span> known: Vec&lt;String&gt; = CARDS</span>
+<span class="ln" id="L445">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L446">            .<span class="tok-fn">take</span>(CARDS.<span class="tok-fn">len</span>() - <span class="tok-num">2</span>)</span>
+<span class="ln" id="L447">            .<span class="tok-fn">map</span>(|(key, _, _)| (*key).<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L448">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L449">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L450">        tour.<span class="tok-fn">start_new_only</span>(&amp;known);</span>
+<span class="ln" id="L451">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;two new tabs should start a tour&quot;</span>);</span>
+<span class="ln" id="L452">        assert_eq!(tour.showing.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L453">    }</span>
+<span class="ln" id="L454"></span>
+<span class="ln" id="L455">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L456">    <span class="tok-kw">fn</span> <span class="tok-fn">what_is_stored_is_every_tab_the_tour_covered</span>() {</span>
+<span class="ln" id="L457">        <span class="tok-com">// The stored list is what &quot;which of these is new to you&quot; is answered</span></span>
+<span class="ln" id="L458">        <span class="tok-com">// against, so it has to be complete when the tour finishes.</span></span>
+<span class="ln" id="L459">        assert_eq!(<span class="tok-fn">all_keys</span>().<span class="tok-fn">len</span>(), CARDS.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L460">    }</span>
+<span class="ln" id="L461"></span>
+<span class="ln" id="L462">    <span class="tok-com">/// Roadmap item 171. Asking for it is not a question about which tabs are</span></span>
+<span class="ln" id="L463">    <span class="tok-com">/// new, so it shows all of them whatever is stored.</span></span>
+<span class="ln" id="L464">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L465">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_for_it_again_shows_every_card</span>() {</span>
+<span class="ln" id="L466">        <span class="tok-kw">let</span> every: Vec&lt;String&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| (*key).<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L467">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L468">        <span class="tok-com">// The state somebody in this position is actually in: they have seen</span></span>
+<span class="ln" id="L469">        <span class="tok-com">// the whole thing, so `start_new_only` would show them nothing.</span></span>
+<span class="ln" id="L470">        tour.<span class="tok-fn">start_new_only</span>(&amp;every);</span>
+<span class="ln" id="L471">        assert!(!tour.<span class="tok-fn">running</span>());</span>
+<span class="ln" id="L472"></span>
+<span class="ln" id="L473">        tour.<span class="tok-fn">restart</span>();</span>
+<span class="ln" id="L474">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;asking for it must start it&quot;</span>);</span>
+<span class="ln" id="L475">        assert_eq!(</span>
+<span class="ln" id="L476">            tour.showing.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L477">            CARDS.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L478">            <span class="tok-str">&quot;a reader who asked to see it again was shown a subset&quot;</span></span>
+<span class="ln" id="L479">        );</span>
+<span class="ln" id="L480">    }</span>
+<span class="ln" id="L481"></span>
+<span class="ln" id="L482">    <span class="tok-com">/// Roadmap item 171. The tour is drawn over the window rather than instead of</span></span>
+<span class="ln" id="L483">    <span class="tok-com">/// it, and that is a claim about `app.rs` as much as about this file: the</span></span>
+<span class="ln" id="L484">    <span class="tok-com">/// whole point is lost if the window returns before it draws the tabs the</span></span>
+<span class="ln" id="L485">    <span class="tok-com">/// cards are describing.</span></span>
+<span class="ln" id="L486">    <span class="tok-com">///</span></span>
+<span class="ln" id="L487">    <span class="tok-com">/// Read from the source, because what is asserted is that a statement is</span></span>
+<span class="ln" id="L488">    <span class="tok-com">/// *not reachable*. A rendering test would prove it for one frame.</span></span>
+<span class="ln" id="L489">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L490">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_still_draws_underneath_the_tour</span>() {</span>
+<span class="ln" id="L491">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L492">        <span class="tok-kw">let</span> at = app</span>
+<span class="ln" id="L493">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;self.tour.overlay(&quot;</span>)</span>
+<span class="ln" id="L494">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the window draws the tour as an overlay&quot;</span>);</span>
+<span class="ln" id="L495">        <span class="tok-kw">let</span> central = app</span>
+<span class="ln" id="L496">            .<span class="tok-fn">rfind</span>(<span class="tok-str">&quot;egui::CentralPanel::default().show(root, |ui| {&quot;</span>)</span>
+<span class="ln" id="L497">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the window has a central panel&quot;</span>);</span>
+<span class="ln" id="L498">        assert!(</span>
+<span class="ln" id="L499">            at &gt; central,</span>
+<span class="ln" id="L500">            <span class="tok-str">&quot;the tour is drawn inside the central panel again, so it replaces \</span></span>
+<span class="ln" id="L501"><span class="tok-str">             the tabs it is describing rather than sitting over them&quot;</span></span>
+<span class="ln" id="L502">        );</span>
+<span class="ln" id="L503">        assert!(</span>
+<span class="ln" id="L504">            !app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.tour.panel(&quot;</span>),</span>
+<span class="ln" id="L505">            <span class="tok-str">&quot;the old panel that returned instead of drawing the window is back&quot;</span></span>
+<span class="ln" id="L506">        );</span>
+<span class="ln" id="L507">    }</span>
+<span class="ln" id="L508"></span>
+<span class="ln" id="L509">    <span class="tok-com">/// The card has to fit in the window it is drawn over, and its buttons have</span></span>
+<span class="ln" id="L510">    <span class="tok-com">/// to stay reachable. Both are properties of the numbers rather than of a</span></span>
+<span class="ln" id="L511">    <span class="tok-com">/// frame, so both are checked here.</span></span>
+<span class="ln" id="L512">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L513">    <span class="tok-kw">fn</span> <span class="tok-fn">the_card_leaves_the_window_visible_around_it</span>() {</span>
+<span class="ln" id="L514">        <span class="tok-com">// Against the real window sizes rather than against the share on its</span></span>
+<span class="ln" id="L515">        <span class="tok-com">// own: what has to hold is that there is window left around the card,</span></span>
+<span class="ln" id="L516">        <span class="tok-com">// and on the shortest window this application will open at, which is</span></span>
+<span class="ln" id="L517">        <span class="tok-com">// where it is tightest.</span></span>
+<span class="ln" id="L518">        <span class="tok-kw">for</span> height <span class="tok-kw">in</span> [<span class="tok-kw">crate</span>::window::MINIMUM[<span class="tok-num">1</span>], <span class="tok-num">900.0</span>, <span class="tok-num">1440.0</span>] {</span>
+<span class="ln" id="L519">            <span class="tok-kw">let</span> card = height * CARD_HEIGHT_SHARE;</span>
+<span class="ln" id="L520">            <span class="tok-kw">let</span> shade = height - card;</span>
+<span class="ln" id="L521">            assert!(</span>
+<span class="ln" id="L522">                shade &gt;= <span class="tok-num">48.0</span>,</span>
+<span class="ln" id="L523">                <span class="tok-str">&quot;at {height} the shade around the card is {shade} pixels, too \</span></span>
+<span class="ln" id="L524"><span class="tok-str">                 thin to read as an overlay rather than as a replacement&quot;</span></span>
+<span class="ln" id="L525">            );</span>
+<span class="ln" id="L526">            assert!(</span>
+<span class="ln" id="L527">                card &gt; <span class="tok-num">200.0</span>,</span>
+<span class="ln" id="L528">                <span class="tok-str">&quot;at {height} the card is {card} pixels and a sentence does not \</span></span>
+<span class="ln" id="L529"><span class="tok-str">                 fit in it&quot;</span></span>
+<span class="ln" id="L530">            );</span>
+<span class="ln" id="L531">        }</span>
+<span class="ln" id="L532">        <span class="tok-kw">for</span> width <span class="tok-kw">in</span> [<span class="tok-kw">crate</span>::window::MINIMUM[<span class="tok-num">0</span>], <span class="tok-num">1100.0</span>, <span class="tok-num">1920.0</span>] {</span>
+<span class="ln" id="L533">            assert!(</span>
+<span class="ln" id="L534">                CARD_WIDTH &lt;= width,</span>
+<span class="ln" id="L535">                <span class="tok-str">&quot;at {width} across, the card is wider than the window and \</span></span>
+<span class="ln" id="L536"><span class="tok-str">                 would be cut off&quot;</span></span>
+<span class="ln" id="L537">            );</span>
+<span class="ln" id="L538">        }</span>
+<span class="ln" id="L539">    }</span>
+<span class="ln" id="L540"></span>
+<span class="ln" id="L541">    <span class="tok-com">/// Escape is handled and a click on the shade is deliberately not.</span></span>
+<span class="ln" id="L542">    <span class="tok-com">///</span></span>
+<span class="ln" id="L543">    <span class="tok-com">/// `ModalResponse::should_close` treats the two as one gesture. Using it</span></span>
+<span class="ln" id="L544">    <span class="tok-com">/// would mean a misjudged click halfway through the tour threw away the</span></span>
+<span class="ln" id="L545">    <span class="tok-com">/// half the reader had not seen, so this asserts the code does not call it.</span></span>
+<span class="ln" id="L546">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L547">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stray_click_outside_the_card_does_not_end_the_tour</span>() {</span>
+<span class="ln" id="L548">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;tour.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L549">        <span class="tok-kw">let</span> overlay = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn overlay(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the overlay exists&quot;</span>);</span>
+<span class="ln" id="L550">        <span class="tok-com">// Bounded at the end of the function. Unbounded, this reads its own</span></span>
+<span class="ln" id="L551">        <span class="tok-com">// test as part of the code it is checking and fails on the string it</span></span>
+<span class="ln" id="L552">        <span class="tok-com">// is looking for, which is a guard that can only ever fail.</span></span>
+<span class="ln" id="L553">        <span class="tok-kw">let</span> end = source[overlay..]</span>
+<span class="ln" id="L554">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\nenum Step {&quot;</span>)</span>
+<span class="ln" id="L555">            .<span class="tok-fn">map</span>(|at| overlay + at)</span>
+<span class="ln" id="L556">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the step enum follows the overlay&quot;</span>);</span>
+<span class="ln" id="L557">        <span class="tok-kw">let</span> body = &amp;source[overlay..end];</span>
+<span class="ln" id="L558">        assert!(</span>
+<span class="ln" id="L559">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Key::Escape&quot;</span>),</span>
+<span class="ln" id="L560">            <span class="tok-str">&quot;nothing reads Escape, so the overlay has no keyboard way out&quot;</span></span>
+<span class="ln" id="L561">        );</span>
+<span class="ln" id="L562">        assert!(</span>
+<span class="ln" id="L563">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;should_close()&quot;</span>),</span>
+<span class="ln" id="L564">            <span class="tok-str">&quot;should_close() closes on a backdrop click as well, which ends the \</span></span>
+<span class="ln" id="L565"><span class="tok-str">             tour on a stray press&quot;</span></span>
+<span class="ln" id="L566">        );</span>
+<span class="ln" id="L567">    }</span>
+<span class="ln" id="L568"></span>
+<span class="ln" id="L569">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L570">    <span class="tok-kw">fn</span> <span class="tok-fn">an_upgrade_that_adds_no_tabs_shows_nothing</span>() {</span>
+<span class="ln" id="L571">        <span class="tok-kw">let</span> known: Vec&lt;String&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| (*key).<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L572">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L573">        tour.<span class="tok-fn">start_new_only</span>(&amp;known);</span>
+<span class="ln" id="L574">        assert!(</span>
+<span class="ln" id="L575">            !tour.<span class="tok-fn">running</span>(),</span>
+<span class="ln" id="L576">            <span class="tok-str">&quot;a tour with nothing new to say must not run&quot;</span></span>
+<span class="ln" id="L577">        );</span>
+<span class="ln" id="L578">    }</span>
+<span class="ln" id="L579">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
