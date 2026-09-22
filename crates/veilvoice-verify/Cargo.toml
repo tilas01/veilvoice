@@ -45,6 +45,29 @@ pgp = { version = "0.20", default-features = false }
 # The SHA-256 in `check::sha256_file`, which is the hash every published
 # list is written in.
 sha2 = "0.10"
+# Roadmap item 164. Decompressing a release archive so every file inside it can
+# be hashed where it sits, rather than only after somebody has unpacked it.
+#
+# This adds no crate to the graph: `pgp`, above, already depends on it, so the
+# code is compiled into this binary either way and naming it here costs nothing
+# but makes the reliance honest.
+#
+# It is the only part of reading an archive that is not written in
+# `check::archive`. Walking a tar header or a zip central directory is a loop
+# over fixed-width fields, and this verifier never unpacks -- it hashes members
+# where they lie and compares the names as strings -- so the defects that make
+# archive extraction dangerous have nothing to reach here. Inflating is the
+# opposite kind of problem, and a hand-written DEFLATE in the one tool whose job
+# is not to silently accept is not a trade worth making.
+#
+# `default-features` are kept, and the backend is not chosen here. Measured
+# with `cargo tree -p veilvoice-verify -e features`: `pgp` turns on
+# `flate2/zlib-rs`, features unify across the graph, and that backend is
+# therefore what this binary compiles either way. Naming a different one here
+# would not change what is built, it would only add a second one beside it.
+# Both it and flate2's own default are Rust, so nothing here asks for a C
+# toolchain in a binary whose whole point is needing nothing installed.
+flate2 = "1"
 
 [dev-dependencies]
 # Tests that build a release layout and verify it, in a directory that goes

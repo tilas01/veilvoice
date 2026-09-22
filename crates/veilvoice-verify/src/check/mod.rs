@@ -51,6 +51,8 @@
 //! the one this cannot do for you: it needs somebody other than the author to have
 //! built the same thing and got the same answer.
 
+pub mod archive;
+pub mod carried;
 pub mod contents;
 pub mod reproduce;
 
@@ -171,17 +173,22 @@ pub fn sha256_file(path: &Path) -> Result<String, Error> {
         }
         hasher.update(&buffer[..read]);
     }
-    Ok(hex(&hasher.finalize()))
+    Ok(hex_of(&hasher.finalize()))
 }
 
 /// SHA-256 of bytes already in memory.
 pub fn sha256_bytes(data: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(data);
-    hex(&hasher.finalize())
+    hex_of(&hasher.finalize())
 }
 
-fn hex(bytes: &[u8]) -> String {
+/// A digest as lowercase hex, the spelling every published list is written in.
+///
+/// Reached by [`archive`] as well as by this module: the two archive readers
+/// finish a hash of their own and have to render it the same way, and a second
+/// hex formatter beside this one is a second chance to render it differently.
+pub(crate) fn hex_of(bytes: &[u8]) -> String {
     let mut out = String::with_capacity(bytes.len() * 2);
     for byte in bytes {
         let _ = write!(out, "{byte:02x}");

@@ -1386,3 +1386,286 @@ fn no_audio_callback_allocates_or_blocks() {
         offenders.join("\n")
     );
 }
+
+// ---------------------------------------------------------------------------
+// Roadmap item 164: the key a download carries, and the order of the checks
+// ---------------------------------------------------------------------------
+
+/// **Roadmap item 164.** The key a download brings is compared and never used.
+///
+/// Written as a test over the source because it is the property the whole
+/// feature rests on and it cannot be observed from outside: a version that
+/// verified the signature with the carried key would pass every test that uses
+/// a genuine release, because in a genuine release the two keys are the same
+/// one. It would only fail against a forged set, which is to say against the
+/// exact input it exists to refuse.
+///
+/// Two things are asserted. That `carried` never reaches a signature check at
+/// all, and that it hands no key back to a caller who could -- see the note on
+/// `carried::examine`, which says that returning a `SignedPublicKey` read off
+/// the disk would put this one call site away from the defect.
+#[test]
+fn the_key_a_download_carries_is_never_used_to_check_anything() {
+    let source = include_str!("check/carried.rs").replace("\r\n", "\n");
+    // The doc comments say these words a great deal, which is the point of
+    // them, so only the code is read.
+    let code: String = source
+        .lines()
+        .filter(|line| {
+            let trimmed = line.trim_start();
+            !trimmed.starts_with("//!") && !trimmed.starts_with("///") && !trimmed.starts_with("//")
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    // The tests at the foot of that file are not the subject: one of them
+    // writes this project's own key out to check it is recognised.
+    let code = code.split("mod tests").next().unwrap();
+
+    for forbidden in ["verify_detached", "verify(", "DetachedSignature"] {
+        assert!(
+            !code.contains(forbidden),
+            "check/carried.rs reaches {forbidden}: the key a download carries \
+             must never verify anything"
+        );
+    }
+    assert!(
+        !code.contains("-> SignedPublicKey") && !code.contains("Result<SignedPublicKey"),
+        "check/carried.rs hands a caller the key it read off the disk"
+    );
+}
+
+/// **Roadmap item 164.** The carried key is examined before anything is checked.
+///
+/// The order is the whole of what makes a mismatch the whole verdict. A
+/// version that checked the signature first and looked at the carried key
+/// afterwards would print a page of passing lines above the refusal, and
+/// somebody skimming it would read the passes.
+#[test]
+fn the_carried_key_is_looked_at_before_anything_is_checked() {
+    let source = include_str!("lib.rs").replace("\r\n", "\n");
+    for (name, first, second) in [
+        (
+            "command_auto",
+            "report_carried",
+            "command_file_against_sums",
+        ),
+        (
+            "command_archive",
+            "report_carried",
+            "command_file_against_sums",
+        ),
+    ] {
+        let body = source
+            .split(&format!("fn {name}("))
+            .nth(1)
+            .unwrap_or_else(|| panic!("{name} has to be findable"));
+        let body = body.split("\nfn ").next().unwrap();
+        let at_first = body
+            .find(first)
+            .unwrap_or_else(|| panic!("{name} no longer calls {first}"));
+        let at_second = body
+            .find(second)
+            .unwrap_or_else(|| panic!("{name} no longer calls {second}"));
+        assert!(
+            at_first < at_second,
+            "{name} checks the download before it looks at the key that came with it"
+        );
+    }
+}
+
+/// **Roadmap item 164.** An archive is verified before anything inside it is read.
+///
+/// The same rule the contents list is read under, one link further down. The
+/// members of an archive that is not the published archive are not a set of
+/// files worth reporting on: they are whatever somebody who handed you a
+/// forgery chose to put in it.
+#[test]
+fn an_archive_is_checked_against_the_signed_list_before_it_is_opened() {
+    let source = include_str!("lib.rs").replace("\r\n", "\n");
+    let body = source
+        .split("fn command_archive(")
+        .nth(1)
+        .expect("command_archive has to be findable");
+    let body = body.split("\nfn ").next().unwrap();
+    let checked = body
+        .find("command_file_against_sums")
+        .expect("the archive must be checked against the signed hash list");
+    let opened = body.find("report_inside").expect("and then looked inside");
+    assert!(
+        checked < opened,
+        "command_archive opens the archive before it has verified it"
+    );
+    // And the failure has to stop it, not merely be recorded. A verifier that
+    // noted a bad signature and went on to list the archive's contents would
+    // be reporting on a forgery's contents.
+    let stopped = body[checked..]
+        .find("return outcome")
+        .map(|at| at + checked)
+        .expect("a failed check must return, not continue");
+    assert!(
+        stopped < opened,
+        "command_archive looks inside an archive whose signature check failed"
+    );
+}
+
+/// **Roadmap item 164.** Nothing in the archive readers writes to the filesystem.
+///
+/// The claim [`crate::check::archive`] makes for itself, and the reason the
+/// whole class of archive-extraction defects has no purchase there. It is a
+/// claim about code that does not exist, so nothing but reading the source can
+/// check it.
+#[test]
+fn nothing_that_reads_an_archive_ever_writes_one_out() {
+    for (name, source) in [
+        (
+            "check/archive/mod.rs",
+            include_str!("check/archive/mod.rs").replace("\r\n", "\n"),
+        ),
+        (
+            "check/archive/tar.rs",
+            include_str!("check/archive/tar.rs").replace("\r\n", "\n"),
+        ),
+        (
+            "check/archive/zip.rs",
+            include_str!("check/archive/zip.rs").replace("\r\n", "\n"),
+        ),
+    ] {
+        let code: String = source
+            .lines()
+            .filter(|line| {
+                let trimmed = line.trim_start();
+                !trimmed.starts_with("//!")
+                    && !trimmed.starts_with("///")
+                    && !trimmed.starts_with("//")
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        for forbidden in [
+            "fs::write",
+            "fs::create_dir",
+            "fs::copy",
+            "fs::remove",
+            "fs::rename",
+            "fs::set_permissions",
+            "File::create",
+            "OpenOptions",
+        ] {
+            assert!(
+                !code.contains(forbidden),
+                "{name} reaches {forbidden}: reading an archive must never write one out"
+            );
+        }
+    }
+}
+
+/// **Roadmap item 164.** `report_inside` counts what is wrong, and says so.
+///
+/// The integration test beside this one proves the comparison is right. This
+/// proves the *reporting* of it is: that a clean archive returns nothing wrong,
+/// that a tampered one returns the number of things that are, and that an
+/// archive the release never listed is counted against rather than passed over.
+///
+/// The last of those is the one worth a test of its own. "This archive is not
+/// in the contents list" is the easiest case in the world to write as a `None`
+/// that falls through to a pass, and it means the reader was handed a file the
+/// release does not admit to publishing.
+#[test]
+fn what_is_inside_an_archive_is_counted_rather_than_glanced_at() {
+    let Some(tar) = tar_on_this_machine() else {
+        return;
+    };
+    let work = std::env::temp_dir().join(format!(
+        "veilvoice-report-inside-{:x}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0)
+    ));
+    let name = "veilvoice-v0.1.23-linux-x86_64";
+    let release = work.join("dist").join(name);
+    std::fs::create_dir_all(&release).expect("a directory to work in");
+    std::fs::write(release.join("veilvoice"), b"the command line").unwrap();
+    std::fs::write(release.join("README.md"), b"# VeilVoice\n").unwrap();
+
+    let archive = work.join(format!("{name}.tar.gz"));
+    let build = |to: &std::path::Path| {
+        assert!(std::process::Command::new(tar)
+            .arg("-C")
+            .arg(work.join("dist"))
+            .arg("-czf")
+            .arg(to)
+            .arg(name)
+            .status()
+            .expect("tar runs")
+            .success());
+    };
+    build(&archive);
+
+    // The list, written from what the archive actually holds, so the only
+    // thing under test below is what happens when the archive stops matching
+    // it.
+    let honest: Vec<check::contents::ArchiveContents> = vec![check::contents::ArchiveContents {
+        archive: format!("{name}.tar.gz"),
+        members: check::archive::members(&archive)
+            .expect("the archive reads")
+            .into_iter()
+            .map(|member| check::contents::Member {
+                path: member.path,
+                digest: member.digest.expect("every member here is a plain file"),
+            })
+            .collect(),
+    }];
+    assert_eq!(
+        report_inside(&archive, Some(&honest)),
+        0,
+        "an archive that matches its list has nothing wrong with it"
+    );
+
+    // An archive the list does not mention. Not a pass: the reader is holding
+    // a file this release does not admit to publishing.
+    let elsewhere: Vec<check::contents::ArchiveContents> = vec![check::contents::ArchiveContents {
+        archive: "veilvoice-v0.1.23-windows-x86_64.zip".to_string(),
+        members: Vec::new(),
+    }];
+    assert_eq!(
+        report_inside(&archive, Some(&elsewhere)),
+        1,
+        "an archive missing from the contents list must not read as clean"
+    );
+
+    // A release with no contents list at all. Nothing wrong, because nothing
+    // was claimed: everything before v0.1.15 is in this position and refusing
+    // them would be refusing files that are perfectly sound.
+    assert_eq!(
+        report_inside(&archive, None),
+        0,
+        "a release that published no contents list is not a failure"
+    );
+
+    // And now the substitution. The list is the honest one and the archive is
+    // not, which is exactly the arrangement this command exists to notice.
+    std::fs::write(release.join("veilvoice"), b"something else entirely").unwrap();
+    std::fs::write(release.join("added"), b"not published\n").unwrap();
+    build(&archive);
+    assert_eq!(
+        report_inside(&archive, Some(&honest)),
+        2,
+        "one file changed and one added"
+    );
+
+    std::fs::remove_dir_all(&work).ok();
+}
+
+/// A `tar` to run, if this machine has one.
+///
+/// The same skip the release-manifest test takes, for the same reason: the
+/// absence of `tar` is a fact about the machine rather than a defect here, and
+/// every runner this project uses has one.
+fn tar_on_this_machine() -> Option<&'static str> {
+    ["tar", "bsdtar"].into_iter().find(|name| {
+        std::process::Command::new(name)
+            .arg("--version")
+            .output()
+            .is_ok()
+    })
+}

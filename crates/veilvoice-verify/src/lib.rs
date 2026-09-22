@@ -134,6 +134,7 @@ use pgp::composed::SignedPublicKey;
 // a silent accept could come from is the one place there is only one of.
 // ---------------------------------------------------------------------------
 
+use crate::check::carried::{self, Carried};
 use crate::check::{digest_from_sums, digests_match, fingerprint_of, FINGERPRINT};
 
 /// The embedded key, with its fingerprint checked against [`FINGERPRINT`].
@@ -185,16 +186,45 @@ USAGE
       beside the VeilVoice program, then your Downloads and Desktop.
 
       In order, and each step only if the one before it passed:
+        0. the signing key the download came with, if it brought one
         1. the signature over SHA256SUMS
         2. every archive, against SHA256SUMS
         3. CONTENTS.sha256, against SHA256SUMS
-        4. every file you extracted, against CONTENTS.sha256
-        5. all of it again through your own GnuPG, if you have one
+        4. every file INSIDE each archive, against CONTENTS.sha256
+        5. every file you extracted, against CONTENTS.sha256
+        6. all of it again through your own GnuPG, if you have one
 
-      Step 4 is what tells you the program you are about to run is the one
-      that was published, rather than only that the zip was. Releases before
-      v0.1.15 carry no CONTENTS.sha256 and are checked as far as step 2,
-      which it says at the time.
+      Steps 4 and 5 are what tell you the program you are about to run is the
+      one that was published, rather than only that the zip was. Step 4 does
+      it without unpacking anything, so you get the answer before you extract
+      rather than after. Releases before v0.1.15 carry no CONTENTS.sha256 and
+      are checked as far as step 2, which it says at the time.
+
+      Step 0 never verifies anything. A release publishes its public key so
+      you can check it with your own GnuPG, and a download that brought its
+      own key, its own hash list and its own signature verifies perfectly
+      against itself and means nothing. So the key that came with the
+      download is compared, by fingerprint, against the one built into this
+      program, and never used. A key that is not ours ends the check there.
+
+      Entirely offline.
+
+  veilvoice verify archive <ARCHIVE>
+      Take one archive apart and check every file in it, without unpacking it.
+
+      The same chain as `auto`, pointed at a file rather than a folder: the
+      key that came with the download, the signature over SHA256SUMS, the
+      archive against that list, CONTENTS.sha256 against that list, and then
+      every file inside the archive against CONTENTS.sha256.
+
+      SHA256SUMS and SHA256SUMS.asc are taken from the folder the archive is
+      in, because that is where your download put them. Nothing is extracted
+      and nothing is written anywhere.
+
+        veilvoice verify archive veilvoice-v0.1.23-linux-x86_64.tar.gz
+
+      .tar.gz and .zip. A .tar.xz cannot be opened by this program, and it
+      says so and names the .tar.gz of the same files.
 
       Entirely offline.
 
@@ -850,6 +880,13 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
 
     out!("Checking what is in {}", found.directory.display());
     out!();
+
+    // Roadmap item 164. The key the download carries, before anything else, and on
+    // its own when it is not ours. See `report_carried`.
+    if report_carried(&found.directory) {
+        return Status::Refused.into();
+    }
+
     let sums = found.sums.clone().unwrap_or_default();
     let signature = found.signature.clone().unwrap_or_default();
 
@@ -874,10 +911,36 @@ fn command_auto(explicit: Option<&Path>) -> ExitCode {
         return worst;
     }
 
+    // Roadmap item 164. Inside each archive, before the folder beside it. The
+    // archive is what was signed; the folder is what an unpacking tool made of
+    // it, and somebody who has not unpacked anything yet still gets an answer.
+    //
+    // The manifest is read once here and handed to each archive, rather than
+    // re-verified per archive: `manifest` checks its signature before parsing
+    // it, and doing that five times over one file would be five chances to do
+    // it in a different order.
+    let published = match manifest(&found) {
+        Manifest::None => None,
+        Manifest::Unusable(why) => {
+            out!("  the release published a contents list and it could not be used:");
+            out!("  {why}");
+            out!();
+            out!("  Nothing inside the archives was checked, and neither was the folder");
+            out!("  beside them. Do not treat either as verified.");
+            out!();
+            return Status::Incomplete.into();
+        }
+        Manifest::Ready(all) => Some(all),
+    };
+    let mut wrong = 0usize;
+    for archive in &found.archives {
+        wrong += report_inside(archive, published.as_deref());
+    }
+
     // Roadmap item 97. Both of these now check rather than describe, so both can
     // fail the run. A verifier that prints "CHANGED veilvoice" and then exits
     // zero has told somebody nothing they will act on.
-    let wrong = report_extracted(&found) + report_gnupg(&found);
+    let wrong = wrong + report_extracted(&found) + report_gnupg(&found);
     if wrong > 0 {
         verdict!("  {wrong} thing(s) above did not check out.");
         return Status::Refused.into();
@@ -1252,6 +1315,269 @@ fn report_gnupg(found: &discover::Found) -> usize {
     out!("  fingerprint on the website is the independent answer.");
     out!();
     problems
+}
+
+/// **Roadmap item 164.** The key the download brought with it, before anything else.
+///
+/// First, and on its own, because of what a mismatch means. See
+/// [`crate::check::carried`] for the whole of the reasoning; the short of it is
+/// that a download carrying somebody else's key is a release signed by somebody
+/// else, and going on to report that its archive matches its own hash list
+/// would be true, useless, and read as a pass.
+///
+/// Returns whether the check should stop here.
+fn report_carried(directory: &Path) -> bool {
+    let Some(path) = carried::beside(directory) else {
+        // No key file. Not a failure: a release publishes one, a folder
+        // somebody copied an archive into does not, and the key that does the
+        // checking is compiled in either way.
+        return false;
+    };
+    match carried::examine(&path) {
+        Carried::None => false,
+        Carried::Ours => {
+            good(&format!(
+                "the key beside the download is this project's own ({FINGERPRINT})"
+            ));
+            // Said every time, because it is the sentence somebody has to
+            // read to understand what they were just told. The line above
+            // reports a comparison, not a verification, and those are easy to
+            // hear as the same thing.
+            out!("        it was compared against the one compiled in, and not used to");
+            out!("        check anything. A download cannot vouch for itself.");
+            false
+        }
+        Carried::Unreadable { why } => {
+            out!("  the key file beside the download could not be read: {why}");
+            out!("  Nothing turns on it either way: the key that does the checking is");
+            out!("  compiled into this program.");
+            false
+        }
+        Carried::Foreign { fingerprint } => {
+            deny(
+                "this download carries somebody else's signing key",
+                &[
+                    &format!("it carries  {fingerprint}"),
+                    &format!("VeilVoice's is  {FINGERPRINT}"),
+                    "",
+                    "That is the whole answer and nothing else has been checked.",
+                    "",
+                    "A download that brings its own key, its own hash list and its own",
+                    "signature verifies perfectly against itself and proves nothing,",
+                    "because whoever made one made all four. This is not a release of",
+                    "VeilVoice signed with the wrong key. It is somebody else's",
+                    "release.",
+                    "",
+                    "Fetch it again from https://github.com/tilas01/veilvoice/releases",
+                ],
+            );
+            true
+        }
+    }
+}
+
+/// **Roadmap item 164.** Every file inside an archive, against the signed list.
+///
+/// The check [`report_extracted`] does on disk, done on the archive itself.
+/// Worth more than the on-disk one rather than less: a folder on disk is
+/// whatever the unpacking tool produced and whatever has happened to it since,
+/// and the members of the archive are what was signed. It also answers before
+/// anything has been unpacked, which is the order somebody would like to know
+/// in.
+///
+/// Returns how many things were wrong, so the caller can fail the run.
+fn report_inside(archive: &Path, published: Option<&[check::contents::ArchiveContents]>) -> usize {
+    let name = archive
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .into_owned();
+
+    let Some(published) = published else {
+        out!("Inside {name}");
+        out!("  this release published no list of what is inside its archives, so");
+        out!("  there is nothing to check its contents against. Releases from");
+        out!("  v0.1.15 onwards carry one.");
+        out!();
+        return 0;
+    };
+    let Some(section) = check::contents::for_archive(published, &name) else {
+        out!("Inside {name}");
+        out!("  the contents list does not mention this archive, so nothing inside");
+        out!("  it could be checked");
+        out!();
+        return 1;
+    };
+
+    let inside = match check::archive::members(archive) {
+        Ok(inside) => inside,
+        Err(why) => {
+            out!("Inside {name}");
+            // Not a refusal. The archive matched the signed hash list at this
+            // point, so its bytes are the published ones; what failed is this
+            // program's ability to look inside them. Calling that tampering
+            // would be telling somebody their sound download is compromised.
+            out!("  it could not be opened to look inside: {why}");
+            out!("  The archive itself matched the signed list, so what is in it is");
+            out!("  unchecked rather than wrong.");
+            out!();
+            return 1;
+        }
+    };
+
+    out!("Inside {name}");
+    let comparison = check::archive::compare(&inside, section);
+    for outcome in &comparison.outcomes {
+        match &outcome.verdict {
+            // The passes are counted rather than listed, as on disk: a release
+            // carries about seventy files and printing every one of them
+            // buries the lines somebody actually needs to read.
+            check::archive::Verdict::Matches => {}
+            check::archive::Verdict::Differs { found } => {
+                verdict!("  CHANGED  {}", outcome.path);
+                note!("found    {found}");
+            }
+            check::archive::Verdict::Missing => verdict!("  MISSING  {}", outcome.path),
+            check::archive::Verdict::NotAFile(what) => {
+                verdict!("  {what} WHERE A FILE SHOULD BE  {}", outcome.path)
+            }
+        }
+    }
+    for extra in &comparison.extras {
+        verdict!("  NOT PART OF THE RELEASE  {extra}");
+    }
+
+    if comparison.is_clean() {
+        good(&format!(
+            "all {} files inside it are the published ones, and there is nothing else in it",
+            comparison.outcomes.len()
+        ));
+        out!();
+        return 0;
+    }
+
+    out!();
+    verdict!(
+        "  {} of {} files inside it are as published.",
+        comparison.as_published(),
+        comparison.outcomes.len()
+    );
+    out!();
+    out!("  The archive matched the signed hash list, and what is inside it does");
+    out!("  not match the signed contents list. Those two cannot both be true of");
+    out!("  a release this project published. Do not extract it.");
+    out!();
+    comparison.wrong()
+}
+
+/// **Roadmap item 164.** `veilvoice verify archive`: one archive, taken apart.
+///
+/// The whole chain for one download, ending inside the file rather than at it:
+///
+/// ```text
+/// the key it came with  (compared, never used)
+/// SHA256SUMS.asc -> SHA256SUMS -> the archive
+///                              -> CONTENTS.sha256 -> every file inside it
+/// ```
+///
+/// Nothing is extracted and nothing is written. The archive's members are
+/// hashed where they lie, so this answers before anybody has unpacked
+/// anything, which is when they would like to know.
+///
+/// The companion files are taken from the directory the archive is in, because
+/// that is where a download puts them. A directory holding an archive and no
+/// hash list is reported rather than completed from a list found somewhere
+/// else: that would be checking one release against another release's list.
+fn command_archive(archive: &Path) -> ExitCode {
+    if !archive.is_file() {
+        return cannot(
+            "that is not a file this program can check",
+            &[
+                &format!("  {}", archive.display()),
+                "",
+                "It does not exist, or it is a folder rather than a file.",
+                "",
+                "  veilvoice verify archive <ARCHIVE>",
+            ],
+        );
+    }
+    let name = archive
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .into_owned();
+    if let check::archive::Kind::Unreadable(why) = check::archive::kind_of(&name) {
+        return incomplete_deny("that archive is in a format this cannot open", &[why]);
+    }
+
+    // The directory the archive is in. `parent` of a bare file name is the
+    // empty path, which is not the current directory to `read_dir`, so an
+    // empty one becomes `.` rather than a directory that does not exist.
+    let directory = match archive.parent() {
+        Some(parent) if !parent.as_os_str().is_empty() => parent.to_path_buf(),
+        _ => PathBuf::from("."),
+    };
+    let found = discover::look_in(&directory);
+
+    out!("Checking {name}");
+    out!("  in {}", directory.display());
+    out!();
+
+    // The key it came with, first and on its own.
+    if report_carried(&directory) {
+        return Status::Refused.into();
+    }
+
+    let (Some(sums), Some(signature)) = (found.sums.clone(), found.signature.clone()) else {
+        let mut detail: Vec<String> = vec![
+            "A check needs the archive, SHA256SUMS and SHA256SUMS.asc together,".to_string(),
+            "and they are not all in that folder.".to_string(),
+            String::new(),
+        ];
+        detail.push(format!("  missing: {}", found.missing().join(", ")));
+        detail.push(String::new());
+        detail.push("Both are on the release page beside the archive.".to_string());
+        let borrowed: Vec<&str> = detail.iter().map(String::as_str).collect();
+        return incomplete_deny("that archive cannot be checked on its own", &borrowed);
+    };
+
+    // The signature and the archive's own hash, by the same path every other
+    // command takes. A failure here is a failure of the whole thing and
+    // nothing inside is looked at: an archive that is not the published one
+    // has no published contents to be compared against.
+    let outcome = command_file_against_sums(archive, &sums, &signature);
+    if format!("{outcome:?}") != format!("{:?}", ExitCode::SUCCESS) {
+        return outcome;
+    }
+
+    // And now inside it. The manifest is verified before it is parsed, by
+    // `manifest`, for the reason written there: this file decides which paths
+    // are compared against what.
+    let published = match manifest(&found) {
+        Manifest::None => None,
+        Manifest::Unusable(why) => {
+            out!("  the release published a contents list and it could not be used:");
+            out!("  {why}");
+            out!();
+            out!("  Nothing inside the archive was checked. The archive itself is the");
+            out!("  published one; what is in it is unchecked rather than wrong.");
+            out!();
+            return Status::Incomplete.into();
+        }
+        Manifest::Ready(all) => Some(all),
+    };
+
+    let wrong = report_inside(archive, published.as_deref());
+    if wrong > 0 {
+        verdict!("  {wrong} thing(s) inside it did not check out. Do not run any of it.");
+        return Status::Refused.into();
+    }
+
+    verdict!("  {name} is the published archive, and so is every file in it.");
+    out!();
+    out!("  {}", check::SCOPE);
+    out!();
+    Status::Success.into()
 }
 
 /// Roadmap item 91. Print the commands that check this release with somebody else's
@@ -1726,6 +2052,14 @@ pub fn run(mut args: Vec<String>) -> ExitCode {
 
     match args[0].as_str() {
         "auto" => command_auto(args.get(1).map(Path::new)),
+
+        "archive" => match args.get(1) {
+            Some(path) => command_archive(Path::new(path)),
+            None => usage(
+                "`archive` needs an archive to take apart",
+                &["veilvoice verify archive veilvoice-v0.1.23-linux-x86_64.tar.gz"],
+            ),
+        },
 
         "key" => command_key(),
 
