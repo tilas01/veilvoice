@@ -245,6 +245,17 @@ CHECKS = [
     # about a different tree than the one somebody would check out.
     ("the release step tags the commit it built",
      [sys.executable, "tools/audit/publishing.py"]),
+    # F-204. Every other check in this file reads the working tree, and the
+    # working tree is not what anybody else clones. A file that is present and
+    # untracked reads exactly like a file that is committed, which is how an
+    # `include_str!` fixture went out without the file it names and took the
+    # whole workspace down on every clone but the one that wrote it. This is
+    # the only check here that asks git rather than the disk, which is why it
+    # belongs in the routine before a push and not only in CI.
+    ("every file the build reads is in the repository",
+     [sys.executable, "tools/audit/fixtures.py"]),
+    ("that guard catches what it claims to",
+     [sys.executable, "tools/audit/fixtures.py", "--self-test"]),
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),

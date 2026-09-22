@@ -5,17 +5,26 @@ target/
 **/*.rs.bk
 
 # Never commit private key material or captured audio.
+#
+# There are no negations under this heading, and there used to be two that
+# looked like there were. `!*.pub` allowed back in a kind of file this
+# repository does not hold: a `.pub` is a recipient's hybrid public key, made
+# by whoever is going to be sent a recording, and it belongs where they keep
+# their keys. `!assets/**` carried its explanation on the same line, and git
+# has no inline comments, so the pattern was the whole line including the
+# `#` and it never matched a path. Anything under `assets/` that one of the
+# rules below would catch is allowed back in by name, on its own line, when
+# there is a file to allow: a negation nothing exercises is a negation nobody
+# has tested. See F-204 and `tools/audit/fixtures.py`, which now refuses both
+# shapes.
 *.key
 *.pgp
 *.gpg
-!*.pub
-!*public*.asc
 /secrets/
 *.wav
 *.mp3
 *.flac
 *.ogg
-!assets/**            # curated demo/test assets are opted back in explicitly
 
 # OS / editor noise
 .DS_Store
@@ -28,19 +37,21 @@ desktop.ini
 # Bundled third-party installers are fetched at packaging time, not committed.
 /packaging/vendor/
 
-# Locally generated release-signing material. NEVER commit any of this.
-# `scripts/generate-signing-key.py` writes here; the private key and the
-# passphrase that protects it live only on the maintainer's machine and in
-# GitHub's encrypted secret store. Only the public key and fingerprint are
-# ever meant to leave this folder.
+# Locally generated release-signing material. NEVER commit any of this. The
+# private key and the passphrase that protects it live only on the
+# maintainer's machine and in GitHub's encrypted secret store, and only the
+# public key and the fingerprint are ever meant to leave this folder. A
+# negation cannot reach inside an excluded directory, so nothing below can
+# rescue a file from here by accident, which is the point of excluding the
+# directory rather than the files in it.
 /gpg_secrets/
 gpg_secrets/
 # Armoured OpenPGP files are ignored by default so a private key can never be
-# committed by accident. The *public* key is meant to be published, so the two
-# places it legitimately lives are allowed back in explicitly.
+# committed by accident. Each file that legitimately lives here is allowed
+# back in by its own name below, and each of those rules is exercised by the
+# file it names, so none of them can quietly stop working.
 *.asc
 !website/assets/veilvoice-signing-key.asc
-!**/public-key.asc
 # A public key that is deliberately NOT this project's, used by
 # `check::carried`'s tests to prove a download carrying somebody else's key is
 # refused. Its private half was never kept and it signs nothing. Allowed back

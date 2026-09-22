@@ -406,6 +406,18 @@ jobs:
       - name: The release step must tag the commit it built
         run: python tools/audit/publishing.py
 
+      # F-204. This is the one guard whose answer differs between the machine
+      # that wrote a commit and the machine that clones it, which is the whole
+      # reason it exists: a fixture an `include_str!` names was excluded by
+      # `.gitignore`, skipped in silence by `git add -A`, and pushed without
+      # ever being added, so `veilvoice-verify` did not compile anywhere else.
+      # Here the checkout is a clone, so a failure here is what everybody else
+      # would have got.
+      - name: Every file the build reads must be in the repository
+        run: |
+          python tools/audit/fixtures.py
+          python tools/audit/fixtures.py --self-test
+
       # Four more of `tools/verify.py`'s checks that ran only when somebody ran
       # them. Each needs nothing but the tree and an interpreter, so there was
       # no reason for them to be here and every reason: the first is the guard

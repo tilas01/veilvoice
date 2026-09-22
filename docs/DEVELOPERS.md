@@ -126,6 +126,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/dependencies.py`](../tools/audit/dependencies.py) | Every dependency says what it is for, where it is declared |
 | [`tools/audit/documented.py`](../tools/audit/documented.py) | Every item on a generated page has something written under it |
 | [`tools/audit/features.py`](../tools/audit/features.py) | Every feature selection a release builds is built here too |
+| [`tools/audit/fixtures.py`](../tools/audit/fixtures.py) | A file the build needs is in the commit, not merely on the machine that wrote it |
 | [`tools/audit/publishing.py`](../tools/audit/publishing.py) | The step that publishes a release says which commit it is publishing |
 | [`tools/audit/randomness.py`](../tools/audit/randomness.py) | Every random number this project draws comes from a cryptographic source |
 | [`tools/audit/reachable.py`](../tools/audit/reachable.py) | Every public item is named by something other than its own declaration |
@@ -192,6 +193,8 @@ And what it then checks:
 - **every random draw comes from the OS CSPRNG**: `python tools/audit/randomness.py`
 - **every action a workflow runs is pinned to a commit**: `python tools/audit/actions.py`
 - **the release step tags the commit it built**: `python tools/audit/publishing.py`
+- **every file the build reads is in the repository**: `python tools/audit/fixtures.py`
+- **that guard catches what it claims to**: `python tools/audit/fixtures.py --self-test`
 - **the app-manifest tooling works**: `python tools/sign/selftest.py`
 - **artwork matches its generator**: `python assets/generate.py --check`
 - **no screenshot has a capture border**: `python tools/shots/crop.py --check`
