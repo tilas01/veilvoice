@@ -554,6 +554,69 @@ legitimate is a finding rather than a result, so CI passes `--rerun-only` and
 asks the four questions it can answer. The fifth is asked by `promote.yml`,
 which runs `tools/verify.py` whole, at the point where it can be answered.
 
+### F-209: a generator that published the previous demonstration, and looked like a flake
+
+Found while pushing roadmap item 181. That change edits `tools/site/demo.py`,
+so `website/js/demo-data.js` comes out different, and a single
+`python tools/verify.py --quick` went red on **website source pages match
+their files**, naming `website/js/demo-data.js` and the five pages derived from
+it. Running it a second time, changing nothing, passed.
+
+**A single run fails, a second run passes, and nothing is wrong with the
+change being tested.** That is the worst shape a build failure can take,
+because it is indistinguishable from a flake, and the cheapest response to a
+flake is to run it again, which works. Nobody investigates a thing that fixed
+itself.
+
+The cause is an ordering in `tools/verify.py`. `tools/docs/sources.py`
+publishes a page for every file under `website/js` and `website/css`, and
+`tools/site/demo.py` writes one of the files under `website/js`. So the
+demonstration has to be generated before the source pages are taken from it.
+The generator list ran them the other way round: source pages at position
+nine, demonstration at position fourteen. A pass therefore published the
+*previous* demonstration as the source page, then regenerated the
+demonstration underneath it, and the check at the end compared the two and
+found them different. The second run published what the first run had left
+behind, which is why it passed.
+
+**The comment was right and the code was not.** The line above the
+demonstration step read, and had read since it was written, "Before the source
+pages walk website/js, since this writes one of them". That is a correct
+statement of the dependency, sitting on a step that ran after the thing it
+names. Both halves looked fine to a reader: the comment says the right thing,
+and the list is long enough that nobody holds fourteen positions in their head
+while reading one of them. A comment cannot be run, which is the whole lesson.
+
+It survived because `website/js/demo-data.js` almost never changes. The
+demonstration is generated from the tab list, the settings pages and the
+screenshots, so it moves when the interface moves, which is rare enough that
+the two-run behaviour had either not been seen or been seen and taken for a
+flake.
+
+**The fix is the reorder, and then a guard, because a reorder is exactly the
+kind of thing a later edit undoes.** `MUST_RUN_BEFORE` names the four pairs in
+that list which are load bearing, each with the file that creates the
+dependency: the demonstration before the source pages, the source pages before
+the wiki on the website (which learns what exists by walking
+`website/reference/`), the section pages before the roadmap page (which borrows
+the header the split takes out of `index.html`), and the addresses before the
+search index. `ordering_faults()` checks the list against that table and runs
+**before any generator does**, because an order that is wrong wastes the whole
+run and then reports the file that was published stale rather than the ordering
+that published it.
+
+It is deliberately not a second copy of the order. Fourteen generators have
+many possible orderings and only four of them matter; a table listing all
+fourteen would be the same fact written twice, which is the thing this
+repository does not do, and it would need editing every time a generator was
+added for a reason having nothing to do with dependencies.
+
+Proven both ways rather than only the way that passes: it reports no faults as
+shipped, and swapping the demonstration and the source pages back makes it name
+that exact pair and the reason. A guard that has only ever been seen to pass is
+the shape F-200 ran into, where the reader being relied on could not have seen
+the key it was checking for.
+
 ### F-208: the release procedure was a paragraph, and the only thing checking it ran last
 
 The other half of the same reading, and the larger one.
@@ -6713,7 +6776,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1723 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1724 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -8361,7 +8424,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and eight defects found and fixed (F-1 to F-208), across
+**Two hundred and nine defects found and fixed (F-1 to F-209), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

@@ -65,9 +65,15 @@ TAB_ROW = re.compile(r"\(Tab::(?P<variant>\w+),\s*\"(?P<label>[^\"]+)\"\)")
 # And the key each variant is stored under: `Self::File => "file",`.
 TAB_KEY = re.compile(r"Self::(?P<variant>\w+) => \"(?P<key>[a-z]+)\",")
 # The Settings tab's own menu, as `settings.rs` writes it:
-# `(Page::Motion, "motion", "Animation, and the mark"),`.
+# `(Page::Motion, "motion", "Motion", "Animation, and the mark"),`.
+#
+# Four fields rather than three since roadmap item 181: the key, which names
+# the capture and the deep link, and the heading the menu draws, which is the
+# same word capitalised. The walkthrough shows the heading, because that is
+# what a reader sees in the window the picture is of.
 PAGE_ROW = re.compile(
-    r"\(Page::(?P<variant>\w+),\s*\"(?P<key>[a-z]+)\",\s*\"(?P<label>[^\"]+)\"\)")
+    r"\(Page::(?P<variant>\w+),\s*\"(?P<key>[a-z]+)\",\s*"
+    r"\"(?P<heading>[^\"]+)\",\s*\"(?P<blurb>[^\"]+)\"\)")
 
 # What each command line capture is a picture of.
 #
@@ -354,7 +360,7 @@ def sessions():
 
 
 def settings_pages():
-    """Every page of the Settings tab, in menu order, with its label.
+    """Every page of the Settings tab, in menu order, with its heading.
 
     Read from `settings.rs` for the same reason the tabs are read from
     `app.rs`: a page added there has to appear here, and a list written out
@@ -362,15 +368,16 @@ def settings_pages():
     """
     source = read(os.path.join(ROOT, "crates", "veilvoice-gui", "src",
                                "settings.rs"))
-    found = [{"key": m.group("key"), "label": m.group("label")}
+    found = [{"key": m.group("key"), "heading": m.group("heading")}
              for m in PAGE_ROW.finditer(source)]
     if not found:
         raise SystemExit(
             "no settings pages were found in "
             "crates/veilvoice-gui/src/settings.rs.\n"
-            "  They are read from the `(Page::X, \"key\", \"label\")` list the\n"
-            "  menu draws. If that moved, fix PAGE_ROW here rather than\n"
-            "  shipping a demonstration that has lost half the settings.")
+            "  They are read from the `(Page::X, \"key\", \"Heading\",\n"
+            "  \"blurb\")` list the menu draws. If that moved, fix PAGE_ROW\n"
+            "  here rather than shipping a demonstration that has lost half\n"
+            "  the settings.")
     return found
 
 
@@ -422,7 +429,7 @@ def shots():
     for page in settings_pages()[1:]:
         key = page["key"]
         out.append(shot("settings-%s" % key,
-                        "Settings: %s" % key,
+                        "Settings: %s" % page["heading"],
                         PAGE_NOTES.get(key),
                         "the settings menu has a %r page" % key))
 

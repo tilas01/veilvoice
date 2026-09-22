@@ -211,27 +211,15 @@ window.VEILVOICE_DEMO = {
       "note": "The version, what this build can do on this machine, and the graphics driver that actually drew the window."
     },
     {
-      "image": "assets/screenshots/gui-settings-motion.png",
-      "key": "settings-motion",
-      "label": "Settings: motion",
-      "note": "Animation, the frame rate the window draws at, and whether the mark moves. It follows the system's own reduced-motion setting unless you say otherwise, and says which way it read it."
-    },
-    {
-      "image": "assets/screenshots/gui-settings-interface.png",
-      "key": "settings-interface",
-      "label": "Settings: interface",
-      "note": "Which tabs the window offers. An installed copy never shows the install tab, because a program offering to install itself when it already is tells you something untrue."
-    },
-    {
       "image": "assets/screenshots/gui-settings-security.png",
       "key": "settings-security",
-      "label": "Settings: security",
+      "label": "Settings: Security",
       "note": "How long the window waits before locking itself, in the list or typed as `90m`. Off unless you turn it on, and a long render does not count as using the window."
     },
     {
       "image": "assets/screenshots/gui-settings-storage.png",
       "key": "settings-storage",
-      "label": "Settings: storage",
+      "label": "Settings: Storage",
       "note": "Where the settings file is, what is in it, and what resetting it does. Nothing is hidden behind a menu item called advanced."
     },
     {
