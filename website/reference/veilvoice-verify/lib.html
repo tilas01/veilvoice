@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/lib.svg" alt="lib.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1918 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 2252 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -94,15 +94,15 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1918 lines defining <strong>34 functions</strong> (2 public), <strong>1 type</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>2252 lines defining <strong>37 functions</strong> (2 public), <strong>1 type</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Manifest</code> <span style="color:var(--muted)">line 976</span> &middot; What the release said is inside its archives, if anything usable.</li>
+<li><code>enum Manifest</code> <span style="color:var(--muted)">line 1039</span> &middot; What the release said is inside its archives, if anything usable.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>help_text</code> <span style="color:var(--muted)">line 165</span> &middot; The verifier&#x27;s own help, with its verbosity and exit-status tables.
+<li><code>help_text</code> <span style="color:var(--muted)">line 166</span> &middot; The verifier&#x27;s own help, with its verbosity and exit-status tables.
 </li>
-<li><code>run</code> <span style="color:var(--muted)">line 1689</span> &middot; Run the verifier over args, which are the words after veilvoice verify.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>asked_for</code>, <code>command_auto</code>, <code>command_build</code>, <code>command_deps</code>, <code>command_file_against_hash</code>, <code>command_file_against_sums</code>, <code>command_gnupg</code>, <code>command_hash</code>, <code>command_install</code>, <code>command_key</code>, <code>command_release</code>, <code>command_reproduce</code></span>
+<li><code>run</code> <span style="color:var(--muted)">line 2015</span> &middot; Run the verifier over args, which are the words after veilvoice verify.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>asked_for</code>, <code>command_archive</code>, <code>command_auto</code>, <code>command_build</code>, <code>command_deps</code>, <code>command_file_against_hash</code>, <code>command_file_against_sums</code>, <code>command_gnupg</code>, <code>command_hash</code>, <code>command_install</code>, <code>command_key</code>, <code>command_release</code></span>
 </li>
 </ul>
 </section>
@@ -121,6 +121,7 @@
 <rect x="0" y="0" width="641" height="930" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M612.9 447.0 C 634.9 447.0, 634.9 347.0, 310.5 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M612.9 447.0 C 634.9 447.0, 634.9 147.0, 457.2 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M550.6 474.0 C 550.6 494.0, 200.8 700.0, 200.8 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M550.6 474.0 C 550.6 494.0, 320.5 600.0, 320.5 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M563.0 347.0 C 594.6 347.0, 594.6 147.0, 575.6 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M563.0 347.0 C 585.0 347.0, 585.0 147.0, 282.3 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
@@ -148,10 +149,10 @@
 <path d="M576.7 247.0 C 622.9 247.0, 622.9 47.0, 603.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M576.7 247.0 C 598.7 247.0, 598.7 247.0, 286.3 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M576.7 247.0 C 598.7 247.0, 598.7 47.0, 485.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M247.0 747.0 C 305.3 747.0, 305.3 247.0, 286.3 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M486.4 747.0 C 622.9 747.0, 622.9 47.0, 603.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M251.1 747.0 C 305.3 747.0, 305.3 247.0, 286.3 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M490.4 747.0 C 622.9 747.0, 622.9 47.0, 603.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M320.5 674.0 C 320.5 694.0, 200.8 700.0, 200.8 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M320.5 674.0 C 320.5 694.0, 379.7 700.0, 379.7 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M320.5 674.0 C 320.5 694.0, 383.7 700.0, 383.7 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M370.7 547.0 C 634.9 547.0, 634.9 447.0, 615.9 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M370.7 547.0 C 585.0 547.0, 585.0 347.0, 566.0 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M370.7 547.0 C 392.7 547.0, 392.7 347.0, 310.5 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
@@ -164,112 +165,112 @@
 <a href="lib.src.html#fn-embedded_key">
 <rect x="40.1" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="102.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">embedded_key</text>
-<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
+<text x="102.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 141</text>
 </a>
 <a href="lib.src.html#fn-sha256_file">
 <rect x="190.8" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="249.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sha256_file</text>
-<text x="249.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 151</text>
+<text x="249.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 152</text>
 </a>
 <a href="lib.src.html#fn-verify_detached">
 <rect x="333.5" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="407.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">verify_detached</text>
-<text x="407.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 156</text>
+<text x="407.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 157</text>
 </a>
 <a href="lib.src.html#fn-good">
 <rect x="508.4" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="554.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">good</text>
-<text x="554.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 333</text>
+<text x="554.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 363</text>
 </a>
 <a href="lib.src.html#fn-fail">
 <rect x="68.3" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="114.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fail</text>
-<text x="114.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 344</text>
+<text x="114.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 374</text>
 </a>
 <a href="lib.src.html#fn-deny">
 <rect x="186.8" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="233.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">deny</text>
-<text x="233.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 360</text>
+<text x="233.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
 </a>
 <a href="lib.src.html#fn-incomplete_deny">
 <rect x="305.3" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="379.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">incomplete_deny</text>
-<text x="379.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 377</text>
+<text x="379.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 407</text>
 </a>
 <a href="lib.src.html#fn-cannot">
 <rect x="480.2" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="526.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">cannot</text>
-<text x="526.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 395</text>
+<text x="526.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 425</text>
 </a>
 <a href="lib.src.html#fn-usage-2">
 <rect x="64.3" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="110.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">usage</text>
-<text x="110.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
+<text x="110.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 445</text>
 </a>
 <a href="lib.src.html#fn-read_text">
 <rect x="182.8" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="233.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_text</text>
-<text x="233.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 437</text>
+<text x="233.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 467</text>
 </a>
 <a href="lib.src.html#fn-command_key">
 <rect x="309.3" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="367.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_key</text>
-<text x="367.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 446</text>
+<text x="367.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 476</text>
 </a>
 <a href="lib.src.html#fn-command_sums">
 <rect x="452.0" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="514.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_sums</text>
-<text x="514.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 469</text>
+<text x="514.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 499</text>
 </a>
 <a href="lib.src.html#fn-command_file_against_sums">
 <rect x="78.0" y="320.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="192.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_file_against_sums</text>
-<text x="192.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 512</text>
+<text x="192.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 542</text>
 </a>
 <a href="lib.src.html#fn-command_file_against_hash">
 <rect x="333.5" y="320.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="448.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_file_against_hash</text>
-<text x="448.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 608</text>
+<text x="448.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 638</text>
 </a>
 <a href="lib.src.html#fn-command_hash">
 <rect x="28.0" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="90.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_hash</text>
-<text x="90.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 664</text>
+<text x="90.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 694</text>
 </a>
 <a href="lib.src.html#fn-take_value">
 <rect x="178.7" y="420.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="233.0" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">take_value</text>
-<text x="233.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 682</text>
+<text x="233.0" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 712</text>
 </a>
 <a href="lib.src.html#fn-command_release">
 <rect x="313.3" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="387.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_release</text>
-<text x="387.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 698</text>
+<text x="387.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 728</text>
 </a>
 <a href="lib.src.html#fn-command_auto">
 <rect x="488.2" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="550.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_auto</text>
-<text x="550.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 779</text>
+<text x="550.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 809</text>
 </a>
 <a href="lib.src.html#fn-report_extracted">
 <rect x="242.0" y="620.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="320.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">report_extracted</text>
-<text x="320.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 912</text>
+<text x="320.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 975</text>
 </a>
 <a href="lib.src.html#fn-manifest-2">
-<rect x="154.5" y="720.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<rect x="150.5" y="720.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="200.8" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">manifest</text>
-<text x="200.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 992</text>
+<text x="200.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1055</text>
 </a>
 <a href="lib.src.html#fn-report_against_manifest">
-<rect x="273.0" y="720.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="379.7" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">report_against_manifest</text>
-<text x="379.7" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1023</text>
+<rect x="277.1" y="720.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="383.7" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">report_against_manifest</text>
+<text x="383.7" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1086</text>
 </a>
 <a href="lib.src.html#fn-run">
 <rect x="270.2" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="320.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="320.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1689</text>
+<text x="320.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2015</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -279,38 +280,39 @@
 <text x="35.0" y="845.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
 <text x="20.0" y="867.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
 <text x="20.0" y="882.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
-<text x="20.0" y="897.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it</text>
+<text x="20.0" y="897.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 37 functions are drawn; the diagram is bounded at 22 so it</text>
 <text x="20.0" y="912.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 34 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 37 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_embedded_key[&quot;embedded_key&lt;br/&gt;line 140&quot;]
-    n_sha256_file[&quot;sha256_file&lt;br/&gt;line 151&quot;]
-    n_verify_detached[&quot;verify_detached&lt;br/&gt;line 156&quot;]
-    n_good[&quot;good&lt;br/&gt;line 333&quot;]
-    n_fail[&quot;fail&lt;br/&gt;line 344&quot;]
-    n_deny[&quot;deny&lt;br/&gt;line 360&quot;]
-    n_incomplete_deny[&quot;incomplete_deny&lt;br/&gt;line 377&quot;]
-    n_cannot[&quot;cannot&lt;br/&gt;line 395&quot;]
-    n_usage[&quot;usage&lt;br/&gt;line 415&quot;]
-    n_read_text[&quot;read_text&lt;br/&gt;line 437&quot;]
-    n_command_key[&quot;command_key&lt;br/&gt;line 446&quot;]
-    n_command_sums[&quot;command_sums&lt;br/&gt;line 469&quot;]
-    n_command_file_against_sums[&quot;command_file_against_sums&lt;br/&gt;line 512&quot;]
-    n_command_file_against_hash[&quot;command_file_against_hash&lt;br/&gt;line 608&quot;]
-    n_command_hash[&quot;command_hash&lt;br/&gt;line 664&quot;]
-    n_take_value[&quot;take_value&lt;br/&gt;line 682&quot;]
-    n_command_release[&quot;command_release&lt;br/&gt;line 698&quot;]
-    n_command_auto[&quot;command_auto&lt;br/&gt;line 779&quot;]
-    n_report_extracted[&quot;report_extracted&lt;br/&gt;line 912&quot;]
-    n_manifest[&quot;manifest&lt;br/&gt;line 992&quot;]
-    n_report_against_manifest[&quot;report_against_manifest&lt;br/&gt;line 1023&quot;]
-    n_run([&quot;run&lt;br/&gt;line 1689&quot;])
+    n_embedded_key[&quot;embedded_key&lt;br/&gt;line 141&quot;]
+    n_sha256_file[&quot;sha256_file&lt;br/&gt;line 152&quot;]
+    n_verify_detached[&quot;verify_detached&lt;br/&gt;line 157&quot;]
+    n_good[&quot;good&lt;br/&gt;line 363&quot;]
+    n_fail[&quot;fail&lt;br/&gt;line 374&quot;]
+    n_deny[&quot;deny&lt;br/&gt;line 390&quot;]
+    n_incomplete_deny[&quot;incomplete_deny&lt;br/&gt;line 407&quot;]
+    n_cannot[&quot;cannot&lt;br/&gt;line 425&quot;]
+    n_usage[&quot;usage&lt;br/&gt;line 445&quot;]
+    n_read_text[&quot;read_text&lt;br/&gt;line 467&quot;]
+    n_command_key[&quot;command_key&lt;br/&gt;line 476&quot;]
+    n_command_sums[&quot;command_sums&lt;br/&gt;line 499&quot;]
+    n_command_file_against_sums[&quot;command_file_against_sums&lt;br/&gt;line 542&quot;]
+    n_command_file_against_hash[&quot;command_file_against_hash&lt;br/&gt;line 638&quot;]
+    n_command_hash[&quot;command_hash&lt;br/&gt;line 694&quot;]
+    n_take_value[&quot;take_value&lt;br/&gt;line 712&quot;]
+    n_command_release[&quot;command_release&lt;br/&gt;line 728&quot;]
+    n_command_auto[&quot;command_auto&lt;br/&gt;line 809&quot;]
+    n_report_extracted[&quot;report_extracted&lt;br/&gt;line 975&quot;]
+    n_manifest[&quot;manifest&lt;br/&gt;line 1055&quot;]
+    n_report_against_manifest[&quot;report_against_manifest&lt;br/&gt;line 1086&quot;]
+    n_run([&quot;run&lt;br/&gt;line 2015&quot;])
     n_command_auto --&gt; n_command_file_against_sums
     n_command_auto --&gt; n_incomplete_deny
+    n_command_auto --&gt; n_manifest
     n_command_auto --&gt; n_report_extracted
     n_command_file_against_hash --&gt; n_cannot
     n_command_file_against_hash --&gt; n_deny
@@ -351,28 +353,28 @@ flowchart TD
     n_run --&gt; n_command_sums
     n_run --&gt; n_take_value
     n_run --&gt; n_usage
-    click n_embedded_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L140&quot; &quot;open the source&quot;
-    click n_sha256_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L151&quot; &quot;open the source&quot;
-    click n_verify_detached href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L156&quot; &quot;open the source&quot;
-    click n_good href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L333&quot; &quot;open the source&quot;
-    click n_fail href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L344&quot; &quot;open the source&quot;
-    click n_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L360&quot; &quot;open the source&quot;
-    click n_incomplete_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L377&quot; &quot;open the source&quot;
-    click n_cannot href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L395&quot; &quot;open the source&quot;
-    click n_usage href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L415&quot; &quot;open the source&quot;
-    click n_read_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L437&quot; &quot;open the source&quot;
-    click n_command_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L446&quot; &quot;open the source&quot;
-    click n_command_sums href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L469&quot; &quot;open the source&quot;
-    click n_command_file_against_sums href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L512&quot; &quot;open the source&quot;
-    click n_command_file_against_hash href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L608&quot; &quot;open the source&quot;
-    click n_command_hash href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L664&quot; &quot;open the source&quot;
-    click n_take_value href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L682&quot; &quot;open the source&quot;
-    click n_command_release href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L698&quot; &quot;open the source&quot;
-    click n_command_auto href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L779&quot; &quot;open the source&quot;
-    click n_report_extracted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L912&quot; &quot;open the source&quot;
-    click n_manifest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L992&quot; &quot;open the source&quot;
-    click n_report_against_manifest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1023&quot; &quot;open the source&quot;
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1689&quot; &quot;open the source&quot;
+    click n_embedded_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L141&quot; &quot;open the source&quot;
+    click n_sha256_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L152&quot; &quot;open the source&quot;
+    click n_verify_detached href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L157&quot; &quot;open the source&quot;
+    click n_good href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L363&quot; &quot;open the source&quot;
+    click n_fail href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L374&quot; &quot;open the source&quot;
+    click n_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L390&quot; &quot;open the source&quot;
+    click n_incomplete_deny href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L407&quot; &quot;open the source&quot;
+    click n_cannot href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L425&quot; &quot;open the source&quot;
+    click n_usage href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L445&quot; &quot;open the source&quot;
+    click n_read_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L467&quot; &quot;open the source&quot;
+    click n_command_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L476&quot; &quot;open the source&quot;
+    click n_command_sums href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L499&quot; &quot;open the source&quot;
+    click n_command_file_against_sums href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L542&quot; &quot;open the source&quot;
+    click n_command_file_against_hash href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L638&quot; &quot;open the source&quot;
+    click n_command_hash href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L694&quot; &quot;open the source&quot;
+    click n_take_value href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L712&quot; &quot;open the source&quot;
+    click n_command_release href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L728&quot; &quot;open the source&quot;
+    click n_command_auto href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L809&quot; &quot;open the source&quot;
+    click n_report_extracted href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L975&quot; &quot;open the source&quot;
+    click n_manifest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1055&quot; &quot;open the source&quot;
+    click n_report_against_manifest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1086&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2015&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -383,43 +385,46 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>embedded_key</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-embedded_key">140</a></td><td>The embedded key, with its fingerprint checked against FINGERPRINT.</td></tr>
-<tr><td><code>sha256_file</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-sha256_file">151</a></td><td>SHA-256 of a file, as this program&#x27;s Result&lt;_, String&gt;.</td></tr>
-<tr><td><code>verify_detached</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-verify_detached">156</a></td><td>Verify a detached signature, as this program&#x27;s Result&lt;_, String&gt;.</td></tr>
-<tr><td><code>help_text</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-help_text">165</a></td><td>The verifier&#x27;s own help, with its verbosity and exit-status tables.</td></tr>
-<tr><td><code>USAGE</code> <sub>const</sub></td><td><a href="lib.src.html#fn-usage">169</a></td><td></td></tr>
-<tr><td><code>EXPLAIN</code> <sub>const</sub></td><td><a href="lib.src.html#fn-explain">285</a></td><td></td></tr>
-<tr><td><code>good</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-good">333</a></td><td>One line of a passing check, in the shape every other line here uses.</td></tr>
-<tr><td><code>fail</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-fail">344</a></td><td>A failure that is not a refusal: something did not happen, rather than something was checked and found wrong.</td></tr>
-<tr><td><code>deny</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-deny">360</a></td><td>Every refusal goes through here, so every refusal names the check.</td></tr>
-<tr><td><code>incomplete_deny</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-incomplete_deny">377</a></td><td>Nothing could be checked, with the same shape of detail as a refusal.</td></tr>
-<tr><td><code>cannot</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-cannot">395</a></td><td>A file this program was told to read could not be read.</td></tr>
-<tr><td><code>usage</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-usage-2">415</a></td><td>The command line could not be understood, so nothing was attempted.</td></tr>
-<tr><td><code>read_text</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-read_text">437</a></td><td>A file as text, with the path in the error rather than just the reason.</td></tr>
-<tr><td><code>command_key</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_key">446</a></td><td>veilvoice verify key: what the key compiled into this binary is.</td></tr>
-<tr><td><code>command_sums</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_sums">469</a></td><td>veilvoice verify sums: the signature over a hash list, and nothing else.</td></tr>
-<tr><td><code>command_file_against_sums</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_file_against_sums">512</a></td><td>veilvoice verify file: the whole chain for one download.</td></tr>
-<tr><td><code>command_file_against_hash</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_file_against_hash">608</a></td><td>veilvoice verify file --sha256: one file against one hash typed by hand.</td></tr>
-<tr><td><code>command_hash</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_hash">664</a></td><td>veilvoice verify hash: print a file&#x27;s SHA-256 and stop.</td></tr>
-<tr><td><code>take_value</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-take_value">682</a></td><td>The value after a flag, or a message naming the flag that is missing one.</td></tr>
-<tr><td><code>command_release</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_release">698</a></td><td>Fetch a release and check it, in one step.</td></tr>
-<tr><td><code>command_auto</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_auto">779</a></td><td>Find a release near the user and check it, with nothing else to type.</td></tr>
-<tr><td><code>report_extracted</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_extracted">912</a></td><td>Roadmap item 97.</td></tr>
-<tr><td><code>Manifest</code> <sub>enum</sub></td><td><a href="lib.src.html#fn-manifest">976</a></td><td>What the release said is inside its archives, if anything usable.</td></tr>
-<tr><td><code>manifest</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-manifest-2">992</a></td><td>Read CONTENTS.sha256, having first proved it is the published one.</td></tr>
-<tr><td><code>report_against_manifest</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_against_manifest">1023</a></td><td>Check one extracted folder against the section of the list that covers it.</td></tr>
-<tr><td><code>digest_for</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-digest_for">1097</a></td><td>The published hash for one path, for a --verbose line.</td></tr>
-<tr><td><code>report_runnable</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_runnable">1112</a></td><td>Whether the operating system will run the programs that are there.</td></tr>
-<tr><td><code>report_presence_only</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_presence_only">1136</a></td><td>The old report, for a release that published no contents list.</td></tr>
-<tr><td><code>report_gnupg</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_gnupg">1179</a></td><td>Roadmap item 97.</td></tr>
-<tr><td><code>command_gnupg</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_gnupg">1264</a></td><td>Roadmap item 91.</td></tr>
-<tr><td><code>command_deps</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_deps">1309</a></td><td>What this machine needs before it can build VeilVoice.</td></tr>
-<tr><td><code>command_build</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_build">1381</a></td><td>Build the workspace from source and hash what came out.</td></tr>
-<tr><td><code>do_build</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-do_build">1399</a></td><td>Everything both build commands do before they differ.</td></tr>
-<tr><td><code>command_reproduce</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_reproduce">1468</a></td><td>Build here, and compare against the published hashes for this platform.</td></tr>
-<tr><td><code>command_install</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_install">1577</a></td><td>Put binaries where a shell will find them.</td></tr>
-<tr><td><code>asked_for</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-asked_for">1666</a></td><td>Print something the reader asked for by name, at any level.</td></tr>
-<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-run">1689</a></td><td>Run the verifier over args, which are the words after veilvoice verify.</td></tr>
+<tr><td><code>embedded_key</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-embedded_key">141</a></td><td>The embedded key, with its fingerprint checked against FINGERPRINT.</td></tr>
+<tr><td><code>sha256_file</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-sha256_file">152</a></td><td>SHA-256 of a file, as this program&#x27;s Result&lt;_, String&gt;.</td></tr>
+<tr><td><code>verify_detached</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-verify_detached">157</a></td><td>Verify a detached signature, as this program&#x27;s Result&lt;_, String&gt;.</td></tr>
+<tr><td><code>help_text</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-help_text">166</a></td><td>The verifier&#x27;s own help, with its verbosity and exit-status tables.</td></tr>
+<tr><td><code>USAGE</code> <sub>const</sub></td><td><a href="lib.src.html#fn-usage">170</a></td><td></td></tr>
+<tr><td><code>EXPLAIN</code> <sub>const</sub></td><td><a href="lib.src.html#fn-explain">315</a></td><td></td></tr>
+<tr><td><code>good</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-good">363</a></td><td>One line of a passing check, in the shape every other line here uses.</td></tr>
+<tr><td><code>fail</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-fail">374</a></td><td>A failure that is not a refusal: something did not happen, rather than something was checked and found wrong.</td></tr>
+<tr><td><code>deny</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-deny">390</a></td><td>Every refusal goes through here, so every refusal names the check.</td></tr>
+<tr><td><code>incomplete_deny</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-incomplete_deny">407</a></td><td>Nothing could be checked, with the same shape of detail as a refusal.</td></tr>
+<tr><td><code>cannot</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-cannot">425</a></td><td>A file this program was told to read could not be read.</td></tr>
+<tr><td><code>usage</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-usage-2">445</a></td><td>The command line could not be understood, so nothing was attempted.</td></tr>
+<tr><td><code>read_text</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-read_text">467</a></td><td>A file as text, with the path in the error rather than just the reason.</td></tr>
+<tr><td><code>command_key</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_key">476</a></td><td>veilvoice verify key: what the key compiled into this binary is.</td></tr>
+<tr><td><code>command_sums</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_sums">499</a></td><td>veilvoice verify sums: the signature over a hash list, and nothing else.</td></tr>
+<tr><td><code>command_file_against_sums</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_file_against_sums">542</a></td><td>veilvoice verify file: the whole chain for one download.</td></tr>
+<tr><td><code>command_file_against_hash</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_file_against_hash">638</a></td><td>veilvoice verify file --sha256: one file against one hash typed by hand.</td></tr>
+<tr><td><code>command_hash</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_hash">694</a></td><td>veilvoice verify hash: print a file&#x27;s SHA-256 and stop.</td></tr>
+<tr><td><code>take_value</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-take_value">712</a></td><td>The value after a flag, or a message naming the flag that is missing one.</td></tr>
+<tr><td><code>command_release</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_release">728</a></td><td>Fetch a release and check it, in one step.</td></tr>
+<tr><td><code>command_auto</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_auto">809</a></td><td>Find a release near the user and check it, with nothing else to type.</td></tr>
+<tr><td><code>report_extracted</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_extracted">975</a></td><td>Roadmap item 97.</td></tr>
+<tr><td><code>Manifest</code> <sub>enum</sub></td><td><a href="lib.src.html#fn-manifest">1039</a></td><td>What the release said is inside its archives, if anything usable.</td></tr>
+<tr><td><code>manifest</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-manifest-2">1055</a></td><td>Read CONTENTS.sha256, having first proved it is the published one.</td></tr>
+<tr><td><code>report_against_manifest</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_against_manifest">1086</a></td><td>Check one extracted folder against the section of the list that covers it.</td></tr>
+<tr><td><code>digest_for</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-digest_for">1160</a></td><td>The published hash for one path, for a --verbose line.</td></tr>
+<tr><td><code>report_runnable</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_runnable">1175</a></td><td>Whether the operating system will run the programs that are there.</td></tr>
+<tr><td><code>report_presence_only</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_presence_only">1199</a></td><td>The old report, for a release that published no contents list.</td></tr>
+<tr><td><code>report_gnupg</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_gnupg">1242</a></td><td>Roadmap item 97.</td></tr>
+<tr><td><code>report_carried</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_carried">1329</a></td><td>Roadmap item 164.</td></tr>
+<tr><td><code>report_inside</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-report_inside">1389</a></td><td>Roadmap item 164.</td></tr>
+<tr><td><code>command_archive</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_archive">1491</a></td><td>Roadmap item 164.</td></tr>
+<tr><td><code>command_gnupg</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_gnupg">1590</a></td><td>Roadmap item 91.</td></tr>
+<tr><td><code>command_deps</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_deps">1635</a></td><td>What this machine needs before it can build VeilVoice.</td></tr>
+<tr><td><code>command_build</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_build">1707</a></td><td>Build the workspace from source and hash what came out.</td></tr>
+<tr><td><code>do_build</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-do_build">1725</a></td><td>Everything both build commands do before they differ.</td></tr>
+<tr><td><code>command_reproduce</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_reproduce">1794</a></td><td>Build here, and compare against the published hashes for this platform.</td></tr>
+<tr><td><code>command_install</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-command_install">1903</a></td><td>Put binaries where a shell will find them.</td></tr>
+<tr><td><code>asked_for</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-asked_for">1992</a></td><td>Print something the reader asked for by name, at any level.</td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-run">2015</a></td><td>Run the verifier over args, which are the words after veilvoice verify.</td></tr>
 </tbody></table>
 </section>
 </div></div>

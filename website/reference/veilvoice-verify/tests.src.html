@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1388 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1671 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1519,6 +1519,301 @@
 <span class="ln" id="L1386">        offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
 <span class="ln" id="L1387">    );</span>
 <span class="ln" id="L1388">}</span>
+</span>
+<span class="ln" id="L1389"></span>
+<span class="ln" id="L1390"><span class="tok-com">// ---------------------------------------------------------------------------</span></span>
+<span class="ln" id="L1391"><span class="tok-com">// Roadmap item 164: the key a download carries, and the order of the checks</span></span>
+<span class="ln" id="L1392"><span class="tok-com">// ---------------------------------------------------------------------------</span></span>
+<span class="ln" id="L1393"></span>
+<span class="src-item" id="fn-the_key_a_download_carries_is_never_used_to_check_anything">
+<span class="ln" id="L1394"><span class="tok-com">/// **Roadmap item 164.** The key a download brings is compared and never used.</span></span>
+<span class="ln" id="L1395"><span class="tok-com">///</span></span>
+<span class="ln" id="L1396"><span class="tok-com">/// Written as a test over the source because it is the property the whole</span></span>
+<span class="ln" id="L1397"><span class="tok-com">/// feature rests on and it cannot be observed from outside: a version that</span></span>
+<span class="ln" id="L1398"><span class="tok-com">/// verified the signature with the carried key would pass every test that uses</span></span>
+<span class="ln" id="L1399"><span class="tok-com">/// a genuine release, because in a genuine release the two keys are the same</span></span>
+<span class="ln" id="L1400"><span class="tok-com">/// one. It would only fail against a forged set, which is to say against the</span></span>
+<span class="ln" id="L1401"><span class="tok-com">/// exact input it exists to refuse.</span></span>
+<span class="ln" id="L1402"><span class="tok-com">///</span></span>
+<span class="ln" id="L1403"><span class="tok-com">/// Two things are asserted. That `carried` never reaches a signature check at</span></span>
+<span class="ln" id="L1404"><span class="tok-com">/// all, and that it hands no key back to a caller who could -- see the note on</span></span>
+<span class="ln" id="L1405"><span class="tok-com">/// `carried::examine`, which says that returning a `SignedPublicKey` read off</span></span>
+<span class="ln" id="L1406"><span class="tok-com">/// the disk would put this one call site away from the defect.</span></span>
+<span class="ln" id="L1407"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1408"><span class="tok-kw">fn</span> <span class="tok-fn">the_key_a_download_carries_is_never_used_to_check_anything</span>() {</span>
+<span class="ln" id="L1409">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;check/carried.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1410">    <span class="tok-com">// The doc comments say these words a great deal, which is the point of</span></span>
+<span class="ln" id="L1411">    <span class="tok-com">// them, so only the code is read.</span></span>
+<span class="ln" id="L1412">    <span class="tok-kw">let</span> code: String = source</span>
+<span class="ln" id="L1413">        .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L1414">        .<span class="tok-fn">filter</span>(|line| {</span>
+<span class="ln" id="L1415">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1416">            !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//!&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>)</span>
+<span class="ln" id="L1417">        })</span>
+<span class="ln" id="L1418">        .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L1419">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1420">    <span class="tok-com">// The tests at the foot of that file are not the subject: one of them</span></span>
+<span class="ln" id="L1421">    <span class="tok-com">// writes this project&#x27;s own key out to check it is recognised.</span></span>
+<span class="ln" id="L1422">    <span class="tok-kw">let</span> code = code.<span class="tok-fn">split</span>(<span class="tok-str">&quot;mod tests&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1423"></span>
+<span class="ln" id="L1424">    <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;verify_detached&quot;</span>, <span class="tok-str">&quot;verify(&quot;</span>, <span class="tok-str">&quot;DetachedSignature&quot;</span>] {</span>
+<span class="ln" id="L1425">        assert!(</span>
+<span class="ln" id="L1426">            !code.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L1427">            <span class="tok-str">&quot;check/carried.rs reaches {forbidden}: the key a download carries \</span></span>
+<span class="ln" id="L1428"><span class="tok-str">             must never verify anything&quot;</span></span>
+<span class="ln" id="L1429">        );</span>
+<span class="ln" id="L1430">    }</span>
+<span class="ln" id="L1431">    assert!(</span>
+<span class="ln" id="L1432">        !code.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;-&gt; SignedPublicKey&quot;</span>) &amp;&amp; !code.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Result&lt;SignedPublicKey&quot;</span>),</span>
+<span class="ln" id="L1433">        <span class="tok-str">&quot;check/carried.rs hands a caller the key it read off the disk&quot;</span></span>
+<span class="ln" id="L1434">    );</span>
+<span class="ln" id="L1435">}</span>
+</span>
+<span class="ln" id="L1436"></span>
+<span class="src-item" id="fn-the_carried_key_is_looked_at_before_anything_is_checked">
+<span class="ln" id="L1437"><span class="tok-com">/// **Roadmap item 164.** The carried key is examined before anything is checked.</span></span>
+<span class="ln" id="L1438"><span class="tok-com">///</span></span>
+<span class="ln" id="L1439"><span class="tok-com">/// The order is the whole of what makes a mismatch the whole verdict. A</span></span>
+<span class="ln" id="L1440"><span class="tok-com">/// version that checked the signature first and looked at the carried key</span></span>
+<span class="ln" id="L1441"><span class="tok-com">/// afterwards would print a page of passing lines above the refusal, and</span></span>
+<span class="ln" id="L1442"><span class="tok-com">/// somebody skimming it would read the passes.</span></span>
+<span class="ln" id="L1443"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1444"><span class="tok-kw">fn</span> <span class="tok-fn">the_carried_key_is_looked_at_before_anything_is_checked</span>() {</span>
+<span class="ln" id="L1445">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1446">    <span class="tok-kw">for</span> (name, first, second) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1447">        (</span>
+<span class="ln" id="L1448">            <span class="tok-str">&quot;command_auto&quot;</span>,</span>
+<span class="ln" id="L1449">            <span class="tok-str">&quot;report_carried&quot;</span>,</span>
+<span class="ln" id="L1450">            <span class="tok-str">&quot;command_file_against_sums&quot;</span>,</span>
+<span class="ln" id="L1451">        ),</span>
+<span class="ln" id="L1452">        (</span>
+<span class="ln" id="L1453">            <span class="tok-str">&quot;command_archive&quot;</span>,</span>
+<span class="ln" id="L1454">            <span class="tok-str">&quot;report_carried&quot;</span>,</span>
+<span class="ln" id="L1455">            <span class="tok-str">&quot;command_file_against_sums&quot;</span>,</span>
+<span class="ln" id="L1456">        ),</span>
+<span class="ln" id="L1457">    ] {</span>
+<span class="ln" id="L1458">        <span class="tok-kw">let</span> body = source</span>
+<span class="ln" id="L1459">            .<span class="tok-fn">split</span>(&amp;format!(<span class="tok-str">&quot;fn {name}(&quot;</span>))</span>
+<span class="ln" id="L1460">            .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L1461">            .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{name} has to be findable&quot;</span>));</span>
+<span class="ln" id="L1462">        <span class="tok-kw">let</span> body = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\nfn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1463">        <span class="tok-kw">let</span> at_first = body</span>
+<span class="ln" id="L1464">            .<span class="tok-fn">find</span>(first)</span>
+<span class="ln" id="L1465">            .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{name} no longer calls {first}&quot;</span>));</span>
+<span class="ln" id="L1466">        <span class="tok-kw">let</span> at_second = body</span>
+<span class="ln" id="L1467">            .<span class="tok-fn">find</span>(second)</span>
+<span class="ln" id="L1468">            .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{name} no longer calls {second}&quot;</span>));</span>
+<span class="ln" id="L1469">        assert!(</span>
+<span class="ln" id="L1470">            at_first &lt; at_second,</span>
+<span class="ln" id="L1471">            <span class="tok-str">&quot;{name} checks the download before it looks at the key that came with it&quot;</span></span>
+<span class="ln" id="L1472">        );</span>
+<span class="ln" id="L1473">    }</span>
+<span class="ln" id="L1474">}</span>
+</span>
+<span class="ln" id="L1475"></span>
+<span class="src-item" id="fn-an_archive_is_checked_against_the_signed_list_before_it_is_opened">
+<span class="ln" id="L1476"><span class="tok-com">/// **Roadmap item 164.** An archive is verified before anything inside it is read.</span></span>
+<span class="ln" id="L1477"><span class="tok-com">///</span></span>
+<span class="ln" id="L1478"><span class="tok-com">/// The same rule the contents list is read under, one link further down. The</span></span>
+<span class="ln" id="L1479"><span class="tok-com">/// members of an archive that is not the published archive are not a set of</span></span>
+<span class="ln" id="L1480"><span class="tok-com">/// files worth reporting on: they are whatever somebody who handed you a</span></span>
+<span class="ln" id="L1481"><span class="tok-com">/// forgery chose to put in it.</span></span>
+<span class="ln" id="L1482"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1483"><span class="tok-kw">fn</span> <span class="tok-fn">an_archive_is_checked_against_the_signed_list_before_it_is_opened</span>() {</span>
+<span class="ln" id="L1484">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1485">    <span class="tok-kw">let</span> body = source</span>
+<span class="ln" id="L1486">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn command_archive(&quot;</span>)</span>
+<span class="ln" id="L1487">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L1488">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_archive has to be findable&quot;</span>);</span>
+<span class="ln" id="L1489">    <span class="tok-kw">let</span> body = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\nfn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1490">    <span class="tok-kw">let</span> checked = body</span>
+<span class="ln" id="L1491">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;command_file_against_sums&quot;</span>)</span>
+<span class="ln" id="L1492">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the archive must be checked against the signed hash list&quot;</span>);</span>
+<span class="ln" id="L1493">    <span class="tok-kw">let</span> opened = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;report_inside&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;and then looked inside&quot;</span>);</span>
+<span class="ln" id="L1494">    assert!(</span>
+<span class="ln" id="L1495">        checked &lt; opened,</span>
+<span class="ln" id="L1496">        <span class="tok-str">&quot;command_archive opens the archive before it has verified it&quot;</span></span>
+<span class="ln" id="L1497">    );</span>
+<span class="ln" id="L1498">    <span class="tok-com">// And the failure has to stop it, not merely be recorded. A verifier that</span></span>
+<span class="ln" id="L1499">    <span class="tok-com">// noted a bad signature and went on to list the archive&#x27;s contents would</span></span>
+<span class="ln" id="L1500">    <span class="tok-com">// be reporting on a forgery&#x27;s contents.</span></span>
+<span class="ln" id="L1501">    <span class="tok-kw">let</span> stopped = body[checked..]</span>
+<span class="ln" id="L1502">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;return outcome&quot;</span>)</span>
+<span class="ln" id="L1503">        .<span class="tok-fn">map</span>(|at| at + checked)</span>
+<span class="ln" id="L1504">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a failed check must return, not continue&quot;</span>);</span>
+<span class="ln" id="L1505">    assert!(</span>
+<span class="ln" id="L1506">        stopped &lt; opened,</span>
+<span class="ln" id="L1507">        <span class="tok-str">&quot;command_archive looks inside an archive whose signature check failed&quot;</span></span>
+<span class="ln" id="L1508">    );</span>
+<span class="ln" id="L1509">}</span>
+</span>
+<span class="ln" id="L1510"></span>
+<span class="src-item" id="fn-nothing_that_reads_an_archive_ever_writes_one_out">
+<span class="ln" id="L1511"><span class="tok-com">/// **Roadmap item 164.** Nothing in the archive readers writes to the filesystem.</span></span>
+<span class="ln" id="L1512"><span class="tok-com">///</span></span>
+<span class="ln" id="L1513"><span class="tok-com">/// The claim [`crate::check::archive`] makes for itself, and the reason the</span></span>
+<span class="ln" id="L1514"><span class="tok-com">/// whole class of archive-extraction defects has no purchase there. It is a</span></span>
+<span class="ln" id="L1515"><span class="tok-com">/// claim about code that does not exist, so nothing but reading the source can</span></span>
+<span class="ln" id="L1516"><span class="tok-com">/// check it.</span></span>
+<span class="ln" id="L1517"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1518"><span class="tok-kw">fn</span> <span class="tok-fn">nothing_that_reads_an_archive_ever_writes_one_out</span>() {</span>
+<span class="ln" id="L1519">    <span class="tok-kw">for</span> (name, source) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1520">        (</span>
+<span class="ln" id="L1521">            <span class="tok-str">&quot;check/archive/mod.rs&quot;</span>,</span>
+<span class="ln" id="L1522">            include_str!(<span class="tok-str">&quot;check/archive/mod.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L1523">        ),</span>
+<span class="ln" id="L1524">        (</span>
+<span class="ln" id="L1525">            <span class="tok-str">&quot;check/archive/tar.rs&quot;</span>,</span>
+<span class="ln" id="L1526">            include_str!(<span class="tok-str">&quot;check/archive/tar.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L1527">        ),</span>
+<span class="ln" id="L1528">        (</span>
+<span class="ln" id="L1529">            <span class="tok-str">&quot;check/archive/zip.rs&quot;</span>,</span>
+<span class="ln" id="L1530">            include_str!(<span class="tok-str">&quot;check/archive/zip.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L1531">        ),</span>
+<span class="ln" id="L1532">    ] {</span>
+<span class="ln" id="L1533">        <span class="tok-kw">let</span> code: String = source</span>
+<span class="ln" id="L1534">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L1535">            .<span class="tok-fn">filter</span>(|line| {</span>
+<span class="ln" id="L1536">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1537">                !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//!&quot;</span>)</span>
+<span class="ln" id="L1538">                    &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>)</span>
+<span class="ln" id="L1539">                    &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>)</span>
+<span class="ln" id="L1540">            })</span>
+<span class="ln" id="L1541">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L1542">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1543">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1544">            <span class="tok-str">&quot;fs::write&quot;</span>,</span>
+<span class="ln" id="L1545">            <span class="tok-str">&quot;fs::create_dir&quot;</span>,</span>
+<span class="ln" id="L1546">            <span class="tok-str">&quot;fs::copy&quot;</span>,</span>
+<span class="ln" id="L1547">            <span class="tok-str">&quot;fs::remove&quot;</span>,</span>
+<span class="ln" id="L1548">            <span class="tok-str">&quot;fs::rename&quot;</span>,</span>
+<span class="ln" id="L1549">            <span class="tok-str">&quot;fs::set_permissions&quot;</span>,</span>
+<span class="ln" id="L1550">            <span class="tok-str">&quot;File::create&quot;</span>,</span>
+<span class="ln" id="L1551">            <span class="tok-str">&quot;OpenOptions&quot;</span>,</span>
+<span class="ln" id="L1552">        ] {</span>
+<span class="ln" id="L1553">            assert!(</span>
+<span class="ln" id="L1554">                !code.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L1555">                <span class="tok-str">&quot;{name} reaches {forbidden}: reading an archive must never write one out&quot;</span></span>
+<span class="ln" id="L1556">            );</span>
+<span class="ln" id="L1557">        }</span>
+<span class="ln" id="L1558">    }</span>
+<span class="ln" id="L1559">}</span>
+</span>
+<span class="ln" id="L1560"></span>
+<span class="src-item" id="fn-what_is_inside_an_archive_is_counted_rather_than_glanced_at">
+<span class="ln" id="L1561"><span class="tok-com">/// **Roadmap item 164.** `report_inside` counts what is wrong, and says so.</span></span>
+<span class="ln" id="L1562"><span class="tok-com">///</span></span>
+<span class="ln" id="L1563"><span class="tok-com">/// The integration test beside this one proves the comparison is right. This</span></span>
+<span class="ln" id="L1564"><span class="tok-com">/// proves the *reporting* of it is: that a clean archive returns nothing wrong,</span></span>
+<span class="ln" id="L1565"><span class="tok-com">/// that a tampered one returns the number of things that are, and that an</span></span>
+<span class="ln" id="L1566"><span class="tok-com">/// archive the release never listed is counted against rather than passed over.</span></span>
+<span class="ln" id="L1567"><span class="tok-com">///</span></span>
+<span class="ln" id="L1568"><span class="tok-com">/// The last of those is the one worth a test of its own. &quot;This archive is not</span></span>
+<span class="ln" id="L1569"><span class="tok-com">/// in the contents list&quot; is the easiest case in the world to write as a `None`</span></span>
+<span class="ln" id="L1570"><span class="tok-com">/// that falls through to a pass, and it means the reader was handed a file the</span></span>
+<span class="ln" id="L1571"><span class="tok-com">/// release does not admit to publishing.</span></span>
+<span class="ln" id="L1572"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1573"><span class="tok-kw">fn</span> <span class="tok-fn">what_is_inside_an_archive_is_counted_rather_than_glanced_at</span>() {</span>
+<span class="ln" id="L1574">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(tar) = <span class="tok-fn">tar_on_this_machine</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1575">        <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L1576">    };</span>
+<span class="ln" id="L1577">    <span class="tok-kw">let</span> work = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(</span>
+<span class="ln" id="L1578">        <span class="tok-str">&quot;veilvoice-report-inside-{:x}&quot;</span>,</span>
+<span class="ln" id="L1579">        std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L1580">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L1581">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
+<span class="ln" id="L1582">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L1583">    ));</span>
+<span class="ln" id="L1584">    <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64&quot;</span>;</span>
+<span class="ln" id="L1585">    <span class="tok-kw">let</span> release = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>).<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L1586">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;release).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a directory to work in&quot;</span>);</span>
+<span class="ln" id="L1587">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;the command line&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1588">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;README.md&quot;</span>), b<span class="tok-str">&quot;# VeilVoice\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1589"></span>
+<span class="ln" id="L1590">    <span class="tok-kw">let</span> archive = work.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
+<span class="ln" id="L1591">    <span class="tok-kw">let</span> build = |to: &amp;std::path::Path| {</span>
+<span class="ln" id="L1592">        assert!(std::process::Command::<span class="tok-fn">new</span>(tar)</span>
+<span class="ln" id="L1593">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
+<span class="ln" id="L1594">            .<span class="tok-fn">arg</span>(work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>))</span>
+<span class="ln" id="L1595">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
+<span class="ln" id="L1596">            .<span class="tok-fn">arg</span>(to)</span>
+<span class="ln" id="L1597">            .<span class="tok-fn">arg</span>(name)</span>
+<span class="ln" id="L1598">            .<span class="tok-fn">status</span>()</span>
+<span class="ln" id="L1599">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>)</span>
+<span class="ln" id="L1600">            .<span class="tok-fn">success</span>());</span>
+<span class="ln" id="L1601">    };</span>
+<span class="ln" id="L1602">    <span class="tok-fn">build</span>(&amp;archive);</span>
+<span class="ln" id="L1603"></span>
+<span class="ln" id="L1604">    <span class="tok-com">// The list, written from what the archive actually holds, so the only</span></span>
+<span class="ln" id="L1605">    <span class="tok-com">// thing under test below is what happens when the archive stops matching</span></span>
+<span class="ln" id="L1606">    <span class="tok-com">// it.</span></span>
+<span class="ln" id="L1607">    <span class="tok-kw">let</span> honest: Vec&lt;check::contents::ArchiveContents&gt; = vec![check::contents::ArchiveContents {</span>
+<span class="ln" id="L1608">        archive: format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>),</span>
+<span class="ln" id="L1609">        members: check::archive::<span class="tok-fn">members</span>(&amp;archive)</span>
+<span class="ln" id="L1610">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the archive reads&quot;</span>)</span>
+<span class="ln" id="L1611">            .<span class="tok-fn">into_iter</span>()</span>
+<span class="ln" id="L1612">            .<span class="tok-fn">map</span>(|member| check::contents::Member {</span>
+<span class="ln" id="L1613">                path: member.path,</span>
+<span class="ln" id="L1614">                digest: member.digest.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every member here is a plain file&quot;</span>),</span>
+<span class="ln" id="L1615">            })</span>
+<span class="ln" id="L1616">            .<span class="tok-fn">collect</span>(),</span>
+<span class="ln" id="L1617">    }];</span>
+<span class="ln" id="L1618">    assert_eq!(</span>
+<span class="ln" id="L1619">        <span class="tok-fn">report_inside</span>(&amp;archive, <span class="tok-fn">Some</span>(&amp;honest)),</span>
+<span class="ln" id="L1620">        <span class="tok-num">0</span>,</span>
+<span class="ln" id="L1621">        <span class="tok-str">&quot;an archive that matches its list has nothing wrong with it&quot;</span></span>
+<span class="ln" id="L1622">    );</span>
+<span class="ln" id="L1623"></span>
+<span class="ln" id="L1624">    <span class="tok-com">// An archive the list does not mention. Not a pass: the reader is holding</span></span>
+<span class="ln" id="L1625">    <span class="tok-com">// a file this release does not admit to publishing.</span></span>
+<span class="ln" id="L1626">    <span class="tok-kw">let</span> elsewhere: Vec&lt;check::contents::ArchiveContents&gt; = vec![check::contents::ArchiveContents {</span>
+<span class="ln" id="L1627">        archive: <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64.zip&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L1628">        members: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1629">    }];</span>
+<span class="ln" id="L1630">    assert_eq!(</span>
+<span class="ln" id="L1631">        <span class="tok-fn">report_inside</span>(&amp;archive, <span class="tok-fn">Some</span>(&amp;elsewhere)),</span>
+<span class="ln" id="L1632">        <span class="tok-num">1</span>,</span>
+<span class="ln" id="L1633">        <span class="tok-str">&quot;an archive missing from the contents list must not read as clean&quot;</span></span>
+<span class="ln" id="L1634">    );</span>
+<span class="ln" id="L1635"></span>
+<span class="ln" id="L1636">    <span class="tok-com">// A release with no contents list at all. Nothing wrong, because nothing</span></span>
+<span class="ln" id="L1637">    <span class="tok-com">// was claimed: everything before v0.1.15 is in this position and refusing</span></span>
+<span class="ln" id="L1638">    <span class="tok-com">// them would be refusing files that are perfectly sound.</span></span>
+<span class="ln" id="L1639">    assert_eq!(</span>
+<span class="ln" id="L1640">        <span class="tok-fn">report_inside</span>(&amp;archive, None),</span>
+<span class="ln" id="L1641">        <span class="tok-num">0</span>,</span>
+<span class="ln" id="L1642">        <span class="tok-str">&quot;a release that published no contents list is not a failure&quot;</span></span>
+<span class="ln" id="L1643">    );</span>
+<span class="ln" id="L1644"></span>
+<span class="ln" id="L1645">    <span class="tok-com">// And now the substitution. The list is the honest one and the archive is</span></span>
+<span class="ln" id="L1646">    <span class="tok-com">// not, which is exactly the arrangement this command exists to notice.</span></span>
+<span class="ln" id="L1647">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;something else entirely&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1648">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;added&quot;</span>), b<span class="tok-str">&quot;not published\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1649">    <span class="tok-fn">build</span>(&amp;archive);</span>
+<span class="ln" id="L1650">    assert_eq!(</span>
+<span class="ln" id="L1651">        <span class="tok-fn">report_inside</span>(&amp;archive, <span class="tok-fn">Some</span>(&amp;honest)),</span>
+<span class="ln" id="L1652">        <span class="tok-num">2</span>,</span>
+<span class="ln" id="L1653">        <span class="tok-str">&quot;one file changed and one added&quot;</span></span>
+<span class="ln" id="L1654">    );</span>
+<span class="ln" id="L1655"></span>
+<span class="ln" id="L1656">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1657">}</span>
+</span>
+<span class="ln" id="L1658"></span>
+<span class="src-item" id="fn-tar_on_this_machine">
+<span class="ln" id="L1659"><span class="tok-com">/// A `tar` to run, if this machine has one.</span></span>
+<span class="ln" id="L1660"><span class="tok-com">///</span></span>
+<span class="ln" id="L1661"><span class="tok-com">/// The same skip the release-manifest test takes, for the same reason: the</span></span>
+<span class="ln" id="L1662"><span class="tok-com">/// absence of `tar` is a fact about the machine rather than a defect here, and</span></span>
+<span class="ln" id="L1663"><span class="tok-com">/// every runner this project uses has one.</span></span>
+<span class="ln" id="L1664"><span class="tok-kw">fn</span> <span class="tok-fn">tar_on_this_machine</span>() -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt; {</span>
+<span class="ln" id="L1665">    [<span class="tok-str">&quot;tar&quot;</span>, <span class="tok-str">&quot;bsdtar&quot;</span>].<span class="tok-fn">into_iter</span>().<span class="tok-fn">find</span>(|name| {</span>
+<span class="ln" id="L1666">        std::process::Command::<span class="tok-fn">new</span>(name)</span>
+<span class="ln" id="L1667">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--version&quot;</span>)</span>
+<span class="ln" id="L1668">            .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L1669">            .<span class="tok-fn">is_ok</span>()</span>
+<span class="ln" id="L1670">    })</span>
+<span class="ln" id="L1671">}</span>
 </span>
 </code></pre>
 </main>

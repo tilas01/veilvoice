@@ -501,6 +501,44 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-201: a recorded session that stopped matching the program it records
+
+Found while running `python tools/verify.py --quick` before a push, which is
+what that command is for.
+
+`assets/screenshots/session-info.txt` is a recording of `veilvoice info`,
+committed so the website and the README can show what the program prints
+without anybody retyping it. Two commits earlier, "Two channels, and a build
+that knows which one it came from" added a `Release channel` line to that
+output. The recording was not re-made, so the transcript on the website was one
+line short of what the program says, and had been since that commit landed.
+
+**The check that catches this already existed and already worked.**
+`tools/shots/sessions.py --check` re-runs each session and compares, and
+`tools/verify.py` runs it. So this is not a missing guard: it is a guard that
+was not run before a push, and the thing it guards drifted in exactly the way
+it was written to notice. The fix is one line of re-recorded transcript, and it landed on `dev` in
+another change while this was being written. The entry is kept because that
+change carried no write-up, and the reason this survived is worth more than the
+one line it cost.
+
+What is worth writing down is why it survived. The two other transcripts this
+tool records, `session-anonymise` and `session-unencrypted`, hold a measured
+speed and a randomly drawn seed range, neither of which can repeat. They are
+compared through `steady()`, which replaces those before the comparison, so
+they pass anywhere. `--record`, though, writes the literal values, so
+re-recording on any machine rewrites two files with that machine's numbers and
+nothing else. A maintainer who runs `--record` to fix one genuine drift is
+handed three changed files, two of them noise, and the habit that forms is to
+discard all three and move on.
+
+So the asymmetry is the finding: this check is cheap to run and expensive to
+act on. It is left as it is for now, because the alternative -- recording the
+normalised text -- would publish a transcript with the interesting numbers
+blanked out, and these recordings exist to show a reader what the program
+actually prints. The note is here so the next person who sees three files where
+they expected one knows which of them to keep.
+
 ### F-200: a branch policy that sent the upgrades to the wrong branch
 
 The same shape as F-197, one file along, and found by reading the remote's
@@ -6294,7 +6332,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1668 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1683 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -7942,7 +7980,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred defects found and fixed (F-1 to F-200), across
+**Two hundred and one defects found and fixed (F-1 to F-201), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

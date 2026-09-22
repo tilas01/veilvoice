@@ -192,6 +192,7 @@ Verify a VeilVoice release without GnuPG installed
 - [[`lib.rs`|File-veilvoice-verify-lib]] &middot; The portable verifier: check a VeilVoice release without GnuPG installed.
 - [[`report.rs`|File-veilvoice-verify-report]] &middot; How much this program says, and what it returns when it says nothing.
 - [[`tests.rs`|File-veilvoice-verify-tests]] &middot; The verifier's own tests.
+- [[`inside_the_archive.rs`|File-veilvoice-verify-tests-inside_the_archive]] &middot; Roadmap item 164.
 - [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] &middot; Roadmap item 97.
 
 ## [[veilvoice-video|Crate-veilvoice-video]]
