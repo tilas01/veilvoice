@@ -690,6 +690,32 @@ def split_entry(lines):
     return (trimmed(lines), [])
 
 
+HEADLINE = re.compile(r"\*\*(.+?)\*\*[.:]?$")
+
+
+def headlines(lines):
+    """The bold lines an entry uses as a heading for one change.
+
+    From v0.1.13 an entry is written as a bold line naming a change with the
+    detail in bullets under it. Before that an entry is a bullet list under
+    `### Added` and there are none, which callers handle by falling back to
+    `summary` rather than by inventing one.
+
+    A bold run inside a sentence is not a heading, so the whole line has to be
+    the bold run. `**Nothing was deleted and nothing behaves differently.**`
+    appears mid-bullet in v0.1.22 and is emphasis, not a heading for anything.
+    """
+    found = []
+    for line in lines:
+        text = line.strip()
+        if not text.startswith("**"):
+            continue
+        match = HEADLINE.fullmatch(text)
+        if match:
+            found.append(match.group(1).strip())
+    return found
+
+
 def unreleased(text):
     """The lines under `## Unreleased`, which is what the next version holds."""
     lines = text.split("\n")
@@ -920,6 +946,24 @@ def build():
         out.append(
             "<summary><strong>v%s</strong> <span class=\"muted\">%s</span></summary>"
             % (version, docs.inline_html(line))
+        )
+        # **A picture of this release, above everything it says.**
+        #
+        # Roadmap item 183. Drawn by `tools/release/card.py` from this
+        # release's own entry in `CHANGELOG.md`, so the picture at the top of
+        # a release cannot end up describing a different one: the card and the
+        # notes under it are the same text read by the same functions, and a
+        # card that has drifted fails the build.
+        #
+        # The alt text says what the picture is rather than reading it out.
+        # Every word on the card is in the notes immediately below it, so a
+        # reader on a screen reader who is given the card's contents is given
+        # them twice.
+        out.append(
+            '<img class="release-card" src="assets/changelog/v%s.png" '
+            'alt="A card for v%s, carrying the version and the changes it '
+            'led with" width="1280" height="640" loading="lazy">'
+            % (version, version)
         )
         # **The files first, the notes under them.**
         #

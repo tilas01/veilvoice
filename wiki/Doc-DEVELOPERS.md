@@ -158,6 +158,7 @@ What it regenerates, in the order it has to:
 
 - **measured numbers**: `python tools/measured/generate.py`
 - **artwork**: `python assets/generate.py`
+- **release cards**: `python tools/release/card.py`
 - **screenshot borders**: `python tools/shots/crop.py`
 - **screenshot height**: `python tools/shots/fit.py`
 - **screenshot corners**: `python tools/shots/round.py`
@@ -200,6 +201,7 @@ And what it then checks:
 - **that guard catches what it claims to**: `python tools/audit/fixtures.py --self-test`
 - **the app-manifest tooling works**: `python tools/sign/selftest.py`
 - **artwork matches its generator**: `python assets/generate.py --check`
+- **the release cards match CHANGELOG.md**: `python tools/release/card.py --check`
 - **no screenshot has a capture border**: `python tools/shots/crop.py --check`
 - **no screenshot has empty space below its content**: `python tools/shots/fit.py --check`
 - **screenshots have rounded corners**: `python tools/shots/round.py --check`

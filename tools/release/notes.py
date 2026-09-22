@@ -287,8 +287,19 @@ def technical_document(tag, half, repro, built_on):
 
 def notes_document(tag, version, new, has_technical, fingerprint, signed):
     """The release body: the files, checking them, then what changed."""
+    # Roadmap item 183. The card is committed, so it is addressed at this
+    # release's own tag rather than as a release asset: the tag exists by the
+    # time anybody reads these notes, and a picture that resolves through the
+    # tag cannot start showing a later release's card the way a `main` link
+    # would. The alt text says what the picture is; every word on it is in the
+    # list of changes further down.
+    card = ("![A card for %s, carrying the version and the changes it led "
+            "with](https://github.com/%s/raw/%s/assets/changelog/v%s.png)"
+            % (tag, site.docs.REPO, tag, version))
     out = [
         "## VeilVoice %s" % tag,
+        "",
+        card,
         "",
         "Irreversible voice de-identification, fully offline. It destroys the "
         "biometric voiceprint, pitch, formants, timbre and the melody of an "

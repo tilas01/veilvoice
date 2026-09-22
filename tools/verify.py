@@ -20,9 +20,10 @@ it is written.
 The order below is the dependency order, and it is the whole point of the file:
 
   1. `assets/generate.py`      -- artwork, from nothing but itself
-  2. `tools/docs/generate.py`  -- reads the Rust doc comments, writes 371 files
-  3. `tools/search-index/generate.py` -- reads *everything*, so it goes last
-  4. the checks, which must all see the same tree
+  2. `tools/release/card.py`   -- a card per release, drawn with 1's font
+  3. `tools/docs/generate.py`  -- reads the Rust doc comments, writes 371 files
+  4. `tools/search-index/generate.py` -- reads *everything*, so it goes last
+  5. the checks, which must all see the same tree
 
 Anything that regenerates has to be staged before the index runs, because the
 index walks `git ls-files` and a file git has never heard of is not in it.
@@ -86,6 +87,10 @@ GENERATORS = [
     # disagreed with it, on the very first run.
     ("measured numbers", [sys.executable, "tools/measured/generate.py"]),
     ("artwork", [sys.executable, "assets/generate.py"]),
+    # After the artwork, because it loads `assets/generate.py` for the PNG
+    # writer, the palette and the font rather than keeping copies of them, and
+    # before the website, which puts each card at the top of its release.
+    ("release cards", [sys.executable, "tools/release/card.py"]),
     # Drawn from the command output committed beside them. `--capture`, which
     # actually runs `veilvoice`, is a separate and manual step: it needs a
     # build, a machine and a person deciding the output is right. Everything
@@ -314,6 +319,11 @@ CHECKS = [
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
+    # Roadmap item 183. The card is the release's own entry drawn as a
+    # picture, so it goes stale the moment the entry is edited, and a picture
+    # of the wrong release is worse than no picture.
+    ("the release cards match CHANGELOG.md",
+     [sys.executable, "tools/release/card.py", "--check"]),
     ("no screenshot has a capture border",
      [sys.executable, "tools/shots/crop.py", "--check"]),
     ("no screenshot has empty space below its content",

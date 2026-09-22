@@ -1869,6 +1869,25 @@ summary { cursor: pointer; color: var(--accent); }
 
 /* The tables of files and of documentation scroll inside themselves rather
  * than pushing the page sideways on a phone. */
+/*
+ * The picture of what changed, at the top of a release.
+ *
+ * Drawn at 1280x640 by `tools/release/card.py`, which is the shape a link
+ * preview is cropped to, and shown here at whatever width the page has.
+ * `height: auto` against the declared attributes keeps the space reserved
+ * before it loads, so nothing below it moves when it arrives, which is what
+ * `tools/site-tests/anchors.test.js` is checking when it insists on a width
+ * and a height on every image.
+ */
+.release-card {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 0 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
 .release table { display: block; overflow-x: auto; max-width: 100%; }
 
 /* ---------- footer ---------- */
