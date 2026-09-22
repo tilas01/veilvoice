@@ -178,6 +178,7 @@ And what it then checks:
 
 - **every copy of the version agrees with Cargo.toml**: `python tools/release/version.py --check`
 - **every package installs what the workspace builds**: `python tools/release/packaging.py`
+- **the newest release notes can be built from the changelog**: `python tools/release/notes.py --check`
 - **no state file is written one place and read another**: `python tools/audit/state_paths.py`
 - **every dependency says what it is for**: `python tools/audit/dependencies.py`
 - **every public item is reached by something**: `python tools/audit/reachable.py`

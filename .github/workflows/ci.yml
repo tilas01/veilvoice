@@ -300,6 +300,16 @@ jobs:
       - name: The releases page must match CHANGELOG.md
         run: python tools/site/releases.py --check
 
+      # The same document, read by the other thing that reads it. A release's
+      # notes were built by shell inside the release workflow and were
+      # therefore seen for the first time at the moment of publishing:
+      # v0.1.21 went out with no notes at all, because its changelog heading
+      # was nearly right. This runs the tool that builds them against the
+      # newest entry, on every push, so a release's notes are checkable
+      # before there is a release. Roadmap item 180.
+      - name: The newest release notes must be buildable
+        run: python tools/release/notes.py --check
+
       - name: The walkthrough must match the tabs and commands that exist
         run: python tools/site/demo.py --check
 

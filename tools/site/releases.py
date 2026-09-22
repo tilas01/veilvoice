@@ -645,6 +645,51 @@ def earlier(text):
     return ["%d.%d.%d" % (major, minor, n) for n in range(patch, -1, -1)]
 
 
+#: The heading that begins a release's technical half, exactly.
+#:
+#: Roadmap item 180. Everything from this heading to the end of an entry is
+#: the reproducibility table, the audit findings, the dependency changes and
+#: the measurements; everything above it is what is new and what was fixed.
+#:
+#: **Declared rather than guessed.** The alternative was to sort an entry's
+#: sections by what their headings sound like, and a rule that reads
+#: "Dependencies, reviewed one by one" as technical and "The window draws at
+#: the display's rate" as a feature is a rule that will be wrong, quietly, on
+#: a release nobody re-reads.
+#:
+#: It lives here rather than in `tools/release/notes.py`, which is the other
+#: thing that needs it, because every other piece of `CHANGELOG.md` parsing is
+#: here and one file that knows the shape of that document is the whole point.
+#: `notes.py` imports it; the reasoning about what the two halves are for is
+#: written there, where the release's own notes are built.
+TECHNICAL_MARKER = "### Technical detail"
+
+
+def trimmed(lines):
+    """The same lines with the blank ones at each end removed."""
+    out = list(lines)
+    while out and not out[0].strip():
+        out.pop(0)
+    while out and not out[-1].strip():
+        out.pop()
+    return out
+
+
+def split_entry(lines):
+    """One entry, as (what is new and what was fixed, the technical half).
+
+    The marker line itself belongs to neither: it is a heading for a section
+    that becomes a document of its own, and a document does not open with a
+    heading saying it is itself. An entry with no marker is all of it "what is
+    new", which is what every published release already says, so nothing in
+    the past changes meaning.
+    """
+    for at, line in enumerate(lines):
+        if line.rstrip() == TECHNICAL_MARKER:
+            return (trimmed(lines[:at]), trimmed(lines[at + 1:]))
+    return (trimmed(lines), [])
+
+
 def unreleased(text):
     """The lines under `## Unreleased`, which is what the next version holds."""
     lines = text.split("\n")
@@ -885,13 +930,36 @@ def build():
         # to reach them, every time, which is a poor trade for making a point
         # about what the page is for.
         out.extend(files_html(version))
+        # **The two halves, the same split the release page makes.**
+        #
+        # Roadmap item 180. `tools/release/notes.py` decides where a release's
+        # technical detail begins, from a marker in the entry itself, and the
+        # release on GitHub opens with what changed and folds the rest away.
+        # This page showed one undifferentiated block, so the two places a
+        # reader can read the same release disagreed about its shape.
+        #
+        # Imported rather than re-implemented: a second rule for where the
+        # split falls is a second rule to go wrong, on the copy nobody
+        # re-reads. That is F-71's shape and this file already carries two
+        # findings of it.
+        changed, technical = split_entry(release["body"])
         out.append('<details class="notes">')
         out.append(
             "<summary><strong>Release notes</strong> "
-            '<span class="muted">everything that changed in v%s, in '
-            "full</span></summary>" % version
+            '<span class="muted">what is new and what was fixed in '
+            "v%s</span></summary>" % version
         )
-        out.extend(docs.doc_html(release["body"], ids_for(release["body"])))
+        out.extend(docs.doc_html(changed, ids_for(changed)))
+        if technical:
+            out.append('<details class="notes">')
+            out.append(
+                "<summary><strong>The technical detail</strong> "
+                '<span class="muted">reproducibility per platform, the audit '
+                "findings, the dependency changes and the "
+                "measurements</span></summary>"
+            )
+            out.extend(docs.doc_html(technical, ids_for(technical)))
+            out.append("</details>")
         out.append(
             '<p class="muted">The same notes are in '
             '<a href="https://github.com/%s/blob/%s/CHANGELOG.md" '

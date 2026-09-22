@@ -207,7 +207,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.22" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.22, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.22</span></summary>
 <p><strong>Twenty-seven crates became thirteen</strong></p>
 <ul>
 <li>VeilVoice was split into twenty-seven separate libraries. Seven of them were under seven hundred lines and four were used by exactly one thing. Every one of those splits is a published surface, a manifest, a README, a page of the reference and a row in every list of what this project is made of, and somebody deciding what to depend on had to read twenty-seven descriptions to find the two they wanted.</li>
@@ -428,7 +428,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.21" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.21, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.21</span></summary>
 <p><strong>Every screenshot the same size, and in the face they were meant to be in</strong></p>
 <ul>
 <li>The captures were trimmed to each tab&#x27;s own content, with a floor. That gave eight pictures 1000 tall, one 1095 and one 1315, which is right for one picture and wrong for the grid the README and the website show them in: the row holding the group tab sat lower than the rows either side of it.</li>
@@ -732,7 +732,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.20" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.20, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.20</span></summary>
 <p><strong>The offline claim is now proved by a machine, four ways</strong></p>
 <ul>
 <li>The front page says VeilVoice never touches the network. CI checked the dependency graph for HTTP clients, and then a <em>comment</em> in that job said the source names no network API anywhere. True, and a sentence a reader was asked to believe, inside a job whose purpose is to replace belief with a check.</li>
@@ -824,7 +824,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.19" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.19, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.19</span></summary>
 <p><strong>The audited release.</strong> No new features. The whole repository was read for security, memory safety, correctness, reproducibility, optimisation and accuracy, and everything it found was fixed. Eight defects, F-149 to F-156, are written up in <code>docs/AUDIT.md</code>.</p>
 <p><strong>A recording no longer passes through unprotected memory (F-155)</strong></p>
 <ul>
@@ -886,7 +886,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.18" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.18, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.18</span></summary>
 <p><strong>The app lock now protects your files, not just the window</strong></p>
 <ul>
 <li>Setting an app-lock password derives a third key beside the verifier, and VeilVoice&#x27;s own files (settings, measurements, the integrity record) are encrypted under it, stored under meaningless base64 names, padded to a few fixed sizes, with decoy files sown among them. Without the passphrase the folder says nothing about what you have done. The module states plainly what this buys and what it does not: it is not protection from someone with your passphrase or while the app is open, and it does not hide that VeilVoice is installed.</li>
@@ -1039,7 +1039,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.17" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.17, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.17</span></summary>
 <p><strong>In short</strong></p>
 <ul>
 <li>The window really does cost nothing when you are not using it now. It was still redrawing sixty times a second, and the reason was the animated logo.</li>
@@ -1096,7 +1096,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.16" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.16, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.16</span></summary>
 <p><strong>In short</strong></p>
 <ul>
 <li>The window costs nothing when you are not using it. It was quietly redrawing itself twice a second on every tab, for ever.</li>
@@ -1275,7 +1275,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.15" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.15, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.15</span></summary>
 <p>Encrypted volumes, one password if you want one, a window that locks itself, and an interview from an OBS recording through to a video.</p>
 <h4 id="a-verifier-anybody-can-use-checking-everything">A verifier anybody can use, checking everything</h4>
 <p><strong>One press, or one command, and it checks the lot.</strong> <code>veilvoice-verify</code> and the desktop application&#x27;s verify tab now check the signature over the hash list, then the archive against that list, then <strong>every file you extracted out of the archive</strong>, and then ask the GnuPG on your own machine the same question and show you what it said.</p>
@@ -1553,7 +1553,7 @@ curl: (22) The requested URL returned error: 403
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.14" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.14, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.14</span></summary>
 <p>The safety catch, an interface that reads like English, and a window that does not stop when you open a file.</p>
 <p><strong>Failsafe is the headline, and it is on by default.</strong> It watches for the one accident this whole project is powerless against once it has happened: you are talking through VeilVoice with your voice veiled, you plug in a headset, and your computer quietly switches the call to the real microphone. Your own voice goes out and nothing on screen looks any different. Failsafe notices within about a second and closes the program that took it. It says plainly that it notices rather than prevents, because the gap is short and it is not zero.</p>
 <p><strong>Seven file pickers used to freeze the entire window</strong> until you chose a file. That is the answer to &quot;it lags when I select things&quot;, and it was an accurate report.</p>
@@ -1690,7 +1690,7 @@ veilvoice input known</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.13" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.13, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.13</span></summary>
 <p>Build it yourself and check the release against what you built; group mode you can see; projects, profiles and a voice limit that was measured rather than chosen; and the eighth audit round.</p>
 <p><strong>The headline is <code>veilvoice-verify reproduce</code>.</strong> Until now the verifier answered one question: <em>is this download the one that was published</em>. It now answers the harder one: <strong>is the published build the one this source produces</strong>. A signature says who made a file. Only a build says what it is made of.</p>
 <p><strong>The eighth audit round found seven defects , none of them shipped.</strong> Two were found by continuous integration rather than by anybody&#x27;s judgement, and both had been watched to pass on the machine they failed on. Three more were found by running a command and reading what it printed. Not one would have been found by reading the code, which is the round&#x27;s whole lesson and the third time this project has had to learn it.</p>
@@ -2078,7 +2078,7 @@ veilvoice capture check          exits non-zero if something unallowed is runnin
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.12" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.12, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.12</span></summary>
 <p>Fetching and checking a release in one command, installing without an installer, and diagrams that open the code.</p>
 <h4 id="verify-a-release-without-downloading-it-yourself">Verify a release without downloading it yourself</h4>
 <pre><code>veilvoice-verify release v0.1.12
@@ -2129,7 +2129,7 @@ veilvoice gui              # open the desktop application</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.11" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.11, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.11</span></summary>
 <p><strong>If you have v0.1.10 on Windows, replace it.</strong> The desktop application flashed a console window and could fail with no message at all.</p>
 <h4 id="the-windows-desktop-application">The Windows desktop application</h4>
 <p>Three separate defects were behind one report: &quot;it flashes a command prompt, loads in an unusable state, and crashes&quot;.</p>
@@ -2172,7 +2172,7 @@ veilvoice gui              # open the desktop application</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.10" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.10, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.10</span></summary>
 <p>Documentation you cannot outrun.</p>
 <p>Every crate and <strong>every one of the 63 <code>.rs</code> files</strong> in this repository now has a page, a flowchart and a banner, generated from the doc comments in the source and mirrored to the website and the GitHub wiki. A fifth audit round found twelve defects (<code>docs/AUDIT.md</code>(docs/AUDIT.md)); two of them had shipped.</p>
 <h4 id="a-page-for-every-file">A page for every file</h4>
@@ -2219,7 +2219,7 @@ veilvoice gui              # open the desktop application</code></pre>
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.9" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.9, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.9</span></summary>
 <p>Getting a genuine copy, and finding your way around one.</p>
 <p>This release adds a search index over the whole repository and website, a portable verifier that checks a release <strong>without GnuPG installed</strong>, install scripts that refuse rather than continue, package definitions for six formats, and OpenBSD and NetBSD builds. A fourth audit round found ten defects (<code>docs/AUDIT.md</code>(docs/AUDIT.md)); three of them had shipped.</p>
 <h4 id="verify-a-download-without-installing-anything">Verify a download without installing anything</h4>
@@ -2288,7 +2288,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.8" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.8, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.8</span></summary>
 <p>A security release. A third audit round, run against the <em>classes</em> of defect rather than against a list of things that seemed worth checking, found and fixed <strong>twenty-eight</strong> of them -- thirteen in the Rust, fifteen in the website.</p>
 <p>Nothing here is a confidentiality failure: no finding let anyone recover a voiceprint, read a sealed recording or bypass a password. Several are worse than that sounds anyway, because they are failures of the thing being relied on. Full write-ups, one per finding, are in <code>docs/AUDIT.md</code>(docs/AUDIT.md).</p>
 <h4 id="security-fixes----the-engine-and-the-tools">Security fixes -- the engine and the tools</h4>
@@ -2350,7 +2350,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.7" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.7, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.7</span></summary>
 <h4 id="added-1">Added</h4>
 <ul>
 <li><strong>Tamper detection</strong> (<code>veilvoice-guard</code>, <code>veilvoice guard</code>). Records a SHA-256 manifest of VeilVoice&#x27;s own files and reports what was modified, removed or added since. <code>--sealed</code> encrypts the record under a passphrase, so rewriting it to match a tampered file needs the passphrase as well as write access -- keep that passphrase somewhere other than beside the record.</li>
@@ -2388,7 +2388,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.6" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
 </div>
 <details class="notes">
-<summary><strong>Release notes</strong> <span class="muted">everything that changed in v0.1.6, in full</span></summary>
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.6</span></summary>
 <h4 id="breaking">Breaking</h4>
 <ul>
 <li><strong><code>veilvoice anonymise</code> now writes an encrypted <code>.veil</code> container.</strong> <code>-o clean.wav</code> produces <code>clean.wav.veil</code>. Open it with <code>veilvoice decrypt clean.wav.veil -o clean.wav</code>, or pass <code>--encrypt false</code> for the old behaviour, which prints what you are giving up and waits for you to type <code>UNENCRYPTED</code>.</li>
