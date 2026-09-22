@@ -501,6 +501,110 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-207: the whole of CI could be green over a tree `tools/verify.py` fails on
+
+Found by reading `ci.yml` against `tools/verify.py` line for line, after
+F-201, and it is F-201's cause rather than another instance of it.
+
+`tools/verify.py` makes forty checks. Thirty-eight of them are in `ci.yml`,
+almost all in the `assets` job, which was deliberately built to hold every
+guard that needs nothing but the tree and an interpreter. Two were in neither
+that job nor any other:
+
+  * `tools/shots/sessions.py --check`, which re-runs each recorded session
+    against the real program and compares the transcript, and
+  * `tools/measured/generate.py --check`, which measures the test count, the
+    functional line count and the crate count and compares them against the ten
+    sentences on the website and in the README that quote them.
+
+Both need a compiled program, which is why they were left out of a job that has
+no toolchain. **The consequence is the finding**: CI going green did not mean
+`tools/verify.py` would pass, and for those two checks CI was not a weaker
+signal than the verification pass, it was no signal at all.
+
+That is not a theoretical gap, it is exactly how F-201 survived.
+`assets/screenshots/session-info.txt` disagreed with what `veilvoice info`
+prints for two commits on `dev`, with the whole matrix green each time, until
+somebody happened to run the verification pass by hand before a push. The check
+that catches it existed, worked, and was run by nobody automatically.
+
+`tools/measured/generate.py` states the same gap about itself in its own
+docstring, in a sentence written when it was true: "a claim can now drift only
+if this tool is not run -- which `tools/verify.py` and CI both do." CI did not.
+This is the F-176 and F-177 shape a third time, a check that exists and is
+advisory, and it is worth noticing that all three were found by comparing one
+file against another rather than by anything failing. **The absence of a check
+is invisible in a way its failure would not be**, which is F-197's sentence and
+now has four instances.
+
+**The fix** puts both in the `test` job's Linux leg, after the release build
+they need and after the test run whose compilation the second one reuses.
+Linux only, because both ask about the source rather than about a platform.
+
+**And one thing had to move before that was safe.** `sessions.py` records five
+sessions, four of which it re-runs and one of which it cannot: the fifth is the
+verifier checking a *published* release, so between a version bump and that
+release going out it legitimately names the previous version. The tool says so
+in as many words, and the comment beside it closed with the reason that was
+fine: "`tools/verify.py` is the only thing that runs this check, so a release
+commit still goes through CI green." Wiring it into CI unchanged would have
+made that sentence false and put `dev` red for the length of every release,
+over a state the tool itself calls expected. A guard that fires on something
+legitimate is a finding rather than a result, so CI passes `--rerun-only` and
+asks the four questions it can answer. The fifth is asked by `promote.yml`,
+which runs `tools/verify.py` whole, at the point where it can be answered.
+
+### F-208: the release procedure was a paragraph, and the only thing checking it ran last
+
+The other half of the same reading, and the larger one.
+
+`docs/CONTRIBUTING.md` says when a version is cut: the roadmap items in the
+group are done, `tools/verify.py` passes whole rather than `--quick`,
+`CHANGELOG.md` has the notes, and an audit round has read what changed. Six
+clauses, each of them checkable, and the enforcement for all six was a person
+reading that paragraph on the morning of a release.
+
+One of them had machinery. `release.yml` refuses to publish a release whose
+`## v<version>` section is missing from `CHANGELOG.md`, which was put there
+because v0.1.21 published describing nothing at all. **It fires in the last
+step of the last job**, after twelve build jobs have compiled every target
+twice and compared the bytes, and, more to the point, after `main` has already
+moved. `main` is the released branch: the website publishes from it, the wiki
+publishes from it, and a reader who fetches between a bad merge and its repair
+gets a `main` claiming to be a release whose notes nobody can read.
+
+So the ordering was inverted. The cheapest check ran last, behind the most
+expensive work, and behind the one step that is awkward to undo.
+
+Nothing checked the other five at all. An item still marked `planned` in a
+released version is the roadmap misdescribing what is finished, which is the
+one thing a roadmap is for. A release cut with no round written up in this
+document is the audit clause skipped rather than satisfied, and nothing would
+ever say so.
+
+**The fix is `promote.yml`, and the order it does things in.** Everything
+askable is asked first, from a fresh checkout, and `main` moves only once all
+of it has passed: the six clauses above through
+`tools/release/readiness.py`, then `tools/verify.py` whole with the cargo
+steps, then whether `ci.yml` is actually green on the commit being promoted.
+Only then the merge, and then the release build, which makes the tag at the
+commit it built.
+
+**Why a fresh checkout is written into it rather than assumed.** The defect
+found on `dev` the same morning is the argument: a commit referenced a test
+fixture that `.gitignore` had kept out of the repository, `git add` skipped it
+in silence, `git status` was clean because an ignored file is never a candidate
+to report, `tools/verify.py --quick` passed, and the tree did not compile for
+anybody who cloned it. No check that runs where the author is standing can see
+that class of defect, because the file is there. A release gate is the one
+place it is cheapest to catch and most expensive to miss.
+
+**What is deliberately not automated.** There is no push trigger and no
+schedule. `docs/CONTRIBUTING.md` says a version is cut when a group of changes
+is finished and audited, not on a date, and "every green commit on `dev`
+becomes a release" is a different policy from that one. Starting it is a
+judgement, so it stays a dispatch; everything after that judgement is not, so
+none of it does.
 ### F-206: a test fixture the ignore rules swallowed, and a gate that failed for everybody
 
 Roadmap item 164 added `crates/veilvoice-verify/src/check/testdata/not-our-key.asc`,
@@ -8257,7 +8361,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and six defects found and fixed (F-1 to F-206), across
+**Two hundred and eight defects found and fixed (F-1 to F-208), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

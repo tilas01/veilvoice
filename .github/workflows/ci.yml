@@ -107,6 +107,42 @@ jobs:
         if: runner.os == 'Linux'
         run: python tools/audit/features.py --build
 
+      # The last two checks in `tools/verify.py` that nothing here ran.
+      #
+      # Everything else it does is in the `assets` job, which has an
+      # interpreter and no toolchain. These two need a compiled program, which
+      # is why they were left out, and leaving them out meant the whole of CI
+      # could be green over a tree `tools/verify.py` fails on. That is what
+      # happened: F-201 was a recorded session that had disagreed with the
+      # program it records for two commits, on `dev`, with nothing red, until
+      # somebody ran the verification pass by hand before a push.
+      #
+      # Linux only, because both are questions about the source rather than
+      # about a platform, and the second one re-runs the test suite.
+      #
+      # `--rerun-only` skips the fifth session, which is a recording of the
+      # verifier checking a *published* release and so cannot be re-made until
+      # that release exists. Between a version bump and its publication it
+      # legitimately names the previous version, which `sessions.py` itself
+      # calls an expected state. Asking that question here would put `dev` red
+      # for the length of every release for no defect. `promote.yml` runs
+      # `tools/verify.py` whole, which does ask it, at the point where the
+      # answer can be known.
+      - name: The recorded sessions must match the programs
+        if: runner.os == 'Linux'
+        run: python tools/shots/sessions.py --check --rerun-only
+
+      # The numbers this project states about itself: the test count, the
+      # functional line count, the crate count. `tools/measured/generate.py`
+      # writes them and the ten sentences that quote them, and its own
+      # docstring said "`tools/verify.py` and CI both do" while CI did not.
+      # It measures the test count by running the tests, so it belongs here,
+      # where they have just been run and the compilation is cached, rather
+      # than in a job that would build the workspace a second time to count.
+      - name: The measured numbers must match the tree
+        if: runner.os == 'Linux'
+        run: python tools/measured/generate.py --check
+
   # Two of this project's shipped defects were reachable only where a pointer
   # is 32 bits wide: F-4, an arithmetic overflow, and F-11, an erase loop that
   # never terminated and left the file it was destroying intact. Both were
@@ -455,6 +491,19 @@ jobs:
 
       - name: The app-manifest generator must still verify what it writes
         run: python tools/sign/selftest.py
+
+      # The gate `promote.yml` runs before `main` moves, asked of itself.
+      #
+      # It is not in this job's list of `--check` runs above, because it is not
+      # a question about this commit: it asks whether a named version is ready
+      # to be cut, and the answer on an ordinary push is "no, there is no
+      # changelog section for the next version yet", which is correct and would
+      # fail every build. What can be checked on every push is its readers,
+      # and those are the part that can be wrong quietly. A regular expression
+      # that stops matching reports a clean gate rather than a failure, which
+      # is the one way a gate is worse than no gate at all.
+      - name: The promotion gate must still be able to read what it reads
+        run: python tools/release/readiness.py --self-test
 
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested

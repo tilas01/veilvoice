@@ -134,11 +134,12 @@ happens; `main` is what has been released.
 | Who pushes to it | anybody working on VeilVoice | only a release merge |
 | CI | runs on every push | runs on every push |
 | The website and the wiki | not published from here | published from here |
-| Tags | `v0.1.23-beta.1`, marked prerelease | `v0.1.23` |
+| Tags | `v0.1.23-beta.1`, marked prerelease | `v0.1.23`, made by the release workflow at the commit it built |
 
 Work is committed and pushed to `dev`. `main` moves when a release is cut, by
 merging `dev` into it and tagging that merge; the release workflow builds the
-tag, and the site redeploys when it finishes.
+commit, and the site redeploys when it finishes. The `promote` workflow does
+all of that, and the gates it runs first are below.
 
 The one exception to "never a third" is a `dependabot/*` branch. Dependabot
 pushes one per pull request it opens, and it goes away when that pull request
@@ -161,6 +162,37 @@ the recorded sessions have been retaken if the interface moved, `CHANGELOG.md`
 has the notes, and an audit round has read what changed. `docs/AUDIT.md`
 records that round; the release notes are derived from `CHANGELOG.md` and
 nothing hand-copies them anywhere.
+
+**That list is a workflow now rather than a habit.** Run `promote` from the
+Actions tab, give it the version, and leave *Move main* off the first time: it
+reports what stands between `dev` and that release and changes nothing. Run it
+again with *Move main* on and it merges `dev` into `main`, pushes it, and
+starts the release build, which creates the tag at the commit it built and
+redeploys the website when it finishes.
+
+What it asks before anything moves:
+
+- the version a person typed is the version `Cargo.toml` declares
+- `CHANGELOG.md` has a `## v<version>` section and it is the newest one
+- every roadmap item that release's section names is marked done
+- `docs/AUDIT.md` has been written in since the previous tag
+- the tag does not exist, and nothing has landed on `main` that `dev` lacks
+- `tools/verify.py` passes whole, from a fresh checkout rather than a
+  working tree
+- `ci.yml` is green on the exact commit being promoted
+
+The first six are [`tools/release/readiness.py`](../tools/release/readiness.py),
+which runs anywhere: `python tools/release/readiness.py v0.1.23` answers the
+same question from a laptop, and is the quickest way to see what a release is
+still waiting on.
+
+**The fresh checkout is the part that is easy to skip and should not be.** A
+commit reached `dev` referencing a test fixture that `.gitignore` had kept out
+of the repository. `git add` skipped it without a word, `git status` was clean
+because an ignored file is never a candidate to report, `tools/verify.py
+--quick` passed, and the tree did not compile for anybody who cloned it. No
+check run where the author is standing can see that, because the file is
+there. The gate runs where a reader stands.
 
 **One gate on that list may still need a person, once.** The `wiki` workflow
 publishes from `main`, so a release merge is when it runs, and it has something
