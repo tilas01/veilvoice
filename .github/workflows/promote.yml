@@ -66,6 +66,14 @@ jobs:
   check:
     name: is dev ready for ${{ github.event.inputs.version }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # The last step asks the API whether `ci.yml` succeeded on the commit
+      # being promoted, and workflow runs are the `actions` scope rather than
+      # the `contents` one. Without this the job gets a 403 on its final step,
+      # after the half-hour verification pass above it, which is the most
+      # expensive possible place to discover a missing permission.
+      actions: read
     steps:
       # `ref: dev` explicitly. A dispatch runs from the branch it was
       # dispatched on, and dispatching this from anywhere else would otherwise
@@ -130,6 +138,33 @@ jobs:
       # writes nothing.
       - name: Every check tools/verify.py makes, including the cargo steps
         run: python tools/verify.py --check
+
+      # And then the question the exit code does not answer.
+      #
+      # `tools/verify.py` stages what its generators write, with `git add -A`
+      # before each one, so a regenerating run ends green with the tree
+      # changed and nothing about that appearing as unstaged work. That is
+      # harmless where a maintainer runs it, reads `git status` and commits
+      # the result, which is what the pre-push routine is for, and it would be
+      # wrong to fail on there: at that moment the tree is dirty by
+      # definition.
+      #
+      # Here it means something else entirely. This is a fresh clone of a
+      # commit that is about to become `main`, and nothing has been
+      # regenerated on it. Anything changed after the pass is committed output
+      # that does not match the source it derives from, on the tree a release
+      # would be built from. The step above runs `--check`, which writes
+      # nothing, so this should never fire; it is asserted rather than assumed
+      # because a check that writes as a side effect would otherwise make that
+      # green meaningless, and one `git status` is nothing against publishing
+      # a release whose website disagrees with it.
+      - name: The verification pass must not have written anything
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --porcelain
+            echo "::error::tools/verify.py --check left the tree dirty, so something it ran writes as a side effect"
+            exit 1
+          fi
 
       # And the last question, which is about the commit rather than the tree:
       # did CI pass on it? `ci.yml` runs the platform matrix and the 32-bit

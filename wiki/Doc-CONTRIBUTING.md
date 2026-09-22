@@ -171,7 +171,16 @@ Actions tab, give it the version, and leave *Move main* off the first time: it
 reports what stands between `dev` and that release and changes nothing. Run it
 again with *Move main* on and it merges `dev` into `main`, pushes it, and
 starts the release build, which creates the tag at the commit it built and
-redeploys the website when it finishes.
+redeploys the website when it finishes. No tag is pushed by hand at any point.
+
+**It cannot run until it is on `main`, which is once.** GitHub registers a
+`workflow_dispatch` workflow only from the repository's default branch, so a
+workflow that exists on `dev` alone is not listed and not dispatchable: the API
+answers 404. `promote.yml` arrives on `main` with the first release merge, so
+that merge is the one this workflow cannot perform. Cut it the old way, by
+merging `dev` into `main` and dispatching `release` with the version, or push
+`promote.yml` to `main` on its own first. From the release after it, the
+workflow does all of it.
 
 What it asks before anything moves:
 
