@@ -1397,6 +1397,70 @@ The campaign is not yet part of any build. It takes twenty-three minutes over
 four files and there are twenty-seven crates; making it a check is the work,
 and roadmap item 151 carries it.
 
+### F-204: four of the six rules that let a file back in had never let anything back in
+
+`.gitignore` excludes broadly and then names the exceptions, which is the right
+shape: a private key or a captured recording is the kind of thing that must not
+be committed by accident, and a blanket rule with named exceptions fails safe.
+The file had six exceptions. **Two of them worked.**
+
+    !*.pub                 nothing tracked here is a `.pub` file
+    !*public*.asc          never the deciding rule for any tracked path
+    !assets/** # comment   never matched a path at all
+    !**/public-key.asc     never the deciding rule for any tracked path
+
+The interesting one is the third. It read:
+
+    !assets/**            # curated demo/test assets are opted back in explicitly
+
+**`.gitignore` has no inline comments.** A `#` begins a comment only at the
+start of a line; anywhere else it is an ordinary character in the pattern. So
+that rule asks git to un-ignore a path named `assets/**            # curated
+demo/test assets are opted back in explicitly`, and no such path will ever
+exist. `git check-ignore -v assets/demo.wav` answers `.gitignore:14:*.wav`: the
+blanket rule six lines above it, which the exception was written to hold back.
+
+The other three are dead for a duller reason and the same one: nothing tracked
+matches them. `!*public*.asc` and `!**/public-key.asc` are two guesses at what
+`!website/assets/veilvoice-signing-key.asc` already does exactly, and the
+second could not have worked for the folder it appears to be aimed at, because
+a negation cannot reach inside an excluded directory and `/gpg_secrets/` is
+excluded as a directory. `!*.pub` allows back a kind of file this repository
+does not hold: a `.pub` is a recipient's hybrid public key, made by whoever is
+to be sent a recording, and it belongs where they keep their keys.
+
+**None of this had a consequence, and that is the finding.** Every one of those
+rules reads as protection. Somebody adding a demo recording under `assets/`
+would have read line 18, believed the file was covered, run `git add -A`, and
+been told nothing: an excluded path is skipped in silence and a file git has
+never heard of is absent from `git status` in both directions. That is exactly
+what did happen one commit earlier with a test fixture under `*.asc`, and the
+crate that read it stopped compiling on every clone but the one that wrote it.
+
+**A rule that matches nothing is indistinguishable from a rule that works.**
+The four were removed rather than repaired, because repairing a negation for a
+file that does not exist produces another untested rule. An exception is
+written when there is a file that needs it, at which point the file exercises
+it. The comment above each surviving rule now says that.
+
+`tools/audit/fixtures.py` is the regression test, and it is a guard rather than
+a unit test because the thing being asserted is a property of the repository
+rather than of a function. Three checks: every path an `include_str!` or
+`include_bytes!` names is **tracked**, not merely present; no pattern line in
+any `.gitignore` carries a `#`, with a failure message that says what git
+actually does with one; and every negation is the deciding rule for at least
+one tracked file, which is asked of git with `check-ignore --no-index`, since
+without that flag git answers "tracked, so not ignored" and never says which
+rule it would have used. It runs in `tools/verify.py` as well as in CI,
+because the point is to catch this before a push rather than after one, and it
+carries a `--self-test` that builds four small repositories each broken in one
+of these ways and fails if it does not catch them, plus a sound one it must
+report clean.
+
+It is the only check in this repository that asks git rather than the disk.
+Every other one reads the working tree, and the working tree is not what
+anybody else gets.
+
 ### F-203: nothing compared the key that signs a release against the key its binaries accept
 
 The release notes tell a reader to compare a fingerprint by eye, and say
@@ -8075,7 +8139,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and three defects found and fixed (F-1 to F-203), across
+**Two hundred and four defects found and fixed (F-1 to F-204), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
