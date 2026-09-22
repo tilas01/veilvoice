@@ -31,6 +31,23 @@
 // The selector is checked too. A list of element names is how the releases
 // page and the roadmap ended up with no offset at all, and the next id to be
 // added to something not on the list would go the same way.
+//
+// # The cue, and why it is checked on every page rather than some
+//
+// Landing somewhere is half of it. A fragment jump moves the page without
+// moving anything the eye can follow, so the landing is outlined for a moment
+// and the outline fades. That is three things in three files: `.landed` and
+// its keyframes in the stylesheet, the call that applies the class in
+// `js/teleport.js`, and both of those loaded by the page. Any one of them
+// missing and the cue is silently absent, which is what F-205 was: the class
+// was applied only when a `hashchange` arrived, so a click on a link naming
+// the fragment already in the address bar wrote no hash, fired nothing, and
+// was not cued. The link worked, the page moved, and nothing was marked.
+//
+// So the chain is checked end to end, and the page half of it is checked for
+// every page rather than for pages that happen to carry the sticky header.
+// The header is why the *offset* exists; it is not why the cue exists, and a
+// page without one would have lost the cue without failing anything.
 
 "use strict";
 
@@ -141,6 +158,53 @@ function run() {
          (missing.length > 5 ? ", ..." : ""));
   } else {
     pass("every page with a sticky header loads the script that measures it");
+  }
+
+  // The cue exists in the stylesheet.
+  if (!/\.landed\s*\{/.test(css) || !/@keyframes\s+landed-fade/.test(css)) {
+    fail("main.css no longer defines `.landed` and its fade, so a landing is " +
+         "never marked and a fragment jump moves the page without moving " +
+         "anything the reader can follow");
+  } else {
+    pass("the landing cue and its fade are in the stylesheet");
+  }
+
+  // The script applies it.
+  if (!/classList\.add\("landed"\)/.test(js)) {
+    fail("js/teleport.js no longer applies the `landed` class, so the " +
+         "stylesheet's cue is never drawn on anything");
+  } else {
+    pass("js/teleport.js marks the landing it made");
+  }
+
+  // And it applies it to the one landing that writes no hash. F-205.
+  const handler = js.slice(js.indexOf('a[href^="#"]'));
+  if (!/named\(\)\s*===\s*id/.test(handler) || !/teleport\(id,\s*true\)/.test(handler)) {
+    fail("js/teleport.js cues a landing only when the hash changes, so a " +
+         "click on a link naming the fragment already in the address bar " +
+         "writes no hash, fires no hashchange and is never marked. On a page " +
+         "with a contents list that is most of the clicks after the first.");
+  } else {
+    pass("a link to where the reader already is is cued too, not only the first one");
+  }
+
+  // Every page carries both halves. The exception is the edition that runs no
+  // scripts, which has no sticky header either and therefore needs neither.
+  const NO_SCRIPTS = /^website\/nojs\//;
+  const script = /<script[^>]+src="[^"]*js\/teleport\.js"/;
+  const sheet = /<link[^>]+href="[^"]*css\/main\.css"/;
+  const scripted = pages().filter(rel => !NO_SCRIPTS.test(rel.replace(/\\/g, "/")));
+  const uncued = scripted.filter(rel => {
+    const html = read(rel);
+    return !script.test(html) || !sheet.test(html);
+  });
+  if (uncued.length) {
+    fail(`${uncued.length} page(s) do not load both js/teleport.js and ` +
+         `css/main.css, so a fragment link into them lands with no cue at ` +
+         `all: ${uncued.slice(0, 5).join(", ")}` +
+         (uncued.length > 5 ? ", ..." : ""));
+  } else {
+    pass(`all ${scripted.length} scripted pages can draw a landing cue`);
   }
 
   return failures;

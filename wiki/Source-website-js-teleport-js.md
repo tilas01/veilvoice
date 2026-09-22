@@ -3,7 +3,7 @@
 
 # `website/js/teleport.js`
 
-[[The website's source|Source-index]] &middot; 310 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/teleport.js)
+[[The website's source|Source-index]] &middot; 346 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/teleport.js)
 
 ## What it does
 
@@ -27,6 +27,14 @@ A fragment jump happens once, at the moment the browser reads the hash, and the 
 
 Reveal transitions are settled up front rather than corrected afterwards. `.reveal` holds an element 18px below where it belongs, and an element scrolled to is an element that has been reached, so the target and anything holding it are shown before the browser scrolls, while the click is still being handled.
 
+# The landing that arrived only once
+
+The highlight is drawn when a landing is *cued*, and until F-205 the only thing that cued one was `hashchange`. That covers arriving at a page with a fragment already in the address bar, and it covers the first click on a link into the page, because that click writes a hash where there was none or a different one.
+
+It does not cover a click on a link naming the fragment that is already there. No new hash is written, so no `hashchange` arrives, so nothing runs. The link still works and the browser still scrolls, and the reader gets no cue at all. On a page with a contents list that is most of the clicks after the first one: pick an entry, read, come back, pick the same entry again, and the second time nothing is marked.
+
+So the click handler below cues that one case itself, on the frame after the browser has done its own scrolling. It is the only case it takes: every other click writes a hash, and cueing it here as well would draw the highlight twice.
+
 # What is deliberately left alone
 
 The navigation itself. Clicks are not prevented and no history entry is written here, because the full-size screenshot viewers are opened by `:target`, which follows a real fragment navigation and not a `pushState`. The back button, the middle button and copying a link therefore behave exactly as they do with this file absent, which is also what happens if it fails to load: the stylesheet still clears the header, just less exactly.
@@ -45,15 +53,15 @@ resolved one.
 
 | Function | Line |
 |---|---:|
-| `header` | 84 |
-| `measure` | 89 |
-| `restingPlace` | 100 |
-| `snapTo` | 118 |
-| `settleReveal` | 131 |
-| `cueFor` | 143 |
-| `highlight` | 152 |
-| `settle` | 179 |
-| `stopSettling` | 195 |
-| `teleport` | 202 |
-| `named` | 243 |
-| `fromHash` | 255 |
+| `header` | 104 |
+| `measure` | 109 |
+| `restingPlace` | 120 |
+| `snapTo` | 138 |
+| `settleReveal` | 151 |
+| `cueFor` | 163 |
+| `highlight` | 172 |
+| `settle` | 199 |
+| `stopSettling` | 215 |
+| `teleport` | 222 |
+| `named` | 263 |
+| `fromHash` | 275 |

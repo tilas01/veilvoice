@@ -1397,6 +1397,60 @@ The campaign is not yet part of any build. It takes twenty-three minutes over
 four files and there are twenty-seven crates; making it a check is the work,
 and roadmap item 151 carries it.
 
+### F-205: the landing was marked the first time a link was followed and never again
+
+A fragment jump moves the page without moving anything the eye can follow, so
+`js/teleport.js` outlines where the reader landed and lets the outline fade.
+That is the cue, it is two seconds long, and it works.
+
+It is drawn when a landing is **cued**, and the only thing that cued one was
+`hashchange`. That covers arriving at a page with a fragment already in the
+address bar, and it covers the first click on a link into the page, because
+that click writes a hash where there was none or a different one.
+
+**It does not cover a click on a link naming the fragment that is already
+there.** No new hash is written, so the browser fires no `hashchange`, so
+`fromHash` never runs and nothing is marked. The link works. The page scrolls,
+because the stylesheet's `scroll-margin-top` is doing that and it is not
+involved. The reader simply gets no cue.
+
+On a page with a contents list that is most of the clicks after the first one:
+pick an entry, read it, come back to the top, pick the same entry again, and
+the second time nothing is outlined. The wiki pages are contents lists, the
+roadmap is one, and the releases page is one.
+
+The click handler already existed, for a different reason. It settles the
+target's reveal transition before the browser scrolls, so that an element held
+18px below where it belongs is not measured there. It had the target element in
+hand and did not mark it, which is why this was easy to miss by reading: the
+code that needed to run was one line from code that was already running.
+
+The handler now cues that one case itself, on the frame after the browser has
+done its own scrolling so the two are not correcting the same pixels at once.
+It is the only case it takes, because every other click writes a hash and
+cueing it here as well would draw the highlight twice. A click with a modifier
+held is excluded: that opens a new tab or saves the target, and this page is
+not going anywhere.
+
+Four checks in `tools/site-tests/anchors.test.js`, each negative-tested by
+breaking the thing it watches. The cue is three things in three files and any
+one of them missing makes it silently absent, so the chain is checked end to
+end: `.landed` and its keyframes in the stylesheet, the call that applies the
+class, the click handler's treatment of the case above, and both files loaded
+by every page.
+
+**That last one is checked for every page rather than for pages that carry the
+sticky header**, which is what the existing coverage check did. The header is
+why the *offset* exists. It is not why the cue exists, and a page without one
+would have lost the cue without failing anything. All 372 scripted pages carry
+both halves; the two pages of the no-JavaScript edition carry neither, which
+is what that edition is.
+
+This is the same shape as F-176, F-177, F-197, F-199 and F-204, and it is the
+fifth entry to say so: a thing that works in the case somebody tested and does
+nothing in a case nobody did, with no failure anywhere to say which case you
+are in.
+
 ### F-204: four of the six rules that let a file back in had never let anything back in
 
 `.gitignore` excludes broadly and then names the exceptions, which is the right
@@ -8139,7 +8193,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and four defects found and fixed (F-1 to F-204), across
+**Two hundred and five defects found and fixed (F-1 to F-205), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
