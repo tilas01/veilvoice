@@ -743,6 +743,75 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-211: nothing compared the pictures of the window against the window
+
+Fifteen photographs of the running window are published: on the website, in
+the documentation, in the wiki, and as the whole of the demonstration for the
+edition that runs no scripts. `tools/shots/gui.sh` takes them by running the
+real program under a headless display.
+
+Four checks guard them, and `tools/verify.py` runs all four on every push:
+no capture carries a border, none has empty space below its content, they all
+share one height, and the sizes written on the pages match the files.
+
+**Every one of those is about the pictures as pictures.** A photograph of last
+month's window passes all four, because nothing in the set asks what the
+pictures are pictures *of*.
+
+Two had gone stale on `dev`, and both were found by a person looking rather
+than by a build:
+
+  * `gui-about.png` was 7.02% different from what the window draws. Roadmap
+    item 165 added a release channel line to the About tab and the capture was
+    never retaken.
+  * The common height moved from 1550 to 1576, because roadmap item 164 made
+    the Verify tab taller. `tools/shots/fit.py` fits every capture to one
+    height, so that is the whole set out of date rather than one of them.
+
+Neither failed anything. Both would have shipped in v0.1.23.
+
+**The obvious check is not available.** Capturing again and comparing needs a
+build, a display and `libxkbcommon-x11`, and a fresh capture differs from a
+committed one by antialiasing even on the same machine at the same commit:
+thirteen of the fifteen reproduce to within 0.1% of bytes and two do not. A
+gate that is right most of the time about a difference nobody can act on is a
+gate people learn to pass rather than read.
+
+So the check is the thing that can be known exactly. The captures carry the
+version they were taken from, in `assets/screenshots/taken.txt`, and
+`tools/shots/taken.py --check` fails when that is not the version in
+`Cargo.toml`. Retaking becomes an obligation once per release, which is what
+it actually is: the interface changes many times between releases and is
+published once. It is not a claim that the pictures are current on any given
+day. It is a claim that **a release does not ship pictures of an older one**,
+which is the promise being made to somebody reading the site.
+
+**The record is written by `gui.sh` at the end of a successful capture, and by
+nothing else.** It is deliberately not a generator that `tools/verify.py`
+regenerates beside every other derived file: a record any run can rewrite
+records nothing, and the only way to move the version forward has to be taking
+the pictures. The record also names which captures it covers, so one added or
+removed outside a capture run fails too.
+
+Two things found while in that file, neither a finding of its own:
+
+`gui.sh` refuses to capture when JetBrains Mono is missing, because the
+fallback face would produce a set that does not match the others and nothing
+about the run would say so. It had no such check for `libxkbcommon-x11`, which
+the window loads at run time rather than linking, so `ldd` says nothing and a
+machine without it gets "Library libxkbcommon-x11.so could not be loaded" and
+an abort before anything is drawn. That reads as the program crashing. It is
+asked for now in the same place and for the same reason.
+
+`tools/verify.py` stages what it writes, with `git add -A`, so the search
+index's walk sees files the step before has just created. That is right and it
+was silent: a run that rewrote forty files and a run that rewrote none printed
+the same last line. A commit made **before** the run therefore contains none
+of it, and `git status` shows nothing unstaged to say so. The run now names
+what it wrote, from `git status --porcelain` taken either side of the
+generators, and says plainly that those files are in the index rather than in
+a commit.
+
 ### F-210: the test that proved every spawn was wrapped scanned half the crate
 
 `veilvoice-setup` reaches the Windows registry, `df`, `fsutil.exe`, `curl` and
@@ -8487,7 +8556,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and ten defects found and fixed (F-1 to F-210), across
+**Two hundred and eleven defects found and fixed (F-1 to F-211), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

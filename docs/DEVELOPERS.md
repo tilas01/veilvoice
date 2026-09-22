@@ -205,6 +205,7 @@ And what it then checks:
 - **every screenshot tag matches its file**: `python tools/shots/attrs.py --check`
 - **terminal drawings match their output**: `python tools/shots/terminal.py --check`
 - **recorded sessions match the programs**: `python tools/shots/sessions.py --check`
+- **the window captures are of this version**: `python tools/shots/taken.py --check`
 - **documentation matches the source**: `python tools/docs/generate.py --check`
 - **per-program guides match the user guide**: `python tools/docs/guides.py --check`
 - **the wiki matches the documents, and every link in it resolves**: `python tools/docs/wiki.py --check`
