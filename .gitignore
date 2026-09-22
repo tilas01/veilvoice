@@ -41,6 +41,14 @@ gpg_secrets/
 *.asc
 !website/assets/veilvoice-signing-key.asc
 !**/public-key.asc
+# A public key that is deliberately NOT this project's, used by
+# `check::carried`'s tests to prove a download carrying somebody else's key is
+# refused. Its private half was never kept and it signs nothing. Allowed back
+# in for the same reason as the two above, and named here rather than added
+# with `git add -f` so the next person sees why it is tracked: an -f leaves no
+# record, and this rule is exactly the kind that swallows a file silently
+# (F-203).
+!crates/veilvoice-verify/src/check/testdata/*.asc
 
 # Python bytecode. Importing `assets/generate.py` from a check script -- which
 # is a reasonable thing to do -- drops a .pyc next to it. A compiled blob is
