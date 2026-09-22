@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/security.svg" alt="security.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/security.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2403 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2550 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-passwords-and-why">Two passwords, and why</a>
@@ -103,76 +103,79 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>2403 lines defining <strong>45 functions</strong> (26 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>2550 lines defining <strong>47 functions</strong> (27 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Sealing</code> <span style="color:var(--muted)">line 81</span> &middot; How the recording that comes out of a job is protected.</li>
 <li><code>enum Op</code> <span style="color:var(--muted)">line 106</span> &middot; What a background lock operation was trying to do.</li>
 <li><code>struct Security</code> <span style="color:var(--muted)">line 129</span> &middot; Everything about locking the app and sealing its output.</li>
-<li><code>enum Plan</code> <span style="color:var(--muted)">line 1357</span> &middot; What a finished job should do with its bytes.</li>
+<li><code>enum Plan</code> <span style="color:var(--muted)">line 1410</span> &middot; What a finished job should do with its bytes.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Security::load</code> <span style="color:var(--muted)">line 279</span> &middot; Read the lock file for this machine and start locked if one is set.
+<li><code>Security::load</code> <span style="color:var(--muted)">line 287</span> &middot; Read the lock file for this machine and start locked if one is set.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default</code></span>
 </li>
-<li><code>Security::take_unlock_passphrase</code> <span style="color:var(--muted)">line 322</span> &middot; Take the passphrase that just opened the lock, once.
+<li><code>Security::take_unlock_passphrase</code> <span style="color:var(--muted)">line 330</span> &middot; Take the passphrase that just opened the lock, once.
 </li>
-<li><code>Security::take_unlock_store_key</code> <span style="color:var(--muted)">line 331</span> &middot; Collect the obfuscated store&#x27;s key from the unlock that just happened.
+<li><code>Security::take_unlock_store_key</code> <span style="color:var(--muted)">line 339</span> &middot; Collect the obfuscated store&#x27;s key from the unlock that just happened.
 </li>
-<li><code>Security::prefer_app_lock_sealing</code> <span style="color:var(--muted)">line 340</span> &middot; Start in Sealing::AppLock, because the user asked for that last time.
+<li><code>Security::prefer_app_lock_sealing</code> <span style="color:var(--muted)">line 360</span> &middot; Start in Sealing::AppLock, because the user asked for that last time.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>apply_preferred_sealing</code></span>
 </li>
-<li><code>Security::seals_with_app_lock</code> <span style="color:var(--muted)">line 348</span> &middot; Whether the app-lock sealing mode is currently chosen, so the window can have the choice remembered.
+<li><code>Security::app_lock_sealing_is_waiting</code> <span style="color:var(--muted)">line 388</span> &middot; Whether the stored preference is still waiting for a lock to apply to.
 </li>
-<li><code>Security::tampered</code> <span style="color:var(--muted)">line 356</span> &middot; Whether the lock reported having been interfered with.
+<li><code>Security::seals_with_app_lock</code> <span style="color:var(--muted)">line 394</span> &middot; Whether the app-lock sealing mode is currently chosen, so the window can have the choice remembered.
 </li>
-<li><code>Security::is_locked</code> <span style="color:var(--muted)">line 361</span> &middot; Whether the unlock screen should be shown instead of the app.
+<li><code>Security::tampered</code> <span style="color:var(--muted)">line 402</span> &middot; Whether the lock reported having been interfered with.
 </li>
-<li><code>Security::set_lock_from_setup</code> <span style="color:var(--muted)">line 371</span> &middot; Whether a lock is configured at all.
+<li><code>Security::is_locked</code> <span style="color:var(--muted)">line 407</span> &middot; Whether the unlock screen should be shown instead of the app.
+</li>
+<li><code>Security::set_lock_from_setup</code> <span style="color:var(--muted)">line 417</span> &middot; Whether a lock is configured at all.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>spawn</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::has_recording_passphrase</code> <span style="color:var(--muted)">line 378</span> &middot; Whether a recording passphrase is held for this session.
+<li><code>Security::has_recording_passphrase</code> <span style="color:var(--muted)">line 424</span> &middot; Whether a recording passphrase is held for this session.
 </li>
-<li><code>Security::set_recording_passphrase</code> <span style="color:var(--muted)">line 387</span> &middot; Take a recording passphrase from the first-run setup.
+<li><code>Security::set_recording_passphrase</code> <span style="color:var(--muted)">line 433</span> &middot; Take a recording passphrase from the first-run setup.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>into_secret</code></span>
 </li>
-<li><code>Security::lock_after_idle</code> <span style="color:var(--muted)">line 415</span> &middot; Lock because nobody has touched the window for a while.
+<li><code>Security::lock_after_idle</code> <span style="color:var(--muted)">line 461</span> &middot; Lock because nobody has touched the window for a while.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>lock_inner</code>, <code>wipe_secrets</code></span>
 </li>
-<li><code>Security::blocked_reason</code> <span style="color:var(--muted)">line 476</span> &middot; Why a job cannot start yet, for the button&#x27;s tooltip.
+<li><code>Security::blocked_reason</code> <span style="color:var(--muted)">line 522</span> &middot; Why a job cannot start yet, for the button&#x27;s tooltip.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>ready_to_write</code></span>
 </li>
-<li><code>Security::plan</code> <span style="color:var(--muted)">line 494</span> &middot; How the next job should protect its output.
+<li><code>Security::plan</code> <span style="color:var(--muted)">line 540</span> &middot; How the next job should protect its output.
 </li>
-<li><code>Security::is_busy</code> <span style="color:var(--muted)">line 647</span> &middot; Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.
+<li><code>Security::is_busy</code> <span style="color:var(--muted)">line 700</span> &middot; Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code></span>
 </li>
-<li><code>Security::unlock_screen</code> <span style="color:var(--muted)">line 652</span> &middot; The full-window unlock screen.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>poll</code>, <code>spawn</code>, <code>unlock_row</code>, <code>into_secret</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
+<li><code>Security::unlock_screen</code> <span style="color:var(--muted)">line 705</span> &middot; The full-window unlock screen.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>poll</code>, <code>spawn</code>, <code>unlock_row</code>, <code>apply_preferred_sealing</code>, <code>into_secret</code>, <code>wipe_form</code>, <code>run_op</code>, <code>reopen</code></span>
 </li>
-<li><code>Security::tab</code> <span style="color:var(--muted)">line 854</span> &middot; The security tab: manage the lock, and see what it is worth.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>button_column</code>, <code>has_lock</code>, <code>interference_banner</code>, <code>lock_now</code>, <code>password_row</code>, <code>poll</code>, <code>spawn</code>, <code>lock_inner</code>, <code>into_secret</code>, <code>wipe_form</code>, <code>run_op</code></span>
+<li><code>Security::tab</code> <span style="color:var(--muted)">line 907</span> &middot; The security tab: manage the lock, and see what it is worth.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>busy</code>, <code>button_column</code>, <code>has_lock</code>, <code>interference_banner</code>, <code>lock_now</code>, <code>password_row</code>, <code>poll</code>, <code>spawn</code>, <code>lock_inner</code>, <code>apply_preferred_sealing</code>, <code>into_secret</code>, <code>wipe_form</code></span>
 </li>
-<li><code>Security::load_mandate</code> <span style="color:var(--muted)">line 1031</span> &middot; Read the baseline from disk and apply it to the checkbox.
+<li><code>Security::load_mandate</code> <span style="color:var(--muted)">line 1084</span> &middot; Read the baseline from disk and apply it to the checkbox.
 </li>
-<li><code>Security::mandate_requires_app_lock</code> <span style="color:var(--muted)">line 1046</span> &middot; Whether the baseline insists on the app lock.
+<li><code>Security::mandate_requires_app_lock</code> <span style="color:var(--muted)">line 1099</span> &middot; Whether the baseline insists on the app lock.
 </li>
-<li><code>Security::mandate_requires_encryption</code> <span style="color:var(--muted)">line 1051</span> &middot; Whether the baseline insists on encryption at rest.
+<li><code>Security::mandate_requires_encryption</code> <span style="color:var(--muted)">line 1104</span> &middot; Whether the baseline insists on encryption at rest.
 </li>
-<li><code>Security::mandate_history</code> <span style="color:var(--muted)">line 1056</span> &middot; The change log, for the panel that shows it.
+<li><code>Security::mandate_history</code> <span style="color:var(--muted)">line 1109</span> &middot; The change log, for the panel that shows it.
 </li>
-<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 1079</span> &middot; The at-rest controls that sit inside the file tab.
+<li><code>Security::recording_controls</code> <span style="color:var(--muted)">line 1132</span> &middot; The at-rest controls that sit inside the file tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>into_secret</code>, <code>mandate_history_panel</code>, <code>password_row</code>, <code>record</code>, <code>mandate_history_rows</code></span>
 </li>
-<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 1299</span> &middot; The dialogue shown when the user turns at-rest encryption off.
+<li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 1352</span> &middot; The dialogue shown when the user turns at-rest encryption off.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>record</code></span>
 </li>
-<li><code>Plan::write</code> <span style="color:var(--muted)">line 1382</span> &middot; Seal wav if the plan says to, and write it.
+<li><code>Plan::write</code> <span style="color:var(--muted)">line 1435</span> &middot; Seal wav if the plan says to, and write it.
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 611 1163" width="611" height="1163" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 619 1297" width="619" height="1297" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -181,226 +184,224 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="611" height="1163" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M540.1 464.0 C 562.1 464.0, 562.1 464.0, 295.6 464.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M472.5 74.0 C 472.5 94.0, 305.6 917.0, 305.6 934.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M555.0 564.0 C 577.0 564.0, 577.0 564.0, 366.9 564.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M232.2 147.0 C 398.0 147.0, 398.0 47.0, 379.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M405.2 391.0 C 405.2 411.0, 114.6 817.0, 114.6 834.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M114.6 891.0 C 114.6 911.0, 305.6 917.0, 305.6 934.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M177.9 391.0 C 177.9 411.0, 114.6 817.0, 114.6 834.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
-<path d="M197.1 564.0 C 219.1 564.0, 219.1 47.0, 188.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M126.7 591.0 C 126.7 611.0, 500.7 817.0, 500.7 834.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M300.7 764.0 C 322.7 764.0, 322.7 47.0, 188.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M389.0 174.0 C 389.0 194.0, 309.7 817.0, 309.7 834.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M316.8 255.5 C 338.8 255.5, 338.8 47.0, 188.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M491.7 664.0 C 513.7 664.0, 513.7 564.0, 366.9 564.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M491.7 664.0 C 537.9 664.0, 537.9 255.5, 518.9 255.5" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M491.7 664.0 C 513.7 664.0, 513.7 364.0, 267.4 364.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M491.7 664.0 C 513.7 664.0, 513.7 564.0, 200.1 564.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M425.3 691.0 C 425.3 711.0, 309.7 817.0, 309.7 834.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M332.9 664.0 C 385.9 664.0, 385.9 564.0, 366.9 564.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M332.9 664.0 C 354.9 664.0, 354.9 564.0, 200.1 564.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M226.2 691.0 C 226.2 711.0, 309.7 817.0, 309.7 834.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<rect x="0" y="0" width="619" height="1297" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M241.4 581.0 C 570.1 581.0, 570.1 481.0, 551.1 481.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M476.5 74.0 C 476.5 94.0, 309.6 1051.0, 309.6 1068.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M260.4 155.5 C 402.1 155.5, 402.1 47.0, 383.1 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M185.9 508.0 C 185.9 528.0, 429.3 842.5, 429.3 859.5" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M429.3 916.5 C 429.3 936.5, 309.6 1051.0, 309.6 1068.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M409.2 408.0 C 409.2 428.0, 429.3 842.5, 429.3 859.5" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M337.9 608.0 C 337.9 628.0, 202.0 834.0, 202.0 851.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M408.3 581.0 C 430.3 581.0, 430.3 47.0, 192.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M393.1 191.0 C 393.1 211.0, 202.0 834.0, 202.0 851.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M304.7 781.0 C 326.7 781.0, 326.7 47.0, 192.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M185.9 299.5 C 185.9 319.5, 309.6 951.0, 309.6 968.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M564.2 272.5 C 586.2 272.5, 586.2 47.0, 192.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M495.7 681.0 C 517.7 681.0, 517.7 381.0, 299.6 381.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M495.7 681.0 C 517.7 681.0, 517.7 381.0, 498.7 381.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M495.7 681.0 C 517.7 681.0, 517.7 581.0, 411.3 581.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M429.3 708.0 C 429.3 728.0, 309.6 951.0, 309.6 968.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M336.9 681.0 C 430.3 681.0, 430.3 581.0, 411.3 581.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M230.3 708.0 C 230.3 728.0, 309.6 951.0, 309.6 968.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="security.src.html#fn-into_secret">
-<rect x="68.4" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="126.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">into_secret</text>
-<text x="126.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 72</text>
+<rect x="72.4" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="130.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">into_secret</text>
+<text x="130.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 72</text>
 </a>
 <a href="security.src.html#fn-security-default">
-<rect x="211.0" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="293.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::default</text>
-<text x="293.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 236</text>
+<rect x="215.0" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="297.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::default</text>
+<text x="297.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 242</text>
 </a>
 <a href="security.src.html#fn-security-drop">
-<rect x="402.0" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="472.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::drop</text>
-<text x="472.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
+<rect x="406.1" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="476.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::drop</text>
+<text x="476.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 280</text>
 </a>
 <a href="security.src.html#fn-security-load">
-<rect x="91.3" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="161.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::load</text>
-<text x="161.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
+<rect x="119.5" y="128.5" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="190.0" y="151.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::load</text>
+<text x="190.0" y="168.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
+</a>
+<a href="security.src.html#fn-security-prefer_app_lock_sealing">
+<rect x="286.4" y="120.0" width="213.4" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="393.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::</text>
+<text x="393.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">prefer_app_lock_sealing</text>
+<text x="393.1" y="176.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 360</text>
+</a>
+<a href="security.src.html#fn-security-apply_preferred_sealing">
+<rect x="95.4" y="854.0" width="213.4" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="202.0" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::</text>
+<text x="202.0" y="893.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">apply_preferred_sealing</text>
+<text x="202.0" y="910.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 375</text>
 </a>
 <a href="security.src.html#fn-security-set_lock_from_setup">
-<rect x="258.2" y="120.0" width="261.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="389.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::set_lock_from_setup</text>
-<text x="389.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 371</text>
+<rect x="55.1" y="245.5" width="261.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="185.9" y="268.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::set_lock_from_setup</text>
+<text x="185.9" y="285.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 417</text>
 </a>
 <a href="security.src.html#fn-security-set_recording_passphrase">
-<rect x="95.4" y="220.0" width="221.4" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="206.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::</text>
-<text x="206.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">set_recording_passphrase</text>
-<text x="206.1" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 387</text>
+<rect x="342.8" y="237.0" width="221.4" height="71.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="453.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::</text>
+<text x="453.5" y="276.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">set_recording_passphrase</text>
+<text x="453.5" y="293.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 433</text>
 </a>
 <a href="security.src.html#fn-security-has_lock">
-<rect x="342.8" y="228.5" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="429.3" y="251.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::has_lock</text>
-<text x="429.3" y="268.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 396</text>
+<rect x="123.6" y="354.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="210.1" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::has_lock</text>
+<text x="210.1" y="393.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 442</text>
 </a>
 <a href="security.src.html#fn-security-lock_now">
-<rect x="91.3" y="337.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="177.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::lock_now</text>
-<text x="177.9" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 405</text>
+<rect x="322.6" y="354.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="409.2" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::lock_now</text>
+<text x="409.2" y="393.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 451</text>
 </a>
 <a href="security.src.html#fn-security-lock_after_idle">
-<rect x="290.4" y="337.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="405.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::lock_after_idle</text>
-<text x="405.2" y="376.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
+<rect x="71.2" y="454.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="185.9" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::lock_after_idle</text>
+<text x="185.9" y="493.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 461</text>
 </a>
 <a href="security.src.html#fn-security-lock_inner">
-<rect x="20.0" y="837.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="114.6" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::lock_inner</text>
-<text x="114.6" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 424</text>
+<rect x="334.7" y="862.5" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="429.3" y="885.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::lock_inner</text>
+<text x="429.3" y="902.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 470</text>
 </a>
 <a href="security.src.html#fn-security-wipe_secrets">
-<rect x="203.0" y="937.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="305.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::wipe_secrets</text>
-<text x="305.6" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 433</text>
+<rect x="207.0" y="1071.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="309.6" y="1093.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::wipe_secrets</text>
+<text x="309.6" y="1110.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
 </a>
 <a href="security.src.html#fn-security-ready_to_write">
-<rect x="71.2" y="437.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="181.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::ready_to_write</text>
-<text x="181.9" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 464</text>
+<rect x="326.7" y="454.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="437.4" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::ready_to_write</text>
+<text x="437.4" y="493.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 510</text>
 </a>
 <a href="security.src.html#fn-security-blocked_reason">
-<rect x="318.6" y="437.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="429.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::blocked_reason</text>
-<text x="429.3" y="476.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 476</text>
+<rect x="20.0" y="554.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="130.7" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::blocked_reason</text>
+<text x="130.7" y="593.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 522</text>
 </a>
 <a href="security.src.html#fn-security-spawn">
-<rect x="235.2" y="837.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="309.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::spawn</text>
-<text x="309.7" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 526</text>
+<rect x="235.2" y="971.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="309.6" y="993.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::spawn</text>
+<text x="309.6" y="1010.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 572</text>
 </a>
 <a href="security.src.html#fn-security-poll">
-<rect x="56.3" y="537.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="126.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::poll</text>
-<text x="126.7" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 541</text>
-</a>
-<a href="security.src.html#fn-security-wipe_form">
-<rect x="410.1" y="837.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="500.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::wipe_form</text>
-<text x="500.7" y="876.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 633</text>
-</a>
-<a href="security.src.html#fn-security-busy">
-<rect x="223.1" y="537.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="293.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::busy</text>
-<text x="293.5" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 641</text>
+<rect x="267.4" y="554.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="337.9" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::poll</text>
+<text x="337.9" y="593.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 587</text>
 </a>
 <a href="security.src.html#fn-security-is_busy">
-<rect x="389.9" y="537.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="472.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::is_busy</text>
-<text x="472.5" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 647</text>
+<rect x="434.3" y="554.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="516.8" y="576.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::is_busy</text>
+<text x="516.8" y="593.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 700</text>
 </a>
 <a href="security.src.html#fn-security-unlock_screen">
-<rect x="119.5" y="637.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="226.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::unlock_screen</text>
-<text x="226.2" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 652</text>
+<rect x="123.6" y="654.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="230.3" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::unlock_screen</text>
+<text x="230.3" y="693.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 705</text>
 </a>
 <a href="security.src.html#fn-security-tab">
-<rect x="358.9" y="637.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="425.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::tab</text>
-<text x="425.3" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 854</text>
+<rect x="362.9" y="654.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="429.3" y="676.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::tab</text>
+<text x="429.3" y="693.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 907</text>
 </a>
 <a href="security.src.html#fn-security-recording_controls">
-<rect x="47.0" y="737.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="173.8" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::recording_controls</text>
-<text x="173.8" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1079</text>
+<rect x="51.0" y="754.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="177.9" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::recording_controls</text>
+<text x="177.9" y="793.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1132</text>
 </a>
 <a href="security.src.html#fn-security-disable_dialogue">
-<rect x="326.7" y="737.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="445.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::disable_dialogue</text>
-<text x="445.5" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1299</text>
+<rect x="330.7" y="754.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="449.5" y="776.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Security::disable_dialogue</text>
+<text x="449.5" y="793.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1352</text>
 </a>
-<rect x="20.0" y="1021.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="1030.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="1037.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
-<text x="35.0" y="1046.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
-<rect x="20.0" y="1053.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="1062.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 1073.5 L29.0 1073.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="1078.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="1100.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="1115.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 45 functions are drawn; the diagram is</text>
-<text x="20.0" y="1145.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
+<rect x="20.0" y="1155.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="1164.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="1171.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="1180.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="1187.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="1196.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 1207.5 L29.0 1207.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="1212.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="1234.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="1249.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="1264.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one. 22 of 47 functions are drawn; the diagram is</text>
+<text x="20.0" y="1279.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">bounded at 22 so it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 45 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 47 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_into_secret[&quot;into_secret&lt;br/&gt;line 72&quot;]
-    n_default[&quot;Security::default&lt;br/&gt;line 236&quot;]
-    n_drop[&quot;Security::drop&lt;br/&gt;line 272&quot;]
-    n_load([&quot;Security::load&lt;br/&gt;line 279&quot;])
-    n_set_lock_from_setup([&quot;Security::set_lock_from_setup&lt;br/&gt;line 371&quot;])
-    n_set_recording_passphrase([&quot;Security::&lt;br/&gt;set_recording_passphrase&lt;br/&gt;line 387&quot;])
-    n_has_lock[&quot;Security::has_lock&lt;br/&gt;line 396&quot;]
-    n_lock_now[&quot;Security::lock_now&lt;br/&gt;line 405&quot;]
-    n_lock_after_idle([&quot;Security::lock_after_idle&lt;br/&gt;line 415&quot;])
-    n_lock_inner[&quot;Security::lock_inner&lt;br/&gt;line 424&quot;]
-    n_wipe_secrets[&quot;Security::wipe_secrets&lt;br/&gt;line 433&quot;]
-    n_ready_to_write[&quot;Security::ready_to_write&lt;br/&gt;line 464&quot;]
-    n_blocked_reason([&quot;Security::blocked_reason&lt;br/&gt;line 476&quot;])
-    n_spawn[&quot;Security::spawn&lt;br/&gt;line 526&quot;]
-    n_poll[&quot;Security::poll&lt;br/&gt;line 541&quot;]
-    n_wipe_form[&quot;Security::wipe_form&lt;br/&gt;line 633&quot;]
-    n_busy[&quot;Security::busy&lt;br/&gt;line 641&quot;]
-    n_is_busy([&quot;Security::is_busy&lt;br/&gt;line 647&quot;])
-    n_unlock_screen([&quot;Security::unlock_screen&lt;br/&gt;line 652&quot;])
-    n_tab([&quot;Security::tab&lt;br/&gt;line 854&quot;])
-    n_recording_controls([&quot;Security::recording_controls&lt;br/&gt;line 1079&quot;])
-    n_disable_dialogue([&quot;Security::disable_dialogue&lt;br/&gt;line 1299&quot;])
+    n_default[&quot;Security::default&lt;br/&gt;line 242&quot;]
+    n_drop[&quot;Security::drop&lt;br/&gt;line 280&quot;]
+    n_load([&quot;Security::load&lt;br/&gt;line 287&quot;])
+    n_prefer_app_lock_sealing([&quot;Security::&lt;br/&gt;prefer_app_lock_sealing&lt;br/&gt;line 360&quot;])
+    n_apply_preferred_sealing[&quot;Security::&lt;br/&gt;apply_preferred_sealing&lt;br/&gt;line 375&quot;]
+    n_set_lock_from_setup([&quot;Security::set_lock_from_setup&lt;br/&gt;line 417&quot;])
+    n_set_recording_passphrase([&quot;Security::&lt;br/&gt;set_recording_passphrase&lt;br/&gt;line 433&quot;])
+    n_has_lock[&quot;Security::has_lock&lt;br/&gt;line 442&quot;]
+    n_lock_now[&quot;Security::lock_now&lt;br/&gt;line 451&quot;]
+    n_lock_after_idle([&quot;Security::lock_after_idle&lt;br/&gt;line 461&quot;])
+    n_lock_inner[&quot;Security::lock_inner&lt;br/&gt;line 470&quot;]
+    n_wipe_secrets[&quot;Security::wipe_secrets&lt;br/&gt;line 479&quot;]
+    n_ready_to_write[&quot;Security::ready_to_write&lt;br/&gt;line 510&quot;]
+    n_blocked_reason([&quot;Security::blocked_reason&lt;br/&gt;line 522&quot;])
+    n_spawn[&quot;Security::spawn&lt;br/&gt;line 572&quot;]
+    n_poll[&quot;Security::poll&lt;br/&gt;line 587&quot;]
+    n_is_busy([&quot;Security::is_busy&lt;br/&gt;line 700&quot;])
+    n_unlock_screen([&quot;Security::unlock_screen&lt;br/&gt;line 705&quot;])
+    n_tab([&quot;Security::tab&lt;br/&gt;line 907&quot;])
+    n_recording_controls([&quot;Security::recording_controls&lt;br/&gt;line 1132&quot;])
+    n_disable_dialogue([&quot;Security::disable_dialogue&lt;br/&gt;line 1352&quot;])
     n_blocked_reason --&gt; n_ready_to_write
     n_drop --&gt; n_wipe_secrets
-    n_is_busy --&gt; n_busy
     n_load --&gt; n_default
     n_lock_after_idle --&gt; n_lock_inner
     n_lock_inner --&gt; n_wipe_secrets
     n_lock_now --&gt; n_lock_inner
+    n_poll --&gt; n_apply_preferred_sealing
     n_poll --&gt; n_into_secret
-    n_poll --&gt; n_wipe_form
+    n_prefer_app_lock_sealing --&gt; n_apply_preferred_sealing
     n_recording_controls --&gt; n_into_secret
     n_set_lock_from_setup --&gt; n_spawn
     n_set_recording_passphrase --&gt; n_into_secret
-    n_tab --&gt; n_busy
     n_tab --&gt; n_has_lock
     n_tab --&gt; n_lock_now
     n_tab --&gt; n_poll
     n_tab --&gt; n_spawn
-    n_unlock_screen --&gt; n_busy
     n_unlock_screen --&gt; n_poll
     n_unlock_screen --&gt; n_spawn
     click n_into_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L72&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L236&quot; &quot;open the source&quot;
-    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L272&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L279&quot; &quot;open the source&quot;
-    click n_set_lock_from_setup href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L371&quot; &quot;open the source&quot;
-    click n_set_recording_passphrase href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L387&quot; &quot;open the source&quot;
-    click n_has_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L396&quot; &quot;open the source&quot;
-    click n_lock_now href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L405&quot; &quot;open the source&quot;
-    click n_lock_after_idle href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L415&quot; &quot;open the source&quot;
-    click n_lock_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L424&quot; &quot;open the source&quot;
-    click n_wipe_secrets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L433&quot; &quot;open the source&quot;
-    click n_ready_to_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L464&quot; &quot;open the source&quot;
-    click n_blocked_reason href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L476&quot; &quot;open the source&quot;
-    click n_spawn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L526&quot; &quot;open the source&quot;
-    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L541&quot; &quot;open the source&quot;
-    click n_wipe_form href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L633&quot; &quot;open the source&quot;
-    click n_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L641&quot; &quot;open the source&quot;
-    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L647&quot; &quot;open the source&quot;
-    click n_unlock_screen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L652&quot; &quot;open the source&quot;
-    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L854&quot; &quot;open the source&quot;
-    click n_recording_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1079&quot; &quot;open the source&quot;
-    click n_disable_dialogue href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1299&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L242&quot; &quot;open the source&quot;
+    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L280&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L287&quot; &quot;open the source&quot;
+    click n_prefer_app_lock_sealing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L360&quot; &quot;open the source&quot;
+    click n_apply_preferred_sealing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L375&quot; &quot;open the source&quot;
+    click n_set_lock_from_setup href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L417&quot; &quot;open the source&quot;
+    click n_set_recording_passphrase href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L433&quot; &quot;open the source&quot;
+    click n_has_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L442&quot; &quot;open the source&quot;
+    click n_lock_now href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L451&quot; &quot;open the source&quot;
+    click n_lock_after_idle href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L461&quot; &quot;open the source&quot;
+    click n_lock_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L470&quot; &quot;open the source&quot;
+    click n_wipe_secrets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L479&quot; &quot;open the source&quot;
+    click n_ready_to_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L510&quot; &quot;open the source&quot;
+    click n_blocked_reason href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L522&quot; &quot;open the source&quot;
+    click n_spawn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L572&quot; &quot;open the source&quot;
+    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L587&quot; &quot;open the source&quot;
+    click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L700&quot; &quot;open the source&quot;
+    click n_unlock_screen href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L705&quot; &quot;open the source&quot;
+    click n_tab href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L907&quot; &quot;open the source&quot;
+    click n_recording_controls href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1132&quot; &quot;open the source&quot;
+    click n_disable_dialogue href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1352&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_load,n_set_lock_from_setup,n_set_recording_passphrase,n_lock_after_idle,n_blocked_reason,n_is_busy,n_unlock_screen,n_tab,n_recording_controls,n_disable_dialogue entry
+    class n_load,n_prefer_app_lock_sealing,n_set_lock_from_setup,n_set_recording_passphrase,n_lock_after_idle,n_blocked_reason,n_is_busy,n_unlock_screen,n_tab,n_recording_controls,n_disable_dialogue entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_has_lock,n_lock_now,n_ready_to_write api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_into_secret,n_default,n_drop,n_lock_inner,n_wipe_secrets,n_spawn,n_poll,n_wipe_form,n_busy helper</code></pre>
+    class n_into_secret,n_default,n_drop,n_apply_preferred_sealing,n_lock_inner,n_wipe_secrets,n_spawn,n_poll helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -412,54 +413,56 @@ flowchart TD
 <tr><td><code>Op</code> <sub>enum</sub></td><td><a href="security.src.html#fn-op">106</a></td><td>What a background lock operation was trying to do.</td></tr>
 <tr><td><code>OpResult</code> <sub>type</sub></td><td><a href="security.src.html#fn-opresult">117</a></td><td>A finished lock operation: the store as it now stands, and how it went.</td></tr>
 <tr><td><code>Security</code> <sub>pub struct</sub></td><td><a href="security.src.html#fn-security">129</a></td><td>Everything about locking the app and sealing its output.</td></tr>
-<tr><td><code>Security::default</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-default">236</a></td><td>The safe state, and deliberately free of I/O so tests and VeilVoiceApp::default() never touch the real lock file.</td></tr>
-<tr><td><code>Security::drop</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-drop">272</a></td><td></td></tr>
-<tr><td><code>Security::load</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-load">279</a></td><td>Read the lock file for this machine and start locked if one is set.</td></tr>
-<tr><td><code>Security::take_unlock_passphrase</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-take_unlock_passphrase">322</a></td><td>Take the passphrase that just opened the lock, once.</td></tr>
-<tr><td><code>Security::take_unlock_store_key</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-take_unlock_store_key">331</a></td><td>Collect the obfuscated store&#x27;s key from the unlock that just happened.</td></tr>
-<tr><td><code>Security::prefer_app_lock_sealing</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-prefer_app_lock_sealing">340</a></td><td>Start in Sealing::AppLock, because the user asked for that last time.</td></tr>
-<tr><td><code>Security::seals_with_app_lock</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-seals_with_app_lock">348</a></td><td>Whether the app-lock sealing mode is currently chosen, so the window can have the choice remembered.</td></tr>
-<tr><td><code>Security::tampered</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-tampered">356</a></td><td>Whether the lock reported having been interfered with.</td></tr>
-<tr><td><code>Security::is_locked</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-is_locked">361</a></td><td>Whether the unlock screen should be shown instead of the app.</td></tr>
-<tr><td><code>Security::set_lock_from_setup</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-set_lock_from_setup">371</a></td><td>Whether a lock is configured at all.</td></tr>
-<tr><td><code>Security::has_recording_passphrase</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-has_recording_passphrase">378</a></td><td>Whether a recording passphrase is held for this session.</td></tr>
-<tr><td><code>Security::set_recording_passphrase</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-set_recording_passphrase">387</a></td><td>Take a recording passphrase from the first-run setup.</td></tr>
-<tr><td><code>Security::has_lock</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-has_lock">396</a></td><td>Whether an app lock is configured on this machine.</td></tr>
-<tr><td><code>Security::lock_now</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-lock_now">405</a></td><td>Lock the app now, wiping the session passphrase with it.</td></tr>
-<tr><td><code>Security::lock_after_idle</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-lock_after_idle">415</a></td><td>Lock because nobody has touched the window for a while.</td></tr>
-<tr><td><code>Security::lock_inner</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-lock_inner">424</a></td><td>Lock, remembering whether the person did it or the idle timer did.</td></tr>
-<tr><td><code>Security::wipe_secrets</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-wipe_secrets">433</a></td><td>Wipe every plaintext secret this struct is holding.</td></tr>
-<tr><td><code>Security::ready_to_write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-ready_to_write">464</a></td><td>Whether a job may start: either encryption is off, or there is something to encrypt with.</td></tr>
-<tr><td><code>Security::blocked_reason</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-blocked_reason">476</a></td><td>Why a job cannot start yet, for the button&#x27;s tooltip.</td></tr>
-<tr><td><code>Security::plan</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-plan">494</a></td><td>How the next job should protect its output.</td></tr>
-<tr><td><code>Security::spawn</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-spawn">526</a></td><td>Run a lock operation on a thread, so the window keeps drawing.</td></tr>
-<tr><td><code>Security::poll</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-poll">541</a></td><td>Collect a finished lock operation.</td></tr>
-<tr><td><code>Security::wipe_form</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-wipe_form">633</a></td><td>Clear what was typed, so a passphrase does not sit in a field after use.</td></tr>
-<tr><td><code>Security::busy</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-busy">641</a></td><td>Whether an operation is in flight, so the panel can refuse a second one.</td></tr>
-<tr><td><code>Security::is_busy</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-is_busy">647</a></td><td>Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.</td></tr>
-<tr><td><code>Security::unlock_screen</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-unlock_screen">652</a></td><td>The full-window unlock screen.</td></tr>
-<tr><td><code>Security::interference_banner</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-interference_banner">798</a></td><td>The standing report that the lock file was interfered with.</td></tr>
-<tr><td><code>Security::tab</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-tab">854</a></td><td>The security tab: manage the lock, and see what it is worth.</td></tr>
-<tr><td><code>Security::load_mandate</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-load_mandate">1031</a></td><td>Read the baseline from disk and apply it to the checkbox.</td></tr>
-<tr><td><code>Security::mandate_requires_app_lock</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_requires_app_lock">1046</a></td><td>Whether the baseline insists on the app lock.</td></tr>
-<tr><td><code>Security::mandate_requires_encryption</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_requires_encryption">1051</a></td><td>Whether the baseline insists on encryption at rest.</td></tr>
-<tr><td><code>Security::mandate_history</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_history">1056</a></td><td>The change log, for the panel that shows it.</td></tr>
-<tr><td><code>Security::record</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-record">1066</a></td><td>Record a change to the baseline, and write it down.</td></tr>
-<tr><td><code>Security::recording_controls</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-recording_controls">1079</a></td><td>The at-rest controls that sit inside the file tab.</td></tr>
-<tr><td><code>Security::mandate_history_panel</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_panel">1269</a></td><td>The log of every time a requirement was turned off or back on.</td></tr>
-<tr><td><code>Security::mandate_history_rows</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_rows">1288</a></td><td>One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off.</td></tr>
-<tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-disable_dialogue">1299</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
-<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-disable_warning">1341</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
-<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="security.src.html#fn-plan">1357</a></td><td>What a finished job should do with its bytes.</td></tr>
-<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-plan-write">1382</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
-<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">1429</a></td><td></td></tr>
-<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">1440</a></td><td>Run one lock operation, off the UI thread.</td></tr>
-<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">1509</a></td><td>Re-open the lock store from disk, or None when there is nothing to open.</td></tr>
-<tr><td><code>PASSWORD_LABEL_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_label_width">1516</a></td><td>The width every passphrase label is given, so every field starts level.</td></tr>
-<tr><td><code>PASSWORD_FIELD_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_field_width">1521</a></td><td>How wide every passphrase field is drawn, on this tab and on the lock screen.</td></tr>
-<tr><td><code>button_column</code> <sub>fn</sub></td><td><a href="security.src.html#fn-button_column">1555</a></td><td>One labelled passphrase field, with the field in the same place every time.</td></tr>
-<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">1570</a></td><td>One passphrase field with its label, at the shared width.</td></tr>
-<tr><td><code>unlock_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-unlock_row">1615</a></td><td>The password row on the lock screen: the label, the field and the button.</td></tr>
+<tr><td><code>Security::default</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-default">242</a></td><td>The safe state, and deliberately free of I/O so tests and VeilVoiceApp::default() never touch the real lock file.</td></tr>
+<tr><td><code>Security::drop</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-drop">280</a></td><td></td></tr>
+<tr><td><code>Security::load</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-load">287</a></td><td>Read the lock file for this machine and start locked if one is set.</td></tr>
+<tr><td><code>Security::take_unlock_passphrase</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-take_unlock_passphrase">330</a></td><td>Take the passphrase that just opened the lock, once.</td></tr>
+<tr><td><code>Security::take_unlock_store_key</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-take_unlock_store_key">339</a></td><td>Collect the obfuscated store&#x27;s key from the unlock that just happened.</td></tr>
+<tr><td><code>Security::prefer_app_lock_sealing</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-prefer_app_lock_sealing">360</a></td><td>Start in Sealing::AppLock, because the user asked for that last time.</td></tr>
+<tr><td><code>Security::apply_preferred_sealing</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-apply_preferred_sealing">375</a></td><td>Turn the remembered preference into the sealing mode, once.</td></tr>
+<tr><td><code>Security::app_lock_sealing_is_waiting</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-app_lock_sealing_is_waiting">388</a></td><td>Whether the stored preference is still waiting for a lock to apply to.</td></tr>
+<tr><td><code>Security::seals_with_app_lock</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-seals_with_app_lock">394</a></td><td>Whether the app-lock sealing mode is currently chosen, so the window can have the choice remembered.</td></tr>
+<tr><td><code>Security::tampered</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-tampered">402</a></td><td>Whether the lock reported having been interfered with.</td></tr>
+<tr><td><code>Security::is_locked</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-is_locked">407</a></td><td>Whether the unlock screen should be shown instead of the app.</td></tr>
+<tr><td><code>Security::set_lock_from_setup</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-set_lock_from_setup">417</a></td><td>Whether a lock is configured at all.</td></tr>
+<tr><td><code>Security::has_recording_passphrase</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-has_recording_passphrase">424</a></td><td>Whether a recording passphrase is held for this session.</td></tr>
+<tr><td><code>Security::set_recording_passphrase</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-set_recording_passphrase">433</a></td><td>Take a recording passphrase from the first-run setup.</td></tr>
+<tr><td><code>Security::has_lock</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-has_lock">442</a></td><td>Whether an app lock is configured on this machine.</td></tr>
+<tr><td><code>Security::lock_now</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-lock_now">451</a></td><td>Lock the app now, wiping the session passphrase with it.</td></tr>
+<tr><td><code>Security::lock_after_idle</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-lock_after_idle">461</a></td><td>Lock because nobody has touched the window for a while.</td></tr>
+<tr><td><code>Security::lock_inner</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-lock_inner">470</a></td><td>Lock, remembering whether the person did it or the idle timer did.</td></tr>
+<tr><td><code>Security::wipe_secrets</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-wipe_secrets">479</a></td><td>Wipe every plaintext secret this struct is holding.</td></tr>
+<tr><td><code>Security::ready_to_write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-ready_to_write">510</a></td><td>Whether a job may start: either encryption is off, or there is something to encrypt with.</td></tr>
+<tr><td><code>Security::blocked_reason</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-blocked_reason">522</a></td><td>Why a job cannot start yet, for the button&#x27;s tooltip.</td></tr>
+<tr><td><code>Security::plan</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-plan">540</a></td><td>How the next job should protect its output.</td></tr>
+<tr><td><code>Security::spawn</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-spawn">572</a></td><td>Run a lock operation on a thread, so the window keeps drawing.</td></tr>
+<tr><td><code>Security::poll</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-poll">587</a></td><td>Collect a finished lock operation.</td></tr>
+<tr><td><code>Security::wipe_form</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-wipe_form">686</a></td><td>Clear what was typed, so a passphrase does not sit in a field after use.</td></tr>
+<tr><td><code>Security::busy</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-busy">694</a></td><td>Whether an operation is in flight, so the panel can refuse a second one.</td></tr>
+<tr><td><code>Security::is_busy</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-is_busy">700</a></td><td>Whether a lock operation is running, so the window keeps repainting and the spinner actually spins.</td></tr>
+<tr><td><code>Security::unlock_screen</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-unlock_screen">705</a></td><td>The full-window unlock screen.</td></tr>
+<tr><td><code>Security::interference_banner</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-interference_banner">851</a></td><td>The standing report that the lock file was interfered with.</td></tr>
+<tr><td><code>Security::tab</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-tab">907</a></td><td>The security tab: manage the lock, and see what it is worth.</td></tr>
+<tr><td><code>Security::load_mandate</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-load_mandate">1084</a></td><td>Read the baseline from disk and apply it to the checkbox.</td></tr>
+<tr><td><code>Security::mandate_requires_app_lock</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_requires_app_lock">1099</a></td><td>Whether the baseline insists on the app lock.</td></tr>
+<tr><td><code>Security::mandate_requires_encryption</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_requires_encryption">1104</a></td><td>Whether the baseline insists on encryption at rest.</td></tr>
+<tr><td><code>Security::mandate_history</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-mandate_history">1109</a></td><td>The change log, for the panel that shows it.</td></tr>
+<tr><td><code>Security::record</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-record">1119</a></td><td>Record a change to the baseline, and write it down.</td></tr>
+<tr><td><code>Security::recording_controls</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-recording_controls">1132</a></td><td>The at-rest controls that sit inside the file tab.</td></tr>
+<tr><td><code>Security::mandate_history_panel</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_panel">1322</a></td><td>The log of every time a requirement was turned off or back on.</td></tr>
+<tr><td><code>Security::mandate_history_rows</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_rows">1341</a></td><td>One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off.</td></tr>
+<tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-disable_dialogue">1352</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
+<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-disable_warning">1394</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
+<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="security.src.html#fn-plan">1410</a></td><td>What a finished job should do with its bytes.</td></tr>
+<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-plan-write">1435</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
+<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">1482</a></td><td></td></tr>
+<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">1493</a></td><td>Run one lock operation, off the UI thread.</td></tr>
+<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">1562</a></td><td>Re-open the lock store from disk, or None when there is nothing to open.</td></tr>
+<tr><td><code>PASSWORD_LABEL_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_label_width">1569</a></td><td>The width every passphrase label is given, so every field starts level.</td></tr>
+<tr><td><code>PASSWORD_FIELD_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_field_width">1574</a></td><td>How wide every passphrase field is drawn, on this tab and on the lock screen.</td></tr>
+<tr><td><code>button_column</code> <sub>fn</sub></td><td><a href="security.src.html#fn-button_column">1608</a></td><td>One labelled passphrase field, with the field in the same place every time.</td></tr>
+<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">1623</a></td><td>One passphrase field with its label, at the shared width.</td></tr>
+<tr><td><code>unlock_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-unlock_row">1668</a></td><td>The password row on the lock screen: the label, the field and the button.</td></tr>
 </tbody></table>
 </section>
 </div></div>

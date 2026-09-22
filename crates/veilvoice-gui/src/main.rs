@@ -224,9 +224,16 @@ fn main() -> eframe::Result<()> {
     // made. The settings file is the one place this is turned off, and a
     // machine whose driver accepts the request and then draws badly is the case
     // it exists for: from inside the process that looks like success.
-    let acceleration = veilvoice_gui::prefs::default_path()
-        .map(|path| veilvoice_gui::prefs::Prefs::load(&path).acceleration)
-        .unwrap_or(true);
+    //
+    // Roadmap item 170. `starting_point` rather than `load`, so the run that
+    // has no settings file to read asks this machine what it draws with
+    // instead of assuming every machine has a graphics card. That look costs a
+    // subprocess and is cached for the process, so the window created here and
+    // the settings panel built afterwards share one answer between them.
+    let acceleration = veilvoice_gui::prefs::Prefs::starting_point(
+        veilvoice_gui::prefs::default_path().as_deref(),
+    )
+    .acceleration;
 
     let result = eframe::run_native(
         "VeilVoice",

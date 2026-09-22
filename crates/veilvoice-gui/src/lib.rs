@@ -105,6 +105,7 @@ pub mod palettes;
 pub mod paths;
 pub mod policy;
 pub mod prefs;
+pub mod probe;
 pub mod reduced_motion;
 pub mod security;
 pub mod settings;
