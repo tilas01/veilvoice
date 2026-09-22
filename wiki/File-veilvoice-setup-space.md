@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-setup/src/space.rs`
 
-[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 171 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs)
+[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 170 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs)
 
 ## Contents
 
@@ -49,11 +49,11 @@ If the system will not say, it says so rather than guessing.
 
 ## What this file contains
 
-171 lines defining **5 functions** (3 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+170 lines defining **5 functions** (3 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `free_bytes` (line 45) -- Free space at path, in bytes, or None if the platform would not say.
+- `free_bytes` (line 44) -- Free space at path, in bytes, or None if the platform would not say.
   - reaches: `unix_free`, `windows_free`, `parse_df`, `parse_fsutil`
 
 ## What calls what
@@ -70,20 +70,20 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_free_bytes(["free_bytes<br/>line 45"])
-    n_unix_free["unix_free<br/>line 63"]
-    n_parse_df["parse_df<br/>line 91"]
-    n_windows_free["windows_free<br/>line 115"]
-    n_parse_fsutil["parse_fsutil<br/>line 150"]
+    n_free_bytes(["free_bytes<br/>line 44"])
+    n_unix_free["unix_free<br/>line 62"]
+    n_parse_df["parse_df<br/>line 90"]
+    n_windows_free["windows_free<br/>line 114"]
+    n_parse_fsutil["parse_fsutil<br/>line 149"]
     n_free_bytes --> n_unix_free
     n_free_bytes --> n_windows_free
     n_unix_free --> n_parse_df
     n_windows_free --> n_parse_fsutil
-    click n_free_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L45" "open the source"
-    click n_unix_free href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L63" "open the source"
-    click n_parse_df href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L91" "open the source"
-    click n_windows_free href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L115" "open the source"
-    click n_parse_fsutil href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L150" "open the source"
+    click n_free_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L44" "open the source"
+    click n_unix_free href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L62" "open the source"
+    click n_parse_df href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L90" "open the source"
+    click n_windows_free href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L114" "open the source"
+    click n_parse_fsutil href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L149" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_free_bytes entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -98,8 +98,8 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `free_bytes` <sub>pub fn</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L45) | Free space at path, in bytes, or None if the platform would not say. |
-| `unix_free` <sub>fn</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L63) | df -Pk, parsed from the format POSIX specifies. |
-| `parse_df` <sub>pub fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L91) | The available column of a df -Pk report. |
-| `windows_free` <sub>fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L115) | fsutil volume diskfree, which is on every Windows since Vista. |
-| `parse_fsutil` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L150) | The free-bytes figure from fsutil volume diskfree. |
+| `free_bytes` <sub>pub fn</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L44) | Free space at path, in bytes, or None if the platform would not say. |
+| `unix_free` <sub>fn</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L62) | df -Pk, parsed from the format POSIX specifies. |
+| `parse_df` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L90) | The available column of a df -Pk report. |
+| `windows_free` <sub>fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L114) | fsutil volume diskfree, which is on every Windows since Vista. |
+| `parse_fsutil` <sub>pub fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs#L149) | The free-bytes figure from fsutil volume diskfree. |

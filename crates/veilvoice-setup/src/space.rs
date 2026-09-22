@@ -34,7 +34,6 @@
 //! If the system will not say, it says so rather than guessing.
 
 use std::path::Path;
-use std::process::Command;
 
 /// Free space at `path`, in bytes, or `None` if the platform would not say.
 ///
@@ -70,7 +69,7 @@ fn unix_free(path: &Path) -> Option<u64> {
         .into_iter()
         .find(|p| Path::new(p).is_file())?;
 
-    let output = Command::new(program).arg("-Pk").arg(path).output().ok()?;
+    let output = crate::command(program).arg("-Pk").arg(path).output().ok()?;
     if !output.status.success() {
         return None;
     }
@@ -121,7 +120,7 @@ fn windows_free(path: &Path) -> Option<u64> {
     .into_iter()
     .find(|p| Path::new(p).is_file())?;
 
-    let output = Command::new(program)
+    let output = crate::command(program)
         .arg("volume")
         .arg("diskfree")
         .arg(path)

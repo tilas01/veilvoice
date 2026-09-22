@@ -65,7 +65,6 @@
 //! anything.
 
 use std::path::PathBuf;
-use std::process::Command;
 use std::time::Duration;
 
 /// The repository asked about.
@@ -486,7 +485,7 @@ fn fetch(tool: &Tool, url: &str) -> Result<String, Error> {
     // the effective URL of that page would return the page's own address every
     // time, which parses as no version at all, so the body is what is read.
     let redirect_carries_the_answer = url == LATEST_URL;
-    let mut command = Command::new(&tool.program);
+    let mut command = crate::command(&tool.program);
     if tool.wget {
         command.args([
             "--quiet",
