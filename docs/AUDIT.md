@@ -1397,6 +1397,63 @@ The campaign is not yet part of any build. It takes twenty-three minutes over
 four files and there are twenty-seven crates; making it a check is the work,
 and roadmap item 151 carries it.
 
+### F-202: a preference cleared on the first frame of every run that had no lock
+
+Roadmap item 86 gave the window a setting for sealing every recording with the
+app-lock passphrase, and the window kept that setting in step with the live
+mode in one line of `update`:
+
+    self.preferences
+        .set_seal_with_app_lock(self.security.seals_with_app_lock());
+
+Once per frame, and `set_` is a no-op when nothing changed, so it costs a
+comparison and almost never a write. That was the whole of the reasoning and
+it is right about cost and wrong about meaning.
+
+`seals_with_app_lock` reports the **mode the Security tab is in**. Without an
+app lock there is nothing to seal with, so the mode is never the app-lock one,
+so the line wrote `false` into the preference. Not because anybody had turned
+it off. Because the thing it names did not exist yet.
+
+The other half is `prefer_app_lock_sealing`, which read the preference once at
+startup and applied it only `if on && self.store.is_some()`. With no lock it
+dropped the answer on the floor. There was no path that offered it again when
+a lock appeared later.
+
+**Together those two make a preference that cannot survive not being usable
+yet.** Set an app lock at any point after startup, which is exactly what the
+first-run cards ask somebody to do in the second card, and the preference had
+already been cleared several hundred frames earlier, before the first card was
+drawn. The reader got a locked window and unencrypted recordings and nothing
+anywhere said why.
+
+**Nothing could have noticed, and that is the part worth keeping.** The
+preference defaulted to off, and the only way to turn it on was the Security
+tab, which is only reachable when a lock already exists. So in every state a
+test or a person could construct, the store was already there and both halves
+behaved. The defect was unreachable from the defaults and would have become
+reachable the moment the defaults changed, which is what roadmap item 170 does.
+A bug that is dormant because of a default is not a bug that is absent; it is
+one waiting for the default to move, and it moves without anybody looking at
+the code that depended on it.
+
+The fix is in two places, because the defect is. `Security` now **remembers**
+the preference when it cannot apply it, and applies it the moment a lock
+appears, which is the one other point at which that becomes possible: `poll`
+is where a completed lock operation installs the store, so the offer is made
+there. Once, not every frame, so somebody who sets a lock and then deliberately
+chooses passphrase sealing is not overruled on the next lock event. And the
+window asks before it mirrors: `app_lock_sealing_is_waiting` is true while a
+preference is held with nowhere to go, and the write-back is skipped while it
+is.
+
+Four regression tests, one of which drives the real thing end to end: prefer
+the mode with no lock, set a lock on a worker, and assert that sealing turned
+on and that the preference is no longer being held. The unguarded write-back
+is held by reading the source of `update`, because what is being asserted is
+that the write is not *reachable* in that state, and a rendered frame would
+only prove it for that frame.
+
 ### F-199: the workflow that publishes the wiki had never once succeeded
 
 `wiki.yml` was added to put the generated pages where a reader looks. It has
@@ -7980,7 +8037,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and one defects found and fixed (F-1 to F-201), across
+**Two hundred and two defects found and fixed (F-1 to F-202), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

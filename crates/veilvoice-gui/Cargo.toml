@@ -35,8 +35,9 @@ veilvoice-conversation = { path = "../veilvoice-conversation" }
 # The Install tab, the encrypted volumes it can write into, and the free space
 # the first-run card measures.
 veilvoice-setup = { path = "../veilvoice-setup" }
-# The palettes speakers are coloured from, the preview page and the render
-# size.
+# The palettes speakers are coloured from, the preview page, the render size,
+# and the list of this machine's graphics devices that decides which drawing
+# path a first run starts on.
 veilvoice-video = { path = "../veilvoice-video" }
 # The Monitor tab's feed of what is holding the microphone and the camera.
 veilvoice-watch = { path = "../veilvoice-watch" }

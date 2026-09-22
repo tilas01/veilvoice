@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/firstrun.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 693 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 706 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs)
 
 ## Contents
 
@@ -66,7 +66,7 @@ walk away. You can skip any of them and set them later.
 
 ## What this file contains
 
-693 lines defining **13 functions** (1 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+706 lines defining **13 functions** (1 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -107,11 +107,11 @@ flowchart TD
     n_app_lock["FirstRun::app_lock<br/>line 218"]
     n_recording["FirstRun::recording<br/>line 290"]
     n_machine["FirstRun::machine<br/>line 373"]
-    n_autolock["FirstRun::autolock<br/>line 477"]
-    n_card["card<br/>line 501"]
-    n_device_counts["device_counts<br/>line 534"]
-    n_field["field<br/>line 547"]
-    n_buttons["buttons<br/>line 559"]
+    n_autolock["FirstRun::autolock<br/>line 490"]
+    n_card["card<br/>line 514"]
+    n_device_counts["device_counts<br/>line 547"]
+    n_field["field<br/>line 560"]
+    n_buttons["buttons<br/>line 572"]
     n_app_lock --> n_buttons
     n_app_lock --> n_card
     n_app_lock --> n_field
@@ -139,11 +139,11 @@ flowchart TD
     click n_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L218" "open the source"
     click n_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L290" "open the source"
     click n_machine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L373" "open the source"
-    click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L477" "open the source"
-    click n_card href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L501" "open the source"
-    click n_device_counts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L534" "open the source"
-    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L547" "open the source"
-    click n_buttons href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L559" "open the source"
+    click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L490" "open the source"
+    click n_card href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L514" "open the source"
+    click n_device_counts href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L547" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L560" "open the source"
+    click n_buttons href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L572" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_panel entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -168,11 +168,11 @@ flowchart TD
 | `FirstRun::app_lock` <sub>fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L218) | The app-lock step: set a passphrase for VeilVoice itself, or decline it. |
 | `FirstRun::recording` <sub>fn</sub> | [290](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L290) | The recording step: the at-rest passphrase, and what it is separate from. |
 | `FirstRun::machine` <sub>fn</sub> | [373](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L373) | What this machine says about itself, and the one choice that follows. |
-| `FirstRun::autolock` <sub>fn</sub> | [477](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L477) | The auto-lock step: how long idle before the window locks itself. |
-| `card` <sub>fn</sub> | [501](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L501) | A bordered card, so each step reads as one thing rather than a page of text. |
-| `device_counts` <sub>fn</sub> | [534](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L534) | How many recording and playback devices this machine has. |
-| `field` <sub>fn</sub> | [547](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L547) | A password field with its label, laid out like the rest of the application. |
-| `buttons` <sub>fn</sub> | [559](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L559) | The row that moves on. |
+| `FirstRun::autolock` <sub>fn</sub> | [490](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L490) | The auto-lock step: how long idle before the window locks itself. |
+| `card` <sub>fn</sub> | [514](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L514) | A bordered card, so each step reads as one thing rather than a page of text. |
+| `device_counts` <sub>fn</sub> | [547](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L547) | How many recording and playback devices this machine has. |
+| `field` <sub>fn</sub> | [560](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L560) | A password field with its label, laid out like the rest of the application. |
+| `buttons` <sub>fn</sub> | [572](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L572) | The row that moves on. |
 
 ---
 

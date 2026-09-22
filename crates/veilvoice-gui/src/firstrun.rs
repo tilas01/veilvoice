@@ -457,18 +457,31 @@ impl FirstRun {
             {
                 prefs.set_acceleration(accelerated);
             }
+            // Roadmap item 170. The probe's own sentence, which names what was
+            // found on this machine, rather than a paragraph written once for
+            // every machine. This card is called "What this machine says" and
+            // this was the one section on it that did not say anything about
+            // the machine.
             ui.label(
-                RichText::new(
-                    "On, and asking is the safe direction: a machine that cannot \
-                     give a hardware context is given a software one and the \
-                     window still opens. Turn it off if the window is black or \
-                     wrong, which happens on some drivers that accept and then \
-                     draw badly. It costs speed and nothing else, and the About \
-                     tab shows what the driver actually gave.",
-                )
-                .small()
-                .color(p::muted()),
+                RichText::new(crate::probe::look().acceleration_reason.as_str())
+                    .small()
+                    .color(p::muted()),
             );
+            // And a plain statement of whether the sentence above is a finding
+            // or a fallback. A reader deciding whether to touch the tick needs
+            // to know which, and an interface that reads the same either way is
+            // claiming a measurement it may not have taken.
+            if !crate::probe::look().graphics_answered {
+                ui.label(
+                    RichText::new(
+                        "This is the setting every machine started on before it \
+                         could be asked, so nothing is lost by it. The About tab \
+                         shows what the driver actually gave.",
+                    )
+                    .small()
+                    .color(p::muted()),
+                );
+            }
         });
         buttons(ui, "finish", None).0
     }

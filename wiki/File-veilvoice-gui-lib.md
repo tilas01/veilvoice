@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 147 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 148 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -69,7 +69,7 @@ another thread, so the window keeps answering while it is busy.
 
 ## What this file contains
 
-147 lines defining **4 functions** (3 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+148 lines defining **4 functions** (3 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -94,11 +94,11 @@ flowchart TD
     n_tabs(["tabs<br/>line 68"])
     n_settings_pages(["settings_pages<br/>line 79"])
     n_jetbrains_mono_path(["jetbrains_mono_path<br/>line 87"])
-    n_headless_frame["headless_frame<br/>line 139"]
+    n_headless_frame["headless_frame<br/>line 140"]
     click n_tabs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68" "open the source"
     click n_settings_pages href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L79" "open the source"
     click n_jetbrains_mono_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L87" "open the source"
-    click n_headless_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L139" "open the source"
+    click n_headless_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L140" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_tabs,n_settings_pages,n_jetbrains_mono_path entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -114,5 +114,5 @@ flowchart TD
 | `tabs` <sub>pub fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68) | The name of every tab the window shows, in the order it shows them. |
 | `settings_pages` <sub>pub fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L79) | The name of every page of the Settings tab, in the order the menu shows them. |
 | `jetbrains_mono_path` <sub>pub fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L87) | Where JetBrains Mono is on this machine, if it is anywhere. |
-| `VERSION` <sub>pub const</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L126) | Crate version string, surfaced in the About panel. |
-| `headless_frame` <sub>pub(crate) fn</sub> | [139](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L139) | Draw one frame with no window, and discard what a real backend would have uploaded. |
+| `VERSION` <sub>pub const</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L127) | Crate version string, surfaced in the About panel. |
+| `headless_frame` <sub>pub(crate) fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L140) | Draw one frame with no window, and discard what a real backend would have uploaded. |

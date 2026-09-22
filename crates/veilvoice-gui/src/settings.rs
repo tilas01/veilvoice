@@ -160,10 +160,12 @@ impl Settings {
     /// force, and the panel says so.
     pub fn load(ctx: &egui::Context) -> Self {
         let path = crate::prefs::default_path();
-        let prefs = match &path {
-            Some(p) => Prefs::load(p),
-            None => Prefs::default(),
-        };
+        // Roadmap item 170. `starting_point` rather than `load`: a run with no
+        // settings file is a first run, and a first run asks this machine
+        // about itself rather than opening on constants. The look is cached
+        // for the process and `main` has already taken it, so this costs
+        // nothing here.
+        let prefs = Prefs::starting_point(path.as_deref());
         crate::theme::set_by_id(ctx, &prefs.theme);
         let first_run = !prefs.configured;
         Self {
@@ -1477,6 +1479,7 @@ mod tests {
                 autolock_ceiling: crate::autolock::CEILING_SECS,
                 frame_rate: 0,
                 show_frame_rate: false,
+                defaults_measured: true,
                 recovered_from_corrupt_file: false,
             },
             page: Page::Storage,

@@ -180,6 +180,12 @@ pub struct Security {
     pub encrypt_recordings: bool,
     /// Which container mode sealing uses.
     pub sealing: Sealing,
+    /// The stored "seal with the app lock" preference, held until there is a
+    /// lock to apply it to. **F-202.**
+    wants_app_lock_sealing: bool,
+    /// Whether that preference has been turned into a sealing mode. Applied
+    /// once, so a later choice in the Security tab is not overruled.
+    app_lock_sealing_applied: bool,
     /// Recipient public key, for [`Sealing::PublicKey`].
     pub public_key: Option<PathBuf>,
     /// The key picker, while it is open.
@@ -252,6 +258,8 @@ impl Default for Security {
             repeat: String::new(),
             encrypt_recordings: true,
             sealing: Sealing::Password,
+            wants_app_lock_sealing: false,
+            app_lock_sealing_applied: false,
             public_key: None,
             choosing_key: crate::dialog::Pending::new(),
             passphrase: String::new(),
@@ -337,10 +345,48 @@ impl Security {
     /// Applied at startup, before the window is drawn and so before anything
     /// can be unlocked, which matters: the passphrase is captured as the lock
     /// opens and only when this mode is already chosen.
+    ///
+    /// **F-202.** The preference is now *remembered* when there is no lock to
+    /// apply it to, rather than dropped. It used to be dropped, and that was
+    /// invisible while the preference defaulted to off: the only way to have
+    /// it on was to have turned it on, which needed a lock, so a lock always
+    /// existed by the time this ran. Roadmap item 170 made it the default, and
+    /// the hole opened. A first run sets an app lock in the second card, and
+    /// this had already been called and thrown the answer away in the frame
+    /// before the first card was drawn.
+    ///
+    /// So it is held until [`Self::apply_preferred_sealing`] has somewhere to
+    /// put it.
     pub fn prefer_app_lock_sealing(&mut self, on: bool) {
-        if on && self.store.is_some() {
+        self.wants_app_lock_sealing = on;
+        self.apply_preferred_sealing();
+    }
+
+    /// Turn the remembered preference into the sealing mode, once.
+    ///
+    /// Called at startup and again the moment a lock appears, which is the
+    /// only other time it can become possible.
+    ///
+    /// Once, and that is the whole subtlety. This is not a mirror of the
+    /// preference: somebody who sets an app lock and then deliberately picks
+    /// passphrase sealing in the Security tab has answered the question, and a
+    /// second application would overrule them on the next lock event. The flag
+    /// says the offer has been made.
+    fn apply_preferred_sealing(&mut self) {
+        if self.wants_app_lock_sealing && !self.app_lock_sealing_applied && self.store.is_some() {
+            self.app_lock_sealing_applied = true;
             self.sealing = Sealing::AppLock;
         }
+    }
+
+    /// Whether the stored preference is still waiting for a lock to apply to.
+    ///
+    /// **F-202.** The window writes the live sealing mode back into the
+    /// settings file every frame, and while this is true that write would
+    /// record "off" for a preference that is on and simply has nothing to act
+    /// on yet. It is how the caller knows to leave the file alone.
+    pub fn app_lock_sealing_is_waiting(&self) -> bool {
+        self.wants_app_lock_sealing && !self.app_lock_sealing_applied
     }
 
     /// Whether the app-lock sealing mode is currently chosen, so the window can
@@ -553,6 +599,13 @@ impl Security {
         };
         self.pending = None;
         self.store = store;
+
+        // F-202. A lock may have just come into existence, which is the only
+        // moment other than startup at which a held preference can be acted
+        // on. Before the `Op::Unlock` arm below, deliberately: that arm keeps
+        // the passphrase for the session only when this mode is already
+        // chosen, so a mode chosen after it would keep nothing.
+        self.apply_preferred_sealing();
 
         // Whatever the operation was, the store is the authority on whether a
         // report is outstanding. Reading it back here means one place decides,
@@ -2399,5 +2452,99 @@ mod tests {
         let mut s = Security::default();
         s.lock_now();
         assert!(!s.is_locked(), "there is nothing to unlock it with");
+    }
+
+    /// F-202. The stored preference is held, not dropped, while there is no
+    /// lock to apply it to.
+    ///
+    /// This was invisible until roadmap item 170 made app-lock sealing the
+    /// default: before that the only way to have the preference on was to have
+    /// turned it on, which needed a lock, so one always existed by the time
+    /// this ran.
+    #[test]
+    fn the_sealing_preference_waits_for_a_lock_rather_than_being_dropped() {
+        let mut s = Security::default();
+        s.prefer_app_lock_sealing(true);
+        assert!(
+            !s.seals_with_app_lock(),
+            "there is nothing to seal with yet, so the mode is not chosen"
+        );
+        assert!(
+            s.app_lock_sealing_is_waiting(),
+            "and the window must not write that back over the preference"
+        );
+    }
+
+    /// The other half of F-202: a preference that is off is not waiting for
+    /// anything, so the window keeps mirroring the live mode as it always did.
+    #[test]
+    fn a_preference_that_is_off_is_not_waiting_for_anything() {
+        let mut s = Security::default();
+        s.prefer_app_lock_sealing(false);
+        assert!(!s.app_lock_sealing_is_waiting());
+        assert!(!s.seals_with_app_lock());
+    }
+
+    /// F-202, end to end. Setting an app lock during the first run, which is
+    /// where roadmap item 176 will put it, turns the held preference into the
+    /// sealing mode. Before this, a first run produced a locked window and
+    /// unencrypted recordings and no sign of why.
+    #[test]
+    fn a_lock_set_after_the_preference_turns_sealing_on() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut s = Security::default();
+        s.path = Some(dir.path().join("app.lock"));
+        s.prefer_app_lock_sealing(true);
+        assert!(s.app_lock_sealing_is_waiting());
+
+        s.set_lock_from_setup("a passphrase for the window".into());
+        // Argon2id at the default cost, on a worker. Bounded rather than
+        // spun on: a test that hangs is worse than a test that fails.
+        for _ in 0..600 {
+            if s.poll() {
+                break;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+
+        assert!(s.has_lock(), "the lock was not created: {:?}", s.message);
+        assert!(
+            s.seals_with_app_lock(),
+            "the lock exists and the preference said to use it"
+        );
+        assert!(
+            !s.app_lock_sealing_is_waiting(),
+            "it has been applied, so the window may mirror it again"
+        );
+    }
+
+    /// Applied once, not mirrored. Somebody who sets a lock and then picks
+    /// passphrase sealing in this tab has answered the question, and the next
+    /// lock event must not overrule them.
+    #[test]
+    fn the_preference_is_offered_once_and_does_not_overrule_a_later_choice() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut s = Security::default();
+        s.path = Some(dir.path().join("app.lock"));
+        s.prefer_app_lock_sealing(true);
+        s.set_lock_from_setup("a passphrase for the window".into());
+        for _ in 0..600 {
+            if s.poll() {
+                break;
+            }
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+        assert!(s.has_lock());
+        assert!(s.seals_with_app_lock());
+
+        // The reader changes their mind in the Security tab.
+        s.sealing = Sealing::Password;
+        // Anything that reaches `apply_preferred_sealing` again must leave
+        // that alone.
+        s.apply_preferred_sealing();
+        assert!(
+            s.sealing == Sealing::Password,
+            "the stored preference overruled a choice made afterwards"
+        );
     }
 }

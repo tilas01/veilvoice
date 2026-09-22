@@ -34,10 +34,36 @@
 //! answered this question, and a privacy tool asking again -- and defaulting to
 //! yes -- would be ignoring them.
 //!
+//! # Two kinds of default, and which one this file holds
+//!
+//! **Roadmap item 170.** [`Prefs::default`] is the written-down starting
+//! point: constants, chosen once, the same on every machine. It is what the
+//! tests construct and what a build with nothing to ask falls back to.
+//!
+//! [`Prefs::starting_point`] is the one a real first run takes, and it is not
+//! the same thing. Where a value can be established by asking this machine, it
+//! is asked. Which is not most of them: a theme, a notification style and a
+//! vault folder are preferences and there is nothing to measure. The one that
+//! can be measured is the drawing path, and [`crate::probe`] is where that
+//! question is put. The other two the roadmap item names were already measured
+//! and were not described that way: `frame_rate` of `0` means the display's own
+//! rate, which [`crate::pace`] takes from the intervals between frames, and
+//! whether anything animates is resolved against the system's reduce-motion
+//! setting every frame by [`Motion::resolve`].
+//!
+//! The measurement happens once, on the run with no file to read, and is
+//! written into the file with everything else. [`Prefs::defaults_measured`]
+//! records that it happened, so the interface can say the machine was asked
+//! rather than implying it.
+//!
 //! # In plain words
 //!
 //! What you have chosen about how VeilVoice looks and behaves, kept in a small
 //! text file.
+//!
+//! The first time it runs, the things that can be worked out from your computer
+//! are worked out from your computer rather than guessed, and written down here
+//! so it only has to look once. All of them are still settings.
 //!
 //! Nothing in it is secret and nothing in it is required: delete the file and the
 //! application opens with its defaults. You can read it and edit it by hand.
@@ -106,6 +132,21 @@ pub struct Prefs {
     /// otherwise have been encrypted some other way, which is not. The
     /// direction it can fail in is the safe one, so it survives a restart and
     /// the user is not asked to choose it again every launch.
+    ///
+    /// **Roadmap item 170 turned it on.** It is the "encryption at rest" the
+    /// item names, and the argument for off was that it does nothing without
+    /// an app lock, which was true and was the wrong way round: a setting that
+    /// does nothing until a protection exists is exactly the setting to have
+    /// already chosen when one appears. Off meant that somebody who set an app
+    /// lock in the first-run cards got a locked window and unencrypted
+    /// recordings, and had to find a third tab to join the two.
+    ///
+    /// On with no app lock still changes nothing at all, which is what makes
+    /// this safe to default: [`crate::security::Security::prefer_app_lock_sealing`]
+    /// holds it until there is a lock to apply it to. That holding is new. It
+    /// had to be, because the old code read the preference once at startup and
+    /// then wrote the live state back over it every frame, which cleared it on
+    /// the first frame of every run that had no lock yet. See F-202.
     pub seal_with_app_lock: bool,
     /// The encrypted folder veiled recordings are written into, or empty.
     ///
@@ -159,6 +200,19 @@ pub struct Prefs {
     pub frame_rate: u32,
     /// Whether the header carries a live frame-rate readout.
     pub show_frame_rate: bool,
+    /// Whether this file started from a look at the machine it is on.
+    ///
+    /// **Roadmap item 170.** Persisted, and the reason it is persisted rather
+    /// than recomputed is that the look costs a subprocess. It is taken on the
+    /// run that finds no settings file, written down with the answer, and read
+    /// back for ever after.
+    ///
+    /// What it is *for* is honesty in the interface. "Asking the driver to
+    /// draw the window" reads differently depending on whether this machine
+    /// was asked what it has or whether every machine is asked the same
+    /// question, and the first-run card says which. False here means the
+    /// values came from [`Prefs::default`], which is the written-down set.
+    pub defaults_measured: bool,
     /// Set when the file on disk could not be understood, so the settings
     /// panel can say the defaults are in force and why. Never persisted.
     pub recovered_from_corrupt_file: bool,
@@ -177,7 +231,10 @@ impl Default for Prefs {
             acceleration: true,
             hide_install_tab: false,
             always_group: false,
-            seal_with_app_lock: false,
+            // Roadmap item 170. On, and it does nothing until there is an app
+            // lock to seal with, which is the point: the answer is already
+            // chosen when one appears. See the field for why off was wrong.
+            seal_with_app_lock: true,
             vault_dir: String::new(),
             vault_tool: String::new(),
             vault_hidden: String::new(),
@@ -202,6 +259,9 @@ impl Default for Prefs {
             // a privacy tool is a distraction for everybody who is not
             // diagnosing it.
             show_frame_rate: false,
+            // False, because this is the written-down set by definition.
+            // `starting_point` is what sets it.
+            defaults_measured: false,
             recovered_from_corrupt_file: false,
         }
     }
@@ -230,6 +290,63 @@ impl Prefs {
             return Self::default();
         };
         Self::parse(&text)
+    }
+
+    /// The preferences to open with: the file if there is one, and otherwise a
+    /// look at this machine.
+    ///
+    /// **Roadmap item 170.** This is the one that probes, and it is a separate
+    /// function from [`load`](Self::load) on purpose. `load` is named after a
+    /// cheap thing and has to stay one: it is called from tests and from
+    /// anything that wants to read a settings file without side effects.
+    /// Running `lspci` inside it would be the kind of surprise this project
+    /// writes findings about.
+    ///
+    /// `None` is a machine whose platform does not say where an application
+    /// should keep its files. It still gets the measured starting point,
+    /// because the values are just as right for this session; there is simply
+    /// nowhere to remember them, so the look is taken again next launch.
+    ///
+    /// The probe behind it is cached for the process, so the two callers that
+    /// both need this before the first frame cost one look between them: `main`
+    /// creates the window from `acceleration`, and
+    /// [`crate::settings::Settings::load`] builds the panel from the rest.
+    pub fn starting_point(path: Option<&Path>) -> Self {
+        match path {
+            // `is_file` rather than a failed read, because the two say
+            // different things. No file is a first run. A file that exists and
+            // will not read is a broken file, and `load` reports that as the
+            // defaults being in force, which the panel shows. Measuring over
+            // the top of it would replace one honest report with a silent
+            // reset.
+            Some(path) if path.is_file() => Self::load(path),
+            _ => Self::measured(crate::probe::look()),
+        }
+    }
+
+    /// The starting point for a machine that has just been asked about itself.
+    ///
+    /// Takes the answer rather than fetching it, so the whole of this can be
+    /// tested against a constructed machine without a subprocess.
+    ///
+    /// Everything not listed here is a preference with nothing to measure, and
+    /// comes from [`Self::default`] unchanged.
+    ///
+    /// `animations` is deliberately **not** set from
+    /// [`crate::probe::Machine`], and it is worth saying why, because the
+    /// roadmap item asks for animation to follow the system and it looks like
+    /// the omission. It already does, in [`Motion::resolve`], which resolves it
+    /// every frame against the live setting. Writing the system's answer into
+    /// the file here would freeze a moment of it: somebody who turned reduced
+    /// motion on for an afternoon and off again would have a still window and a
+    /// preference saying off, with nothing to connect the two. Resolved beats
+    /// recorded for a value the system can change underneath us.
+    pub fn measured(machine: &crate::probe::Machine) -> Self {
+        Self {
+            acceleration: machine.acceleration,
+            defaults_measured: true,
+            ..Self::default()
+        }
     }
 
     /// Parse the `key = value` format. Unknown keys are ignored, so a file
@@ -291,6 +408,12 @@ impl Prefs {
                 "hide_install_tab" => {
                     if let Some(on) = parse_bool(value) {
                         prefs.hide_install_tab = on;
+                        understood += 1;
+                    }
+                }
+                "defaults_measured" => {
+                    if let Some(on) = parse_bool(value) {
+                        prefs.defaults_measured = on;
                         understood += 1;
                     }
                 }
@@ -402,6 +525,7 @@ impl Prefs {
         out.push_str(&format!("toured_tabs = {}\n", self.toured_tabs));
         out.push_str(&format!("acceleration = {}\n", self.acceleration));
         out.push_str(&format!("hide_install_tab = {}\n", self.hide_install_tab));
+        out.push_str(&format!("defaults_measured = {}\n", self.defaults_measured));
         out.push_str(&format!("always_group = {}\n", self.always_group));
         out.push_str(&format!(
             "seal_with_app_lock = {}\n",
@@ -541,6 +665,7 @@ mod tests {
             live_monitor: "toolbar".to_string(),
             frame_rate: 144,
             show_frame_rate: true,
+            defaults_measured: true,
             recovered_from_corrupt_file: false,
         };
         let back = Prefs::parse(&prefs.to_text());
@@ -640,6 +765,155 @@ mod tests {
         assert_eq!(prefs, Prefs::default());
     }
 
+    /// Roadmap item 170. `load` is named after a cheap thing and has to stay
+    /// one: it must not run the probe, because tests and tools read settings
+    /// files and none of them asked for a subprocess.
+    #[test]
+    fn loading_a_file_never_measures_anything() {
+        let prefs = Prefs::load(std::path::Path::new("no-such-settings-file-anywhere.conf"));
+        assert!(
+            !prefs.defaults_measured,
+            "`load` took a measurement nobody asked it for"
+        );
+    }
+
+    /// Roadmap item 170. A first run is the run with no file, and it is the
+    /// one that asks the machine.
+    #[test]
+    fn a_first_run_starts_from_what_the_machine_said() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.conf");
+        let first = Prefs::starting_point(Some(&path));
+        assert!(
+            first.defaults_measured,
+            "a run with no settings file is a first run"
+        );
+        assert_eq!(
+            first.acceleration,
+            crate::probe::look().acceleration,
+            "the drawing path is the one the machine was asked about"
+        );
+    }
+
+    /// And the second run is not. Reading the answer back is the whole reason
+    /// it is written down.
+    #[test]
+    fn a_later_run_reads_the_answer_rather_than_taking_it_again() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.conf");
+        let mut first = Prefs::starting_point(Some(&path));
+        // Whatever this machine said, write down the opposite, so reading it
+        // back cannot be confused with measuring it again.
+        first.acceleration = !crate::probe::look().acceleration;
+        first.save(&path).unwrap();
+
+        let second = Prefs::starting_point(Some(&path));
+        assert_eq!(
+            second.acceleration,
+            !crate::probe::look().acceleration,
+            "the file's answer was overwritten by a fresh measurement"
+        );
+        assert!(
+            second.defaults_measured,
+            "the file records that the answer was measured once"
+        );
+    }
+
+    /// A machine with nowhere to keep files still gets the measured values for
+    /// this session. There is simply nothing to remember them in.
+    #[test]
+    fn a_machine_with_nowhere_to_save_is_still_measured() {
+        let prefs = Prefs::starting_point(None);
+        assert!(prefs.defaults_measured);
+        assert_eq!(prefs.acceleration, crate::probe::look().acceleration);
+    }
+
+    /// A settings file that exists and will not parse is reported as corrupt,
+    /// with the defaults in force. Measuring over the top of it would replace
+    /// an honest report with a silent reset.
+    #[test]
+    fn a_corrupt_file_is_reported_rather_than_quietly_remeasured() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.conf");
+        std::fs::write(&path, "nonsense\nmore nonsense\n").unwrap();
+        let prefs = Prefs::starting_point(Some(&path));
+        assert!(
+            prefs.recovered_from_corrupt_file,
+            "the panel has to be able to say the defaults are in force"
+        );
+        assert!(!prefs.defaults_measured);
+    }
+
+    /// Roadmap item 170: a better starting point, not a decision taken away.
+    /// Every value the probe chooses is still a value somebody can change and
+    /// have remembered.
+    #[test]
+    fn everything_the_probe_chooses_is_still_a_setting() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("settings.conf");
+        let mut prefs = Prefs::starting_point(Some(&path));
+
+        for chosen in [true, false] {
+            prefs.acceleration = chosen;
+            prefs.save(&path).unwrap();
+            assert_eq!(
+                Prefs::load(&path).acceleration,
+                chosen,
+                "the drawing path could not be set to {chosen} and kept"
+            );
+        }
+    }
+
+    /// Roadmap item 170. The three values the item says should already be
+    /// right, asserted where somebody changing a default will see them fail.
+    #[test]
+    fn the_starting_point_is_private_and_smooth_without_opening_settings() {
+        let d = Prefs::default();
+        assert!(d.autolock, "the window locks itself when it is left alone");
+        assert!(
+            d.seal_with_app_lock,
+            "recordings are encrypted at rest once there is a lock to do it with"
+        );
+        assert_eq!(
+            d.frame_rate, 0,
+            "zero means the display's own rate, measured rather than assumed"
+        );
+    }
+
+    /// The system's reduce-motion setting is honoured by resolving it every
+    /// frame, not by writing a moment of it into the file. Somebody who turns
+    /// it on for an afternoon and off again must not be left with a still
+    /// window and a preference they never set.
+    #[test]
+    fn the_measured_starting_point_does_not_freeze_the_motion_setting() {
+        let still = crate::probe::Machine {
+            acceleration: false,
+            acceleration_reason: "software only".into(),
+            graphics_answered: true,
+        };
+        let prefs = Prefs::measured(&still);
+        assert!(
+            prefs.animations,
+            "the preference stays on and `Motion::resolve` decides per frame"
+        );
+        assert!(!Motion::resolve(&prefs, true).enabled);
+        assert!(Motion::resolve(&prefs, false).enabled);
+    }
+
+    #[test]
+    fn a_measured_starting_point_takes_the_drawing_path_from_the_machine() {
+        for asked in [true, false] {
+            let machine = crate::probe::Machine {
+                acceleration: asked,
+                acceleration_reason: "because".into(),
+                graphics_answered: true,
+            };
+            let prefs = Prefs::measured(&machine);
+            assert_eq!(prefs.acceleration, asked);
+            assert!(prefs.defaults_measured);
+        }
+    }
+
     #[test]
     fn saving_and_loading_round_trips_through_a_real_file() {
         let dir = tempfile::tempdir().unwrap();
@@ -666,6 +940,7 @@ mod tests {
             autolock_ceiling: 7 * 86_400,
             frame_rate: 0,
             show_frame_rate: false,
+            defaults_measured: true,
             recovered_from_corrupt_file: false,
         };
         prefs.save(&path).unwrap();

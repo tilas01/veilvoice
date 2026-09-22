@@ -1059,8 +1059,18 @@ impl eframe::App for VeilVoiceApp {
         }
         // Roadmap item 86, kept in step. `set_` is a no-op when nothing changed, so
         // this costs a comparison per frame and never a write.
-        self.preferences
-            .set_seal_with_app_lock(self.security.seals_with_app_lock());
+        //
+        // F-202, found taking roadmap item 170. Not while the preference is still
+        // waiting for a lock. Without a lock `seals_with_app_lock` is false
+        // because there is nothing to seal with, not because anybody turned it
+        // off, and writing that back cleared the setting on the first frame of
+        // every run that had no lock yet. That was invisible while the
+        // preference defaulted to off and would have silently undone item 170
+        // on every first run.
+        if !self.security.app_lock_sealing_is_waiting() {
+            self.preferences
+                .set_seal_with_app_lock(self.security.seals_with_app_lock());
+        }
 
         // Before anything is drawn, and it has to be: this was at the *bottom*
         // of `update`, after the panel that shows the result had already been
@@ -3574,6 +3584,29 @@ mod tests {
         assert!(!app.neutralise_accent);
         assert!(!app.clean_metadata);
         assert_eq!(app.config().intensity, 0.25);
+    }
+
+    /// F-202. The per-frame mirror of the sealing mode must stay behind the
+    /// guard, because the line it guards is the one that carried the defect:
+    /// without a lock, `seals_with_app_lock` is false for a reason that is not
+    /// a choice, and writing it back cleared the preference on the first frame
+    /// of every run that had no lock yet.
+    ///
+    /// Read from the source rather than driven, because what is held is that
+    /// the write is *not reachable* in that state. Driving it would prove it
+    /// for one frame.
+    #[test]
+    fn the_sealing_preference_is_not_written_back_while_it_waits_for_a_lock() {
+        let source = include_str!("app.rs").replace("\r\n", "\n");
+        let at = source
+            .find("set_seal_with_app_lock")
+            .expect("the mirror exists");
+        let before = &source[at.saturating_sub(400)..at];
+        assert!(
+            before.contains("if !self.security.app_lock_sealing_is_waiting()"),
+            "the write-back is unguarded again, so every first run clears the \
+             preference before the app-lock card is drawn"
+        );
     }
 
     /// The one test that talks to the machine's audio stack. Kept single, and

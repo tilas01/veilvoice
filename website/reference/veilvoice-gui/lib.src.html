@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 147 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 148 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -179,49 +179,50 @@
 <span class="ln" id="L105"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> paths;</span>
 <span class="ln" id="L106"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> policy;</span>
 <span class="ln" id="L107"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> prefs;</span>
-<span class="ln" id="L108"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> reduced_motion;</span>
-<span class="ln" id="L109"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> security;</span>
-<span class="ln" id="L110"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> settings;</span>
-<span class="ln" id="L111"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> setup;</span>
-<span class="ln" id="L112"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> soundbar;</span>
-<span class="ln" id="L113"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> storage;</span>
-<span class="ln" id="L114"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> studio;</span>
-<span class="ln" id="L115"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> theme;</span>
-<span class="ln" id="L116"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> tour;</span>
-<span class="ln" id="L117"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> updates;</span>
-<span class="ln" id="L118"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> vault_store;</span>
-<span class="ln" id="L119"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> verify;</span>
-<span class="ln" id="L120"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> watchfeed;</span>
-<span class="ln" id="L121"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> window;</span>
-<span class="ln" id="L122"></span>
-<span class="ln" id="L123"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> app::VeilVoiceApp;</span>
-<span class="ln" id="L124"></span>
+<span class="ln" id="L108"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> probe;</span>
+<span class="ln" id="L109"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> reduced_motion;</span>
+<span class="ln" id="L110"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> security;</span>
+<span class="ln" id="L111"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> settings;</span>
+<span class="ln" id="L112"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> setup;</span>
+<span class="ln" id="L113"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> soundbar;</span>
+<span class="ln" id="L114"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> storage;</span>
+<span class="ln" id="L115"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> studio;</span>
+<span class="ln" id="L116"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> theme;</span>
+<span class="ln" id="L117"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> tour;</span>
+<span class="ln" id="L118"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> updates;</span>
+<span class="ln" id="L119"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> vault_store;</span>
+<span class="ln" id="L120"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> verify;</span>
+<span class="ln" id="L121"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> watchfeed;</span>
+<span class="ln" id="L122"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> window;</span>
+<span class="ln" id="L123"></span>
+<span class="ln" id="L124"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> app::VeilVoiceApp;</span>
+<span class="ln" id="L125"></span>
 <span class="src-item" id="fn-version">
-<span class="ln" id="L125"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
-<span class="ln" id="L126"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
+<span class="ln" id="L126"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
+<span class="ln" id="L127"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
 </span>
-<span class="ln" id="L127"></span>
+<span class="ln" id="L128"></span>
 <span class="src-item" id="fn-headless_frame">
-<span class="ln" id="L128"><span class="tok-com">/// Draw one frame with no window, and discard what a real backend would have</span></span>
-<span class="ln" id="L129"><span class="tok-com">/// uploaded.</span></span>
-<span class="ln" id="L130"><span class="tok-com">///</span></span>
-<span class="ln" id="L131"><span class="tok-com">/// Every test in this crate that renders headlessly goes through here.</span></span>
-<span class="ln" id="L132"><span class="tok-com">/// `egui` 0.36 asserts that a frame&#x27;s texture deltas were handled: dropping a</span></span>
-<span class="ln" id="L133"><span class="tok-com">/// `FullOutput` that still carries one panics, which is exactly right for a</span></span>
-<span class="ln" id="L134"><span class="tok-com">/// backend that forgot to upload a font atlas and exactly wrong for a test</span></span>
-<span class="ln" id="L135"><span class="tok-com">/// that only wants the shapes back. Clearing it in one place beats repeating</span></span>
-<span class="ln" id="L136"><span class="tok-com">/// the same two lines at fifteen call sites and forgetting it at the</span></span>
-<span class="ln" id="L137"><span class="tok-com">/// sixteenth.</span></span>
-<span class="ln" id="L138"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L139"><span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">headless_frame</span>(</span>
-<span class="ln" id="L140">    ctx: &amp;egui::Context,</span>
-<span class="ln" id="L141">    input: egui::RawInput,</span>
-<span class="ln" id="L142">    add_contents: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> egui::Ui),</span>
-<span class="ln" id="L143">) -&gt; egui::FullOutput {</span>
-<span class="ln" id="L144">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = ctx.<span class="tok-fn">run_ui</span>(input, add_contents);</span>
-<span class="ln" id="L145">    output.textures_delta.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L146">    output</span>
-<span class="ln" id="L147">}</span>
+<span class="ln" id="L129"><span class="tok-com">/// Draw one frame with no window, and discard what a real backend would have</span></span>
+<span class="ln" id="L130"><span class="tok-com">/// uploaded.</span></span>
+<span class="ln" id="L131"><span class="tok-com">///</span></span>
+<span class="ln" id="L132"><span class="tok-com">/// Every test in this crate that renders headlessly goes through here.</span></span>
+<span class="ln" id="L133"><span class="tok-com">/// `egui` 0.36 asserts that a frame&#x27;s texture deltas were handled: dropping a</span></span>
+<span class="ln" id="L134"><span class="tok-com">/// `FullOutput` that still carries one panics, which is exactly right for a</span></span>
+<span class="ln" id="L135"><span class="tok-com">/// backend that forgot to upload a font atlas and exactly wrong for a test</span></span>
+<span class="ln" id="L136"><span class="tok-com">/// that only wants the shapes back. Clearing it in one place beats repeating</span></span>
+<span class="ln" id="L137"><span class="tok-com">/// the same two lines at fifteen call sites and forgetting it at the</span></span>
+<span class="ln" id="L138"><span class="tok-com">/// sixteenth.</span></span>
+<span class="ln" id="L139"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L140"><span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">headless_frame</span>(</span>
+<span class="ln" id="L141">    ctx: &amp;egui::Context,</span>
+<span class="ln" id="L142">    input: egui::RawInput,</span>
+<span class="ln" id="L143">    add_contents: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> egui::Ui),</span>
+<span class="ln" id="L144">) -&gt; egui::FullOutput {</span>
+<span class="ln" id="L145">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = ctx.<span class="tok-fn">run_ui</span>(input, add_contents);</span>
+<span class="ln" id="L146">    output.textures_delta.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L147">    output</span>
+<span class="ln" id="L148">}</span>
 </span>
 </code></pre>
 </main>
