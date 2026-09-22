@@ -4,6 +4,7 @@
 
     tools/shots/sessions.py --record   # run them and write the transcripts
     tools/shots/sessions.py --check    # verify the transcripts are current
+    tools/shots/sessions.py --check --rerun-only   # only the ones re-runnable here
 
 # Why this exists
 
@@ -388,8 +389,18 @@ def check_witnessed(name, transcript):
         # whether they have broken something. This transcript is a recording of
         # the verifier checking a *published* release, so it cannot be made
         # until the release exists. The order is: bump, tag, publish, re-record
-        # here, commit. `tools/verify.py` is the only thing that runs this
-        # check, so a release commit still goes through CI green.
+        # here, commit.
+        #
+        # That window used to be harmless because `tools/verify.py` was the
+        # only thing that ran this, and it is run by a person. CI runs the
+        # re-runnable sessions now (F-207), which would otherwise mean `dev`
+        # goes red for the days between a bump and a publication, for a state
+        # this very message calls expected. So CI passes `--rerun-only` and
+        # skips this one: a check that fires on something legitimate is a
+        # finding in itself, and the honest fix is to not ask the question
+        # where it cannot yet have an answer. The release gate in
+        # `promote.yml` runs `tools/verify.py` whole, which does ask it, and
+        # by then the answer is knowable.
         problems.append(
             "does not mention the workspace version %s, so it is from an older "
             "release. If %s has not been published yet, this is the expected "
@@ -449,14 +460,18 @@ def difference(committed, fresh, most=24):
     return out
 
 
-def check():
+def check(rerun_only=False):
     problems = []
+    checked = 0
     for session in SESSIONS:
         path = path_for(session["name"])
+        if session["how"] == "witnessed" and rerun_only:
+            continue
         if not os.path.exists(path):
             problems.append("%s: never recorded" % os.path.relpath(path, ROOT))
             continue
         committed = read(path)
+        checked += 1
         if session["how"] == "witnessed":
             for problem in check_witnessed(session["name"], committed):
                 problems.append("%s: %s" % (os.path.relpath(path, ROOT), problem))
@@ -471,7 +486,7 @@ def check():
         for problem in problems:
             print("  " + problem, file=sys.stderr)
         return 1
-    print("  %d recorded sessions match the programs" % len(SESSIONS))
+    print("  %d recorded sessions match the programs" % checked)
     return 0
 
 
@@ -481,10 +496,13 @@ def main():
     parser.add_argument("--check", action="store_true", help="verify the transcripts are current")
     parser.add_argument("--release", metavar="FOLDER",
                         help="a folder holding a downloaded release, for the verifier session")
+    parser.add_argument("--rerun-only", action="store_true",
+                        help="check only the sessions that can be re-run here, "
+                             "skipping the one that records a published release")
     args = parser.parse_args()
     if args.record:
         return record(args.release)
-    return check()
+    return check(rerun_only=args.rerun_only)
 
 
 if __name__ == "__main__":

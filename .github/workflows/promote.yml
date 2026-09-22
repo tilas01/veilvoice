@@ -1,0 +1,231 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Cut a release: prove `dev` is ready, move `main` to it, and start the build.
+#
+# This is the one step of the path from a commit to a published release that
+# had nothing behind it. Everything else was already automated:
+#
+#   * `ci.yml` builds and tests every push to `dev` on three platforms, plus
+#     two 32-bit targets, and runs the drift checks.
+#   * `release.yml` builds every target twice, compares the bytes, signs the
+#     hash list and publishes, given a tag or a version to dispatch.
+#   * `pages.yml` redeploys the website when a release finishes.
+#
+# Between them sat a procedure written in `docs/CONTRIBUTING.md` and performed
+# by hand: check the version, check the notes, check the items are done, check
+# the audit round happened, merge, tag, dispatch. Every clause of it was
+# enforced by somebody remembering it, and the two things that would notice a
+# mistake both fire too late to help. `release.yml` refuses to publish without
+# a `## v<version>` section in `CHANGELOG.md`, but only after twelve build jobs
+# have run and `main` has already moved; and `main` moving is the awkward half,
+# because the website and the wiki publish from it.
+#
+# So the order here is the opposite one. Everything that can be checked is
+# checked first, from a **fresh checkout** rather than from anybody's working
+# tree, and `main` moves only once all of it has passed.
+#
+# The fresh checkout is not incidental. A commit landed on `dev` referencing a
+# test fixture that `.gitignore` had kept out of the repository: `git add`
+# skipped it in silence, `git status` was clean because an ignored file is
+# never a candidate to report, `tools/verify.py --quick` passed, and the tree
+# did not compile for anybody who cloned it. A gate that runs where the author
+# is standing cannot see that class of defect. This one runs where a reader
+# stands.
+#
+# Starting it is a person's decision and stays one. `docs/CONTRIBUTING.md`:
+# a version is cut when a group of changes is finished and audited, not on a
+# date. There is no schedule here and no trigger on a push, because "every
+# green commit on `dev` becomes a release" is a different policy from the one
+# this project has written down.
+
+name: promote
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: The version to cut, e.g. v0.1.23
+        required: true
+      move_main:
+        description: Move main and start the release. Left off, this only reports.
+        type: boolean
+        default: false
+
+# Nothing above job level. `check` only reads, and says so by taking the
+# default; the job that pushes a branch and starts a workflow asks for what it
+# needs where it needs it.
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+  VERSION_TAG: ${{ github.event.inputs.version }}
+
+jobs:
+  check:
+    name: is dev ready for ${{ github.event.inputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      # `ref: dev` explicitly. A dispatch runs from the branch it was
+      # dispatched on, and dispatching this from anywhere else would otherwise
+      # gate one tree and promote another.
+      #
+      # `fetch-depth: 0` and the tags, because three of the gates are questions
+      # about history: whether this tag already exists, whether `docs/AUDIT.md`
+      # has been written in since the last release, and whether anything landed
+      # on `main` that `dev` has not got. A shallow clone answers all three
+      # wrongly and confidently.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: dev
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Linux audio and windowing headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libudev-dev pkg-config \
+            libgtk-3-dev libxkbcommon-dev libwayland-dev \
+            libxkbcommon-x11-0
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+      - name: Install the pinned toolchain
+        run: rustup show
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+
+      # First, because it is seconds and it answers the questions that make the
+      # rest pointless: the wrong version, missing notes, a roadmap item still
+      # marked planned, no audit round. Finding those out after a half-hour
+      # verification pass helps nobody.
+      - name: The release is coherent
+        run: python tools/release/readiness.py "$VERSION_TAG"
+
+      # `tools/shots/sessions.py --check` re-runs the recorded sessions against
+      # the real program, so there has to be one. This is also the step that
+      # fails when a source file the build needs was never committed.
+      - name: Build what the recorded sessions are compared against
+        run: cargo build --release --workspace --locked
+
+      # Whole, not `--quick`. `docs/CONTRIBUTING.md` names this as the
+      # difference between a push and a release, and it is not a formality:
+      # `--quick` skips the three cargo steps, and the two checks that CI could
+      # not run until now, `sessions.py` and `measured/generate.py`, are the
+      # ones that need a compiled program. F-201 was a recorded session that
+      # had disagreed with the program for two commits, on `dev`, with
+      # everything green.
+      #
+      # `--check` rather than a bare run, and that matters here specifically.
+      # Without it `verify.py` regenerates first, and `sessions.py --record`
+      # writes a measured speed and a drawn seed range into two transcripts:
+      # properties of the machine that ran it. A gate that committed whatever
+      # it regenerated would rewrite those two files with a runner's numbers on
+      # every release. `--check` compares through the same normalisation and
+      # writes nothing.
+      - name: Every check tools/verify.py makes, including the cargo steps
+        run: python tools/verify.py --check
+
+      # And the last question, which is about the commit rather than the tree:
+      # did CI pass on it? `ci.yml` runs the platform matrix and the 32-bit
+      # targets, none of which this job repeats, and a release built from a
+      # commit whose Windows build failed is a release nobody can run.
+      - name: CI is green on the commit being promoted
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sha="$(git rev-parse HEAD)"
+          echo "dev is at $sha"
+          runs="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${sha}&per_page=100" \
+                    --jq '[.workflow_runs[] | select(.status == "completed")] | map(.conclusion) | unique | join(",")')"
+          if [ -z "$runs" ]; then
+            echo "::error::ci.yml has no completed run for $sha. Wait for it, or re-run it."
+            exit 1
+          fi
+          echo "ci conclusions for this commit: $runs"
+          if [ "$runs" != "success" ]; then
+            echo "::error::ci.yml did not succeed on $sha (conclusions: $runs)."
+            exit 1
+          fi
+
+      - name: Say so
+        run: |
+          {
+            echo "### \`dev\` is ready for \`$VERSION_TAG\`"
+            echo
+            echo "- the version, the notes, the roadmap items and the audit round agree"
+            echo "- \`tools/verify.py\` passes whole, from a fresh checkout"
+            echo "- \`ci.yml\` is green on \`$(git rev-parse --short HEAD)\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  promote:
+    name: move main to dev and start the release
+    needs: check
+    if: github.event.inputs.move_main == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      # To push the merge to `main`.
+      contents: write
+      # To dispatch `release.yml`. A workflow's own token cannot start a run
+      # through a push, which is what stops a workflow triggering itself; a
+      # `workflow_dispatch` is the documented exception, and this is the
+      # permission that exception needs.
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      # One author, as `docs/CONTRIBUTING.md` requires, and a merge commit is a
+      # commit. A runner's default identity is github-actions[bot], which would
+      # make every release the one non-tilas01 commit in the history.
+      - name: Merge dev into main
+        env:
+          GIT_AUTHOR_NAME: tilas01
+          GIT_AUTHOR_EMAIL: tilas01@users.noreply.github.com
+          GIT_COMMITTER_NAME: tilas01
+          GIT_COMMITTER_EMAIL: tilas01@users.noreply.github.com
+        run: |
+          git fetch origin dev
+          # --no-ff on purpose. The release is tagged at the merge, and a
+          # fast-forward would leave nothing to tag that says a release
+          # happened here. Plain text, one line per line, like every other
+          # commit message in this repository.
+          git merge --no-ff origin/dev -m "Release $VERSION_TAG
+
+          Merging dev into main to cut $VERSION_TAG. The release workflow
+          builds this commit, and the tag is made at it.
+          "
+          git push origin main
+
+      # The tag is not pushed from here, and that is deliberate rather than a
+      # gap. `release.yml` publishes with `target_commitish` set to the commit
+      # it built, so creating the release creates the tag at exactly the tree
+      # the binaries came from. That is F-170's fix, and pushing a tag first
+      # would put a second, earlier answer to the same question into the
+      # repository. `tools/audit/publishing.py` fails the build if that step
+      # ever stops naming the commit.
+      #
+      # A push made with this token starts no workflow, which is what stops a
+      # workflow from triggering itself. `workflow_dispatch` is the documented
+      # exception, so this is also the only way the release could be started
+      # from here at all.
+      - name: Start the release build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run release.yml --ref main -f tag="$VERSION_TAG"
+          {
+            echo "### \`main\` is at \`$VERSION_TAG\`"
+            echo
+            echo "- merged \`dev\` into \`main\` as $(git rev-parse --short HEAD)"
+            echo "- dispatched \`release.yml\` against \`main\` for \`$VERSION_TAG\`"
+            echo "- the tag is created by the publishing step, at the commit it built"
+            echo "- the website redeploys when that run finishes"
+          } >> "$GITHUB_STEP_SUMMARY"
