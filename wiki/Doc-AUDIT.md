@@ -504,6 +504,88 @@ is reachable only through a self-contradiction: telling the vault's index guard
 apart from one that accepts any failure needs a read of a path that fails and a
 write to that same path that then succeeds.
 
+### F-200: a branch policy that sent the upgrades to the wrong branch
+
+The same shape as F-197, one file along, and found by reading the remote's
+branch list rather than by anything failing.
+
+`git branch -r` showed three branches where the project says there are two:
+`main`, `dev`, and `dependabot/cargo/minor-and-patch-722c7a5dc4` carrying pull
+request #22, `clap` 4.6.6 to 4.6.7. The third is not the defect: Dependabot
+pushes a branch per pull request and deletes it when that pull request is
+merged or closed, so it is a bot's working branch rather than a place anybody
+develops, and "never a third" was simply never written with that caveat. It is
+written with it now, in `docs/CONTRIBUTING.md` under the branch table.
+
+**The defect is where that pull request points.** `.github/dependabot.yml`
+declares three ecosystems, cargo at `/`, cargo at `/fuzz` and github-actions at
+`/`, and not one of them set `target-branch`. Dependabot opens against the
+repository's default branch when nothing says otherwise, and the default branch
+here is `main`. Development moved to `dev` in roadmap item 125; this file did
+not move with it.
+
+So every dependency bump this project has ever been offered was aimed at the
+released branch. Merging one there puts a commit on `main` that `dev` does not
+have. `dev` is then behind by exactly that change, and the next release merge
+either drops it, because the release is cut by merging `dev` into `main` and
+`dev` never had it, or stops on a conflict in a manifest and a lock file that
+two branches edited independently. Neither outcome announces itself at the time
+the mistake is made.
+
+**And nothing reported it, for the same reason nothing reported F-197.** A pull
+request opened against `main` looks exactly like a pull request opened against
+anything else. GitHub shows the default branch as the base without comment,
+the diff is the one-line version bump you expected, CI runs and goes green
+because `ci.yml` builds `main` too. There is no failure anywhere to notice. The
+absence of a policy is invisible in a way its violation would not be, which is
+the property F-197's write-up named and which this is a third instance of:
+F-176 and F-177 were checks that existed and were not wired into CI, F-197 was
+CI wired to the wrong branch, F-199 was the wiki workflow that had never once
+run on the branch the work was on, and this is the upgrade robot pointed at
+the wrong branch.
+
+Four times now a branch policy has been changed and something reading it has
+been left behind. The pattern is worth stating plainly: **a branch policy is
+not a fact about branches, it is a fact several files depend on**, and moving
+it means finding all of them. The ones that read it are `ci.yml`, `pages.yml`,
+`wiki.yml`, `release.yml`, `dependabot.yml` and the branch table in
+`docs/CONTRIBUTING.md`.
+
+**The fix, and why the guard does not simply say `dev`.** All three ecosystems
+carry `target-branch: dev` now, with the reasoning at the top of the file
+rather than written out three times. `tools/audit/dependabot.py` is the guard
+for that file and fails the build on an entry with no `target-branch`, on one
+aimed at the released branch, and on one aimed at a branch `ci.yml` does not
+build on a push.
+
+That last clause is the point. Writing `dev` into the guard would have put the
+branch name in a fourth file, which is the mechanism that produced all three
+findings. Instead the guard reads `ci.yml`'s own `push:` branch list and
+requires the target to be one of them and not `main`: the file that decides
+which branches are built is also the file that decides where a bump may land,
+so the two cannot drift apart without one of them failing. The single name the
+guard does spell out is `main`, because the default branch is a repository
+setting rather than anything in the tree, and a tool that inferred it from the
+tree would be guessing.
+
+**How it is tested.** `python tools/audit/dependabot.py --self-test` drives the
+branch check over six written-out configurations: one correct, one with no
+`target-branch` at all, one aimed at `main`, one aimed at a branch nothing
+builds, one with a single ecosystem quietly wrong among others that are right,
+and one whose `ignore:` list must not be misread as a second entry. It runs in
+`tools/verify.py` beside the guard itself, because a check proved only against
+the repository it guards is a check that has been seen to pass and never seen
+to fail: the reader in place before this stopped looking at an entry once it
+had found `directory:`, so it could not have seen a `target-branch` written
+after it, and would have reported a clean file either way.
+
+This change touched pull request #22 itself not at all. Retargeting an existing
+pull request is Dependabot's own job on its next run, and whether to take a
+bump is a decision rather than a consequence of fixing the configuration it
+arrived through. The `clap` 4.6.7 bump that pull request carried was applied to
+`dev` separately, which is the shape every bump takes from here: it enters
+`dev`, and reaches `main` only when a release merges one into the other.
+
 ### F-197: a branch policy that turned the checks off
 
 Development moved off `main` onto `dev`, which is roadmap item 125 and is right: a
@@ -7863,7 +7945,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**One hundred and ninety-nine defects found and fixed (F-1 to F-199), across
+**Two hundred defects found and fixed (F-1 to F-200), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

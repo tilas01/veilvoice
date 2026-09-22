@@ -1,6 +1,7 @@
 $ veilvoice info
 VeilVoice
   Version                0.1.22
+  Release channel        stable (cut from main, signed, and what the download page offers)
   Engine                 0.1.22
   Crypto                 0.1.22
   Audio                  0.1.22

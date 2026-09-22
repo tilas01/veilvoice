@@ -23,6 +23,29 @@
 # added outside the workspace, or a second workflow directory, would otherwise
 # stop being monitored silently, which is the kind of gap that is noticed a
 # year later. It runs in CI beside `tools/audit/dependencies.py`.
+#
+# # Why every entry below says `target-branch: dev`
+#
+# Dependabot opens against the repository's default branch unless it is told
+# otherwise, and the default branch here is `main`. `main` is the released
+# program: it moves when a release is cut, by merging `dev` into it and tagging
+# that merge, and it is not a place work arrives any other way.
+#
+# Without `target-branch` every bump below went straight at `main`. Merging one
+# there puts a change on the release branch that `dev` does not have, so `dev`
+# falls behind by exactly that commit, and the next release merge either drops
+# it or conflicts with it. Nothing reports that: the pull request looks
+# entirely ordinary, and the branch it names is the one GitHub shows by
+# default. That is F-200, and it is the fourth time a branch policy changed
+# (development moved to `dev`, roadmap item 125) without the file that reads it
+# moving too: F-197 was `ci.yml`, which had stopped running CI on the branch
+# all the work was on.
+#
+# So the rule is written down and then checked: a bump enters `dev` like every
+# other change, and reaches `main` only through a release merge.
+# `tools/audit/dependabot.py` fails the build on an entry with no
+# `target-branch`, or with one that is not a branch `ci.yml` builds, so this
+# cannot quietly come untrue again.
 
 # # Why an upgrade here cannot break the project abruptly
 #
@@ -67,6 +90,10 @@ updates:
   # open 27 pull requests for one bumped version.
   - package-ecosystem: cargo
     directory: "/"
+    # Development, not the released branch. See the header: a bump merged into
+    # `main` is a change `dev` does not have, and the release merge that
+    # follows either loses it or conflicts with it.
+    target-branch: dev
     schedule:
       interval: weekly
       day: monday
@@ -146,6 +173,8 @@ updates:
   # year. `tools/audit/dependencies.py` includes it for the same reason.
   - package-ecosystem: cargo
     directory: "/fuzz"
+    # Same reason as the entry above.
+    target-branch: dev
     schedule:
       interval: monthly
     open-pull-requests-limit: 3
@@ -166,6 +195,10 @@ updates:
   # same terms as the code.
   - package-ecosystem: github-actions
     directory: "/"
+    # Same reason as the two above, and it matters most here: these actions
+    # build and sign the release, so an action version that reached `main`
+    # without passing through `dev` is one nothing on `dev` has ever run.
+    target-branch: dev
     schedule:
       interval: weekly
       day: monday

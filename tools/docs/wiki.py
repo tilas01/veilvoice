@@ -162,6 +162,14 @@ DOCUMENTS = [
 # claim of the wiki is that it is the whole manual, and a document nobody
 # listed is a document nobody can find.
 NOT_A_WIKI_PAGE = {
+    # Not in the repository at all: `CLAUDE.md` is in `.gitignore`, so a fresh
+    # clone does not have one and CI never sees it. It exists only on a machine
+    # where somebody working on this has written one, which is most of them,
+    # and without this line the wiki check failed on every one of those and on
+    # no runner. That is the wrong way round for a guard: it should fail where
+    # the defect is, and a file nobody publishes cannot be a published page.
+    "CLAUDE.md":
+        "in .gitignore, so it is never committed and cannot be a wiki page",
     "docs/GUIDE_CLI.md":
         "tools/docs/guides.py writes it into the wiki as Guide-command-line",
     "docs/GUIDE_GUI.md":
