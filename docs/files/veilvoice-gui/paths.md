@@ -11,12 +11,13 @@
 
 # `crates/veilvoice-gui/src/paths.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 234 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 248 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs)
 
 ## Contents
 
 - [Why the About tab prints these](#why-the-about-tab-prints-these)
 - [Derived, not listed](#derived-not-listed)
+- [The words are not written here either](#the-words-are-not-written-here-either)
 - [The one path deliberately not shown](#the-one-path-deliberately-not-shown)
 - [In plain words](#in-plain-words)
   - [What this file contains](#what-this-file-contains)
@@ -46,6 +47,19 @@ A test reads the crate's own source for every `default_path` and
 `default_dir` and fails naming any this panel does not show, so a location
 added tomorrow cannot quietly stop being reported.
 
+# The words are not written here either
+
+What each location is called and the line under it come from
+`veilvoice_crypto::layout`, which is the one list of what VeilVoice keeps
+between runs. The path still comes from the module that owns it, and a test
+checks the two agree, because this panel telling somebody a folder that the
+program does not use is the failure that matters most here: a person told
+the wrong directory deletes the wrong directory.
+
+The reason that list is in the crypto crate rather than in this one is that
+`veilvoice reset` has to name the same things from the command line, which
+cannot see this crate at all.
+
 # The one path deliberately not shown
 
 The app lock's own files. `veilvoice_crypto::vault` gives them names
@@ -64,17 +78,17 @@ without guessing.
 
 ## What this file contains
 
-234 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+248 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Where` (line 44) -- One place VeilVoice keeps something, and what it keeps there.
+- `struct Where` (line 57) -- One place VeilVoice keeps something, and what it keeps there.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `arrangement` (line 62) -- Which of the two arrangements this copy is using, in one sentence.
-- `all` (line 85) -- Every location, in the order the About tab shows them.
-- `carry_over` (line 151) -- Copy a portable copy's state into the platform's own configuration directory, without overwriting anything already there.
+- `arrangement` (line 75) -- Which of the two arrangements this copy is using, in one sentence.
+- `all` (line 98) -- Every location, in the order the About tab shows them.
+- `carry_over` (line 165) -- Copy a portable copy's state into the platform's own configuration directory, without overwriting anything already there.
   - reaches: `copy_new_only`, `copy_into`
 
 ## What calls what
@@ -97,18 +111,18 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_arrangement(["arrangement<br/>line 62"])
-    n_all(["all<br/>line 85"])
-    n_carry_over(["carry_over<br/>line 151"])
-    n_copy_new_only["copy_new_only<br/>line 176"]
-    n_copy_into["copy_into<br/>line 219"]
+    n_arrangement(["arrangement<br/>line 75"])
+    n_all(["all<br/>line 98"])
+    n_carry_over(["carry_over<br/>line 165"])
+    n_copy_new_only["copy_new_only<br/>line 190"]
+    n_copy_into["copy_into<br/>line 233"]
     n_carry_over --> n_copy_new_only
     n_copy_new_only --> n_copy_into
-    click n_arrangement href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L62" "open the source"
-    click n_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L85" "open the source"
-    click n_carry_over href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L151" "open the source"
-    click n_copy_new_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L176" "open the source"
-    click n_copy_into href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L219" "open the source"
+    click n_arrangement href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L75" "open the source"
+    click n_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L98" "open the source"
+    click n_carry_over href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L165" "open the source"
+    click n_copy_new_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L190" "open the source"
+    click n_copy_into href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L233" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_arrangement,n_all,n_carry_over entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -121,12 +135,12 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Where` <sub>pub struct</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L44) | One place VeilVoice keeps something, and what it keeps there. |
-| `arrangement` <sub>pub fn</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L62) | Which of the two arrangements this copy is using, in one sentence. |
-| `all` <sub>pub fn</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L85) | Every location, in the order the About tab shows them. |
-| `carry_over` <sub>pub fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L151) | Copy a portable copy's state into the platform's own configuration directory, without overwriting anything already there. |
-| `copy_new_only` <sub>fn</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L176) | Everything in from that is not already in into, and a line about each. |
-| `copy_into` <sub>fn</sub> | [219](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L219) | One file or one whole directory, recursively. |
+| `Where` <sub>pub struct</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L57) | One place VeilVoice keeps something, and what it keeps there. |
+| `arrangement` <sub>pub fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L75) | Which of the two arrangements this copy is using, in one sentence. |
+| `all` <sub>pub fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L98) | Every location, in the order the About tab shows them. |
+| `carry_over` <sub>pub fn</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L165) | Copy a portable copy's state into the platform's own configuration directory, without overwriting anything already there. |
+| `copy_new_only` <sub>fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L190) | Everything in from that is not already in into, and a line about each. |
+| `copy_into` <sub>fn</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/paths.rs#L233) | One file or one whole directory, recursively. |
 
 ---
 

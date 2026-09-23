@@ -108,7 +108,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>241 lines"])
+    n_lib(["lib.rs<br/>242 lines"])
     n_aead["aead.rs<br/>280 lines"]
     n_amnesia["amnesia.rs<br/>468 lines"]
     n_container["container.rs<br/>618 lines"]
@@ -116,6 +116,7 @@ flowchart TD
     n_hoard["hoard.rs<br/>1099 lines"]
     n_hybrid["hybrid.rs<br/>524 lines"]
     n_kdf["kdf.rs<br/>633 lines"]
+    n_layout["layout.rs<br/>318 lines"]
     n_lock["lock.rs<br/>2264 lines"]
     n_privatefile["privatefile.rs<br/>313 lines"]
     n_shred["shred.rs<br/>417 lines"]
@@ -126,6 +127,7 @@ flowchart TD
     n_hoard --> n_amnesia
     n_hoard --> n_privatefile
     n_hoard --> n_weave
+    n_layout --> n_lock
     n_lock --> n_aead
     n_lock --> n_hoard
     n_lock --> n_privatefile
@@ -143,6 +145,7 @@ flowchart TD
     click n_hoard href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs" "open the source"
     click n_hybrid href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hybrid.rs" "open the source"
     click n_kdf href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/kdf.rs" "open the source"
+    click n_layout href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs" "open the source"
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" "open the source"
     click n_privatefile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" "open the source"
     click n_shred href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs" "open the source"
@@ -165,7 +168,8 @@ flowchart TD
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 524 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 633 | Password-based key derivation with Argon2id. |
-| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 241 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | 318 | Everything VeilVoice keeps between runs, in one list. |
+| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 242 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2264 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 313 | Writing a file that only its owner can read. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 417 | Secure erasure, the self-destruct. |
@@ -177,7 +181,7 @@ flowchart TD
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**7,234 functional lines of Rust** in this crate. A functional line is a line
+**7,447 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -231,6 +235,12 @@ counts blank lines and comments too. Both are produced by
 | `const KEY_LEN` | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | Length of a derived symmetric key. |
 | `fn derive_key` | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | Derive a 32-byte key from password and salt. |
 | `fn random_salt` | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | Draw a fresh random salt from the OS CSPRNG. |
+| `enum Item` | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | One thing VeilVoice keeps between runs. |
+| `struct Entry` | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | One entry: what it is called, what it is, and what losing it costs. |
+| `const ALL` | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | Every named thing, in the order a person meets it. |
+| `fn dir` | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | The folder all of this is in, if this platform says where one is. |
+| `fn entry` | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | The entry for one thing. |
+| `fn path` | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | Where one thing is, if this platform says where anything is. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | Crate version string, surfaced in the About panel. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | Everything that can go wrong in this crate. |
 | `const SCOPE` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | What the app lock protects against, and what it does not, in the words a front-end should show the user. |

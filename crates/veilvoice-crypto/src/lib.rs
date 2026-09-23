@@ -77,6 +77,7 @@ pub mod decoy;
 pub mod hoard;
 pub mod hybrid;
 pub mod kdf;
+pub mod layout;
 pub mod lock;
 pub mod privatefile;
 pub mod shred;

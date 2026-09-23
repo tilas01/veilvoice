@@ -91,6 +91,7 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`hoard.rs`|File-veilvoice-crypto-hoard]] &middot; The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing.
 - [[`hybrid.rs`|File-veilvoice-crypto-hybrid]] &middot; Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768.
 - [[`kdf.rs`|File-veilvoice-crypto-kdf]] &middot; Password-based key derivation with Argon2id.
+- [[`layout.rs`|File-veilvoice-crypto-layout]] &middot; Everything VeilVoice keeps between runs, in one list.
 - [[`lib.rs`|File-veilvoice-crypto-lib]] &middot; Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.
 - [[`lock.rs`|File-veilvoice-crypto-lock]] &middot; The application lock: an Argon2id password verifier with a rate limit.
 - [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] &middot; Writing a file that only its owner can read.
