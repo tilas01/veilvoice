@@ -238,6 +238,60 @@ jobs:
             -p veilvoice-setup -p veilvoice-verify \
             -p veilvoice-guard -p veilvoice-watch
 
+  # Roadmap item 177 runs the real window on the website, compiled to
+  # WebAssembly, so from here on "this project builds" has to include a target
+  # with no operating system under it. Without a job saying so, the browser
+  # build would rot between the day it starts working and the day somebody
+  # tries it, and it would rot silently: nothing else here ever names
+  # `wasm32-unknown-unknown`, and every other target has an OS.
+  #
+  # Two dependencies decide whether this passes, and both are third-party
+  # rather than ours. `getrandom` refuses to guess at a source of randomness
+  # for this target and needs its `js` feature turned on in the workspace
+  # table; `region`, which locks pages out of the swap file, has no backend
+  # here and is declared under `cfg(not(target_arch = "wasm32"))` because there
+  # is no swap file to be locked out of. What that second one costs is written
+  # down in `veilvoice-crypto`'s `amnesia` module note and in
+  # `docs/WHITEPAPER.md`, not left to the `cfg`.
+  #
+  # **Why `--workspace --exclude` and not a spelled-out list**, which is the
+  # opposite of what the 32-bit job above does. There the exclusions are a
+  # sysroot exercise and a crate joining silently would fail for a linker
+  # reason with nothing to do with 32-bit arithmetic, so the list is the point.
+  # Here the claim is the whole workspace, and a crate added later that cannot
+  # reach the browser is exactly the thing worth failing on. The one exclusion
+  # is `veilvoice-gui`, whose `dialog` and `graphics` modules reach for a
+  # native file picker and `eframe::NativeOptions`, neither of which exists on
+  # this target. That is roadmap 177's own entry point and is not yet written.
+  # When it is, this line comes out, and until it does the exclusion is named
+  # here rather than hidden in a list.
+  browser:
+    name: the browser build
+    runs-on: ubuntu-latest
+    env:
+      # The wasm build is checked, not shipped, so a warning here is a defect
+      # like any other. One was found writing this job: `veilvoice-video`
+      # imported `std::process::Command` unconditionally while every caller of
+      # it sat behind a Windows, Linux or macOS gate.
+      RUSTFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install the pinned toolchain
+        run: rustup show
+
+      - name: Add the target
+        run: rustup target add wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+        with:
+          key: wasm32-unknown-unknown
+
+      - name: Every crate but the window must compile for a browser
+        run: |
+          cargo check --locked --workspace --exclude veilvoice-gui \
+            --target wasm32-unknown-unknown
+
   # The generated artwork is committed, so it must match what the generator
   # produces. Otherwise the two drift and the "verifiable from source" claim
   # quietly stops being true.

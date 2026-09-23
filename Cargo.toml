@@ -67,7 +67,17 @@ rustfft = "6"
 # changed how `gen_range` draws, so the same seed would produce a different
 # modulation stream across the bump; that is not a promise this project makes,
 # but it is worth moving on purpose rather than by accident.
-getrandom = "0.2"        # OS CSPRNG seed
+# OS CSPRNG seed.
+#
+# The `js` feature is what points it at the host's `crypto.getRandomValues` on
+# `wasm32-unknown-unknown`, where there is no operating system to ask.
+# `getrandom` refuses to guess on that target and fails the build rather than
+# quietly using something weaker, which is the right refusal and has to be
+# answered somewhere. It is inert on every other target, where the same crate
+# makes the same system call it always did, so no shipped binary changes.
+# Roadmap item 177, the window compiled to WebAssembly so the site can run the
+# real interface, is the only reason that target is built at all.
+getrandom = { version = "0.2", features = ["js"] }
 # The `Rng` traits the modulation stream is driven through. The randomness
 # itself is `rand_chacha`, seeded from `getrandom`; this is the interface, not
 # the source.

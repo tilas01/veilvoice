@@ -14,19 +14,10 @@ zeroize.workspace = true
 # Constant-time comparison. An `==` on a verifier or a tag is a timing oracle,
 # and this is the type that refuses to be one.
 subtle = "2"
-# Page-locking wrapper. The one place this crate steps outside `forbid(unsafe)`;
-# see the `amnesia` module for why and how it is contained.
-#
-# Held at 3 deliberately. Version 4 made `region::unlock` an `unsafe` function,
-# and this crate unlocks explicitly rather than through the RAII guard, for the
-# reason the `amnesia` module gives at length: the guard's destructor fails
-# loudly when Windows drops pages from a working set on its own, and a type
-# whose whole job is holding key material must not abort while being dropped.
-# Taking 4 would therefore put an `unsafe` block into a crate whose
-# `#![forbid(unsafe_code)]` is a promise made on the website and in the
-# security notes, to buy no-std support this project does not use. `cargo
-# audit` reports nothing against 3, so there is no security reason to move.
-region = "3"
+# The page-locking wrapper, `region`, is declared at the foot of this file
+# rather than here: it is not compiled for WebAssembly, so it sits under a
+# target table of its own, and a target table cannot go in the middle of this
+# one.
 # --- key derivation ---
 #
 # The RustCrypto crates below are held on the generation `pgp` 0.20 uses
@@ -60,3 +51,28 @@ rand_core = "0.6"
 # Tests that seal a file and open it again, in a directory that goes away with
 # them.
 tempfile = "3"
+
+# --- page locking, everywhere but a browser ---
+#
+# Under a target rather than in `[dependencies]` because `region` has no
+# backend for `wasm32-unknown-unknown` and would not build, and because there
+# is nothing there for it to do: a WebAssembly module has a linear memory the
+# host owns, no `mlock` and no page file of its own. `Secret` still allocates,
+# wipes, compares in constant time and refuses to print itself there; it
+# simply locks nothing, and says so. The `amnesia` module note says what that
+# costs, and `docs/WHITEPAPER.md` says it where a reader will find it, because
+# a security property given up on one target must not be left to a `cfg`.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+# Page-locking wrapper. The one place this crate steps outside
+# `forbid(unsafe)`; see the `amnesia` module for why and how it is contained.
+#
+# Held at 3 deliberately. Version 4 made `region::unlock` an `unsafe` function,
+# and this crate unlocks explicitly rather than through the RAII guard, for the
+# reason the `amnesia` module gives at length: the guard's destructor fails
+# loudly when Windows drops pages from a working set on its own, and a type
+# whose whole job is holding key material must not abort while being dropped.
+# Taking 4 would therefore put an `unsafe` block into a crate whose
+# `#![forbid(unsafe_code)]` is a promise made on the website and in the
+# security notes, to buy no-std support this project does not use. `cargo
+# audit` reports nothing against 3, so there is no security reason to move.
+region = "3"

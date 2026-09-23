@@ -51,6 +51,10 @@
 //! is not proof it will work: that also depends on your drivers and on the
 //! copy of ffmpeg you have.
 
+// Every caller of this is behind one of the three platform gates below,
+// so on any other target, `wasm32-unknown-unknown` among them, the import
+// is unused and warns.
+#[cfg(any(windows, target_os = "linux", target_os = "macos"))]
 use std::process::Command;
 
 /// Who made a graphics device.

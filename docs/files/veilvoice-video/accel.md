@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-video/src/accel.rs`
 
-[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 648 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs)
+[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 652 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs)
 
 ## Contents
 
@@ -77,27 +77,27 @@ copy of ffmpeg you have.
 
 ## What this file contains
 
-648 lines defining **17 functions** (11 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+652 lines defining **17 functions** (11 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Vendor` (line 58) -- Who made a graphics device.
-- `struct Adapter` (line 116) -- One graphics device.
-- `struct Found` (line 169) -- Everything found, and anything that went wrong looking.
+- `enum Vendor` (line 62) -- Who made a graphics device.
+- `struct Adapter` (line 120) -- One graphics device.
+- `struct Found` (line 173) -- Everything found, and anything that went wrong looking.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Vendor::encoder` (line 92) -- The ffmpeg encoder this vendor's hardware provides, if any.
-- `Vendor::encoder_name` (line 103) -- What to call the encoder in front of a person.
-- `Adapter::encoder` (line 132) -- The encoder to ask ffmpeg for, if this device has one.
-- `Adapter::caveat` (line 137) -- What finding this device does and does not establish.
-- `Adapter::describe` (line 145) -- One line, for a list.
-- `Found::is_answerable` (line 181) -- Whether anything could be established at all.
-- `Found::why_recommended` (line 206) -- Why that one, in the words to show.
+- `Vendor::encoder` (line 96) -- The ffmpeg encoder this vendor's hardware provides, if any.
+- `Vendor::encoder_name` (line 107) -- What to call the encoder in front of a person.
+- `Adapter::encoder` (line 136) -- The encoder to ask ffmpeg for, if this device has one.
+- `Adapter::caveat` (line 141) -- What finding this device does and does not establish.
+- `Adapter::describe` (line 149) -- One line, for a list.
+- `Found::is_answerable` (line 185) -- Whether anything could be established at all.
+- `Found::why_recommended` (line 210) -- Why that one, in the words to show.
   - reaches: `recommended`
-- `look` (line 232) -- Look for graphics hardware.
+- `look` (line 236) -- Look for graphics hardware.
   - reaches: `linux_adapters`, `macos_adapters`, `windows_adapters`, `adapter`, `tool`, `parse_pairs`, `of`
-- `usable_threads` (line 428) -- How many threads this machine can usefully run at once.
+- `usable_threads` (line 432) -- How many threads this machine can usefully run at once.
 
 ## What calls what
 
@@ -119,23 +119,23 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_of["Vendor::of<br/>line 73"]
-    n_encoder(["Vendor::encoder<br/>line 92"])
-    n_encoder_name(["Vendor::encoder_name<br/>line 103"])
-    n_encoder(["Adapter::encoder<br/>line 132"])
-    n_caveat(["Adapter::caveat<br/>line 137"])
-    n_describe(["Adapter::describe<br/>line 145"])
-    n_is_answerable(["Found::is_answerable<br/>line 181"])
-    n_recommended["Found::recommended<br/>line 192"]
-    n_why_recommended(["Found::why_recommended<br/>line 206"])
-    n_look(["look<br/>line 232"])
-    n_windows_adapters["windows_adapters<br/>line 256"]
-    n_tool["tool<br/>line 301"]
-    n_linux_adapters["linux_adapters<br/>line 315"]
-    n_macos_adapters["macos_adapters<br/>line 354"]
-    n_parse_pairs["parse_pairs<br/>line 380"]
-    n_adapter["adapter<br/>line 403"]
-    n_usable_threads(["usable_threads<br/>line 428"])
+    n_of["Vendor::of<br/>line 77"]
+    n_encoder(["Vendor::encoder<br/>line 96"])
+    n_encoder_name(["Vendor::encoder_name<br/>line 107"])
+    n_encoder(["Adapter::encoder<br/>line 136"])
+    n_caveat(["Adapter::caveat<br/>line 141"])
+    n_describe(["Adapter::describe<br/>line 149"])
+    n_is_answerable(["Found::is_answerable<br/>line 185"])
+    n_recommended["Found::recommended<br/>line 196"]
+    n_why_recommended(["Found::why_recommended<br/>line 210"])
+    n_look(["look<br/>line 236"])
+    n_windows_adapters["windows_adapters<br/>line 260"]
+    n_tool["tool<br/>line 305"]
+    n_linux_adapters["linux_adapters<br/>line 319"]
+    n_macos_adapters["macos_adapters<br/>line 358"]
+    n_parse_pairs["parse_pairs<br/>line 384"]
+    n_adapter["adapter<br/>line 407"]
+    n_usable_threads(["usable_threads<br/>line 432"])
     n_adapter --> n_of
     n_linux_adapters --> n_adapter
     n_linux_adapters --> n_tool
@@ -146,23 +146,23 @@ flowchart TD
     n_parse_pairs --> n_adapter
     n_why_recommended --> n_recommended
     n_windows_adapters --> n_parse_pairs
-    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L73" "open the source"
-    click n_encoder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L92" "open the source"
-    click n_encoder_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L103" "open the source"
-    click n_encoder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L132" "open the source"
-    click n_caveat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L137" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L145" "open the source"
-    click n_is_answerable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L181" "open the source"
-    click n_recommended href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L192" "open the source"
-    click n_why_recommended href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L206" "open the source"
-    click n_look href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L232" "open the source"
-    click n_windows_adapters href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L256" "open the source"
-    click n_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L301" "open the source"
-    click n_linux_adapters href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L315" "open the source"
-    click n_macos_adapters href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L354" "open the source"
-    click n_parse_pairs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L380" "open the source"
-    click n_adapter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L403" "open the source"
-    click n_usable_threads href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L428" "open the source"
+    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L77" "open the source"
+    click n_encoder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L96" "open the source"
+    click n_encoder_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L107" "open the source"
+    click n_encoder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L136" "open the source"
+    click n_caveat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L141" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L149" "open the source"
+    click n_is_answerable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L185" "open the source"
+    click n_recommended href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L196" "open the source"
+    click n_why_recommended href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L210" "open the source"
+    click n_look href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L236" "open the source"
+    click n_windows_adapters href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L260" "open the source"
+    click n_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L305" "open the source"
+    click n_linux_adapters href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L319" "open the source"
+    click n_macos_adapters href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L358" "open the source"
+    click n_parse_pairs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L384" "open the source"
+    click n_adapter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L407" "open the source"
+    click n_usable_threads href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L432" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_encoder,n_encoder_name,n_encoder,n_caveat,n_describe,n_is_answerable,n_why_recommended,n_look,n_usable_threads entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -177,28 +177,28 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Vendor` <sub>pub enum</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L58) | Who made a graphics device. |
-| `Vendor::of` <sub>pub fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L73) | The vendor a device name belongs to. |
-| `Vendor::encoder` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L92) | The ffmpeg encoder this vendor's hardware provides, if any. |
-| `Vendor::encoder_name` <sub>pub fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L103) | What to call the encoder in front of a person. |
-| `Adapter` <sub>pub struct</sub> | [116](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L116) | One graphics device. |
-| `Adapter::encoder` <sub>pub fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L132) | The encoder to ask ffmpeg for, if this device has one. |
-| `Adapter::caveat` <sub>pub fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L137) | What finding this device does and does not establish. |
-| `Adapter::describe` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L145) | One line, for a list. |
-| `Found` <sub>pub struct</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L169) | Everything found, and anything that went wrong looking. |
-| `Found::is_answerable` <sub>pub fn</sub> | [181](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L181) | Whether anything could be established at all. |
-| `Found::recommended` <sub>pub fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L192) | The device to suggest, and why. |
-| `Found::why_recommended` <sub>pub fn</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L206) | Why that one, in the words to show. |
-| `look` <sub>pub fn</sub> | [232](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L232) | Look for graphics hardware. |
-| `windows_adapters` <sub>fn</sub> | [256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L256) | Ask Windows through its own management interface. |
-| `tool` <sub>fn</sub> | [301](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L301) | Resolve a tool to an absolute path, never through PATH. |
-| `linux_adapters` <sub>fn</sub> | [315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L315) | Ask Linux through lspci. |
-| `macos_adapters` <sub>fn</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L354) | Ask macOS through system_profiler. |
-| `parse_pairs` <sub>fn</sub> | [380](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L380) | name\|driver lines into adapters. |
-| `adapter` <sub>fn</sub> | [403](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L403) | One adapter from a name. |
-| `usable_threads` <sub>pub fn</sub> | [428](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L428) | How many threads this machine can usefully run at once. |
-| `WHY_NOT_THE_ENGINE` <sub>pub const</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L435) | Why the audio engine is not offered a graphics card, with the numbers. |
-| `WHAT_IT_CHANGES` <sub>pub const</sub> | [446](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L446) | What hardware encoding is for, and what it does not change. |
+| `Vendor` <sub>pub enum</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L62) | Who made a graphics device. |
+| `Vendor::of` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L77) | The vendor a device name belongs to. |
+| `Vendor::encoder` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L96) | The ffmpeg encoder this vendor's hardware provides, if any. |
+| `Vendor::encoder_name` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L107) | What to call the encoder in front of a person. |
+| `Adapter` <sub>pub struct</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L120) | One graphics device. |
+| `Adapter::encoder` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L136) | The encoder to ask ffmpeg for, if this device has one. |
+| `Adapter::caveat` <sub>pub fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L141) | What finding this device does and does not establish. |
+| `Adapter::describe` <sub>pub fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L149) | One line, for a list. |
+| `Found` <sub>pub struct</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L173) | Everything found, and anything that went wrong looking. |
+| `Found::is_answerable` <sub>pub fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L185) | Whether anything could be established at all. |
+| `Found::recommended` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L196) | The device to suggest, and why. |
+| `Found::why_recommended` <sub>pub fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L210) | Why that one, in the words to show. |
+| `look` <sub>pub fn</sub> | [236](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L236) | Look for graphics hardware. |
+| `windows_adapters` <sub>fn</sub> | [260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L260) | Ask Windows through its own management interface. |
+| `tool` <sub>fn</sub> | [305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L305) | Resolve a tool to an absolute path, never through PATH. |
+| `linux_adapters` <sub>fn</sub> | [319](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L319) | Ask Linux through lspci. |
+| `macos_adapters` <sub>fn</sub> | [358](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L358) | Ask macOS through system_profiler. |
+| `parse_pairs` <sub>fn</sub> | [384](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L384) | name\|driver lines into adapters. |
+| `adapter` <sub>fn</sub> | [407](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L407) | One adapter from a name. |
+| `usable_threads` <sub>pub fn</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L432) | How many threads this machine can usefully run at once. |
+| `WHY_NOT_THE_ENGINE` <sub>pub const</sub> | [439](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L439) | Why the audio engine is not offered a graphics card, with the numbers. |
+| `WHAT_IT_CHANGES` <sub>pub const</sub> | [450](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs#L450) | What hardware encoding is for, and what it does not change. |
 
 ---
 

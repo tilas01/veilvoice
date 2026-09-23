@@ -110,7 +110,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>241 lines"])
     n_aead["aead.rs<br/>280 lines"]
-    n_amnesia["amnesia.rs<br/>428 lines"]
+    n_amnesia["amnesia.rs<br/>468 lines"]
     n_container["container.rs<br/>618 lines"]
     n_decoy["decoy.rs<br/>464 lines"]
     n_hoard["hoard.rs<br/>1099 lines"]
@@ -159,7 +159,7 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 280 | Authenticated encryption with XChaCha20-Poly1305. |
-| [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 428 | Amnesic secret storage: page-locked, zeroized, and never printed. |
+| [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 468 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 618 | The .veil encrypted container format. |
 | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 464 | A second passphrase that opens a different, empty VeilVoice. |
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
@@ -177,7 +177,7 @@ flowchart TD
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**7,226 functional lines of Rust** in this crate. A functional line is a line
+**7,234 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
