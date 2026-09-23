@@ -96,7 +96,17 @@ fn reg_exe() -> PathBuf {
     PathBuf::from(format!(r"{root}\System32\reg.exe"))
 }
 
-/// Where an installation goes, for this user only.
+/// The directory VeilVoice owns on this machine, for this user only.
+///
+/// **Not where the binaries go.** That is [`bin_dir`], and the two are the same
+/// directory on Windows and different ones everywhere else. This one is
+/// VeilVoice's own: nothing else writes to it, it holds whatever VeilVoice
+/// keeps beside itself such as `copies-seen.txt`, and it is the one directory
+/// [`uninstall`] may remove whole.
+///
+/// The distinction is F-214. These two were used interchangeably, and on
+/// Unix that meant the binaries were copied into one directory while a
+/// different one was added to `PATH`.
 pub fn prefix() -> Option<PathBuf> {
     #[cfg(windows)]
     {
@@ -113,7 +123,23 @@ pub fn prefix() -> Option<PathBuf> {
     }
 }
 
-/// The directory a `PATH` entry should point at.
+/// Where the binaries go, and therefore the directory `PATH` must contain.
+///
+/// On Windows this is [`prefix`]: a per-application directory under
+/// `%LOCALAPPDATA%\\Programs` is the platform's own convention and it is added
+/// to `PATH` by name.
+///
+/// Everywhere else it is `~/.local/bin`, which is where the XDG layout and
+/// systemd's file hierarchy both put a user's own executables, and which modern
+/// distributions already have on `PATH`. It is **not** VeilVoice's directory:
+/// other programs put their binaries there too, which is why [`uninstall`]
+/// removes files from it by name and never removes the directory.
+///
+/// This used to be answered one way and acted on another. `install` copied into
+/// [`prefix`], `~/.local/share/veilvoice`, and then added this directory to
+/// `PATH`, so the binaries were never in the directory the user was told about
+/// and typing `veilvoice` could not work: the entire point of installing. That
+/// is F-214.
 pub fn bin_dir() -> Option<PathBuf> {
     #[cfg(windows)]
     {
@@ -132,8 +158,13 @@ pub fn bin_dir() -> Option<PathBuf> {
 /// copy" are different, and a front end that conflates them tells somebody
 /// editing a portable folder that their changes took effect.
 pub struct Status {
-    /// Where an installation would go, or does. `None` when this system
-    /// offers no per-user program directory at all.
+    /// Where the binaries go, or are. `None` when this system offers no
+    /// per-user program directory at all.
+    ///
+    /// This is [`bin_dir`], and every other field here answers about that same
+    /// directory. It reported [`prefix`] until F-214, while `install`
+    /// copied into one directory and added another to `PATH`, so all three
+    /// facts below were about three different places.
     pub prefix: Option<PathBuf>,
     /// A VeilVoice command line exists under [`Status::prefix`].
     pub installed: bool,
@@ -152,19 +183,22 @@ pub struct Status {
 
 /// Read the current state without changing anything.
 pub fn status() -> Status {
-    let prefix = prefix();
+    let dir = bin_dir();
     let running = std::env::current_exe().ok();
-    let installed = prefix
+    let installed = dir
         .as_ref()
-        .map(|p| p.join(exe_name("veilvoice")).exists())
+        .map(|d| d.join(exe_name("veilvoice")).exists())
         .unwrap_or(false);
-    let running_installed = match (&prefix, &running) {
-        (Some(p), Some(r)) => r.parent().map(|d| d == p.as_path()).unwrap_or(false),
+    let running_installed = match (&dir, &running) {
+        (Some(d), Some(r)) => r
+            .parent()
+            .map(|parent| parent == d.as_path())
+            .unwrap_or(false),
         _ => false,
     };
     Status {
-        on_path: prefix.as_ref().map(|p| path_contains(p)).unwrap_or(false),
-        prefix,
+        on_path: dir.as_ref().map(|d| path_contains(d)).unwrap_or(false),
+        prefix: dir,
         installed,
         running_from: running,
         running_installed,
@@ -482,25 +516,27 @@ fn unregister_uninstall() -> Result<(), String> {
 
 /// Install for this user. Returns the lines to report.
 pub fn install() -> Result<Vec<String>, String> {
-    let prefix = prefix()
+    // One directory, and it is the one that goes on `PATH`. Copying into a
+    // second and adding this one is F-214, and it made installing a
+    // no-op on every platform but Windows.
+    let dir = bin_dir()
         .ok_or_else(|| "no per-user program directory could be found on this system".to_string())?;
     let mut report = Vec::new();
 
-    let copied = copy_programs(&prefix)?;
+    let copied = copy_programs(&dir)?;
     report.push(format!(
         "copied {} into {}",
         copied.join(", "),
-        prefix.display()
+        dir.display()
     ));
 
-    let dir = bin_dir().unwrap_or_else(|| prefix.clone());
     match add_to_path(&dir) {
         Ok(true) => report.push(format!("added {} to your PATH", dir.display())),
         Ok(false) => report.push(format!("{} was already on your PATH", dir.display())),
         Err(error) => report.push(format!("PATH was not changed: {error}")),
     }
 
-    register_uninstall(&prefix)?;
+    register_uninstall(&dir)?;
     if cfg!(windows) {
         report.push("registered in Apps & features, so Windows can remove it".to_string());
     }
@@ -509,11 +545,10 @@ pub fn install() -> Result<Vec<String>, String> {
 
 /// Remove what `install` added.
 pub fn uninstall() -> Result<Vec<String>, String> {
-    let prefix = prefix()
+    let dir = bin_dir()
         .ok_or_else(|| "no per-user program directory could be found on this system".to_string())?;
     let mut report = Vec::new();
 
-    let dir = bin_dir().unwrap_or_else(|| prefix.clone());
     match remove_from_path(&dir) {
         Ok(true) => report.push(format!("removed {} from your PATH", dir.display())),
         Ok(false) => report.push("PATH did not mention it".to_string()),
@@ -522,29 +557,116 @@ pub fn uninstall() -> Result<Vec<String>, String> {
 
     unregister_uninstall()?;
 
-    // The directory goes last: if this binary is the installed one, it is
-    // deleting itself, and Windows will not let it. Saying so is better than
-    // failing halfway with the registry already cleaned up.
+    // The binaries, by name. See `remove_programs` for why this is not a
+    // recursive delete of the directory they are in.
     let running = std::env::current_exe().ok();
-    let running_here = running
-        .as_ref()
-        .and_then(|r| r.parent())
-        .map(|d| d == prefix.as_path())
-        .unwrap_or(false);
-    if running_here {
+    let (removed, in_use) = remove_programs(&dir, running.as_deref())?;
+    if removed.is_empty() && in_use.is_empty() {
+        report.push("nothing was installed".to_string());
+    } else if !removed.is_empty() {
+        report.push(format!(
+            "removed {} from {}",
+            removed.join(", "),
+            dir.display()
+        ));
+    }
+    for path in &in_use {
         report.push(format!(
             "left {} in place: this program is running from it, and a running \
-             program cannot delete itself. Remove that folder by hand.",
-            prefix.display()
+             program cannot delete itself. Remove that file by hand.",
+            path.display()
         ));
-    } else if prefix.exists() {
-        std::fs::remove_dir_all(&prefix)
-            .map_err(|e| format!("could not remove {}: {e}", prefix.display()))?;
-        report.push(format!("removed {}", prefix.display()));
-    } else {
-        report.push("nothing was installed".to_string());
     }
+
+    // VeilVoice's own directory, which is a different one everywhere but
+    // Windows, and which it created. Only this directory may go whole.
+    if let Some(owned) = removable_prefix() {
+        // On Windows that is the directory the binaries were just in, so a
+        // program still running from it has already been reported and there is
+        // nothing to add by failing to delete the folder around it.
+        let already_said = !in_use.is_empty() && owned == dir;
+        if owned.exists() && !already_said {
+            match std::fs::remove_dir_all(&owned) {
+                Ok(()) => report.push(format!("removed {}", owned.display())),
+                // Not fatal. The binaries are gone, `PATH` is clean and the
+                // uninstall entry is gone; failing the whole operation over a
+                // data directory would leave somebody with a half-removed
+                // program and an error they cannot act on.
+                Err(e) => report.push(format!("could not remove {}: {e}", owned.display())),
+            }
+        }
+    }
+
     Ok(report)
+}
+
+/// Remove the programs `install` wrote, by name, and say which are still in
+/// use.
+///
+/// **By name, never as a directory.** On every platform but Windows the
+/// binaries live in `~/.local/bin`, which belongs to the user and holds other
+/// programs' binaries too. A `remove_dir_all` there would take every one of
+/// them, during an uninstall, which is the moment somebody is least likely to
+/// be watching closely. The previous version of this function did exactly that
+/// to [`prefix`], and it was only ever safe because `prefix` happened not to be
+/// a shared directory: one line moving the binaries to where they belonged
+/// would have turned it into a command that empties `~/.local/bin`. That is
+/// half of F-214, and the answer is a function that cannot do it rather
+/// than a comment asking the next person not to.
+///
+/// A file that is the running program is reported rather than deleted: Windows
+/// will not unlink a running executable, and the honest report is which file is
+/// still there and why.
+fn remove_programs(
+    dir: &Path,
+    running: Option<&Path>,
+) -> Result<(Vec<String>, Vec<PathBuf>), String> {
+    let mut removed = Vec::new();
+    let mut in_use = Vec::new();
+    for stem in PROGRAMS {
+        let name = exe_name(stem);
+        let path = dir.join(&name);
+        if !path.exists() {
+            continue;
+        }
+        if running == Some(path.as_path()) {
+            in_use.push(path);
+            continue;
+        }
+        match std::fs::remove_file(&path) {
+            Ok(()) => removed.push(name),
+            // Anything else is a real failure and is reported as one: a
+            // binary left behind is a `veilvoice` that still runs after an
+            // uninstall said it was gone.
+            Err(e) => return Err(format!("could not remove {}: {e}", path.display())),
+        }
+    }
+    Ok((removed, in_use))
+}
+
+/// [`prefix`], but only when it is genuinely a directory VeilVoice made for
+/// itself.
+///
+/// The check is the point rather than paranoia. `remove_dir_all` is the one
+/// call in this crate that can destroy something a user cares about, and it is
+/// reached during an uninstall, so it is given a directory that has passed two
+/// tests: it is not the directory the binaries live in, and its last component
+/// names VeilVoice. Either one alone would have been enough to stop
+/// F-214 turning into a command that empties `~/.local/bin`; both are
+/// here because the cost of the check is nothing and the cost of being wrong
+/// is somebody's machine.
+fn removable_prefix() -> Option<PathBuf> {
+    let owned = prefix()?;
+    if Some(&owned) == bin_dir().as_ref() && !cfg!(windows) {
+        // On Windows these are deliberately the same directory, and it is
+        // VeilVoice's own, so the equality is not a warning there.
+        return None;
+    }
+    let last = owned.file_name()?.to_str()?.to_ascii_lowercase();
+    if !last.contains("veilvoice") {
+        return None;
+    }
+    Some(owned)
 }
 
 #[cfg(test)]
@@ -577,6 +699,151 @@ mod tests {
             assert_eq!(name, "veilvoice.exe");
         } else {
             assert_eq!(name, "veilvoice");
+        }
+    }
+
+    /// **F-214, the half that could have damaged a machine.**
+    ///
+    /// `uninstall` removes the programs it wrote **by name** and leaves
+    /// everything else in the directory alone. The directory the binaries live
+    /// in is `~/.local/bin` on every platform but Windows, and that belongs to
+    /// the user: it holds whatever else they have installed. The previous
+    /// version removed a directory recursively, and was safe only because it
+    /// happened to be pointed at a directory nobody else wrote to.
+    ///
+    /// Written against `remove_programs` directly rather than `uninstall`,
+    /// because `uninstall` reads the real environment and a test that could
+    /// empty the developer's own `~/.local/bin` is not a test worth having.
+    #[test]
+    fn uninstalling_removes_its_own_files_and_nothing_else() {
+        let dir = std::env::temp_dir().join(format!(
+            "veilvoice-uninstall-{:x}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+
+        // What VeilVoice put there, and what somebody else did.
+        for stem in PROGRAMS {
+            std::fs::write(dir.join(exe_name(stem)), b"ours").unwrap();
+        }
+        let theirs = ["ripgrep", "fd", "a-script-somebody-wrote"];
+        for name in theirs {
+            std::fs::write(dir.join(name), b"not ours").unwrap();
+        }
+        std::fs::create_dir(dir.join("a-directory-of-their-own")).unwrap();
+
+        let (removed, in_use) = remove_programs(&dir, None).expect("it removes");
+        assert_eq!(removed.len(), PROGRAMS.len(), "{removed:?}");
+        assert!(in_use.is_empty());
+
+        for stem in PROGRAMS {
+            assert!(!dir.join(exe_name(stem)).exists(), "{stem} was not removed");
+        }
+        for name in theirs {
+            assert!(
+                dir.join(name).exists(),
+                "uninstalling VeilVoice removed {name}, which is not VeilVoice"
+            );
+        }
+        assert!(
+            dir.join("a-directory-of-their-own").is_dir(),
+            "uninstalling VeilVoice removed a directory that was not its own"
+        );
+        assert!(
+            dir.is_dir(),
+            "uninstalling VeilVoice removed the directory itself"
+        );
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// The running program is reported rather than deleted, and nothing else
+    /// is skipped because of it.
+    #[test]
+    fn the_running_program_is_left_and_named() {
+        let dir = std::env::temp_dir().join(format!(
+            "veilvoice-uninstall-running-{:x}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        for stem in PROGRAMS {
+            std::fs::write(dir.join(exe_name(stem)), b"ours").unwrap();
+        }
+        let running = dir.join(exe_name(PROGRAMS[0]));
+
+        let (removed, in_use) = remove_programs(&dir, Some(&running)).expect("it removes");
+        assert_eq!(in_use, vec![running.clone()]);
+        assert!(running.exists(), "the running program was deleted");
+        assert_eq!(
+            removed.len(),
+            PROGRAMS.len() - 1,
+            "the others should still go: {removed:?}"
+        );
+    }
+
+    /// The one recursive delete in this crate is only ever given a directory
+    /// VeilVoice made for itself.
+    ///
+    /// The guard is what keeps F-214 from being able to come back as
+    /// something much worse than an install that did not work. If `prefix` is
+    /// ever pointed at the directory the binaries live in, on a platform where
+    /// that directory is shared, this returns `None` and the recursive delete
+    /// does not happen at all.
+    #[test]
+    fn only_a_directory_named_for_veilvoice_may_be_removed_whole() {
+        let Some(owned) = removable_prefix() else {
+            // Nothing will be removed recursively on this machine, which is the
+            // safe answer and not a failure.
+            return;
+        };
+        let last = owned
+            .file_name()
+            .expect("a final component")
+            .to_str()
+            .expect("a readable name")
+            .to_ascii_lowercase();
+        assert!(
+            last.contains("veilvoice"),
+            "{} would be removed whole and is not VeilVoice's own directory",
+            owned.display()
+        );
+        if !cfg!(windows) {
+            assert_ne!(
+                Some(owned.clone()),
+                bin_dir(),
+                "the directory holding other programs' binaries must never be \
+                 removed whole"
+            );
+        }
+    }
+
+    /// Everything `status` reports is about one directory, and it is the one
+    /// the binaries actually go into.
+    ///
+    /// Three facts about three different places is what F-214 was:
+    /// `install` copied into one, added a second to `PATH`, and `status`
+    /// answered about a third, so an install that worked reported itself as an
+    /// install that had not happened.
+    #[test]
+    fn everything_reported_is_about_the_directory_the_binaries_go_into() {
+        let state = status();
+        assert_eq!(
+            state.prefix,
+            bin_dir(),
+            "status reports a directory the binaries are not copied into"
+        );
+        if let (Some(dir), Some(from)) = (&state.prefix, &state.running_from) {
+            assert_eq!(
+                state.running_installed,
+                from.parent() == Some(dir.as_path()),
+                "`running_installed` is answered about a different directory"
+            );
         }
     }
 

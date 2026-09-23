@@ -1500,7 +1500,10 @@ fn run(command: Command) -> Result<(), String> {
             println!(
                 "{}",
                 field(
-                    "prefix",
+                    // The same words the window's setup tab uses. It said
+                    // `prefix`, which was jargon and, after F-214, named
+                    // a directory the binaries were not copied into.
+                    "install goes to",
                     &state
                         .prefix
                         .as_ref()
