@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/settings.svg" alt="settings.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/settings.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1662 lines &middot; <a href="settings.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1664 lines &middot; <a href="settings.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-menu-rather-than-one-long-list">Why a menu rather than one long list</a>
@@ -91,7 +91,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1662 lines defining <strong>46 functions</strong> (35 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1664 lines defining <strong>46 functions</strong> (35 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Page</code> <span style="color:var(--muted)">line 46</span> &middot; Which page of the settings menu is showing.</li>
 <li><code>struct Settings</code> <span style="color:var(--muted)">line 135</span> &middot; The settings tab&#x27;s own state.</li>
@@ -129,24 +129,24 @@
 <li><code>Settings::set_seal_with_app_lock</code> <span style="color:var(--muted)">line 452</span> &middot; Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::toured_tabs</code> <span style="color:var(--muted)">line 693</span> &middot; The tabs the tour has already covered.
+<li><code>Settings::toured_tabs</code> <span style="color:var(--muted)">line 695</span> &middot; The tabs the tour has already covered.
 </li>
-<li><code>Settings::mark_toured</code> <span style="color:var(--muted)">line 704</span> &middot; Record that the tour has covered these tabs, and save.
+<li><code>Settings::mark_toured</code> <span style="color:var(--muted)">line 706</span> &middot; Record that the tour has covered these tabs, and save.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::first_run_appearance</code> <span style="color:var(--muted)">line 718</span> &middot; The first-run panel: offered once, with animation already on.
+<li><code>Settings::first_run_appearance</code> <span style="color:var(--muted)">line 720</span> &middot; The first-run panel: offered once, with animation already on.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::first_run_autolock</code> <span style="color:var(--muted)">line 745</span> &middot; The autolock switch and delay, for the first-run setup to place.
+<li><code>Settings::first_run_autolock</code> <span style="color:var(--muted)">line 747</span> &middot; The autolock switch and delay, for the first-run setup to place.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::finish_first_run</code> <span style="color:var(--muted)">line 773</span> &middot; Mark the first run answered.
+<li><code>Settings::finish_first_run</code> <span style="color:var(--muted)">line 775</span> &middot; Mark the first run answered.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
-<li><code>Settings::tab</code> <span style="color:var(--muted)">line 780</span> &middot; The settings tab.
+<li><code>Settings::tab</code> <span style="color:var(--muted)">line 782</span> &middot; The settings tab.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>appearance_page</code>, <code>interface_page</code>, <code>motion_page</code>, <code>security_page</code>, <code>storage_page</code>, <code>custom_palette_help</code>, <code>persist</code>, <code>section</code>, <code>swatches</code>, <code>failsafe</code>, <code>live_monitor</code>, <code>notify_style</code></span>
 </li>
-<li><code>Settings::theme_picker</code> <span style="color:var(--muted)">line 914</span> &middot; The colour scheme, as a compact control for the window header.
+<li><code>Settings::theme_picker</code> <span style="color:var(--muted)">line 916</span> &middot; The colour scheme, as a compact control for the window header.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>persist</code></span>
 </li>
 </ul>
@@ -262,22 +262,22 @@
 <a href="settings.src.html#fn-settings-mark_toured">
 <rect x="311.8" y="828.5" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="410.4" y="851.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::mark_toured</text>
-<text x="410.4" y="868.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 704</text>
+<text x="410.4" y="868.2" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 706</text>
 </a>
 <a href="settings.src.html#fn-settings-first_run_appearance">
 <rect x="20.0" y="937.0" width="269.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="154.9" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::first_run_appearance</text>
-<text x="154.9" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 718</text>
+<text x="154.9" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 720</text>
 </a>
 <a href="settings.src.html#fn-settings-first_run_autolock">
 <rect x="315.8" y="937.0" width="253.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="442.6" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::first_run_autolock</text>
-<text x="442.6" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 745</text>
+<text x="442.6" y="976.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 747</text>
 </a>
 <a href="settings.src.html#fn-settings-finish_first_run">
 <rect x="176.0" y="1037.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="294.7" y="1059.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Settings::finish_first_run</text>
-<text x="294.7" y="1076.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 773</text>
+<text x="294.7" y="1076.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 775</text>
 </a>
 <rect x="20.0" y="1121.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1130.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -313,10 +313,10 @@ flowchart TD
     n_set_live_monitor[&quot;Settings::set_live_monitor&lt;br/&gt;line 429&quot;]
     n_set_always_group([&quot;Settings::set_always_group&lt;br/&gt;line 438&quot;])
     n_set_seal_with_app_lock([&quot;Settings::&lt;br/&gt;set_seal_with_app_lock&lt;br/&gt;line 452&quot;])
-    n_mark_toured([&quot;Settings::mark_toured&lt;br/&gt;line 704&quot;])
-    n_first_run_appearance([&quot;Settings::first_run_appearance&lt;br/&gt;line 718&quot;])
-    n_first_run_autolock([&quot;Settings::first_run_autolock&lt;br/&gt;line 745&quot;])
-    n_finish_first_run([&quot;Settings::finish_first_run&lt;br/&gt;line 773&quot;])
+    n_mark_toured([&quot;Settings::mark_toured&lt;br/&gt;line 706&quot;])
+    n_first_run_appearance([&quot;Settings::first_run_appearance&lt;br/&gt;line 720&quot;])
+    n_first_run_autolock([&quot;Settings::first_run_autolock&lt;br/&gt;line 747&quot;])
+    n_finish_first_run([&quot;Settings::finish_first_run&lt;br/&gt;line 775&quot;])
     n_set_autolock --&gt; n_autolock
     n_set_failsafe --&gt; n_failsafe
     n_set_live_monitor --&gt; n_live_monitor
@@ -339,10 +339,10 @@ flowchart TD
     click n_set_live_monitor href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L429&quot; &quot;open the source&quot;
     click n_set_always_group href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L438&quot; &quot;open the source&quot;
     click n_set_seal_with_app_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L452&quot; &quot;open the source&quot;
-    click n_mark_toured href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L704&quot; &quot;open the source&quot;
-    click n_first_run_appearance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L718&quot; &quot;open the source&quot;
-    click n_first_run_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L745&quot; &quot;open the source&quot;
-    click n_finish_first_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L773&quot; &quot;open the source&quot;
+    click n_mark_toured href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L706&quot; &quot;open the source&quot;
+    click n_first_run_appearance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L720&quot; &quot;open the source&quot;
+    click n_first_run_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L747&quot; &quot;open the source&quot;
+    click n_finish_first_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L775&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load,n_set_destination,n_set_always_group,n_set_seal_with_app_lock,n_mark_toured,n_first_run_appearance,n_first_run_autolock,n_finish_first_run entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -389,20 +389,20 @@ flowchart TD
 <tr><td><code>Settings::set_always_group</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_always_group">438</a></td><td>Record whether the app should open in group mode.</td></tr>
 <tr><td><code>Settings::set_seal_with_app_lock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-set_seal_with_app_lock">452</a></td><td>Remember, or stop remembering, that recordings are sealed with the app-lock passphrase.</td></tr>
 <tr><td><code>Settings::interface_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-interface_page">461</a></td><td>Which tabs the window offers.</td></tr>
-<tr><td><code>Settings::toured_tabs</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-toured_tabs">693</a></td><td>The tabs the tour has already covered.</td></tr>
-<tr><td><code>Settings::mark_toured</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-mark_toured">704</a></td><td>Record that the tour has covered these tabs, and save.</td></tr>
-<tr><td><code>Settings::first_run_appearance</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-first_run_appearance">718</a></td><td>The first-run panel: offered once, with animation already on.</td></tr>
-<tr><td><code>Settings::first_run_autolock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-first_run_autolock">745</a></td><td>The autolock switch and delay, for the first-run setup to place.</td></tr>
-<tr><td><code>Settings::finish_first_run</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-finish_first_run">773</a></td><td>Mark the first run answered.</td></tr>
-<tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-tab">780</a></td><td>The settings tab.</td></tr>
-<tr><td><code>Settings::custom_palette_help</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-custom_palette_help">835</a></td><td>Explain where custom palettes go, and say what was refused and why.</td></tr>
-<tr><td><code>Settings::theme_picker</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-theme_picker">914</a></td><td>The colour scheme, as a compact control for the window header.</td></tr>
-<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-appearance_page">940</a></td><td>The appearance page: palette, and what each one changes.</td></tr>
-<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-motion_page">979</a></td><td>The motion page, including honouring the system&#x27;s reduced-motion setting.</td></tr>
-<tr><td><code>Settings::security_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-security_page">1116</a></td><td>Roadmap item 92.</td></tr>
-<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-storage_page">1216</a></td><td>The storage page: where files go, and the portable or installed choice.</td></tr>
-<tr><td><code>section</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-section">1277</a></td><td>A titled group with a one-line explanation under it.</td></tr>
-<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-swatches">1285</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
+<tr><td><code>Settings::toured_tabs</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-toured_tabs">695</a></td><td>The tabs the tour has already covered.</td></tr>
+<tr><td><code>Settings::mark_toured</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-mark_toured">706</a></td><td>Record that the tour has covered these tabs, and save.</td></tr>
+<tr><td><code>Settings::first_run_appearance</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-first_run_appearance">720</a></td><td>The first-run panel: offered once, with animation already on.</td></tr>
+<tr><td><code>Settings::first_run_autolock</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-first_run_autolock">747</a></td><td>The autolock switch and delay, for the first-run setup to place.</td></tr>
+<tr><td><code>Settings::finish_first_run</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-finish_first_run">775</a></td><td>Mark the first run answered.</td></tr>
+<tr><td><code>Settings::tab</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-tab">782</a></td><td>The settings tab.</td></tr>
+<tr><td><code>Settings::custom_palette_help</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-custom_palette_help">837</a></td><td>Explain where custom palettes go, and say what was refused and why.</td></tr>
+<tr><td><code>Settings::theme_picker</code> <sub>pub fn</sub></td><td><a href="settings.src.html#fn-settings-theme_picker">916</a></td><td>The colour scheme, as a compact control for the window header.</td></tr>
+<tr><td><code>Settings::appearance_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-appearance_page">942</a></td><td>The appearance page: palette, and what each one changes.</td></tr>
+<tr><td><code>Settings::motion_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-motion_page">981</a></td><td>The motion page, including honouring the system&#x27;s reduced-motion setting.</td></tr>
+<tr><td><code>Settings::security_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-security_page">1118</a></td><td>Roadmap item 92.</td></tr>
+<tr><td><code>Settings::storage_page</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-settings-storage_page">1218</a></td><td>The storage page: where files go, and the portable or installed choice.</td></tr>
+<tr><td><code>section</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-section">1279</a></td><td>A titled group with a one-line explanation under it.</td></tr>
+<tr><td><code>swatches</code> <sub>fn</sub></td><td><a href="settings.src.html#fn-swatches">1287</a></td><td>The active palette, as a row of swatches, so the choice can be seen rather than only read.</td></tr>
 </tbody></table>
 </section>
 </div></div>

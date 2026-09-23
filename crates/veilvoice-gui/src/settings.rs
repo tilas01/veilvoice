@@ -667,17 +667,19 @@ impl Settings {
         section(
             ui,
             "The tour",
-            "What each tab is for, over the window, a card at a time.",
+            "The setup worth doing, and what each tab is for, over the window, a \
+             step at a time.",
         );
         if ui.button("Show the tour again").clicked() {
             self.tour_requested = true;
         }
         ui.label(
             RichText::new(
-                "  Every card, including the ones you have seen: asking for it is not a \
-                 question about which tabs are new. It runs over the window rather than \
-                 instead of it, so the tab a card is describing is on screen while it \
-                 describes it, and Escape closes it.",
+                "  Every step, including the ones you have seen: asking for it is not a \
+                 question about what is new. Anything already set is left out rather \
+                 than asked again. It runs over the window rather than instead of it, \
+                 so the tab a step is describing is on screen while it describes it, \
+                 and Escape closes it.",
             )
             .small()
             .color(p::muted()),
