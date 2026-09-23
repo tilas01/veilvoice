@@ -872,6 +872,90 @@ of it, and `git status` shows nothing unstaged to say so. The run now names
 what it wrote, from `git status --porcelain` taken either side of the
 generators, and says plainly that those files are in the index rather than in
 a commit.
+### F-214: install put the programs in one directory and added a different one to the path
+
+`veilvoice install` exists so that typing `veilvoice` in a terminal works. On
+Linux and macOS it could not do that, and had never been able to.
+
+It copied the binaries into `prefix()`, which is `~/.local/share/veilvoice`. It
+then added `bin_dir()`, which is `~/.local/bin`, to the user's path. Those are
+different directories, and the second never receives a file. So an install
+reported success, told the reader to open a new terminal for the path change to
+take effect, and left them with a command that is not found.
+
+`status()` then answered about a third place. Its `on_path` field was
+`path_contains(prefix)`, and `~/.local/share/veilvoice` is on nobody's path, so
+a correctly installed copy reported itself as not installed on the path
+whatever had happened. `running_installed` compared against `prefix` too, so
+somebody running the installed binary was told they were running a portable
+copy.
+
+**Two separate install commands, disagreeing.** `veilvoice verify install
+--from <DIR>` copies into `bin_dir()`, which is the right place, while
+`veilvoice install` copied into `prefix()`. Each therefore reported the other's
+work as nothing installed, because both read the same `status()` and `status()`
+answered about `prefix`.
+
+Windows was unaffected throughout, which is why this survived: there
+`bin_dir()` *is* `prefix()`, both are `%LOCALAPPDATA%\Programs\VeilVoice`, and
+every one of the three questions has the same answer. The platform the
+maintainer tests on is the one platform where the bug cannot appear.
+
+**The documentation was right the whole time.** `docs/INSTALL.md` has a table
+headed "Where things get installed" giving `~/.local/bin` for Linux and macOS,
+and `install/install.sh` puts the binaries there, at `$PREFIX/bin` with
+`$PREFIX` defaulting to `$HOME/.local`. So the shell installer, the manual and
+the Rust installer disagreed, and the two that agreed with each other were the
+two nobody had changed. There is a lesson in which artefact went wrong: the
+document is checked against the tree by a build step, and the shell script is
+what a reader follows step by step, while `install()` is a function whose
+result nobody had typed `veilvoice` after.
+
+## The half that could have damaged a machine
+
+`uninstall()` ended with `std::fs::remove_dir_all(prefix)`.
+
+That was safe, and safe by accident. `~/.local/share/veilvoice` is VeilVoice's
+own directory and nothing else writes to it, so removing it whole took nothing
+that was not VeilVoice's. But the obvious fix for everything above is to move
+the binaries to where the path entry points, and the obvious way to write that
+fix is to change what `prefix()` returns. One line, and `veilvoice uninstall`
+becomes a command that recursively deletes `~/.local/bin`, with every other
+program the user has installed in it, at the moment they are least inclined to
+look closely at the output.
+
+The fix is therefore not only to correct the directory. `uninstall` now removes
+the programs it wrote **by name**, one file at a time, from the directory they
+live in, and never removes that directory. The recursive delete survives for
+exactly one thing, the directory VeilVoice made for itself, and it is guarded:
+`removable_prefix()` returns `None` unless the directory's final component
+names VeilVoice and, off Windows, is not the directory the binaries live in.
+Either test alone would have been enough. Both are there because the check
+costs nothing and being wrong costs somebody their `~/.local/bin`.
+
+A running program is reported rather than deleted, because Windows will not
+unlink a running executable, and the other programs are still removed rather
+than the whole operation stopping at the first one.
+
+## What is checked
+
+Three regression tests, and the first is the one that matters. It stages a
+directory holding VeilVoice's programs, three files somebody else put there and
+a directory of their own, runs the removal, and asserts that the three files,
+the directory and the directory itself are all still there. Confirmed by
+putting a `remove_dir_all` back: the test fails naming the file that was taken.
+
+The second asserts that the running program is left and named while the others
+still go. The third asserts that everything `status()` reports is about the one
+directory the binaries are actually copied into, which is the shape of the
+original defect rather than its symptom.
+
+Found while landing roadmap item 179, whose updater needed one answer to "where is
+the installed copy" and found two. The updater does not depend on this: it
+replaces the files beside the running program, which is right for a folder
+somebody unzipped as well as for an install, and portable is this project's
+default.
+
 ### F-213: the program told people it had no network code, next to a command that downloads
 
 Two sentences shipped, in the two places somebody is most likely to read one.
@@ -7025,7 +7109,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1755 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1759 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -8673,7 +8757,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and thirteen defects found and fixed (F-1 to F-213), across
+**Two hundred and fourteen defects found and fixed (F-1 to F-214), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

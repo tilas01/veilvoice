@@ -110,7 +110,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>224 lines"])
     n_companions["companions.rs<br/>1088 lines"]
-    n_install["install.rs<br/>594 lines"]
+    n_install["install.rs<br/>861 lines"]
     n_space["space.rs<br/>170 lines"]
     n_update["update.rs<br/>892 lines"]
     n_volumes["volumes.rs<br/>580 lines"]
@@ -130,13 +130,13 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`companions.rs`](../../docs/files/veilvoice-setup/companions.md) | 1088 | Optional third-party software, detected rather than assumed. |
-| [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 594 | Put this program somewhere the system can find it. |
+| [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 861 | Put this program somewhere the system can find it. |
 | [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 224 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | 170 | How much room is actually free where VeilVoice keeps things. |
 | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | 892 | Ask, only when told to, whether a newer VeilVoice release exists. |
 | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**2,293 functional lines of Rust** in this crate. A functional line is a line
+**2,440 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -156,8 +156,8 @@ counts blank lines and comments too. Both are produced by
 | `fn run` | [`companions.rs`](../../docs/files/veilvoice-setup/companions.md) | Run an offer, and return what it printed. |
 | `fn open_page` | [`companions.rs`](../../docs/files/veilvoice-setup/companions.md) | Open a companion's own page in the user's browser. |
 | `const NAME` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | The name of the directory and the uninstall entry. |
-| `fn prefix` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | Where an installation goes, for this user only. |
-| `fn bin_dir` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | The directory a PATH entry should point at. |
+| `fn prefix` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | The directory VeilVoice owns on this machine, for this user only. |
+| `fn bin_dir` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | Where the binaries go, and therefore the directory PATH must contain. |
 | `struct Status` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | What an installation currently looks like. |
 | `fn status` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | Read the current state without changing anything. |
 | `fn install` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | Install for this user. |
