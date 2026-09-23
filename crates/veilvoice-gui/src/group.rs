@@ -1454,7 +1454,7 @@ fn render_video(
         ));
     };
 
-    let output = std::process::Command::new(program)
+    let output = crate::command(program)
         .args(argv.iter().skip(1))
         .output()
         .map_err(|error| error.to_string())?;

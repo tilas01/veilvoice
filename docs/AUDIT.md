@@ -743,6 +743,64 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-212: the guard that proved no spawn flashed a console read one file of thirty-four
+
+The window's own half of the same defect `veilvoice-setup` had, found by
+reading `veilvoice-gui` for roadmap item 167 rather than by anything failing.
+
+On Windows a `Command` for a console program creates a console, and a GUI
+process has none of its own, so Windows opens a **window** for it that appears
+and vanishes as the child runs. That is what "a cmd prompt flashing randomly"
+was, it was fixed in v0.1.10, and the fix was a wrapper that sets
+`CREATE_NO_WINDOW`.
+
+The wrapper lived in `reduced_motion.rs`, as a private function called
+`no_window`, with a test beside it that read `reduced_motion.rs` and asserted
+every `Command::new` in that file went through it. The test was correct and it
+passed, and it could not have said anything about any other file, because a
+private helper is not reachable from one and `include_str!` was pointed at its
+own module. Meanwhile `studio.rs` and `group.rs` each spawned `ffmpeg`
+directly. Rendering a take to video, and rendering a group conversation, both
+flashed a console on Windows, for as long as either feature had existed.
+
+**The module that bothers to write a rule is the least likely one to break
+it.** That is the whole finding, and it is worth stating as a shape rather
+than as an instance: a guard that reads the file it lives in proves something
+about the one file whose author was already thinking about the rule. The two
+files that broke this one are six hundred and a thousand lines away from the
+comment explaining why it matters, written by somebody solving a different
+problem.
+
+`veilvoice-setup` reached the same conclusion independently and days apart, as
+F-210, where a hand-kept list of three modules claimed in its own comment to
+cover all six, and the two that were never read both spawned bare. Two crates,
+the same defect, the same week, neither found by the other's test.
+
+**The fix.** `crate::command` in `lib.rs`, one wrapper the whole crate can
+reach, with `hide_console` split into a Windows half and an everywhere-else
+half as two signatures rather than one body with a `cfg` block inside it, for
+the reason `veilvoice-setup` records: the block version needs `let mut` on
+Windows and no `mut` elsewhere, which compiles on Windows and fails the Linux
+and macOS runners on `unused_mut`. The three spawns in `reduced_motion.rs` and
+the two `ffmpeg` spawns now go through it.
+
+**And the guard reads the whole crate, with the list checked rather than
+remembered.** `include_str!` takes a literal, so the thirty-four entries
+cannot be produced by walking the directory. What they can be is checked
+against `lib.rs`'s own `mod` declarations, so a module added later fails this
+test rather than silently going unscanned. Each file is cut at its first
+`#[cfg(test)]`, because two guards in this crate name the forbidden call in
+order to forbid it and a check that trips over its own source is a check
+somebody deletes.
+
+Proven by breaking both halves rather than only by passing: a bare spawn put
+back in `studio.rs` fails naming the file and the line, and `studio.rs`
+removed from the scan list fails naming the module.
+
+This is the console half of roadmap item 167. The freezing half, every call
+that does its work on the thread that draws, is the larger part and follows
+separately.
+
 ### F-211: nothing compared the pictures of the window against the window
 
 Fifteen photographs of the running window are published: on the website, in
@@ -8556,7 +8614,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and eleven defects found and fixed (F-1 to F-211), across
+**Two hundred and twelve defects found and fixed (F-1 to F-212), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
