@@ -2583,7 +2583,7 @@
 <span class="ln" id="L2368">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(program) = veilvoice_video::ffmpeg::<span class="tok-fn">found</span>() <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L2369">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;`ffmpeg` went away between the check and the run.&quot;</span>.<span class="tok-fn">into</span>());</span>
 <span class="ln" id="L2370">    };</span>
-<span class="ln" id="L2371">    <span class="tok-kw">let</span> output = std::process::Command::<span class="tok-fn">new</span>(program)</span>
+<span class="ln" id="L2371">    <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(program)</span>
 <span class="ln" id="L2372">        .<span class="tok-fn">args</span>(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(<span class="tok-num">1</span>))</span>
 <span class="ln" id="L2373">        .<span class="tok-fn">output</span>()</span>
 <span class="ln" id="L2374">        .<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>

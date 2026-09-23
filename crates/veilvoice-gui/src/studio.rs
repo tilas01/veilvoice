@@ -2368,7 +2368,7 @@ fn run_ffmpeg(audio: &std::path::Path, video: &std::path::Path) -> Result<(), St
     let Some(program) = veilvoice_video::ffmpeg::found() else {
         return Err("`ffmpeg` went away between the check and the run.".into());
     };
-    let output = std::process::Command::new(program)
+    let output = crate::command(program)
         .args(argv.iter().skip(1))
         .output()
         .map_err(|error| error.to_string())?;

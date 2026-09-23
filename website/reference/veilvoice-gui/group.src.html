@@ -1605,7 +1605,7 @@
 <span class="ln" id="L1454">        ));</span>
 <span class="ln" id="L1455">    };</span>
 <span class="ln" id="L1456"></span>
-<span class="ln" id="L1457">    <span class="tok-kw">let</span> output = std::process::Command::<span class="tok-fn">new</span>(program)</span>
+<span class="ln" id="L1457">    <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(program)</span>
 <span class="ln" id="L1458">        .<span class="tok-fn">args</span>(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(<span class="tok-num">1</span>))</span>
 <span class="ln" id="L1459">        .<span class="tok-fn">output</span>()</span>
 <span class="ln" id="L1460">        .<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>

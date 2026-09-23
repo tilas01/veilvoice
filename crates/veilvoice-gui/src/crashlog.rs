@@ -12,7 +12,8 @@
 //! That is not hypothetical. A release shipped and the report was "it flashes a
 //! command prompt, loads in an unusable state, and crashes" -- which is all a
 //! user *can* report, because the program tells them nothing. The console flash
-//! turned out to be subprocesses (see `no_window` in [`crate::reduced_motion`]),
+//! turned out to be subprocesses (see [`crate::command`], which every spawn
+//! in this crate goes through),
 //! and the crash could not be diagnosed at all from what was observable.
 //!
 //! # What this does about it

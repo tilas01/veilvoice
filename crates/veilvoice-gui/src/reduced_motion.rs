@@ -46,34 +46,6 @@
 //! be overridden by hand either way.
 
 use std::path::{Path, PathBuf};
-use std::process::Command;
-
-/// Spawn without a console window.
-///
-/// On Windows a `Command` for a console program creates a console, and when the
-/// parent is a GUI process with none of its own, Windows opens a **window** for
-/// it -- appearing and vanishing as the child runs. That is what "a cmd prompt
-/// flashing randomly" was: once at startup, and again on every poll.
-///
-/// `CREATE_NO_WINDOW` suppresses it. `creation_flags` is a **safe** API, so
-/// this costs nothing against `#![forbid(unsafe_code)]`.
-///
-/// Every `Command::new` in this crate goes through here, and a test asserts it
-/// -- because "no console window appeared" is not observable from a test, which
-/// is exactly why the defect shipped.
-// `mut` is only needed where the body below is compiled in. Everywhere
-// else the parameter is moved straight through, and `-D warnings` in CI
-// rejects the unused `mut` -- which only the Linux runner can see.
-#[cfg_attr(not(windows), allow(unused_mut))]
-fn no_window(mut command: Command) -> Command {
-    #[cfg(windows)]
-    {
-        use std::os::windows::process::CommandExt;
-        const CREATE_NO_WINDOW: u32 = 0x0800_0000;
-        command.creation_flags(CREATE_NO_WINDOW);
-    }
-    command
-}
 
 /// What the platform said.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -143,7 +115,7 @@ fn windows_query() -> Query {
         return Query::Unknown;
     };
 
-    let Ok(output) = no_window(Command::new(reg))
+    let Ok(output) = crate::command(reg)
         .args([
             "query",
             r"HKCU\Control Panel\Desktop",
@@ -192,7 +164,7 @@ fn macos_query() -> Query {
     let Some(defaults) = tool(&["/usr/bin", "/bin"], "defaults") else {
         return Query::Unknown;
     };
-    let Ok(output) = no_window(Command::new(defaults))
+    let Ok(output) = crate::command(defaults)
         .args(["read", "com.apple.universalaccess", "reduceMotion"])
         .output()
     else {
@@ -217,7 +189,7 @@ fn unix_query() -> Query {
     let Some(gsettings) = tool(&["/usr/bin", "/bin", "/usr/local/bin"], "gsettings") else {
         return Query::Unknown;
     };
-    let Ok(output) = no_window(Command::new(gsettings))
+    let Ok(output) = crate::command(gsettings)
         .args(["get", "org.gnome.desktop.interface", "enable-animations"])
         .output()
     else {
@@ -236,41 +208,6 @@ fn unix_query() -> Query {
 #[cfg(test)]
 mod tests {
 
-    /// Every subprocess in this file must be spawned through `no_window`.
-    ///
-    /// This reads the file's own source rather than exercising the behaviour,
-    /// because "no console window appeared" cannot be observed from a test --
-    /// which is precisely why the defect reached a release. A `Command::new`
-    /// added later without the wrapper fails here rather than on a desktop.
-    #[test]
-    fn every_subprocess_is_spawned_without_a_console_window() {
-        // A source-reading test, so the line endings have to be settled first.
-        // F-72: these searched for "\n}\n" and passed on every machine
-        // whose checkout uses LF. GitHub's Windows runners default to
-        // core.autocrlf=true, so the file arrives with CRLF, the pattern
-        // matches nothing, and three tests failed there and nowhere else --
-        // including on the developer machine that had just run them.
-        // Normalised here as well as pinned in .gitattributes: a test that
-        // depends on a git setting is a test somebody will trip over.
-        let source = include_str!("reduced_motion.rs").replace("\r\n", "\n");
-        let mut bare = Vec::new();
-        for (number, line) in source.lines().enumerate() {
-            let trimmed = line.trim_start();
-            if trimmed.starts_with("//") || trimmed.starts_with('*') {
-                continue; // prose: this rule is discussed in the comments
-            }
-            if !line.contains("Command::new") || line.contains("no_window(") {
-                continue;
-            }
-            bare.push(format!("line {}: {}", number + 1, trimmed));
-        }
-        assert!(
-            bare.is_empty(),
-            "these spawns bypass `no_window`, so each flashes a console window \
-             on Windows:\n{}",
-            bare.join("\n")
-        );
-    }
     use super::*;
 
     /// Whatever this machine says, it must say it without panicking and
