@@ -275,7 +275,7 @@ pub struct VeilVoiceApp {
     /// One at a time. A stack of cards covering the window is how somebody
     /// dismisses six warnings without reading any of them.
     notice: Option<crate::notify::Notice>,
-    /// The short tour, on a first run and after an upgrade that adds a tab.
+    /// The walkthrough, on a first run and after an upgrade that adds a stop.
     tour: crate::tour::Tour,
     /// Set once the tour has been considered for this launch, so the decision
     /// is taken from the saved version once rather than on every frame.
@@ -1388,6 +1388,15 @@ impl eframe::App for VeilVoiceApp {
                         == crate::firstrun::Outcome::Finished
                     {
                         self.preferences.finish_first_run();
+                        // Roadmap item 171. The walkthrough starts the moment
+                        // these are answered, and its first stop offers the app
+                        // lock, which the card just above offered. Asking the
+                        // same question twice in thirty seconds reads as a
+                        // program that was not listening, so the stop is marked
+                        // as shown: it was, on a card of its own, and somebody
+                        // who skipped it there has said what they think of it.
+                        self.preferences
+                            .mark_toured(&[crate::tour::Stage::AppLock.key()]);
                     }
                     return;
                 }
@@ -1443,28 +1452,40 @@ impl eframe::App for VeilVoiceApp {
         // card. The modal's own backdrop takes the clicks; the tab strip above
         // is drawn disabled as well, so it looks as unavailable as it is.
         //
-        // Considered once per launch: a first run sees every card, an upgrade
-        // sees only the tabs that did not exist when it last ran, and a
-        // version that has already toured sees nothing. Held back until the
-        // first-run cards are answered, because those are a decision and this
-        // is an explanation, and stacking one over the other is two things
-        // asking at once.
+        // Considered once per launch: a first run sees every stop, an upgrade
+        // sees only the stops it has not been shown, and somebody who has seen
+        // all of them sees nothing. Held back until the first-run cards are
+        // answered, because stacking one over the other is two things asking
+        // at once.
+        let already = self.tour_already();
         if !self.tour_considered && !self.preferences.needs_first_run() {
             self.tour_considered = true;
             let seen = self.preferences.toured_tabs();
             if seen.is_empty() {
-                self.tour.start();
+                self.tour.start(&already);
             } else {
-                self.tour.start_new_only(&seen);
+                self.tour.start_new_only(&seen, &already);
             }
         }
         // Asked for from Settings, under Interface. Taken rather than read, so
         // one press starts one tour: this runs every frame.
         if self.preferences.take_tour_request() {
-            self.tour.restart();
+            self.tour.restart(&already);
         }
-        if self.tour.running() && self.tour.overlay(ctx, self.setup.running_installed()) {
-            self.preferences.mark_toured(&crate::tour::all_keys());
+        if self.tour.running() {
+            let outcome =
+                self.tour
+                    .overlay(ctx, &mut self.preferences, &mut self.security, &already);
+            if let crate::tour::Outcome::Finished { show } = outcome {
+                // Every stop, not the ones this run happened to show. A stop
+                // left out because it was already answered has nothing left to
+                // say, and storing it is what stops the next launch offering
+                // it again.
+                self.preferences.mark_toured(&crate::tour::all_keys());
+                if let Some(tab) = show.and_then(Tab::from_key) {
+                    self.tab = tab;
+                }
+            }
         }
 
         self.watch.drain();
@@ -2387,6 +2408,24 @@ impl VeilVoiceApp {
                  and nowhere else. Listen for a voice that is not yours.",
             )
         });
+    }
+
+    /// What the tour should not bother offering, because it is already so.
+    ///
+    /// **Roadmap item 171.** Read every frame rather than once at the start,
+    /// because the app lock can be set while the tour is on screen: the stop
+    /// that sets it watches this answer to know the worker has finished.
+    ///
+    /// `decoy_can_be_set` is false here and not a preference, because nothing
+    /// in the workspace stores a decoy pair yet. `veilvoice_crypto::decoy` is
+    /// written and tested and wired to nothing, which is roadmap item 173's
+    /// half of it; this is the one line that turns the stop on when it is.
+    fn tour_already(&self) -> crate::tour::Already {
+        crate::tour::Already {
+            app_lock: self.security.has_lock(),
+            installed: self.setup.running_installed(),
+            decoy_can_be_set: false,
+        }
     }
 
     /// Ask the safety catch what it makes of what is holding a microphone.

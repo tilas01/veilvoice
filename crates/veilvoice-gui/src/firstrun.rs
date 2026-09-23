@@ -32,8 +32,10 @@
 //! flow that will not let somebody reach the program is a setup flow they
 //! resent; this one is a set of offers made at the moment they make sense.
 //!
-//! The tour runs after it, so a person meets the decisions first and the tabs
-//! second, which is the order they matter in.
+//! The walkthrough in [`crate::tour`] runs after it, and carries the rest of
+//! the setup: encryption at rest, whether this copy is installed, and what
+//! each tab is for. It does not offer the app lock again, because this did,
+//! thirty seconds earlier, on a card of its own.
 //!
 //! # In plain words
 //!

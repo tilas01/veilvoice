@@ -146,7 +146,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`storage.rs`|File-veilvoice-gui-storage]] &middot; Where veiled recordings are written, and the encrypted volume that may hold them.
 - [[`studio.rs`|File-veilvoice-gui-studio]] &middot; The Recording Studio and the Recording Browser.
 - [[`theme.rs`|File-veilvoice-gui-theme]] &middot; Colour schemes for the desktop app.
-- [[`tour.rs`|File-veilvoice-gui-tour]] &middot; The short tour on a first run, and after an upgrade.
+- [[`tour.rs`|File-veilvoice-gui-tour]] &middot; The short walkthrough on a first run, and after an upgrade.
 - [[`updates.rs`|File-veilvoice-gui-updates]] &middot; The manual update check, as the window shows it.
 - [[`vault_store.rs`|File-veilvoice-gui-vault_store]] &middot; Where the desktop application keeps its own files, and what the app lock buys for them.
 - [[`verify.rs`|File-veilvoice-gui-verify]] &middot; The verify tab: drop a download on the window and be told what it is.

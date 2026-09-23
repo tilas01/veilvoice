@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/app.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 3643 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 3682 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs)
 
 ## Contents
 
@@ -155,7 +155,7 @@ started on another thread and the answer is collected later.
 
 ## What this file contains
 
-3643 lines defining **34 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+3682 lines defining **35 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -177,7 +177,7 @@ called, inside the caller's body. It is a syntactic reading, not a
 type-resolved one, so a call made through a trait object or a macro
 will not appear.
 
-_22 of 34 functions are drawn; the diagram is bounded at 22 so it
+_22 of 35 functions are drawn; the diagram is bounded at 22 so it
 stays readable. The full list is in the table below._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
@@ -209,11 +209,11 @@ flowchart TD
     n_fit_to_the_screen["VeilVoiceApp::<br/>fit_to_the_screen<br/>line 887"]
     n_header_button["header_button<br/>line 929"]
     n_ui["VeilVoiceApp::ui<br/>line 952"]
-    n_poll_job["VeilVoiceApp::poll_job<br/>line 1540"]
-    n_settings["VeilVoiceApp::settings<br/>line 1576"]
-    n_file_tab["VeilVoiceApp::file_tab<br/>line 1688"]
-    n_start_job["VeilVoiceApp::start_job<br/>line 1798"]
-    n_guest_list["VeilVoiceApp::guest_list<br/>line 1909"]
+    n_poll_job["VeilVoiceApp::poll_job<br/>line 1561"]
+    n_settings["VeilVoiceApp::settings<br/>line 1597"]
+    n_file_tab["VeilVoiceApp::file_tab<br/>line 1709"]
+    n_start_job["VeilVoiceApp::start_job<br/>line 1819"]
+    n_guest_list["VeilVoiceApp::guest_list<br/>line 1930"]
     n_apply_policy --> n_posture
     n_config --> n_posture
     n_default --> n_preferred_input
@@ -252,11 +252,11 @@ flowchart TD
     click n_fit_to_the_screen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L887" "open the source"
     click n_header_button href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L929" "open the source"
     click n_ui href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L952" "open the source"
-    click n_poll_job href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1540" "open the source"
-    click n_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1576" "open the source"
-    click n_file_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1688" "open the source"
-    click n_start_job href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1798" "open the source"
-    click n_guest_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1909" "open the source"
+    click n_poll_job href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1561" "open the source"
+    click n_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1597" "open the source"
+    click n_file_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1709" "open the source"
+    click n_start_job href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1819" "open the source"
+    click n_guest_list href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1930" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -294,22 +294,23 @@ flowchart TD
 | `header_button` <sub>fn</sub> | [929](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L929) | A small-text button drawn to the size of the control beside it. |
 | `VeilVoiceApp::on_exit` <sub>fn</sub> | [942](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L942) |  |
 | `VeilVoiceApp::ui` <sub>fn</sub> | [952](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L952) |  |
-| `VeilVoiceApp::poll_job` <sub>fn</sub> | [1540](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1540) | Take the result of a finished job without ever waiting for one. |
-| `VeilVoiceApp::settings` <sub>fn</sub> | [1576](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1576) | Draw the settings panel, with a policy floor shown as a floor rather than as a value somebody can move. |
-| `VeilVoiceApp::file_tab` <sub>fn</sub> | [1688](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1688) | Draw the File tab: pick a recording, veil it, write it somewhere else. |
-| `VeilVoiceApp::start_job` <sub>fn</sub> | [1798](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1798) | Hand the work to a thread, so the window keeps drawing while it runs. |
-| `VeilVoiceApp::guest_list` <sub>fn</sub> | [1909](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1909) | The Recording Studio: the voice first, then the take. |
-| `VeilVoiceApp::studio_tab` <sub>fn</sub> | [1986](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1986) | Draw the Recording Studio: record into the vault, veiled on the way in. |
-| `VeilVoiceApp::start_preview` <sub>fn</sub> | [2349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2349) | Veil to this machine's own output, and say where it is going. |
-| `VeilVoiceApp::check_failsafe` <sub>fn</sub> | [2401](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2401) | Ask the safety catch what it makes of what is holding a microphone. |
-| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [2477](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2477) | Re-scan on a timer rather than every frame. |
-| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [2509](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2509) | Draw the Watch tab: what is recording the screen, and what is allowed to. |
-| `VeilVoiceApp::report_a_fault` <sub>fn</sub> | [2599](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2599) | Say so if the last run ended badly, and offer the file. |
-| `VeilVoiceApp::about_tab` <sub>fn</sub> | [2616](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2616) | Draw the About tab: versions, where files live, and the companion list. |
-| `paths_section` <sub>fn</sub> | [2755](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2755) | Where this copy is keeping things, on this machine. |
-| `device_picker` <sub>fn</sub> | [2815](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2815) | A dropdown of devices that keeps working when the chosen one disappears. |
-| `field` <sub>fn</sub> | [2841](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2841) | One labelled read-only value, in the shape the About tab uses throughout. |
-| `header_layout_tests` <sub>mod</sub> | [2849](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2849) |  |
+| `VeilVoiceApp::poll_job` <sub>fn</sub> | [1561](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1561) | Take the result of a finished job without ever waiting for one. |
+| `VeilVoiceApp::settings` <sub>fn</sub> | [1597](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1597) | Draw the settings panel, with a policy floor shown as a floor rather than as a value somebody can move. |
+| `VeilVoiceApp::file_tab` <sub>fn</sub> | [1709](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1709) | Draw the File tab: pick a recording, veil it, write it somewhere else. |
+| `VeilVoiceApp::start_job` <sub>fn</sub> | [1819](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1819) | Hand the work to a thread, so the window keeps drawing while it runs. |
+| `VeilVoiceApp::guest_list` <sub>fn</sub> | [1930](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L1930) | The Recording Studio: the voice first, then the take. |
+| `VeilVoiceApp::studio_tab` <sub>fn</sub> | [2007](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2007) | Draw the Recording Studio: record into the vault, veiled on the way in. |
+| `VeilVoiceApp::start_preview` <sub>fn</sub> | [2370](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2370) | Veil to this machine's own output, and say where it is going. |
+| `VeilVoiceApp::tour_already` <sub>fn</sub> | [2423](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2423) | What the tour should not bother offering, because it is already so. |
+| `VeilVoiceApp::check_failsafe` <sub>fn</sub> | [2440](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2440) | Ask the safety catch what it makes of what is holding a microphone. |
+| `VeilVoiceApp::watch_indicator` <sub>fn</sub> | [2516](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2516) | Re-scan on a timer rather than every frame. |
+| `VeilVoiceApp::watch_tab` <sub>fn</sub> | [2548](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2548) | Draw the Watch tab: what is recording the screen, and what is allowed to. |
+| `VeilVoiceApp::report_a_fault` <sub>fn</sub> | [2638](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2638) | Say so if the last run ended badly, and offer the file. |
+| `VeilVoiceApp::about_tab` <sub>fn</sub> | [2655](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2655) | Draw the About tab: versions, where files live, and the companion list. |
+| `paths_section` <sub>fn</sub> | [2794](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2794) | Where this copy is keeping things, on this machine. |
+| `device_picker` <sub>fn</sub> | [2854](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2854) | A dropdown of devices that keeps working when the chosen one disappears. |
+| `field` <sub>fn</sub> | [2880](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2880) | One labelled read-only value, in the shape the About tab uses throughout. |
+| `header_layout_tests` <sub>mod</sub> | [2888](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/app.rs#L2888) |  |
 
 ---
 

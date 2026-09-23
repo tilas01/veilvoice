@@ -31,7 +31,7 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 | `veilvoice-core` | Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility. | 3,141 | [`crates/veilvoice-core/README.md`](../crates/veilvoice-core/README.md) |
 | `veilvoice-crypto` | Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice. | 7,226 | [`crates/veilvoice-crypto/README.md`](../crates/veilvoice-crypto/README.md) |
 | `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them. | 2,947 | [`crates/veilvoice-guard/README.md`](../crates/veilvoice-guard/README.md) |
-| `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 19,613 | [`crates/veilvoice-gui/README.md`](../crates/veilvoice-gui/README.md) |
+| `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 20,051 | [`crates/veilvoice-gui/README.md`](../crates/veilvoice-gui/README.md) |
 | `veilvoice-meta` | Strip or spoof identifying metadata: audio tags, and image EXIF/GPS. | 696 | [`crates/veilvoice-meta/README.md`](../crates/veilvoice-meta/README.md) |
 | `veilvoice-policy` | Settings that can only be tightened, sealed with the project's own post-quantum cryptography. | 1,689 | [`crates/veilvoice-policy/README.md`](../crates/veilvoice-policy/README.md) |
 | `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,293 | [`crates/veilvoice-setup/README.md`](../crates/veilvoice-setup/README.md) |
