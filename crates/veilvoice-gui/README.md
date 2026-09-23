@@ -112,7 +112,7 @@ flowchart TD
     n_notify["notify.rs<br/>460 lines"]
     n_pace["pace.rs<br/>509 lines"]
     n_palettes["palettes.rs<br/>700 lines"]
-    n_paths["paths.rs<br/>234 lines"]
+    n_paths["paths.rs<br/>248 lines"]
     n_policy["policy.rs<br/>320 lines"]
     n_prefs["prefs.rs<br/>1005 lines"]
     n_probe["probe.rs<br/>426 lines"]
@@ -291,7 +291,7 @@ flowchart TD
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
 | [`pace.rs`](../../docs/files/veilvoice-gui/pace.md) | 509 | How often the window draws while something in it is moving, and what that actually came to. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 700 | User-defined colour schemes, and the contrast check that keeps them usable. |
-| [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | 234 | Exactly where this copy of VeilVoice is keeping things. |
+| [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | 248 | Exactly where this copy of VeilVoice is keeping things. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
 | [`prefs.rs`](../../docs/files/veilvoice-gui/prefs.md) | 1005 | What the user has chosen about how the app looks and moves. |
 | [`probe.rs`](../../docs/files/veilvoice-gui/probe.md) | 426 | What this machine answers, so the settings it starts on were measured here. |
@@ -310,7 +310,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**20,051 functional lines of Rust** in this crate. A functional line is a line
+**20,094 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

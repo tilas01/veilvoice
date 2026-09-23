@@ -183,3 +183,60 @@ fn what_was_left_behind_is_still_there_afterwards() {
         "kept"
     );
 }
+
+/// The shared list and the modules that own the paths have to agree.
+///
+/// `veilvoice_crypto::layout` names every location once so that the About tab
+/// and `veilvoice reset` describe the same files, and the command line cannot
+/// see this crate. That only holds while the name in the list is the name the
+/// owning module actually uses: a table that says `settings.conf` while `prefs`
+/// writes something else would have the About tab pointing at a file nobody
+/// uses and the reset leaving the real one behind.
+///
+/// Checked rather than derived, because the path belongs where it is used.
+#[test]
+fn the_shared_list_names_the_same_files_the_modules_do() {
+    use veilvoice_crypto::layout::{self, Item};
+    if layout::dir().is_none() {
+        return; // a platform that does not say where configuration goes
+    }
+    for (item, mine) in [
+        (Item::Settings, crate::prefs::default_path()),
+        (Item::Vaults, crate::studio::default_dir()),
+        (Item::Policies, crate::policy::default_dir()),
+        (Item::Palettes, crate::palettes::default_dir()),
+        (Item::CrashReport, crate::crashlog::default_path()),
+        (Item::SessionMarker, crate::avnotice::marker_path()),
+        (Item::Mandate, veilvoice_policy::mandate_path()),
+        (Item::Integrity, veilvoice_guard::record_path()),
+    ] {
+        assert_eq!(
+            layout::path(item),
+            mine,
+            "{:?} is in two places at once: the shared list says {:?} and the \
+             module that writes it says {:?}",
+            item,
+            layout::path(item),
+            mine
+        );
+    }
+}
+
+/// Every row of the About tab that is one of the shared list's things takes its
+/// words from there rather than carrying a second copy of them.
+#[test]
+fn the_panel_does_not_write_its_own_version_of_the_shared_words() {
+    use veilvoice_crypto::layout;
+    let panel = include_str!("../paths.rs");
+    for entry in layout::ALL {
+        if !panel.contains(entry.label) {
+            continue; // not a location this panel shows
+        }
+        assert!(
+            !panel.contains(entry.note),
+            "the About tab carries its own copy of the note for {}, which is \
+             now two sentences that have to be kept the same by hand",
+            entry.label
+        );
+    }
+}

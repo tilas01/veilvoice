@@ -22,6 +22,19 @@
 //! `default_dir` and fails naming any this panel does not show, so a location
 //! added tomorrow cannot quietly stop being reported.
 //!
+//! # The words are not written here either
+//!
+//! What each location is called and the line under it come from
+//! [`veilvoice_crypto::layout`], which is the one list of what VeilVoice keeps
+//! between runs. The path still comes from the module that owns it, and a test
+//! checks the two agree, because this panel telling somebody a folder that the
+//! program does not use is the failure that matters most here: a person told
+//! the wrong directory deletes the wrong directory.
+//!
+//! The reason that list is in the crypto crate rather than in this one is that
+//! `veilvoice reset` has to name the same things from the command line, which
+//! cannot see this crate at all.
+//!
 //! # The one path deliberately not shown
 //!
 //! The app lock's own files. [`veilvoice_crypto::vault`] gives them names
@@ -83,6 +96,7 @@ pub fn arrangement() -> String {
 /// hangs off, then what is in it. Somebody reading down the list sees the shape
 /// of the installation rather than an alphabetical pile.
 pub fn all() -> Vec<Where> {
+    use veilvoice_crypto::layout::{entry, Item};
     vec![
         Where {
             label: "this program",
@@ -95,35 +109,35 @@ pub fn all() -> Vec<Where> {
             note: "everything below is in here, and this is what to back up",
         },
         Where {
-            label: "settings",
+            label: entry(Item::Settings).label,
             path: crate::prefs::default_path(),
-            note: "the palette, the motion setting, the device choices",
+            note: entry(Item::Settings).note,
         },
         Where {
-            label: "app lock",
+            label: entry(Item::AppLock).label,
+            // The folder rather than the files, for the reason the note gives.
             path: veilvoice_crypto::lock::default_dir(),
-            note: "kept here under names derived from an index, which is why \
-                   this shows the folder rather than the files",
+            note: entry(Item::AppLock).note,
         },
         Where {
-            label: "vaults",
+            label: entry(Item::Vaults).label,
             path: crate::studio::default_dir(),
-            note: "the Studio's recordings, and any decoys made beside them",
+            note: entry(Item::Vaults).note,
         },
         Where {
-            label: "policies",
+            label: entry(Item::Policies).label,
             path: crate::policy::default_dir(),
-            note: "settings somebody else decided, if any are in force",
+            note: entry(Item::Policies).note,
         },
         Where {
-            label: "palettes",
+            label: entry(Item::Palettes).label,
             path: crate::palettes::default_dir(),
-            note: "colour schemes you wrote, read at startup",
+            note: entry(Item::Palettes).note,
         },
         Where {
-            label: "crash report",
+            label: entry(Item::CrashReport).label,
             path: crate::crashlog::default_path(),
-            note: "written only by a failure, and offered on the next launch",
+            note: entry(Item::CrashReport).note,
         },
     ]
 }
