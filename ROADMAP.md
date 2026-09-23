@@ -1500,6 +1500,24 @@ above: the layout it draws from was already the new one. **177** is what
 remains of this group, and it is the one piece of it that needs the window
 itself.
 
+**177 has started from the bottom.** Every crate but `veilvoice-gui` now
+compiles for `wasm32-unknown-unknown`, and CI checks that it still does, so the
+browser build cannot rot between the day it starts working and the day somebody
+tries it. Two third-party dependencies decided it and neither needed a change to
+this project's own code: `getrandom` takes its `js` feature in the workspace
+table, and `region`, which locks pages out of the swap file, is declared under
+`cfg(not(target_arch = "wasm32"))` because a WebAssembly module has no swap file
+to be locked out of. That last one gives up a stated security property on that
+target, so it is written down in `docs/WHITEPAPER.md` and at length in
+`veilvoice-crypto`'s `amnesia` module note rather than left to the `cfg`.
+
+What is left is the window itself. `veilvoice-gui` reaches for a native file
+picker and `eframe::NativeOptions`, neither of which exists in a browser, so it
+needs an `eframe::WebRunner` entry point and a browser path through `dialog`
+beside the native one. That is window work rather than website work. The page,
+the bundling step, the no-JavaScript fallback and the check that stops the
+bundle going stale are all independent of it and come first.
+
 ### Originally: v0.1.23, the documentation and the two buttons
 
 Roadmap item 165 first, because it is plumbing rather than a feature and everything

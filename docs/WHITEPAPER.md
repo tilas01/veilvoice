@@ -225,6 +225,19 @@ The primitives:
   already read process memory; `Secret::is_locked` reports whether it actually
   succeeded rather than assuming.
 
+  **Except in a browser**, where there is nothing to lock: a WebAssembly module
+  is handed one linear memory by the host and has no `mlock` and no page file
+  of its own, so that build locks nothing and `is_locked` answers `false`
+  everywhere, which is the same answer a Linux machine out of `RLIMIT_MEMLOCK`
+  budget has always given. Everything else a `Secret` does it still does there:
+  it wipes on drop, it compares in constant time, and it refuses to print
+  itself. That is a real reduction, so it is written here rather than left to a
+  `cfg`, and it is written at greater length in `veilvoice-crypto`'s `amnesia`
+  module note. The only build it applies to is the demonstration of the
+  interface that roadmap item 177 puts on the website, which holds no recording
+  and no passphrase anybody wants kept out of a page file. A browser is
+  somewhere to look at VeilVoice, not somewhere to open a vault.
+
 One caveat that is stated rather than engineered around: a passphrase **being
 typed** into a text field or a terminal prompt lives in an ordinary string,
 because something has to receive the keystrokes. It is moved into a page-locked

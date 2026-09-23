@@ -23,6 +23,26 @@
 //!
 //! Zeroization, by contrast, always happens.
 //!
+//! # In a browser, nothing is locked at all
+//!
+//! Compiled to `wasm32-unknown-unknown`, this type still allocates, still
+//! wipes on drop, still compares in constant time and still refuses to print
+//! itself. **It does not lock anything**, because there is nothing there to
+//! lock: a WebAssembly module has a linear memory the host owns, there is no
+//! `mlock` and no page file of its own, and what the browser's process does
+//! with that memory is the browser's business. `region` is therefore not
+//! compiled for that target at all, and [`Secret::is_locked`] answers false,
+//! which is the same answer a Linux machine with no `RLIMIT_MEMLOCK` budget
+//! gives and has always given.
+//!
+//! That is a real reduction and it is written down rather than left to a
+//! `cfg`. Roadmap item 177 compiles the window to WebAssembly so the site can
+//! run the real interface, and that build is a demonstration: it holds no
+//! recording anybody cares about and no passphrase worth keeping out of a
+//! page file. A browser is not somewhere to open a vault, and the reason it
+//! is not is this paragraph. `docs/WHITEPAPER.md` says the same thing where a
+//! reader will find it.
+//!
 //! # Why each secret owns whole pages
 //!
 //! Locking has *page* granularity, not byte granularity. If two secrets share a
@@ -78,6 +98,26 @@ pub struct Secret {
     locked_span: usize,
 }
 
+/// The size of a page of memory, for aligning the span a [`Secret`] locks.
+///
+/// `region` is not compiled for `wasm32-unknown-unknown`, because there is
+/// nothing there for it to do: a WebAssembly module has a linear memory the
+/// host owns and no `mlock`, and the browser is the only build where that is
+/// true. The number below is only ever used to round an allocation up and
+/// align within it, and on a target where nothing is locked the rounding is
+/// decorative, so it is the ordinary 4 KiB rather than WebAssembly's own
+/// 64 KiB page: the larger one would make every small secret allocate
+/// 128 KiB to hold thirty-two bytes.
+#[cfg(not(target_arch = "wasm32"))]
+fn page_size() -> usize {
+    region::page::size()
+}
+
+#[cfg(target_arch = "wasm32")]
+fn page_size() -> usize {
+    4096
+}
+
 /// Lock `span` bytes at `at` out of swap, answering whether it happened.
 ///
 /// # Why this is a function rather than the call it wraps
@@ -101,12 +141,12 @@ pub struct Secret {
 /// The zeroing is untouched and is the part that matters for the guarantee
 /// this type makes, so Miri still sees every write and every drop.
 fn lock_pages(at: *const u8, span: usize) -> bool {
-    #[cfg(miri)]
+    #[cfg(any(miri, target_arch = "wasm32"))]
     {
         let _ = (at, span);
         false
     }
-    #[cfg(not(miri))]
+    #[cfg(not(any(miri, target_arch = "wasm32")))]
     {
         region::lock(at, span).map(std::mem::forget).is_ok()
     }
@@ -115,11 +155,11 @@ fn lock_pages(at: *const u8, span: usize) -> bool {
 /// Release a lock taken by [`lock_pages`]. Never reached under Miri, because
 /// nothing is locked there for `Drop` to release.
 fn unlock_pages(at: *const u8, span: usize) {
-    #[cfg(miri)]
+    #[cfg(any(miri, target_arch = "wasm32"))]
     {
         let _ = (at, span);
     }
-    #[cfg(not(miri))]
+    #[cfg(not(any(miri, target_arch = "wasm32")))]
     {
         // Ignored on purpose: see the module note on not panicking here.
         let _ = region::unlock(at, span);
@@ -145,7 +185,7 @@ impl Secret {
                 locked_span: 0,
             };
         }
-        let page = region::page::size();
+        let page = page_size();
         // Round up to whole pages, plus one page of slack to align within.
         let span = len.div_ceil(page) * page;
         let backing = vec![0u8; span + page];
@@ -389,7 +429,7 @@ mod tests {
     /// allocation, so no other allocation can share a locked page with it.
     #[test]
     fn locked_span_is_page_aligned() {
-        let page = region::page::size();
+        let page = page_size();
         for len in [1usize, 31, 32, page - 1, page, page + 1, 5 * page] {
             let s = Secret::zeroed(len);
             if !s.is_locked() {
