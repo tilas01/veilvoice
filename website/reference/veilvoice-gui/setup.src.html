@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/setup.rs</code></h1>
-<p style="color:var(--muted)"><a href="setup.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1038 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="setup.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1039 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -511,642 +511,643 @@
 <span class="ln" id="L420">                ui.<span class="tok-fn">label</span>(</span>
 <span class="ln" id="L421">                    RichText::<span class="tok-fn">new</span>(</span>
 <span class="ln" id="L422">                        <span class="tok-str">&quot;Open a new terminal for a PATH change to take effect. VeilVoice \</span></span>
-<span class="ln" id="L423"><span class="tok-str">                         never checks for updates and cannot tell you when one exists. \</span></span>
-<span class="ln" id="L424"><span class="tok-str">                         it has no network code at all.&quot;</span>,</span>
-<span class="ln" id="L425">                    )</span>
-<span class="ln" id="L426">                    .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L427">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L428">                );</span>
-<span class="ln" id="L429">            }</span>
-<span class="ln" id="L430">        }</span>
-<span class="ln" id="L431">    }</span>
+<span class="ln" id="L423"><span class="tok-str">                         never checks for updates on its own: no timer, nothing at \</span></span>
+<span class="ln" id="L424"><span class="tok-str">                         startup and nothing in the background. Ask it on the About tab, \</span></span>
+<span class="ln" id="L425"><span class="tok-str">                         or run `veilvoice update`.&quot;</span>,</span>
+<span class="ln" id="L426">                    )</span>
+<span class="ln" id="L427">                    .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L428">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L429">                );</span>
+<span class="ln" id="L430">            }</span>
+<span class="ln" id="L431">        }</span>
+<span class="ln" id="L432">    }</span>
 </span>
-<span class="ln" id="L432"></span>
+<span class="ln" id="L433"></span>
 <span class="src-item" id="fn-setup-carry_question">
-<span class="ln" id="L433">    <span class="tok-com">/// Ask whether an install should take the settings with it.</span></span>
-<span class="ln" id="L434">    <span class="tok-com">///</span></span>
-<span class="ln" id="L435">    <span class="tok-com">/// A question rather than a default, because the two right answers point in</span></span>
-<span class="ln" id="L436">    <span class="tok-com">/// opposite directions and nothing here can tell which one applies.</span></span>
-<span class="ln" id="L437">    <span class="tok-com">/// Somebody moving off a memory stick onto their own machine wants their</span></span>
-<span class="ln" id="L438">    <span class="tok-com">/// settings and vaults carried over. Somebody installing on a shared or</span></span>
-<span class="ln" id="L439">    <span class="tok-com">/// borrowed machine wants them left exactly where they are, and guessing</span></span>
-<span class="ln" id="L440">    <span class="tok-com">/// wrong there copies their vault onto a computer that is not theirs.</span></span>
-<span class="ln" id="L441">    <span class="tok-kw">fn</span> <span class="tok-fn">carry_question</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L442">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L443">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;This copy keeps its settings beside itself&quot;</span>)</span>
-<span class="ln" id="L444">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
-<span class="ln" id="L445">                .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L446">        );</span>
-<span class="ln" id="L447">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L448">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L449">                <span class="tok-str">&quot;An installed copy looks in this platform&#x27;s own configuration \</span></span>
-<span class="ln" id="L450"><span class="tok-str">                 directory instead. Say what should happen to what is beside \</span></span>
-<span class="ln" id="L451"><span class="tok-str">                 the program before installing.&quot;</span>,</span>
-<span class="ln" id="L452">            )</span>
-<span class="ln" id="L453">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
-<span class="ln" id="L454">        );</span>
-<span class="ln" id="L455">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L456">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L457">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.carry, <span class="tok-fn">Some</span>(true), <span class="tok-str">&quot;carry them across&quot;</span>);</span>
-<span class="ln" id="L458">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.carry, <span class="tok-fn">Some</span>(false), <span class="tok-str">&quot;leave them here&quot;</span>);</span>
-<span class="ln" id="L459">        });</span>
-<span class="ln" id="L460">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L461">            RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> <span class="tok-kw">self</span>.carry {</span>
-<span class="ln" id="L462">                <span class="tok-fn">Some</span>(true) =&gt; {</span>
-<span class="ln" id="L463">                    <span class="tok-str">&quot;Copied, never moved and never overwritten: anything already \</span></span>
-<span class="ln" id="L464"><span class="tok-str">                     in the configuration directory is left alone and named in \</span></span>
-<span class="ln" id="L465"><span class="tok-str">                     the report, and this copy keeps working from the folder \</span></span>
-<span class="ln" id="L466"><span class="tok-str">                     beside it.&quot;</span></span>
-<span class="ln" id="L467">                }</span>
-<span class="ln" id="L468">                <span class="tok-fn">Some</span>(false) =&gt; {</span>
-<span class="ln" id="L469">                    <span class="tok-str">&quot;Nothing is copied. The installed copy starts with no \</span></span>
-<span class="ln" id="L470"><span class="tok-str">                     settings, and this one carries on using the folder beside \</span></span>
-<span class="ln" id="L471"><span class="tok-str">                     it.&quot;</span></span>
-<span class="ln" id="L472">                }</span>
-<span class="ln" id="L473">                None =&gt; {</span>
-<span class="ln" id="L474">                    <span class="tok-str">&quot;Unanswered, so the install button is waiting. There is no \</span></span>
-<span class="ln" id="L475"><span class="tok-str">                     sensible default: one answer is right when moving onto your \</span></span>
-<span class="ln" id="L476"><span class="tok-str">                     own machine and the other when installing on somebody \</span></span>
-<span class="ln" id="L477"><span class="tok-str">                     else&#x27;s.&quot;</span></span>
-<span class="ln" id="L478">                }</span>
-<span class="ln" id="L479">            })</span>
-<span class="ln" id="L480">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L481">            .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L482">        );</span>
-<span class="ln" id="L483">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L484">    }</span>
+<span class="ln" id="L434">    <span class="tok-com">/// Ask whether an install should take the settings with it.</span></span>
+<span class="ln" id="L435">    <span class="tok-com">///</span></span>
+<span class="ln" id="L436">    <span class="tok-com">/// A question rather than a default, because the two right answers point in</span></span>
+<span class="ln" id="L437">    <span class="tok-com">/// opposite directions and nothing here can tell which one applies.</span></span>
+<span class="ln" id="L438">    <span class="tok-com">/// Somebody moving off a memory stick onto their own machine wants their</span></span>
+<span class="ln" id="L439">    <span class="tok-com">/// settings and vaults carried over. Somebody installing on a shared or</span></span>
+<span class="ln" id="L440">    <span class="tok-com">/// borrowed machine wants them left exactly where they are, and guessing</span></span>
+<span class="ln" id="L441">    <span class="tok-com">/// wrong there copies their vault onto a computer that is not theirs.</span></span>
+<span class="ln" id="L442">    <span class="tok-kw">fn</span> <span class="tok-fn">carry_question</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L443">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L444">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;This copy keeps its settings beside itself&quot;</span>)</span>
+<span class="ln" id="L445">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
+<span class="ln" id="L446">                .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L447">        );</span>
+<span class="ln" id="L448">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L449">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L450">                <span class="tok-str">&quot;An installed copy looks in this platform&#x27;s own configuration \</span></span>
+<span class="ln" id="L451"><span class="tok-str">                 directory instead. Say what should happen to what is beside \</span></span>
+<span class="ln" id="L452"><span class="tok-str">                 the program before installing.&quot;</span>,</span>
+<span class="ln" id="L453">            )</span>
+<span class="ln" id="L454">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
+<span class="ln" id="L455">        );</span>
+<span class="ln" id="L456">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L457">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L458">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.carry, <span class="tok-fn">Some</span>(true), <span class="tok-str">&quot;carry them across&quot;</span>);</span>
+<span class="ln" id="L459">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.carry, <span class="tok-fn">Some</span>(false), <span class="tok-str">&quot;leave them here&quot;</span>);</span>
+<span class="ln" id="L460">        });</span>
+<span class="ln" id="L461">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L462">            RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> <span class="tok-kw">self</span>.carry {</span>
+<span class="ln" id="L463">                <span class="tok-fn">Some</span>(true) =&gt; {</span>
+<span class="ln" id="L464">                    <span class="tok-str">&quot;Copied, never moved and never overwritten: anything already \</span></span>
+<span class="ln" id="L465"><span class="tok-str">                     in the configuration directory is left alone and named in \</span></span>
+<span class="ln" id="L466"><span class="tok-str">                     the report, and this copy keeps working from the folder \</span></span>
+<span class="ln" id="L467"><span class="tok-str">                     beside it.&quot;</span></span>
+<span class="ln" id="L468">                }</span>
+<span class="ln" id="L469">                <span class="tok-fn">Some</span>(false) =&gt; {</span>
+<span class="ln" id="L470">                    <span class="tok-str">&quot;Nothing is copied. The installed copy starts with no \</span></span>
+<span class="ln" id="L471"><span class="tok-str">                     settings, and this one carries on using the folder beside \</span></span>
+<span class="ln" id="L472"><span class="tok-str">                     it.&quot;</span></span>
+<span class="ln" id="L473">                }</span>
+<span class="ln" id="L474">                None =&gt; {</span>
+<span class="ln" id="L475">                    <span class="tok-str">&quot;Unanswered, so the install button is waiting. There is no \</span></span>
+<span class="ln" id="L476"><span class="tok-str">                     sensible default: one answer is right when moving onto your \</span></span>
+<span class="ln" id="L477"><span class="tok-str">                     own machine and the other when installing on somebody \</span></span>
+<span class="ln" id="L478"><span class="tok-str">                     else&#x27;s.&quot;</span></span>
+<span class="ln" id="L479">                }</span>
+<span class="ln" id="L480">            })</span>
+<span class="ln" id="L481">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L482">            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L483">        );</span>
+<span class="ln" id="L484">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L485">    }</span>
 </span>
-<span class="ln" id="L485"></span>
+<span class="ln" id="L486"></span>
 <span class="src-item" id="fn-setup-start">
-<span class="ln" id="L486">    <span class="tok-com">/// Start a worker, and remember what it is doing so the strip can say.</span></span>
-<span class="ln" id="L487">    <span class="tok-kw">fn</span> start&lt;F&gt;(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, what: &amp;str, work: F)</span>
-<span class="ln" id="L488">    <span class="tok-kw">where</span></span>
-<span class="ln" id="L489">        F: <span class="tok-fn">FnOnce</span>() -&gt; Result&lt;Vec&lt;String&gt;, String&gt; + Send + &#x27;<span class="tok-kw">static</span>,</span>
-<span class="ln" id="L490">    {</span>
-<span class="ln" id="L491">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L492">        <span class="tok-kw">self</span>.report = None;</span>
-<span class="ln" id="L493">        <span class="tok-kw">self</span>.busy = <span class="tok-fn">Some</span>(what.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L494">        <span class="tok-kw">self</span>.job = <span class="tok-fn">Some</span>(rx);</span>
-<span class="ln" id="L495">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L496">            <span class="tok-kw">let</span> done = <span class="tok-kw">match</span> <span class="tok-fn">work</span>() {</span>
-<span class="ln" id="L497">                <span class="tok-fn">Ok</span>(lines) =&gt; Done { lines, good: true },</span>
-<span class="ln" id="L498">                <span class="tok-fn">Err</span>(error) =&gt; Done {</span>
-<span class="ln" id="L499">                    lines: vec![error],</span>
-<span class="ln" id="L500">                    good: false,</span>
-<span class="ln" id="L501">                },</span>
-<span class="ln" id="L502">            };</span>
-<span class="ln" id="L503">            <span class="tok-com">// The receiver is gone only if the window closed mid-job, which is</span></span>
-<span class="ln" id="L504">            <span class="tok-com">// not an error worth reporting to a window that is not there.</span></span>
-<span class="ln" id="L505">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(done);</span>
-<span class="ln" id="L506">        });</span>
-<span class="ln" id="L507">    }</span>
+<span class="ln" id="L487">    <span class="tok-com">/// Start a worker, and remember what it is doing so the strip can say.</span></span>
+<span class="ln" id="L488">    <span class="tok-kw">fn</span> start&lt;F&gt;(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, what: &amp;str, work: F)</span>
+<span class="ln" id="L489">    <span class="tok-kw">where</span></span>
+<span class="ln" id="L490">        F: <span class="tok-fn">FnOnce</span>() -&gt; Result&lt;Vec&lt;String&gt;, String&gt; + Send + &#x27;<span class="tok-kw">static</span>,</span>
+<span class="ln" id="L491">    {</span>
+<span class="ln" id="L492">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L493">        <span class="tok-kw">self</span>.report = None;</span>
+<span class="ln" id="L494">        <span class="tok-kw">self</span>.busy = <span class="tok-fn">Some</span>(what.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L495">        <span class="tok-kw">self</span>.job = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L496">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L497">            <span class="tok-kw">let</span> done = <span class="tok-kw">match</span> <span class="tok-fn">work</span>() {</span>
+<span class="ln" id="L498">                <span class="tok-fn">Ok</span>(lines) =&gt; Done { lines, good: true },</span>
+<span class="ln" id="L499">                <span class="tok-fn">Err</span>(error) =&gt; Done {</span>
+<span class="ln" id="L500">                    lines: vec![error],</span>
+<span class="ln" id="L501">                    good: false,</span>
+<span class="ln" id="L502">                },</span>
+<span class="ln" id="L503">            };</span>
+<span class="ln" id="L504">            <span class="tok-com">// The receiver is gone only if the window closed mid-job, which is</span></span>
+<span class="ln" id="L505">            <span class="tok-com">// not an error worth reporting to a window that is not there.</span></span>
+<span class="ln" id="L506">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(done);</span>
+<span class="ln" id="L507">        });</span>
+<span class="ln" id="L508">    }</span>
 </span>
-<span class="ln" id="L508"></span>
+<span class="ln" id="L509"></span>
 <span class="src-item" id="fn-setup-progress">
-<span class="ln" id="L509">    <span class="tok-com">/// The progress strip: a travelling highlight, or a plain bar when motion</span></span>
-<span class="ln" id="L510">    <span class="tok-com">/// is off.</span></span>
-<span class="ln" id="L511">    <span class="tok-kw">fn</span> <span class="tok-fn">progress</span>(&amp;<span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, motion: <span class="tok-kw">crate</span>::prefs::Motion) {</span>
-<span class="ln" id="L512">        <span class="tok-kw">let</span> label = <span class="tok-kw">self</span>.busy.<span class="tok-fn">clone</span>().<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;working&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L513">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L514">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{label}&#8230;&quot;</span>)).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()));</span>
-<span class="ln" id="L515">        });</span>
-<span class="ln" id="L516">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L517"></span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> (rect, _) = ui.<span class="tok-fn">allocate_exact_size</span>(</span>
-<span class="ln" id="L519">            egui::<span class="tok-fn">vec2</span>(ui.<span class="tok-fn">available_width</span>().<span class="tok-fn">min</span>(<span class="tok-num">420.0</span>), <span class="tok-num">8.0</span>),</span>
-<span class="ln" id="L520">            egui::Sense::<span class="tok-fn">hover</span>(),</span>
-<span class="ln" id="L521">        );</span>
-<span class="ln" id="L522">        <span class="tok-kw">let</span> painter = ui.<span class="tok-fn">painter</span>();</span>
-<span class="ln" id="L523">        painter.<span class="tok-fn">rect_filled</span>(rect, <span class="tok-num">3.0</span>, p::<span class="tok-fn">bg_dark</span>());</span>
-<span class="ln" id="L524">        painter.<span class="tok-fn">rect_stroke</span>(</span>
-<span class="ln" id="L525">            rect,</span>
-<span class="ln" id="L526">            <span class="tok-num">3.0</span>,</span>
-<span class="ln" id="L527">            egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()),</span>
-<span class="ln" id="L528">            egui::StrokeKind::Inside,</span>
-<span class="ln" id="L529">        );</span>
-<span class="ln" id="L530"></span>
-<span class="ln" id="L531">        <span class="tok-kw">if</span> motion.enabled {</span>
-<span class="ln" id="L532">            <span class="tok-com">// A quarter-width highlight travelling left to right, so the</span></span>
-<span class="ln" id="L533">            <span class="tok-com">// window is visibly alive without claiming to know a percentage.</span></span>
-<span class="ln" id="L534">            <span class="tok-com">// It does not: `reg.exe` and a package manager report no progress,</span></span>
-<span class="ln" id="L535">            <span class="tok-com">// and a bar that fills to 90% and waits is a lie with a shape.</span></span>
-<span class="ln" id="L536">            <span class="tok-kw">let</span> time = ui.<span class="tok-fn">input</span>(|i| i.time) <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L537">            <span class="tok-kw">let</span> width = rect.<span class="tok-fn">width</span>() * <span class="tok-num">0.25</span>;</span>
-<span class="ln" id="L538">            <span class="tok-kw">let</span> travel = rect.<span class="tok-fn">width</span>() + width;</span>
-<span class="ln" id="L539">            <span class="tok-kw">let</span> position = (time * <span class="tok-num">0.45</span>).<span class="tok-fn">fract</span>() * travel - width;</span>
-<span class="ln" id="L540">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lit = rect;</span>
-<span class="ln" id="L541">            lit.min.x = rect.min.x + position.<span class="tok-fn">max</span>(<span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L542">            lit.max.x = (rect.min.x + position + width).<span class="tok-fn">min</span>(rect.max.x);</span>
-<span class="ln" id="L543">            <span class="tok-kw">if</span> lit.max.x &gt; lit.min.x {</span>
-<span class="ln" id="L544">                painter.<span class="tok-fn">rect_filled</span>(lit, <span class="tok-num">3.0</span>, p::<span class="tok-fn">blue</span>());</span>
-<span class="ln" id="L545">            }</span>
-<span class="ln" id="L546">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L547">            <span class="tok-com">// Still, but not empty: an empty bar reads as &quot;stuck&quot;.</span></span>
-<span class="ln" id="L548">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lit = rect;</span>
-<span class="ln" id="L549">            lit.<span class="tok-fn">set_width</span>(rect.<span class="tok-fn">width</span>() * <span class="tok-num">0.35</span>);</span>
-<span class="ln" id="L550">            painter.<span class="tok-fn">rect_filled</span>(lit, <span class="tok-num">3.0</span>, p::<span class="tok-fn">blend</span>(p::<span class="tok-fn">blue</span>(), p::<span class="tok-fn">bg_dark</span>(), <span class="tok-num">0.45</span>));</span>
-<span class="ln" id="L551">        }</span>
-<span class="ln" id="L552">    }</span>
+<span class="ln" id="L510">    <span class="tok-com">/// The progress strip: a travelling highlight, or a plain bar when motion</span></span>
+<span class="ln" id="L511">    <span class="tok-com">/// is off.</span></span>
+<span class="ln" id="L512">    <span class="tok-kw">fn</span> <span class="tok-fn">progress</span>(&amp;<span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, motion: <span class="tok-kw">crate</span>::prefs::Motion) {</span>
+<span class="ln" id="L513">        <span class="tok-kw">let</span> label = <span class="tok-kw">self</span>.busy.<span class="tok-fn">clone</span>().<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;working&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L514">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L515">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{label}&#8230;&quot;</span>)).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()));</span>
+<span class="ln" id="L516">        });</span>
+<span class="ln" id="L517">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L518"></span>
+<span class="ln" id="L519">        <span class="tok-kw">let</span> (rect, _) = ui.<span class="tok-fn">allocate_exact_size</span>(</span>
+<span class="ln" id="L520">            egui::<span class="tok-fn">vec2</span>(ui.<span class="tok-fn">available_width</span>().<span class="tok-fn">min</span>(<span class="tok-num">420.0</span>), <span class="tok-num">8.0</span>),</span>
+<span class="ln" id="L521">            egui::Sense::<span class="tok-fn">hover</span>(),</span>
+<span class="ln" id="L522">        );</span>
+<span class="ln" id="L523">        <span class="tok-kw">let</span> painter = ui.<span class="tok-fn">painter</span>();</span>
+<span class="ln" id="L524">        painter.<span class="tok-fn">rect_filled</span>(rect, <span class="tok-num">3.0</span>, p::<span class="tok-fn">bg_dark</span>());</span>
+<span class="ln" id="L525">        painter.<span class="tok-fn">rect_stroke</span>(</span>
+<span class="ln" id="L526">            rect,</span>
+<span class="ln" id="L527">            <span class="tok-num">3.0</span>,</span>
+<span class="ln" id="L528">            egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()),</span>
+<span class="ln" id="L529">            egui::StrokeKind::Inside,</span>
+<span class="ln" id="L530">        );</span>
+<span class="ln" id="L531"></span>
+<span class="ln" id="L532">        <span class="tok-kw">if</span> motion.enabled {</span>
+<span class="ln" id="L533">            <span class="tok-com">// A quarter-width highlight travelling left to right, so the</span></span>
+<span class="ln" id="L534">            <span class="tok-com">// window is visibly alive without claiming to know a percentage.</span></span>
+<span class="ln" id="L535">            <span class="tok-com">// It does not: `reg.exe` and a package manager report no progress,</span></span>
+<span class="ln" id="L536">            <span class="tok-com">// and a bar that fills to 90% and waits is a lie with a shape.</span></span>
+<span class="ln" id="L537">            <span class="tok-kw">let</span> time = ui.<span class="tok-fn">input</span>(|i| i.time) <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L538">            <span class="tok-kw">let</span> width = rect.<span class="tok-fn">width</span>() * <span class="tok-num">0.25</span>;</span>
+<span class="ln" id="L539">            <span class="tok-kw">let</span> travel = rect.<span class="tok-fn">width</span>() + width;</span>
+<span class="ln" id="L540">            <span class="tok-kw">let</span> position = (time * <span class="tok-num">0.45</span>).<span class="tok-fn">fract</span>() * travel - width;</span>
+<span class="ln" id="L541">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lit = rect;</span>
+<span class="ln" id="L542">            lit.min.x = rect.min.x + position.<span class="tok-fn">max</span>(<span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L543">            lit.max.x = (rect.min.x + position + width).<span class="tok-fn">min</span>(rect.max.x);</span>
+<span class="ln" id="L544">            <span class="tok-kw">if</span> lit.max.x &gt; lit.min.x {</span>
+<span class="ln" id="L545">                painter.<span class="tok-fn">rect_filled</span>(lit, <span class="tok-num">3.0</span>, p::<span class="tok-fn">blue</span>());</span>
+<span class="ln" id="L546">            }</span>
+<span class="ln" id="L547">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L548">            <span class="tok-com">// Still, but not empty: an empty bar reads as &quot;stuck&quot;.</span></span>
+<span class="ln" id="L549">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lit = rect;</span>
+<span class="ln" id="L550">            lit.<span class="tok-fn">set_width</span>(rect.<span class="tok-fn">width</span>() * <span class="tok-num">0.35</span>);</span>
+<span class="ln" id="L551">            painter.<span class="tok-fn">rect_filled</span>(lit, <span class="tok-num">3.0</span>, p::<span class="tok-fn">blend</span>(p::<span class="tok-fn">blue</span>(), p::<span class="tok-fn">bg_dark</span>(), <span class="tok-num">0.45</span>));</span>
+<span class="ln" id="L552">        }</span>
+<span class="ln" id="L553">    }</span>
 </span>
-<span class="ln" id="L553"></span>
-<span class="ln" id="L554">    <span class="tok-com">// --- the companions ----------------------------------------------------</span></span>
-<span class="ln" id="L555"></span>
+<span class="ln" id="L554"></span>
+<span class="ln" id="L555">    <span class="tok-com">// --- the companions ----------------------------------------------------</span></span>
+<span class="ln" id="L556"></span>
 <span class="src-item" id="fn-setup-companion_rows">
-<span class="ln" id="L556">    <span class="tok-com">/// One row per companion: whether it is here, and how to get it if not.</span></span>
-<span class="ln" id="L557">    <span class="tok-kw">fn</span> <span class="tok-fn">companion_rows</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
-<span class="ln" id="L558">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Companion software&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L559">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L560">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L561">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L562">                <span class="tok-str">&quot;None of this is part of VeilVoice and none of it is required. Nothing \</span></span>
-<span class="ln" id="L563"><span class="tok-str">                 here is pre-selected: each is one button, for one named program, and \</span></span>
-<span class="ln" id="L564"><span class="tok-str">                 VeilVoice never runs somebody else&#x27;s installer.&quot;</span>,</span>
-<span class="ln" id="L565">            )</span>
-<span class="ln" id="L566">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
-<span class="ln" id="L567">        );</span>
-<span class="ln" id="L568">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L569">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.probe.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L570">            <span class="tok-com">// Said rather than left blank. The button that has just been</span></span>
-<span class="ln" id="L571">            <span class="tok-com">// pressed going quiet for half a second is what reads as a freeze,</span></span>
-<span class="ln" id="L572">            <span class="tok-com">// and the fix is as much this line as it is the worker.</span></span>
-<span class="ln" id="L573">            ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L574">                ui.<span class="tok-fn">spinner</span>();</span>
-<span class="ln" id="L575">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L576">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;looking for each of these on this machine&quot;</span>)</span>
-<span class="ln" id="L577">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L578">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L579">                );</span>
-<span class="ln" id="L580">            });</span>
-<span class="ln" id="L581">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L582">            .<span class="tok-fn">button</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;look again&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>())</span>
-<span class="ln" id="L583">            .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L584">        {</span>
-<span class="ln" id="L585">            <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L586">            <span class="tok-com">// Detached: nothing waits for it, and a probe that outlives the</span></span>
-<span class="ln" id="L587">            <span class="tok-com">// tab simply sends into a channel nobody reads.</span></span>
-<span class="ln" id="L588">            std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L589">                <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(<span class="tok-fn">detect_all</span>());</span>
-<span class="ln" id="L590">            });</span>
-<span class="ln" id="L591">            <span class="tok-kw">self</span>.probe = <span class="tok-fn">Some</span>(rx);</span>
-<span class="ln" id="L592">        }</span>
-<span class="ln" id="L593">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L594"></span>
-<span class="ln" id="L595">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> action: Option&lt;(String, Offer)&gt; = None;</span>
-<span class="ln" id="L596">        <span class="tok-kw">let</span> busy = <span class="tok-kw">self</span>.job.<span class="tok-fn">is_some</span>();</span>
-<span class="ln" id="L597"></span>
-<span class="ln" id="L598">        <span class="tok-kw">for</span> row <span class="tok-kw">in</span> &amp;<span class="tok-kw">self</span>.rows {</span>
-<span class="ln" id="L599">            ui.<span class="tok-fn">group</span>(|ui| {</span>
-<span class="ln" id="L600">                ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L601">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(row.companion.name).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
-<span class="ln" id="L602">                    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L603">                        RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;&#183; {}&quot;</span>, row.companion.vendor))</span>
-<span class="ln" id="L604">                            .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L605">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L606">                    );</span>
-<span class="ln" id="L607">                    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L608">                        RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;&#183; {}&quot;</span>, row.companion.licence))</span>
-<span class="ln" id="L609">                            .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L610">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L611">                    );</span>
-<span class="ln" id="L612">                });</span>
-<span class="ln" id="L613">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(row.companion.what).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
-<span class="ln" id="L614">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(row.companion.why).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L615">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L616"></span>
-<span class="ln" id="L617">                <span class="tok-kw">let</span> (text, colour) = <span class="tok-kw">match</span> &amp;row.presence {</span>
-<span class="ln" id="L618">                    Presence::<span class="tok-fn">Present</span>(_) =&gt; (row.presence.<span class="tok-fn">describe</span>(), p::<span class="tok-fn">green</span>()),</span>
-<span class="ln" id="L619">                    Presence::NotDetected =&gt; (</span>
-<span class="ln" id="L620">                        format!(</span>
-<span class="ln" id="L621">                            <span class="tok-str">&quot;{}. That is where VeilVoice looked, not a claim about your machine&quot;</span>,</span>
-<span class="ln" id="L622">                            row.presence.<span class="tok-fn">describe</span>()</span>
-<span class="ln" id="L623">                        ),</span>
-<span class="ln" id="L624">                        p::<span class="tok-fn">muted</span>(),</span>
-<span class="ln" id="L625">                    ),</span>
-<span class="ln" id="L626">                    Presence::<span class="tok-fn">Unknown</span>(_) =&gt; (row.presence.<span class="tok-fn">describe</span>(), p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L627">                };</span>
-<span class="ln" id="L628">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(colour));</span>
-<span class="ln" id="L629"></span>
-<span class="ln" id="L630">                <span class="tok-kw">if</span> row.presence.<span class="tok-fn">is_present</span>() {</span>
-<span class="ln" id="L631">                    <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L632">                }</span>
-<span class="ln" id="L633">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L634">                <span class="tok-kw">match</span> &amp;row.offer {</span>
-<span class="ln" id="L635">                    Offer::<span class="tok-fn">Page</span>(url) =&gt; {</span>
-<span class="ln" id="L636">                        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L637">                            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L638">                                <span class="tok-str">&quot;VeilVoice will not install this for you: it is not free \</span></span>
-<span class="ln" id="L639"><span class="tok-str">                                 software and it is a driver. This opens their page, where \</span></span>
-<span class="ln" id="L640"><span class="tok-str">                                 their licence is yours to accept and their installer is \</span></span>
-<span class="ln" id="L641"><span class="tok-str">                                 yours to run.&quot;</span>,</span>
-<span class="ln" id="L642">                            )</span>
-<span class="ln" id="L643">                            .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L644">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L645">                        );</span>
-<span class="ln" id="L646">                        <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L647">                            .<span class="tok-fn">add_enabled</span>(</span>
-<span class="ln" id="L648">                                !busy,</span>
-<span class="ln" id="L649">                                egui::Button::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L650">                                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;open their page&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()),</span>
-<span class="ln" id="L651">                                ),</span>
-<span class="ln" id="L652">                            )</span>
-<span class="ln" id="L653">                            .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L654">                        {</span>
-<span class="ln" id="L655">                            action = <span class="tok-fn">Some</span>((row.companion.name.<span class="tok-fn">to_string</span>(), row.offer.<span class="tok-fn">clone</span>()));</span>
-<span class="ln" id="L656">                        }</span>
-<span class="ln" id="L657">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(*url).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L658">                    }</span>
-<span class="ln" id="L659">                    Offer::Command {</span>
-<span class="ln" id="L660">                        via,</span>
-<span class="ln" id="L661">                        needs_privilege,</span>
-<span class="ln" id="L662">                        ..</span>
-<span class="ln" id="L663">                    } =&gt; {</span>
-<span class="ln" id="L664">                        <span class="tok-kw">let</span> line = row.offer.<span class="tok-fn">command_line</span>().<span class="tok-fn">unwrap_or_default</span>();</span>
-<span class="ln" id="L665">                        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L666">                            RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;via {via}: {line}&quot;</span>))</span>
-<span class="ln" id="L667">                                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L668">                                .<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()),</span>
-<span class="ln" id="L669">                        );</span>
-<span class="ln" id="L670">                        <span class="tok-kw">if</span> *needs_privilege {</span>
-<span class="ln" id="L671">                            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L672">                                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L673">                                    <span class="tok-str">&quot;This needs root. VeilVoice does not ask for a password \</span></span>
-<span class="ln" id="L674"><span class="tok-str">                                     and will not run it. Run that command in a terminal, \</span></span>
-<span class="ln" id="L675"><span class="tok-str">                                     where you can see what you are approving.&quot;</span>,</span>
-<span class="ln" id="L676">                                )</span>
-<span class="ln" id="L677">                                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L678">                                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L679">                            );</span>
-<span class="ln" id="L680">                        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L681">                            .<span class="tok-fn">add_enabled</span>(</span>
-<span class="ln" id="L682">                                !busy,</span>
-<span class="ln" id="L683">                                egui::Button::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L684">                                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;install {}&quot;</span>, row.companion.name))</span>
-<span class="ln" id="L685">                                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>()),</span>
-<span class="ln" id="L686">                                ),</span>
-<span class="ln" id="L687">                            )</span>
-<span class="ln" id="L688">                            .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L689">                        {</span>
-<span class="ln" id="L690">                            action = <span class="tok-fn">Some</span>((row.companion.name.<span class="tok-fn">to_string</span>(), row.offer.<span class="tok-fn">clone</span>()));</span>
-<span class="ln" id="L691">                        }</span>
-<span class="ln" id="L692">                    }</span>
-<span class="ln" id="L693">                    Offer::<span class="tok-fn">PartOfTheSystem</span>(explanation) =&gt; {</span>
-<span class="ln" id="L694">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(*explanation).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L695">                    }</span>
-<span class="ln" id="L696">                    Offer::<span class="tok-fn">NoKnownRoute</span>(reason) =&gt; {</span>
-<span class="ln" id="L697">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(reason).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()));</span>
-<span class="ln" id="L698">                    }</span>
-<span class="ln" id="L699">                    <span class="tok-com">// Filtered out by `for_this_platform`, so unreachable in</span></span>
-<span class="ln" id="L700">                    <span class="tok-com">// practice; drawn as nothing rather than as an empty group.</span></span>
-<span class="ln" id="L701">                    Offer::NotOnThisPlatform =&gt; {}</span>
-<span class="ln" id="L702">                }</span>
-<span class="ln" id="L703">            });</span>
-<span class="ln" id="L704">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L705">        }</span>
-<span class="ln" id="L706"></span>
-<span class="ln" id="L707">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((name, offer)) = action {</span>
-<span class="ln" id="L708">            <span class="tok-kw">match</span> offer {</span>
-<span class="ln" id="L709">                Offer::<span class="tok-fn">Page</span>(url) =&gt; <span class="tok-kw">match</span> companions::<span class="tok-fn">open_page</span>(url) {</span>
-<span class="ln" id="L710">                    <span class="tok-fn">Ok</span>(()) =&gt; <span class="tok-kw">self</span>.report = <span class="tok-fn">Some</span>((vec![format!(<span class="tok-str">&quot;opened {url}&quot;</span>)], true)),</span>
-<span class="ln" id="L711">                    <span class="tok-fn">Err</span>(error) =&gt; <span class="tok-kw">self</span>.report = <span class="tok-fn">Some</span>((vec![error], false)),</span>
-<span class="ln" id="L712">                },</span>
-<span class="ln" id="L713">                offer =&gt; {</span>
-<span class="ln" id="L714">                    <span class="tok-kw">self</span>.<span class="tok-fn">start</span>(&amp;format!(<span class="tok-str">&quot;installing {name}&quot;</span>), <span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L715">                        companions::<span class="tok-fn">run</span>(&amp;offer).<span class="tok-fn">map</span>(|output| {</span>
-<span class="ln" id="L716">                            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines: Vec&lt;String&gt; = output</span>
-<span class="ln" id="L717">                                .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L718">                                .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>())</span>
-<span class="ln" id="L719">                                .<span class="tok-fn">map</span>(|line| line.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L720">                                .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L721">                            lines.<span class="tok-fn">push</span>(<span class="tok-str">&quot;done&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L722">                            lines</span>
-<span class="ln" id="L723">                        })</span>
-<span class="ln" id="L724">                    });</span>
-<span class="ln" id="L725">                }</span>
-<span class="ln" id="L726">            }</span>
-<span class="ln" id="L727">        }</span>
-<span class="ln" id="L728">    }</span>
+<span class="ln" id="L557">    <span class="tok-com">/// One row per companion: whether it is here, and how to get it if not.</span></span>
+<span class="ln" id="L558">    <span class="tok-kw">fn</span> <span class="tok-fn">companion_rows</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L559">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Companion software&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L560">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L561">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L562">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L563">                <span class="tok-str">&quot;None of this is part of VeilVoice and none of it is required. Nothing \</span></span>
+<span class="ln" id="L564"><span class="tok-str">                 here is pre-selected: each is one button, for one named program, and \</span></span>
+<span class="ln" id="L565"><span class="tok-str">                 VeilVoice never runs somebody else&#x27;s installer.&quot;</span>,</span>
+<span class="ln" id="L566">            )</span>
+<span class="ln" id="L567">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()),</span>
+<span class="ln" id="L568">        );</span>
+<span class="ln" id="L569">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L570">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.probe.<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L571">            <span class="tok-com">// Said rather than left blank. The button that has just been</span></span>
+<span class="ln" id="L572">            <span class="tok-com">// pressed going quiet for half a second is what reads as a freeze,</span></span>
+<span class="ln" id="L573">            <span class="tok-com">// and the fix is as much this line as it is the worker.</span></span>
+<span class="ln" id="L574">            ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L575">                ui.<span class="tok-fn">spinner</span>();</span>
+<span class="ln" id="L576">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L577">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;looking for each of these on this machine&quot;</span>)</span>
+<span class="ln" id="L578">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L579">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L580">                );</span>
+<span class="ln" id="L581">            });</span>
+<span class="ln" id="L582">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L583">            .<span class="tok-fn">button</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;look again&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>())</span>
+<span class="ln" id="L584">            .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L585">        {</span>
+<span class="ln" id="L586">            <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L587">            <span class="tok-com">// Detached: nothing waits for it, and a probe that outlives the</span></span>
+<span class="ln" id="L588">            <span class="tok-com">// tab simply sends into a channel nobody reads.</span></span>
+<span class="ln" id="L589">            std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L590">                <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(<span class="tok-fn">detect_all</span>());</span>
+<span class="ln" id="L591">            });</span>
+<span class="ln" id="L592">            <span class="tok-kw">self</span>.probe = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L593">        }</span>
+<span class="ln" id="L594">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L595"></span>
+<span class="ln" id="L596">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> action: Option&lt;(String, Offer)&gt; = None;</span>
+<span class="ln" id="L597">        <span class="tok-kw">let</span> busy = <span class="tok-kw">self</span>.job.<span class="tok-fn">is_some</span>();</span>
+<span class="ln" id="L598"></span>
+<span class="ln" id="L599">        <span class="tok-kw">for</span> row <span class="tok-kw">in</span> &amp;<span class="tok-kw">self</span>.rows {</span>
+<span class="ln" id="L600">            ui.<span class="tok-fn">group</span>(|ui| {</span>
+<span class="ln" id="L601">                ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L602">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(row.companion.name).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
+<span class="ln" id="L603">                    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L604">                        RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;&#183; {}&quot;</span>, row.companion.vendor))</span>
+<span class="ln" id="L605">                            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L606">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L607">                    );</span>
+<span class="ln" id="L608">                    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L609">                        RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;&#183; {}&quot;</span>, row.companion.licence))</span>
+<span class="ln" id="L610">                            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L611">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L612">                    );</span>
+<span class="ln" id="L613">                });</span>
+<span class="ln" id="L614">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(row.companion.what).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
+<span class="ln" id="L615">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(row.companion.why).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L616">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L617"></span>
+<span class="ln" id="L618">                <span class="tok-kw">let</span> (text, colour) = <span class="tok-kw">match</span> &amp;row.presence {</span>
+<span class="ln" id="L619">                    Presence::<span class="tok-fn">Present</span>(_) =&gt; (row.presence.<span class="tok-fn">describe</span>(), p::<span class="tok-fn">green</span>()),</span>
+<span class="ln" id="L620">                    Presence::NotDetected =&gt; (</span>
+<span class="ln" id="L621">                        format!(</span>
+<span class="ln" id="L622">                            <span class="tok-str">&quot;{}. That is where VeilVoice looked, not a claim about your machine&quot;</span>,</span>
+<span class="ln" id="L623">                            row.presence.<span class="tok-fn">describe</span>()</span>
+<span class="ln" id="L624">                        ),</span>
+<span class="ln" id="L625">                        p::<span class="tok-fn">muted</span>(),</span>
+<span class="ln" id="L626">                    ),</span>
+<span class="ln" id="L627">                    Presence::<span class="tok-fn">Unknown</span>(_) =&gt; (row.presence.<span class="tok-fn">describe</span>(), p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L628">                };</span>
+<span class="ln" id="L629">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(colour));</span>
+<span class="ln" id="L630"></span>
+<span class="ln" id="L631">                <span class="tok-kw">if</span> row.presence.<span class="tok-fn">is_present</span>() {</span>
+<span class="ln" id="L632">                    <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L633">                }</span>
+<span class="ln" id="L634">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L635">                <span class="tok-kw">match</span> &amp;row.offer {</span>
+<span class="ln" id="L636">                    Offer::<span class="tok-fn">Page</span>(url) =&gt; {</span>
+<span class="ln" id="L637">                        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L638">                            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L639">                                <span class="tok-str">&quot;VeilVoice will not install this for you: it is not free \</span></span>
+<span class="ln" id="L640"><span class="tok-str">                                 software and it is a driver. This opens their page, where \</span></span>
+<span class="ln" id="L641"><span class="tok-str">                                 their licence is yours to accept and their installer is \</span></span>
+<span class="ln" id="L642"><span class="tok-str">                                 yours to run.&quot;</span>,</span>
+<span class="ln" id="L643">                            )</span>
+<span class="ln" id="L644">                            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L645">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L646">                        );</span>
+<span class="ln" id="L647">                        <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L648">                            .<span class="tok-fn">add_enabled</span>(</span>
+<span class="ln" id="L649">                                !busy,</span>
+<span class="ln" id="L650">                                egui::Button::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L651">                                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;open their page&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()),</span>
+<span class="ln" id="L652">                                ),</span>
+<span class="ln" id="L653">                            )</span>
+<span class="ln" id="L654">                            .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L655">                        {</span>
+<span class="ln" id="L656">                            action = <span class="tok-fn">Some</span>((row.companion.name.<span class="tok-fn">to_string</span>(), row.offer.<span class="tok-fn">clone</span>()));</span>
+<span class="ln" id="L657">                        }</span>
+<span class="ln" id="L658">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(*url).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L659">                    }</span>
+<span class="ln" id="L660">                    Offer::Command {</span>
+<span class="ln" id="L661">                        via,</span>
+<span class="ln" id="L662">                        needs_privilege,</span>
+<span class="ln" id="L663">                        ..</span>
+<span class="ln" id="L664">                    } =&gt; {</span>
+<span class="ln" id="L665">                        <span class="tok-kw">let</span> line = row.offer.<span class="tok-fn">command_line</span>().<span class="tok-fn">unwrap_or_default</span>();</span>
+<span class="ln" id="L666">                        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L667">                            RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;via {via}: {line}&quot;</span>))</span>
+<span class="ln" id="L668">                                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L669">                                .<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()),</span>
+<span class="ln" id="L670">                        );</span>
+<span class="ln" id="L671">                        <span class="tok-kw">if</span> *needs_privilege {</span>
+<span class="ln" id="L672">                            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L673">                                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L674">                                    <span class="tok-str">&quot;This needs root. VeilVoice does not ask for a password \</span></span>
+<span class="ln" id="L675"><span class="tok-str">                                     and will not run it. Run that command in a terminal, \</span></span>
+<span class="ln" id="L676"><span class="tok-str">                                     where you can see what you are approving.&quot;</span>,</span>
+<span class="ln" id="L677">                                )</span>
+<span class="ln" id="L678">                                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L679">                                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L680">                            );</span>
+<span class="ln" id="L681">                        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L682">                            .<span class="tok-fn">add_enabled</span>(</span>
+<span class="ln" id="L683">                                !busy,</span>
+<span class="ln" id="L684">                                egui::Button::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L685">                                    RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;install {}&quot;</span>, row.companion.name))</span>
+<span class="ln" id="L686">                                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">green</span>()),</span>
+<span class="ln" id="L687">                                ),</span>
+<span class="ln" id="L688">                            )</span>
+<span class="ln" id="L689">                            .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L690">                        {</span>
+<span class="ln" id="L691">                            action = <span class="tok-fn">Some</span>((row.companion.name.<span class="tok-fn">to_string</span>(), row.offer.<span class="tok-fn">clone</span>()));</span>
+<span class="ln" id="L692">                        }</span>
+<span class="ln" id="L693">                    }</span>
+<span class="ln" id="L694">                    Offer::<span class="tok-fn">PartOfTheSystem</span>(explanation) =&gt; {</span>
+<span class="ln" id="L695">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(*explanation).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L696">                    }</span>
+<span class="ln" id="L697">                    Offer::<span class="tok-fn">NoKnownRoute</span>(reason) =&gt; {</span>
+<span class="ln" id="L698">                        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(reason).<span class="tok-fn">small</span>().<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()));</span>
+<span class="ln" id="L699">                    }</span>
+<span class="ln" id="L700">                    <span class="tok-com">// Filtered out by `for_this_platform`, so unreachable in</span></span>
+<span class="ln" id="L701">                    <span class="tok-com">// practice; drawn as nothing rather than as an empty group.</span></span>
+<span class="ln" id="L702">                    Offer::NotOnThisPlatform =&gt; {}</span>
+<span class="ln" id="L703">                }</span>
+<span class="ln" id="L704">            });</span>
+<span class="ln" id="L705">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L706">        }</span>
+<span class="ln" id="L707"></span>
+<span class="ln" id="L708">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((name, offer)) = action {</span>
+<span class="ln" id="L709">            <span class="tok-kw">match</span> offer {</span>
+<span class="ln" id="L710">                Offer::<span class="tok-fn">Page</span>(url) =&gt; <span class="tok-kw">match</span> companions::<span class="tok-fn">open_page</span>(url) {</span>
+<span class="ln" id="L711">                    <span class="tok-fn">Ok</span>(()) =&gt; <span class="tok-kw">self</span>.report = <span class="tok-fn">Some</span>((vec![format!(<span class="tok-str">&quot;opened {url}&quot;</span>)], true)),</span>
+<span class="ln" id="L712">                    <span class="tok-fn">Err</span>(error) =&gt; <span class="tok-kw">self</span>.report = <span class="tok-fn">Some</span>((vec![error], false)),</span>
+<span class="ln" id="L713">                },</span>
+<span class="ln" id="L714">                offer =&gt; {</span>
+<span class="ln" id="L715">                    <span class="tok-kw">self</span>.<span class="tok-fn">start</span>(&amp;format!(<span class="tok-str">&quot;installing {name}&quot;</span>), <span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L716">                        companions::<span class="tok-fn">run</span>(&amp;offer).<span class="tok-fn">map</span>(|output| {</span>
+<span class="ln" id="L717">                            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines: Vec&lt;String&gt; = output</span>
+<span class="ln" id="L718">                                .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L719">                                .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>())</span>
+<span class="ln" id="L720">                                .<span class="tok-fn">map</span>(|line| line.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L721">                                .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L722">                            lines.<span class="tok-fn">push</span>(<span class="tok-str">&quot;done&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L723">                            lines</span>
+<span class="ln" id="L724">                        })</span>
+<span class="ln" id="L725">                    });</span>
+<span class="ln" id="L726">                }</span>
+<span class="ln" id="L727">            }</span>
+<span class="ln" id="L728">        }</span>
+<span class="ln" id="L729">    }</span>
 </span>
-<span class="ln" id="L729">}</span>
-<span class="ln" id="L730"></span>
+<span class="ln" id="L730">}</span>
+<span class="ln" id="L731"></span>
 <span class="src-item" id="fn-detect_all">
-<span class="ln" id="L731"><span class="tok-com">/// Probe for every companion that applies to this platform.</span></span>
-<span class="ln" id="L732"><span class="tok-kw">fn</span> <span class="tok-fn">detect_all</span>() -&gt; Vec&lt;Row&gt; {</span>
-<span class="ln" id="L733">    companions::<span class="tok-fn">for_this_platform</span>()</span>
-<span class="ln" id="L734">        .<span class="tok-fn">into_iter</span>()</span>
-<span class="ln" id="L735">        .<span class="tok-fn">map</span>(|companion| Row {</span>
-<span class="ln" id="L736">            companion,</span>
-<span class="ln" id="L737">            presence: companion.<span class="tok-fn">detect</span>(),</span>
-<span class="ln" id="L738">            offer: companion.<span class="tok-fn">offer</span>(),</span>
-<span class="ln" id="L739">        })</span>
-<span class="ln" id="L740">        .<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L741">}</span>
+<span class="ln" id="L732"><span class="tok-com">/// Probe for every companion that applies to this platform.</span></span>
+<span class="ln" id="L733"><span class="tok-kw">fn</span> <span class="tok-fn">detect_all</span>() -&gt; Vec&lt;Row&gt; {</span>
+<span class="ln" id="L734">    companions::<span class="tok-fn">for_this_platform</span>()</span>
+<span class="ln" id="L735">        .<span class="tok-fn">into_iter</span>()</span>
+<span class="ln" id="L736">        .<span class="tok-fn">map</span>(|companion| Row {</span>
+<span class="ln" id="L737">            companion,</span>
+<span class="ln" id="L738">            presence: companion.<span class="tok-fn">detect</span>(),</span>
+<span class="ln" id="L739">            offer: companion.<span class="tok-fn">offer</span>(),</span>
+<span class="ln" id="L740">        })</span>
+<span class="ln" id="L741">        .<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L742">}</span>
 </span>
-<span class="ln" id="L742"></span>
+<span class="ln" id="L743"></span>
 <span class="src-item" id="fn-can_install">
-<span class="ln" id="L743"><span class="tok-com">/// Exactly what an install changes, in the order it changes it.</span></span>
-<span class="ln" id="L744"><span class="tok-com">///</span></span>
-<span class="ln" id="L745"><span class="tok-com">/// Written out beside the button rather than in a manual. An installer that</span></span>
-<span class="ln" id="L746"><span class="tok-com">/// says &quot;install?&quot; and nothing else is asking somebody to consent to something</span></span>
-<span class="ln" id="L747"><span class="tok-com">/// they have not been told.</span></span>
-<span class="ln" id="L748"><span class="tok-com">/// Whether the install button is live.</span></span>
-<span class="ln" id="L749"><span class="tok-com">///</span></span>
-<span class="ln" id="L750"><span class="tok-com">/// A function rather than four conditions in a closure, so the rule that</span></span>
-<span class="ln" id="L751"><span class="tok-com">/// matters can be asserted: **a portable copy cannot be installed until the</span></span>
-<span class="ln" id="L752"><span class="tok-com">/// question about its settings has been answered**. An install that ran on the</span></span>
-<span class="ln" id="L753"><span class="tok-com">/// first click would have taken one of the two answers by default, and the</span></span>
-<span class="ln" id="L754"><span class="tok-com">/// wrong one either copies a vault onto somebody else&#x27;s machine or leaves a</span></span>
-<span class="ln" id="L755"><span class="tok-com">/// person wondering where their recordings went.</span></span>
-<span class="ln" id="L756"><span class="tok-kw">fn</span> <span class="tok-fn">can_install</span>(</span>
-<span class="ln" id="L757">    somewhere_to_install: bool,</span>
-<span class="ln" id="L758">    already_running_installed: bool,</span>
-<span class="ln" id="L759">    portable: bool,</span>
-<span class="ln" id="L760">    carry: Option&lt;bool&gt;,</span>
-<span class="ln" id="L761">) -&gt; bool {</span>
-<span class="ln" id="L762">    somewhere_to_install &amp;&amp; !already_running_installed &amp;&amp; (!portable || carry.<span class="tok-fn">is_some</span>())</span>
-<span class="ln" id="L763">}</span>
+<span class="ln" id="L744"><span class="tok-com">/// Exactly what an install changes, in the order it changes it.</span></span>
+<span class="ln" id="L745"><span class="tok-com">///</span></span>
+<span class="ln" id="L746"><span class="tok-com">/// Written out beside the button rather than in a manual. An installer that</span></span>
+<span class="ln" id="L747"><span class="tok-com">/// says &quot;install?&quot; and nothing else is asking somebody to consent to something</span></span>
+<span class="ln" id="L748"><span class="tok-com">/// they have not been told.</span></span>
+<span class="ln" id="L749"><span class="tok-com">/// Whether the install button is live.</span></span>
+<span class="ln" id="L750"><span class="tok-com">///</span></span>
+<span class="ln" id="L751"><span class="tok-com">/// A function rather than four conditions in a closure, so the rule that</span></span>
+<span class="ln" id="L752"><span class="tok-com">/// matters can be asserted: **a portable copy cannot be installed until the</span></span>
+<span class="ln" id="L753"><span class="tok-com">/// question about its settings has been answered**. An install that ran on the</span></span>
+<span class="ln" id="L754"><span class="tok-com">/// first click would have taken one of the two answers by default, and the</span></span>
+<span class="ln" id="L755"><span class="tok-com">/// wrong one either copies a vault onto somebody else&#x27;s machine or leaves a</span></span>
+<span class="ln" id="L756"><span class="tok-com">/// person wondering where their recordings went.</span></span>
+<span class="ln" id="L757"><span class="tok-kw">fn</span> <span class="tok-fn">can_install</span>(</span>
+<span class="ln" id="L758">    somewhere_to_install: bool,</span>
+<span class="ln" id="L759">    already_running_installed: bool,</span>
+<span class="ln" id="L760">    portable: bool,</span>
+<span class="ln" id="L761">    carry: Option&lt;bool&gt;,</span>
+<span class="ln" id="L762">) -&gt; bool {</span>
+<span class="ln" id="L763">    somewhere_to_install &amp;&amp; !already_running_installed &amp;&amp; (!portable || carry.<span class="tok-fn">is_some</span>())</span>
+<span class="ln" id="L764">}</span>
 </span>
-<span class="ln" id="L764"></span>
+<span class="ln" id="L765"></span>
 <span class="src-item" id="fn-install_changes">
-<span class="ln" id="L765"><span class="tok-com">/// Everything installing alters, listed so the button is never a surprise.</span></span>
-<span class="ln" id="L766"><span class="tok-kw">fn</span> <span class="tok-fn">install_changes</span>() -&gt; Vec&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt; {</span>
-<span class="ln" id="L767">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = vec![</span>
-<span class="ln" id="L768">        <span class="tok-str">&quot;copies the VeilVoice programs beside this one into your own program directory&quot;</span>,</span>
-<span class="ln" id="L769">        <span class="tok-str">&quot;adds that directory to your PATH, appending to the value it first reads&quot;</span>,</span>
-<span class="ln" id="L770">    ];</span>
-<span class="ln" id="L771">    <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L772">        lines.<span class="tok-fn">push</span>(<span class="tok-str">&quot;adds an entry to Apps &amp; features, so Windows can list and remove it&quot;</span>);</span>
-<span class="ln" id="L773">    }</span>
-<span class="ln" id="L774">    lines.<span class="tok-fn">push</span>(<span class="tok-str">&quot;nothing else: no service, no system directory, no administrator rights&quot;</span>);</span>
-<span class="ln" id="L775">    lines</span>
-<span class="ln" id="L776">}</span>
+<span class="ln" id="L766"><span class="tok-com">/// Everything installing alters, listed so the button is never a surprise.</span></span>
+<span class="ln" id="L767"><span class="tok-kw">fn</span> <span class="tok-fn">install_changes</span>() -&gt; Vec&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt; {</span>
+<span class="ln" id="L768">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = vec![</span>
+<span class="ln" id="L769">        <span class="tok-str">&quot;copies the VeilVoice programs beside this one into your own program directory&quot;</span>,</span>
+<span class="ln" id="L770">        <span class="tok-str">&quot;adds that directory to your PATH, appending to the value it first reads&quot;</span>,</span>
+<span class="ln" id="L771">    ];</span>
+<span class="ln" id="L772">    <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L773">        lines.<span class="tok-fn">push</span>(<span class="tok-str">&quot;adds an entry to Apps &amp; features, so Windows can list and remove it&quot;</span>);</span>
+<span class="ln" id="L774">    }</span>
+<span class="ln" id="L775">    lines.<span class="tok-fn">push</span>(<span class="tok-str">&quot;nothing else: no service, no system directory, no administrator rights&quot;</span>);</span>
+<span class="ln" id="L776">    lines</span>
+<span class="ln" id="L777">}</span>
 </span>
-<span class="ln" id="L777"></span>
+<span class="ln" id="L778"></span>
 <span class="src-item" id="fn-field">
-<span class="ln" id="L778"><span class="tok-com">/// One labelled read-only value, in the shape this tab uses throughout.</span></span>
-<span class="ln" id="L779"><span class="tok-kw">fn</span> <span class="tok-fn">field</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, label: &amp;str, value: &amp;str) {</span>
-<span class="ln" id="L780">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L781">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{label:&lt;18}&quot;</span>)).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L782">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(value).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()));</span>
-<span class="ln" id="L783">    });</span>
-<span class="ln" id="L784">}</span>
+<span class="ln" id="L779"><span class="tok-com">/// One labelled read-only value, in the shape this tab uses throughout.</span></span>
+<span class="ln" id="L780"><span class="tok-kw">fn</span> <span class="tok-fn">field</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, label: &amp;str, value: &amp;str) {</span>
+<span class="ln" id="L781">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L782">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{label:&lt;18}&quot;</span>)).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L783">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(value).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()));</span>
+<span class="ln" id="L784">    });</span>
+<span class="ln" id="L785">}</span>
 </span>
-<span class="ln" id="L785"></span>
-<span class="ln" id="L786"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L787"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L788">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L789"></span>
-<span class="ln" id="L790">    <span class="tok-com">/// The tab reads the machine on construction and must not change it.</span></span>
-<span class="ln" id="L791">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L792">    <span class="tok-kw">fn</span> <span class="tok-fn">a_portable_copy_is_not_installed_until_the_question_is_answered</span>() {</span>
-<span class="ln" id="L793">        <span class="tok-com">// The one thing this gate exists for. Unanswered means the button is</span></span>
-<span class="ln" id="L794">        <span class="tok-com">// dead, and either answer makes it live: both are real choices and</span></span>
-<span class="ln" id="L795">        <span class="tok-com">// neither is a default.</span></span>
-<span class="ln" id="L796">        assert!(!<span class="tok-fn">can_install</span>(true, false, true, None), <span class="tok-str">&quot;it installed anyway&quot;</span>);</span>
-<span class="ln" id="L797">        assert!(<span class="tok-fn">can_install</span>(true, false, true, <span class="tok-fn">Some</span>(true)));</span>
-<span class="ln" id="L798">        assert!(<span class="tok-fn">can_install</span>(true, false, true, <span class="tok-fn">Some</span>(false)));</span>
-<span class="ln" id="L799"></span>
-<span class="ln" id="L800">        <span class="tok-com">// A copy that is not portable has nothing to carry, so it is never</span></span>
-<span class="ln" id="L801">        <span class="tok-com">// asked and never waits.</span></span>
-<span class="ln" id="L802">        assert!(<span class="tok-fn">can_install</span>(true, false, false, None));</span>
-<span class="ln" id="L803">    }</span>
-<span class="ln" id="L804"></span>
-<span class="ln" id="L805">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L806">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_installs_where_there_is_nowhere_to_install_it</span>() {</span>
-<span class="ln" id="L807">        assert!(!<span class="tok-fn">can_install</span>(false, false, false, None));</span>
-<span class="ln" id="L808">        assert!(!<span class="tok-fn">can_install</span>(false, false, true, <span class="tok-fn">Some</span>(true)));</span>
-<span class="ln" id="L809">        assert!(</span>
-<span class="ln" id="L810">            !<span class="tok-fn">can_install</span>(true, true, false, None),</span>
-<span class="ln" id="L811">            <span class="tok-str">&quot;the installed copy offered to install itself&quot;</span></span>
-<span class="ln" id="L812">        );</span>
-<span class="ln" id="L813">    }</span>
-<span class="ln" id="L814"></span>
-<span class="ln" id="L815">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L816">    <span class="tok-kw">fn</span> <span class="tok-fn">opening_the_tab_changes_nothing</span>() {</span>
-<span class="ln" id="L817">        <span class="tok-kw">let</span> first = Setup::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L818">        <span class="tok-kw">let</span> second = Setup::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L819">        assert_eq!(first.status.installed, second.status.installed);</span>
-<span class="ln" id="L820">        assert_eq!(first.status.on_path, second.status.on_path);</span>
-<span class="ln" id="L821">        assert_eq!(first.status.prefix, second.status.prefix);</span>
-<span class="ln" id="L822">        assert_eq!(first.rows.<span class="tok-fn">len</span>(), second.rows.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L823">        assert!(first.job.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L824">        assert!(first.report.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L825">        assert!(</span>
-<span class="ln" id="L826">            !first.confirming_uninstall,</span>
-<span class="ln" id="L827">            <span class="tok-str">&quot;the uninstall confirmation must start closed&quot;</span></span>
-<span class="ln" id="L828">        );</span>
-<span class="ln" id="L829">    }</span>
-<span class="ln" id="L830"></span>
-<span class="ln" id="L831">    <span class="tok-com">/// Drive the tab once with no window, in both motion states.</span></span>
-<span class="ln" id="L832">    <span class="tok-com">///</span></span>
-<span class="ln" id="L833">    <span class="tok-com">/// The progress strip does arithmetic on a rectangle, and a rectangle in a</span></span>
-<span class="ln" id="L834">    <span class="tok-com">/// headless context can be zero-width. A panic there would only ever be</span></span>
-<span class="ln" id="L835">    <span class="tok-com">/// seen on somebody&#x27;s desktop, mid-install.</span></span>
-<span class="ln" id="L836">    <span class="tok-kw">fn</span> <span class="tok-fn">render</span>(setup: &amp;<span class="tok-kw">mut</span> Setup, motion: <span class="tok-kw">crate</span>::prefs::Motion) {</span>
-<span class="ln" id="L837">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L838">        <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, Default::<span class="tok-fn">default</span>(), |ui| {</span>
-<span class="ln" id="L839">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| setup.<span class="tok-fn">tab</span>(ui, motion));</span>
-<span class="ln" id="L840">        });</span>
-<span class="ln" id="L841">    }</span>
-<span class="ln" id="L842"></span>
-<span class="ln" id="L843">    <span class="tok-kw">fn</span> <span class="tok-fn">motion</span>(enabled: bool) -&gt; <span class="tok-kw">crate</span>::prefs::Motion {</span>
-<span class="ln" id="L844">        <span class="tok-kw">crate</span>::prefs::Motion {</span>
-<span class="ln" id="L845">            enabled,</span>
-<span class="ln" id="L846">            icon: enabled,</span>
-<span class="ln" id="L847">            system_reduced: !enabled,</span>
-<span class="ln" id="L848">        }</span>
-<span class="ln" id="L849">    }</span>
-<span class="ln" id="L850"></span>
-<span class="ln" id="L851">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L852">    <span class="tok-kw">fn</span> <span class="tok-fn">the_tab_renders_without_a_window</span>() {</span>
-<span class="ln" id="L853">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> setup = Setup::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L854">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> setup, <span class="tok-fn">motion</span>(true));</span>
-<span class="ln" id="L855">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> setup, <span class="tok-fn">motion</span>(false));</span>
-<span class="ln" id="L856">        <span class="tok-com">// Drawing must not have started anything.</span></span>
-<span class="ln" id="L857">        assert!(setup.job.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;drawing the tab started a worker&quot;</span>);</span>
-<span class="ln" id="L858">    }</span>
-<span class="ln" id="L859"></span>
-<span class="ln" id="L860">    <span class="tok-com">/// The uninstall confirmation is drawn, and drawing it must not act.</span></span>
-<span class="ln" id="L861">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L862">    <span class="tok-kw">fn</span> <span class="tok-fn">the_uninstall_confirmation_renders_and_does_nothing_by_itself</span>() {</span>
-<span class="ln" id="L863">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> setup = Setup::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L864">        setup.confirming_uninstall = true;</span>
-<span class="ln" id="L865">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> setup, <span class="tok-fn">motion</span>(true));</span>
-<span class="ln" id="L866">        assert!(setup.job.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L867">        assert!(setup.report.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L868">    }</span>
-<span class="ln" id="L869"></span>
-<span class="ln" id="L870">    <span class="tok-com">/// A report from a worker that vanished must say so rather than leaving</span></span>
-<span class="ln" id="L871">    <span class="tok-com">/// the strip running for ever.</span></span>
-<span class="ln" id="L872">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L873">    <span class="tok-kw">fn</span> <span class="tok-fn">a_worker_that_disappears_is_reported</span>() {</span>
-<span class="ln" id="L874">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> setup = Setup::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L875">        <span class="tok-kw">let</span> (tx, rx) = mpsc::channel::&lt;Done&gt;();</span>
-<span class="ln" id="L876">        setup.job = <span class="tok-fn">Some</span>(rx);</span>
-<span class="ln" id="L877">        setup.busy = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;installing&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L878">        <span class="tok-fn">drop</span>(tx);</span>
-<span class="ln" id="L879">        setup.<span class="tok-fn">poll</span>();</span>
-<span class="ln" id="L880">        assert!(setup.job.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;the job must be cleared&quot;</span>);</span>
-<span class="ln" id="L881">        assert!(!setup.<span class="tok-fn">is_busy</span>());</span>
-<span class="ln" id="L882">        <span class="tok-kw">let</span> (lines, good) = setup.report.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a disappearance must be reported&quot;</span>);</span>
-<span class="ln" id="L883">        assert!(!good);</span>
-<span class="ln" id="L884">        assert!(lines[<span class="tok-num">0</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped without reporting&quot;</span>), <span class="tok-str">&quot;{lines:?}&quot;</span>);</span>
-<span class="ln" id="L885">    }</span>
-<span class="ln" id="L886"></span>
-<span class="ln" id="L887">    <span class="tok-com">/// Every companion shown is one that applies here, with a probe result.</span></span>
-<span class="ln" id="L888">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L889">    <span class="tok-kw">fn</span> <span class="tok-fn">every_row_has_been_probed</span>() {</span>
-<span class="ln" id="L890">        <span class="tok-kw">for</span> row <span class="tok-kw">in</span> <span class="tok-fn">detect_all</span>() {</span>
-<span class="ln" id="L891">            assert!(!matches!(row.offer, Offer::NotOnThisPlatform));</span>
-<span class="ln" id="L892">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Presence::<span class="tok-fn">Unknown</span>(reason) = &amp;row.presence {</span>
-<span class="ln" id="L893">                assert!(!reason.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no probe is written&quot;</span>), <span class="tok-str">&quot;{reason}&quot;</span>);</span>
-<span class="ln" id="L894">            }</span>
-<span class="ln" id="L895">        }</span>
-<span class="ln" id="L896">    }</span>
-<span class="ln" id="L897"></span>
-<span class="ln" id="L898">    <span class="tok-com">/// The list of changes is what the user consents to, so it must name the</span></span>
-<span class="ln" id="L899">    <span class="tok-com">/// three things `veilvoice_setup::install` actually does, and must not</span></span>
-<span class="ln" id="L900">    <span class="tok-com">/// stop mentioning that it asks for no administrator rights.</span></span>
-<span class="ln" id="L901">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L902">    <span class="tok-kw">fn</span> <span class="tok-fn">the_consent_text_names_what_install_changes</span>() {</span>
-<span class="ln" id="L903">        <span class="tok-kw">let</span> lines = <span class="tok-fn">install_changes</span>();</span>
-<span class="ln" id="L904">        <span class="tok-kw">let</span> joined = lines.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>);</span>
-<span class="ln" id="L905">        assert!(joined.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;PATH&quot;</span>), <span class="tok-str">&quot;{joined}&quot;</span>);</span>
-<span class="ln" id="L906">        assert!(joined.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;copies&quot;</span>), <span class="tok-str">&quot;{joined}&quot;</span>);</span>
-<span class="ln" id="L907">        assert!(</span>
-<span class="ln" id="L908">            joined.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no administrator rights&quot;</span>),</span>
-<span class="ln" id="L909">            <span class="tok-str">&quot;the per-user promise must be stated beside the button: {joined}&quot;</span></span>
-<span class="ln" id="L910">        );</span>
-<span class="ln" id="L911">        <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L912">            assert!(joined.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Apps &amp; features&quot;</span>), <span class="tok-str">&quot;{joined}&quot;</span>);</span>
-<span class="ln" id="L913">        }</span>
-<span class="ln" id="L914">    }</span>
-<span class="ln" id="L915"></span>
-<span class="ln" id="L916">    <span class="tok-com">/// A front end must not offer a button for anything the library refuses to</span></span>
-<span class="ln" id="L917">    <span class="tok-com">/// run. This is the same rule as `companions::run`, checked from the side</span></span>
-<span class="ln" id="L918">    <span class="tok-com">/// that draws the button.</span></span>
-<span class="ln" id="L919">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L920">    <span class="tok-kw">fn</span> <span class="tok-fn">no_button_is_drawn_for_a_command_that_cannot_be_run</span>() {</span>
-<span class="ln" id="L921">        <span class="tok-kw">for</span> row <span class="tok-kw">in</span> <span class="tok-fn">detect_all</span>() {</span>
-<span class="ln" id="L922">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::Command {</span>
-<span class="ln" id="L923">                needs_privilege, ..</span>
-<span class="ln" id="L924">            } = row.offer</span>
-<span class="ln" id="L925">            {</span>
-<span class="ln" id="L926">                assert_eq!(</span>
-<span class="ln" id="L927">                    !needs_privilege,</span>
-<span class="ln" id="L928">                    row.offer.<span class="tok-fn">is_runnable</span>(),</span>
-<span class="ln" id="L929">                    <span class="tok-str">&quot;{} disagrees with the library about whether it is runnable&quot;</span>,</span>
-<span class="ln" id="L930">                    row.companion.key</span>
-<span class="ln" id="L931">                );</span>
-<span class="ln" id="L932">            }</span>
-<span class="ln" id="L933">        }</span>
-<span class="ln" id="L934">    }</span>
-<span class="ln" id="L935">}</span>
-<span class="ln" id="L936"></span>
+<span class="ln" id="L786"></span>
+<span class="ln" id="L787"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L788"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L789">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L790"></span>
+<span class="ln" id="L791">    <span class="tok-com">/// The tab reads the machine on construction and must not change it.</span></span>
+<span class="ln" id="L792">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L793">    <span class="tok-kw">fn</span> <span class="tok-fn">a_portable_copy_is_not_installed_until_the_question_is_answered</span>() {</span>
+<span class="ln" id="L794">        <span class="tok-com">// The one thing this gate exists for. Unanswered means the button is</span></span>
+<span class="ln" id="L795">        <span class="tok-com">// dead, and either answer makes it live: both are real choices and</span></span>
+<span class="ln" id="L796">        <span class="tok-com">// neither is a default.</span></span>
+<span class="ln" id="L797">        assert!(!<span class="tok-fn">can_install</span>(true, false, true, None), <span class="tok-str">&quot;it installed anyway&quot;</span>);</span>
+<span class="ln" id="L798">        assert!(<span class="tok-fn">can_install</span>(true, false, true, <span class="tok-fn">Some</span>(true)));</span>
+<span class="ln" id="L799">        assert!(<span class="tok-fn">can_install</span>(true, false, true, <span class="tok-fn">Some</span>(false)));</span>
+<span class="ln" id="L800"></span>
+<span class="ln" id="L801">        <span class="tok-com">// A copy that is not portable has nothing to carry, so it is never</span></span>
+<span class="ln" id="L802">        <span class="tok-com">// asked and never waits.</span></span>
+<span class="ln" id="L803">        assert!(<span class="tok-fn">can_install</span>(true, false, false, None));</span>
+<span class="ln" id="L804">    }</span>
+<span class="ln" id="L805"></span>
+<span class="ln" id="L806">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L807">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_installs_where_there_is_nowhere_to_install_it</span>() {</span>
+<span class="ln" id="L808">        assert!(!<span class="tok-fn">can_install</span>(false, false, false, None));</span>
+<span class="ln" id="L809">        assert!(!<span class="tok-fn">can_install</span>(false, false, true, <span class="tok-fn">Some</span>(true)));</span>
+<span class="ln" id="L810">        assert!(</span>
+<span class="ln" id="L811">            !<span class="tok-fn">can_install</span>(true, true, false, None),</span>
+<span class="ln" id="L812">            <span class="tok-str">&quot;the installed copy offered to install itself&quot;</span></span>
+<span class="ln" id="L813">        );</span>
+<span class="ln" id="L814">    }</span>
+<span class="ln" id="L815"></span>
+<span class="ln" id="L816">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L817">    <span class="tok-kw">fn</span> <span class="tok-fn">opening_the_tab_changes_nothing</span>() {</span>
+<span class="ln" id="L818">        <span class="tok-kw">let</span> first = Setup::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L819">        <span class="tok-kw">let</span> second = Setup::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L820">        assert_eq!(first.status.installed, second.status.installed);</span>
+<span class="ln" id="L821">        assert_eq!(first.status.on_path, second.status.on_path);</span>
+<span class="ln" id="L822">        assert_eq!(first.status.prefix, second.status.prefix);</span>
+<span class="ln" id="L823">        assert_eq!(first.rows.<span class="tok-fn">len</span>(), second.rows.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L824">        assert!(first.job.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L825">        assert!(first.report.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L826">        assert!(</span>
+<span class="ln" id="L827">            !first.confirming_uninstall,</span>
+<span class="ln" id="L828">            <span class="tok-str">&quot;the uninstall confirmation must start closed&quot;</span></span>
+<span class="ln" id="L829">        );</span>
+<span class="ln" id="L830">    }</span>
+<span class="ln" id="L831"></span>
+<span class="ln" id="L832">    <span class="tok-com">/// Drive the tab once with no window, in both motion states.</span></span>
+<span class="ln" id="L833">    <span class="tok-com">///</span></span>
+<span class="ln" id="L834">    <span class="tok-com">/// The progress strip does arithmetic on a rectangle, and a rectangle in a</span></span>
+<span class="ln" id="L835">    <span class="tok-com">/// headless context can be zero-width. A panic there would only ever be</span></span>
+<span class="ln" id="L836">    <span class="tok-com">/// seen on somebody&#x27;s desktop, mid-install.</span></span>
+<span class="ln" id="L837">    <span class="tok-kw">fn</span> <span class="tok-fn">render</span>(setup: &amp;<span class="tok-kw">mut</span> Setup, motion: <span class="tok-kw">crate</span>::prefs::Motion) {</span>
+<span class="ln" id="L838">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L839">        <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, Default::<span class="tok-fn">default</span>(), |ui| {</span>
+<span class="ln" id="L840">            egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| setup.<span class="tok-fn">tab</span>(ui, motion));</span>
+<span class="ln" id="L841">        });</span>
+<span class="ln" id="L842">    }</span>
+<span class="ln" id="L843"></span>
+<span class="ln" id="L844">    <span class="tok-kw">fn</span> <span class="tok-fn">motion</span>(enabled: bool) -&gt; <span class="tok-kw">crate</span>::prefs::Motion {</span>
+<span class="ln" id="L845">        <span class="tok-kw">crate</span>::prefs::Motion {</span>
+<span class="ln" id="L846">            enabled,</span>
+<span class="ln" id="L847">            icon: enabled,</span>
+<span class="ln" id="L848">            system_reduced: !enabled,</span>
+<span class="ln" id="L849">        }</span>
+<span class="ln" id="L850">    }</span>
+<span class="ln" id="L851"></span>
+<span class="ln" id="L852">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L853">    <span class="tok-kw">fn</span> <span class="tok-fn">the_tab_renders_without_a_window</span>() {</span>
+<span class="ln" id="L854">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> setup = Setup::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L855">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> setup, <span class="tok-fn">motion</span>(true));</span>
+<span class="ln" id="L856">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> setup, <span class="tok-fn">motion</span>(false));</span>
+<span class="ln" id="L857">        <span class="tok-com">// Drawing must not have started anything.</span></span>
+<span class="ln" id="L858">        assert!(setup.job.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;drawing the tab started a worker&quot;</span>);</span>
+<span class="ln" id="L859">    }</span>
+<span class="ln" id="L860"></span>
+<span class="ln" id="L861">    <span class="tok-com">/// The uninstall confirmation is drawn, and drawing it must not act.</span></span>
+<span class="ln" id="L862">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L863">    <span class="tok-kw">fn</span> <span class="tok-fn">the_uninstall_confirmation_renders_and_does_nothing_by_itself</span>() {</span>
+<span class="ln" id="L864">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> setup = Setup::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L865">        setup.confirming_uninstall = true;</span>
+<span class="ln" id="L866">        <span class="tok-fn">render</span>(&amp;<span class="tok-kw">mut</span> setup, <span class="tok-fn">motion</span>(true));</span>
+<span class="ln" id="L867">        assert!(setup.job.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L868">        assert!(setup.report.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L869">    }</span>
+<span class="ln" id="L870"></span>
+<span class="ln" id="L871">    <span class="tok-com">/// A report from a worker that vanished must say so rather than leaving</span></span>
+<span class="ln" id="L872">    <span class="tok-com">/// the strip running for ever.</span></span>
+<span class="ln" id="L873">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L874">    <span class="tok-kw">fn</span> <span class="tok-fn">a_worker_that_disappears_is_reported</span>() {</span>
+<span class="ln" id="L875">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> setup = Setup::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L876">        <span class="tok-kw">let</span> (tx, rx) = mpsc::channel::&lt;Done&gt;();</span>
+<span class="ln" id="L877">        setup.job = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L878">        setup.busy = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;installing&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L879">        <span class="tok-fn">drop</span>(tx);</span>
+<span class="ln" id="L880">        setup.<span class="tok-fn">poll</span>();</span>
+<span class="ln" id="L881">        assert!(setup.job.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;the job must be cleared&quot;</span>);</span>
+<span class="ln" id="L882">        assert!(!setup.<span class="tok-fn">is_busy</span>());</span>
+<span class="ln" id="L883">        <span class="tok-kw">let</span> (lines, good) = setup.report.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a disappearance must be reported&quot;</span>);</span>
+<span class="ln" id="L884">        assert!(!good);</span>
+<span class="ln" id="L885">        assert!(lines[<span class="tok-num">0</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped without reporting&quot;</span>), <span class="tok-str">&quot;{lines:?}&quot;</span>);</span>
+<span class="ln" id="L886">    }</span>
+<span class="ln" id="L887"></span>
+<span class="ln" id="L888">    <span class="tok-com">/// Every companion shown is one that applies here, with a probe result.</span></span>
+<span class="ln" id="L889">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L890">    <span class="tok-kw">fn</span> <span class="tok-fn">every_row_has_been_probed</span>() {</span>
+<span class="ln" id="L891">        <span class="tok-kw">for</span> row <span class="tok-kw">in</span> <span class="tok-fn">detect_all</span>() {</span>
+<span class="ln" id="L892">            assert!(!matches!(row.offer, Offer::NotOnThisPlatform));</span>
+<span class="ln" id="L893">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Presence::<span class="tok-fn">Unknown</span>(reason) = &amp;row.presence {</span>
+<span class="ln" id="L894">                assert!(!reason.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no probe is written&quot;</span>), <span class="tok-str">&quot;{reason}&quot;</span>);</span>
+<span class="ln" id="L895">            }</span>
+<span class="ln" id="L896">        }</span>
+<span class="ln" id="L897">    }</span>
+<span class="ln" id="L898"></span>
+<span class="ln" id="L899">    <span class="tok-com">/// The list of changes is what the user consents to, so it must name the</span></span>
+<span class="ln" id="L900">    <span class="tok-com">/// three things `veilvoice_setup::install` actually does, and must not</span></span>
+<span class="ln" id="L901">    <span class="tok-com">/// stop mentioning that it asks for no administrator rights.</span></span>
+<span class="ln" id="L902">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L903">    <span class="tok-kw">fn</span> <span class="tok-fn">the_consent_text_names_what_install_changes</span>() {</span>
+<span class="ln" id="L904">        <span class="tok-kw">let</span> lines = <span class="tok-fn">install_changes</span>();</span>
+<span class="ln" id="L905">        <span class="tok-kw">let</span> joined = lines.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>);</span>
+<span class="ln" id="L906">        assert!(joined.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;PATH&quot;</span>), <span class="tok-str">&quot;{joined}&quot;</span>);</span>
+<span class="ln" id="L907">        assert!(joined.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;copies&quot;</span>), <span class="tok-str">&quot;{joined}&quot;</span>);</span>
+<span class="ln" id="L908">        assert!(</span>
+<span class="ln" id="L909">            joined.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no administrator rights&quot;</span>),</span>
+<span class="ln" id="L910">            <span class="tok-str">&quot;the per-user promise must be stated beside the button: {joined}&quot;</span></span>
+<span class="ln" id="L911">        );</span>
+<span class="ln" id="L912">        <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L913">            assert!(joined.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Apps &amp; features&quot;</span>), <span class="tok-str">&quot;{joined}&quot;</span>);</span>
+<span class="ln" id="L914">        }</span>
+<span class="ln" id="L915">    }</span>
+<span class="ln" id="L916"></span>
+<span class="ln" id="L917">    <span class="tok-com">/// A front end must not offer a button for anything the library refuses to</span></span>
+<span class="ln" id="L918">    <span class="tok-com">/// run. This is the same rule as `companions::run`, checked from the side</span></span>
+<span class="ln" id="L919">    <span class="tok-com">/// that draws the button.</span></span>
+<span class="ln" id="L920">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L921">    <span class="tok-kw">fn</span> <span class="tok-fn">no_button_is_drawn_for_a_command_that_cannot_be_run</span>() {</span>
+<span class="ln" id="L922">        <span class="tok-kw">for</span> row <span class="tok-kw">in</span> <span class="tok-fn">detect_all</span>() {</span>
+<span class="ln" id="L923">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> Offer::Command {</span>
+<span class="ln" id="L924">                needs_privilege, ..</span>
+<span class="ln" id="L925">            } = row.offer</span>
+<span class="ln" id="L926">            {</span>
+<span class="ln" id="L927">                assert_eq!(</span>
+<span class="ln" id="L928">                    !needs_privilege,</span>
+<span class="ln" id="L929">                    row.offer.<span class="tok-fn">is_runnable</span>(),</span>
+<span class="ln" id="L930">                    <span class="tok-str">&quot;{} disagrees with the library about whether it is runnable&quot;</span>,</span>
+<span class="ln" id="L931">                    row.companion.key</span>
+<span class="ln" id="L932">                );</span>
+<span class="ln" id="L933">            }</span>
+<span class="ln" id="L934">        }</span>
+<span class="ln" id="L935">    }</span>
+<span class="ln" id="L936">}</span>
+<span class="ln" id="L937"></span>
 <span class="src-item" id="fn-companion_tests">
-<span class="ln" id="L937"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L938"><span class="tok-kw">mod</span> companion_tests {</span>
-<span class="ln" id="L939">    <span class="tok-com">/// The probe runs off the paint thread.</span></span>
-<span class="ln" id="L940">    <span class="tok-com">///</span></span>
-<span class="ln" id="L941">    <span class="tok-com">/// `detect_all` runs a command per companion, and on Windows one of them</span></span>
-<span class="ln" id="L942">    <span class="tok-com">/// enumerates sound devices through PowerShell. On the paint thread that is</span></span>
-<span class="ln" id="L943">    <span class="tok-com">/// hundreds of milliseconds inside a single frame, which is the window</span></span>
-<span class="ln" id="L944">    <span class="tok-com">/// going white and the pointer becoming a spinner. Pressing &quot;look again&quot;</span></span>
-<span class="ln" id="L945">    <span class="tok-com">/// did exactly that.</span></span>
-<span class="ln" id="L946">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L947">    <span class="tok-kw">fn</span> <span class="tok-fn">looking_again_does_not_probe_on_the_paint_thread</span>() {</span>
-<span class="ln" id="L948">        <span class="tok-kw">let</span> source = std::fs::<span class="tok-fn">read_to_string</span>(<span class="tok-str">&quot;src/setup.rs&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its own source&quot;</span>);</span>
-<span class="ln" id="L949">        <span class="tok-kw">let</span> at = source</span>
-<span class="ln" id="L950">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn companion_rows&quot;</span>)</span>
-<span class="ln" id="L951">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the companion rows&quot;</span>);</span>
-<span class="ln" id="L952">        <span class="tok-kw">let</span> end = source[at..]</span>
-<span class="ln" id="L953">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    fn &quot;</span>)</span>
-<span class="ln" id="L954">            .<span class="tok-fn">map</span>(|offset| at + offset)</span>
-<span class="ln" id="L955">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L956">        <span class="tok-kw">let</span> body = &amp;source[at..end];</span>
-<span class="ln" id="L957"></span>
-<span class="ln" id="L958">        assert!(</span>
-<span class="ln" id="L959">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;std::thread::spawn&quot;</span>),</span>
-<span class="ln" id="L960">            <span class="tok-str">&quot;the probe is started on the thread that is painting&quot;</span></span>
-<span class="ln" id="L961">        );</span>
-<span class="ln" id="L962">        assert!(</span>
-<span class="ln" id="L963">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.rows = detect_all()&quot;</span>),</span>
-<span class="ln" id="L964">            <span class="tok-str">&quot;the rows are still being filled in by probing inside the frame&quot;</span></span>
-<span class="ln" id="L965">        );</span>
-<span class="ln" id="L966">        assert!(</span>
-<span class="ln" id="L967">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ui.spinner()&quot;</span>),</span>
-<span class="ln" id="L968">            <span class="tok-str">&quot;nothing on screen says the probe is running, so the button reads as dead&quot;</span></span>
-<span class="ln" id="L969">        );</span>
-<span class="ln" id="L970">    }</span>
-<span class="ln" id="L971"></span>
-<span class="ln" id="L972">    <span class="tok-com">/// Every message that names a missing ffmpeg says where to get it.</span></span>
-<span class="ln" id="L973">    <span class="tok-com">///</span></span>
-<span class="ln" id="L974">    <span class="tok-com">/// Naming a thing somebody cannot act on from where they are standing is</span></span>
-<span class="ln" id="L975">    <span class="tok-com">/// the failure this guards: the render said &quot;ffmpeg is not on this machine&quot;</span></span>
-<span class="ln" id="L976">    <span class="tok-com">/// and the tab that installs software had never heard of it.</span></span>
-<span class="ln" id="L977">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L978">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_ffmpeg_always_says_where_it_can_be_installed</span>() {</span>
-<span class="ln" id="L979">        <span class="tok-kw">for</span> file <span class="tok-kw">in</span> [<span class="tok-str">&quot;src/studio.rs&quot;</span>, <span class="tok-str">&quot;src/group.rs&quot;</span>] {</span>
-<span class="ln" id="L980">            <span class="tok-kw">let</span> source = std::fs::<span class="tok-fn">read_to_string</span>(file).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a source file&quot;</span>);</span>
-<span class="ln" id="L981">            <span class="tok-kw">for</span> (at, _) <span class="tok-kw">in</span> source.<span class="tok-fn">match_indices</span>(<span class="tok-str">&quot;`ffmpeg` is not on&quot;</span>) {</span>
-<span class="ln" id="L982">                <span class="tok-com">// The sentence and what follows it, which is where the offer</span></span>
-<span class="ln" id="L983">                <span class="tok-com">// has to be. Bounded rather than to the end of the file, so a</span></span>
-<span class="ln" id="L984">                <span class="tok-com">// mention of Setup somewhere else entirely cannot satisfy this.</span></span>
-<span class="ln" id="L985">                <span class="tok-kw">let</span> window = &amp;source[at..(at + <span class="tok-num">600</span>).<span class="tok-fn">min</span>(source.<span class="tok-fn">len</span>())];</span>
-<span class="ln" id="L986">                assert!(</span>
-<span class="ln" id="L987">                    window.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Setup tab&quot;</span>),</span>
-<span class="ln" id="L988">                    <span class="tok-str">&quot;{file} says ffmpeg is missing without saying where to get it&quot;</span></span>
-<span class="ln" id="L989">                );</span>
-<span class="ln" id="L990">            }</span>
-<span class="ln" id="L991">        }</span>
-<span class="ln" id="L992">    }</span>
-<span class="ln" id="L993">}</span>
+<span class="ln" id="L938"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L939"><span class="tok-kw">mod</span> companion_tests {</span>
+<span class="ln" id="L940">    <span class="tok-com">/// The probe runs off the paint thread.</span></span>
+<span class="ln" id="L941">    <span class="tok-com">///</span></span>
+<span class="ln" id="L942">    <span class="tok-com">/// `detect_all` runs a command per companion, and on Windows one of them</span></span>
+<span class="ln" id="L943">    <span class="tok-com">/// enumerates sound devices through PowerShell. On the paint thread that is</span></span>
+<span class="ln" id="L944">    <span class="tok-com">/// hundreds of milliseconds inside a single frame, which is the window</span></span>
+<span class="ln" id="L945">    <span class="tok-com">/// going white and the pointer becoming a spinner. Pressing &quot;look again&quot;</span></span>
+<span class="ln" id="L946">    <span class="tok-com">/// did exactly that.</span></span>
+<span class="ln" id="L947">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L948">    <span class="tok-kw">fn</span> <span class="tok-fn">looking_again_does_not_probe_on_the_paint_thread</span>() {</span>
+<span class="ln" id="L949">        <span class="tok-kw">let</span> source = std::fs::<span class="tok-fn">read_to_string</span>(<span class="tok-str">&quot;src/setup.rs&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its own source&quot;</span>);</span>
+<span class="ln" id="L950">        <span class="tok-kw">let</span> at = source</span>
+<span class="ln" id="L951">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn companion_rows&quot;</span>)</span>
+<span class="ln" id="L952">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the companion rows&quot;</span>);</span>
+<span class="ln" id="L953">        <span class="tok-kw">let</span> end = source[at..]</span>
+<span class="ln" id="L954">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    fn &quot;</span>)</span>
+<span class="ln" id="L955">            .<span class="tok-fn">map</span>(|offset| at + offset)</span>
+<span class="ln" id="L956">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L957">        <span class="tok-kw">let</span> body = &amp;source[at..end];</span>
+<span class="ln" id="L958"></span>
+<span class="ln" id="L959">        assert!(</span>
+<span class="ln" id="L960">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;std::thread::spawn&quot;</span>),</span>
+<span class="ln" id="L961">            <span class="tok-str">&quot;the probe is started on the thread that is painting&quot;</span></span>
+<span class="ln" id="L962">        );</span>
+<span class="ln" id="L963">        assert!(</span>
+<span class="ln" id="L964">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.rows = detect_all()&quot;</span>),</span>
+<span class="ln" id="L965">            <span class="tok-str">&quot;the rows are still being filled in by probing inside the frame&quot;</span></span>
+<span class="ln" id="L966">        );</span>
+<span class="ln" id="L967">        assert!(</span>
+<span class="ln" id="L968">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ui.spinner()&quot;</span>),</span>
+<span class="ln" id="L969">            <span class="tok-str">&quot;nothing on screen says the probe is running, so the button reads as dead&quot;</span></span>
+<span class="ln" id="L970">        );</span>
+<span class="ln" id="L971">    }</span>
+<span class="ln" id="L972"></span>
+<span class="ln" id="L973">    <span class="tok-com">/// Every message that names a missing ffmpeg says where to get it.</span></span>
+<span class="ln" id="L974">    <span class="tok-com">///</span></span>
+<span class="ln" id="L975">    <span class="tok-com">/// Naming a thing somebody cannot act on from where they are standing is</span></span>
+<span class="ln" id="L976">    <span class="tok-com">/// the failure this guards: the render said &quot;ffmpeg is not on this machine&quot;</span></span>
+<span class="ln" id="L977">    <span class="tok-com">/// and the tab that installs software had never heard of it.</span></span>
+<span class="ln" id="L978">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L979">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_ffmpeg_always_says_where_it_can_be_installed</span>() {</span>
+<span class="ln" id="L980">        <span class="tok-kw">for</span> file <span class="tok-kw">in</span> [<span class="tok-str">&quot;src/studio.rs&quot;</span>, <span class="tok-str">&quot;src/group.rs&quot;</span>] {</span>
+<span class="ln" id="L981">            <span class="tok-kw">let</span> source = std::fs::<span class="tok-fn">read_to_string</span>(file).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a source file&quot;</span>);</span>
+<span class="ln" id="L982">            <span class="tok-kw">for</span> (at, _) <span class="tok-kw">in</span> source.<span class="tok-fn">match_indices</span>(<span class="tok-str">&quot;`ffmpeg` is not on&quot;</span>) {</span>
+<span class="ln" id="L983">                <span class="tok-com">// The sentence and what follows it, which is where the offer</span></span>
+<span class="ln" id="L984">                <span class="tok-com">// has to be. Bounded rather than to the end of the file, so a</span></span>
+<span class="ln" id="L985">                <span class="tok-com">// mention of Setup somewhere else entirely cannot satisfy this.</span></span>
+<span class="ln" id="L986">                <span class="tok-kw">let</span> window = &amp;source[at..(at + <span class="tok-num">600</span>).<span class="tok-fn">min</span>(source.<span class="tok-fn">len</span>())];</span>
+<span class="ln" id="L987">                assert!(</span>
+<span class="ln" id="L988">                    window.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Setup tab&quot;</span>),</span>
+<span class="ln" id="L989">                    <span class="tok-str">&quot;{file} says ffmpeg is missing without saying where to get it&quot;</span></span>
+<span class="ln" id="L990">                );</span>
+<span class="ln" id="L991">            }</span>
+<span class="ln" id="L992">        }</span>
+<span class="ln" id="L993">    }</span>
+<span class="ln" id="L994">}</span>
 </span>
-<span class="ln" id="L994"></span>
+<span class="ln" id="L995"></span>
 <span class="src-item" id="fn-typeface_tests">
-<span class="ln" id="L995"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L996"><span class="tok-kw">mod</span> typeface_tests {</span>
-<span class="ln" id="L997">    <span class="tok-com">/// The capture script refuses to photograph in the wrong face.</span></span>
-<span class="ln" id="L998">    <span class="tok-com">///</span></span>
-<span class="ln" id="L999">    <span class="tok-com">/// The window prefers JetBrains Mono and falls back to the built-in</span></span>
-<span class="ln" id="L1000">    <span class="tok-com">/// monospace. That fallback is right for somebody running the program and</span></span>
-<span class="ln" id="L1001">    <span class="tok-com">/// wrong for a screenshot: a capture in the wrong face looks subtly unlike</span></span>
-<span class="ln" id="L1002">    <span class="tok-com">/// every other picture in the set and nothing about the run says so, so</span></span>
-<span class="ln" id="L1003">    <span class="tok-com">/// half a set could be published before anybody noticed.</span></span>
-<span class="ln" id="L1004">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1005">    <span class="tok-kw">fn</span> <span class="tok-fn">the_capture_script_will_not_photograph_in_the_fallback_face</span>() {</span>
-<span class="ln" id="L1006">        <span class="tok-kw">let</span> script =</span>
-<span class="ln" id="L1007">            std::fs::<span class="tok-fn">read_to_string</span>(<span class="tok-str">&quot;../../tools/shots/gui.sh&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the Linux capture script&quot;</span>);</span>
-<span class="ln" id="L1008">        assert!(</span>
-<span class="ln" id="L1009">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface&quot;</span>),</span>
-<span class="ln" id="L1010">            <span class="tok-str">&quot;the script does not ask which face the window would use&quot;</span></span>
-<span class="ln" id="L1011">        );</span>
-<span class="ln" id="L1012">        assert!(</span>
-<span class="ln" id="L1013">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;JetBrains Mono&quot;</span>),</span>
-<span class="ln" id="L1014">            <span class="tok-str">&quot;the script does not check for the face it wants&quot;</span></span>
-<span class="ln" id="L1015">        );</span>
-<span class="ln" id="L1016">        assert!(</span>
-<span class="ln" id="L1017">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;exit 1&quot;</span>),</span>
-<span class="ln" id="L1018">            <span class="tok-str">&quot;the script does not refuse, so it would capture in the fallback&quot;</span></span>
-<span class="ln" id="L1019">        );</span>
-<span class="ln" id="L1020">    }</span>
-<span class="ln" id="L1021"></span>
-<span class="ln" id="L1022">    <span class="tok-com">/// The flag exists and is documented in the usage text.</span></span>
-<span class="ln" id="L1023">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1024">    <span class="tok-com">/// A flag the capture script depends on and the help does not mention is</span></span>
-<span class="ln" id="L1025">    <span class="tok-com">/// one somebody removes as unused.</span></span>
-<span class="ln" id="L1026">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1027">    <span class="tok-kw">fn</span> <span class="tok-fn">the_typeface_flag_is_documented_where_it_is_answered</span>() {</span>
-<span class="ln" id="L1028">        <span class="tok-kw">let</span> main = std::fs::<span class="tok-fn">read_to_string</span>(<span class="tok-str">&quot;src/main.rs&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the binary&#x27;s source&quot;</span>);</span>
-<span class="ln" id="L1029">        assert!(</span>
-<span class="ln" id="L1030">            main.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface&quot;</span>),</span>
-<span class="ln" id="L1031">            <span class="tok-str">&quot;the flag is not answered in main.rs&quot;</span></span>
-<span class="ln" id="L1032">        );</span>
-<span class="ln" id="L1033">        assert!(</span>
-<span class="ln" id="L1034">            main.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface    Say which face&quot;</span>),</span>
-<span class="ln" id="L1035">            <span class="tok-str">&quot;the flag is answered and not documented in the usage text&quot;</span></span>
-<span class="ln" id="L1036">        );</span>
-<span class="ln" id="L1037">    }</span>
-<span class="ln" id="L1038">}</span>
+<span class="ln" id="L996"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L997"><span class="tok-kw">mod</span> typeface_tests {</span>
+<span class="ln" id="L998">    <span class="tok-com">/// The capture script refuses to photograph in the wrong face.</span></span>
+<span class="ln" id="L999">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1000">    <span class="tok-com">/// The window prefers JetBrains Mono and falls back to the built-in</span></span>
+<span class="ln" id="L1001">    <span class="tok-com">/// monospace. That fallback is right for somebody running the program and</span></span>
+<span class="ln" id="L1002">    <span class="tok-com">/// wrong for a screenshot: a capture in the wrong face looks subtly unlike</span></span>
+<span class="ln" id="L1003">    <span class="tok-com">/// every other picture in the set and nothing about the run says so, so</span></span>
+<span class="ln" id="L1004">    <span class="tok-com">/// half a set could be published before anybody noticed.</span></span>
+<span class="ln" id="L1005">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1006">    <span class="tok-kw">fn</span> <span class="tok-fn">the_capture_script_will_not_photograph_in_the_fallback_face</span>() {</span>
+<span class="ln" id="L1007">        <span class="tok-kw">let</span> script =</span>
+<span class="ln" id="L1008">            std::fs::<span class="tok-fn">read_to_string</span>(<span class="tok-str">&quot;../../tools/shots/gui.sh&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the Linux capture script&quot;</span>);</span>
+<span class="ln" id="L1009">        assert!(</span>
+<span class="ln" id="L1010">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface&quot;</span>),</span>
+<span class="ln" id="L1011">            <span class="tok-str">&quot;the script does not ask which face the window would use&quot;</span></span>
+<span class="ln" id="L1012">        );</span>
+<span class="ln" id="L1013">        assert!(</span>
+<span class="ln" id="L1014">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;JetBrains Mono&quot;</span>),</span>
+<span class="ln" id="L1015">            <span class="tok-str">&quot;the script does not check for the face it wants&quot;</span></span>
+<span class="ln" id="L1016">        );</span>
+<span class="ln" id="L1017">        assert!(</span>
+<span class="ln" id="L1018">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;exit 1&quot;</span>),</span>
+<span class="ln" id="L1019">            <span class="tok-str">&quot;the script does not refuse, so it would capture in the fallback&quot;</span></span>
+<span class="ln" id="L1020">        );</span>
+<span class="ln" id="L1021">    }</span>
+<span class="ln" id="L1022"></span>
+<span class="ln" id="L1023">    <span class="tok-com">/// The flag exists and is documented in the usage text.</span></span>
+<span class="ln" id="L1024">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1025">    <span class="tok-com">/// A flag the capture script depends on and the help does not mention is</span></span>
+<span class="ln" id="L1026">    <span class="tok-com">/// one somebody removes as unused.</span></span>
+<span class="ln" id="L1027">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1028">    <span class="tok-kw">fn</span> <span class="tok-fn">the_typeface_flag_is_documented_where_it_is_answered</span>() {</span>
+<span class="ln" id="L1029">        <span class="tok-kw">let</span> main = std::fs::<span class="tok-fn">read_to_string</span>(<span class="tok-str">&quot;src/main.rs&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the binary&#x27;s source&quot;</span>);</span>
+<span class="ln" id="L1030">        assert!(</span>
+<span class="ln" id="L1031">            main.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface&quot;</span>),</span>
+<span class="ln" id="L1032">            <span class="tok-str">&quot;the flag is not answered in main.rs&quot;</span></span>
+<span class="ln" id="L1033">        );</span>
+<span class="ln" id="L1034">        assert!(</span>
+<span class="ln" id="L1035">            main.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--typeface    Say which face&quot;</span>),</span>
+<span class="ln" id="L1036">            <span class="tok-str">&quot;the flag is answered and not documented in the usage text&quot;</span></span>
+<span class="ln" id="L1037">        );</span>
+<span class="ln" id="L1038">    }</span>
+<span class="ln" id="L1039">}</span>
 </span>
 </code></pre>
 </main>

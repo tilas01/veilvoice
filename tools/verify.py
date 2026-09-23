@@ -345,6 +345,14 @@ CHECKS = [
      [sys.executable, "tools/audit/fixtures.py"]),
     ("that guard catches what it claims to",
      [sys.executable, "tools/audit/fixtures.py", "--self-test"]),
+    # Roadmap item 179. The updater builds a download URL from a platform label,
+    # and the labels live in the release workflow as well as in Rust. Drift
+    # either way is silent: a platform nothing is offered for, or a build asking
+    # for an archive that has never existed.
+    ("the updater can ask for every release that is published",
+     [sys.executable, "tools/audit/release_targets.py"]),
+    ("that guard catches what it claims to, too",
+     [sys.executable, "tools/audit/release_targets.py", "--self-test"]),
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),

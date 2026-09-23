@@ -26,16 +26,16 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 |---|---|---:|---|
 | `fuzz` | - | 165 | [`fuzz/README.md`](../fuzz/README.md) |
 | `veilvoice-audio` | Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice. | 2,051 | [`crates/veilvoice-audio/README.md`](../crates/veilvoice-audio/README.md) |
-| `veilvoice-cli` | Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings. | 6,114 | [`crates/veilvoice-cli/README.md`](../crates/veilvoice-cli/README.md) |
+| `veilvoice-cli` | Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings. | 6,300 | [`crates/veilvoice-cli/README.md`](../crates/veilvoice-cli/README.md) |
 | `veilvoice-conversation` | Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles. | 2,644 | [`crates/veilvoice-conversation/README.md`](../crates/veilvoice-conversation/README.md) |
 | `veilvoice-core` | Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility. | 3,141 | [`crates/veilvoice-core/README.md`](../crates/veilvoice-core/README.md) |
 | `veilvoice-crypto` | Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice. | 7,226 | [`crates/veilvoice-crypto/README.md`](../crates/veilvoice-crypto/README.md) |
-| `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them. | 2,916 | [`crates/veilvoice-guard/README.md`](../crates/veilvoice-guard/README.md) |
-| `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 19,612 | [`crates/veilvoice-gui/README.md`](../crates/veilvoice-gui/README.md) |
+| `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them. | 2,947 | [`crates/veilvoice-guard/README.md`](../crates/veilvoice-guard/README.md) |
+| `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 19,613 | [`crates/veilvoice-gui/README.md`](../crates/veilvoice-gui/README.md) |
 | `veilvoice-meta` | Strip or spoof identifying metadata: audio tags, and image EXIF/GPS. | 696 | [`crates/veilvoice-meta/README.md`](../crates/veilvoice-meta/README.md) |
 | `veilvoice-policy` | Settings that can only be tightened, sealed with the project's own post-quantum cryptography. | 1,689 | [`crates/veilvoice-policy/README.md`](../crates/veilvoice-policy/README.md) |
 | `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,293 | [`crates/veilvoice-setup/README.md`](../crates/veilvoice-setup/README.md) |
-| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 8,677 | [`crates/veilvoice-verify/README.md`](../crates/veilvoice-verify/README.md) |
+| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 9,494 | [`crates/veilvoice-verify/README.md`](../crates/veilvoice-verify/README.md) |
 | `veilvoice-video` | A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg. | 4,470 | [`crates/veilvoice-video/README.md`](../crates/veilvoice-video/README.md) |
 | `veilvoice-watch` | Detect which applications are currently using the microphone and camera, with alerts on change. | 3,917 | [`crates/veilvoice-watch/README.md`](../crates/veilvoice-watch/README.md) |
 
@@ -130,6 +130,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/publishing.py`](../tools/audit/publishing.py) | The step that publishes a release says which commit it is publishing |
 | [`tools/audit/randomness.py`](../tools/audit/randomness.py) | Every random number this project draws comes from a cryptographic source |
 | [`tools/audit/reachable.py`](../tools/audit/reachable.py) | Every public item is named by something other than its own declaration |
+| [`tools/audit/release_targets.py`](../tools/audit/release_targets.py) | The updater asks for an archive the release workflow actually builds |
 | [`tools/audit/rsa_usage.py`](../tools/audit/rsa_usage.py) | No crate reaching `pgp` may gain an RSA private-key code path |
 | [`tools/audit/state_paths.py`](../tools/audit/state_paths.py) | Find state files that one part of VeilVoice writes and another reads |
 
@@ -196,6 +197,8 @@ And what it then checks:
 - **the release step tags the commit it built**: `python tools/audit/publishing.py`
 - **every file the build reads is in the repository**: `python tools/audit/fixtures.py`
 - **that guard catches what it claims to**: `python tools/audit/fixtures.py --self-test`
+- **the updater can ask for every release that is published**: `python tools/audit/release_targets.py`
+- **that guard catches what it claims to, too**: `python tools/audit/release_targets.py --self-test`
 - **the app-manifest tooling works**: `python tools/sign/selftest.py`
 - **artwork matches its generator**: `python assets/generate.py --check`
 - **the release cards match CHANGELOG.md**: `python tools/release/card.py --check`

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/integrity.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 386 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 390 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs)
 
 ## Contents
 
@@ -73,7 +73,7 @@ accident but not one changed by somebody covering their tracks.
 
 ## What this file contains
 
-386 lines defining **11 functions** (6 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+390 lines defining **11 functions** (6 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -115,11 +115,11 @@ flowchart TD
     n_changed(["Integrity::changed<br/>line 107"])
     n_start(["Integrity::start<br/>line 120"])
     n_poll(["Integrity::poll<br/>line 142"])
-    n_record_path["record_path<br/>line 166"]
-    n_sealed_path["sealed_path<br/>line 171"]
-    n_targets["targets<br/>line 181"]
-    n_run["run<br/>line 190"]
-    n_write_private["write_private<br/>line 283"]
+    n_record_path["record_path<br/>line 170"]
+    n_sealed_path["sealed_path<br/>line 175"]
+    n_targets["targets<br/>line 185"]
+    n_run["run<br/>line 194"]
+    n_write_private["write_private<br/>line 287"]
     n_run --> n_record_path
     n_run --> n_sealed_path
     n_run --> n_targets
@@ -131,11 +131,11 @@ flowchart TD
     click n_changed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L107" "open the source"
     click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L120" "open the source"
     click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L142" "open the source"
-    click n_record_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L166" "open the source"
-    click n_sealed_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L171" "open the source"
-    click n_targets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L181" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L190" "open the source"
-    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L283" "open the source"
+    click n_record_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L170" "open the source"
+    click n_sealed_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L175" "open the source"
+    click n_targets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L185" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L194" "open the source"
+    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L287" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_state,n_is_busy,n_changed,n_start,n_poll entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -158,11 +158,11 @@ flowchart TD
 | `Integrity::changed` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L107) | Whether the record found a difference worth showing the user. |
 | `Integrity::start` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L120) | Take or check the record, off the drawing thread. |
 | `Integrity::poll` <sub>pub fn</sub> | [142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L142) | Collect a finished check. |
-| `record_path` <sub>pub fn</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L166) | Where the record is kept, beside the app lock and under the same rules. |
-| `sealed_path` <sub>fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L171) | The sealed record sits beside the plain one under the container suffix. |
-| `targets` <sub>fn</sub> | [181](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L181) | The files worth watching: the running program, and nothing assumed. |
-| `run` <sub>fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L190) | The whole of the work, on the worker thread. |
-| `write_private` <sub>fn</sub> | [283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L283) |  |
+| `record_path` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L170) | Where the record is kept, beside the app lock and under the same rules. |
+| `sealed_path` <sub>fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L175) | The sealed record sits beside the plain one under the container suffix. |
+| `targets` <sub>fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L185) | The files worth watching: the running program, and nothing assumed. |
+| `run` <sub>fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L194) | The whole of the work, on the worker thread. |
+| `write_private` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L287) |  |
 
 ---
 

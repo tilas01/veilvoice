@@ -872,6 +872,62 @@ of it, and `git status` shows nothing unstaged to say so. The run now names
 what it wrote, from `git status --porcelain` taken either side of the
 generators, and says plainly that those files are in the index rather than in
 a commit.
+### F-213: the program told people it had no network code, next to a command that downloads
+
+Two sentences shipped, in the two places somebody is most likely to read one.
+
+`veilvoice --help`, the first paragraph of the first thing anybody types:
+
+> This command line talks to no servers, ever: the one thing in VeilVoice that
+> reaches the network is the desktop app's check-for-updates button, and it is
+> not here.
+
+And the message the desktop application prints on a successful install:
+
+> VeilVoice never checks for updates and cannot tell you when one exists. it
+> has no network code at all.
+
+`veilvoice verify release v0.1.22 veilvoice-v0.1.22-linux-x86_64.tar.gz`
+downloads three files from `github.com`. It has done since v0.1.11, it is
+documented in `veilvoice verify --help`, and it is in `docs/COMMANDS.md`. So the
+first sentence was false when it was written and stayed false for eleven
+releases, and the second was false about the program it was printed by.
+
+**What makes this worth a finding rather than a typo is which claim it is.** The
+front page's promise is that VeilVoice has no HTTP client anywhere in its
+dependency graph, that a reader can check that in ten seconds with `cargo tree`,
+and that CI fails the build if `reqwest`, `hyper`, `curl`, `ureq`,
+`tungstenite`, `isahc` or `surf` ever appears. That claim is **true**, it is
+enforced, and it is a large part of why this project is worth trusting.
+
+"Talks to no servers, ever" is a different claim, and it is the one a reader
+takes away. Somebody who reads it, then watches `veilvoice verify release` open
+a connection, has been given every reason to stop believing the first claim too,
+and they would be right to: they cannot tell from the outside which of the two
+sentences was the careless one. An overclaim next to a true and carefully
+enforced claim costs the true one its credit. This project has a guard against
+exactly this shape in `veilvoice_guard::SCOPE`, which refuses the words
+"prevent", "unbreakable", "guarantee" and "protects against" in a test, and the
+lesson of that guard had not reached the one sentence at the top of `--help`.
+
+Both are corrected to say what is actually true, which is the stronger statement
+and did not need the overclaim:
+
+> Nothing here reaches the network except when you ask it to by name:
+> `veilvoice update` and `veilvoice verify release` fetch from the releases
+> page, and no other command opens a connection for any reason.
+
+"Nothing happens unless you ask" is the property that was worth having. "No
+network code at all" was never it, and was being used as a proxy for it.
+
+Found while landing roadmap item 179, which adds `veilvoice update` and would
+have made both sentences worse. The rule that everything describing a change
+moves in the same commit is what turned it up: the sentences had to be read
+before they could be edited, and reading them was enough.
+
+`docs/UPDATING.md` carried the same claim in its own words, along with a section
+headed "What is deliberately not here yet" describing the updater as planned,
+and is rewritten with them.
 
 ### F-210: the test that proved every spawn was wrapped scanned half the crate
 
@@ -6969,7 +7025,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1730 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1748 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -8617,7 +8673,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twelve defects found and fixed (F-1 to F-212), across
+**Two hundred and thirteen defects found and fixed (F-1 to F-213), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

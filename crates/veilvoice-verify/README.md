@@ -93,7 +93,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>2501 lines"])
+    n_lib(["lib.rs<br/>2502 lines"])
     n_builder["builder.rs<br/>1210 lines"]
     n_deps["deps.rs<br/>652 lines"]
     n_discover["discover.rs<br/>460 lines"]
@@ -101,10 +101,14 @@ flowchart TD
     n_fetch["fetch.rs<br/>329 lines"]
     n_report["report.rs<br/>385 lines"]
     n_tests["tests.rs<br/>1743 lines"]
+    n_update["update.rs<br/>1333 lines"]
     n_builder --> n_deps
     n_builder --> n_extracted
     n_builder --> n_report
     n_lib --> n_report
+    n_update --> n_builder
+    n_update --> n_extracted
+    n_update --> n_fetch
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" "open the source"
     click n_builder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/builder.rs" "open the source"
     click n_deps href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/deps.rs" "open the source"
@@ -113,6 +117,7 @@ flowchart TD
     click n_fetch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" "open the source"
     click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/report.rs" "open the source"
     click n_tests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" "open the source"
+    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs" "open the source"
 ```
 
 </details>
@@ -126,13 +131,14 @@ flowchart TD
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 460 | Finding a release to check, without being told where it is. |
 | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 316 | What came out of the archive, and the GnuPG somebody already has. |
 | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 2501 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 2502 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 1743 | The verifier's own tests. |
+| [`update.rs`](../../docs/files/veilvoice-verify/update.md) | 1333 | The update that does the update. |
 | [`inside_the_archive.rs`](../../docs/files/veilvoice-verify/tests-inside_the_archive.md) | 430 | Roadmap item 164. |
 | [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 208 | Roadmap item 97. |
 
-**8,677 functional lines of Rust** in this crate. A functional line is a line
+**9,494 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -199,6 +205,20 @@ counts blank lines and comments too. Both are produced by
 | `fn level` | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | The level in force. |
 | `enum Status` | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | What happened, as a number a script can read. |
 | `enum Loudness` | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | How much to print. |
+| `const PUBLISHED` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | Every platform label the release workflow publishes an archive for. |
+| `const PLATFORM` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | This build's label, or None for a build of a kind nothing is published for. |
+| `fn archive_for` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | The archive this platform's release is published under. |
+| `enum Error` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | Everything that can stop an update, in the words the reader is given. |
+| `struct Offer` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | A newer release, and the file to fetch for it. |
+| `fn offered` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | Ask what is published, and offer it if it is newer. |
+| `fn lock_is_set` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | Whether this machine has an app lock set. |
+| `fn installation` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | Where the running copy of VeilVoice lives. |
+| `enum Step` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | What the update is doing, reported as it happens. |
+| `enum Record` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | What became of the integrity record. |
+| `struct Done` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | A finished update. |
+| `fn perform` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | The whole update, in the one order that is safe. |
+| `fn workspace` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | Where an update does its work: beside the copy being replaced. |
+| `fn relaunch` | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | Start the updated program and return. |
 
 ## Reading it elsewhere
 

@@ -420,8 +420,9 @@ impl Setup {
                 ui.label(
                     RichText::new(
                         "Open a new terminal for a PATH change to take effect. VeilVoice \
-                         never checks for updates and cannot tell you when one exists. \
-                         it has no network code at all.",
+                         never checks for updates on its own: no timer, nothing at \
+                         startup and nothing in the background. Ask it on the About tab, \
+                         or run `veilvoice update`.",
                     )
                     .small()
                     .color(p::muted()),

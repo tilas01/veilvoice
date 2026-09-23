@@ -464,6 +464,16 @@ jobs:
           python tools/audit/fixtures.py
           python tools/audit/fixtures.py --self-test
 
+      # Roadmap item 179. The updater's platform labels and the release workflow's
+      # build matrix are two copies of one list, in two languages, and nothing
+      # in either relates them. A label in one and not the other is silent both
+      # ways round: a platform told nothing is offered for it, or a build asking
+      # for an archive that has never been published.
+      - name: The updater must be able to ask for every release published
+        run: |
+          python tools/audit/release_targets.py
+          python tools/audit/release_targets.py --self-test
+
       # Four more of `tools/verify.py`'s checks that ran only when somebody ran
       # them. Each needs nothing but the tree and an interpreter, so there was
       # no reason for them to be here and every reason: the first is the guard

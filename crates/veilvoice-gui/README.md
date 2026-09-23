@@ -106,7 +106,7 @@ flowchart TD
     n_firstrun["firstrun.rs<br/>706 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
     n_group["group.rs<br/>2110 lines"]
-    n_integrity["integrity.rs<br/>386 lines"]
+    n_integrity["integrity.rs<br/>390 lines"]
     n_layout["layout.rs<br/>473 lines"]
     n_monitor["monitor.rs<br/>579 lines"]
     n_notify["notify.rs<br/>460 lines"]
@@ -119,7 +119,7 @@ flowchart TD
     n_reduced_motion["reduced_motion.rs<br/>285 lines"]
     n_security["security.rs<br/>2550 lines"]
     n_settings["settings.rs<br/>1662 lines"]
-    n_setup["setup.rs<br/>1038 lines"]
+    n_setup["setup.rs<br/>1039 lines"]
     n_soundbar["soundbar.rs<br/>779 lines"]
     n_storage["storage.rs<br/>659 lines"]
     n_studio["studio.rs<br/>2406 lines"]
@@ -281,7 +281,7 @@ flowchart TD
 | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 706 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 214 | What the window is drawn with, asked for explicitly and then reported. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 2110 | Group mode: several people in one recording, each with a name and a colour. |
-| [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 386 | The integrity record, taken and checked by the window rather than by hand. |
+| [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 390 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 473 | Centring a row of widgets, which egui does not do by nesting. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 382 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 254 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
@@ -296,7 +296,7 @@ flowchart TD
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 285 | Whether the operating system has been asked to reduce motion. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 2550 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1662 | The settings panel: a menu of pages, each a titled group of choices. |
-| [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1038 | The setup tab: install this copy, undo that, and the optional companions. |
+| [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1039 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 779 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2406 | The Recording Studio and the Recording Browser. |
@@ -308,7 +308,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 244 | How big the window opens, and why it is not a constant. |
 
-**19,612 functional lines of Rust** in this crate. A functional line is a line
+**19,613 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

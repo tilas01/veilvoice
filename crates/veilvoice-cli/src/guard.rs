@@ -72,21 +72,24 @@ pub enum Action {
 }
 
 /// Where the manifest lives, beside the app lock.
+///
+/// The default location is [`veilvoice_guard::record_path`], which is also
+/// what the desktop application and the updater read. This function adds only
+/// the `--path` override and the message for a platform that names nowhere.
 fn manifest_path(explicit: Option<PathBuf>) -> Result<PathBuf, String> {
     if let Some(path) = explicit {
         return Ok(path);
     }
-    let lock = veilvoice_crypto::lock::default_path().ok_or_else(|| {
+    veilvoice_guard::record_path().ok_or_else(|| {
         "cannot work out where this platform keeps configuration \
          (no APPDATA, XDG_CONFIG_HOME or HOME) - pass --path"
             .to_string()
-    })?;
-    Ok(lock.with_file_name("integrity.manifest"))
+    })
 }
 
 /// A sealed manifest sits beside the plain one, with a different suffix.
 fn sealed_path(base: &Path) -> PathBuf {
-    veilvoice_crypto::container::veil_path(base)
+    veilvoice_guard::sealed_record_path(base)
 }
 
 /// Say what the integrity record detects and what it cannot, before it is
