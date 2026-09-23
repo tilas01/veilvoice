@@ -162,14 +162,18 @@ impl Integrity {
 /// Where the record is kept, beside the app lock and under the same rules.
 ///
 /// The same path `veilvoice guard` uses, so the window and the command line
-/// read one record rather than two.
+/// read one record rather than two. Both now delegate to
+/// [`veilvoice_guard::record_path`], which is where that arithmetic lives:
+/// this was the second of what became three copies of it. It reads two
+/// environment variables and joins a path, and touches no disk, so it costs
+/// nothing to call from the thread that draws.
 pub fn record_path() -> Option<PathBuf> {
-    veilvoice_crypto::lock::default_path().map(|p| p.with_file_name("integrity.manifest"))
+    veilvoice_guard::record_path()
 }
 
 /// The sealed record sits beside the plain one under the container suffix.
 fn sealed_path(base: &std::path::Path) -> PathBuf {
-    veilvoice_crypto::container::veil_path(base)
+    veilvoice_guard::sealed_record_path(base)
 }
 
 /// The files worth watching: the running program, and nothing assumed.

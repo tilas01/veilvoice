@@ -49,6 +49,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`record.rs`|File-veilvoice-cli-record]] &middot; veilvoice record -- capture the veiled voice straight into an encrypted file.
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &middot; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &middot; Tokyo Night colouring for the terminal.
+- [[`update.rs`|File-veilvoice-cli-update]] &middot; veilvoice update: fetch the new release, check it, and put it in place.
 
 ## [[veilvoice-conversation|Crate-veilvoice-conversation]]
 
@@ -109,6 +110,7 @@ Integrity manifest and tamper detection for VeilVoice's own files, with best-eff
 - [[`blame.rs`|File-veilvoice-guard-blame]] &middot; Best-effort attribution: which program changed a file.
 - [[`lib.rs`|File-veilvoice-guard-lib]] &middot; Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them".
 - [[`manifest.rs`|File-veilvoice-guard-manifest]] &middot; The integrity manifest: what the files were, and what they are now.
+- [[`record.rs`|File-veilvoice-guard-record]] &middot; Where the integrity record is kept.
 
 ## [[veilvoice-gui|Crate-veilvoice-gui]]
 
@@ -193,6 +195,7 @@ Verify a VeilVoice release without GnuPG installed
 - [[`lib.rs`|File-veilvoice-verify-lib]] &middot; The portable verifier: check a VeilVoice release without GnuPG installed.
 - [[`report.rs`|File-veilvoice-verify-report]] &middot; How much this program says, and what it returns when it says nothing.
 - [[`tests.rs`|File-veilvoice-verify-tests]] &middot; The verifier's own tests.
+- [[`update.rs`|File-veilvoice-verify-update]] &middot; The update that does the update.
 - [[`inside_the_archive.rs`|File-veilvoice-verify-tests-inside_the_archive]] &middot; Roadmap item 164.
 - [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] &middot; Roadmap item 97.
 

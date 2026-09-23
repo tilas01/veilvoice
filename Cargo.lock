@@ -4821,6 +4821,8 @@ dependencies = [
  "pgp",
  "sha2",
  "tempfile",
+ "veilvoice-crypto",
+ "veilvoice-guard",
  "veilvoice-setup",
  "winresource",
 ]

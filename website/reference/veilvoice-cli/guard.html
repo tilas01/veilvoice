@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/guard.svg" alt="guard.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/guard.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 359 lines &middot; <a href="guard.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 362 lines &middot; <a href="guard.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-the-three-steps-actually-do">What the three steps actually do</a>
@@ -96,12 +96,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>359 lines defining <strong>9 functions</strong> (1 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>362 lines defining <strong>9 functions</strong> (1 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Action</code> <span style="color:var(--muted)">line 54</span></li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>run</code> <span style="color:var(--muted)">line 117</span> &middot; Dispatch veilvoice guard to the subcommand that was asked for.
+<li><code>run</code> <span style="color:var(--muted)">line 120</span> &middot; Dispatch veilvoice guard to the subcommand that was asked for.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>check</code>, <code>init</code>, <code>manifest_path</code>, <code>status</code>, <code>load</code>, <code>print_scope</code>, <code>sealed_path</code>, <code>default_targets</code></span>
 </li>
 </ul>
@@ -135,47 +135,47 @@
 <a href="guard.src.html#fn-manifest_path">
 <rect x="28.0" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="94.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">manifest_path</text>
-<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
+<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 79</text>
 </a>
 <a href="guard.src.html#fn-sealed_path">
 <rect x="186.8" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="245.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sealed_path</text>
-<text x="245.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 88</text>
+<text x="245.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 91</text>
 </a>
 <a href="guard.src.html#fn-print_scope">
 <rect x="329.4" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="387.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">print_scope</text>
-<text x="387.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
+<text x="387.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
 </a>
 <a href="guard.src.html#fn-default_targets">
 <rect x="472.1" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="546.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_targets</text>
-<text x="546.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 103</text>
+<text x="546.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 106</text>
 </a>
 <a href="guard.src.html#fn-run">
 <rect x="219.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="265.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="265.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 117</text>
+<text x="265.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 120</text>
 </a>
 <a href="guard.src.html#fn-init">
 <rect x="159.8" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="206.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">init</text>
-<text x="206.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
+<text x="206.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
 </a>
 <a href="guard.src.html#fn-load">
 <rect x="337.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="383.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
-<text x="383.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
+<text x="383.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
 </a>
 <a href="guard.src.html#fn-check">
 <rect x="278.3" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="324.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="324.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
+<text x="324.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 217</text>
 </a>
 <a href="guard.src.html#fn-status">
 <rect x="396.7" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="443.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status</text>
-<text x="443.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 284</text>
+<text x="443.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -192,15 +192,15 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_manifest_path[&quot;manifest_path&lt;br/&gt;line 75&quot;]
-    n_sealed_path[&quot;sealed_path&lt;br/&gt;line 88&quot;]
-    n_print_scope[&quot;print_scope&lt;br/&gt;line 94&quot;]
-    n_default_targets[&quot;default_targets&lt;br/&gt;line 103&quot;]
-    n_run([&quot;run&lt;br/&gt;line 117&quot;])
-    n_init[&quot;init&lt;br/&gt;line 134&quot;]
-    n_load[&quot;load&lt;br/&gt;line 197&quot;]
-    n_check[&quot;check&lt;br/&gt;line 214&quot;]
-    n_status[&quot;status&lt;br/&gt;line 284&quot;]
+    n_manifest_path[&quot;manifest_path&lt;br/&gt;line 79&quot;]
+    n_sealed_path[&quot;sealed_path&lt;br/&gt;line 91&quot;]
+    n_print_scope[&quot;print_scope&lt;br/&gt;line 97&quot;]
+    n_default_targets[&quot;default_targets&lt;br/&gt;line 106&quot;]
+    n_run([&quot;run&lt;br/&gt;line 120&quot;])
+    n_init[&quot;init&lt;br/&gt;line 137&quot;]
+    n_load[&quot;load&lt;br/&gt;line 200&quot;]
+    n_check[&quot;check&lt;br/&gt;line 217&quot;]
+    n_status[&quot;status&lt;br/&gt;line 287&quot;]
     n_check --&gt; n_load
     n_check --&gt; n_print_scope
     n_check --&gt; n_sealed_path
@@ -214,15 +214,15 @@ flowchart TD
     n_run --&gt; n_status
     n_status --&gt; n_print_scope
     n_status --&gt; n_sealed_path
-    click n_manifest_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L75&quot; &quot;open the source&quot;
-    click n_sealed_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L88&quot; &quot;open the source&quot;
-    click n_print_scope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L94&quot; &quot;open the source&quot;
-    click n_default_targets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L103&quot; &quot;open the source&quot;
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L117&quot; &quot;open the source&quot;
-    click n_init href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L134&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L197&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L214&quot; &quot;open the source&quot;
-    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L284&quot; &quot;open the source&quot;
+    click n_manifest_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L79&quot; &quot;open the source&quot;
+    click n_sealed_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L91&quot; &quot;open the source&quot;
+    click n_print_scope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L97&quot; &quot;open the source&quot;
+    click n_default_targets href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L106&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L120&quot; &quot;open the source&quot;
+    click n_init href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L137&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L200&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L217&quot; &quot;open the source&quot;
+    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L287&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -234,15 +234,15 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Action</code> <sub>pub enum</sub></td><td><a href="guard.src.html#fn-action">54</a></td><td></td></tr>
-<tr><td><code>manifest_path</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-manifest_path">75</a></td><td>Where the manifest lives, beside the app lock.</td></tr>
-<tr><td><code>sealed_path</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-sealed_path">88</a></td><td>A sealed manifest sits beside the plain one, with a different suffix.</td></tr>
-<tr><td><code>print_scope</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-print_scope">94</a></td><td>Say what the integrity record detects and what it cannot, before it is used.</td></tr>
-<tr><td><code>default_targets</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-default_targets">103</a></td><td>The files worth watching when the user names none: the running binary, and the app lock beside it.</td></tr>
-<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="guard.src.html#fn-run">117</a></td><td>Dispatch veilvoice guard to the subcommand that was asked for.</td></tr>
-<tr><td><code>init</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-init">134</a></td><td>veilvoice guard init: record what these files are now.</td></tr>
-<tr><td><code>load</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-load">197</a></td><td>Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there.</td></tr>
-<tr><td><code>check</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-check">214</a></td><td>veilvoice guard check: compare the files against the record and report.</td></tr>
-<tr><td><code>status</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-status">284</a></td><td>veilvoice guard status: what the record covers, and when it was taken.</td></tr>
+<tr><td><code>manifest_path</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-manifest_path">79</a></td><td>Where the manifest lives, beside the app lock.</td></tr>
+<tr><td><code>sealed_path</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-sealed_path">91</a></td><td>A sealed manifest sits beside the plain one, with a different suffix.</td></tr>
+<tr><td><code>print_scope</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-print_scope">97</a></td><td>Say what the integrity record detects and what it cannot, before it is used.</td></tr>
+<tr><td><code>default_targets</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-default_targets">106</a></td><td>The files worth watching when the user names none: the running binary, and the app lock beside it.</td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="guard.src.html#fn-run">120</a></td><td>Dispatch veilvoice guard to the subcommand that was asked for.</td></tr>
+<tr><td><code>init</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-init">137</a></td><td>veilvoice guard init: record what these files are now.</td></tr>
+<tr><td><code>load</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-load">200</a></td><td>Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there.</td></tr>
+<tr><td><code>check</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-check">217</a></td><td>veilvoice guard check: compare the files against the record and report.</td></tr>
+<tr><td><code>status</code> <sub>fn</sub></td><td><a href="guard.src.html#fn-status">287</a></td><td>veilvoice guard status: what the record covers, and when it was taken.</td></tr>
 </tbody></table>
 </section>
 </div></div>

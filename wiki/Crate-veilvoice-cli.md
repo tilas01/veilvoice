@@ -97,7 +97,7 @@ thousand times.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>3523 lines"])
+    n_main(["main.rs<br/>3550 lines"])
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>286 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
@@ -105,7 +105,7 @@ flowchart TD
     n_conversation["conversation.rs<br/>1090 lines"]
     n_decoy["decoy.rs<br/>58 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
-    n_guard["guard.rs<br/>359 lines"]
+    n_guard["guard.rs<br/>362 lines"]
     n_gui["gui.rs<br/>247 lines"]
     n_input["input.rs<br/>120 lines"]
     n_lock["lock.rs<br/>347 lines"]
@@ -116,6 +116,7 @@ flowchart TD
     n_record["record.rs<br/>406 lines"]
     n_sentry["sentry.rs<br/>386 lines"]
     n_theme["theme.rs<br/>144 lines"]
+    n_update["update.rs<br/>246 lines"]
     n_accel --> n_sentry
     n_accel --> n_theme
     n_appctl --> n_sentry
@@ -152,6 +153,8 @@ flowchart TD
     n_record --> n_meter
     n_record --> n_theme
     n_sentry --> n_theme
+    n_update --> n_atrest
+    n_update --> n_theme
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" "open the source"
     click n_accel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/accel.rs" "open the source"
     click n_appctl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs" "open the source"
@@ -171,6 +174,7 @@ flowchart TD
     click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs" "open the source"
     click n_sentry href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" "open the source"
+    click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/update.rs" "open the source"
 ```
 
 </details>
@@ -186,11 +190,11 @@ flowchart TD
 | [[`conversation.rs`|File-veilvoice-cli-conversation]] | 1090 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [[`decoy.rs`|File-veilvoice-cli-decoy]] | 58 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
 | [[`failsafe.rs`|File-veilvoice-cli-failsafe]] | 112 | veilvoice failsafe is the safety catch. |
-| [[`guard.rs`|File-veilvoice-cli-guard]] | 359 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [[`guard.rs`|File-veilvoice-cli-guard]] | 362 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [[`gui.rs`|File-veilvoice-cli-gui]] | 247 | veilvoice gui opens the desktop application from the command line. |
 | [[`input.rs`|File-veilvoice-cli-input]] | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
 | [[`lock.rs`|File-veilvoice-cli-lock]] | 347 | veilvoice lock manages the application lock from the command line. |
-| [[`main.rs`|File-veilvoice-cli-main]] | 3523 | veilvoice, the command-line interface. |
+| [[`main.rs`|File-veilvoice-cli-main]] | 3550 | veilvoice, the command-line interface. |
 | [[`mandate.rs`|File-veilvoice-cli-mandate]] | 339 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
 | [[`meter.rs`|File-veilvoice-cli-meter]] | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [[`policy.rs`|File-veilvoice-cli-policy]] | 243 | veilvoice policy -- settings that can only be tightened. |
@@ -198,8 +202,9 @@ flowchart TD
 | [[`record.rs`|File-veilvoice-cli-record]] | 406 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
 | [[`sentry.rs`|File-veilvoice-cli-sentry]] | 386 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 144 | Tokyo Night colouring for the terminal. |
+| [[`update.rs`|File-veilvoice-cli-update]] | 246 | veilvoice update: fetch the new release, check it, and put it in place. |
 
-**6,114 functional lines of Rust** in this crate. A functional line is a line
+**6,300 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

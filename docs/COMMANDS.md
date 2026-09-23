@@ -33,6 +33,7 @@ This page is the whole of the command line, in the program's own order, with wha
 | [`veilvoice accel`](#veilvoice-accel) | The graphics hardware here, and what it is good for | **About** tab |
 | [`veilvoice gui`](#veilvoice-gui) | Open the desktop application | command line only |
 | [`veilvoice install`](#veilvoice-install) | Copy VeilVoice somewhere the system can find it, and add it to PATH | **Install** tab |
+| [`veilvoice update`](#veilvoice-update) | Fetch the newest release, check it, and put it in place | **About** tab |
 | [`veilvoice uninstall`](#veilvoice-uninstall) | Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy | command line only |
 | [`veilvoice policy`](#veilvoice-policy) | Settings fixed so the interface cannot turn them off | command line only |
 | [`veilvoice mandate`](#veilvoice-mandate) | The two things VeilVoice insists on, unless you say otherwise | command line only |
@@ -242,6 +243,18 @@ Copies VeilVoice somewhere the system can find it and adds it to your PATH, so `
 
 ```bash
 veilvoice install
+```
+
+## `veilvoice update`
+
+> Fetch the newest release, check it, and put it in place
+
+Fetches the newest release, checks it, and puts it in place. Nothing here happens on its own: there is no timer, nothing at startup and nothing in the background. Everything downloaded is checked against the signature made with the key already inside the copy you are running, before the archive is opened and long before anything of yours is replaced, and an update that fails any part of that replaces nothing. It updates the copy you are running, which for a folder you unpacked is that folder, and it asks for your app lock if you have one, because the integrity record is sealed with it and has to be rewritten. `--check` reports the published version and changes nothing.
+
+**In the window:** the **Check for updates** button on the About tab, which asks the same question the same way.
+
+```bash
+veilvoice update --check
 ```
 
 ## `veilvoice uninstall`

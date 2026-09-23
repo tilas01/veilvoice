@@ -112,6 +112,7 @@ mod extracted;
 mod fetch;
 pub mod gnupg;
 mod report;
+pub mod update;
 
 use report::{Loudness, Status};
 

@@ -95,6 +95,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/sentry.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/theme.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/theme.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/update.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/update.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-conversation.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-conversation/edit.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-conversation/edit.src.html</loc></url>
@@ -179,6 +181,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-guard/lib.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-guard/manifest.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-guard/manifest.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-guard/record.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-guard/record.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/app.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/app.src.html</loc></url>
@@ -306,6 +310,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/tests-release_manifest.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/tests.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/tests.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/update.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-verify/update.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/accel.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-video/accel.src.html</loc></url>

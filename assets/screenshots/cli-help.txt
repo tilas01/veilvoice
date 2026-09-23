@@ -1,4 +1,4 @@
-VeilVoice destroys the biometric voiceprint of a speaker: the pitch, the formants, the timbre and the melody of an accent. It keeps the words clean and transcribable. This command line talks to no servers, ever: the one thing in VeilVoice that reaches the network is the desktop app's check-for-updates button, and it is not here.
+VeilVoice destroys the biometric voiceprint of a speaker: the pitch, the formants, the timbre and the melody of an accent. It keeps the words clean and transcribable. Nothing here reaches the network except when you ask it to by name: `veilvoice update` and `veilvoice verify release` fetch from the releases page, and no other command opens a connection for any reason.
 
 Usage: veilvoice <COMMAND>
 
@@ -19,6 +19,7 @@ Commands:
   accel         The graphics hardware here, and what it is good for
   gui           Open the desktop application
   install       Copy VeilVoice somewhere the system can find it, and add it to PATH
+  update        Fetch the newest release, check it, and put it in place
   uninstall     Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy
   policy        Settings fixed so the interface cannot turn them off
   mandate       The two things VeilVoice insists on, unless you say otherwise

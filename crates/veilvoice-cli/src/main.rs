@@ -90,6 +90,7 @@ mod meter;
 mod policy;
 mod sentry;
 mod theme;
+mod update;
 
 use atrest::{prompt_secret, read_new_password};
 use clap::{Parser, Subcommand, ValueEnum};
@@ -113,7 +114,7 @@ use veilvoice_setup::{companions, install};
     about = "Irreversible voice de-identification, fully offline.",
     long_about = "VeilVoice destroys the biometric voiceprint of a speaker: the \
 pitch, the formants, the timbre and the melody of an accent. It keeps the words clean and \
-transcribable. This command line talks to no servers, ever: the one thing in VeilVoice that reaches the network is the desktop app's check-for-updates button, and it is not here."
+transcribable. Nothing here reaches the network except when you ask it to by name: `veilvoice update` and `veilvoice verify release` fetch from the releases page, and no other command opens a connection for any reason."
 )]
 struct Cli {
     #[command(subcommand)]
@@ -399,6 +400,28 @@ enum Command {
         /// Report what is installed, and change nothing.
         #[arg(long)]
         status: bool,
+    },
+
+    /// Fetch the newest release, check it, and put it in place.
+    ///
+    /// **Nothing here happens on its own.** There is no timer, no check at
+    /// startup and nothing in the background. This runs because it was typed.
+    ///
+    /// Everything downloaded is checked against the signature made with the key
+    /// compiled into this program, before the archive is opened and long before
+    /// anything of yours is replaced. An update that fails any part of that
+    /// replaces nothing and says what failed.
+    ///
+    /// It replaces the copy you are running, which for a folder you unzipped is
+    /// that folder. Portable is a perfectly ordinary way to use VeilVoice and
+    /// this does not require an install.
+    Update {
+        /// Report the published version and change nothing.
+        #[arg(long)]
+        check: bool,
+        /// Do not ask before replacing this copy.
+        #[arg(long)]
+        yes: bool,
     },
 
     /// Undo what `install` did: the PATH entry, the uninstall entry, and the
@@ -1469,6 +1492,8 @@ fn run(command: Command) -> Result<(), String> {
 
         Command::Gui { quiet } => gui::open(quiet),
 
+        Command::Update { check, yes } => update::run(check, yes),
+
         Command::Install { status } => {
             let state = install::status();
             println!("{}", heading("Install"));
@@ -1526,13 +1551,15 @@ fn run(command: Command) -> Result<(), String> {
                     println!("  Open a new terminal for the PATH change to take effect.");
                     println!();
                     // Said plainly, once, where somebody installing will read
-                    // it: this program will never tell them an update exists.
+                    // it: nothing here will ever tell them an update exists
+                    // unless they ask.
                     println!(
                         "{}",
                         warn(
-                            "VeilVoice never checks for updates and cannot tell you when \
-                             one exists -- it has no network code at all. Watch the \
-                             releases page, and verify what you download."
+                            "VeilVoice never checks for updates on its own. There is no \
+                             timer, nothing at startup and nothing in the background. \
+                             Run `veilvoice update --check` when you want to know, or \
+                             `veilvoice update` to fetch, check and install one."
                         )
                     );
                     Ok(())

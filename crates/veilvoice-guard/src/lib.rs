@@ -24,6 +24,10 @@
 //!   what was **modified**, **removed** or **added**.
 //! - [`blame`] tries to name the process responsible for a change. It usually
 //!   cannot, and says so instead of guessing.
+//! - [`record_path`] says where that manifest is kept. It is here rather than
+//!   in the programs that read it because three of them now need the answer
+//!   and a record written to one path and checked at another is a check that
+//!   passes for the wrong reason.
 //!
 //! ## The manifest is only as trustworthy as where it is kept
 //!
@@ -66,6 +70,7 @@
 
 mod blame;
 mod manifest;
+mod record;
 
 // The two things that watch for interference rather than describe it, and that
 // were crates of their own. `sentry` notices a directory being rewritten;
@@ -78,6 +83,7 @@ pub mod sentry;
 
 pub use blame::{who_touched, who_touched as blame_path, Blame};
 pub use manifest::{files_in as manifest_files_in, Change, Entry, Manifest, Report};
+pub use record::{record_path, sealed_path as sealed_record_path, RECORD};
 
 /// Crate version string, surfaced in the About panel.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

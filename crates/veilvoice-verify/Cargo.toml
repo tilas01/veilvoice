@@ -45,6 +45,18 @@ pgp = { version = "0.20", default-features = false }
 # The SHA-256 in `check::sha256_file`, which is the hash every published
 # list is written in.
 sha2 = "0.10"
+# Roadmap item 179. Re-taking the integrity record as part of an update, because
+# an update replaces the files the record describes and the next launch would
+# otherwise report the update as tampering, every time.
+#
+# This adds nothing to either shipped binary. `veilvoice` and `veilvoice-gui`
+# are the only two, and both already depend on it directly; this crate is a
+# library compiled into each of them and is no longer a program of its own.
+veilvoice-guard = { path = "../veilvoice-guard" }
+# Sealing that record under the app lock's passphrase, and writing it
+# owner-readable. Reached through `veilvoice-guard`, which is where the sealing
+# itself lives, plus `lock::default_path` to ask whether a lock is set at all.
+veilvoice-crypto = { path = "../veilvoice-crypto" }
 # Roadmap item 164. Decompressing a release archive so every file inside it can
 # be hashed where it sits, rather than only after somebody has unpacked it.
 #

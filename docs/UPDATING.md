@@ -2,21 +2,20 @@
 
 # Updating, and what to expect when you do
 
-VeilVoice does not update itself, does not check for updates on its own, and
-will not start doing either. This page is how to find out that something newer
-exists, how to move to it, and what you will see afterwards.
+VeilVoice does not update itself and does not check for updates on its own. It
+will do both when you ask it to, and at no other time. This page is how to find
+out that something newer exists, how to move to it, and what you will see
+afterwards.
 
 ---
 
 ## Nothing checks unless you press the button
 
-There is no timer, no check at startup and nothing in the background. The only
-thing in VeilVoice that reaches the network at all is the **Check for updates**
-button on the About tab of the window, and it runs because somebody pressed it
-in that run of the program.
-
-The command line does not have it. `veilvoice --help` says so in its opening
-paragraph: the command line talks to no servers, ever.
+There is no timer, no check at startup and nothing in the background. Two things
+in VeilVoice reach the network, and neither of them does it until it is asked:
+the **Check for updates** button on the About tab of the window, and
+`veilvoice update` at the command line. Each runs because somebody pressed or
+typed it, in that run of the program.
 
 The reason is worth stating, because "check for updates automatically" reads as
 a courtesy rather than as a disclosure. An update checker that runs by itself
@@ -26,13 +25,14 @@ software somebody installed because they are worried about being identified, it
 is the one message you would least want sent, and it would be sent every day
 without being asked for.
 
-So it is a button. There is no setting that turns it into a schedule.
+So it is a button, or a command. There is no setting that turns either into a schedule.
 
 ## What the check actually does
 
 It fetches one public web page over TLS, the release page anybody can open in a
 browser, and reads the version out of it. The request carries no identifier, no
-configuration and no counter.
+configuration and no counter. That is the whole of the check: an update, which
+is the next section, downloads the release itself and is a separate act.
 
 There is still no HTTP client anywhere in VeilVoice. The check runs the transfer
 tool your operating system already ships, found at an absolute path rather than
@@ -76,10 +76,65 @@ ahead.
 
 ## Doing the update
 
-There is no command that does this for you yet. Updating is four deliberate
-steps, and the third one is the one that matters:
+```bash
+veilvoice update
+```
 
-1. **Get the new release.** From the
+It asks before it replaces anything, then does four things in this order, and
+the order is the whole of why it can be trusted to do them at all:
+
+1. **Fetches** the archive published for this platform, along with
+   `SHA256SUMS`, `SHA256SUMS.asc` and `CONTENTS.sha256`. Nothing is opened and
+   nothing is run.
+2. **Checks**, with the copy of VeilVoice you are already running. The
+   signature over the hash list is verified against the key compiled into that
+   binary; the archive is checked against the hash list; the contents list is
+   checked against the hash list; and then every file **inside** the archive is
+   checked against the contents list, hashed where it lies without unpacking
+   anything.
+3. **Opens** the archive, and hashes what came out of it against the same
+   signed list. An extractor is a program too, and this is the cheapest
+   possible way not to have to trust it.
+4. **Replaces** the files beside the copy you are running, and re-takes the
+   integrity record.
+
+If any part of step 2 or step 3 fails, **nothing is replaced** and it says what
+failed. There is no partial update: the old copy is moved aside before the new
+one is written and moved back if the write fails, so at no point is there no
+program there.
+
+It updates the copy you are running, which for a folder you unzipped is that
+folder. Portable is an ordinary way to use VeilVoice and this does not require
+an install. Your settings, keys, vaults and app lock are not touched: they live
+in the configuration directory, not beside the program.
+
+### Why this is safe to have, when an updater usually is not
+
+The objection to a program that can replace itself is real and this project
+used to state it as a reason for not having one:
+
+> An update checker that could install its own answer is an update checker that
+> can be made to install somebody else's.
+
+That sentence is still true, and it is the constraint the updater is written
+around rather than an argument that was dropped. The missing half of it is
+*whose* answer. Everything fetched is checked against a signature made with a
+key that is **already inside the binary you are running**, before the archive is
+opened and long before anything of yours is replaced. Somebody who can answer
+the network cannot produce that signature. They can make the update refuse,
+loudly, which is the correct failure.
+
+It is also the same checking code as `veilvoice verify`, not a second copy of
+it. An update path with its own private idea of what a valid release looks like
+is two answers to one question, and the second one is always the weaker.
+
+### If you would rather do it yourself
+
+Nothing here has been taken away. The four manual steps still work and are still
+the right thing if you prefer them, or if this machine has no `tar` or no
+transfer tool for the updater to borrow:
+
+1. **Get the new release** from the
    [releases page](https://github.com/tilas01/veilvoice/releases), or build it
    from source.
 2. **Check it before you put it in place**, exactly as you checked your first
@@ -90,49 +145,57 @@ steps, and the third one is the one that matters:
    downloaded. Your existing `veilvoice verify` has the signing key compiled
    into it. The new archive's own copy of anything cannot vouch for itself,
    and neither can a new binary you have not checked yet.
-4. **Replace the files.** VeilVoice runs out of a folder and keeps its
-   configuration, keys and vaults elsewhere, so replacing the program does not
-   touch your data. If you installed it with `veilvoice install`, run that
-   again from the new copy.
+4. **Replace the files**, and then run `veilvoice guard init` so the integrity
+   record describes what is there now. If you installed with
+   `veilvoice install`, run that again from the new copy.
+
+## The app lock, and why an update asks for it
+
+If this machine has an app lock, `veilvoice update` asks for the passphrase
+before it downloads anything, and refuses to go on without it.
+
+That is not an access check. The integrity record described in
+[`GUARD.md`](GUARD.md) is sealed under the app lock's passphrase, and an update
+has to rewrite that record, because the files it describes are about to be
+different ones. An update that went ahead without the passphrase would leave the
+machine with new files and a sealed record of the old ones, and at the next
+unlock that is indistinguishable from somebody having replaced your copy of
+VeilVoice. So it is asked for first, before anything is downloaded, rather than
+discovered to be needed at the end.
+
+With no app lock set, nothing is asked for and the new record is written in the
+clear. That is said at the time, in those words: a record in the clear catches a
+file that changed by accident and not one changed by somebody who thought to
+rewrite the record too. Sealing it under a key kept beside it would be a
+decoration rather than a protection.
 
 ## What you will see afterwards
 
-**VeilVoice will report that its own program file changed.** That is expected,
-and it is the update.
+**Nothing.** That is the change.
 
-The record described in [`GUARD.md`](GUARD.md) is a size and a hash of the
-program file, and an update you installed looks exactly like a file somebody
-swapped, because on disk those are the same event. Nothing can tell them apart
-after the fact, which is precisely why step 3 above is where the real check
-happens: you decide the new file is the published one *before* you put it in
-place, and the change report afterwards is then something you already know the
-answer to.
+Before there was an updater, VeilVoice reported its own program file as changed
+after every update, because on disk an update and a tampered binary are the same
+event and nothing could tell them apart after the fact. The advice was to expect
+it and to re-take the record by hand, which asks somebody to learn to dismiss
+the one alarm that matters.
 
-Once you have updated, record the new state so that the next report means
-something again:
+The updater re-takes the record itself, as part of the update and **after** the
+signature has been checked, never before. A record re-taken first would be a
+record of whatever arrived, blessed by this program, so an update that failed
+its signature check would already have written the attacker's files down as the
+correct ones.
+
+So after `veilvoice update` the next check is clean, and a change report after
+an update now means what a change report is supposed to mean. If you updated by
+hand instead, the old advice applies and the report is yours to account for:
 
 ```bash
 veilvoice guard init --sealed
 ```
 
-If you have an app lock, the window does this for you when you next unlock and
-confirm, and the record is sealed under your passphrase again.
-
-Your settings, keys, vaults and app lock are not touched by an update. They
-live in the configuration directory, not beside the program.
-
-## What is deliberately not here yet
-
-An updater that downloads a release, verifies it with the same code that
-verifies any other download, and puts it in place is planned, and it is planned
-*on top of* the verifier rather than beside it: an update path with its own
-private idea of what a valid release looks like is two answers to one question,
-and the second one is always the weaker. Until it exists, the four steps above
-are the update, and they are the same four steps an updater would take.
-
-An update checker that could install its own answer is an update checker that
-can be made to install somebody else's, so if one arrives it will still be
-something you press.
+If the record could not be re-taken for any reason, the update says so at the
+time and names the reason, rather than leaving you to find out at the next
+launch.
 
 ---
 

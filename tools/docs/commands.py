@@ -231,6 +231,22 @@ NOTES = {
                    "itself when it already is tells you something untrue"),
         "example": "veilvoice install",
     },
+    "update": {
+        "use": "Fetches the newest release, checks it, and puts it in place. "
+               "Nothing here happens on its own: there is no timer, nothing at "
+               "startup and nothing in the background. Everything downloaded is "
+               "checked against the signature made with the key already inside "
+               "the copy you are running, before the archive is opened and long "
+               "before anything of yours is replaced, and an update that fails "
+               "any part of that replaces nothing. It updates the copy you are "
+               "running, which for a folder you unpacked is that folder, and it "
+               "asks for your app lock if you have one, because the integrity "
+               "record is sealed with it and has to be rewritten. "
+               "`--check` reports the published version and changes nothing.",
+        "window": ("about", "the **Check for updates** button on the About tab, "
+                   "which asks the same question the same way"),
+        "example": "veilvoice update --check",
+    },
     "uninstall": {
         "use": "Undoes exactly what `install` did: the copy, the PATH entry "
                "and the uninstall entry. It does not touch your settings, "
