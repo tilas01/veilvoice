@@ -413,6 +413,14 @@ jobs:
       - name: The walkthrough must match the tabs and commands that exist
         run: python tools/site/demo.py --check
 
+      # Roadmap item 177's bundle. Passes while there is no bundle and no page
+      # asking for one, fails the moment those two disagree or the bundle is of
+      # a window this tree no longer has.
+      - name: The window bundle must be of this window
+        run: |
+          python tools/site/window.py --check
+          python tools/site/window.py --self-test
+
       - name: Screenshots must be trimmed, fitted and rounded
         run: |
           python tools/shots/crop.py --check

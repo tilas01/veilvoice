@@ -1514,12 +1514,49 @@ to be locked out of. That last one gives up a stated security property on that
 target, so it is written down in `docs/WHITEPAPER.md` and at length in
 `veilvoice-crypto`'s `amnesia` module note rather than left to the `cfg`.
 
-What is left is the window itself. `veilvoice-gui` reaches for a native file
-picker and `eframe::NativeOptions`, neither of which exists in a browser, so it
-needs an `eframe::WebRunner` entry point and a browser path through `dialog`
-beside the native one. That is window work rather than website work. The page,
-the bundling step, the no-JavaScript fallback and the check that stops the
-bundle going stale are all independent of it and come first.
+**The bundling step and its staleness check are next, and are done.**
+`tools/site/window.py` builds the window for the browser and records what it
+built it from: the workspace version, the `wasm-bindgen` version, and a hash
+over every source file of every crate the window is built from, closed over the
+manifests rather than listed. `--check` compares that against the tree, in
+`tools/verify.py` and in CI. It is a stronger check than the one over the
+window's photographs, which can only be a version stamp, because a bundle's
+input is text and a hash of text is exact.
+
+That check is right about three states rather than two, and the third is the
+point: no bundle and no page asking for one passes, because the absence is this
+roadmap item rather than a drift; a page asking for a bundle that is not there
+fails, because that is a blank rectangle where the interface should be; and a
+bundle built from a window this tree no longer has fails. A running old window
+is worse than a photograph of one, since there is nothing about it to notice.
+
+`wasm-bindgen` is a crate and a tool that must agree, and a mismatch between
+them is not a build failure but a bundle that fails in somebody's browser. So
+the version is read out of `Cargo.lock`, never written down twice, and a tool
+that disagrees is refused with the line that installs the right one.
+
+**What is left is the window itself**, and it is window work rather than
+website work. Measured on 2026-09-26, `veilvoice-gui` needs three things:
+`crate-type = ["cdylib", "rlib"]`, which it has no `[lib]` section to carry, so
+`wasm-bindgen` has no bundle to make; an `eframe::WebRunner` entry point under
+`#[wasm_bindgen]`, with `wasm-bindgen`, `wasm-bindgen-futures` and `web-sys`
+under a `wasm32` target table; and a browser path through the two modules that
+reach for what a browser does not have, `graphics.rs` for
+`eframe::NativeOptions` and an `egui_glow` hardware-acceleration hint, and
+`dialog.rs` for `rfd::FileDialog`. Those are the eleven compile errors and
+there are no others: every *dependency* of the crate already resolves for that
+target.
+
+Everything after that point is proven rather than hoped for. An `eframe` window
+of the same version was built for `wasm32-unknown-unknown` with this
+repository's pinned toolchain and bundled with this pinned `wasm-bindgen`: 5.2
+MB, 1.9 MB compressed, nearly all of it `egui`'s own drawing code and its
+default fonts. That is the floor for the real window and a fair size for a
+page. The fonts are worth dropping, since this window ships JetBrains Mono and
+draws in nothing else.
+
+The page and the no-JavaScript fallback follow the bundle, not the other way
+round: a page is written against a bundle that exists.
 
 ### Originally: v0.1.23, the documentation and the two buttons
 

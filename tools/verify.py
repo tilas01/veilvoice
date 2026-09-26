@@ -411,6 +411,14 @@ CHECKS = [
      [sys.executable, "tools/site/roadmap.py", "--check"]),
     ("the demonstration matches the source",
      [sys.executable, "tools/site/demo.py", "--check"]),
+    # The WebAssembly bundle of the real window. Not a generator here: making
+    # it needs a cargo build for another target and a pinned `wasm-bindgen`,
+    # which is a release step rather than something to run before every push.
+    # The check is cheap and reads the tree, so it belongs here.
+    ("the window bundle is of this window",
+     [sys.executable, "tools/site/window.py", "--check"]),
+    ("the window bundle's staleness check catches its cases",
+     [sys.executable, "tools/site/window.py", "--self-test"]),
     ("the questions page matches docs/FAQ.md",
      [sys.executable, "tools/site/faq.py", "--check"]),
     ("the releases page matches CHANGELOG.md",
