@@ -743,6 +743,86 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-216: the window asked this machine the same three questions sixty times a second
+
+The freezing half of roadmap item 167, found by reading `veilvoice-gui` for
+what the drawing thread waits on rather than by anything failing.
+
+**A machine question written where it is shown runs once per frame.** That is
+the whole finding. A panel needs a number only the computer can give, the line
+that gets it is one line, and the obvious place to write it is beside the
+label that displays it. That place is inside the function that draws, which
+runs at the refresh rate for as long as the panel is on screen.
+
+Three of them were found.
+
+**The setup tour's last card.** It is called "What this machine says" and it
+says four things: where recordings will go, how much room is free there, how
+many sound devices exist, and what the graphics driver answered. Each was read
+inline. `veilvoice_setup::space::free_bytes` spawns `df` on Unix and
+`fsutil.exe` on Windows, so **the last card of the tour forked a process on
+every frame it was displayed**, sixty a second, to print a number that changes
+about as often as somebody empties a bin. `devices::list` enumerated the audio
+hardware beside it, which on Windows is a COM call measured in tens of
+milliseconds, and which F-165 already records as a thing this program does
+exactly once because two enumerators running together killed the process.
+
+**The setup tab, on the frame a job reported back.** `detect_all` runs a
+command per companion and `install::status` walks the install folder and the
+`PATH`. Both were called inline by `poll` when an install or an uninstall
+finished, so the window stopped at the moment it was supposed to be showing
+what had happened.
+
+**The Verify tab's GnuPG section.** `key.is_file()`, to find out whether the
+release shipped a signing key beside the hash list, on every frame the tab was
+open. A stat is cheap on a warm local disk and is not cheap on a network share
+or a drive that has spun down, which is where somebody checking a download
+they were careful about is quite likely to have put it.
+
+**The guard that should have caught the second one read the function that had
+already been fixed.** Pressing "look again" used to probe inline; that was
+found, fixed, and a test was written called
+`looking_again_does_not_probe_on_the_paint_thread`, which found
+`fn companion_rows` and asserted the worker was in it. `poll` is twenty lines
+up in the same file and went on calling both readings inline. This is the
+third crate this week where a guard proved a rule about the one function whose
+author was thinking about it: F-210 in `veilvoice-setup`, F-212 in the window's
+spawns, and now this. The shape is worth naming once more, because three
+independent discoveries of it in one week is not a coincidence: **the scope a
+guard is written at is the scope of the fix that prompted it, and the defect
+is always somewhere else.**
+
+**The fix.** `crate::offthread::Answer<T>` holds one value that a worker works
+out: the drawing function asks once, draws whatever has arrived, and never
+waits. The worker asks for the repaint when it has something, which is the
+rule an untouched window costing nothing already depends on. A worker that
+dies leaves the last true answer on screen rather than replacing it with a
+zero, which is what `setup`'s probe had already decided for itself and for the
+same reason.
+
+The tour's card reads through it. The setup tab has one `start_probe` and both
+callers use it. The Verify tab asks once per chosen hash list. And the tour no
+longer enumerates the audio hardware at all: `app` does that once, at startup,
+and hands the count over, so the two counts cannot disagree and F-165's second
+enumerator cannot come back.
+
+`crate::dialog::Pending` is the same shape and deliberately stays separate. On
+macOS it must run its work **on** the drawing thread, because `NSOpenPanel` can
+be driven from nowhere else, and a type whose whole promise is "not on the
+drawing thread" cannot have a platform where that is false.
+
+**And the guards are written about files rather than functions.**
+`nothing_reads_this_machine_on_the_paint_thread` splits `setup.rs` into its
+functions and names the two that are allowed to read the machine, so the next
+one fails wherever it is written. The tour's card and the Verify section each
+have one that reads the drawing function for the calls that wait. All four are
+confirmed by breaking them: each names the function and the call when the
+defect is put back.
+
+This is not the whole of roadmap item 167. Two heavier ones remain, both the
+same shape and neither a per-frame cost: opening the obfuscated program folder
+after an unlock, and exporting a take. They follow separately.
+
 ### F-212: the guard that proved no spawn flashed a console read one file of thirty-four
 
 The window's own half of the same defect `veilvoice-setup` had, found by
@@ -7146,7 +7226,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1776 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1783 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -8794,7 +8874,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and fifteen defects found and fixed (F-1 to F-215), across
+**Two hundred and sixteen defects found and fixed (F-1 to F-216), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

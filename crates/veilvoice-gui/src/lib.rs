@@ -153,6 +153,7 @@ pub mod integrity;
 pub mod layout;
 pub mod monitor;
 pub mod notify;
+pub mod offthread;
 pub mod pace;
 pub mod palettes;
 pub mod paths;
@@ -284,6 +285,10 @@ mod spawn_tests {
                 include_str!("monitor.rs").replace("\r\n", "\n"),
             ),
             ("notify.rs", include_str!("notify.rs").replace("\r\n", "\n")),
+            (
+                "offthread.rs",
+                include_str!("offthread.rs").replace("\r\n", "\n"),
+            ),
             ("pace.rs", include_str!("pace.rs").replace("\r\n", "\n")),
             (
                 "palettes.rs",

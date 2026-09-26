@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/firstrun.rs</code></h1>
-<p style="color:var(--muted)"><a href="firstrun.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 708 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="firstrun.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 856 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -188,626 +188,778 @@
 <span class="ln" id="L111">    same_passphrase: bool,</span>
 <span class="ln" id="L112">    <span class="tok-com">/// Set once the lock has been asked for, so the card stops offering.</span></span>
 <span class="ln" id="L113">    lock_requested: bool,</span>
-<span class="ln" id="L114">}</span>
+<span class="ln" id="L114">    <span class="tok-com">/// What the last card reads from this machine, read once and elsewhere.</span></span>
+<span class="ln" id="L115">    <span class="tok-com">///</span></span>
+<span class="ln" id="L116">    <span class="tok-com">/// Not a set of fields here, because the point is that none of them exists</span></span>
+<span class="ln" id="L117">    <span class="tok-com">/// until a worker has been and got them. See [`Reading`] and F-216.</span></span>
+<span class="ln" id="L118">    reading: <span class="tok-kw">crate</span>::offthread::Answer&lt;Reading&gt;,</span>
+<span class="ln" id="L119">}</span>
 </span>
-<span class="ln" id="L115"></span>
+<span class="ln" id="L120"></span>
 <span class="src-item" id="fn-outcome">
-<span class="ln" id="L116"><span class="tok-com">/// What the panel wants the application to do after drawing.</span></span>
-<span class="ln" id="L117"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq, Default)]</span>
-<span class="ln" id="L118"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Outcome {</span>
-<span class="ln" id="L119">    <span class="tok-com">/// Still going.</span></span>
-<span class="ln" id="L120">    <span class="tok-attr">#[default</span>]</span>
-<span class="ln" id="L121">    Continue,</span>
-<span class="ln" id="L122">    <span class="tok-com">/// Every card is answered or skipped.</span></span>
-<span class="ln" id="L123">    Finished,</span>
-<span class="ln" id="L124">}</span>
+<span class="ln" id="L121"><span class="tok-com">/// What the panel wants the application to do after drawing.</span></span>
+<span class="ln" id="L122"><span class="tok-attr">#[derive</span>(Debug, Clone, PartialEq, Eq, Default)]</span>
+<span class="ln" id="L123"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Outcome {</span>
+<span class="ln" id="L124">    <span class="tok-com">/// Still going.</span></span>
+<span class="ln" id="L125">    <span class="tok-attr">#[default</span>]</span>
+<span class="ln" id="L126">    Continue,</span>
+<span class="ln" id="L127">    <span class="tok-com">/// Every card is answered or skipped.</span></span>
+<span class="ln" id="L128">    Finished,</span>
+<span class="ln" id="L129">}</span>
 </span>
-<span class="ln" id="L125"></span>
-<span class="ln" id="L126"><span class="tok-kw">impl</span> FirstRun {</span>
+<span class="ln" id="L130"></span>
+<span class="ln" id="L131"><span class="tok-kw">impl</span> FirstRun {</span>
 <span class="src-item" id="fn-firstrun-panel">
-<span class="ln" id="L127">    <span class="tok-com">/// Draw the current card.</span></span>
-<span class="ln" id="L128">    <span class="tok-com">///</span></span>
-<span class="ln" id="L129">    <span class="tok-com">/// Takes the settings and the security state because it changes both, and</span></span>
-<span class="ln" id="L130">    <span class="tok-com">/// returns whether it is done rather than deciding that itself: the caller</span></span>
-<span class="ln" id="L131">    <span class="tok-com">/// owns what happens next, which is the tour.</span></span>
-<span class="ln" id="L132">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">panel</span>(</span>
-<span class="ln" id="L133">        &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>,</span>
-<span class="ln" id="L134">        ui: &amp;<span class="tok-kw">mut</span> Ui,</span>
-<span class="ln" id="L135">        prefs: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::settings::Settings,</span>
-<span class="ln" id="L136">        security: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::security::Security,</span>
-<span class="ln" id="L137">    ) -&gt; Outcome {</span>
-<span class="ln" id="L138">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">18.0</span>);</span>
-<span class="ln" id="L139">        ui.<span class="tok-fn">vertical_centered</span>(|ui| {</span>
-<span class="ln" id="L140">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L141">                RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Setting up VeilVoice&quot;</span>)</span>
-<span class="ln" id="L142">                    .<span class="tok-fn">size</span>(<span class="tok-num">20.0</span>)</span>
-<span class="ln" id="L143">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>())</span>
-<span class="ln" id="L144">                    .<span class="tok-fn">strong</span>(),</span>
-<span class="ln" id="L145">            );</span>
+<span class="ln" id="L132">    <span class="tok-com">/// Draw the current card.</span></span>
+<span class="ln" id="L133">    <span class="tok-com">///</span></span>
+<span class="ln" id="L134">    <span class="tok-com">/// Takes the settings and the security state because it changes both, and</span></span>
+<span class="ln" id="L135">    <span class="tok-com">/// returns whether it is done rather than deciding that itself: the caller</span></span>
+<span class="ln" id="L136">    <span class="tok-com">/// owns what happens next, which is the tour.</span></span>
+<span class="ln" id="L137">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">panel</span>(</span>
+<span class="ln" id="L138">        &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>,</span>
+<span class="ln" id="L139">        ui: &amp;<span class="tok-kw">mut</span> Ui,</span>
+<span class="ln" id="L140">        prefs: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::settings::Settings,</span>
+<span class="ln" id="L141">        security: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::security::Security,</span>
+<span class="ln" id="L142">        devices: (usize, usize),</span>
+<span class="ln" id="L143">    ) -&gt; Outcome {</span>
+<span class="ln" id="L144">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">18.0</span>);</span>
+<span class="ln" id="L145">        ui.<span class="tok-fn">vertical_centered</span>(|ui| {</span>
 <span class="ln" id="L146">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L147">                RichText::<span class="tok-fn">new</span>(format!(</span>
-<span class="ln" id="L148">                    <span class="tok-str">&quot;step {} of {}. Every one of them can be skipped, and \</span></span>
-<span class="ln" id="L149"><span class="tok-str">                     changed later in Settings.&quot;</span>,</span>
-<span class="ln" id="L150">                    <span class="tok-kw">self</span>.step.<span class="tok-fn">position</span>(),</span>
-<span class="ln" id="L151">                    Step::COUNT</span>
-<span class="ln" id="L152">                ))</span>
-<span class="ln" id="L153">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L154">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L155">            );</span>
-<span class="ln" id="L156">        });</span>
-<span class="ln" id="L157">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
-<span class="ln" id="L158"></span>
-<span class="ln" id="L159">        <span class="tok-kw">let</span> advance = <span class="tok-kw">match</span> <span class="tok-kw">self</span>.step {</span>
-<span class="ln" id="L160">            Step::Appearance =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">appearance</span>(ui, prefs),</span>
-<span class="ln" id="L161">            Step::AppLock =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">app_lock</span>(ui, security),</span>
-<span class="ln" id="L162">            Step::Recording =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">recording</span>(ui, security),</span>
-<span class="ln" id="L163">            Step::Autolock =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">autolock</span>(ui, prefs),</span>
-<span class="ln" id="L164">            Step::Machine =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">machine</span>(ui, prefs),</span>
-<span class="ln" id="L165">        };</span>
-<span class="ln" id="L166"></span>
-<span class="ln" id="L167">        <span class="tok-kw">if</span> advance {</span>
-<span class="ln" id="L168">            <span class="tok-kw">match</span> <span class="tok-kw">self</span>.step.<span class="tok-fn">next</span>() {</span>
-<span class="ln" id="L169">                <span class="tok-fn">Some</span>(next) =&gt; {</span>
-<span class="ln" id="L170">                    <span class="tok-kw">self</span>.step = next;</span>
-<span class="ln" id="L171">                    <span class="tok-com">// A card whose question is already answered elsewhere has</span></span>
-<span class="ln" id="L172">                    <span class="tok-com">// nothing to ask, so it is stepped past rather than shown</span></span>
-<span class="ln" id="L173">                    <span class="tok-com">// with everything greyed out.</span></span>
-<span class="ln" id="L174">                    <span class="tok-kw">if</span> <span class="tok-kw">self</span>.<span class="tok-fn">should_skip</span>(<span class="tok-kw">self</span>.step, security) {</span>
-<span class="ln" id="L175">                        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(after) = <span class="tok-kw">self</span>.step.<span class="tok-fn">next</span>() {</span>
-<span class="ln" id="L176">                            <span class="tok-kw">self</span>.step = after;</span>
-<span class="ln" id="L177">                        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L178">                            <span class="tok-kw">return</span> Outcome::Finished;</span>
-<span class="ln" id="L179">                        }</span>
-<span class="ln" id="L180">                    }</span>
-<span class="ln" id="L181">                }</span>
-<span class="ln" id="L182">                None =&gt; <span class="tok-kw">return</span> Outcome::Finished,</span>
-<span class="ln" id="L183">            }</span>
-<span class="ln" id="L184">        }</span>
-<span class="ln" id="L185">        Outcome::Continue</span>
-<span class="ln" id="L186">    }</span>
+<span class="ln" id="L147">                RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Setting up VeilVoice&quot;</span>)</span>
+<span class="ln" id="L148">                    .<span class="tok-fn">size</span>(<span class="tok-num">20.0</span>)</span>
+<span class="ln" id="L149">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>())</span>
+<span class="ln" id="L150">                    .<span class="tok-fn">strong</span>(),</span>
+<span class="ln" id="L151">            );</span>
+<span class="ln" id="L152">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L153">                RichText::<span class="tok-fn">new</span>(format!(</span>
+<span class="ln" id="L154">                    <span class="tok-str">&quot;step {} of {}. Every one of them can be skipped, and \</span></span>
+<span class="ln" id="L155"><span class="tok-str">                     changed later in Settings.&quot;</span>,</span>
+<span class="ln" id="L156">                    <span class="tok-kw">self</span>.step.<span class="tok-fn">position</span>(),</span>
+<span class="ln" id="L157">                    Step::COUNT</span>
+<span class="ln" id="L158">                ))</span>
+<span class="ln" id="L159">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L160">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L161">            );</span>
+<span class="ln" id="L162">        });</span>
+<span class="ln" id="L163">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">16.0</span>);</span>
+<span class="ln" id="L164"></span>
+<span class="ln" id="L165">        <span class="tok-kw">let</span> advance = <span class="tok-kw">match</span> <span class="tok-kw">self</span>.step {</span>
+<span class="ln" id="L166">            Step::Appearance =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">appearance</span>(ui, prefs),</span>
+<span class="ln" id="L167">            Step::AppLock =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">app_lock</span>(ui, security),</span>
+<span class="ln" id="L168">            Step::Recording =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">recording</span>(ui, security),</span>
+<span class="ln" id="L169">            Step::Autolock =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">autolock</span>(ui, prefs),</span>
+<span class="ln" id="L170">            Step::Machine =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">machine</span>(ui, prefs, devices),</span>
+<span class="ln" id="L171">        };</span>
+<span class="ln" id="L172"></span>
+<span class="ln" id="L173">        <span class="tok-kw">if</span> advance {</span>
+<span class="ln" id="L174">            <span class="tok-kw">match</span> <span class="tok-kw">self</span>.step.<span class="tok-fn">next</span>() {</span>
+<span class="ln" id="L175">                <span class="tok-fn">Some</span>(next) =&gt; {</span>
+<span class="ln" id="L176">                    <span class="tok-kw">self</span>.step = next;</span>
+<span class="ln" id="L177">                    <span class="tok-com">// A card whose question is already answered elsewhere has</span></span>
+<span class="ln" id="L178">                    <span class="tok-com">// nothing to ask, so it is stepped past rather than shown</span></span>
+<span class="ln" id="L179">                    <span class="tok-com">// with everything greyed out.</span></span>
+<span class="ln" id="L180">                    <span class="tok-kw">if</span> <span class="tok-kw">self</span>.<span class="tok-fn">should_skip</span>(<span class="tok-kw">self</span>.step, security) {</span>
+<span class="ln" id="L181">                        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(after) = <span class="tok-kw">self</span>.step.<span class="tok-fn">next</span>() {</span>
+<span class="ln" id="L182">                            <span class="tok-kw">self</span>.step = after;</span>
+<span class="ln" id="L183">                        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L184">                            <span class="tok-kw">return</span> Outcome::Finished;</span>
+<span class="ln" id="L185">                        }</span>
+<span class="ln" id="L186">                    }</span>
+<span class="ln" id="L187">                }</span>
+<span class="ln" id="L188">                None =&gt; <span class="tok-kw">return</span> Outcome::Finished,</span>
+<span class="ln" id="L189">            }</span>
+<span class="ln" id="L190">        }</span>
+<span class="ln" id="L191">        Outcome::Continue</span>
+<span class="ln" id="L192">    }</span>
 </span>
-<span class="ln" id="L187"></span>
+<span class="ln" id="L193"></span>
 <span class="src-item" id="fn-firstrun-should_skip">
-<span class="ln" id="L188">    <span class="tok-com">/// Whether a card has nothing left to ask.</span></span>
-<span class="ln" id="L189">    <span class="tok-com">///</span></span>
-<span class="ln" id="L190">    <span class="tok-com">/// The app lock and the recording passphrase can both be set already --</span></span>
-<span class="ln" id="L191">    <span class="tok-com">/// from the command line, from a previous run, or from a copied</span></span>
-<span class="ln" id="L192">    <span class="tok-com">/// configuration. Asking somebody to set a thing they have set is how a</span></span>
-<span class="ln" id="L193">    <span class="tok-com">/// setup flow teaches people to click through it without reading.</span></span>
-<span class="ln" id="L194">    <span class="tok-kw">fn</span> <span class="tok-fn">should_skip</span>(&amp;<span class="tok-kw">self</span>, step: Step, security: &amp;<span class="tok-kw">crate</span>::security::Security) -&gt; bool {</span>
-<span class="ln" id="L195">        <span class="tok-kw">match</span> step {</span>
-<span class="ln" id="L196">            Step::AppLock =&gt; security.<span class="tok-fn">has_lock</span>(),</span>
-<span class="ln" id="L197">            Step::Recording =&gt; security.<span class="tok-fn">has_recording_passphrase</span>(),</span>
-<span class="ln" id="L198">            _ =&gt; false,</span>
-<span class="ln" id="L199">        }</span>
-<span class="ln" id="L200">    }</span>
+<span class="ln" id="L194">    <span class="tok-com">/// Whether a card has nothing left to ask.</span></span>
+<span class="ln" id="L195">    <span class="tok-com">///</span></span>
+<span class="ln" id="L196">    <span class="tok-com">/// The app lock and the recording passphrase can both be set already --</span></span>
+<span class="ln" id="L197">    <span class="tok-com">/// from the command line, from a previous run, or from a copied</span></span>
+<span class="ln" id="L198">    <span class="tok-com">/// configuration. Asking somebody to set a thing they have set is how a</span></span>
+<span class="ln" id="L199">    <span class="tok-com">/// setup flow teaches people to click through it without reading.</span></span>
+<span class="ln" id="L200">    <span class="tok-kw">fn</span> <span class="tok-fn">should_skip</span>(&amp;<span class="tok-kw">self</span>, step: Step, security: &amp;<span class="tok-kw">crate</span>::security::Security) -&gt; bool {</span>
+<span class="ln" id="L201">        <span class="tok-kw">match</span> step {</span>
+<span class="ln" id="L202">            Step::AppLock =&gt; security.<span class="tok-fn">has_lock</span>(),</span>
+<span class="ln" id="L203">            Step::Recording =&gt; security.<span class="tok-fn">has_recording_passphrase</span>(),</span>
+<span class="ln" id="L204">            _ =&gt; false,</span>
+<span class="ln" id="L205">        }</span>
+<span class="ln" id="L206">    }</span>
 </span>
-<span class="ln" id="L201"></span>
+<span class="ln" id="L207"></span>
 <span class="src-item" id="fn-firstrun-appearance">
-<span class="ln" id="L202">    <span class="tok-com">/// The appearance step: pick a palette and see it applied immediately.</span></span>
-<span class="ln" id="L203">    <span class="tok-kw">fn</span> <span class="tok-fn">appearance</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, prefs: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::settings::Settings) -&gt; bool {</span>
-<span class="ln" id="L204">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;How it should look&quot;</span>, |ui| {</span>
-<span class="ln" id="L205">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L206">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L207">                    <span class="tok-str">&quot;Both are on. Nothing here leaves your machine, and neither \</span></span>
-<span class="ln" id="L208"><span class="tok-str">                     affects what VeilVoice does to a recording.&quot;</span>,</span>
-<span class="ln" id="L209">                )</span>
-<span class="ln" id="L210">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L211">            );</span>
-<span class="ln" id="L212">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L213">            prefs.<span class="tok-fn">first_run_appearance</span>(ui);</span>
-<span class="ln" id="L214">        });</span>
-<span class="ln" id="L215">        <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;continue&quot;</span>, None).<span class="tok-num">0</span></span>
-<span class="ln" id="L216">    }</span>
+<span class="ln" id="L208">    <span class="tok-com">/// The appearance step: pick a palette and see it applied immediately.</span></span>
+<span class="ln" id="L209">    <span class="tok-kw">fn</span> <span class="tok-fn">appearance</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, prefs: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::settings::Settings) -&gt; bool {</span>
+<span class="ln" id="L210">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;How it should look&quot;</span>, |ui| {</span>
+<span class="ln" id="L211">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L212">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L213">                    <span class="tok-str">&quot;Both are on. Nothing here leaves your machine, and neither \</span></span>
+<span class="ln" id="L214"><span class="tok-str">                     affects what VeilVoice does to a recording.&quot;</span>,</span>
+<span class="ln" id="L215">                )</span>
+<span class="ln" id="L216">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L217">            );</span>
+<span class="ln" id="L218">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L219">            prefs.<span class="tok-fn">first_run_appearance</span>(ui);</span>
+<span class="ln" id="L220">        });</span>
+<span class="ln" id="L221">        <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;continue&quot;</span>, None).<span class="tok-num">0</span></span>
+<span class="ln" id="L222">    }</span>
 </span>
-<span class="ln" id="L217"></span>
+<span class="ln" id="L223"></span>
 <span class="src-item" id="fn-firstrun-app_lock">
-<span class="ln" id="L218">    <span class="tok-com">/// The app-lock step: set a passphrase for VeilVoice itself, or decline</span></span>
-<span class="ln" id="L219">    <span class="tok-com">/// it.</span></span>
-<span class="ln" id="L220">    <span class="tok-kw">fn</span> <span class="tok-fn">app_lock</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, security: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::security::Security) -&gt; bool {</span>
-<span class="ln" id="L221">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> advance = false;</span>
-<span class="ln" id="L222">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;A password for VeilVoice itself&quot;</span>, |ui| {</span>
-<span class="ln" id="L223">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L224">                <span class="tok-str">&quot;It stops somebody who picks up your unlocked computer from \</span></span>
-<span class="ln" id="L225"><span class="tok-str">                 opening VeilVoice, seeing what you have processed, or starting \</span></span>
-<span class="ln" id="L226"><span class="tok-str">                 a live scramble.&quot;</span>,</span>
-<span class="ln" id="L227">            ));</span>
-<span class="ln" id="L228">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L229">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L230">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L231">                    <span class="tok-str">&quot;It also encrypts VeilVoice&#x27;s own files and gives them \</span></span>
-<span class="ln" id="L232"><span class="tok-str">                     meaningless names, with decoy files among them, so the \</span></span>
-<span class="ln" id="L233"><span class="tok-str">                     folder says nothing about what you have done. Without a \</span></span>
-<span class="ln" id="L234"><span class="tok-str">                     password none of that is possible: there is no key.&quot;</span>,</span>
-<span class="ln" id="L235">                )</span>
-<span class="ln" id="L236">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L237">            );</span>
-<span class="ln" id="L238">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L239">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L240">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L241">                    <span class="tok-str">&quot;Forget this password and those files are gone. It is not a \</span></span>
-<span class="ln" id="L242"><span class="tok-str">                     lock you can take off; it is the only way back to them.&quot;</span>,</span>
-<span class="ln" id="L243">                )</span>
-<span class="ln" id="L244">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
-<span class="ln" id="L245">            );</span>
-<span class="ln" id="L246">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L247">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L248">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L249">                    <span class="tok-str">&quot;It is not protection against somebody who has your disk. \</span></span>
-<span class="ln" id="L250"><span class="tok-str">                     For that, use full-volume encryption as well.&quot;</span>,</span>
-<span class="ln" id="L251">                )</span>
-<span class="ln" id="L252">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L253">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L254">            );</span>
-<span class="ln" id="L255">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L256"></span>
-<span class="ln" id="L257">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.lock_requested {</span>
-<span class="ln" id="L258">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;setting it now&#8230;&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L259">                <span class="tok-kw">if</span> security.<span class="tok-fn">has_lock</span>() {</span>
-<span class="ln" id="L260">                    advance = true;</span>
-<span class="ln" id="L261">                }</span>
-<span class="ln" id="L262">                <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L263">            }</span>
-<span class="ln" id="L264"></span>
-<span class="ln" id="L265">            <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;password&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.lock_entry);</span>
-<span class="ln" id="L266">            <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;again&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.lock_repeat);</span>
-<span class="ln" id="L267">            <span class="tok-kw">let</span> matched = !<span class="tok-kw">self</span>.lock_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; <span class="tok-kw">self</span>.lock_entry == <span class="tok-kw">self</span>.lock_repeat;</span>
-<span class="ln" id="L268">            <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.lock_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; !matched {</span>
-<span class="ln" id="L269">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L270">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;the two entries differ&quot;</span>)</span>
-<span class="ln" id="L271">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
-<span class="ln" id="L272">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L273">                );</span>
-<span class="ln" id="L274">            }</span>
-<span class="ln" id="L275">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L276">            <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L277">                .<span class="tok-fn">add_enabled</span>(matched, egui::Button::<span class="tok-fn">new</span>(<span class="tok-str">&quot;set this password&quot;</span>))</span>
-<span class="ln" id="L278">                .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L279">            {</span>
-<span class="ln" id="L280">                <span class="tok-kw">let</span> entry = std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.lock_entry);</span>
-<span class="ln" id="L281">                <span class="tok-kw">self</span>.lock_repeat.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L282">                security.<span class="tok-fn">set_lock_from_setup</span>(entry);</span>
-<span class="ln" id="L283">                <span class="tok-kw">self</span>.lock_requested = true;</span>
-<span class="ln" id="L284">            }</span>
-<span class="ln" id="L285">        });</span>
-<span class="ln" id="L286">        <span class="tok-kw">let</span> (next, _) = <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;skip for now&quot;</span>, None);</span>
-<span class="ln" id="L287">        advance || next</span>
-<span class="ln" id="L288">    }</span>
+<span class="ln" id="L224">    <span class="tok-com">/// The app-lock step: set a passphrase for VeilVoice itself, or decline</span></span>
+<span class="ln" id="L225">    <span class="tok-com">/// it.</span></span>
+<span class="ln" id="L226">    <span class="tok-kw">fn</span> <span class="tok-fn">app_lock</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, security: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::security::Security) -&gt; bool {</span>
+<span class="ln" id="L227">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> advance = false;</span>
+<span class="ln" id="L228">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;A password for VeilVoice itself&quot;</span>, |ui| {</span>
+<span class="ln" id="L229">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L230">                <span class="tok-str">&quot;It stops somebody who picks up your unlocked computer from \</span></span>
+<span class="ln" id="L231"><span class="tok-str">                 opening VeilVoice, seeing what you have processed, or starting \</span></span>
+<span class="ln" id="L232"><span class="tok-str">                 a live scramble.&quot;</span>,</span>
+<span class="ln" id="L233">            ));</span>
+<span class="ln" id="L234">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L235">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L236">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L237">                    <span class="tok-str">&quot;It also encrypts VeilVoice&#x27;s own files and gives them \</span></span>
+<span class="ln" id="L238"><span class="tok-str">                     meaningless names, with decoy files among them, so the \</span></span>
+<span class="ln" id="L239"><span class="tok-str">                     folder says nothing about what you have done. Without a \</span></span>
+<span class="ln" id="L240"><span class="tok-str">                     password none of that is possible: there is no key.&quot;</span>,</span>
+<span class="ln" id="L241">                )</span>
+<span class="ln" id="L242">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L243">            );</span>
+<span class="ln" id="L244">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L245">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L246">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L247">                    <span class="tok-str">&quot;Forget this password and those files are gone. It is not a \</span></span>
+<span class="ln" id="L248"><span class="tok-str">                     lock you can take off; it is the only way back to them.&quot;</span>,</span>
+<span class="ln" id="L249">                )</span>
+<span class="ln" id="L250">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()),</span>
+<span class="ln" id="L251">            );</span>
+<span class="ln" id="L252">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L253">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L254">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L255">                    <span class="tok-str">&quot;It is not protection against somebody who has your disk. \</span></span>
+<span class="ln" id="L256"><span class="tok-str">                     For that, use full-volume encryption as well.&quot;</span>,</span>
+<span class="ln" id="L257">                )</span>
+<span class="ln" id="L258">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L259">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L260">            );</span>
+<span class="ln" id="L261">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L262"></span>
+<span class="ln" id="L263">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.lock_requested {</span>
+<span class="ln" id="L264">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;setting it now&#8230;&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L265">                <span class="tok-kw">if</span> security.<span class="tok-fn">has_lock</span>() {</span>
+<span class="ln" id="L266">                    advance = true;</span>
+<span class="ln" id="L267">                }</span>
+<span class="ln" id="L268">                <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L269">            }</span>
+<span class="ln" id="L270"></span>
+<span class="ln" id="L271">            <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;password&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.lock_entry);</span>
+<span class="ln" id="L272">            <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;again&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.lock_repeat);</span>
+<span class="ln" id="L273">            <span class="tok-kw">let</span> matched = !<span class="tok-kw">self</span>.lock_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; <span class="tok-kw">self</span>.lock_entry == <span class="tok-kw">self</span>.lock_repeat;</span>
+<span class="ln" id="L274">            <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.lock_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; !matched {</span>
+<span class="ln" id="L275">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L276">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;the two entries differ&quot;</span>)</span>
+<span class="ln" id="L277">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
+<span class="ln" id="L278">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L279">                );</span>
+<span class="ln" id="L280">            }</span>
+<span class="ln" id="L281">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L282">            <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L283">                .<span class="tok-fn">add_enabled</span>(matched, egui::Button::<span class="tok-fn">new</span>(<span class="tok-str">&quot;set this password&quot;</span>))</span>
+<span class="ln" id="L284">                .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L285">            {</span>
+<span class="ln" id="L286">                <span class="tok-kw">let</span> entry = std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.lock_entry);</span>
+<span class="ln" id="L287">                <span class="tok-kw">self</span>.lock_repeat.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L288">                security.<span class="tok-fn">set_lock_from_setup</span>(entry);</span>
+<span class="ln" id="L289">                <span class="tok-kw">self</span>.lock_requested = true;</span>
+<span class="ln" id="L290">            }</span>
+<span class="ln" id="L291">        });</span>
+<span class="ln" id="L292">        <span class="tok-kw">let</span> (next, _) = <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;skip for now&quot;</span>, None);</span>
+<span class="ln" id="L293">        advance || next</span>
+<span class="ln" id="L294">    }</span>
 </span>
-<span class="ln" id="L289"></span>
+<span class="ln" id="L295"></span>
 <span class="src-item" id="fn-firstrun-recording">
-<span class="ln" id="L290">    <span class="tok-com">/// The recording step: the at-rest passphrase, and what it is separate</span></span>
-<span class="ln" id="L291">    <span class="tok-com">/// from.</span></span>
-<span class="ln" id="L292">    <span class="tok-kw">fn</span> <span class="tok-fn">recording</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, security: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::security::Security) -&gt; bool {</span>
-<span class="ln" id="L293">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> advance = false;</span>
-<span class="ln" id="L294">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;A password for your recordings&quot;</span>, |ui| {</span>
-<span class="ln" id="L295">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L296">                <span class="tok-str">&quot;Veiled recordings are encrypted before they are written. This \</span></span>
-<span class="ln" id="L297"><span class="tok-str">                 is what opens them again.&quot;</span>,</span>
-<span class="ln" id="L298">            ));</span>
-<span class="ln" id="L299">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L300">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L301">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L302">                    <span class="tok-str">&quot;A different password from the one above, by default, \</span></span>
-<span class="ln" id="L303"><span class="tok-str">                     because they protect different things: that one guards a \</span></span>
-<span class="ln" id="L304"><span class="tok-str">                     session, this one guards files that outlive it.&quot;</span>,</span>
-<span class="ln" id="L305">                )</span>
-<span class="ln" id="L306">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L307">            );</span>
-<span class="ln" id="L308">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L309"></span>
-<span class="ln" id="L310">            <span class="tok-kw">if</span> security.<span class="tok-fn">has_lock</span>() {</span>
-<span class="ln" id="L311">                ui.<span class="tok-fn">checkbox</span>(</span>
-<span class="ln" id="L312">                    &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.same_passphrase,</span>
-<span class="ln" id="L313">                    <span class="tok-str">&quot;Use the VeilVoice password for recordings too&quot;</span>,</span>
-<span class="ln" id="L314">                );</span>
-<span class="ln" id="L315">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L316">                    RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L317">                        <span class="tok-str">&quot;  One password to remember instead of two. What it \</span></span>
-<span class="ln" id="L318"><span class="tok-str">                         trades is that one password then opens the \</span></span>
-<span class="ln" id="L319"><span class="tok-str">                         application and everything it has written.&quot;</span>,</span>
-<span class="ln" id="L320">                    )</span>
-<span class="ln" id="L321">                    .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L322">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L323">                );</span>
-<span class="ln" id="L324">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L325">            }</span>
-<span class="ln" id="L326"></span>
-<span class="ln" id="L327">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.same_passphrase {</span>
-<span class="ln" id="L328">                security.<span class="tok-fn">prefer_app_lock_sealing</span>(true);</span>
-<span class="ln" id="L329">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L330">                    RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L331">                        <span class="tok-str">&quot;Recordings will be sealed with the VeilVoice password. \</span></span>
-<span class="ln" id="L332"><span class="tok-str">                         Unlock once and it is in hand.&quot;</span>,</span>
-<span class="ln" id="L333">                    )</span>
-<span class="ln" id="L334">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L335">                );</span>
-<span class="ln" id="L336">                <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L337">            }</span>
-<span class="ln" id="L338"></span>
-<span class="ln" id="L339">            <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;password&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.rec_entry);</span>
-<span class="ln" id="L340">            <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;again&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.rec_repeat);</span>
-<span class="ln" id="L341">            <span class="tok-kw">let</span> matched = !<span class="tok-kw">self</span>.rec_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; <span class="tok-kw">self</span>.rec_entry == <span class="tok-kw">self</span>.rec_repeat;</span>
-<span class="ln" id="L342">            <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.rec_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; !matched {</span>
-<span class="ln" id="L343">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L344">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;the two entries differ&quot;</span>)</span>
-<span class="ln" id="L345">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
-<span class="ln" id="L346">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L347">                );</span>
-<span class="ln" id="L348">            }</span>
-<span class="ln" id="L349">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L350">            <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L351">                .<span class="tok-fn">add_enabled</span>(matched, egui::Button::<span class="tok-fn">new</span>(<span class="tok-str">&quot;use this password&quot;</span>))</span>
-<span class="ln" id="L352">                .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L353">            {</span>
-<span class="ln" id="L354">                <span class="tok-kw">let</span> entry = std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.rec_entry);</span>
-<span class="ln" id="L355">                <span class="tok-kw">self</span>.rec_repeat.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L356">                security.<span class="tok-fn">set_recording_passphrase</span>(entry);</span>
-<span class="ln" id="L357">                advance = true;</span>
-<span class="ln" id="L358">            }</span>
-<span class="ln" id="L359">        });</span>
-<span class="ln" id="L360">        <span class="tok-kw">let</span> (next, _) = <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;skip for now&quot;</span>, None);</span>
-<span class="ln" id="L361">        advance || next</span>
-<span class="ln" id="L362">    }</span>
+<span class="ln" id="L296">    <span class="tok-com">/// The recording step: the at-rest passphrase, and what it is separate</span></span>
+<span class="ln" id="L297">    <span class="tok-com">/// from.</span></span>
+<span class="ln" id="L298">    <span class="tok-kw">fn</span> <span class="tok-fn">recording</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, security: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::security::Security) -&gt; bool {</span>
+<span class="ln" id="L299">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> advance = false;</span>
+<span class="ln" id="L300">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;A password for your recordings&quot;</span>, |ui| {</span>
+<span class="ln" id="L301">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L302">                <span class="tok-str">&quot;Veiled recordings are encrypted before they are written. This \</span></span>
+<span class="ln" id="L303"><span class="tok-str">                 is what opens them again.&quot;</span>,</span>
+<span class="ln" id="L304">            ));</span>
+<span class="ln" id="L305">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L306">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L307">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L308">                    <span class="tok-str">&quot;A different password from the one above, by default, \</span></span>
+<span class="ln" id="L309"><span class="tok-str">                     because they protect different things: that one guards a \</span></span>
+<span class="ln" id="L310"><span class="tok-str">                     session, this one guards files that outlive it.&quot;</span>,</span>
+<span class="ln" id="L311">                )</span>
+<span class="ln" id="L312">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L313">            );</span>
+<span class="ln" id="L314">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L315"></span>
+<span class="ln" id="L316">            <span class="tok-kw">if</span> security.<span class="tok-fn">has_lock</span>() {</span>
+<span class="ln" id="L317">                ui.<span class="tok-fn">checkbox</span>(</span>
+<span class="ln" id="L318">                    &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.same_passphrase,</span>
+<span class="ln" id="L319">                    <span class="tok-str">&quot;Use the VeilVoice password for recordings too&quot;</span>,</span>
+<span class="ln" id="L320">                );</span>
+<span class="ln" id="L321">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L322">                    RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L323">                        <span class="tok-str">&quot;  One password to remember instead of two. What it \</span></span>
+<span class="ln" id="L324"><span class="tok-str">                         trades is that one password then opens the \</span></span>
+<span class="ln" id="L325"><span class="tok-str">                         application and everything it has written.&quot;</span>,</span>
+<span class="ln" id="L326">                    )</span>
+<span class="ln" id="L327">                    .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L328">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L329">                );</span>
+<span class="ln" id="L330">                ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L331">            }</span>
+<span class="ln" id="L332"></span>
+<span class="ln" id="L333">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.same_passphrase {</span>
+<span class="ln" id="L334">                security.<span class="tok-fn">prefer_app_lock_sealing</span>(true);</span>
+<span class="ln" id="L335">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L336">                    RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L337">                        <span class="tok-str">&quot;Recordings will be sealed with the VeilVoice password. \</span></span>
+<span class="ln" id="L338"><span class="tok-str">                         Unlock once and it is in hand.&quot;</span>,</span>
+<span class="ln" id="L339">                    )</span>
+<span class="ln" id="L340">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L341">                );</span>
+<span class="ln" id="L342">                <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L343">            }</span>
+<span class="ln" id="L344"></span>
+<span class="ln" id="L345">            <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;password&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.rec_entry);</span>
+<span class="ln" id="L346">            <span class="tok-fn">field</span>(ui, <span class="tok-str">&quot;again&quot;</span>, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.rec_repeat);</span>
+<span class="ln" id="L347">            <span class="tok-kw">let</span> matched = !<span class="tok-kw">self</span>.rec_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; <span class="tok-kw">self</span>.rec_entry == <span class="tok-kw">self</span>.rec_repeat;</span>
+<span class="ln" id="L348">            <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.rec_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; !matched {</span>
+<span class="ln" id="L349">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L350">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;the two entries differ&quot;</span>)</span>
+<span class="ln" id="L351">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>())</span>
+<span class="ln" id="L352">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L353">                );</span>
+<span class="ln" id="L354">            }</span>
+<span class="ln" id="L355">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L356">            <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L357">                .<span class="tok-fn">add_enabled</span>(matched, egui::Button::<span class="tok-fn">new</span>(<span class="tok-str">&quot;use this password&quot;</span>))</span>
+<span class="ln" id="L358">                .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L359">            {</span>
+<span class="ln" id="L360">                <span class="tok-kw">let</span> entry = std::mem::<span class="tok-fn">take</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.rec_entry);</span>
+<span class="ln" id="L361">                <span class="tok-kw">self</span>.rec_repeat.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L362">                security.<span class="tok-fn">set_recording_passphrase</span>(entry);</span>
+<span class="ln" id="L363">                advance = true;</span>
+<span class="ln" id="L364">            }</span>
+<span class="ln" id="L365">        });</span>
+<span class="ln" id="L366">        <span class="tok-kw">let</span> (next, _) = <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;skip for now&quot;</span>, None);</span>
+<span class="ln" id="L367">        advance || next</span>
+<span class="ln" id="L368">    }</span>
 </span>
-<span class="ln" id="L363"></span>
+<span class="ln" id="L369"></span>
 <span class="src-item" id="fn-firstrun-machine">
-<span class="ln" id="L364">    <span class="tok-com">/// What this machine says about itself, and the one choice that follows.</span></span>
-<span class="ln" id="L365">    <span class="tok-com">///</span></span>
-<span class="ln" id="L366">    <span class="tok-com">/// **Roadmap item 135.** Every number here is read from the machine at the moment</span></span>
-<span class="ln" id="L367">    <span class="tok-com">/// the card is drawn. None of it is a default written into this program: a</span></span>
-<span class="ln" id="L368">    <span class="tok-com">/// setup screen that asserts how much room there is, or that the graphics</span></span>
-<span class="ln" id="L369">    <span class="tok-com">/// will be fine, is guessing on somebody else&#x27;s hardware and sounding</span></span>
-<span class="ln" id="L370">    <span class="tok-com">/// certain about it.</span></span>
+<span class="ln" id="L370">    <span class="tok-com">/// The machine card: what this computer says, read once rather than per frame.</span></span>
 <span class="ln" id="L371">    <span class="tok-com">///</span></span>
-<span class="ln" id="L372">    <span class="tok-com">/// Where the machine will not say, the card says that instead. &quot;This system</span></span>
-<span class="ln" id="L373">    <span class="tok-com">/// would not tell us&quot; is a real answer and is a different one from a</span></span>
-<span class="ln" id="L374">    <span class="tok-com">/// number.</span></span>
-<span class="ln" id="L375">    <span class="tok-kw">fn</span> <span class="tok-fn">machine</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, prefs: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::settings::Settings) -&gt; bool {</span>
-<span class="ln" id="L376">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;What this machine says&quot;</span>, |ui| {</span>
-<span class="ln" id="L377">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L378">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L379">                    <span class="tok-str">&quot;Read from this computer just now, rather than assumed. \</span></span>
-<span class="ln" id="L380"><span class="tok-str">                     Nothing here is sent anywhere, and nothing on this card has \</span></span>
-<span class="ln" id="L381"><span class="tok-str">                     to be answered.&quot;</span>,</span>
-<span class="ln" id="L382">                )</span>
-<span class="ln" id="L383">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L384">            );</span>
-<span class="ln" id="L385">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L386"></span>
-<span class="ln" id="L387">            <span class="tok-com">// Where the recordings will go, and how much room is there for</span></span>
-<span class="ln" id="L388">            <span class="tok-com">// them. The two belong together: a folder nobody can find and a</span></span>
-<span class="ln" id="L389">            <span class="tok-com">// disk with nothing left on it are the same problem to somebody</span></span>
-<span class="ln" id="L390">            <span class="tok-com">// whose recording did not save.</span></span>
-<span class="ln" id="L391">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Where recordings will go&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()));</span>
-<span class="ln" id="L392">            <span class="tok-kw">match</span> veilvoice_crypto::lock::<span class="tok-fn">default_dir</span>() {</span>
-<span class="ln" id="L393">                <span class="tok-fn">Some</span>(dir) =&gt; {</span>
-<span class="ln" id="L394">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(dir.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()));</span>
-<span class="ln" id="L395">                    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L396">                        RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> veilvoice_setup::space::<span class="tok-fn">free_bytes</span>(&amp;dir) {</span>
-<span class="ln" id="L397">                            <span class="tok-fn">Some</span>(free) =&gt; format!(</span>
-<span class="ln" id="L398">                                <span class="tok-str">&quot;{} free there, which is room for about {} of an \</span></span>
-<span class="ln" id="L399"><span class="tok-str">                                 hour&#x27;s veiled audio.&quot;</span>,</span>
-<span class="ln" id="L400">                                <span class="tok-kw">crate</span>::studio::<span class="tok-fn">size</span>(usize::<span class="tok-fn">try_from</span>(free).<span class="tok-fn">unwrap_or</span>(usize::MAX)),</span>
-<span class="ln" id="L401">                                <span class="tok-com">// An hour of 48 kHz mono 16-bit audio, which is</span></span>
-<span class="ln" id="L402">                                <span class="tok-com">// what the recorder writes. Worked out from the</span></span>
-<span class="ln" id="L403">                                <span class="tok-com">// free space rather than stated, so it is this</span></span>
-<span class="ln" id="L404">                                <span class="tok-com">// machine&#x27;s answer. Unsigned, so it cannot go</span></span>
-<span class="ln" id="L405">                                <span class="tok-com">// below zero and is not clamped as though it</span></span>
-<span class="ln" id="L406">                                <span class="tok-com">// could.</span></span>
-<span class="ln" id="L407">                                free / (<span class="tok-num">48_000</span> * <span class="tok-num">2</span> * <span class="tok-num">3_600</span>)</span>
-<span class="ln" id="L408">                            ),</span>
-<span class="ln" id="L409">                            None =&gt; <span class="tok-str">&quot;This system would not say how much room is \</span></span>
-<span class="ln" id="L410"><span class="tok-str">                                     free there, so check before a long recording.&quot;</span></span>
-<span class="ln" id="L411">                                .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L412">                        })</span>
-<span class="ln" id="L413">                        .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L414">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L415">                    );</span>
-<span class="ln" id="L416">                }</span>
-<span class="ln" id="L417">                None =&gt; {</span>
-<span class="ln" id="L418">                    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L419">                        RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L420">                            <span class="tok-str">&quot;This system does not say where an application should \</span></span>
-<span class="ln" id="L421"><span class="tok-str">                             keep its files, so nothing will be kept between runs \</span></span>
-<span class="ln" id="L422"><span class="tok-str">                             and the vault cannot be opened. The About tab says \</span></span>
-<span class="ln" id="L423"><span class="tok-str">                             the same thing in more detail.&quot;</span>,</span>
-<span class="ln" id="L424">                        )</span>
-<span class="ln" id="L425">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()),</span>
-<span class="ln" id="L426">                    );</span>
-<span class="ln" id="L427">                }</span>
-<span class="ln" id="L428">            }</span>
-<span class="ln" id="L429"></span>
-<span class="ln" id="L430">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L431">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Sound devices&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()));</span>
-<span class="ln" id="L432">            <span class="tok-kw">let</span> (inputs, outputs) = <span class="tok-fn">device_counts</span>();</span>
-<span class="ln" id="L433">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L434">                RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> (inputs, outputs) {</span>
-<span class="ln" id="L435">                    (<span class="tok-num">0</span>, <span class="tok-num">0</span>) =&gt; <span class="tok-str">&quot;None found. Anonymising a file still works; the \</span></span>
-<span class="ln" id="L436"><span class="tok-str">                               live and Studio tabs need a microphone.&quot;</span></span>
-<span class="ln" id="L437">                        .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L438">                    (<span class="tok-num">0</span>, _) =&gt; <span class="tok-str">&quot;No microphone found. Anonymising a file works; \</span></span>
-<span class="ln" id="L439"><span class="tok-str">                               recording does not.&quot;</span></span>
-<span class="ln" id="L440">                        .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L441">                    (i, o) =&gt; format!(</span>
-<span class="ln" id="L442">                        <span class="tok-str">&quot;{i} to record from, {o} to play to. The Settings tab \</span></span>
-<span class="ln" id="L443"><span class="tok-str">                         picks which.&quot;</span></span>
-<span class="ln" id="L444">                    ),</span>
-<span class="ln" id="L445">                })</span>
-<span class="ln" id="L446">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L447">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L448">            );</span>
-<span class="ln" id="L449"></span>
-<span class="ln" id="L450">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L451">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Drawing the window&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()));</span>
-<span class="ln" id="L452">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> accelerated = prefs.<span class="tok-fn">acceleration</span>();</span>
-<span class="ln" id="L453">            <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L454">                .<span class="tok-fn">checkbox</span>(</span>
-<span class="ln" id="L455">                    &amp;<span class="tok-kw">mut</span> accelerated,</span>
-<span class="ln" id="L456">                    <span class="tok-str">&quot;Ask the graphics driver to draw the window&quot;</span>,</span>
-<span class="ln" id="L457">                )</span>
-<span class="ln" id="L458">                .<span class="tok-fn">changed</span>()</span>
-<span class="ln" id="L459">            {</span>
-<span class="ln" id="L460">                prefs.<span class="tok-fn">set_acceleration</span>(accelerated);</span>
-<span class="ln" id="L461">            }</span>
-<span class="ln" id="L462">            <span class="tok-com">// Roadmap item 170. The probe&#x27;s own sentence, which names what was</span></span>
-<span class="ln" id="L463">            <span class="tok-com">// found on this machine, rather than a paragraph written once for</span></span>
-<span class="ln" id="L464">            <span class="tok-com">// every machine. This card is called &quot;What this machine says&quot; and</span></span>
-<span class="ln" id="L465">            <span class="tok-com">// this was the one section on it that did not say anything about</span></span>
-<span class="ln" id="L466">            <span class="tok-com">// the machine.</span></span>
-<span class="ln" id="L467">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L468">                RichText::<span class="tok-fn">new</span>(<span class="tok-kw">crate</span>::probe::<span class="tok-fn">look</span>().acceleration_reason.<span class="tok-fn">as_str</span>())</span>
-<span class="ln" id="L469">                    .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L470">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L471">            );</span>
-<span class="ln" id="L472">            <span class="tok-com">// And a plain statement of whether the sentence above is a finding</span></span>
-<span class="ln" id="L473">            <span class="tok-com">// or a fallback. A reader deciding whether to touch the tick needs</span></span>
-<span class="ln" id="L474">            <span class="tok-com">// to know which, and an interface that reads the same either way is</span></span>
-<span class="ln" id="L475">            <span class="tok-com">// claiming a measurement it may not have taken.</span></span>
-<span class="ln" id="L476">            <span class="tok-kw">if</span> !<span class="tok-kw">crate</span>::probe::<span class="tok-fn">look</span>().graphics_answered {</span>
-<span class="ln" id="L477">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L478">                    RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L479">                        <span class="tok-str">&quot;This is the setting every machine started on before it \</span></span>
-<span class="ln" id="L480"><span class="tok-str">                         could be asked, so nothing is lost by it. The About tab \</span></span>
-<span class="ln" id="L481"><span class="tok-str">                         shows what the driver actually gave.&quot;</span>,</span>
-<span class="ln" id="L482">                    )</span>
-<span class="ln" id="L483">                    .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L484">                    .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L485">                );</span>
-<span class="ln" id="L486">            }</span>
-<span class="ln" id="L487">        });</span>
-<span class="ln" id="L488">        <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;finish&quot;</span>, None).<span class="tok-num">0</span></span>
-<span class="ln" id="L489">    }</span>
-</span>
-<span class="ln" id="L490"></span>
-<span class="src-item" id="fn-firstrun-autolock">
-<span class="ln" id="L491">    <span class="tok-com">/// The auto-lock step: how long idle before the window locks itself.</span></span>
-<span class="ln" id="L492">    <span class="tok-kw">fn</span> <span class="tok-fn">autolock</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, prefs: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::settings::Settings) -&gt; bool {</span>
-<span class="ln" id="L493">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;Locking itself when you walk away&quot;</span>, |ui| {</span>
-<span class="ln" id="L494">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L495">                <span class="tok-str">&quot;VeilVoice locks its window again after half an hour with \</span></span>
-<span class="ln" id="L496"><span class="tok-str">                 nobody touching it.&quot;</span>,</span>
-<span class="ln" id="L497">            ));</span>
-<span class="ln" id="L498">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L499">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L500">                RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L501">                    <span class="tok-str">&quot;A job running does not count as touching it. If you start \</span></span>
-<span class="ln" id="L502"><span class="tok-str">                     a long render and leave the room, that is exactly when you \</span></span>
-<span class="ln" id="L503"><span class="tok-str">                     would want it locked.&quot;</span>,</span>
-<span class="ln" id="L504">                )</span>
-<span class="ln" id="L505">                .<span class="tok-fn">small</span>()</span>
-<span class="ln" id="L506">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L507">            );</span>
-<span class="ln" id="L508">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
-<span class="ln" id="L509">            prefs.<span class="tok-fn">first_run_autolock</span>(ui);</span>
-<span class="ln" id="L510">        });</span>
-<span class="ln" id="L511">        <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;finish&quot;</span>, None).<span class="tok-num">0</span></span>
-<span class="ln" id="L512">    }</span>
-</span>
-<span class="ln" id="L513">}</span>
-<span class="ln" id="L514"></span>
-<span class="src-item" id="fn-card">
-<span class="ln" id="L515"><span class="tok-com">/// A bordered card, so each step reads as one thing rather than a page of text.</span></span>
-<span class="ln" id="L516"><span class="tok-kw">fn</span> <span class="tok-fn">card</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, title: &amp;str, contents: <span class="tok-kw">impl</span> <span class="tok-fn">FnOnce</span>(&amp;<span class="tok-kw">mut</span> Ui)) {</span>
-<span class="ln" id="L517">    egui::Frame::<span class="tok-fn">new</span>()</span>
-<span class="ln" id="L518">        .<span class="tok-fn">fill</span>(p::<span class="tok-fn">bg_dark</span>())</span>
-<span class="ln" id="L519">        .<span class="tok-fn">stroke</span>(egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()))</span>
-<span class="ln" id="L520">        .<span class="tok-fn">inner_margin</span>(<span class="tok-num">16.0</span>)</span>
-<span class="ln" id="L521">        .<span class="tok-fn">corner_radius</span>(<span class="tok-num">6.0</span>)</span>
-<span class="ln" id="L522">        .<span class="tok-fn">show</span>(ui, |ui| {</span>
-<span class="ln" id="L523">            ui.<span class="tok-fn">set_max_width</span>(<span class="tok-num">560.0</span>);</span>
-<span class="ln" id="L524">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(title).<span class="tok-fn">size</span>(<span class="tok-num">16.0</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
-<span class="ln" id="L525">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L526">            <span class="tok-fn">contents</span>(ui);</span>
+<span class="ln" id="L372">    <span class="tok-com">/// # Why the reading is not done here</span></span>
+<span class="ln" id="L373">    <span class="tok-com">///</span></span>
+<span class="ln" id="L374">    <span class="tok-com">/// Every answer on this card is a question with a cost.</span></span>
+<span class="ln" id="L375">    <span class="tok-com">/// `veilvoice_setup::space::free_bytes` spawns `df` on Unix and</span></span>
+<span class="ln" id="L376">    <span class="tok-com">/// `fsutil.exe` on Windows; the graphics probe asks the driver. Written</span></span>
+<span class="ln" id="L377">    <span class="tok-com">/// inline, which is how this card was written, each of them ran **once per</span></span>
+<span class="ln" id="L378">    <span class="tok-com">/// frame** for as long as the card was on screen: a process forked sixty</span></span>
+<span class="ln" id="L379">    <span class="tok-com">/// times a second to print a number that changes about as often as</span></span>
+<span class="ln" id="L380">    <span class="tok-com">/// somebody empties a bin. See F-216.</span></span>
+<span class="ln" id="L381">    <span class="tok-com">///</span></span>
+<span class="ln" id="L382">    <span class="tok-com">/// So the reading happens on a worker and the card draws whatever has come</span></span>
+<span class="ln" id="L383">    <span class="tok-com">/// back. The card still measures rather than asserting, which is roadmap</span></span>
+<span class="ln" id="L384">    <span class="tok-com">/// item 135&#x27;s whole point; it measures once.</span></span>
+<span class="ln" id="L385">    <span class="tok-com">///</span></span>
+<span class="ln" id="L386">    <span class="tok-com">/// # And the device counts come from the caller</span></span>
+<span class="ln" id="L387">    <span class="tok-com">///</span></span>
+<span class="ln" id="L388">    <span class="tok-com">/// There is one enumeration of the audio hardware in this program, in</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// `app`, at startup. **F-165** is what a second one cost: two enumerators</span></span>
+<span class="ln" id="L390">    <span class="tok-com">/// running beside each other killed the process on Windows. This card used</span></span>
+<span class="ln" id="L391">    <span class="tok-com">/// to make its own, per frame, which is the same defect with a worse</span></span>
+<span class="ln" id="L392">    <span class="tok-com">/// multiplier. It now takes the count from the place that already has it,</span></span>
+<span class="ln" id="L393">    <span class="tok-com">/// so there is one answer rather than two that could disagree.</span></span>
+<span class="ln" id="L394">    <span class="tok-kw">fn</span> <span class="tok-fn">machine</span>(</span>
+<span class="ln" id="L395">        &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>,</span>
+<span class="ln" id="L396">        ui: &amp;<span class="tok-kw">mut</span> Ui,</span>
+<span class="ln" id="L397">        prefs: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::settings::Settings,</span>
+<span class="ln" id="L398">        devices: (usize, usize),</span>
+<span class="ln" id="L399">    ) -&gt; bool {</span>
+<span class="ln" id="L400">        <span class="tok-kw">self</span>.reading.<span class="tok-fn">ask_once</span>(ui.<span class="tok-fn">ctx</span>(), read_machine);</span>
+<span class="ln" id="L401">        <span class="tok-kw">let</span> reading = <span class="tok-kw">self</span>.reading.<span class="tok-fn">get</span>();</span>
+<span class="ln" id="L402">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;What this machine says&quot;</span>, |ui| {</span>
+<span class="ln" id="L403">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L404">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L405">                    <span class="tok-str">&quot;Read from this computer just now, rather than assumed. \</span></span>
+<span class="ln" id="L406"><span class="tok-str">                     Nothing here is sent anywhere, and nothing on this card has \</span></span>
+<span class="ln" id="L407"><span class="tok-str">                     to be answered.&quot;</span>,</span>
+<span class="ln" id="L408">                )</span>
+<span class="ln" id="L409">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L410">            );</span>
+<span class="ln" id="L411">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L412"></span>
+<span class="ln" id="L413">            <span class="tok-com">// Where the recordings will go, and how much room is there for</span></span>
+<span class="ln" id="L414">            <span class="tok-com">// them. The two belong together: a folder nobody can find and a</span></span>
+<span class="ln" id="L415">            <span class="tok-com">// disk with nothing left on it are the same problem to somebody</span></span>
+<span class="ln" id="L416">            <span class="tok-com">// whose recording did not save.</span></span>
+<span class="ln" id="L417">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Where recordings will go&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()));</span>
+<span class="ln" id="L418">            <span class="tok-kw">match</span> reading {</span>
+<span class="ln" id="L419">                None =&gt; <span class="tok-fn">still_reading</span>(ui),</span>
+<span class="ln" id="L420">                <span class="tok-fn">Some</span>(Reading { dir: None, .. }) =&gt; {</span>
+<span class="ln" id="L421">                    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L422">                        RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L423">                            <span class="tok-str">&quot;This system does not say where an application should \</span></span>
+<span class="ln" id="L424"><span class="tok-str">                             keep its files, so nothing will be kept between runs \</span></span>
+<span class="ln" id="L425"><span class="tok-str">                             and the vault cannot be opened. The About tab says \</span></span>
+<span class="ln" id="L426"><span class="tok-str">                             the same thing in more detail.&quot;</span>,</span>
+<span class="ln" id="L427">                        )</span>
+<span class="ln" id="L428">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()),</span>
+<span class="ln" id="L429">                    );</span>
+<span class="ln" id="L430">                }</span>
+<span class="ln" id="L431">                <span class="tok-fn">Some</span>(Reading {</span>
+<span class="ln" id="L432">                    dir: <span class="tok-fn">Some</span>(dir),</span>
+<span class="ln" id="L433">                    free,</span>
+<span class="ln" id="L434">                    ..</span>
+<span class="ln" id="L435">                }) =&gt; {</span>
+<span class="ln" id="L436">                    ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(dir.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">cyan</span>()));</span>
+<span class="ln" id="L437">                    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L438">                        RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> free {</span>
+<span class="ln" id="L439">                            <span class="tok-fn">Some</span>(free) =&gt; format!(</span>
+<span class="ln" id="L440">                                <span class="tok-str">&quot;{} free there, which is room for about {} of an \</span></span>
+<span class="ln" id="L441"><span class="tok-str">                                 hour&#x27;s veiled audio.&quot;</span>,</span>
+<span class="ln" id="L442">                                <span class="tok-kw">crate</span>::studio::<span class="tok-fn">size</span>(usize::<span class="tok-fn">try_from</span>(*free).<span class="tok-fn">unwrap_or</span>(usize::MAX)),</span>
+<span class="ln" id="L443">                                <span class="tok-com">// An hour of 48 kHz mono 16-bit audio, which is</span></span>
+<span class="ln" id="L444">                                <span class="tok-com">// what the recorder writes. Worked out from the</span></span>
+<span class="ln" id="L445">                                <span class="tok-com">// free space rather than stated, so it is this</span></span>
+<span class="ln" id="L446">                                <span class="tok-com">// machine&#x27;s answer. Unsigned, so it cannot go</span></span>
+<span class="ln" id="L447">                                <span class="tok-com">// below zero and is not clamped as though it</span></span>
+<span class="ln" id="L448">                                <span class="tok-com">// could.</span></span>
+<span class="ln" id="L449">                                free / (<span class="tok-num">48_000</span> * <span class="tok-num">2</span> * <span class="tok-num">3_600</span>)</span>
+<span class="ln" id="L450">                            ),</span>
+<span class="ln" id="L451">                            None =&gt; <span class="tok-str">&quot;This system would not say how much room is \</span></span>
+<span class="ln" id="L452"><span class="tok-str">                                     free there, so check before a long recording.&quot;</span></span>
+<span class="ln" id="L453">                                .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L454">                        })</span>
+<span class="ln" id="L455">                        .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L456">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L457">                    );</span>
+<span class="ln" id="L458">                }</span>
+<span class="ln" id="L459">            }</span>
+<span class="ln" id="L460"></span>
+<span class="ln" id="L461">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L462">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Sound devices&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()));</span>
+<span class="ln" id="L463">            <span class="tok-kw">let</span> (inputs, outputs) = devices;</span>
+<span class="ln" id="L464">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L465">                RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> (inputs, outputs) {</span>
+<span class="ln" id="L466">                    (<span class="tok-num">0</span>, <span class="tok-num">0</span>) =&gt; <span class="tok-str">&quot;None found. Anonymising a file still works; the \</span></span>
+<span class="ln" id="L467"><span class="tok-str">                               live and Studio tabs need a microphone.&quot;</span></span>
+<span class="ln" id="L468">                        .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L469">                    (<span class="tok-num">0</span>, _) =&gt; <span class="tok-str">&quot;No microphone found. Anonymising a file works; \</span></span>
+<span class="ln" id="L470"><span class="tok-str">                               recording does not.&quot;</span></span>
+<span class="ln" id="L471">                        .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L472">                    (i, o) =&gt; format!(</span>
+<span class="ln" id="L473">                        <span class="tok-str">&quot;{i} to record from, {o} to play to. The Settings tab \</span></span>
+<span class="ln" id="L474"><span class="tok-str">                         picks which.&quot;</span></span>
+<span class="ln" id="L475">                    ),</span>
+<span class="ln" id="L476">                })</span>
+<span class="ln" id="L477">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L478">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L479">            );</span>
+<span class="ln" id="L480"></span>
+<span class="ln" id="L481">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L482">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Drawing the window&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()));</span>
+<span class="ln" id="L483">            <span class="tok-com">// Outside the reading, and deliberately: this is a preference</span></span>
+<span class="ln" id="L484">            <span class="tok-com">// rather than a measurement, so it is there to be changed on the</span></span>
+<span class="ln" id="L485">            <span class="tok-com">// first frame whether or not the driver has answered yet.</span></span>
+<span class="ln" id="L486">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> accelerated = prefs.<span class="tok-fn">acceleration</span>();</span>
+<span class="ln" id="L487">            <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L488">                .<span class="tok-fn">checkbox</span>(</span>
+<span class="ln" id="L489">                    &amp;<span class="tok-kw">mut</span> accelerated,</span>
+<span class="ln" id="L490">                    <span class="tok-str">&quot;Ask the graphics driver to draw the window&quot;</span>,</span>
+<span class="ln" id="L491">                )</span>
+<span class="ln" id="L492">                .<span class="tok-fn">changed</span>()</span>
+<span class="ln" id="L493">            {</span>
+<span class="ln" id="L494">                prefs.<span class="tok-fn">set_acceleration</span>(accelerated);</span>
+<span class="ln" id="L495">            }</span>
+<span class="ln" id="L496">            <span class="tok-com">// Roadmap item 170. The probe&#x27;s own sentence, which names what was</span></span>
+<span class="ln" id="L497">            <span class="tok-com">// found on this machine, rather than a paragraph written once for</span></span>
+<span class="ln" id="L498">            <span class="tok-com">// every machine. This card is called &quot;What this machine says&quot; and</span></span>
+<span class="ln" id="L499">            <span class="tok-com">// this was the one section on it that did not say anything about</span></span>
+<span class="ln" id="L500">            <span class="tok-com">// the machine.</span></span>
+<span class="ln" id="L501">            <span class="tok-kw">match</span> reading {</span>
+<span class="ln" id="L502">                None =&gt; <span class="tok-fn">still_reading</span>(ui),</span>
+<span class="ln" id="L503">                <span class="tok-fn">Some</span>(machine) =&gt; {</span>
+<span class="ln" id="L504">                    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L505">                        RichText::<span class="tok-fn">new</span>(machine.acceleration_reason.<span class="tok-fn">as_str</span>())</span>
+<span class="ln" id="L506">                            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L507">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L508">                    );</span>
+<span class="ln" id="L509">                    <span class="tok-com">// And a plain statement of whether the sentence above is a</span></span>
+<span class="ln" id="L510">                    <span class="tok-com">// finding or a fallback. A reader deciding whether to touch</span></span>
+<span class="ln" id="L511">                    <span class="tok-com">// the tick needs to know which, and an interface that reads</span></span>
+<span class="ln" id="L512">                    <span class="tok-com">// the same either way is claiming a measurement it may not</span></span>
+<span class="ln" id="L513">                    <span class="tok-com">// have taken.</span></span>
+<span class="ln" id="L514">                    <span class="tok-kw">if</span> !machine.graphics_answered {</span>
+<span class="ln" id="L515">                        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L516">                            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L517">                                <span class="tok-str">&quot;This is the setting every machine started on before it \</span></span>
+<span class="ln" id="L518"><span class="tok-str">                                 could be asked, so nothing is lost by it. The About tab \</span></span>
+<span class="ln" id="L519"><span class="tok-str">                                 shows what the driver actually gave.&quot;</span>,</span>
+<span class="ln" id="L520">                            )</span>
+<span class="ln" id="L521">                            .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L522">                            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L523">                        );</span>
+<span class="ln" id="L524">                    }</span>
+<span class="ln" id="L525">                }</span>
+<span class="ln" id="L526">            }</span>
 <span class="ln" id="L527">        });</span>
-<span class="ln" id="L528">}</span>
+<span class="ln" id="L528">        <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;finish&quot;</span>, None).<span class="tok-num">0</span></span>
+<span class="ln" id="L529">    }</span>
 </span>
-<span class="ln" id="L529"></span>
-<span class="src-item" id="fn-device_counts">
-<span class="ln" id="L530"><span class="tok-com">/// How many recording and playback devices this machine has.</span></span>
-<span class="ln" id="L531"><span class="tok-com">///</span></span>
-<span class="ln" id="L532"><span class="tok-com">/// Counted rather than listed on the setup card: the names are long, the list</span></span>
-<span class="ln" id="L533"><span class="tok-com">/// belongs in Settings where it can be chosen from, and the question at first</span></span>
-<span class="ln" id="L534"><span class="tok-com">/// run is &quot;is there one at all&quot;, which a number answers.</span></span>
-<span class="ln" id="L535"><span class="tok-com">///</span></span>
-<span class="ln" id="L536"><span class="tok-com">/// A platform that will not enumerate reports zero of each, which the card</span></span>
-<span class="ln" id="L537"><span class="tok-com">/// reads the same way as a machine with no sound card. That is the right</span></span>
-<span class="ln" id="L538"><span class="tok-com">/// reading here: from the person&#x27;s side, &quot;we cannot see a microphone&quot; and</span></span>
-<span class="ln" id="L539"><span class="tok-com">/// &quot;there is no microphone&quot; have the same consequence.</span></span>
-<span class="ln" id="L540"><span class="tok-com">///</span></span>
-<span class="ln" id="L541"><span class="tok-com">/// # Not called by any test, and that is deliberate</span></span>
-<span class="ln" id="L542"><span class="tok-com">///</span></span>
-<span class="ln" id="L543"><span class="tok-com">/// This asks the platform for its real devices, and a test that did so was</span></span>
-<span class="ln" id="L544"><span class="tok-com">/// **F-165**: the desktop crate&#x27;s test binary already enumerates once, on</span></span>
-<span class="ln" id="L545"><span class="tok-com">/// purpose, in `app`, and a second enumerator running beside it killed the</span></span>
-<span class="ln" id="L546"><span class="tok-com">/// process on Windows. One enumeration, in one place, is what this crate does.</span></span>
-<span class="ln" id="L547"><span class="tok-com">/// What can be checked without a device is that the card calls this rather than</span></span>
-<span class="ln" id="L548"><span class="tok-com">/// carrying a number, and a test reads the card&#x27;s source for exactly that.</span></span>
-<span class="ln" id="L549"><span class="tok-kw">fn</span> <span class="tok-fn">device_counts</span>() -&gt; (usize, usize) {</span>
-<span class="ln" id="L550">    <span class="tok-kw">use</span> veilvoice_audio::devices::Direction;</span>
-<span class="ln" id="L551">    (</span>
-<span class="ln" id="L552">        veilvoice_audio::devices::<span class="tok-fn">list</span>(Direction::Input)</span>
-<span class="ln" id="L553">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">len</span>())</span>
-<span class="ln" id="L554">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>),</span>
-<span class="ln" id="L555">        veilvoice_audio::devices::<span class="tok-fn">list</span>(Direction::Output)</span>
-<span class="ln" id="L556">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">len</span>())</span>
-<span class="ln" id="L557">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>),</span>
-<span class="ln" id="L558">    )</span>
-<span class="ln" id="L559">}</span>
+<span class="ln" id="L530"></span>
+<span class="src-item" id="fn-firstrun-autolock">
+<span class="ln" id="L531">    <span class="tok-com">/// The auto-lock step: how long idle before the window locks itself.</span></span>
+<span class="ln" id="L532">    <span class="tok-kw">fn</span> <span class="tok-fn">autolock</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, prefs: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::settings::Settings) -&gt; bool {</span>
+<span class="ln" id="L533">        <span class="tok-fn">card</span>(ui, <span class="tok-str">&quot;Locking itself when you walk away&quot;</span>, |ui| {</span>
+<span class="ln" id="L534">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L535">                <span class="tok-str">&quot;VeilVoice locks its window again after half an hour with \</span></span>
+<span class="ln" id="L536"><span class="tok-str">                 nobody touching it.&quot;</span>,</span>
+<span class="ln" id="L537">            ));</span>
+<span class="ln" id="L538">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L539">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L540">                RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L541">                    <span class="tok-str">&quot;A job running does not count as touching it. If you start \</span></span>
+<span class="ln" id="L542"><span class="tok-str">                     a long render and leave the room, that is exactly when you \</span></span>
+<span class="ln" id="L543"><span class="tok-str">                     would want it locked.&quot;</span>,</span>
+<span class="ln" id="L544">                )</span>
+<span class="ln" id="L545">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L546">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L547">            );</span>
+<span class="ln" id="L548">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">12.0</span>);</span>
+<span class="ln" id="L549">            prefs.<span class="tok-fn">first_run_autolock</span>(ui);</span>
+<span class="ln" id="L550">        });</span>
+<span class="ln" id="L551">        <span class="tok-fn">buttons</span>(ui, <span class="tok-str">&quot;finish&quot;</span>, None).<span class="tok-num">0</span></span>
+<span class="ln" id="L552">    }</span>
 </span>
-<span class="ln" id="L560"></span>
+<span class="ln" id="L553">}</span>
+<span class="ln" id="L554"></span>
+<span class="src-item" id="fn-card">
+<span class="ln" id="L555"><span class="tok-com">/// A bordered card, so each step reads as one thing rather than a page of text.</span></span>
+<span class="ln" id="L556"><span class="tok-kw">fn</span> <span class="tok-fn">card</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, title: &amp;str, contents: <span class="tok-kw">impl</span> <span class="tok-fn">FnOnce</span>(&amp;<span class="tok-kw">mut</span> Ui)) {</span>
+<span class="ln" id="L557">    egui::Frame::<span class="tok-fn">new</span>()</span>
+<span class="ln" id="L558">        .<span class="tok-fn">fill</span>(p::<span class="tok-fn">bg_dark</span>())</span>
+<span class="ln" id="L559">        .<span class="tok-fn">stroke</span>(egui::Stroke::<span class="tok-fn">new</span>(<span class="tok-num">1.0</span>, p::<span class="tok-fn">border</span>()))</span>
+<span class="ln" id="L560">        .<span class="tok-fn">inner_margin</span>(<span class="tok-num">16.0</span>)</span>
+<span class="ln" id="L561">        .<span class="tok-fn">corner_radius</span>(<span class="tok-num">6.0</span>)</span>
+<span class="ln" id="L562">        .<span class="tok-fn">show</span>(ui, |ui| {</span>
+<span class="ln" id="L563">            ui.<span class="tok-fn">set_max_width</span>(<span class="tok-num">560.0</span>);</span>
+<span class="ln" id="L564">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(title).<span class="tok-fn">size</span>(<span class="tok-num">16.0</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()).<span class="tok-fn">strong</span>());</span>
+<span class="ln" id="L565">            ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L566">            <span class="tok-fn">contents</span>(ui);</span>
+<span class="ln" id="L567">        });</span>
+<span class="ln" id="L568">}</span>
+</span>
+<span class="ln" id="L569"></span>
+<span class="src-item" id="fn-reading">
+<span class="ln" id="L570"><span class="tok-com">/// What the last card of the tour reads from this computer.</span></span>
+<span class="ln" id="L571"><span class="tok-com">///</span></span>
+<span class="ln" id="L572"><span class="tok-com">/// One struct rather than four calls, because the point is that they happen</span></span>
+<span class="ln" id="L573"><span class="tok-com">/// together, once, somewhere that is not the thread drawing the window. Each</span></span>
+<span class="ln" id="L574"><span class="tok-com">/// field is an answer that has already been got; a card holding these is a</span></span>
+<span class="ln" id="L575"><span class="tok-com">/// card that cannot ask again by accident. See [`crate::offthread`] and F-216.</span></span>
+<span class="ln" id="L576"><span class="tok-com">///</span></span>
+<span class="ln" id="L577"><span class="tok-com">/// **Roadmap item 135&#x27;s whole point** is that this card reads the machine</span></span>
+<span class="ln" id="L578"><span class="tok-com">/// rather than carrying numbers written here, because a constant would be a</span></span>
+<span class="ln" id="L579"><span class="tok-com">/// claim about somebody else&#x27;s hardware stated with the confidence of a</span></span>
+<span class="ln" id="L580"><span class="tok-com">/// measurement. That is unchanged: these are measurements. They are taken</span></span>
+<span class="ln" id="L581"><span class="tok-com">/// once.</span></span>
+<span class="ln" id="L582"><span class="tok-kw">struct</span> Reading {</span>
+<span class="ln" id="L583">    <span class="tok-com">/// Where recordings will go, if this system says where an application</span></span>
+<span class="ln" id="L584">    <span class="tok-com">/// should keep its files.</span></span>
+<span class="ln" id="L585">    dir: Option&lt;std::path::PathBuf&gt;,</span>
+<span class="ln" id="L586">    <span class="tok-com">/// Free bytes there, if the system would say. `None` is reported as not</span></span>
+<span class="ln" id="L587">    <span class="tok-com">/// known rather than as zero, which would read as a full disk.</span></span>
+<span class="ln" id="L588">    free: Option&lt;u64&gt;,</span>
+<span class="ln" id="L589">    <span class="tok-com">/// The graphics probe&#x27;s own sentence about this machine.</span></span>
+<span class="ln" id="L590">    acceleration_reason: String,</span>
+<span class="ln" id="L591">    <span class="tok-com">/// Whether that sentence is a finding or the fallback everything starts on.</span></span>
+<span class="ln" id="L592">    graphics_answered: bool,</span>
+<span class="ln" id="L593">}</span>
+</span>
+<span class="ln" id="L594"></span>
+<span class="src-item" id="fn-read_machine">
+<span class="ln" id="L595"><span class="tok-com">/// Ask this computer everything the last card shows, on a worker thread.</span></span>
+<span class="ln" id="L596"><span class="tok-com">///</span></span>
+<span class="ln" id="L597"><span class="tok-com">/// The device counts are **not** here. There is one enumeration of the audio</span></span>
+<span class="ln" id="L598"><span class="tok-com">/// hardware in this program, in `app`, and F-165 is what a second one cost.</span></span>
+<span class="ln" id="L599"><span class="tok-com">/// The card takes that count from its caller instead.</span></span>
+<span class="ln" id="L600"><span class="tok-kw">fn</span> <span class="tok-fn">read_machine</span>() -&gt; Reading {</span>
+<span class="ln" id="L601">    <span class="tok-kw">let</span> dir = veilvoice_crypto::lock::<span class="tok-fn">default_dir</span>();</span>
+<span class="ln" id="L602">    <span class="tok-kw">let</span> free = dir.<span class="tok-fn">as_deref</span>().<span class="tok-fn">and_then</span>(veilvoice_setup::space::free_bytes);</span>
+<span class="ln" id="L603">    <span class="tok-com">// `look` keeps its answer in a `OnceLock`, so asking here both fills this</span></span>
+<span class="ln" id="L604">    <span class="tok-com">// card and means the first frame of the About tab finds the answer already</span></span>
+<span class="ln" id="L605">    <span class="tok-com">// made rather than waiting for the driver itself.</span></span>
+<span class="ln" id="L606">    <span class="tok-kw">let</span> probe = <span class="tok-kw">crate</span>::probe::<span class="tok-fn">look</span>();</span>
+<span class="ln" id="L607">    Reading {</span>
+<span class="ln" id="L608">        dir,</span>
+<span class="ln" id="L609">        free,</span>
+<span class="ln" id="L610">        acceleration_reason: probe.acceleration_reason.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L611">        graphics_answered: probe.graphics_answered,</span>
+<span class="ln" id="L612">    }</span>
+<span class="ln" id="L613">}</span>
+</span>
+<span class="ln" id="L614"></span>
+<span class="src-item" id="fn-still_reading">
+<span class="ln" id="L615"><span class="tok-com">/// The line a card shows where an answer will go, while it is being got.</span></span>
+<span class="ln" id="L616"><span class="tok-com">///</span></span>
+<span class="ln" id="L617"><span class="tok-com">/// Said rather than left blank. A section that is empty for a moment and then</span></span>
+<span class="ln" id="L618"><span class="tok-com">/// is not reads as the window having glitched, and the spinner is the</span></span>
+<span class="ln" id="L619"><span class="tok-com">/// difference between &quot;being read&quot; and &quot;this machine has none&quot;.</span></span>
+<span class="ln" id="L620"><span class="tok-kw">fn</span> <span class="tok-fn">still_reading</span>(ui: &amp;<span class="tok-kw">mut</span> Ui) {</span>
+<span class="ln" id="L621">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L622">        ui.<span class="tok-fn">spinner</span>();</span>
+<span class="ln" id="L623">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L624">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;reading this machine&quot;</span>)</span>
+<span class="ln" id="L625">                .<span class="tok-fn">small</span>()</span>
+<span class="ln" id="L626">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L627">        );</span>
+<span class="ln" id="L628">    });</span>
+<span class="ln" id="L629">}</span>
+</span>
 <span class="src-item" id="fn-field">
-<span class="ln" id="L561"><span class="tok-com">/// A password field with its label, laid out like the rest of the application.</span></span>
-<span class="ln" id="L562"><span class="tok-kw">fn</span> <span class="tok-fn">field</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, label: &amp;str, value: &amp;<span class="tok-kw">mut</span> String) {</span>
-<span class="ln" id="L563">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L564">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
-<span class="ln" id="L565">        ui.<span class="tok-fn">add</span>(</span>
-<span class="ln" id="L566">            egui::TextEdit::<span class="tok-fn">singleline</span>(value)</span>
-<span class="ln" id="L567">                .<span class="tok-fn">password</span>(true)</span>
-<span class="ln" id="L568">                .<span class="tok-fn">desired_width</span>(<span class="tok-num">240.0</span>),</span>
-<span class="ln" id="L569">        );</span>
-<span class="ln" id="L570">    });</span>
-<span class="ln" id="L571">}</span>
+<span class="ln" id="L630"><span class="tok-com">/// A password field with its label, laid out like the rest of the application.</span></span>
+<span class="ln" id="L631"><span class="tok-kw">fn</span> <span class="tok-fn">field</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, label: &amp;str, value: &amp;<span class="tok-kw">mut</span> String) {</span>
+<span class="ln" id="L632">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L633">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(label).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()));</span>
+<span class="ln" id="L634">        ui.<span class="tok-fn">add</span>(</span>
+<span class="ln" id="L635">            egui::TextEdit::<span class="tok-fn">singleline</span>(value)</span>
+<span class="ln" id="L636">                .<span class="tok-fn">password</span>(true)</span>
+<span class="ln" id="L637">                .<span class="tok-fn">desired_width</span>(<span class="tok-num">240.0</span>),</span>
+<span class="ln" id="L638">        );</span>
+<span class="ln" id="L639">    });</span>
+<span class="ln" id="L640">}</span>
 </span>
-<span class="ln" id="L572"></span>
+<span class="ln" id="L641"></span>
 <span class="src-item" id="fn-buttons">
-<span class="ln" id="L573"><span class="tok-com">/// The row that moves on. Returns whether it was pressed.</span></span>
-<span class="ln" id="L574"><span class="tok-kw">fn</span> <span class="tok-fn">buttons</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, forward: &amp;str, _unused: Option&lt;&amp;str&gt;) -&gt; (bool, bool) {</span>
-<span class="ln" id="L575">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
-<span class="ln" id="L576">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pressed = false;</span>
-<span class="ln" id="L577">    <span class="tok-kw">crate</span>::layout::<span class="tok-fn">centred_row</span>(ui, |ui| {</span>
-<span class="ln" id="L578">        pressed = ui.<span class="tok-fn">button</span>(forward).<span class="tok-fn">clicked</span>();</span>
-<span class="ln" id="L579">    });</span>
-<span class="ln" id="L580">    (pressed, false)</span>
-<span class="ln" id="L581">}</span>
+<span class="ln" id="L642"><span class="tok-com">/// The row that moves on. Returns whether it was pressed.</span></span>
+<span class="ln" id="L643"><span class="tok-kw">fn</span> <span class="tok-fn">buttons</span>(ui: &amp;<span class="tok-kw">mut</span> Ui, forward: &amp;str, _unused: Option&lt;&amp;str&gt;) -&gt; (bool, bool) {</span>
+<span class="ln" id="L644">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">14.0</span>);</span>
+<span class="ln" id="L645">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pressed = false;</span>
+<span class="ln" id="L646">    <span class="tok-kw">crate</span>::layout::<span class="tok-fn">centred_row</span>(ui, |ui| {</span>
+<span class="ln" id="L647">        pressed = ui.<span class="tok-fn">button</span>(forward).<span class="tok-fn">clicked</span>();</span>
+<span class="ln" id="L648">    });</span>
+<span class="ln" id="L649">    (pressed, false)</span>
+<span class="ln" id="L650">}</span>
 </span>
-<span class="ln" id="L582"></span>
-<span class="ln" id="L583"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L584"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L585">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L586"></span>
-<span class="ln" id="L587">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L588">    <span class="tok-kw">fn</span> <span class="tok-fn">the_steps_run_in_order_and_then_stop</span>() {</span>
-<span class="ln" id="L589">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L590">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = vec![step];</span>
-<span class="ln" id="L591">        while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(next) = step.<span class="tok-fn">next</span>() {</span>
-<span class="ln" id="L592">            step = next;</span>
-<span class="ln" id="L593">            seen.<span class="tok-fn">push</span>(step);</span>
-<span class="ln" id="L594">        }</span>
-<span class="ln" id="L595">        assert_eq!(</span>
-<span class="ln" id="L596">            seen,</span>
-<span class="ln" id="L597">            vec![</span>
-<span class="ln" id="L598">                Step::Appearance,</span>
-<span class="ln" id="L599">                Step::AppLock,</span>
-<span class="ln" id="L600">                Step::Recording,</span>
-<span class="ln" id="L601">                Step::Autolock,</span>
-<span class="ln" id="L602">                Step::Machine</span>
-<span class="ln" id="L603">            ]</span>
-<span class="ln" id="L604">        );</span>
-<span class="ln" id="L605">        assert_eq!(seen.<span class="tok-fn">len</span>(), Step::COUNT);</span>
-<span class="ln" id="L606">    }</span>
-<span class="ln" id="L607"></span>
-<span class="ln" id="L608">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L609">    <span class="tok-kw">fn</span> <span class="tok-fn">every_step_knows_where_it_is</span>() {</span>
-<span class="ln" id="L610">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L611">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> expected = <span class="tok-num">1</span>;</span>
-<span class="ln" id="L612">        loop {</span>
-<span class="ln" id="L613">            assert_eq!(step.<span class="tok-fn">position</span>(), expected);</span>
-<span class="ln" id="L614">            <span class="tok-kw">match</span> step.<span class="tok-fn">next</span>() {</span>
-<span class="ln" id="L615">                <span class="tok-fn">Some</span>(next) =&gt; {</span>
-<span class="ln" id="L616">                    step = next;</span>
-<span class="ln" id="L617">                    expected += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L618">                }</span>
-<span class="ln" id="L619">                None =&gt; break,</span>
-<span class="ln" id="L620">            }</span>
-<span class="ln" id="L621">        }</span>
-<span class="ln" id="L622">        assert_eq!(expected, Step::COUNT, <span class="tok-str">&quot;the count and the walk must agree&quot;</span>);</span>
-<span class="ln" id="L623">    }</span>
-<span class="ln" id="L624"></span>
-<span class="ln" id="L625">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L626">    <span class="tok-kw">fn</span> <span class="tok-fn">a_question_already_answered_is_not_asked_again</span>() {</span>
-<span class="ln" id="L627">        <span class="tok-kw">let</span> run = FirstRun::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L628">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L629">        assert!(</span>
-<span class="ln" id="L630">            !run.<span class="tok-fn">should_skip</span>(Step::AppLock, &amp;security),</span>
-<span class="ln" id="L631">            <span class="tok-str">&quot;with no lock set, the card has something to ask&quot;</span></span>
-<span class="ln" id="L632">        );</span>
-<span class="ln" id="L633">        security.<span class="tok-fn">set_recording_passphrase</span>(<span class="tok-str">&quot;already chosen&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L634">        assert!(</span>
-<span class="ln" id="L635">            run.<span class="tok-fn">should_skip</span>(Step::Recording, &amp;security),</span>
-<span class="ln" id="L636">            <span class="tok-str">&quot;a passphrase set from the command line must not be asked for again&quot;</span></span>
-<span class="ln" id="L637">        );</span>
-<span class="ln" id="L638">    }</span>
-<span class="ln" id="L639"></span>
-<span class="ln" id="L640">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L641">    <span class="tok-kw">fn</span> <span class="tok-fn">appearance_and_autolock_are_always_shown</span>() {</span>
-<span class="ln" id="L642">        <span class="tok-com">// Neither can be &quot;already answered&quot;: both have a default that is a</span></span>
-<span class="ln" id="L643">        <span class="tok-com">// real choice, and both are worth stating once.</span></span>
-<span class="ln" id="L644">        <span class="tok-kw">let</span> run = FirstRun::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L645">        <span class="tok-kw">let</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L646">        assert!(!run.<span class="tok-fn">should_skip</span>(Step::Appearance, &amp;security));</span>
-<span class="ln" id="L647">        assert!(!run.<span class="tok-fn">should_skip</span>(Step::Autolock, &amp;security));</span>
-<span class="ln" id="L648">    }</span>
-<span class="ln" id="L649"></span>
-<span class="ln" id="L650">    <span class="tok-com">/// **Roadmap item 135&#x27;s whole point.** The card has to read the machine rather</span></span>
-<span class="ln" id="L651">    <span class="tok-com">/// than carry numbers written here. A constant would be a claim about</span></span>
-<span class="ln" id="L652">    <span class="tok-com">/// somebody else&#x27;s hardware, stated with the confidence of a measurement.</span></span>
-<span class="ln" id="L653">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L654">    <span class="tok-kw">fn</span> <span class="tok-fn">the_machine_card_measures_rather_than_asserts</span>() {</span>
-<span class="ln" id="L655">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
-<span class="ln" id="L656">        <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn machine&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the card exists&quot;</span>);</span>
-<span class="ln" id="L657">        <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
-<span class="ln" id="L658">        <span class="tok-kw">let</span> body = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
-<span class="ln" id="L659"></span>
-<span class="ln" id="L660">        <span class="tok-kw">for</span> reads <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L661">            <span class="tok-str">&quot;veilvoice_setup::space::free_bytes&quot;</span>,</span>
-<span class="ln" id="L662">            <span class="tok-str">&quot;veilvoice_crypto::lock::default_dir&quot;</span>,</span>
-<span class="ln" id="L663">            <span class="tok-str">&quot;device_counts()&quot;</span>,</span>
-<span class="ln" id="L664">            <span class="tok-str">&quot;prefs.acceleration()&quot;</span>,</span>
-<span class="ln" id="L665">        ] {</span>
-<span class="ln" id="L666">            assert!(</span>
-<span class="ln" id="L667">                body.<span class="tok-fn">contains</span>(reads),</span>
-<span class="ln" id="L668">                <span class="tok-str">&quot;the card no longer reads {reads}, so it is asserting something \</span></span>
-<span class="ln" id="L669"><span class="tok-str">                 about this machine instead of measuring it&quot;</span></span>
-<span class="ln" id="L670">            );</span>
-<span class="ln" id="L671">        }</span>
-<span class="ln" id="L672">        <span class="tok-com">// And it says so when the machine will not answer, rather than</span></span>
-<span class="ln" id="L673">        <span class="tok-com">// printing a number it did not get.</span></span>
-<span class="ln" id="L674">        assert!(</span>
-<span class="ln" id="L675">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;would not say&quot;</span>),</span>
-<span class="ln" id="L676">            <span class="tok-str">&quot;the card has no answer for a system that will not say how much \</span></span>
-<span class="ln" id="L677"><span class="tok-str">             room is free, so it would show one that was never measured&quot;</span></span>
-<span class="ln" id="L678">        );</span>
-<span class="ln" id="L679">    }</span>
-<span class="ln" id="L680"></span>
-<span class="ln" id="L681">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L682">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_is_a_gate</span>() {</span>
-<span class="ln" id="L683">        <span class="tok-com">// Every card&#x27;s source has a way past it. Read from the source rather</span></span>
-<span class="ln" id="L684">        <span class="tok-com">// than by driving egui, which needs a context these tests do not build.</span></span>
-<span class="ln" id="L685">        <span class="tok-com">//</span></span>
-<span class="ln" id="L686">        <span class="tok-com">// The window used to be a fixed four thousand characters after the</span></span>
-<span class="ln" id="L687">        <span class="tok-com">// function&#x27;s name, which is a length rather than a body: a card longer</span></span>
-<span class="ln" id="L688">        <span class="tok-com">// than that reported no way past it, and a card shorter than that was</span></span>
-<span class="ln" id="L689">        <span class="tok-com">// checked against the one after it as well. It now ends where the</span></span>
-<span class="ln" id="L690">        <span class="tok-com">// function does.</span></span>
-<span class="ln" id="L691">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
-<span class="ln" id="L692">        <span class="tok-kw">for</span> card <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L693">            <span class="tok-str">&quot;fn appearance&quot;</span>,</span>
-<span class="ln" id="L694">            <span class="tok-str">&quot;fn app_lock&quot;</span>,</span>
-<span class="ln" id="L695">            <span class="tok-str">&quot;fn recording&quot;</span>,</span>
-<span class="ln" id="L696">            <span class="tok-str">&quot;fn autolock&quot;</span>,</span>
-<span class="ln" id="L697">            <span class="tok-str">&quot;fn machine&quot;</span>,</span>
-<span class="ln" id="L698">        ] {</span>
-<span class="ln" id="L699">            <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(card).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every card exists&quot;</span>);</span>
-<span class="ln" id="L700">            <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
-<span class="ln" id="L701">            <span class="tok-kw">let</span> body = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
-<span class="ln" id="L702">            assert!(</span>
-<span class="ln" id="L703">                body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;buttons(ui,&quot;</span>),</span>
-<span class="ln" id="L704">                <span class="tok-str">&quot;{card} has no way past it, which makes the setup a gate&quot;</span></span>
-<span class="ln" id="L705">            );</span>
-<span class="ln" id="L706">        }</span>
+<span class="ln" id="L651"></span>
+<span class="ln" id="L652"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L653"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L654">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L655"></span>
+<span class="ln" id="L656">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L657">    <span class="tok-kw">fn</span> <span class="tok-fn">the_steps_run_in_order_and_then_stop</span>() {</span>
+<span class="ln" id="L658">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L659">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = vec![step];</span>
+<span class="ln" id="L660">        while <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(next) = step.<span class="tok-fn">next</span>() {</span>
+<span class="ln" id="L661">            step = next;</span>
+<span class="ln" id="L662">            seen.<span class="tok-fn">push</span>(step);</span>
+<span class="ln" id="L663">        }</span>
+<span class="ln" id="L664">        assert_eq!(</span>
+<span class="ln" id="L665">            seen,</span>
+<span class="ln" id="L666">            vec![</span>
+<span class="ln" id="L667">                Step::Appearance,</span>
+<span class="ln" id="L668">                Step::AppLock,</span>
+<span class="ln" id="L669">                Step::Recording,</span>
+<span class="ln" id="L670">                Step::Autolock,</span>
+<span class="ln" id="L671">                Step::Machine</span>
+<span class="ln" id="L672">            ]</span>
+<span class="ln" id="L673">        );</span>
+<span class="ln" id="L674">        assert_eq!(seen.<span class="tok-fn">len</span>(), Step::COUNT);</span>
+<span class="ln" id="L675">    }</span>
+<span class="ln" id="L676"></span>
+<span class="ln" id="L677">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L678">    <span class="tok-kw">fn</span> <span class="tok-fn">every_step_knows_where_it_is</span>() {</span>
+<span class="ln" id="L679">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> step = Step::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L680">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> expected = <span class="tok-num">1</span>;</span>
+<span class="ln" id="L681">        loop {</span>
+<span class="ln" id="L682">            assert_eq!(step.<span class="tok-fn">position</span>(), expected);</span>
+<span class="ln" id="L683">            <span class="tok-kw">match</span> step.<span class="tok-fn">next</span>() {</span>
+<span class="ln" id="L684">                <span class="tok-fn">Some</span>(next) =&gt; {</span>
+<span class="ln" id="L685">                    step = next;</span>
+<span class="ln" id="L686">                    expected += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L687">                }</span>
+<span class="ln" id="L688">                None =&gt; break,</span>
+<span class="ln" id="L689">            }</span>
+<span class="ln" id="L690">        }</span>
+<span class="ln" id="L691">        assert_eq!(expected, Step::COUNT, <span class="tok-str">&quot;the count and the walk must agree&quot;</span>);</span>
+<span class="ln" id="L692">    }</span>
+<span class="ln" id="L693"></span>
+<span class="ln" id="L694">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L695">    <span class="tok-kw">fn</span> <span class="tok-fn">a_question_already_answered_is_not_asked_again</span>() {</span>
+<span class="ln" id="L696">        <span class="tok-kw">let</span> run = FirstRun::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L697">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L698">        assert!(</span>
+<span class="ln" id="L699">            !run.<span class="tok-fn">should_skip</span>(Step::AppLock, &amp;security),</span>
+<span class="ln" id="L700">            <span class="tok-str">&quot;with no lock set, the card has something to ask&quot;</span></span>
+<span class="ln" id="L701">        );</span>
+<span class="ln" id="L702">        security.<span class="tok-fn">set_recording_passphrase</span>(<span class="tok-str">&quot;already chosen&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L703">        assert!(</span>
+<span class="ln" id="L704">            run.<span class="tok-fn">should_skip</span>(Step::Recording, &amp;security),</span>
+<span class="ln" id="L705">            <span class="tok-str">&quot;a passphrase set from the command line must not be asked for again&quot;</span></span>
+<span class="ln" id="L706">        );</span>
 <span class="ln" id="L707">    }</span>
-<span class="ln" id="L708">}</span>
+<span class="ln" id="L708"></span>
+<span class="ln" id="L709">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L710">    <span class="tok-kw">fn</span> <span class="tok-fn">appearance_and_autolock_are_always_shown</span>() {</span>
+<span class="ln" id="L711">        <span class="tok-com">// Neither can be &quot;already answered&quot;: both have a default that is a</span></span>
+<span class="ln" id="L712">        <span class="tok-com">// real choice, and both are worth stating once.</span></span>
+<span class="ln" id="L713">        <span class="tok-kw">let</span> run = FirstRun::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L714">        <span class="tok-kw">let</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L715">        assert!(!run.<span class="tok-fn">should_skip</span>(Step::Appearance, &amp;security));</span>
+<span class="ln" id="L716">        assert!(!run.<span class="tok-fn">should_skip</span>(Step::Autolock, &amp;security));</span>
+<span class="ln" id="L717">    }</span>
+<span class="ln" id="L718"></span>
+<span class="ln" id="L719">    <span class="tok-com">/// **Roadmap item 135&#x27;s whole point.** The card has to read the machine</span></span>
+<span class="ln" id="L720">    <span class="tok-com">/// rather than carry numbers written here. A constant would be a claim</span></span>
+<span class="ln" id="L721">    <span class="tok-com">/// about somebody else&#x27;s hardware, stated with the confidence of a</span></span>
+<span class="ln" id="L722">    <span class="tok-com">/// measurement.</span></span>
+<span class="ln" id="L723">    <span class="tok-com">///</span></span>
+<span class="ln" id="L724">    <span class="tok-com">/// The reading moved off the drawing thread under F-216, so the</span></span>
+<span class="ln" id="L725">    <span class="tok-com">/// measurement is looked for in [`super::read_machine`] rather than in the</span></span>
+<span class="ln" id="L726">    <span class="tok-com">/// card. That is the same requirement about a different function, and the</span></span>
+<span class="ln" id="L727">    <span class="tok-com">/// test below is what stops it moving back.</span></span>
+<span class="ln" id="L728">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L729">    <span class="tok-kw">fn</span> <span class="tok-fn">the_machine_card_measures_rather_than_asserts</span>() {</span>
+<span class="ln" id="L730">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
+<span class="ln" id="L731">        <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn read_machine&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the reading exists&quot;</span>);</span>
+<span class="ln" id="L732">        <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
+<span class="ln" id="L733">        <span class="tok-kw">let</span> reading = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n/// &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
+<span class="ln" id="L734"></span>
+<span class="ln" id="L735">        <span class="tok-kw">for</span> reads <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L736">            <span class="tok-str">&quot;veilvoice_setup::space::free_bytes&quot;</span>,</span>
+<span class="ln" id="L737">            <span class="tok-str">&quot;veilvoice_crypto::lock::default_dir&quot;</span>,</span>
+<span class="ln" id="L738">            <span class="tok-str">&quot;crate::probe::look()&quot;</span>,</span>
+<span class="ln" id="L739">        ] {</span>
+<span class="ln" id="L740">            assert!(</span>
+<span class="ln" id="L741">                reading.<span class="tok-fn">contains</span>(reads),</span>
+<span class="ln" id="L742">                <span class="tok-str">&quot;the reading no longer asks this machine for {reads}, so the \</span></span>
+<span class="ln" id="L743"><span class="tok-str">                 card is asserting something about somebody else&#x27;s hardware \</span></span>
+<span class="ln" id="L744"><span class="tok-str">                 instead of measuring this one&quot;</span></span>
+<span class="ln" id="L745">            );</span>
+<span class="ln" id="L746">        }</span>
+<span class="ln" id="L747"></span>
+<span class="ln" id="L748">        <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn machine(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the card exists&quot;</span>);</span>
+<span class="ln" id="L749">        <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
+<span class="ln" id="L750">        <span class="tok-kw">let</span> card = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
+<span class="ln" id="L751">        <span class="tok-com">// The card shows what was read, and offers the one thing on it that is</span></span>
+<span class="ln" id="L752">        <span class="tok-com">// a preference rather than a measurement.</span></span>
+<span class="ln" id="L753">        <span class="tok-kw">for</span> shows <span class="tok-kw">in</span> [<span class="tok-str">&quot;self.reading&quot;</span>, <span class="tok-str">&quot;prefs.acceleration()&quot;</span>] {</span>
+<span class="ln" id="L754">            assert!(card.<span class="tok-fn">contains</span>(shows), <span class="tok-str">&quot;the card no longer draws {shows}&quot;</span>);</span>
+<span class="ln" id="L755">        }</span>
+<span class="ln" id="L756">        <span class="tok-com">// And it says so when the machine will not answer, rather than</span></span>
+<span class="ln" id="L757">        <span class="tok-com">// printing a number it did not get.</span></span>
+<span class="ln" id="L758">        assert!(</span>
+<span class="ln" id="L759">            card.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;would not say&quot;</span>),</span>
+<span class="ln" id="L760">            <span class="tok-str">&quot;the card has no answer for a system that will not say how much \</span></span>
+<span class="ln" id="L761"><span class="tok-str">             room is free, so it would show one that was never measured&quot;</span></span>
+<span class="ln" id="L762">        );</span>
+<span class="ln" id="L763">    }</span>
+<span class="ln" id="L764"></span>
+<span class="ln" id="L765">    <span class="tok-com">/// **F-216.** The card asks this machine once, not once per frame.</span></span>
+<span class="ln" id="L766">    <span class="tok-com">///</span></span>
+<span class="ln" id="L767">    <span class="tok-com">/// `free_bytes` spawns `df` on Unix and `fsutil.exe` on Windows, and the</span></span>
+<span class="ln" id="L768">    <span class="tok-com">/// graphics probe queries the driver. Written inline in the card, which is</span></span>
+<span class="ln" id="L769">    <span class="tok-com">/// where they were, each of those ran on every frame the card was on</span></span>
+<span class="ln" id="L770">    <span class="tok-com">/// screen: a process forked sixty times a second, on the thread that draws.</span></span>
+<span class="ln" id="L771">    <span class="tok-com">///</span></span>
+<span class="ln" id="L772">    <span class="tok-com">/// Read from the source, because a frame count is not observable from here</span></span>
+<span class="ln" id="L773">    <span class="tok-com">/// and the defect is a shape rather than a timing: a machine read written</span></span>
+<span class="ln" id="L774">    <span class="tok-com">/// inside the drawing function is the defect, wherever it ends up costing.</span></span>
+<span class="ln" id="L775">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L776">    <span class="tok-kw">fn</span> <span class="tok-fn">the_card_does_not_read_the_machine_while_drawing</span>() {</span>
+<span class="ln" id="L777">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
+<span class="ln" id="L778">        <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn machine(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the card exists&quot;</span>);</span>
+<span class="ln" id="L779">        <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
+<span class="ln" id="L780">        <span class="tok-kw">let</span> card = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
+<span class="ln" id="L781">        <span class="tok-kw">let</span> card: String = card</span>
+<span class="ln" id="L782">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L783">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
+<span class="ln" id="L784">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L785">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L786"></span>
+<span class="ln" id="L787">        <span class="tok-kw">for</span> waits <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L788">            <span class="tok-str">&quot;space::free_bytes&quot;</span>,</span>
+<span class="ln" id="L789">            <span class="tok-str">&quot;devices::list&quot;</span>,</span>
+<span class="ln" id="L790">            <span class="tok-str">&quot;crate::probe::look()&quot;</span>,</span>
+<span class="ln" id="L791">            <span class="tok-str">&quot;default_dir()&quot;</span>,</span>
+<span class="ln" id="L792">        ] {</span>
+<span class="ln" id="L793">            assert!(</span>
+<span class="ln" id="L794">                !card.<span class="tok-fn">contains</span>(waits),</span>
+<span class="ln" id="L795">                <span class="tok-str">&quot;the card calls {waits} while drawing, so it runs once per \</span></span>
+<span class="ln" id="L796"><span class="tok-str">                 frame on the thread that paints. Read it in `read_machine` \</span></span>
+<span class="ln" id="L797"><span class="tok-str">                 and hand it over, as F-216 did.&quot;</span></span>
+<span class="ln" id="L798">            );</span>
+<span class="ln" id="L799">        }</span>
+<span class="ln" id="L800">        assert!(</span>
+<span class="ln" id="L801">            card.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ask_once&quot;</span>),</span>
+<span class="ln" id="L802">            <span class="tok-str">&quot;the reading is no longer started once, so whatever starts it \</span></span>
+<span class="ln" id="L803"><span class="tok-str">             starts it again on every frame&quot;</span></span>
+<span class="ln" id="L804">        );</span>
+<span class="ln" id="L805">    }</span>
+<span class="ln" id="L806"></span>
+<span class="ln" id="L807">    <span class="tok-com">/// The counts come from the one enumeration this program makes.</span></span>
+<span class="ln" id="L808">    <span class="tok-com">///</span></span>
+<span class="ln" id="L809">    <span class="tok-com">/// **F-165.** Two enumerators of the audio hardware running beside each</span></span>
+<span class="ln" id="L810">    <span class="tok-com">/// other killed the process on Windows, so there is one, in `app`, at</span></span>
+<span class="ln" id="L811">    <span class="tok-com">/// startup. This card used to make its own, inside the frame.</span></span>
+<span class="ln" id="L812">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L813">    <span class="tok-kw">fn</span> <span class="tok-fn">the_device_counts_are_not_enumerated_a_second_time</span>() {</span>
+<span class="ln" id="L814">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
+<span class="ln" id="L815">        <span class="tok-kw">let</span> shipped = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(source);</span>
+<span class="ln" id="L816">        assert!(</span>
+<span class="ln" id="L817">            !shipped.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;devices::list&quot;</span>),</span>
+<span class="ln" id="L818">            <span class="tok-str">&quot;the tour enumerates the audio hardware itself. There is one \</span></span>
+<span class="ln" id="L819"><span class="tok-str">             enumeration in this program, in `app`; the count is handed to \</span></span>
+<span class="ln" id="L820"><span class="tok-str">             `panel` rather than made again here. See F-165.&quot;</span></span>
+<span class="ln" id="L821">        );</span>
+<span class="ln" id="L822">        assert!(</span>
+<span class="ln" id="L823">            shipped.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;devices: (usize, usize)&quot;</span>),</span>
+<span class="ln" id="L824">            <span class="tok-str">&quot;the panel no longer takes the counts, so whatever draws them is \</span></span>
+<span class="ln" id="L825"><span class="tok-str">             getting them from somewhere else&quot;</span></span>
+<span class="ln" id="L826">        );</span>
+<span class="ln" id="L827">    }</span>
+<span class="ln" id="L828"></span>
+<span class="ln" id="L829">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L830">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_here_is_a_gate</span>() {</span>
+<span class="ln" id="L831">        <span class="tok-com">// Every card&#x27;s source has a way past it. Read from the source rather</span></span>
+<span class="ln" id="L832">        <span class="tok-com">// than by driving egui, which needs a context these tests do not build.</span></span>
+<span class="ln" id="L833">        <span class="tok-com">//</span></span>
+<span class="ln" id="L834">        <span class="tok-com">// The window used to be a fixed four thousand characters after the</span></span>
+<span class="ln" id="L835">        <span class="tok-com">// function&#x27;s name, which is a length rather than a body: a card longer</span></span>
+<span class="ln" id="L836">        <span class="tok-com">// than that reported no way past it, and a card shorter than that was</span></span>
+<span class="ln" id="L837">        <span class="tok-com">// checked against the one after it as well. It now ends where the</span></span>
+<span class="ln" id="L838">        <span class="tok-com">// function does.</span></span>
+<span class="ln" id="L839">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>);</span>
+<span class="ln" id="L840">        <span class="tok-kw">for</span> card <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L841">            <span class="tok-str">&quot;fn appearance&quot;</span>,</span>
+<span class="ln" id="L842">            <span class="tok-str">&quot;fn app_lock&quot;</span>,</span>
+<span class="ln" id="L843">            <span class="tok-str">&quot;fn recording&quot;</span>,</span>
+<span class="ln" id="L844">            <span class="tok-str">&quot;fn autolock&quot;</span>,</span>
+<span class="ln" id="L845">            <span class="tok-str">&quot;fn machine&quot;</span>,</span>
+<span class="ln" id="L846">        ] {</span>
+<span class="ln" id="L847">            <span class="tok-kw">let</span> at = source.<span class="tok-fn">find</span>(card).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every card exists&quot;</span>);</span>
+<span class="ln" id="L848">            <span class="tok-kw">let</span> rest = &amp;source[at..];</span>
+<span class="ln" id="L849">            <span class="tok-kw">let</span> body = rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    fn &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(rest);</span>
+<span class="ln" id="L850">            assert!(</span>
+<span class="ln" id="L851">                body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;buttons(ui,&quot;</span>),</span>
+<span class="ln" id="L852">                <span class="tok-str">&quot;{card} has no way past it, which makes the setup a gate&quot;</span></span>
+<span class="ln" id="L853">            );</span>
+<span class="ln" id="L854">        }</span>
+<span class="ln" id="L855">    }</span>
+<span class="ln" id="L856">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

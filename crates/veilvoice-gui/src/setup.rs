@@ -76,14 +76,23 @@ pub struct Setup {
     status: install::Status,
     rows: Vec<Row>,
     job: Option<mpsc::Receiver<Done>>,
-    /// A probe of the companions, running off the paint thread.
+    /// A reading of this machine, running off the paint thread.
     ///
     /// `detect_all` runs a command per companion: `where` or `which`, and on
-    /// Windows a PowerShell call that enumerates sound devices. On the paint
-    /// thread that is hundreds of milliseconds inside one frame, which is the
-    /// window going white and the pointer becoming a spinner. It was doing
-    /// exactly that every time somebody pressed "look again".
-    probe: Option<mpsc::Receiver<Vec<Row>>>,
+    /// Windows a PowerShell call that enumerates sound devices. `install::status`
+    /// walks the install folder and the `PATH`. On the paint thread that is
+    /// hundreds of milliseconds inside one frame, which is the window going
+    /// white and the pointer becoming a spinner. It was doing exactly that
+    /// every time somebody pressed "look again".
+    ///
+    /// **It carries the install status as well as the rows, since F-216.**
+    /// Pressing "look again" was fixed and finishing a job was not: `poll`
+    /// called both readings inline, on the frame a worker reported back, so
+    /// installing or uninstalling froze the window at the moment it was
+    /// supposed to be showing what had happened. The fix and the defect were
+    /// twenty lines apart, and the test that proved the fix read only the
+    /// function that had it.
+    probe: Option<mpsc::Receiver<(install::Status, Vec<Row>)>>,
     /// What is running, in words, for the progress strip.
     busy: Option<String>,
     /// The last report, and whether it was a success.
@@ -135,6 +144,28 @@ impl Setup {
         self.job.is_some() || self.probe.is_some()
     }
 
+    /// Read this machine again, on a worker thread.
+    ///
+    /// The two readings go together because anything that changes one changes
+    /// the other: installing puts VeilVoice on the `PATH` and may also be what
+    /// put a companion there. One worker, one answer, one repaint.
+    ///
+    /// Does nothing when a reading is already running. Two of them is two
+    /// answers arriving for one question, and the second overwrites the first
+    /// with no way to tell which was newer.
+    fn start_probe(&mut self) {
+        if self.probe.is_some() {
+            return;
+        }
+        let (tx, rx) = mpsc::channel();
+        // Detached: nothing waits for it, and a probe that outlives the tab
+        // simply sends into a channel nobody reads.
+        std::thread::spawn(move || {
+            let _ = tx.send((install::status(), detect_all()));
+        });
+        self.probe = Some(rx);
+    }
+
     /// Drain the worker channel. Called once per frame.
     ///
     /// Handles `Disconnected` as well as a message: a worker that panicked
@@ -145,7 +176,8 @@ impl Setup {
         // the channel until the install ended.
         if let Some(rx) = &self.probe {
             match rx.try_recv() {
-                Ok(rows) => {
+                Ok((status, rows)) => {
+                    self.status = status;
                     self.rows = rows;
                     self.probe = None;
                 }
@@ -165,9 +197,12 @@ impl Setup {
                 self.report = Some((lines, good));
                 self.job = None;
                 self.busy = None;
-                // Anything a worker did could have changed both of these.
-                self.status = install::status();
-                self.rows = detect_all();
+                // Anything a worker did could have changed both of these, so
+                // both are read again -- on a thread. Reading them here, which
+                // is what this did, froze the window on the frame that was
+                // supposed to show what the worker had just finished. See
+                // F-216.
+                self.start_probe();
             }
             Err(mpsc::TryRecvError::Empty) => {}
             Err(mpsc::TryRecvError::Disconnected) => {
@@ -182,7 +217,7 @@ impl Setup {
                 ));
                 self.job = None;
                 self.busy = None;
-                self.status = install::status();
+                self.start_probe();
             }
         }
     }
@@ -583,13 +618,7 @@ impl Setup {
             .button(RichText::new("look again").color(p::muted()).small())
             .clicked()
         {
-            let (tx, rx) = mpsc::channel();
-            // Detached: nothing waits for it, and a probe that outlives the
-            // tab simply sends into a channel nobody reads.
-            std::thread::spawn(move || {
-                let _ = tx.send(detect_all());
-            });
-            self.probe = Some(rx);
+            self.start_probe();
         }
         ui.add_space(10.0);
 
@@ -870,6 +899,12 @@ mod tests {
 
     /// A report from a worker that vanished must say so rather than leaving
     /// the strip running for ever.
+    ///
+    /// The tab does read the machine again afterwards, because a worker that
+    /// died halfway may well have changed it, and since F-216 that reading is
+    /// a second worker rather than a stall inside the frame. So `is_busy` is
+    /// allowed to be true here; what must not be true is the dead job still
+    /// being held, which is what left the strip running for ever.
     #[test]
     fn a_worker_that_disappears_is_reported() {
         let mut setup = Setup::new();
@@ -879,10 +914,22 @@ mod tests {
         drop(tx);
         setup.poll();
         assert!(setup.job.is_none(), "the job must be cleared");
-        assert!(!setup.is_busy());
-        let (lines, good) = setup.report.expect("a disappearance must be reported");
+        assert!(setup.busy.is_none(), "the progress strip must have stopped");
+        let (lines, good) = setup
+            .report
+            .clone()
+            .expect("a disappearance must be reported");
         assert!(!good);
         assert!(lines[0].contains("stopped without reporting"), "{lines:?}");
+
+        // And the reading it started finishes, rather than leaving the tab
+        // busy for ever, which would be the same defect one thread along.
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(30);
+        while setup.is_busy() && std::time::Instant::now() < deadline {
+            setup.poll();
+            std::hint::spin_loop();
+        }
+        assert!(!setup.is_busy(), "the reading never came back");
     }
 
     /// Every companion shown is one that applies here, with a probe result.
@@ -937,36 +984,109 @@ mod tests {
 
 #[cfg(test)]
 mod companion_tests {
-    /// The probe runs off the paint thread.
+    /// Nothing reads this machine on the thread that paints.
     ///
     /// `detect_all` runs a command per companion, and on Windows one of them
-    /// enumerates sound devices through PowerShell. On the paint thread that is
+    /// enumerates sound devices through PowerShell. `install::status` walks the
+    /// install folder and the `PATH`. Either one on the paint thread is
     /// hundreds of milliseconds inside a single frame, which is the window
-    /// going white and the pointer becoming a spinner. Pressing "look again"
-    /// did exactly that.
+    /// going white and the pointer becoming a spinner.
+    ///
+    /// # Why this reads the whole file and not one function
+    ///
+    /// Because the version that read one function passed while the defect sat
+    /// twenty lines away from it. Pressing "look again" used to probe inline;
+    /// that was fixed, and a test was written that found `fn companion_rows`
+    /// and asserted the fix was in it. `poll` went on calling both readings
+    /// inline whenever a worker finished, so installing or uninstalling froze
+    /// the window at the moment it was meant to be reporting what had
+    /// happened, and the test that existed for exactly this could not see it.
+    /// See F-216, and F-210 and F-212 for the same shape in two other crates.
+    ///
+    /// So the rule is stated about the file: these two calls appear in the two
+    /// functions that are allowed to make them, and nowhere else.
     #[test]
-    fn looking_again_does_not_probe_on_the_paint_thread() {
-        let source = std::fs::read_to_string("src/setup.rs").expect("its own source");
-        let at = source
+    fn nothing_reads_this_machine_on_the_paint_thread() {
+        let source = include_str!("setup.rs").replace("\r\n", "\n");
+        let shipped = source.split("\n#[cfg(test)]").next().unwrap_or(&source);
+
+        // Split at every function, so each piece begins with its own name.
+        // A piece is attributed to the function it is written in, which is the
+        // question being asked: not "does this file read the machine" but
+        // "does anything that runs while drawing read the machine".
+        // A function starts a piece. `pub` and the rest of the modifiers are
+        // recognised, because the first version of this looked for `fn ` alone
+        // and so read `pub fn new` as part of the `fn default` above it, which
+        // is how a check like this gets the wrong function's name into its own
+        // failure message.
+        let mut pieces: Vec<Vec<&str>> = vec![Vec::new()];
+        for line in shipped.lines() {
+            // `pub`, `pub(crate)` and `async` are stripped in turn. The first
+            // version of this looked for `fn ` alone and so read `pub fn new`
+            // as part of the `fn default` above it, which is how a check like
+            // this ends up naming the wrong function in its own failure.
+            let mut head = line.trim_start();
+            for prefix in ["pub(crate) ", "pub ", "async "] {
+                head = head.strip_prefix(prefix).unwrap_or(head);
+            }
+            if head.starts_with("fn ") {
+                pieces.push(Vec::new());
+            }
+            pieces.last_mut().expect("a piece is open").push(line);
+        }
+
+        // `new` runs once, before the window opens, and says so in its own
+        // comment. `start_probe` is the worker. Nothing else.
+        const ALLOWED: [&str; 2] = ["fn new(", "fn start_probe("];
+        for piece in &pieces {
+            let reads: Vec<&str> = ["install::status(", "detect_all("]
+                .into_iter()
+                .filter(|needle| {
+                    piece
+                        .iter()
+                        // The line that declares the function is not a call of
+                        // it, and `fn detect_all(` reading as a use of
+                        // `detect_all(` is how this first failed.
+                        .skip(1)
+                        .filter(|line| !line.trim_start().starts_with("//"))
+                        .any(|line| line.contains(needle))
+                })
+                .collect();
+            if reads.is_empty() {
+                continue;
+            }
+            let name = piece.first().copied().unwrap_or("").trim();
+            assert!(
+                ALLOWED.iter().any(|allowed| name.contains(allowed)),
+                "`{}` reads this machine, and it is not one of the two places \
+                 allowed to: {reads:?}. Start `start_probe` instead and draw \
+                 the answer when it arrives. See F-216.",
+                name
+            );
+        }
+
+        // And the worker is a worker.
+        let at = shipped.find("fn start_probe").expect("the worker exists");
+        let worker = &shipped[at..];
+        let worker = worker.split("\n    fn ").next().unwrap_or(worker);
+        assert!(
+            worker.contains("std::thread::spawn"),
+            "the reading is made on whichever thread called it, which is the \
+             paint thread every time"
+        );
+
+        // Said on screen, too. The button that has just been pressed going
+        // quiet for half a second is what reads as a freeze, and the fix is as
+        // much that line as it is the worker.
+        let at = shipped
             .find("fn companion_rows")
             .expect("the companion rows");
-        let end = source[at..]
-            .find("\n    fn ")
-            .map(|offset| at + offset)
-            .unwrap_or(source.len());
-        let body = &source[at..end];
-
+        let rows = &shipped[at..];
+        let rows = rows.split("\n    fn ").next().unwrap_or(rows);
         assert!(
-            body.contains("std::thread::spawn"),
-            "the probe is started on the thread that is painting"
-        );
-        assert!(
-            !body.contains("self.rows = detect_all()"),
-            "the rows are still being filled in by probing inside the frame"
-        );
-        assert!(
-            body.contains("ui.spinner()"),
-            "nothing on screen says the probe is running, so the button reads as dead"
+            rows.contains("ui.spinner()"),
+            "nothing on screen says the probe is running, so the button reads \
+             as dead"
         );
     }
 

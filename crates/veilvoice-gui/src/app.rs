@@ -1382,9 +1382,15 @@ impl eframe::App for VeilVoiceApp {
                     // recording passphrase and the autolock are offered here
                     // because a protection nobody is shown is a protection
                     // nobody has. Every card can be skipped.
+                    // The device counts are handed over rather than looked
+                    // up again. This program enumerates the audio hardware
+                    // once, here, at startup; F-165 is what a second
+                    // enumerator cost on Windows, and the card used to make
+                    // one per frame.
+                    let devices = (self.inputs.len(), self.outputs.len());
                     if self
                         .first_run
-                        .panel(ui, &mut self.preferences, &mut self.security)
+                        .panel(ui, &mut self.preferences, &mut self.security, devices)
                         == crate::firstrun::Outcome::Finished
                     {
                         self.preferences.finish_first_run();

@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 382 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 387 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -233,238 +233,243 @@
 <span class="ln" id="L153"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> layout;</span>
 <span class="ln" id="L154"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> monitor;</span>
 <span class="ln" id="L155"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> notify;</span>
-<span class="ln" id="L156"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> pace;</span>
-<span class="ln" id="L157"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> palettes;</span>
-<span class="ln" id="L158"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> paths;</span>
-<span class="ln" id="L159"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> policy;</span>
-<span class="ln" id="L160"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> prefs;</span>
-<span class="ln" id="L161"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> probe;</span>
-<span class="ln" id="L162"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> reduced_motion;</span>
-<span class="ln" id="L163"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> security;</span>
-<span class="ln" id="L164"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> settings;</span>
-<span class="ln" id="L165"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> setup;</span>
-<span class="ln" id="L166"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> soundbar;</span>
-<span class="ln" id="L167"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> storage;</span>
-<span class="ln" id="L168"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> studio;</span>
-<span class="ln" id="L169"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> theme;</span>
-<span class="ln" id="L170"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> tour;</span>
-<span class="ln" id="L171"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> updates;</span>
-<span class="ln" id="L172"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> vault_store;</span>
-<span class="ln" id="L173"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> verify;</span>
-<span class="ln" id="L174"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> watchfeed;</span>
-<span class="ln" id="L175"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> window;</span>
-<span class="ln" id="L176"></span>
-<span class="ln" id="L177"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> app::VeilVoiceApp;</span>
-<span class="ln" id="L178"></span>
+<span class="ln" id="L156"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> offthread;</span>
+<span class="ln" id="L157"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> pace;</span>
+<span class="ln" id="L158"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> palettes;</span>
+<span class="ln" id="L159"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> paths;</span>
+<span class="ln" id="L160"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> policy;</span>
+<span class="ln" id="L161"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> prefs;</span>
+<span class="ln" id="L162"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> probe;</span>
+<span class="ln" id="L163"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> reduced_motion;</span>
+<span class="ln" id="L164"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> security;</span>
+<span class="ln" id="L165"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> settings;</span>
+<span class="ln" id="L166"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> setup;</span>
+<span class="ln" id="L167"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> soundbar;</span>
+<span class="ln" id="L168"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> storage;</span>
+<span class="ln" id="L169"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> studio;</span>
+<span class="ln" id="L170"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> theme;</span>
+<span class="ln" id="L171"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> tour;</span>
+<span class="ln" id="L172"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> updates;</span>
+<span class="ln" id="L173"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> vault_store;</span>
+<span class="ln" id="L174"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> verify;</span>
+<span class="ln" id="L175"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> watchfeed;</span>
+<span class="ln" id="L176"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> window;</span>
+<span class="ln" id="L177"></span>
+<span class="ln" id="L178"><span class="tok-kw">pub</span> <span class="tok-kw">use</span> app::VeilVoiceApp;</span>
+<span class="ln" id="L179"></span>
 <span class="src-item" id="fn-version">
-<span class="ln" id="L179"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
-<span class="ln" id="L180"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
+<span class="ln" id="L180"><span class="tok-com">/// Crate version string, surfaced in the About panel.</span></span>
+<span class="ln" id="L181"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> VERSION: &amp;str = env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>);</span>
 </span>
-<span class="ln" id="L181"></span>
+<span class="ln" id="L182"></span>
 <span class="src-item" id="fn-headless_frame">
-<span class="ln" id="L182"><span class="tok-com">/// Draw one frame with no window, and discard what a real backend would have</span></span>
-<span class="ln" id="L183"><span class="tok-com">/// uploaded.</span></span>
-<span class="ln" id="L184"><span class="tok-com">///</span></span>
-<span class="ln" id="L185"><span class="tok-com">/// Every test in this crate that renders headlessly goes through here.</span></span>
-<span class="ln" id="L186"><span class="tok-com">/// `egui` 0.36 asserts that a frame&#x27;s texture deltas were handled: dropping a</span></span>
-<span class="ln" id="L187"><span class="tok-com">/// `FullOutput` that still carries one panics, which is exactly right for a</span></span>
-<span class="ln" id="L188"><span class="tok-com">/// backend that forgot to upload a font atlas and exactly wrong for a test</span></span>
-<span class="ln" id="L189"><span class="tok-com">/// that only wants the shapes back. Clearing it in one place beats repeating</span></span>
-<span class="ln" id="L190"><span class="tok-com">/// the same two lines at fifteen call sites and forgetting it at the</span></span>
-<span class="ln" id="L191"><span class="tok-com">/// sixteenth.</span></span>
-<span class="ln" id="L192"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L193"><span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">headless_frame</span>(</span>
-<span class="ln" id="L194">    ctx: &amp;egui::Context,</span>
-<span class="ln" id="L195">    input: egui::RawInput,</span>
-<span class="ln" id="L196">    add_contents: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> egui::Ui),</span>
-<span class="ln" id="L197">) -&gt; egui::FullOutput {</span>
-<span class="ln" id="L198">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = ctx.<span class="tok-fn">run_ui</span>(input, add_contents);</span>
-<span class="ln" id="L199">    output.textures_delta.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L200">    output</span>
-<span class="ln" id="L201">}</span>
+<span class="ln" id="L183"><span class="tok-com">/// Draw one frame with no window, and discard what a real backend would have</span></span>
+<span class="ln" id="L184"><span class="tok-com">/// uploaded.</span></span>
+<span class="ln" id="L185"><span class="tok-com">///</span></span>
+<span class="ln" id="L186"><span class="tok-com">/// Every test in this crate that renders headlessly goes through here.</span></span>
+<span class="ln" id="L187"><span class="tok-com">/// `egui` 0.36 asserts that a frame&#x27;s texture deltas were handled: dropping a</span></span>
+<span class="ln" id="L188"><span class="tok-com">/// `FullOutput` that still carries one panics, which is exactly right for a</span></span>
+<span class="ln" id="L189"><span class="tok-com">/// backend that forgot to upload a font atlas and exactly wrong for a test</span></span>
+<span class="ln" id="L190"><span class="tok-com">/// that only wants the shapes back. Clearing it in one place beats repeating</span></span>
+<span class="ln" id="L191"><span class="tok-com">/// the same two lines at fifteen call sites and forgetting it at the</span></span>
+<span class="ln" id="L192"><span class="tok-com">/// sixteenth.</span></span>
+<span class="ln" id="L193"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L194"><span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">headless_frame</span>(</span>
+<span class="ln" id="L195">    ctx: &amp;egui::Context,</span>
+<span class="ln" id="L196">    input: egui::RawInput,</span>
+<span class="ln" id="L197">    add_contents: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> egui::Ui),</span>
+<span class="ln" id="L198">) -&gt; egui::FullOutput {</span>
+<span class="ln" id="L199">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> output = ctx.<span class="tok-fn">run_ui</span>(input, add_contents);</span>
+<span class="ln" id="L200">    output.textures_delta.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L201">    output</span>
+<span class="ln" id="L202">}</span>
 </span>
-<span class="ln" id="L202"></span>
+<span class="ln" id="L203"></span>
 <span class="src-item" id="fn-spawn_tests">
-<span class="ln" id="L203"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L204"><span class="tok-kw">mod</span> spawn_tests {</span>
-<span class="ln" id="L205">    <span class="tok-com">/// Every subprocess in this crate is spawned through [`super::command`].</span></span>
-<span class="ln" id="L206">    <span class="tok-com">///</span></span>
-<span class="ln" id="L207">    <span class="tok-com">/// This reads the crate&#x27;s own source rather than exercising the</span></span>
-<span class="ln" id="L208">    <span class="tok-com">/// behaviour, because &quot;no console window appeared&quot; cannot be observed</span></span>
-<span class="ln" id="L209">    <span class="tok-com">/// from a test, which is precisely why the defect reached a release. A</span></span>
-<span class="ln" id="L210">    <span class="tok-com">/// bare spawn added later fails here rather than on somebody&#x27;s desktop.</span></span>
-<span class="ln" id="L211">    <span class="tok-com">///</span></span>
-<span class="ln" id="L212">    <span class="tok-com">/// # Why it reads the whole crate</span></span>
-<span class="ln" id="L213">    <span class="tok-com">///</span></span>
-<span class="ln" id="L214">    <span class="tok-com">/// It used to read one file. `reduced_motion.rs` carried the wrapper and</span></span>
-<span class="ln" id="L215">    <span class="tok-com">/// a test that scanned `reduced_motion.rs`, and that test passed for as</span></span>
-<span class="ln" id="L216">    <span class="tok-com">/// long as it existed while `studio.rs` and `group.rs` each spawned</span></span>
-<span class="ln" id="L217">    <span class="tok-com">/// `ffmpeg` bare: rendering a take to video, and rendering a group</span></span>
-<span class="ln" id="L218">    <span class="tok-com">/// conversation, both flashed a console on Windows. A guard that reads</span></span>
-<span class="ln" id="L219">    <span class="tok-com">/// the file it lives in only ever proves something about that file, and</span></span>
-<span class="ln" id="L220">    <span class="tok-com">/// the module that bothered to write the rule is the least likely one to</span></span>
-<span class="ln" id="L221">    <span class="tok-com">/// break it.</span></span>
-<span class="ln" id="L222">    <span class="tok-com">///</span></span>
-<span class="ln" id="L223">    <span class="tok-com">/// `veilvoice-setup` learned the same lesson separately and at the same</span></span>
-<span class="ln" id="L224">    <span class="tok-com">/// time, as F-210: its list named three modules of six and said in its own</span></span>
-<span class="ln" id="L225">    <span class="tok-com">/// comment that it covered them all.</span></span>
-<span class="ln" id="L226">    <span class="tok-com">///</span></span>
-<span class="ln" id="L227">    <span class="tok-com">/// # The list is checked rather than kept up to date</span></span>
-<span class="ln" id="L228">    <span class="tok-com">///</span></span>
-<span class="ln" id="L229">    <span class="tok-com">/// `include_str!` takes a literal, so the list below cannot be built by</span></span>
-<span class="ln" id="L230">    <span class="tok-com">/// walking the directory. What it can be is checked: every `mod` this</span></span>
-<span class="ln" id="L231">    <span class="tok-com">/// file declares has to appear in it, and a module added without a line</span></span>
-<span class="ln" id="L232">    <span class="tok-com">/// here fails this test instead of quietly going unscanned. That check is</span></span>
-<span class="ln" id="L233">    <span class="tok-com">/// the part worth having, because a hand-kept list is wrong from the first</span></span>
-<span class="ln" id="L234">    <span class="tok-com">/// module nobody thought about.</span></span>
-<span class="ln" id="L235">    <span class="tok-com">///</span></span>
-<span class="ln" id="L236">    <span class="tok-com">/// Each file is cut at its first `#[cfg(test)]`. Two guards in this crate</span></span>
-<span class="ln" id="L237">    <span class="tok-com">/// name the forbidden call in order to forbid it, and a check that trips</span></span>
-<span class="ln" id="L238">    <span class="tok-com">/// over its own source is a check somebody deletes.</span></span>
-<span class="ln" id="L239">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L240">    <span class="tok-kw">fn</span> <span class="tok-fn">every_subprocess_is_spawned_without_a_console_window</span>() {</span>
-<span class="ln" id="L241">        <span class="tok-com">// Split so this line is not itself a match: the needle cannot appear</span></span>
-<span class="ln" id="L242">        <span class="tok-com">// whole in a file the scan reads, and this file is one of them.</span></span>
-<span class="ln" id="L243">        <span class="tok-kw">const</span> NEEDLE: &amp;str = concat!(<span class="tok-str">&quot;Command&quot;</span>, <span class="tok-str">&quot;::new&quot;</span>);</span>
-<span class="ln" id="L244"></span>
-<span class="ln" id="L245">        <span class="tok-kw">let</span> sources = [</span>
-<span class="ln" id="L246">            <span class="tok-com">// Normalised where they are read, for the reason F-72 gives: a</span></span>
-<span class="ln" id="L247">            <span class="tok-com">// checkout with CRLF makes a line-by-line search quietly match</span></span>
-<span class="ln" id="L248">            <span class="tok-com">// nothing, on Windows runners and nowhere else.</span></span>
-<span class="ln" id="L249">            (<span class="tok-str">&quot;app.rs&quot;</span>, include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L250">            (</span>
-<span class="ln" id="L251">                <span class="tok-str">&quot;autolock.rs&quot;</span>,</span>
-<span class="ln" id="L252">                include_str!(<span class="tok-str">&quot;autolock.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L253">            ),</span>
-<span class="ln" id="L254">            (</span>
-<span class="ln" id="L255">                <span class="tok-str">&quot;avnotice.rs&quot;</span>,</span>
-<span class="ln" id="L256">                include_str!(<span class="tok-str">&quot;avnotice.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L257">            ),</span>
-<span class="ln" id="L258">            (</span>
-<span class="ln" id="L259">                <span class="tok-str">&quot;crashlog.rs&quot;</span>,</span>
-<span class="ln" id="L260">                include_str!(<span class="tok-str">&quot;crashlog.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L261">            ),</span>
-<span class="ln" id="L262">            (</span>
-<span class="ln" id="L263">                <span class="tok-str">&quot;crashreport.rs&quot;</span>,</span>
-<span class="ln" id="L264">                include_str!(<span class="tok-str">&quot;crashreport.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L265">            ),</span>
-<span class="ln" id="L266">            (<span class="tok-str">&quot;decoys.rs&quot;</span>, include_str!(<span class="tok-str">&quot;decoys.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L267">            (<span class="tok-str">&quot;dialog.rs&quot;</span>, include_str!(<span class="tok-str">&quot;dialog.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L268">            (</span>
-<span class="ln" id="L269">                <span class="tok-str">&quot;firstrun.rs&quot;</span>,</span>
-<span class="ln" id="L270">                include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L271">            ),</span>
-<span class="ln" id="L272">            (</span>
-<span class="ln" id="L273">                <span class="tok-str">&quot;graphics.rs&quot;</span>,</span>
-<span class="ln" id="L274">                include_str!(<span class="tok-str">&quot;graphics.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L275">            ),</span>
-<span class="ln" id="L276">            (<span class="tok-str">&quot;group.rs&quot;</span>, include_str!(<span class="tok-str">&quot;group.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L277">            (</span>
-<span class="ln" id="L278">                <span class="tok-str">&quot;integrity.rs&quot;</span>,</span>
-<span class="ln" id="L279">                include_str!(<span class="tok-str">&quot;integrity.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L280">            ),</span>
-<span class="ln" id="L281">            (<span class="tok-str">&quot;layout.rs&quot;</span>, include_str!(<span class="tok-str">&quot;layout.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L282">            (</span>
-<span class="ln" id="L283">                <span class="tok-str">&quot;monitor.rs&quot;</span>,</span>
-<span class="ln" id="L284">                include_str!(<span class="tok-str">&quot;monitor.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L285">            ),</span>
-<span class="ln" id="L286">            (<span class="tok-str">&quot;notify.rs&quot;</span>, include_str!(<span class="tok-str">&quot;notify.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L287">            (<span class="tok-str">&quot;pace.rs&quot;</span>, include_str!(<span class="tok-str">&quot;pace.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L204"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L205"><span class="tok-kw">mod</span> spawn_tests {</span>
+<span class="ln" id="L206">    <span class="tok-com">/// Every subprocess in this crate is spawned through [`super::command`].</span></span>
+<span class="ln" id="L207">    <span class="tok-com">///</span></span>
+<span class="ln" id="L208">    <span class="tok-com">/// This reads the crate&#x27;s own source rather than exercising the</span></span>
+<span class="ln" id="L209">    <span class="tok-com">/// behaviour, because &quot;no console window appeared&quot; cannot be observed</span></span>
+<span class="ln" id="L210">    <span class="tok-com">/// from a test, which is precisely why the defect reached a release. A</span></span>
+<span class="ln" id="L211">    <span class="tok-com">/// bare spawn added later fails here rather than on somebody&#x27;s desktop.</span></span>
+<span class="ln" id="L212">    <span class="tok-com">///</span></span>
+<span class="ln" id="L213">    <span class="tok-com">/// # Why it reads the whole crate</span></span>
+<span class="ln" id="L214">    <span class="tok-com">///</span></span>
+<span class="ln" id="L215">    <span class="tok-com">/// It used to read one file. `reduced_motion.rs` carried the wrapper and</span></span>
+<span class="ln" id="L216">    <span class="tok-com">/// a test that scanned `reduced_motion.rs`, and that test passed for as</span></span>
+<span class="ln" id="L217">    <span class="tok-com">/// long as it existed while `studio.rs` and `group.rs` each spawned</span></span>
+<span class="ln" id="L218">    <span class="tok-com">/// `ffmpeg` bare: rendering a take to video, and rendering a group</span></span>
+<span class="ln" id="L219">    <span class="tok-com">/// conversation, both flashed a console on Windows. A guard that reads</span></span>
+<span class="ln" id="L220">    <span class="tok-com">/// the file it lives in only ever proves something about that file, and</span></span>
+<span class="ln" id="L221">    <span class="tok-com">/// the module that bothered to write the rule is the least likely one to</span></span>
+<span class="ln" id="L222">    <span class="tok-com">/// break it.</span></span>
+<span class="ln" id="L223">    <span class="tok-com">///</span></span>
+<span class="ln" id="L224">    <span class="tok-com">/// `veilvoice-setup` learned the same lesson separately and at the same</span></span>
+<span class="ln" id="L225">    <span class="tok-com">/// time, as F-210: its list named three modules of six and said in its own</span></span>
+<span class="ln" id="L226">    <span class="tok-com">/// comment that it covered them all.</span></span>
+<span class="ln" id="L227">    <span class="tok-com">///</span></span>
+<span class="ln" id="L228">    <span class="tok-com">/// # The list is checked rather than kept up to date</span></span>
+<span class="ln" id="L229">    <span class="tok-com">///</span></span>
+<span class="ln" id="L230">    <span class="tok-com">/// `include_str!` takes a literal, so the list below cannot be built by</span></span>
+<span class="ln" id="L231">    <span class="tok-com">/// walking the directory. What it can be is checked: every `mod` this</span></span>
+<span class="ln" id="L232">    <span class="tok-com">/// file declares has to appear in it, and a module added without a line</span></span>
+<span class="ln" id="L233">    <span class="tok-com">/// here fails this test instead of quietly going unscanned. That check is</span></span>
+<span class="ln" id="L234">    <span class="tok-com">/// the part worth having, because a hand-kept list is wrong from the first</span></span>
+<span class="ln" id="L235">    <span class="tok-com">/// module nobody thought about.</span></span>
+<span class="ln" id="L236">    <span class="tok-com">///</span></span>
+<span class="ln" id="L237">    <span class="tok-com">/// Each file is cut at its first `#[cfg(test)]`. Two guards in this crate</span></span>
+<span class="ln" id="L238">    <span class="tok-com">/// name the forbidden call in order to forbid it, and a check that trips</span></span>
+<span class="ln" id="L239">    <span class="tok-com">/// over its own source is a check somebody deletes.</span></span>
+<span class="ln" id="L240">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L241">    <span class="tok-kw">fn</span> <span class="tok-fn">every_subprocess_is_spawned_without_a_console_window</span>() {</span>
+<span class="ln" id="L242">        <span class="tok-com">// Split so this line is not itself a match: the needle cannot appear</span></span>
+<span class="ln" id="L243">        <span class="tok-com">// whole in a file the scan reads, and this file is one of them.</span></span>
+<span class="ln" id="L244">        <span class="tok-kw">const</span> NEEDLE: &amp;str = concat!(<span class="tok-str">&quot;Command&quot;</span>, <span class="tok-str">&quot;::new&quot;</span>);</span>
+<span class="ln" id="L245"></span>
+<span class="ln" id="L246">        <span class="tok-kw">let</span> sources = [</span>
+<span class="ln" id="L247">            <span class="tok-com">// Normalised where they are read, for the reason F-72 gives: a</span></span>
+<span class="ln" id="L248">            <span class="tok-com">// checkout with CRLF makes a line-by-line search quietly match</span></span>
+<span class="ln" id="L249">            <span class="tok-com">// nothing, on Windows runners and nowhere else.</span></span>
+<span class="ln" id="L250">            (<span class="tok-str">&quot;app.rs&quot;</span>, include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L251">            (</span>
+<span class="ln" id="L252">                <span class="tok-str">&quot;autolock.rs&quot;</span>,</span>
+<span class="ln" id="L253">                include_str!(<span class="tok-str">&quot;autolock.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L254">            ),</span>
+<span class="ln" id="L255">            (</span>
+<span class="ln" id="L256">                <span class="tok-str">&quot;avnotice.rs&quot;</span>,</span>
+<span class="ln" id="L257">                include_str!(<span class="tok-str">&quot;avnotice.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L258">            ),</span>
+<span class="ln" id="L259">            (</span>
+<span class="ln" id="L260">                <span class="tok-str">&quot;crashlog.rs&quot;</span>,</span>
+<span class="ln" id="L261">                include_str!(<span class="tok-str">&quot;crashlog.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L262">            ),</span>
+<span class="ln" id="L263">            (</span>
+<span class="ln" id="L264">                <span class="tok-str">&quot;crashreport.rs&quot;</span>,</span>
+<span class="ln" id="L265">                include_str!(<span class="tok-str">&quot;crashreport.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L266">            ),</span>
+<span class="ln" id="L267">            (<span class="tok-str">&quot;decoys.rs&quot;</span>, include_str!(<span class="tok-str">&quot;decoys.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L268">            (<span class="tok-str">&quot;dialog.rs&quot;</span>, include_str!(<span class="tok-str">&quot;dialog.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L269">            (</span>
+<span class="ln" id="L270">                <span class="tok-str">&quot;firstrun.rs&quot;</span>,</span>
+<span class="ln" id="L271">                include_str!(<span class="tok-str">&quot;firstrun.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L272">            ),</span>
+<span class="ln" id="L273">            (</span>
+<span class="ln" id="L274">                <span class="tok-str">&quot;graphics.rs&quot;</span>,</span>
+<span class="ln" id="L275">                include_str!(<span class="tok-str">&quot;graphics.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L276">            ),</span>
+<span class="ln" id="L277">            (<span class="tok-str">&quot;group.rs&quot;</span>, include_str!(<span class="tok-str">&quot;group.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L278">            (</span>
+<span class="ln" id="L279">                <span class="tok-str">&quot;integrity.rs&quot;</span>,</span>
+<span class="ln" id="L280">                include_str!(<span class="tok-str">&quot;integrity.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L281">            ),</span>
+<span class="ln" id="L282">            (<span class="tok-str">&quot;layout.rs&quot;</span>, include_str!(<span class="tok-str">&quot;layout.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L283">            (</span>
+<span class="ln" id="L284">                <span class="tok-str">&quot;monitor.rs&quot;</span>,</span>
+<span class="ln" id="L285">                include_str!(<span class="tok-str">&quot;monitor.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L286">            ),</span>
+<span class="ln" id="L287">            (<span class="tok-str">&quot;notify.rs&quot;</span>, include_str!(<span class="tok-str">&quot;notify.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
 <span class="ln" id="L288">            (</span>
-<span class="ln" id="L289">                <span class="tok-str">&quot;palettes.rs&quot;</span>,</span>
-<span class="ln" id="L290">                include_str!(<span class="tok-str">&quot;palettes.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L289">                <span class="tok-str">&quot;offthread.rs&quot;</span>,</span>
+<span class="ln" id="L290">                include_str!(<span class="tok-str">&quot;offthread.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
 <span class="ln" id="L291">            ),</span>
-<span class="ln" id="L292">            (<span class="tok-str">&quot;paths.rs&quot;</span>, include_str!(<span class="tok-str">&quot;paths.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L293">            (<span class="tok-str">&quot;policy.rs&quot;</span>, include_str!(<span class="tok-str">&quot;policy.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L294">            (<span class="tok-str">&quot;prefs.rs&quot;</span>, include_str!(<span class="tok-str">&quot;prefs.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L295">            (<span class="tok-str">&quot;probe.rs&quot;</span>, include_str!(<span class="tok-str">&quot;probe.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L296">            (</span>
-<span class="ln" id="L297">                <span class="tok-str">&quot;reduced_motion.rs&quot;</span>,</span>
-<span class="ln" id="L298">                include_str!(<span class="tok-str">&quot;reduced_motion.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L299">            ),</span>
-<span class="ln" id="L300">            (</span>
-<span class="ln" id="L301">                <span class="tok-str">&quot;security.rs&quot;</span>,</span>
-<span class="ln" id="L302">                include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L303">            ),</span>
-<span class="ln" id="L304">            (</span>
-<span class="ln" id="L305">                <span class="tok-str">&quot;settings.rs&quot;</span>,</span>
-<span class="ln" id="L306">                include_str!(<span class="tok-str">&quot;settings.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L307">            ),</span>
-<span class="ln" id="L308">            (<span class="tok-str">&quot;setup.rs&quot;</span>, include_str!(<span class="tok-str">&quot;setup.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L292">            (<span class="tok-str">&quot;pace.rs&quot;</span>, include_str!(<span class="tok-str">&quot;pace.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L293">            (</span>
+<span class="ln" id="L294">                <span class="tok-str">&quot;palettes.rs&quot;</span>,</span>
+<span class="ln" id="L295">                include_str!(<span class="tok-str">&quot;palettes.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L296">            ),</span>
+<span class="ln" id="L297">            (<span class="tok-str">&quot;paths.rs&quot;</span>, include_str!(<span class="tok-str">&quot;paths.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L298">            (<span class="tok-str">&quot;policy.rs&quot;</span>, include_str!(<span class="tok-str">&quot;policy.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L299">            (<span class="tok-str">&quot;prefs.rs&quot;</span>, include_str!(<span class="tok-str">&quot;prefs.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L300">            (<span class="tok-str">&quot;probe.rs&quot;</span>, include_str!(<span class="tok-str">&quot;probe.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L301">            (</span>
+<span class="ln" id="L302">                <span class="tok-str">&quot;reduced_motion.rs&quot;</span>,</span>
+<span class="ln" id="L303">                include_str!(<span class="tok-str">&quot;reduced_motion.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L304">            ),</span>
+<span class="ln" id="L305">            (</span>
+<span class="ln" id="L306">                <span class="tok-str">&quot;security.rs&quot;</span>,</span>
+<span class="ln" id="L307">                include_str!(<span class="tok-str">&quot;security.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L308">            ),</span>
 <span class="ln" id="L309">            (</span>
-<span class="ln" id="L310">                <span class="tok-str">&quot;soundbar.rs&quot;</span>,</span>
-<span class="ln" id="L311">                include_str!(<span class="tok-str">&quot;soundbar.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L310">                <span class="tok-str">&quot;settings.rs&quot;</span>,</span>
+<span class="ln" id="L311">                include_str!(<span class="tok-str">&quot;settings.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
 <span class="ln" id="L312">            ),</span>
-<span class="ln" id="L313">            (</span>
-<span class="ln" id="L314">                <span class="tok-str">&quot;storage.rs&quot;</span>,</span>
-<span class="ln" id="L315">                include_str!(<span class="tok-str">&quot;storage.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L316">            ),</span>
-<span class="ln" id="L317">            (<span class="tok-str">&quot;studio.rs&quot;</span>, include_str!(<span class="tok-str">&quot;studio.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L318">            (<span class="tok-str">&quot;theme.rs&quot;</span>, include_str!(<span class="tok-str">&quot;theme.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L319">            (<span class="tok-str">&quot;tour.rs&quot;</span>, include_str!(<span class="tok-str">&quot;tour.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L320">            (</span>
-<span class="ln" id="L321">                <span class="tok-str">&quot;updates.rs&quot;</span>,</span>
-<span class="ln" id="L322">                include_str!(<span class="tok-str">&quot;updates.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L323">            ),</span>
-<span class="ln" id="L324">            (</span>
-<span class="ln" id="L325">                <span class="tok-str">&quot;vault_store.rs&quot;</span>,</span>
-<span class="ln" id="L326">                include_str!(<span class="tok-str">&quot;vault_store.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
-<span class="ln" id="L327">            ),</span>
-<span class="ln" id="L328">            (<span class="tok-str">&quot;verify.rs&quot;</span>, include_str!(<span class="tok-str">&quot;verify.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L313">            (<span class="tok-str">&quot;setup.rs&quot;</span>, include_str!(<span class="tok-str">&quot;setup.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L314">            (</span>
+<span class="ln" id="L315">                <span class="tok-str">&quot;soundbar.rs&quot;</span>,</span>
+<span class="ln" id="L316">                include_str!(<span class="tok-str">&quot;soundbar.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L317">            ),</span>
+<span class="ln" id="L318">            (</span>
+<span class="ln" id="L319">                <span class="tok-str">&quot;storage.rs&quot;</span>,</span>
+<span class="ln" id="L320">                include_str!(<span class="tok-str">&quot;storage.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L321">            ),</span>
+<span class="ln" id="L322">            (<span class="tok-str">&quot;studio.rs&quot;</span>, include_str!(<span class="tok-str">&quot;studio.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L323">            (<span class="tok-str">&quot;theme.rs&quot;</span>, include_str!(<span class="tok-str">&quot;theme.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L324">            (<span class="tok-str">&quot;tour.rs&quot;</span>, include_str!(<span class="tok-str">&quot;tour.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L325">            (</span>
+<span class="ln" id="L326">                <span class="tok-str">&quot;updates.rs&quot;</span>,</span>
+<span class="ln" id="L327">                include_str!(<span class="tok-str">&quot;updates.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L328">            ),</span>
 <span class="ln" id="L329">            (</span>
-<span class="ln" id="L330">                <span class="tok-str">&quot;watchfeed.rs&quot;</span>,</span>
-<span class="ln" id="L331">                include_str!(<span class="tok-str">&quot;watchfeed.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L330">                <span class="tok-str">&quot;vault_store.rs&quot;</span>,</span>
+<span class="ln" id="L331">                include_str!(<span class="tok-str">&quot;vault_store.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
 <span class="ln" id="L332">            ),</span>
-<span class="ln" id="L333">            (<span class="tok-str">&quot;window.rs&quot;</span>, include_str!(<span class="tok-str">&quot;window.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
-<span class="ln" id="L334">        ];</span>
-<span class="ln" id="L335"></span>
-<span class="ln" id="L336">        <span class="tok-kw">let</span> lib = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L337">        <span class="tok-kw">let</span> declared: Vec&lt;String&gt; = lib</span>
-<span class="ln" id="L338">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L339">            .<span class="tok-fn">filter_map</span>(|line| {</span>
-<span class="ln" id="L340">                <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L341">                <span class="tok-kw">let</span> rest = line</span>
-<span class="ln" id="L342">                    .<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;pub mod &quot;</span>)</span>
-<span class="ln" id="L343">                    .<span class="tok-fn">or_else</span>(|| line.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;mod &quot;</span>))?;</span>
-<span class="ln" id="L344">                rest.<span class="tok-fn">strip_suffix</span>(<span class="tok-str">&#x27;;&#x27;</span>).<span class="tok-fn">map</span>(|name| format!(<span class="tok-str">&quot;{name}.rs&quot;</span>))</span>
-<span class="ln" id="L345">            })</span>
-<span class="ln" id="L346">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L347">        assert!(!declared.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;no modules were read out of lib.rs&quot;</span>);</span>
-<span class="ln" id="L348">        <span class="tok-kw">for</span> module <span class="tok-kw">in</span> &amp;declared {</span>
-<span class="ln" id="L349">            assert!(</span>
-<span class="ln" id="L350">                sources.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|(name, _)| name == module),</span>
-<span class="ln" id="L351">                <span class="tok-str">&quot;{module} is declared in lib.rs and is not scanned for bare \</span></span>
-<span class="ln" id="L352"><span class="tok-str">                 spawns. Add it to the list above: a module left out of it is \</span></span>
-<span class="ln" id="L353"><span class="tok-str">                 a module where this rule is not enforced, which is the shape \</span></span>
-<span class="ln" id="L354"><span class="tok-str">                 of the defect this test exists for.&quot;</span></span>
-<span class="ln" id="L355">            );</span>
-<span class="ln" id="L356">        }</span>
-<span class="ln" id="L357"></span>
-<span class="ln" id="L358">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bare = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L359">        <span class="tok-kw">for</span> (name, source) <span class="tok-kw">in</span> &amp;sources {</span>
-<span class="ln" id="L360">            <span class="tok-kw">let</span> shipped = <span class="tok-kw">match</span> source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>) {</span>
-<span class="ln" id="L361">                <span class="tok-fn">Some</span>(at) =&gt; &amp;source[..at],</span>
-<span class="ln" id="L362">                None =&gt; source.<span class="tok-fn">as_str</span>(),</span>
-<span class="ln" id="L363">            };</span>
-<span class="ln" id="L364">            <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> shipped.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L365">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L366">                <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) || trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;*&#x27;</span>) {</span>
-<span class="ln" id="L367">                    continue; <span class="tok-com">// prose: this rule is discussed in the comments</span></span>
-<span class="ln" id="L368">                }</span>
-<span class="ln" id="L369">                <span class="tok-kw">if</span> !line.<span class="tok-fn">contains</span>(NEEDLE) {</span>
-<span class="ln" id="L370">                    continue;</span>
-<span class="ln" id="L371">                }</span>
-<span class="ln" id="L372">                bare.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{}:{}: {}&quot;</span>, name, number + <span class="tok-num">1</span>, trimmed));</span>
-<span class="ln" id="L373">            }</span>
-<span class="ln" id="L374">        }</span>
-<span class="ln" id="L375">        assert!(</span>
-<span class="ln" id="L376">            bare.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L377">            <span class="tok-str">&quot;these spawns bypass `crate::command`, so each flashes a console \</span></span>
-<span class="ln" id="L378"><span class="tok-str">             window on Windows. Route them through it:\n{}&quot;</span>,</span>
-<span class="ln" id="L379">            bare.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L380">        );</span>
-<span class="ln" id="L381">    }</span>
-<span class="ln" id="L382">}</span>
+<span class="ln" id="L333">            (<span class="tok-str">&quot;verify.rs&quot;</span>, include_str!(<span class="tok-str">&quot;verify.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L334">            (</span>
+<span class="ln" id="L335">                <span class="tok-str">&quot;watchfeed.rs&quot;</span>,</span>
+<span class="ln" id="L336">                include_str!(<span class="tok-str">&quot;watchfeed.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>),</span>
+<span class="ln" id="L337">            ),</span>
+<span class="ln" id="L338">            (<span class="tok-str">&quot;window.rs&quot;</span>, include_str!(<span class="tok-str">&quot;window.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>)),</span>
+<span class="ln" id="L339">        ];</span>
+<span class="ln" id="L340"></span>
+<span class="ln" id="L341">        <span class="tok-kw">let</span> lib = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L342">        <span class="tok-kw">let</span> declared: Vec&lt;String&gt; = lib</span>
+<span class="ln" id="L343">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L344">            .<span class="tok-fn">filter_map</span>(|line| {</span>
+<span class="ln" id="L345">                <span class="tok-kw">let</span> line = line.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L346">                <span class="tok-kw">let</span> rest = line</span>
+<span class="ln" id="L347">                    .<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;pub mod &quot;</span>)</span>
+<span class="ln" id="L348">                    .<span class="tok-fn">or_else</span>(|| line.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;mod &quot;</span>))?;</span>
+<span class="ln" id="L349">                rest.<span class="tok-fn">strip_suffix</span>(<span class="tok-str">&#x27;;&#x27;</span>).<span class="tok-fn">map</span>(|name| format!(<span class="tok-str">&quot;{name}.rs&quot;</span>))</span>
+<span class="ln" id="L350">            })</span>
+<span class="ln" id="L351">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L352">        assert!(!declared.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;no modules were read out of lib.rs&quot;</span>);</span>
+<span class="ln" id="L353">        <span class="tok-kw">for</span> module <span class="tok-kw">in</span> &amp;declared {</span>
+<span class="ln" id="L354">            assert!(</span>
+<span class="ln" id="L355">                sources.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|(name, _)| name == module),</span>
+<span class="ln" id="L356">                <span class="tok-str">&quot;{module} is declared in lib.rs and is not scanned for bare \</span></span>
+<span class="ln" id="L357"><span class="tok-str">                 spawns. Add it to the list above: a module left out of it is \</span></span>
+<span class="ln" id="L358"><span class="tok-str">                 a module where this rule is not enforced, which is the shape \</span></span>
+<span class="ln" id="L359"><span class="tok-str">                 of the defect this test exists for.&quot;</span></span>
+<span class="ln" id="L360">            );</span>
+<span class="ln" id="L361">        }</span>
+<span class="ln" id="L362"></span>
+<span class="ln" id="L363">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bare = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L364">        <span class="tok-kw">for</span> (name, source) <span class="tok-kw">in</span> &amp;sources {</span>
+<span class="ln" id="L365">            <span class="tok-kw">let</span> shipped = <span class="tok-kw">match</span> source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>) {</span>
+<span class="ln" id="L366">                <span class="tok-fn">Some</span>(at) =&gt; &amp;source[..at],</span>
+<span class="ln" id="L367">                None =&gt; source.<span class="tok-fn">as_str</span>(),</span>
+<span class="ln" id="L368">            };</span>
+<span class="ln" id="L369">            <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> shipped.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L370">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L371">                <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) || trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;*&#x27;</span>) {</span>
+<span class="ln" id="L372">                    continue; <span class="tok-com">// prose: this rule is discussed in the comments</span></span>
+<span class="ln" id="L373">                }</span>
+<span class="ln" id="L374">                <span class="tok-kw">if</span> !line.<span class="tok-fn">contains</span>(NEEDLE) {</span>
+<span class="ln" id="L375">                    continue;</span>
+<span class="ln" id="L376">                }</span>
+<span class="ln" id="L377">                bare.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{}:{}: {}&quot;</span>, name, number + <span class="tok-num">1</span>, trimmed));</span>
+<span class="ln" id="L378">            }</span>
+<span class="ln" id="L379">        }</span>
+<span class="ln" id="L380">        assert!(</span>
+<span class="ln" id="L381">            bare.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L382">            <span class="tok-str">&quot;these spawns bypass `crate::command`, so each flashes a console \</span></span>
+<span class="ln" id="L383"><span class="tok-str">             window on Windows. Route them through it:\n{}&quot;</span>,</span>
+<span class="ln" id="L384">            bare.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L385">        );</span>
+<span class="ln" id="L386">    }</span>
+<span class="ln" id="L387">}</span>
 </span>
 </code></pre>
 </main>
