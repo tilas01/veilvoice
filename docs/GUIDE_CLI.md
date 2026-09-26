@@ -181,6 +181,14 @@ on to fetch the release, check its signature against the key compiled into this
 program, and put it in place. [Updating](UPDATING.md) is the whole of what that
 does and what you see afterwards.
 
+**Fetching a release to check it** is the other one. `veilvoice verify release
+<tag>` downloads that release's hash list and signature from the releases page,
+through the same transfer tool, so somebody can verify a copy they already have
+without opening a browser. It downloads nothing else and replaces nothing.
+
+Those two are the whole list, and `veilvoice --help` says so in its opening
+paragraph. Nothing else in either program opens a connection for any reason.
+
 **It looks along the stream this copy came from**, and says which. There are
 two, and they are the same program built the same way:
 

@@ -31,10 +31,10 @@ it beside the workspace members for the same reason.
 
 | What | Measured |
 |---|---:|
-| Tests, measured by running them | 1848 |
+| Tests, measured by running them | 1849 |
 | Crates in the workspace | 13 |
 | Website suites | 20 |
-| Functional lines of Rust | 72329 |
-| Findings written up in the audit | 227 |
-| Highest finding number used | 227 |
+| Functional lines of Rust | 72424 |
+| Findings written up in the audit | 228 |
+| Highest finding number used | 228 |
 | Measured on | `x86_64-unknown-linux-gnu` |

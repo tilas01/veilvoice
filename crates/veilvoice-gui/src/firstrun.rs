@@ -82,7 +82,12 @@ impl Step {
         }
     }
 
-    /// One-based position, for "step 2 of 4".
+    /// One-based position, for the "step 2 of 5" line the card shows.
+    ///
+    /// The total beside it is [`Step::COUNT`] rather than a number written here,
+    /// so the two halves of that line cannot disagree. This comment said "of 4"
+    /// until the machine card was added, which is the same disagreement one
+    /// level up.
     fn position(self) -> usize {
         match self {
             Self::Appearance => 1,

@@ -103,7 +103,7 @@ flowchart TD
     n_crashreport["crashreport.rs<br/>289 lines"]
     n_decoys["decoys.rs<br/>216 lines"]
     n_dialog["dialog.rs<br/>430 lines"]
-    n_firstrun["firstrun.rs<br/>866 lines"]
+    n_firstrun["firstrun.rs<br/>871 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
     n_group["group.rs<br/>2128 lines"]
     n_integrity["integrity.rs<br/>397 lines"]
@@ -314,7 +314,7 @@ flowchart TD
 | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | 289 | Offering the report from the last crash, on the run after it. |
 | [`decoys.rs`](../../docs/files/veilvoice-gui/decoys.md) | 216 | Decoy vaults: how many there is room for, and the panel that offers them. |
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 430 | Asking for a file without stopping the window. |
-| [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 866 | The first run: the four things worth deciding before anything else. |
+| [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 871 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 214 | What the window is drawn with, asked for explicitly and then reported. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 2128 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 397 | The integrity record, taken and checked by the window rather than by hand. |

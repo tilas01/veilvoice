@@ -1741,3 +1741,80 @@ fn the_remembered_record_says_in_itself_that_it_is_not_evidence() {
         "and say why:\n{preamble}"
     );
 }
+
+/// **F-228.** A request for help must be answered, wherever it is written.
+///
+/// `veilvoice verify release --help` read `release` as the subcommand and
+/// `--help` as the tag to fetch, so asking for help opened a connection. Every
+/// case below was confirmed against the old rule, which read only the first
+/// argument: each of the "behind a subcommand" ones failed.
+#[test]
+fn a_question_about_the_program_is_answered_wherever_it_is_asked() {
+    use crate::Asked;
+
+    fn args(words: &[&str]) -> Vec<String> {
+        words.iter().map(|w| w.to_string()).collect()
+    }
+
+    for words in [
+        vec!["--help"],
+        vec!["-h"],
+        vec!["help"],
+        vec!["release", "--help"],
+        vec!["release", "-h"],
+        vec!["archive", "some.tar.gz", "--help"],
+        vec!["reproduce", ".", "--sums", "SHA256SUMS", "-h"],
+    ] {
+        assert_eq!(
+            Asked::in_args(&args(&words)),
+            Some(Asked::Help),
+            "help asked for as {words:?} must be answered before anything runs"
+        );
+    }
+
+    assert_eq!(
+        Asked::in_args(&args(&["release", "--version"])),
+        Some(Asked::Version)
+    );
+    assert_eq!(
+        Asked::in_args(&args(&["release", "--explain"])),
+        Some(Asked::Explain)
+    );
+    assert_eq!(
+        Asked::in_args(&args(&["release", "--exit-status"])),
+        Some(Asked::ExitStatus)
+    );
+
+    // Help wins, whichever order they are written in.
+    assert_eq!(
+        Asked::in_args(&args(&["--version", "--help"])),
+        Some(Asked::Help)
+    );
+    assert_eq!(
+        Asked::in_args(&args(&["--help", "--version"])),
+        Some(Asked::Help)
+    );
+
+    // And a real invocation asks nothing about the program, so nothing here
+    // may catch it. `help` after the first word is a path or a tag.
+    for words in [
+        vec!["release", "v0.1.23"],
+        vec!["auto"],
+        vec!["archive", "veilvoice-v0.1.23-linux-x86_64.tar.gz"],
+        vec!["gnupg", "help"],
+        vec![
+            "reproduce",
+            ".",
+            "--sums",
+            "SHA256SUMS",
+            "--sig",
+            "SHA256SUMS.asc",
+        ],
+    ] {
+        assert_eq!(
+            Asked::in_args(&args(&words)),
+            None,
+            "{words:?} is work to do, not a question about the program"
+        );
+    }
+}
