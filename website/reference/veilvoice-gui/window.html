@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/window.svg" alt="window.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/window.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 244 lines &middot; <a href="window.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 249 lines &middot; <a href="window.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-two-failures-a-single-number-produces">The two failures a single number produces</a>
@@ -85,7 +85,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>244 lines defining <strong>3 functions</strong> (3 public), <strong>0 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>249 lines defining <strong>3 functions</strong> (3 public), <strong>0 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>requested_size</code> <span style="color:var(--muted)">line 64</span> &middot; The size asked for by --size &lt;W&gt;x&lt;H&gt;, if one was and it parses.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>size_from</code></span>
@@ -162,7 +162,7 @@ flowchart TD
 <tr><td><code>requested_size</code> <sub>pub fn</sub></td><td><a href="window.src.html#fn-requested_size">64</a></td><td>The size asked for by --size &lt;W&gt;x&lt;H&gt;, if one was and it parses.</td></tr>
 <tr><td><code>size_from</code> <sub>pub fn</sub></td><td><a href="window.src.html#fn-size_from">73</a></td><td>The parsing half, separated from the environment so it can be tested.</td></tr>
 <tr><td><code>opening_size</code> <sub>pub fn</sub></td><td><a href="window.src.html#fn-opening_size">100</a></td><td>The size to open at on this screen, given the monitor and what was asked for on the command line.</td></tr>
-<tr><td><code>opening</code> <sub>mod</sub></td><td><a href="window.src.html#fn-opening">186</a></td><td></td></tr>
+<tr><td><code>opening</code> <sub>mod</sub></td><td><a href="window.src.html#fn-opening">191</a></td><td>What size the window opens at, on screens from a phone to a workstation.</td></tr>
 </tbody></table>
 </section>
 </div></div>

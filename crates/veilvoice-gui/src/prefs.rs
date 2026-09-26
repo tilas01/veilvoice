@@ -568,6 +568,13 @@ impl Prefs {
     }
 }
 
+/// One of the spellings people write for yes and no, as a `bool`.
+///
+/// Generous on purpose, because this reads a settings file somebody may have
+/// edited by hand, and `on` meaning nothing while `true` works is the kind of
+/// thing that reads as the setting being ignored. Anything else answers `None`
+/// rather than a default: a value that was meant and not understood is worth
+/// reporting, not guessing at.
 fn parse_bool(value: &str) -> Option<bool> {
     match value.to_ascii_lowercase().as_str() {
         "true" | "yes" | "on" | "1" => Some(true),

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/palettes.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 700 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 714 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ numbers so you know how far off it is and which way to move.
 
 ## What this file contains
 
-700 lines defining **8 functions** (4 public), **1 type** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+714 lines defining **8 functions** (4 public), **1 type** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -86,8 +86,8 @@ numbers so you know how far off it is and which way to move.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `default_dir` (line 291) -- Where palettes live, beside the preferences file.
-- `load` (line 318) -- Read every palette in dir, returning the usable ones and every complaint.
+- `default_dir` (line 305) -- Where palettes live, beside the preferences file.
+- `load` (line 332) -- Read every palette in dir, returning the usable ones and every complaint.
   - reaches: `build`, `contrast_problems`, `parse`, `contrast`, `parse_hex`, `luminance`
 
 ## What calls what
@@ -107,11 +107,11 @@ flowchart TD
     n_luminance["luminance<br/>line 94"]
     n_contrast["contrast<br/>line 110"]
     n_contrast_problems["contrast_problems<br/>line 130"]
-    n_parse_hex["parse_hex<br/>line 163"]
-    n_parse["parse<br/>line 180"]
-    n_build["build<br/>line 258"]
-    n_default_dir(["default_dir<br/>line 291"])
-    n_load(["load<br/>line 318"])
+    n_parse_hex["parse_hex<br/>line 170"]
+    n_parse["parse<br/>line 187"]
+    n_build["build<br/>line 272"]
+    n_default_dir(["default_dir<br/>line 305"])
+    n_load(["load<br/>line 332"])
     n_contrast --> n_luminance
     n_contrast_problems --> n_contrast
     n_load --> n_build
@@ -121,11 +121,11 @@ flowchart TD
     click n_luminance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L94" "open the source"
     click n_contrast href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L110" "open the source"
     click n_contrast_problems href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L130" "open the source"
-    click n_parse_hex href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L163" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L180" "open the source"
-    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L258" "open the source"
-    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L291" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L318" "open the source"
+    click n_parse_hex href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L170" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L187" "open the source"
+    click n_build href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L272" "open the source"
+    click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L305" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L332" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_default_dir,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -148,8 +148,8 @@ flowchart TD
 | `PAIRS` <sub>const</sub> | [117](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L117) | The contrast pairs a palette has to satisfy, with the reason for each. |
 | `contrast_problems` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L130) | Check a palette's contrast, returning one message per failing pair. |
 | `Parsed` <sub>struct</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L156) | One parsed colour scheme, before it is accepted. |
-| `parse_hex` <sub>fn</sub> | [163](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L163) |  |
-| `parse` <sub>fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L180) | Parse a palette file's text. |
-| `build` <sub>fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L258) |  |
-| `default_dir` <sub>pub fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L291) | Where palettes live, beside the preferences file. |
-| `load` <sub>pub fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L318) | Read every palette in dir, returning the usable ones and every complaint. |
+| `parse_hex` <sub>fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L170) | A #rrggbb colour, or None if that is not what this is. |
+| `parse` <sub>fn</sub> | [187](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L187) | Parse a palette file's text. |
+| `build` <sub>fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L272) | A parsed palette file as a Theme, with anything it left out taken from the built-in one. |
+| `default_dir` <sub>pub fn</sub> | [305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L305) | Where palettes live, beside the preferences file. |
+| `load` <sub>pub fn</sub> | [332](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L332) | Read every palette in dir, returning the usable ones and every complaint. |

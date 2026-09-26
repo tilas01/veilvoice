@@ -1567,6 +1567,16 @@ the integrity record taken at first run, and the last of the functions with no
 doc comment. Cut v0.1.23 when the audit round over everything since v0.1.22
 is written up.
 
+**The doc comments are done.** `tools/audit/documented.py` found eighty-two items
+appearing on a published page with nothing written under them, spread across
+every crate. All eighty-two now say what they are for, and the guard became a
+build step in `tools/verify.py` and in `ci.yml` in the same commit as the last of
+them, which is what its own module note had promised. It had only reported until
+then, deliberately, because a guard that fails a build for eighty-one known
+things is a guard somebody turns off. The cost of that decision is worth naming:
+while it only reported, nothing ran it, so the number grew from eighty-one to
+eighty-two without anybody being told.
+
 ### Then: v0.1.24, verification for anybody
 
 Roadmap items 164, then 163, then 155, in that order and for one reason: **163 and 155

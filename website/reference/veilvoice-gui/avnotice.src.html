@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/avnotice.rs</code></h1>
-<p style="color:var(--muted)"><a href="avnotice.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 298 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="avnotice.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 305 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -299,95 +299,102 @@
 </span>
 <span class="ln" id="L210"></span>
 <span class="src-item" id="fn-detect_windows">
-<span class="ln" id="L211"><span class="tok-attr">#[cfg</span>(windows)]</span>
-<span class="ln" id="L212"><span class="tok-kw">fn</span> <span class="tok-fn">detect_windows</span>() -&gt; Vec&lt;Product&gt; {</span>
-<span class="ln" id="L213">    <span class="tok-kw">let</span> system_drive = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemDrive&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">&quot;C:&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L214">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L215">    <span class="tok-kw">for</span> (name, tail) <span class="tok-kw">in</span> WINDOWS_PRODUCTS {</span>
-<span class="ln" id="L216">        <span class="tok-kw">let</span> path = format!(<span class="tok-str">&quot;{system_drive}\\{tail}&quot;</span>);</span>
-<span class="ln" id="L217">        <span class="tok-kw">if</span> std::path::Path::<span class="tok-fn">new</span>(&amp;path).<span class="tok-fn">exists</span>() {</span>
-<span class="ln" id="L218">            found.<span class="tok-fn">push</span>(Product { name });</span>
-<span class="ln" id="L219">        }</span>
-<span class="ln" id="L220">    }</span>
-<span class="ln" id="L221">    <span class="tok-com">// Defender is present on essentially every modern Windows, so if the more</span></span>
-<span class="ln" id="L222">    <span class="tok-com">// specific products matched, lead with those -- they are the ones a user</span></span>
-<span class="ln" id="L223">    <span class="tok-com">// installed on purpose and the more likely source of a deliberate block.</span></span>
-<span class="ln" id="L224">    found.<span class="tok-fn">sort_by_key</span>(|p| p.name == <span class="tok-str">&quot;Microsoft Defender&quot;</span>);</span>
-<span class="ln" id="L225">    found</span>
-<span class="ln" id="L226">}</span>
+<span class="ln" id="L211"><span class="tok-com">/// Which of the products in the table above are installed on this machine.</span></span>
+<span class="ln" id="L212"><span class="tok-com">///</span></span>
+<span class="ln" id="L213"><span class="tok-com">/// Looked for by path rather than asked of the registry, and the list is a table</span></span>
+<span class="ln" id="L214"><span class="tok-com">/// rather than a scan: this exists to tell somebody that a screen recorder or a</span></span>
+<span class="ln" id="L215"><span class="tok-com">/// remote-access tool is present while they are about to record, and a routine</span></span>
+<span class="ln" id="L216"><span class="tok-com">/// that went looking for anything unfamiliar would be doing something this</span></span>
+<span class="ln" id="L217"><span class="tok-com">/// program has no business doing.</span></span>
+<span class="ln" id="L218"><span class="tok-attr">#[cfg</span>(windows)]</span>
+<span class="ln" id="L219"><span class="tok-kw">fn</span> <span class="tok-fn">detect_windows</span>() -&gt; Vec&lt;Product&gt; {</span>
+<span class="ln" id="L220">    <span class="tok-kw">let</span> system_drive = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemDrive&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">&quot;C:&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L221">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L222">    <span class="tok-kw">for</span> (name, tail) <span class="tok-kw">in</span> WINDOWS_PRODUCTS {</span>
+<span class="ln" id="L223">        <span class="tok-kw">let</span> path = format!(<span class="tok-str">&quot;{system_drive}\\{tail}&quot;</span>);</span>
+<span class="ln" id="L224">        <span class="tok-kw">if</span> std::path::Path::<span class="tok-fn">new</span>(&amp;path).<span class="tok-fn">exists</span>() {</span>
+<span class="ln" id="L225">            found.<span class="tok-fn">push</span>(Product { name });</span>
+<span class="ln" id="L226">        }</span>
+<span class="ln" id="L227">    }</span>
+<span class="ln" id="L228">    <span class="tok-com">// Defender is present on essentially every modern Windows, so if the more</span></span>
+<span class="ln" id="L229">    <span class="tok-com">// specific products matched, lead with those -- they are the ones a user</span></span>
+<span class="ln" id="L230">    <span class="tok-com">// installed on purpose and the more likely source of a deliberate block.</span></span>
+<span class="ln" id="L231">    found.<span class="tok-fn">sort_by_key</span>(|p| p.name == <span class="tok-str">&quot;Microsoft Defender&quot;</span>);</span>
+<span class="ln" id="L232">    found</span>
+<span class="ln" id="L233">}</span>
 </span>
-<span class="ln" id="L227"></span>
-<span class="ln" id="L228"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L229"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L230">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L231"></span>
-<span class="ln" id="L232">    <span class="tok-kw">fn</span> <span class="tok-fn">product</span>(name: &amp;&#x27;<span class="tok-kw">static</span> str) -&gt; Product {</span>
-<span class="ln" id="L233">        Product { name }</span>
-<span class="ln" id="L234">    }</span>
-<span class="ln" id="L235"></span>
-<span class="ln" id="L236">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L237">    <span class="tok-kw">fn</span> <span class="tok-fn">a_clean_exit_says_nothing</span>() {</span>
-<span class="ln" id="L238">        assert_eq!(<span class="tok-fn">diagnose</span>(false, false, &amp;[<span class="tok-fn">product</span>(<span class="tok-str">&quot;Defender&quot;</span>)]), None);</span>
-<span class="ln" id="L239">    }</span>
-<span class="ln" id="L240"></span>
-<span class="ln" id="L241">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L242">    <span class="tok-kw">fn</span> <span class="tok-fn">a_crash_of_our_own_says_nothing_here</span>() {</span>
-<span class="ln" id="L243">        <span class="tok-com">// A crash has its own report and its own message; this must not also</span></span>
-<span class="ln" id="L244">        <span class="tok-com">// blame the antivirus for something VeilVoice did to itself.</span></span>
-<span class="ln" id="L245">        assert_eq!(<span class="tok-fn">diagnose</span>(true, true, &amp;[<span class="tok-fn">product</span>(<span class="tok-str">&quot;Defender&quot;</span>)]), None);</span>
+<span class="ln" id="L234"></span>
+<span class="ln" id="L235"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L236"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L237">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L238"></span>
+<span class="ln" id="L239">    <span class="tok-kw">fn</span> <span class="tok-fn">product</span>(name: &amp;&#x27;<span class="tok-kw">static</span> str) -&gt; Product {</span>
+<span class="ln" id="L240">        Product { name }</span>
+<span class="ln" id="L241">    }</span>
+<span class="ln" id="L242"></span>
+<span class="ln" id="L243">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L244">    <span class="tok-kw">fn</span> <span class="tok-fn">a_clean_exit_says_nothing</span>() {</span>
+<span class="ln" id="L245">        assert_eq!(<span class="tok-fn">diagnose</span>(false, false, &amp;[<span class="tok-fn">product</span>(<span class="tok-str">&quot;Defender&quot;</span>)]), None);</span>
 <span class="ln" id="L246">    }</span>
 <span class="ln" id="L247"></span>
 <span class="ln" id="L248">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L249">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unclean_exit_with_no_antivirus_says_nothing</span>() {</span>
-<span class="ln" id="L250">        <span class="tok-com">// Nobody to name, so the notice would be a guess.</span></span>
-<span class="ln" id="L251">        assert_eq!(<span class="tok-fn">diagnose</span>(true, false, &amp;[]), None);</span>
-<span class="ln" id="L252">    }</span>
-<span class="ln" id="L253"></span>
-<span class="ln" id="L254">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L255">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unclean_exit_with_antivirus_and_no_crash_is_the_one_case</span>() {</span>
-<span class="ln" id="L256">        <span class="tok-kw">let</span> notice = <span class="tok-fn">diagnose</span>(true, false, &amp;[<span class="tok-fn">product</span>(<span class="tok-str">&quot;Bitdefender&quot;</span>)]).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L257">        assert_eq!(notice.products, vec![<span class="tok-fn">product</span>(<span class="tok-str">&quot;Bitdefender&quot;</span>)]);</span>
-<span class="ln" id="L258">    }</span>
-<span class="ln" id="L259"></span>
-<span class="ln" id="L260">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L261">    <span class="tok-kw">fn</span> <span class="tok-fn">the_message_names_the_product_and_does_not_tell_them_to_disable_it</span>() {</span>
-<span class="ln" id="L262">        <span class="tok-kw">let</span> notice = Notice {</span>
-<span class="ln" id="L263">            products: vec![<span class="tok-fn">product</span>(<span class="tok-str">&quot;ESET&quot;</span>)],</span>
-<span class="ln" id="L264">        };</span>
-<span class="ln" id="L265">        <span class="tok-kw">let</span> message = notice.<span class="tok-fn">message</span>();</span>
-<span class="ln" id="L266">        assert!(message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ESET&quot;</span>));</span>
-<span class="ln" id="L267">        assert!(</span>
-<span class="ln" id="L268">            message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;only if&quot;</span>),</span>
-<span class="ln" id="L269">            <span class="tok-str">&quot;an exclusion is advised only if the problem is real&quot;</span></span>
-<span class="ln" id="L270">        );</span>
-<span class="ln" id="L271">        assert!(</span>
-<span class="ln" id="L272">            !message.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;disable&quot;</span>),</span>
-<span class="ln" id="L273">            <span class="tok-str">&quot;it must never tell somebody to turn off their antivirus&quot;</span></span>
-<span class="ln" id="L274">        );</span>
-<span class="ln" id="L275">        assert!(</span>
-<span class="ln" id="L276">            message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;signed&quot;</span>) || message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Verify&quot;</span>),</span>
-<span class="ln" id="L277">            <span class="tok-str">&quot;it should point at how to check VeilVoice is genuine&quot;</span></span>
-<span class="ln" id="L278">        );</span>
-<span class="ln" id="L279">    }</span>
-<span class="ln" id="L280"></span>
-<span class="ln" id="L281">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L282">    <span class="tok-kw">fn</span> <span class="tok-fn">several_products_are_all_named</span>() {</span>
-<span class="ln" id="L283">        <span class="tok-kw">let</span> notice = Notice {</span>
-<span class="ln" id="L284">            products: vec![<span class="tok-fn">product</span>(<span class="tok-str">&quot;Avast&quot;</span>), <span class="tok-fn">product</span>(<span class="tok-str">&quot;Malwarebytes&quot;</span>)],</span>
-<span class="ln" id="L285">        };</span>
-<span class="ln" id="L286">        <span class="tok-kw">let</span> message = notice.<span class="tok-fn">message</span>();</span>
-<span class="ln" id="L287">        assert!(message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Avast&quot;</span>));</span>
-<span class="ln" id="L288">        assert!(message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Malwarebytes&quot;</span>));</span>
-<span class="ln" id="L289">    }</span>
-<span class="ln" id="L290"></span>
-<span class="ln" id="L291">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L292">    <span class="tok-kw">fn</span> <span class="tok-fn">the_marker_sits_beside_the_lock</span>() {</span>
-<span class="ln" id="L293">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(marker), <span class="tok-fn">Some</span>(lock)) = (<span class="tok-fn">marker_path</span>(), veilvoice_crypto::lock::<span class="tok-fn">default_path</span>())</span>
-<span class="ln" id="L294">        {</span>
-<span class="ln" id="L295">            assert_eq!(marker.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
-<span class="ln" id="L296">        }</span>
-<span class="ln" id="L297">    }</span>
-<span class="ln" id="L298">}</span>
+<span class="ln" id="L249">    <span class="tok-kw">fn</span> <span class="tok-fn">a_crash_of_our_own_says_nothing_here</span>() {</span>
+<span class="ln" id="L250">        <span class="tok-com">// A crash has its own report and its own message; this must not also</span></span>
+<span class="ln" id="L251">        <span class="tok-com">// blame the antivirus for something VeilVoice did to itself.</span></span>
+<span class="ln" id="L252">        assert_eq!(<span class="tok-fn">diagnose</span>(true, true, &amp;[<span class="tok-fn">product</span>(<span class="tok-str">&quot;Defender&quot;</span>)]), None);</span>
+<span class="ln" id="L253">    }</span>
+<span class="ln" id="L254"></span>
+<span class="ln" id="L255">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L256">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unclean_exit_with_no_antivirus_says_nothing</span>() {</span>
+<span class="ln" id="L257">        <span class="tok-com">// Nobody to name, so the notice would be a guess.</span></span>
+<span class="ln" id="L258">        assert_eq!(<span class="tok-fn">diagnose</span>(true, false, &amp;[]), None);</span>
+<span class="ln" id="L259">    }</span>
+<span class="ln" id="L260"></span>
+<span class="ln" id="L261">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L262">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unclean_exit_with_antivirus_and_no_crash_is_the_one_case</span>() {</span>
+<span class="ln" id="L263">        <span class="tok-kw">let</span> notice = <span class="tok-fn">diagnose</span>(true, false, &amp;[<span class="tok-fn">product</span>(<span class="tok-str">&quot;Bitdefender&quot;</span>)]).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L264">        assert_eq!(notice.products, vec![<span class="tok-fn">product</span>(<span class="tok-str">&quot;Bitdefender&quot;</span>)]);</span>
+<span class="ln" id="L265">    }</span>
+<span class="ln" id="L266"></span>
+<span class="ln" id="L267">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L268">    <span class="tok-kw">fn</span> <span class="tok-fn">the_message_names_the_product_and_does_not_tell_them_to_disable_it</span>() {</span>
+<span class="ln" id="L269">        <span class="tok-kw">let</span> notice = Notice {</span>
+<span class="ln" id="L270">            products: vec![<span class="tok-fn">product</span>(<span class="tok-str">&quot;ESET&quot;</span>)],</span>
+<span class="ln" id="L271">        };</span>
+<span class="ln" id="L272">        <span class="tok-kw">let</span> message = notice.<span class="tok-fn">message</span>();</span>
+<span class="ln" id="L273">        assert!(message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;ESET&quot;</span>));</span>
+<span class="ln" id="L274">        assert!(</span>
+<span class="ln" id="L275">            message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;only if&quot;</span>),</span>
+<span class="ln" id="L276">            <span class="tok-str">&quot;an exclusion is advised only if the problem is real&quot;</span></span>
+<span class="ln" id="L277">        );</span>
+<span class="ln" id="L278">        assert!(</span>
+<span class="ln" id="L279">            !message.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;disable&quot;</span>),</span>
+<span class="ln" id="L280">            <span class="tok-str">&quot;it must never tell somebody to turn off their antivirus&quot;</span></span>
+<span class="ln" id="L281">        );</span>
+<span class="ln" id="L282">        assert!(</span>
+<span class="ln" id="L283">            message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;signed&quot;</span>) || message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Verify&quot;</span>),</span>
+<span class="ln" id="L284">            <span class="tok-str">&quot;it should point at how to check VeilVoice is genuine&quot;</span></span>
+<span class="ln" id="L285">        );</span>
+<span class="ln" id="L286">    }</span>
+<span class="ln" id="L287"></span>
+<span class="ln" id="L288">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L289">    <span class="tok-kw">fn</span> <span class="tok-fn">several_products_are_all_named</span>() {</span>
+<span class="ln" id="L290">        <span class="tok-kw">let</span> notice = Notice {</span>
+<span class="ln" id="L291">            products: vec![<span class="tok-fn">product</span>(<span class="tok-str">&quot;Avast&quot;</span>), <span class="tok-fn">product</span>(<span class="tok-str">&quot;Malwarebytes&quot;</span>)],</span>
+<span class="ln" id="L292">        };</span>
+<span class="ln" id="L293">        <span class="tok-kw">let</span> message = notice.<span class="tok-fn">message</span>();</span>
+<span class="ln" id="L294">        assert!(message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Avast&quot;</span>));</span>
+<span class="ln" id="L295">        assert!(message.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Malwarebytes&quot;</span>));</span>
+<span class="ln" id="L296">    }</span>
+<span class="ln" id="L297"></span>
+<span class="ln" id="L298">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L299">    <span class="tok-kw">fn</span> <span class="tok-fn">the_marker_sits_beside_the_lock</span>() {</span>
+<span class="ln" id="L300">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(marker), <span class="tok-fn">Some</span>(lock)) = (<span class="tok-fn">marker_path</span>(), veilvoice_crypto::lock::<span class="tok-fn">default_path</span>())</span>
+<span class="ln" id="L301">        {</span>
+<span class="ln" id="L302">            assert_eq!(marker.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
+<span class="ln" id="L303">        }</span>
+<span class="ln" id="L304">    }</span>
+<span class="ln" id="L305">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

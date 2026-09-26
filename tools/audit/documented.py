@@ -2,16 +2,27 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Every item on a generated page has something written under it.
 
-    python tools/audit/documented.py            # report what is missing
+    python tools/audit/documented.py            # fail if anything is missing
     python tools/audit/documented.py --list     # one path and name per line
 
-# Not yet a build guard, and why that is said here
+# It was not a build guard, and now it is
 
-It **reports**; nothing runs it in CI yet. Eighty-one production items have no
-comment, and a guard that fails a build for eighty-one known things is a guard
-somebody turns off. It becomes a build step in the same commit that takes that
-number to zero, which is roadmap item 143's work; until then this is how the list is
-obtained, and the number above is what it printed on the day it was written.
+For a long time this only reported, and said so here. The reason was sound: it
+found eighty-one items with no comment, and a guard that fails a build for
+eighty-one known things is a guard somebody turns off or a build nobody can
+green. The note said it would become a build step in the same commit that took
+that number to zero.
+
+That happened on 2026-09-26, and the number was eighty-two by then. It is now run
+by `tools/verify.py` and by `ci.yml`, so an item added without a sentence under
+it fails before it is pushed rather than appearing as a blank row on a published
+page.
+
+The waiting was the right decision and the cost of it is worth naming: for as
+long as this only reported, nothing ran it at all, so the eighty-two grew without
+anybody being told. A guard held back until it can pass is a guard that has to be
+finished, and the thing that finishes it is the last of the sentences rather than
+the wiring.
 
 # Why this exists at all
 

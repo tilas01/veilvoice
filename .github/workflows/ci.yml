@@ -553,6 +553,13 @@ jobs:
       # document is the whole list, and the generator refuses to write it
       # while any command has nothing said about it or names a tab the
       # window does not have.
+      # An item with no doc comment is a row on a published page with nothing
+      # in it, so the page reads as broken rather than the code as
+      # undocumented. This reported rather than failed until the day the last
+      # of the eighty-two was written.
+      - name: Every published item must say what it is for
+        run: python tools/audit/documented.py
+
       - name: Every command must be documented
         run: python tools/docs/commands.py --check
 

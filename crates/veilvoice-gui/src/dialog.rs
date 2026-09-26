@@ -370,6 +370,11 @@ mod tests {
     }
 }
 
+/// The house style, enforced rather than described.
+///
+/// A test module rather than a document, because a rule about what the interface
+/// may say is only a rule if something fails when it is broken. Each test below
+/// carries the reason for its rule, so the reason arrives with the failure.
 #[cfg(test)]
 mod house_style {
     /// **No dashes in anything the application shows.**

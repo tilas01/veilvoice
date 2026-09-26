@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/main.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 254 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 269 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs)
 
 ## Contents
 
@@ -58,7 +58,7 @@ failure to open leaves a message behind.
 
 ## What this file contains
 
-254 lines defining **3 functions** (0 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+269 lines defining **3 functions** (0 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -74,13 +74,13 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_answered_without_a_window["answered_without_a_window<br/>line 123"]
-    n_answered_without_a_window["answered_without_a_window<br/>line 173"]
-    n_main["main<br/>line 177"]
+    n_answered_without_a_window["answered_without_a_window<br/>line 131"]
+    n_answered_without_a_window["answered_without_a_window<br/>line 183"]
+    n_main["main<br/>line 192"]
     n_main --> n_answered_without_a_window
-    click n_answered_without_a_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L123" "open the source"
-    click n_answered_without_a_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L173" "open the source"
-    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L177" "open the source"
+    click n_answered_without_a_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L131" "open the source"
+    click n_answered_without_a_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L183" "open the source"
+    click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L192" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_answered_without_a_window,n_answered_without_a_window,n_main helper
 ```
@@ -92,8 +92,8 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `ICON_RGBA` <sub>const</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L58) | The window icon, as raw 32x32 RGBA produced by assets/generate.py. |
-| `ICON_SIZE` <sub>const</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L59) |  |
-| `USAGE` <sub>const</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L74) | What --help prints, on the platforms where printing works. |
-| `answered_without_a_window` <sub>fn</sub> | [123](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L123) | Answer --help and --version before a window is opened. |
-| `answered_without_a_window` <sub>fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L173) |  |
-| `main` <sub>fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L177) |  |
+| `ICON_SIZE` <sub>const</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L61) | The side of that icon in pixels. |
+| `USAGE` <sub>const</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L76) | What --help prints, on the platforms where printing works. |
+| `answered_without_a_window` <sub>fn</sub> | [131](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L131) | Answer --help and --version before a window is opened. |
+| `answered_without_a_window` <sub>fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L183) | Always false away from Unix, where a program built for a window has no console attached to print to and answering would print into nothing. |
+| `main` <sub>fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L192) | Answer the command line if that is all that was asked, then open the window. |

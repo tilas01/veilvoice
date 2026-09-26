@@ -182,6 +182,11 @@ mod tests {
     }
 }
 
+/// What size the window opens at, on screens from a phone to a workstation.
+///
+/// Its own module because the rule has several cases and each needs naming: the
+/// preferred size on a large screen, a shrink to fit on a small one, and an
+/// answer when the platform does not say how large the screen is.
 #[cfg(test)]
 mod opening {
     use super::*;

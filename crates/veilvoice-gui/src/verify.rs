@@ -383,6 +383,12 @@ impl Verify {
         self.body(ui);
     }
 
+    /// The tab itself, drawn under whatever heading the caller has already put
+    /// up.
+    ///
+    /// Split from the function above so the tab can be drawn inside the window
+    /// and inside a test's own frame, from the same code: a test that rebuilt the
+    /// layout it was measuring would be measuring the test.
     fn body(&mut self, ui: &mut Ui) {
         ui.heading(RichText::new("Verify a download").color(p::blue()));
         ui.add_space(4.0);
@@ -785,6 +791,12 @@ impl Verify {
         }
     }
 
+    /// The part of the tab about GnuPG: whether this machine has it, and what
+    /// that means for the answer.
+    ///
+    /// It starts the look for itself, on a worker. Somebody opening this tab is
+    /// asking whether their download is genuine, and a program that could have
+    /// found the answer before being asked should have.
     fn checker_section(&mut self, ui: &mut Ui) {
         // The first look starts itself. Somebody who opens this tab is asking
         // whether their download is genuine, and a program that could have

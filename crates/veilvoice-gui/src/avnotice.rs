@@ -208,6 +208,13 @@ const WINDOWS_PRODUCTS: &[(&str, &str)] = &[
     ("Webroot", r"Program Files\Webroot"),
 ];
 
+/// Which of the products in the table above are installed on this machine.
+///
+/// Looked for by path rather than asked of the registry, and the list is a table
+/// rather than a scan: this exists to tell somebody that a screen recorder or a
+/// remote-access tool is present while they are about to record, and a routine
+/// that went looking for anything unfamiliar would be doing something this
+/// program has no business doing.
 #[cfg(windows)]
 fn detect_windows() -> Vec<Product> {
     let system_drive = std::env::var("SystemDrive").unwrap_or_else(|_| "C:".to_string());

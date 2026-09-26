@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/dialog.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 425 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 430 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs)
 
 ## Contents
 
@@ -61,7 +61,7 @@ which actually works.
 
 ## What this file contains
 
-425 lines defining **11 functions** (9 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+430 lines defining **11 functions** (9 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -146,4 +146,4 @@ flowchart TD
 | `Pending::start` <sub>pub fn</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L178) | Start asking. |
 | `Pending::poll` <sub>pub fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L210) | The answer, if one has arrived. |
 | `Pending::taken` <sub>pub fn</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L229) | The answer, if one arrived and was a path. |
-| `house_style` <sub>mod</sub> | [374](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L374) |  |
+| `house_style` <sub>mod</sub> | [379](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs#L379) | The house style, enforced rather than described. |

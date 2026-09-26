@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/group.svg" alt="group.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/group.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2110 lines &middot; <a href="group.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 2111 lines &middot; <a href="group.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-toggle-does-not-persist-and-the-tick-that-makes-it-persist-is-separate">The toggle does not persist, and the tick that makes it persist is separate</a>
@@ -94,7 +94,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>2110 lines defining <strong>41 functions</strong> (17 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>2111 lines defining <strong>41 functions</strong> (17 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Person</code> <span style="color:var(--muted)">line 71</span> &middot; One person, as the panel holds them.</li>
 <li><code>struct Outputs</code> <span style="color:var(--muted)">line 94</span> &middot; What comes out of a group render.</li>
@@ -262,7 +262,7 @@
 <a href="group.src.html#fn-assigned_colour">
 <rect x="247.2" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="321.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">assigned_colour</text>
-<text x="321.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1499</text>
+<text x="321.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1500</text>
 </a>
 <rect x="20.0" y="904.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -303,7 +303,7 @@ flowchart TD
     n_to_workspace[&quot;Group::to_workspace&lt;br/&gt;line 923&quot;]
     n_from_workspace[&quot;Group::from_workspace&lt;br/&gt;line 949&quot;]
     n_is_busy[&quot;Group::is_busy&lt;br/&gt;line 1001&quot;]
-    n_assigned_colour[&quot;assigned_colour&lt;br/&gt;line 1499&quot;]
+    n_assigned_colour[&quot;assigned_colour&lt;br/&gt;line 1500&quot;]
     n_add --&gt; n_at
     n_body --&gt; n_collect_dialogs
     n_body --&gt; n_mode_controls
@@ -344,7 +344,7 @@ flowchart TD
     click n_to_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L923&quot; &quot;open the source&quot;
     click n_from_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L949&quot; &quot;open the source&quot;
     click n_is_busy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1001&quot; &quot;open the source&quot;
-    click n_assigned_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1499&quot; &quot;open the source&quot;
+    click n_assigned_colour href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1500&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start_from,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -400,8 +400,8 @@ flowchart TD
 <tr><td><code>render_now</code> <sub>fn</sub></td><td><a href="group.src.html#fn-render_now">1298</a></td><td>Do the render.</td></tr>
 <tr><td><code>render_video</code> <sub>fn</sub></td><td><a href="group.src.html#fn-render_video">1418</a></td><td>Roadmap item 139.</td></tr>
 <tr><td><code>write_private</code> <sub>fn</sub></td><td><a href="group.src.html#fn-write_private">1482</a></td><td>Replace the last extension, keeping any .veiled before it.</td></tr>
-<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="group.src.html#fn-with_extension">1487</a></td><td></td></tr>
-<tr><td><code>assigned_colour</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-assigned_colour">1499</a></td><td>The colour a slot is given, as an egui colour.</td></tr>
+<tr><td><code>with_extension</code> <sub>fn</sub></td><td><a href="group.src.html#fn-with_extension">1488</a></td><td>path with its last extension replaced, for putting a render beside its plan.</td></tr>
+<tr><td><code>assigned_colour</code> <sub>pub fn</sub></td><td><a href="group.src.html#fn-assigned_colour">1500</a></td><td>The colour a slot is given, as an egui colour.</td></tr>
 </tbody></table>
 </section>
 </div></div>

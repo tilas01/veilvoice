@@ -93,6 +93,13 @@ impl Step {
         }
     }
 
+    /// How many cards the tour has.
+    ///
+    /// Written down rather than counted from the enum, because the enum has no
+    /// way to be counted without a crate or a macro, and because the number is
+    /// used for the "card 3 of 5" line a reader sees. The test below asserts
+    /// that walking from the first card to the last takes exactly this many
+    /// steps, so a card added without changing this fails.
     const COUNT: usize = 5;
 }
 

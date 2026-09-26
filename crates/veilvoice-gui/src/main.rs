@@ -56,6 +56,8 @@
 /// Raw rather than PNG so the application needs no image decoder just to draw
 /// its own title bar.
 const ICON_RGBA: &[u8] = include_bytes!("../../../assets/icon-32.rgba");
+/// The side of that icon in pixels. The bytes above are raw, so nothing in them
+/// says how wide the picture is and this is how the platform is told.
 const ICON_SIZE: u32 = 32;
 
 /// What `--help` prints, on the platforms where printing works.
@@ -119,6 +121,12 @@ Everything this window does, that command can do without one.
 /// `WAYLAND_DISPLAY`. That is the reply to a reasonable question, and it is
 /// also what `lintian` was pointing at with `no-manual-page`: a binary with no
 /// help text has no page to derive.
+/// Whether the question on the command line was answered without opening a
+/// window, in which case there is nothing left to do.
+///
+/// The long note above says why a windowed program answers `--help` and
+/// `--version` at all. This is the function that does it, and it returns whether
+/// it did rather than exiting, so [`main`] keeps one exit.
 #[cfg(unix)]
 fn answered_without_a_window() -> bool {
     for arg in std::env::args().skip(1) {
@@ -169,11 +177,18 @@ fn answered_without_a_window() -> bool {
     false
 }
 
+/// Always false away from Unix, where a program built for a window has no
+/// console attached to print to and answering would print into nothing.
 #[cfg(not(unix))]
 fn answered_without_a_window() -> bool {
     false
 }
 
+/// Answer the command line if that is all that was asked, then open the window.
+///
+/// Everything that can fail happens here, before the event loop starts, so a
+/// failure is a message on a terminal rather than a window that appears and then
+/// goes away.
 fn main() -> eframe::Result<()> {
     if answered_without_a_window() {
         return Ok(());

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/integrity.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 390 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 397 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs)
 
 ## Contents
 
@@ -73,7 +73,7 @@ accident but not one changed by somebody covering their tracks.
 
 ## What this file contains
 
-390 lines defining **11 functions** (6 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+397 lines defining **11 functions** (6 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -119,7 +119,7 @@ flowchart TD
     n_sealed_path["sealed_path<br/>line 175"]
     n_targets["targets<br/>line 185"]
     n_run["run<br/>line 194"]
-    n_write_private["write_private<br/>line 287"]
+    n_write_private["write_private<br/>line 294"]
     n_run --> n_record_path
     n_run --> n_sealed_path
     n_run --> n_targets
@@ -135,7 +135,7 @@ flowchart TD
     click n_sealed_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L175" "open the source"
     click n_targets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L185" "open the source"
     click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L194" "open the source"
-    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L287" "open the source"
+    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L294" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_state,n_is_busy,n_changed,n_start,n_poll entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -162,7 +162,7 @@ flowchart TD
 | `sealed_path` <sub>fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L175) | The sealed record sits beside the plain one under the container suffix. |
 | `targets` <sub>fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L185) | The files worth watching: the running program, and nothing assumed. |
 | `run` <sub>fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L194) | The whole of the work, on the worker thread. |
-| `write_private` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L287) |  |
+| `write_private` <sub>fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L294) | Write bytes to path, readable by this account and no other, creating the directory if it is not there. |
 
 ---
 

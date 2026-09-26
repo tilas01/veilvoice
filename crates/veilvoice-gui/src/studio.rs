@@ -2280,10 +2280,16 @@ pub enum Render {
 }
 
 impl Render {
+    /// Whether this choice draws the still preview.
+    ///
+    /// Asked rather than matched on at each site, because `Both` has to answer
+    /// yes to this and to [`Render::wants_video`], and a `match` written out
+    /// twice is the place that forgets it.
     fn wants_page(self) -> bool {
         matches!(self, Render::Preview | Render::Both)
     }
 
+    /// Whether this choice renders the video.
     fn wants_video(self) -> bool {
         matches!(self, Render::Video | Render::Both)
     }
@@ -2686,6 +2692,14 @@ fn export_now(job: ExportJob) -> (String, Tone) {
     )
 }
 
+/// Turn a rendered take into a video by running `ffmpeg`, on a worker rather
+/// than on the thread that draws.
+///
+/// The command comes from `veilvoice_video::ffmpeg` rather than being written
+/// here, so the window and the command line run the same arguments. `ffmpeg`
+/// being found earlier is not treated as it still being there: it can be
+/// uninstalled between the check and the run, and the message says exactly that
+/// rather than reporting a missing program as a render failure.
 fn run_ffmpeg(audio: &std::path::Path, video: &std::path::Path) -> Result<(), String> {
     let argv = veilvoice_video::ffmpeg::black_command(
         audio,

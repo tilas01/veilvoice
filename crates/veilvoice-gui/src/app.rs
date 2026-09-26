@@ -939,6 +939,14 @@ fn header_button(
 }
 
 impl eframe::App for VeilVoiceApp {
+    /// What a clean close does, which is remove the marker that says a session
+    /// is in progress.
+    ///
+    /// A process killed from outside never reaches here, and that is the point:
+    /// the marker left behind is what tells the next launch that the last one
+    /// did not finish. So there is deliberately nothing else in here. Anything
+    /// that has to happen whether the program was closed or killed cannot be
+    /// written in this function, because half the time it will not run.
     fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
         // A clean close removes the session marker, so the next launch does not
         // mistake this for a kill. A process terminated from outside never
@@ -949,6 +957,16 @@ impl eframe::App for VeilVoiceApp {
         }
     }
 
+    /// One frame of the whole window: the lock screen, or the tab strip and
+    /// whichever tab is showing.
+    ///
+    /// This runs sixty times a second or faster, which is the constraint that
+    /// shapes everything in it. Nothing here may ask this machine a question,
+    /// start a process or touch the disk: those answers are worked out on a
+    /// worker and read from [`crate::offthread::Answer`], which hands over
+    /// whatever has arrived and never waits. Roadmap item 167 is the record of
+    /// what happens when that rule is broken, which is a program that forks a
+    /// process every frame to print a number nobody watches.
     fn ui(&mut self, root: &mut egui::Ui, _frame: &mut eframe::Frame) {
         // eframe 0.36 hands the root `Ui` rather than the context. The
         // context is what most of this reads, so it is taken once; panels

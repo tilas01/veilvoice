@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/avnotice.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 298 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 305 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs)
 
 ## Contents
 
@@ -69,7 +69,7 @@ separate and thin.
 
 ## What this file contains
 
-298 lines defining **8 functions** (7 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+305 lines defining **8 functions** (7 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -115,7 +115,7 @@ flowchart TD
     n_prior_was_unclean(["Session::prior_was_unclean<br/>line 151"])
     n_end(["Session::end<br/>line 160"])
     n_detect(["detect<br/>line 174"])
-    n_detect_windows["detect_windows<br/>line 212"]
+    n_detect_windows["detect_windows<br/>line 219"]
     n_begin --> n_marker_path
     n_detect --> n_detect_windows
     click n_message href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L69" "open the source"
@@ -125,7 +125,7 @@ flowchart TD
     click n_prior_was_unclean href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L151" "open the source"
     click n_end href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L160" "open the source"
     click n_detect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L174" "open the source"
-    click n_detect_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L212" "open the source"
+    click n_detect_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L219" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_message,n_diagnose,n_begin,n_prior_was_unclean,n_end,n_detect entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -151,7 +151,7 @@ flowchart TD
 | `Session::end` <sub>pub fn</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L160) | End the session cleanly, removing the marker. |
 | `detect` <sub>pub fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L174) | Look for antivirus products on this machine. |
 | `WINDOWS_PRODUCTS` <sub>const</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L192) | Known products, and a path whose presence is good evidence of them. |
-| `detect_windows` <sub>fn</sub> | [212](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L212) |  |
+| `detect_windows` <sub>fn</sub> | [219](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L219) | Which of the products in the table above are installed on this machine. |
 
 ---
 

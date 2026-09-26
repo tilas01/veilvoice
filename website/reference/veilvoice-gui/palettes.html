@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/palettes.svg" alt="palettes.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/palettes.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 700 lines &middot; <a href="palettes.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 714 lines &middot; <a href="palettes.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#a-palette-file-is-untrusted-input">A palette file is untrusted input</a>
@@ -93,14 +93,14 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>700 lines defining <strong>8 functions</strong> (4 public), <strong>1 type</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>714 lines defining <strong>8 functions</strong> (4 public), <strong>1 type</strong> and <strong>4 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Parsed</code> <span style="color:var(--muted)">line 156</span> &middot; One parsed colour scheme, before it is accepted.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>default_dir</code> <span style="color:var(--muted)">line 291</span> &middot; Where palettes live, beside the preferences file.
+<li><code>default_dir</code> <span style="color:var(--muted)">line 305</span> &middot; Where palettes live, beside the preferences file.
 </li>
-<li><code>load</code> <span style="color:var(--muted)">line 318</span> &middot; Read every palette in dir, returning the usable ones and every complaint.
+<li><code>load</code> <span style="color:var(--muted)">line 332</span> &middot; Read every palette in dir, returning the usable ones and every complaint.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>build</code>, <code>contrast_problems</code>, <code>parse</code>, <code>contrast</code>, <code>parse_hex</code>, <code>luminance</code></span>
 </li>
 </ul>
@@ -142,27 +142,27 @@
 <a href="palettes.src.html#fn-parse_hex">
 <rect x="464.0" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="514.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_hex</text>
-<text x="514.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 163</text>
+<text x="514.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
 </a>
 <a href="palettes.src.html#fn-parse">
 <rect x="60.2" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="106.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse</text>
-<text x="106.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 180</text>
+<text x="106.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 187</text>
 </a>
 <a href="palettes.src.html#fn-build">
 <rect x="178.7" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="225.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">build</text>
-<text x="225.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 258</text>
+<text x="225.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 272</text>
 </a>
 <a href="palettes.src.html#fn-default_dir">
 <rect x="297.2" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="355.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">default_dir</text>
-<text x="355.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 291</text>
+<text x="355.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 305</text>
 </a>
 <a href="palettes.src.html#fn-load">
 <rect x="439.9" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="486.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
-<text x="486.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 318</text>
+<text x="486.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 332</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -184,11 +184,11 @@ flowchart TD
     n_luminance[&quot;luminance&lt;br/&gt;line 94&quot;]
     n_contrast[&quot;contrast&lt;br/&gt;line 110&quot;]
     n_contrast_problems[&quot;contrast_problems&lt;br/&gt;line 130&quot;]
-    n_parse_hex[&quot;parse_hex&lt;br/&gt;line 163&quot;]
-    n_parse[&quot;parse&lt;br/&gt;line 180&quot;]
-    n_build[&quot;build&lt;br/&gt;line 258&quot;]
-    n_default_dir([&quot;default_dir&lt;br/&gt;line 291&quot;])
-    n_load([&quot;load&lt;br/&gt;line 318&quot;])
+    n_parse_hex[&quot;parse_hex&lt;br/&gt;line 170&quot;]
+    n_parse[&quot;parse&lt;br/&gt;line 187&quot;]
+    n_build[&quot;build&lt;br/&gt;line 272&quot;]
+    n_default_dir([&quot;default_dir&lt;br/&gt;line 305&quot;])
+    n_load([&quot;load&lt;br/&gt;line 332&quot;])
     n_contrast --&gt; n_luminance
     n_contrast_problems --&gt; n_contrast
     n_load --&gt; n_build
@@ -198,11 +198,11 @@ flowchart TD
     click n_luminance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L94&quot; &quot;open the source&quot;
     click n_contrast href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L110&quot; &quot;open the source&quot;
     click n_contrast_problems href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L130&quot; &quot;open the source&quot;
-    click n_parse_hex href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L163&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L180&quot; &quot;open the source&quot;
-    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L258&quot; &quot;open the source&quot;
-    click n_default_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L291&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L318&quot; &quot;open the source&quot;
+    click n_parse_hex href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L170&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L187&quot; &quot;open the source&quot;
+    click n_build href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L272&quot; &quot;open the source&quot;
+    click n_default_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L305&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/palettes.rs#L332&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_default_dir,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -223,11 +223,11 @@ flowchart TD
 <tr><td><code>PAIRS</code> <sub>const</sub></td><td><a href="palettes.src.html#fn-pairs">117</a></td><td>The contrast pairs a palette has to satisfy, with the reason for each.</td></tr>
 <tr><td><code>contrast_problems</code> <sub>pub fn</sub></td><td><a href="palettes.src.html#fn-contrast_problems">130</a></td><td>Check a palette&#x27;s contrast, returning one message per failing pair.</td></tr>
 <tr><td><code>Parsed</code> <sub>struct</sub></td><td><a href="palettes.src.html#fn-parsed">156</a></td><td>One parsed colour scheme, before it is accepted.</td></tr>
-<tr><td><code>parse_hex</code> <sub>fn</sub></td><td><a href="palettes.src.html#fn-parse_hex">163</a></td><td></td></tr>
-<tr><td><code>parse</code> <sub>fn</sub></td><td><a href="palettes.src.html#fn-parse">180</a></td><td>Parse a palette file&#x27;s text.</td></tr>
-<tr><td><code>build</code> <sub>fn</sub></td><td><a href="palettes.src.html#fn-build">258</a></td><td></td></tr>
-<tr><td><code>default_dir</code> <sub>pub fn</sub></td><td><a href="palettes.src.html#fn-default_dir">291</a></td><td>Where palettes live, beside the preferences file.</td></tr>
-<tr><td><code>load</code> <sub>pub fn</sub></td><td><a href="palettes.src.html#fn-load">318</a></td><td>Read every palette in dir, returning the usable ones and every complaint.</td></tr>
+<tr><td><code>parse_hex</code> <sub>fn</sub></td><td><a href="palettes.src.html#fn-parse_hex">170</a></td><td>A #rrggbb colour, or None if that is not what this is.</td></tr>
+<tr><td><code>parse</code> <sub>fn</sub></td><td><a href="palettes.src.html#fn-parse">187</a></td><td>Parse a palette file&#x27;s text.</td></tr>
+<tr><td><code>build</code> <sub>fn</sub></td><td><a href="palettes.src.html#fn-build">272</a></td><td>A parsed palette file as a Theme, with anything it left out taken from the built-in one.</td></tr>
+<tr><td><code>default_dir</code> <sub>pub fn</sub></td><td><a href="palettes.src.html#fn-default_dir">305</a></td><td>Where palettes live, beside the preferences file.</td></tr>
+<tr><td><code>load</code> <sub>pub fn</sub></td><td><a href="palettes.src.html#fn-load">332</a></td><td>Read every palette in dir, returning the usable ones and every complaint.</td></tr>
 </tbody></table>
 </section>
 </div></div>
