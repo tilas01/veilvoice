@@ -1177,3 +1177,64 @@ fn a_room_gives_every_guest_a_voice_of_their_own() {
         "the room no longer gives its guests a voice each"
     );
 }
+
+/// **Roadmap item 167.** A round of decoys says how far through it is.
+///
+/// One of the two jobs in this window whose total is known before it starts,
+/// because the total is the number the person asked for. The count is taken
+/// after each write rather than before, so a bar that reads three of three
+/// means three vaults are on the disk.
+#[test]
+fn a_decoy_round_counts_what_it_has_written() {
+    let parent = tempfile::tempdir().expect("a folder to make them in");
+    let shape = veilvoice_crypto::studio::Shape {
+        recordings: 1,
+        each: 64,
+        index: 32,
+    };
+    let reach = crate::progress::Reach::counting(3);
+    let round = make_decoys_now(parent.path(), 3, shape, &reach);
+
+    assert_eq!(round.made, 3, "the round did not finish: {:?}", round.error);
+    assert_eq!(reach.done(), 3);
+    assert_eq!(reach.fraction(), Some(1.0));
+    assert!(
+        reach.because().is_none(),
+        "a job that can count must not also be explaining itself"
+    );
+}
+
+/// A round that cannot write leaves the bar where it stopped.
+///
+/// The failure case matters more than the success one: a bar that runs to the
+/// end whatever happened is a bar that says the work was done, and this round
+/// reports "none of eight" in the same breath.
+#[test]
+fn a_decoy_round_that_fails_does_not_finish_its_bar() {
+    // A *file* as the folder to write into, rather than a path that does not
+    // exist: a missing path is created on the way past, and the first version of
+    // this test passed eight of eight on a machine whose user could make
+    // `/definitely/not/a/folder`. Every system refuses a directory inside a
+    // regular file, and no system needs privileges to refuse it.
+    let dir = tempfile::tempdir().expect("somewhere to put the file");
+    let not_a_folder = dir.path().join("this is a file");
+    std::fs::write(&not_a_folder, b"not a folder").expect("write the file");
+    let shape = veilvoice_crypto::studio::Shape {
+        recordings: 1,
+        each: 64,
+        index: 32,
+    };
+    let reach = crate::progress::Reach::counting(8);
+    let round = make_decoys_now(&not_a_folder, 8, shape, &reach);
+
+    assert_eq!(round.made, 0);
+    assert!(
+        round.error.is_some(),
+        "an unwritable folder was not reported"
+    );
+    assert_eq!(
+        reach.fraction(),
+        Some(0.0),
+        "the bar claims progress that did not happen"
+    );
+}

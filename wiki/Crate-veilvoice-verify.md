@@ -125,7 +125,7 @@ flowchart TD
 | [[`inside_the_archive.rs`|File-veilvoice-verify-tests-inside_the_archive]] | 430 | Roadmap item 164. |
 | [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] | 208 | Roadmap item 97. |
 
-**9,494 functional lines of Rust** in this crate. A functional line is a line
+**9,530 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

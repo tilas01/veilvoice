@@ -33,110 +33,110 @@
 <text x="142.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">slot_for</text>
 <text x="142.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L255" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L262" target="_blank" rel="noopener noreferrer">
 <rect x="215.1" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="289.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::is_busy</text>
-<text x="289.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 255</text>
+<text x="289.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 262</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L291" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L300" target="_blank" rel="noopener noreferrer">
 <rect x="390.0" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="460.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::accept</text>
-<text x="460.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 291</text>
+<text x="460.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L321" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L330" target="_blank" rel="noopener noreferrer">
 <rect x="127.6" y="320.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="238.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::fill_from_beside</text>
-<text x="238.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
+<text x="238.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 330</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L343" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L352" target="_blank" rel="noopener noreferrer">
 <rect x="40.1" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="134.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::found_beside</text>
-<text x="134.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 343</text>
+<text x="134.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 352</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L362" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L371" target="_blank" rel="noopener noreferrer">
 <rect x="255.3" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="349.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::take_dropped</text>
-<text x="349.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 362</text>
+<text x="349.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 371</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L380" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L389" target="_blank" rel="noopener noreferrer">
 <rect x="470.6" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="528.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::tab</text>
-<text x="528.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 380</text>
+<text x="528.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 389</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L392" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L401" target="_blank" rel="noopener noreferrer">
 <rect x="375.0" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="437.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::body</text>
-<text x="437.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 392</text>
+<text x="437.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 401</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L538" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L557" target="_blank" rel="noopener noreferrer">
 <rect x="20.0" y="420.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="110.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::drop_target</text>
-<text x="110.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 538</text>
+<text x="110.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 557</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L574" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L593" target="_blank" rel="noopener noreferrer">
 <rect x="227.1" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="305.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::slot_row</text>
-<text x="305.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 574</text>
+<text x="305.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 593</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L637" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L656" target="_blank" rel="noopener noreferrer">
 <rect x="410.1" y="420.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="508.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::gnupg_section</text>
-<text x="508.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 637</text>
+<text x="508.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 656</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L761" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L780" target="_blank" rel="noopener noreferrer">
 <rect x="115.5" y="220.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="210.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::start_survey</text>
-<text x="210.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 761</text>
+<text x="210.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 780</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L782" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L801" target="_blank" rel="noopener noreferrer">
 <rect x="330.7" y="220.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="421.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::poll_survey</text>
-<text x="421.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 782</text>
+<text x="421.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 801</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L800" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L819" target="_blank" rel="noopener noreferrer">
 <rect x="40.1" y="520.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="146.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::checker_section</text>
-<text x="146.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 800</text>
+<text x="146.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 819</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L922" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L941" target="_blank" rel="noopener noreferrer">
 <rect x="79.2" y="620.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="190.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::copyable_command</text>
-<text x="190.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 922</text>
+<text x="190.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 941</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L934" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L953" target="_blank" rel="noopener noreferrer">
 <rect x="279.5" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="354.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::verdict</text>
-<text x="354.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 934</text>
+<text x="354.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 953</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L945" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L964" target="_blank" rel="noopener noreferrer">
 <rect x="326.7" y="620.0" width="221.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="437.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::contents_verdict</text>
-<text x="437.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 945</text>
+<text x="437.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 964</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L992" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1011" target="_blank" rel="noopener noreferrer">
 <rect x="32.1" y="720.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="130.7" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::gnupg_verdict</text>
-<text x="130.7" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 992</text>
+<text x="130.7" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1011</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1030" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1049" target="_blank" rel="noopener noreferrer">
 <rect x="255.3" y="720.0" width="213.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="362.0" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::archive_verdict</text>
-<text x="362.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1030</text>
+<text x="362.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1049</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1089" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1108" target="_blank" rel="noopener noreferrer">
 <rect x="454.4" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="520.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verify::start</text>
-<text x="520.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1089</text>
+<text x="520.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1108</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1112" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1141" target="_blank" rel="noopener noreferrer">
 <rect x="494.7" y="720.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="545.0" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">examine</text>
-<text x="545.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1112</text>
+<text x="545.0" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1141</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1146" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs#L1189" target="_blank" rel="noopener noreferrer">
 <rect x="235.2" y="820.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="313.7" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">examine_contents</text>
-<text x="313.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1146</text>
+<text x="313.7" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1189</text>
 </a>
 <rect x="20.0" y="904.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>

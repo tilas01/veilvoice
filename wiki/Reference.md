@@ -140,6 +140,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`policy.rs`|File-veilvoice-gui-policy]] &middot; The policy in force, and what the interface does about it.
 - [[`prefs.rs`|File-veilvoice-gui-prefs]] &middot; What the user has chosen about how the app looks and moves.
 - [[`probe.rs`|File-veilvoice-gui-probe]] &middot; What this machine answers, so the settings it starts on were measured here.
+- [[`progress.rs`|File-veilvoice-gui-progress]] &middot; How far through a job is, in the two cases that exist: the ones that can honestly say, and the ones that cannot.
 - [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] &middot; Whether the operating system has been asked to reduce motion.
 - [[`security.rs`|File-veilvoice-gui-security]] &middot; The application lock, and the at-rest encryption of what VeilVoice writes.
 - [[`settings.rs`|File-veilvoice-gui-settings]] &middot; The settings panel: a menu of pages, each a titled group of choices.
