@@ -1465,6 +1465,56 @@ reference page means a modifier was read as an item, whichever modifier it was
 next time. It was run against the pages as they stood and failed on both of
 them before the parser was changed.
 
+### F-225: a test that knew only GNU tar's name for a format, and kept `dev` red for three days
+
+`a_tarball_holds_what_the_release_job_published` builds a release tarball three
+times over, once for each of the ways a tar writes a path too long for a plain
+header: a long-name record, a pax extended header, and a path split across
+`ustar`'s `prefix` and `name`. That is the right test to have. The verifier
+reads archives built on five machines by whichever tar each of them ships, and
+a reader that handles one of the three shapes refuses a sound release on the
+platforms that write the others, which looks to the reader exactly like a
+compromised download.
+
+It built those three by passing `--format=gnu`, `--format=pax` and
+`--format=ustar` to whatever `tar` was on the machine. GNU tar accepts all
+three. The bsdtar that macOS and Windows both ship accepts two: it calls the
+long-name format `gnutar`, and answers `gnu` with `Can't use format gnu: No
+such format 'gnu'`, naming no alternative.
+
+The test had a branch for a `tar` that refuses to build an archive, because
+`ustar` genuinely cannot hold every path and refusing one it cannot hold is
+correct. That branch asserted the refusal was `ustar`'s. So on macOS and
+Windows the run failed with `left: "gnu"`, `right: "ustar"`, which reads as a
+claim about path lengths and was in fact a claim about spelling.
+
+**What it cost.** `dev` was red on macOS and Windows from 97ff0dc on
+2026-09-23 until this, four commits and three days, while the Linux leg stayed
+green. Every thread working on this project develops on Linux and runs
+`tools/verify.py --quick` on Linux, so nothing any of them could run locally
+would have shown it. It was found by reading the workflow runs rather than by
+anything in the repository failing.
+
+**The fix is to ask rather than assume.** The three shapes are now listed with
+the spellings a tar might use for each, and before a shape is built the test
+makes a one-file archive with each spelling in turn and keeps the first that
+this machine's `tar` accepts. A shape no spelling reaches is recorded and
+skipped rather than asserted about. The `ustar` branch survives unchanged and
+is now honest: the format was accepted moments earlier, so a failure there is
+about the path and nothing else.
+
+Two of the three shapes are then required. A `tar` that can write neither a pax
+extended header nor a split path is not one this project has ever published
+with, and a run that quietly exercised nothing would otherwise report itself as
+coverage. The long-name record is deliberately not required: it is the one
+shape a `tar` may legitimately not offer, and the code that reads it is the
+same code on every platform, exercised by every Linux run.
+
+Reproduced before it was fixed, not inferred from the log: `libarchive-tools`
+was installed and `bsdtar` put on the path under the name `tar`, which
+reproduced the failure character for character, including the two values in the
+assertion. The same run passes with the fix, and so does the run with GNU tar.
+
 
 ## The half that could have damaged a machine
 
@@ -9398,7 +9448,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twenty-four defects found and fixed (F-1 to F-224), across
+**Two hundred and twenty-five defects found and fixed (F-1 to F-225), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
