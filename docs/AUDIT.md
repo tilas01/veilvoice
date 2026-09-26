@@ -743,6 +743,59 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-218: the window stopped while it opened its own folder, and it stopped at the worst moment to stop
+
+The second part of the freezing half of roadmap item 167.
+
+**What the folder is.** With an app lock set, everything VeilVoice writes about
+itself lives in an encrypted, padded store under filenames derived from the
+passphrase, with decoy files sown among them. The first unlock after a lock is
+set moves the plain files in. That is not a quick operation and it was never
+meant to be: each record is read, written back encrypted, and the original
+**shredded with three passes** rather than deleted, because a settings file that
+says which vault you use should not be recoverable from free space after
+VeilVoice has told you it is now encrypted. Then the decoys are topped up, and
+the folder is audited twice.
+
+**All of it ran inside one frame**, in `app.rs`, on the frame the passphrase was
+accepted. Three passes of overwriting per migrated record, two full reads of the
+folder, and a write per decoy, on the thread that draws.
+
+**And the timing is the part worth saying out loud.** This is the first frame
+after somebody typed their passphrase. They are watching the window, because
+they have just asked it for something. What they got was the window stopping,
+for a length of time set by how many records there were and how slow the disk
+is, and then a notice about whether anything had been tampered with. The one
+moment a privacy tool cannot afford to look broken is the moment it is proving
+it was not.
+
+The comment twenty lines above the call says "Neither touches the disk on this
+thread". It is true of the two calls it is written about and it sat directly
+above the one that did.
+
+**The fix.** `VaultStore::start_unlocking` spawns, `VaultStore::poll` collects
+without waiting, and the work itself is a free function, `open_with`, so the
+thread doing it holds nothing belonging to the window.
+
+**Moving it to a thread introduced something that had to be closed.** The work
+now runs while the window carries on, which means there is an interval in which
+the passphrase has been accepted, the key exists on another thread, and the
+person locks the screen again. A key that arrived a moment later and let itself
+in would be a worse defect than the freeze. `locked` therefore drops the
+receiver as well as the key: the worker's send fails and the store, with the key
+inside it, is dropped on that thread. A test locks during an unlock and then
+watches for two seconds that nothing is ever installed.
+
+**The inline door is shut by the compiler rather than by a guard.** The tests
+here are about what the store does with the files and not about which thread
+does it, so a synchronous `unlocked` remains for them, marked `#[cfg(test)]`. A
+shipped build cannot call it at all, which is a stronger statement than a check
+reading the source for it, and a test asserts the attribute is still there.
+
+The last of item 167's freezing calls, exporting a take from the Studio tab,
+follows separately. It has the same shape and a different cost: it waits for
+`ffmpeg` to finish rendering a video.
+
 ### F-216: the window asked this machine the same three questions sixty times a second
 
 The freezing half of roadmap item 167, found by reading `veilvoice-gui` for
@@ -7312,7 +7365,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1783 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1786 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -8960,7 +9013,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and seventeen defects found and fixed (F-1 to F-217), across
+**Two hundred and eighteen defects found and fixed (F-1 to F-218), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

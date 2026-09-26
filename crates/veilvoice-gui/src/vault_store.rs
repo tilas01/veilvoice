@@ -49,6 +49,7 @@
 //! loud rather than burying it.
 
 use std::path::{Path, PathBuf};
+use std::sync::mpsc;
 
 use veilvoice_crypto::hoard::{Audit, Hoard, StoreKey};
 
@@ -126,12 +127,25 @@ pub struct VaultStore {
     dir: Option<PathBuf>,
     /// The obfuscated store, once a passphrase has produced its key.
     hoard: Option<Hoard>,
+    /// An unlock being carried out, on a thread.
+    ///
+    /// **F-218.** Opening the folder is the one expensive thing this module
+    /// does, and it was done on the frame the passphrase was accepted: each
+    /// plain record read and re-written encrypted, each original **shredded
+    /// with three passes**, the folder audited twice and decoys sown. The
+    /// window stopped for all of it, at the moment somebody had just proved
+    /// they owned the machine and was watching to see what happened.
+    opening: Option<mpsc::Receiver<Result<(Hoard, Audit), String>>>,
 }
 
 impl VaultStore {
     /// Point at the program folder. Nothing is read or written yet.
     pub fn new(dir: Option<PathBuf>) -> Self {
-        Self { dir, hoard: None }
+        Self {
+            dir,
+            hoard: None,
+            opening: None,
+        }
     }
 
     /// The program folder, if this platform has one.
@@ -148,51 +162,96 @@ impl VaultStore {
         self.hoard.is_some()
     }
 
-    /// Take the key from an unlock and open the hoard with it.
+    /// Take the key from an unlock and start opening the hoard with it.
     ///
-    /// Migrates any plain files in on the way, and tops the decoys up. Returns
-    /// what the audit found, so the caller can put a tamper report in front of
-    /// somebody who has just proved they own the machine.
-    pub fn unlocked(&mut self, key: StoreKey) -> Result<Audit, String> {
-        let Some(dir) = self.dir.clone() else {
-            return Err("this system has no program folder".to_string());
-        };
-        let hoard = Hoard::open(&dir, key);
+    /// Returns at once. The work happens on a thread and the answer is
+    /// collected by [`VaultStore::poll`], because the work is
+    /// [`open_with`]: reading every plain record, writing it back encrypted,
+    /// shredding the original with three passes, sowing decoys and auditing
+    /// the folder twice. See F-218 for what that cost inside one frame.
+    ///
+    /// Starting a second unlock while one is running replaces it. That cannot
+    /// happen from the window, which produces a key only from an accepted
+    /// passphrase, and if it ever does then the newer key is the right one.
+    pub fn start_unlocking(&mut self, ctx: &egui::Context, key: StoreKey) {
+        let dir = self.dir.clone();
+        let (tx, rx) = mpsc::channel();
+        self.opening = Some(rx);
+        let ctx = ctx.clone();
+        std::thread::spawn(move || {
+            let answer = match dir {
+                Some(dir) => open_with(&dir, key),
+                None => Err("this system has no program folder".to_string()),
+            };
+            // The receiver is gone if the window locked or shut while this ran,
+            // which is ordinary: see `locked`. The key then goes nowhere, which
+            // is the point.
+            let _ = tx.send(answer);
+            ctx.request_repaint();
+        });
+    }
 
-        for (logical, plain) in records::ALL {
-            let path = dir.join(plain);
-            if !path.exists() {
-                continue;
+    /// Whether an unlock is still being carried out.
+    pub fn is_opening(&self) -> bool {
+        self.opening.is_some()
+    }
+
+    /// Collect a finished unlock, installing the key. Never waits.
+    ///
+    /// Returns what the audit found, so the caller can put a tamper report in
+    /// front of somebody who has just proved they own the machine.
+    pub fn poll(&mut self) -> Option<Result<Audit, String>> {
+        let rx = self.opening.as_ref()?;
+        match rx.try_recv() {
+            Ok(Ok((hoard, audit))) => {
+                self.opening = None;
+                self.hoard = Some(hoard);
+                Some(Ok(audit))
             }
-            let bytes = std::fs::read(&path)
-                .map_err(|e| format!("could not read {plain} to move it in: {e}"))?;
-            hoard
-                .write(logical, &bytes)
-                .map_err(|e| format!("could not store {plain}: {e}"))?;
-            // Erased rather than deleted: a settings file that says which
-            // vault you use should not be recoverable from free space after
-            // VeilVoice has told you it is now encrypted.
-            let _ =
-                veilvoice_crypto::shred::shred_file(&path, veilvoice_crypto::shred::Passes::Triple);
-            let _ = std::fs::remove_file(&path);
+            Ok(Err(why)) => {
+                self.opening = None;
+                Some(Err(why))
+            }
+            Err(mpsc::TryRecvError::Empty) => None,
+            Err(mpsc::TryRecvError::Disconnected) => {
+                self.opening = None;
+                Some(Err(
+                    "opening the program folder stopped without saying why. \
+                     Nothing was lost; lock and unlock again to retry."
+                        .to_string(),
+                ))
+            }
         }
+    }
 
-        // Kept stocked rather than sown once. A folder whose decoy count never
-        // changes while its record count does is a folder that leaks the
-        // difference over time.
-        let present = hoard.audit().map_err(|e| e.to_string())?;
-        if present.unrecognised < DECOYS {
-            let _ = hoard.sow_decoys(DECOYS - present.unrecognised);
-        }
-
-        let audit = hoard.audit().map_err(|e| e.to_string())?;
+    /// Open the hoard here and now, for tests only.
+    ///
+    /// `#[cfg(test)]`, so the window cannot call it: the compiler forbids the
+    /// blocking path in a shipped build, which is a stronger guarantee than a
+    /// guard reading the source for it. The tests below are about what the
+    /// hoard does with the files, not about which thread does it, and spinning
+    /// a worker in each of them would test the channel twenty times over.
+    #[cfg(test)]
+    pub fn unlocked(&mut self, key: StoreKey) -> Result<Audit, String> {
+        let dir = self
+            .dir
+            .clone()
+            .ok_or_else(|| "this system has no program folder".to_string())?;
+        let (hoard, audit) = open_with(&dir, key)?;
         self.hoard = Some(hoard);
         Ok(audit)
     }
 
     /// Forget the key. Called when the window locks.
+    ///
+    /// **An unlock in flight is abandoned as well.** The window locking while
+    /// the folder is being opened must not end with the key installed a moment
+    /// later, which is what dropping the receiver prevents: the worker's send
+    /// fails and its `Hoard`, with the key inside it, is dropped on that
+    /// thread.
     pub fn locked(&mut self) {
         self.hoard = None;
+        self.opening = None;
     }
 
     /// Read a record, from the hoard if it is open and from the plain file if
@@ -234,6 +293,50 @@ impl VaultStore {
             .map(|(_, plain)| *plain)?;
         Some(dir.join(name))
     }
+}
+
+/// Open the hoard in `dir` with `key`, migrating and auditing.
+///
+/// A free function rather than a method, and the only place this work is
+/// written, so that the thread doing it holds nothing belonging to the window.
+/// It is the whole of an unlock:
+///
+/// 1. every plain record read, written back as a hoard record, and the
+///    original **shredded** rather than deleted, because a settings file that
+///    says which vault you use should not be recoverable from free space after
+///    VeilVoice has told you it is now encrypted;
+/// 2. the decoys topped up, because a folder whose decoy count never changes
+///    while its record count does is a folder that leaks the difference over
+///    time;
+/// 3. the folder audited, so the caller can say whether anything was edited or
+///    removed while the window was shut.
+///
+/// Three passes of overwriting per migrated record, two full reads of the
+/// folder, and a write per decoy. None of it belongs in a frame. See F-218.
+fn open_with(dir: &Path, key: StoreKey) -> Result<(Hoard, Audit), String> {
+    let hoard = Hoard::open(dir, key);
+
+    for (logical, plain) in records::ALL {
+        let path = dir.join(plain);
+        if !path.exists() {
+            continue;
+        }
+        let bytes = std::fs::read(&path)
+            .map_err(|e| format!("could not read {plain} to move it in: {e}"))?;
+        hoard
+            .write(logical, &bytes)
+            .map_err(|e| format!("could not store {plain}: {e}"))?;
+        let _ = veilvoice_crypto::shred::shred_file(&path, veilvoice_crypto::shred::Passes::Triple);
+        let _ = std::fs::remove_file(&path);
+    }
+
+    let present = hoard.audit().map_err(|e| e.to_string())?;
+    if present.unrecognised < DECOYS {
+        let _ = hoard.sow_decoys(DECOYS - present.unrecognised);
+    }
+
+    let audit = hoard.audit().map_err(|e| e.to_string())?;
+    Ok((hoard, audit))
 }
 
 #[cfg(test)]
@@ -339,6 +442,121 @@ mod tests {
             other.read(records::MEASURED).unwrap(),
             None,
             "a different key derives names nothing is stored under"
+        );
+    }
+
+    /// **F-218.** The unlock happens somewhere else, and is collected without
+    /// waiting.
+    ///
+    /// Opening the folder reads every plain record, writes each back
+    /// encrypted, shreds the original with three passes, sows decoys and audits
+    /// the folder twice. That ran on the frame the passphrase was accepted, so
+    /// the window stopped for all of it at the moment somebody had just proved
+    /// they owned the machine and was watching to see what happened.
+    #[test]
+    fn an_unlock_is_carried_out_off_the_calling_thread() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
+        store.write(records::MEASURED, b"theme=dark").unwrap();
+
+        let ctx = egui::Context::default();
+        store.start_unlocking(&ctx, key(7));
+        assert!(store.is_opening(), "nothing is being opened");
+        assert!(
+            !store.is_obfuscated(),
+            "the key was installed by the call that started the work, so the \
+             work was done on this thread after all"
+        );
+
+        // Polled rather than waited for, which is what the window does.
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(30);
+        let audit = loop {
+            if let Some(answer) = store.poll() {
+                break answer.expect("the unlock must succeed");
+            }
+            assert!(
+                std::time::Instant::now() < deadline,
+                "the unlock never came back"
+            );
+            std::hint::spin_loop();
+        };
+        assert!(audit.is_clean(), "{audit:?}");
+        assert!(store.is_obfuscated(), "the key was never installed");
+        assert!(!store.is_opening());
+        assert!(
+            !dir.path().join("measured.dat").exists(),
+            "the plain copy has to go, or the obfuscation is decoration"
+        );
+        assert_eq!(
+            store.read(records::MEASURED).unwrap().unwrap(),
+            b"theme=dark"
+        );
+    }
+
+    /// Locking while an unlock is in flight abandons it.
+    ///
+    /// This is the one part of F-218 that is about more than a frame. Moving
+    /// the work to a thread introduces a window in which the passphrase has
+    /// been accepted, the key exists, and the person has locked the screen
+    /// again. The key must not arrive a moment later and let itself in. Dropping
+    /// the receiver is what prevents it: the worker's send fails and the
+    /// `Hoard`, with the key inside it, is dropped on that thread.
+    #[test]
+    fn locking_during_an_unlock_abandons_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
+        let ctx = egui::Context::default();
+        store.start_unlocking(&ctx, key(7));
+        store.locked();
+        assert!(!store.is_opening(), "the abandoned unlock is still awaited");
+
+        // However long the worker takes, and whether it finished before the
+        // lock or after it, nothing it produced may be installed.
+        let until = std::time::Instant::now() + std::time::Duration::from_secs(2);
+        while std::time::Instant::now() < until {
+            assert!(
+                store.poll().is_none(),
+                "an abandoned unlock still reported an answer"
+            );
+            assert!(
+                !store.is_obfuscated(),
+                "the key was installed after the window locked"
+            );
+            std::hint::spin_loop();
+        }
+    }
+
+    /// The work is not written twice, and not written where it can be called
+    /// from a frame.
+    #[test]
+    fn the_unlock_is_written_once_and_only_a_test_can_do_it_inline() {
+        let source = include_str!("vault_store.rs").replace("\r\n", "\n");
+        let shipped = source.split("\n#[cfg(test)]").next().unwrap_or(&source);
+        assert_eq!(
+            shipped.matches("shred_file").count(),
+            1,
+            "the shredding step is written in more than one place, so the \
+             threaded path and whatever else does it will drift"
+        );
+        let at = shipped
+            .find("fn start_unlocking")
+            .expect("the unlock starts somewhere");
+        let starting = &shipped[at..];
+        let starting = starting.split("\n    ///").next().unwrap_or(starting);
+        assert!(
+            starting.contains("std::thread::spawn"),
+            "the unlock is carried out by whichever thread asked for it, which \
+             is the drawing thread every time. See F-218."
+        );
+        // And the inline door is shut in a shipped build, by the compiler
+        // rather than by a check reading the source.
+        let door = source
+            .find("pub fn unlocked(")
+            .expect("the test-only door exists");
+        assert!(
+            source[..door].ends_with("#[cfg(test)]\n    "),
+            "`unlocked` is reachable from a shipped build, so the window can \
+             open the folder inside a frame again"
         );
     }
 
