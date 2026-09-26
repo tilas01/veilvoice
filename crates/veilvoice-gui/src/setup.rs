@@ -606,14 +606,20 @@ impl Setup {
             // Said rather than left blank. The button that has just been
             // pressed going quiet for half a second is what reads as a freeze,
             // and the fix is as much this line as it is the worker.
-            ui.horizontal(|ui| {
-                ui.spinner();
-                ui.label(
-                    RichText::new("looking for each of these on this machine")
-                        .color(p::muted())
-                        .small(),
-                );
-            });
+            //
+            // Said without a bar, and with the reason: the looks are a known
+            // number, but they are not a known length, and on Windows one of
+            // them starts a Linux distribution. A bar over the count would
+            // stand still for most of the wait and then jump, which roadmap
+            // item 167 counts as inventing one.
+            crate::progress::strip(
+                ui,
+                "looking for each of these on this machine",
+                &crate::progress::Reach::unmeasurable(
+                    "each one is a separate look, and on Windows finding out \
+                     whether GnuPG is inside WSL means starting WSL",
+                ),
+            );
         } else if ui
             .button(RichText::new("look again").color(p::muted()).small())
             .clicked()
@@ -1084,7 +1090,7 @@ mod companion_tests {
         let rows = &shipped[at..];
         let rows = rows.split("\n    fn ").next().unwrap_or(rows);
         assert!(
-            rows.contains("ui.spinner()"),
+            rows.contains("progress::strip(") || rows.contains("ui.spinner()"),
             "nothing on screen says the probe is running, so the button reads \
              as dead"
         );

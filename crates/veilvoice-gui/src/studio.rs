@@ -430,6 +430,12 @@ pub struct Studio {
     /// them is eight times the vault written to disk. That happened inside the
     /// frame the button was pressed on.
     decoys: Option<mpsc::Receiver<DecoyRound>>,
+    /// How many of that round have been written.
+    ///
+    /// One of the two jobs in this window that can honestly say how far through
+    /// it is: the count was asked for by the person who pressed the button, so
+    /// the total is known before the first one is written. Roadmap item 167.
+    decoys_made: Option<std::sync::Arc<crate::progress::Reach>>,
     /// An export being carried out, on a thread.
     ///
     /// **F-219.** This work used to happen on the frame the picker's answer
@@ -904,9 +910,11 @@ impl Studio {
 
         let (tx, rx) = mpsc::channel();
         self.decoys = Some(rx);
+        let reach = std::sync::Arc::new(crate::progress::Reach::counting(count as u64));
+        self.decoys_made = Some(std::sync::Arc::clone(&reach));
         let ctx = ctx.clone();
         std::thread::spawn(move || {
-            let _ = tx.send(make_decoys_now(&parent, count, shape));
+            let _ = tx.send(make_decoys_now(&parent, count, shape, &reach));
             ctx.request_repaint();
         });
     }
@@ -919,6 +927,7 @@ impl Studio {
             Err(mpsc::TryRecvError::Empty) => return,
             Err(mpsc::TryRecvError::Disconnected) => {
                 self.decoys = None;
+                self.decoys_made = None;
                 self.message = Some((
                     "making decoys stopped without saying how far it got. The \
                      count above is read from the folder."
@@ -929,6 +938,7 @@ impl Studio {
             }
         };
         self.decoys = None;
+        self.decoys_made = None;
         self.free = outcome.free;
         self.vaults = outcome.vaults;
         self.message = Some(match outcome.error {
@@ -1726,21 +1736,19 @@ impl Studio {
             }
         }
         if self.exporting.is_some() {
-            // The window has to keep drawing for the line below to appear at
-            // all, and for the answer to be collected on some frame.
-            ui.ctx()
-                .request_repaint_after(std::time::Duration::from_millis(200));
-            ui.horizontal(|ui| {
-                ui.spinner();
-                ui.label(
-                    RichText::new(
-                        "writing what you asked for. A video takes as long as it \
-                         takes; this window keeps working while it does.",
-                    )
-                    .small()
-                    .color(p::muted()),
-                );
-            });
+            // No bar, and the reason for there being none is on screen. A video
+            // is most of what an export costs and `ffmpeg` is handed the whole
+            // render in one command, so there is nothing here to count: a bar
+            // would be an invention, which roadmap item 167 rules out. The
+            // repaint this needs is asked for inside `strip`.
+            crate::progress::strip(
+                ui,
+                "writing what you asked for",
+                &crate::progress::Reach::unmeasurable(
+                    "a video is rendered by ffmpeg in one command, which reports \
+                     nothing back that this window can read",
+                ),
+            );
             ui.add_space(6.0);
         }
 
@@ -1960,17 +1968,9 @@ impl Studio {
         if let Some(count) = asked {
             self.start_decoys(ui.ctx(), count, shape);
         }
-        if self.decoys.is_some() {
-            ui.horizontal(|ui| {
-                ui.spinner();
-                ui.label(
-                    RichText::new("making them, each the size of the real one")
-                        .small()
-                        .color(p::muted()),
-                );
-            });
-            ui.ctx()
-                .request_repaint_after(std::time::Duration::from_millis(200));
+        if let Some(reach) = &self.decoys_made {
+            // A real bar, because the total is the number that was asked for.
+            crate::progress::strip(ui, "making them, each the size of the real one", reach);
         }
     }
 
@@ -2031,12 +2031,17 @@ impl Studio {
         if self.unlocking.is_some() {
             // Said, because opening a folder with twenty-five candidates in it
             // is not instant and a button that goes quiet reads as a dead one.
-            ui.horizontal(|ui| {
-                ui.spinner();
-                ui.label(RichText::new("trying the folder").color(p::muted()).small());
-            });
-            ui.ctx()
-                .request_repaint_after(std::time::Duration::from_millis(200));
+            // Said without a bar, and with why: this is the roadmap's own
+            // example of work that cannot honestly estimate itself.
+            crate::progress::strip(
+                ui,
+                "trying the folder",
+                &crate::progress::Reach::unmeasurable(
+                    "deriving the key is one long computation with no countable \
+                     middle, which is the same property that makes a passphrase \
+                     expensive to guess",
+                ),
+            );
         }
         if !ready && self.unlocking.is_none() {
             ui.label(
@@ -2510,7 +2515,12 @@ type DecoyShape = veilvoice_crypto::studio::Shape;
 /// and named the way it is named, so they cannot be told from it by name. The
 /// key each is filled under is made and dropped inside `make_decoy_in`; nothing
 /// here ever holds one, which is why this job needs no vault and no key.
-fn make_decoys_now(parent: &Path, count: usize, shape: DecoyShape) -> DecoyRound {
+fn make_decoys_now(
+    parent: &Path,
+    count: usize,
+    shape: DecoyShape,
+    reach: &crate::progress::Reach,
+) -> DecoyRound {
     let mut made = 0;
     let mut error = None;
     for _ in 0..count {
@@ -2519,6 +2529,11 @@ fn make_decoys_now(parent: &Path, count: usize, shape: DecoyShape) -> DecoyRound
             break;
         }
         made += 1;
+        // Counted after the write, not before it: a bar that moves when the
+        // work is *started* says eight of eight while the eighth is still
+        // being written, which is the small lie that makes a bar not worth
+        // reading.
+        reach.advance(1);
     }
     let (free, vaults) = measure_folder(parent);
     DecoyRound {

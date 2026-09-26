@@ -166,6 +166,13 @@ pub struct Verify {
     pub signature: Option<PathBuf>,
 
     job: Option<mpsc::Receiver<Report>>,
+    /// How far through the hash the running check is.
+    ///
+    /// Shared with the worker: it counts, this thread reads it every frame and
+    /// waits for nothing. See [`crate::progress`] for why this is atomics
+    /// rather than a channel, and roadmap item 167 for why the hash gets a real
+    /// bar while the signature step does not.
+    hashing: Option<std::sync::Arc<crate::progress::Reach>>,
     report: Option<Report>,
     /// Set while files are over the window, so the drop target can light up.
     hovering: bool,
@@ -273,6 +280,7 @@ impl Verify {
             Ok(answer) => {
                 self.report = Some(answer);
                 self.job = None;
+                self.hashing = None;
             }
             Err(mpsc::TryRecvError::Empty) => {}
             Err(mpsc::TryRecvError::Disconnected) => {
@@ -283,6 +291,7 @@ impl Verify {
                     ..Report::default()
                 });
                 self.job = None;
+                self.hashing = None;
             }
         }
     }
@@ -467,8 +476,18 @@ impl Verify {
                 self.start();
             }
             if busy {
-                ui.spinner();
-                ui.label(RichText::new("checking…").color(p::muted()).small());
+                match &self.hashing {
+                    // Before the total is known the worker is still on the
+                    // signature over the list, which is one operation over a
+                    // few kilobytes and has no middle to report. After it, the
+                    // bar is bytes of a known length: the roadmap's own example
+                    // of an estimate that can honestly be given.
+                    Some(reach) if reach.total() == 0 => {
+                        crate::progress::strip(ui, "checking the signature", reach)
+                    }
+                    Some(reach) => crate::progress::strip(ui, "hashing the download", reach),
+                    None => {}
+                }
             } else if !ready {
                 ui.label(
                     RichText::new("all three files are needed")
@@ -1097,8 +1116,15 @@ impl Verify {
         let (tx, rx) = mpsc::channel();
         self.job = Some(rx);
         self.report = None;
+        // Counting nothing yet. The length of the download is a `stat`, and a
+        // `stat` on the thread that draws is the class of thing roadmap item
+        // 167 is about, so the worker measures the file and says what the total
+        // was: until it does, the indicator is a spinner rather than a bar over
+        // a total of zero.
+        let reach = std::sync::Arc::new(crate::progress::Reach::counting(0));
+        self.hashing = Some(std::sync::Arc::clone(&reach));
         std::thread::spawn(move || {
-            let _ = tx.send(examine(&download, &sums, &signature));
+            let _ = tx.send(examine(&download, &sums, &signature, &reach));
         });
     }
 }
@@ -1106,10 +1132,18 @@ impl Verify {
 /// The whole check, off the drawing thread.
 ///
 /// A free function rather than a method so it cannot reach the tab's state:
-/// everything it needs is in its three arguments and everything it found is in
-/// what it returns, which is the only shape that is safe to run on a thread
-/// while the window carries on drawing.
-fn examine(download: &Path, sums_path: &Path, signature_path: &Path) -> Report {
+/// everything it needs is in its arguments and everything it found is in what
+/// it returns, which is the only shape that is safe to run on a thread while
+/// the window carries on drawing. `reach` is the exception that proves the rule:
+/// it is shared rather than returned because it is the one thing the window
+/// wants to see *during* the work, and it is written to with atomics for that
+/// reason.
+fn examine(
+    download: &Path,
+    sums_path: &Path,
+    signature_path: &Path,
+    reach: &crate::progress::Reach,
+) -> Report {
     let read = |path: &Path| {
         std::fs::read_to_string(path)
             .map_err(|e| Error::Io(format!("cannot read {}: {e}", path.display())))
@@ -1124,7 +1158,16 @@ fn examine(download: &Path, sums_path: &Path, signature_path: &Path) -> Report {
         }
     };
 
-    let file = veilvoice_verify::check::check_file(download, &sums, &signature);
+    // Measured here, on the worker, and only for the bar: the check itself
+    // never asks how big the file is, and a wrong or missing answer costs the
+    // indicator its bar and nothing else.
+    if let Ok(known) = std::fs::metadata(download) {
+        reach.set_total(known.len());
+    }
+    let file =
+        veilvoice_verify::check::check_file_watched(download, &sums, &signature, &mut |read| {
+            reach.advance(read)
+        });
     // The rest only when the archive itself is the published one. Reporting on
     // an extracted folder after the archive failed would be answering a
     // question nobody should still be asking.
@@ -1502,6 +1545,58 @@ mod tests {
             !row.contains("gnupg_section"),
             "`slot_row` draws the GnuPG section, so it is drawn once per file \
              slot and the tab carries three copies of it"
+        );
+    }
+
+    /// **Roadmap item 167.** The hash says how far through it is, honestly.
+    ///
+    /// The hash is the roadmap's own example of work that can give a real
+    /// estimate: the total is the file's length, which the operating system
+    /// answers before any of the work starts. What that costs is one extra
+    /// argument through `examine`, and what it buys is the difference between a
+    /// bar and a spinner on the one job here that runs for tens of seconds.
+    ///
+    /// Read from the source because the behaviour cannot be reached from a test:
+    /// `check_file` verifies the signature over the hash list first and by
+    /// design, so a fixture without a genuine release signature never gets as
+    /// far as hashing. That the watcher itself is told about every byte exactly
+    /// once is checked where it is implemented, in
+    /// `veilvoice_verify::check::tests`.
+    #[test]
+    fn the_hash_says_how_far_through_it_is() {
+        let source = include_str!("verify.rs").replace("\r\n", "\n");
+        let source = source.split("\n#[cfg(test)]").next().unwrap();
+
+        let examine = source
+            .split("\nfn examine(")
+            .nth(1)
+            .and_then(|rest| rest.split("\n/// ").next())
+            .expect("examine exists");
+        assert!(
+            examine.contains("check_file_watched"),
+            "the check is run unwatched, so the window has nothing to draw a \
+             bar from and the tab is back to a spinner over tens of seconds"
+        );
+        assert!(
+            examine.contains("reach.set_total"),
+            "nothing tells the indicator how long the file is, so the bar \
+             stays a spinner: the total is the honest half of the estimate"
+        );
+
+        // And the measuring happens on the worker. A `stat` is small and it is
+        // still a syscall, and this file already carries F-216 for putting one
+        // on the drawing thread.
+        let start = source
+            .find("    fn start(&mut self)")
+            .expect("start exists");
+        let start_body = source[start..]
+            .split("\n    }")
+            .next()
+            .expect("start has a body");
+        assert!(
+            !start_body.contains("metadata"),
+            "the file is measured on the thread that draws, which is F-216 \
+             again. The worker can say what the total was."
         );
     }
 

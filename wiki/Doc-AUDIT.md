@@ -746,6 +746,84 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-221: a spinner that spins for four minutes is an indicator that says nothing
+
+The last of roadmap item 167, and the half of it that is not about threads.
+
+Moving the work off the drawing thread stops the window freezing. It does not
+tell anybody what is happening, and for the two longest jobs here it made the
+silence longer: an export that used to freeze for four minutes now draws
+perfectly for four minutes with a spinner in the corner. Twelve places in the
+window drew that spinner. Not one of them drew a bar, and three of them drew
+nothing at all.
+
+**Why the obvious fix is the defect.** A progress bar is read as a promise about
+how much longer. Over a job whose length nobody knows it is a claim nobody
+checked, and it fails in the way that teaches: it crawls to nine tenths, sits
+there, and the next bar this window draws is one the reader has learnt to
+ignore. Roadmap item 167 says the estimate is given **only where one can
+honestly be given**, and names the two cases. A hash of a known length can say
+how far through it is. A key derivation cannot, and has to say so.
+
+**What the shape of that rule is.** `crate::progress::Reach` has two
+constructors and they are not interchangeable. `counting(total)` is for a job
+with a total and draws a bar. `unmeasurable(because)` takes the reason as an
+argument, draws a spinner, and puts the reason on screen under it. There is no
+third constructor, so a panel cannot draw a bar without having been given a
+number, and `strip` is the one function that draws either. A test reads every
+module of the crate and fails on a `ProgressBar::new` anywhere but there, for the
+reason F-210 and F-220 both gave: the rule has to be asked of the whole crate,
+or it is a rule the next file does not have.
+
+`Reach` is two atomics rather than a channel or a lock. It is read every frame
+while a worker writes it thousands of times, which is the opposite traffic to
+`offthread::Answer`'s one value arriving once, and a `Mutex` a worker holds while
+it works is the exact thing roadmap item 167 exists to remove. `Relaxed` is
+enough: nothing is ordered against anything, and the worst a stale read gives is
+a bar one frame behind, which is what every bar is.
+
+**The two that can count.** The verifier's hash, which is the roadmap's own
+example: `check::sha256_file_watched` reports the size of each 64 KiB chunk as it
+hashes it, and the total is the file's length, which the operating system gives
+before any work starts. `sha256_file` is now that function with a watcher that
+does nothing, so the streaming loop, the chunk size and the two error sentences
+exist once. The file is measured **on the worker**, not where the button is
+pressed: a `stat` is small and it is still a syscall, and F-216 is in this same
+file for putting one on the drawing thread. Until the worker says what the total
+is, the indicator is a spinner rather than a bar over zero.
+
+And a round of decoys, where the total is the number the person typed in. Each
+one is counted after it is written, not before: a bar that advances when work is
+*started* says eight of eight while the eighth is still being written, and a test
+holds both ends of that, including that a round which cannot write leaves the bar
+at nothing rather than running it to the end.
+
+**The four that cannot, and what they say instead.** Opening a vault: deriving
+the key is one long computation with no countable middle, which is the same
+property that makes a passphrase expensive to guess, and that is what the window
+now says. Exporting: a video is rendered by `ffmpeg` in one command, which
+reports nothing back this window can read, and it is most of what an export
+costs. The companion look: each one is a separate look, and on Windows finding
+out whether GnuPG is inside WSL means starting WSL. In each case the sentence is
+the honest answer to "how much longer", and it is more use than a bar would have
+been, because it also says why.
+
+**A test that passed by accident, and was fixed rather than kept.** The first
+version of the failing-decoy-round test pointed the round at
+`/definitely/not/a/folder/on/this/machine` and asserted that none were made. It
+reported eight of eight: the folder is created on the way past, and this build
+runs as a user who may create a directory at the root. It writes a file and asks
+for a folder inside it instead, which every system refuses and none needs
+privileges to refuse. A test whose failure case cannot fail is a test that
+reports the opposite of what it checks.
+
+**What is deliberately not in this.** `strip` does not consult the reduce-motion
+setting, so the no-estimate case still spins for somebody who has asked their
+system for no movement, and the twelve older spinners are still twelve. Both are
+roadmap item 169, which is the next item and is now a sweep rather than an
+invention. Said here, and in the module's own doc comment, rather than left for a
+reader to notice the gap and wonder whether anybody had.
+
 ### F-220: the guard was written at the crate, and found two more the same afternoon
 
 Roadmap item 167's guard, and what widening it turned up.
@@ -7501,7 +7579,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1791 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1801 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9149,7 +9227,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twenty defects found and fixed (F-1 to F-220), across
+**Two hundred and twenty-one defects found and fixed (F-1 to F-221), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

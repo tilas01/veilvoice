@@ -160,6 +160,7 @@ pub mod paths;
 pub mod policy;
 pub mod prefs;
 pub mod probe;
+pub mod progress;
 pub mod reduced_motion;
 pub mod security;
 pub mod settings;
@@ -267,6 +268,10 @@ pub(crate) fn sources() -> Vec<(&'static str, String)> {
         ("policy.rs", include_str!("policy.rs").replace("\r\n", "\n")),
         ("prefs.rs", include_str!("prefs.rs").replace("\r\n", "\n")),
         ("probe.rs", include_str!("probe.rs").replace("\r\n", "\n")),
+        (
+            "progress.rs",
+            include_str!("progress.rs").replace("\r\n", "\n"),
+        ),
         (
             "reduced_motion.rs",
             include_str!("reduced_motion.rs").replace("\r\n", "\n"),

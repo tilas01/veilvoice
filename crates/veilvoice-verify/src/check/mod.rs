@@ -160,6 +160,28 @@ pub fn fingerprint_of(key: &SignedPublicKey) -> String {
 /// there is no reason for this to need that much memory at once. The web
 /// verifier had the same problem in the other direction -- finding F-36.
 pub fn sha256_file(path: &Path) -> Result<String, Error> {
+    sha256_file_watched(path, &mut |_| {})
+}
+
+/// SHA-256 of a file, saying how much of it has been read as it goes.
+///
+/// `watch` is handed the size of each chunk as that chunk is hashed, so a
+/// caller adds them up rather than keeping a running total this would have to
+/// agree with. Against the file's length, which the operating system gives
+/// before any of the work starts, that is a genuine measure of how far through
+/// the hash is, which is what roadmap item 167 means by an estimate that can
+/// honestly be given: nothing here is predicted, and the total is not a guess.
+///
+/// [`sha256_file`] is this with a watcher that does nothing, rather than a
+/// second copy of the loop. The chunk size, the streaming decision and the two
+/// error sentences then exist once, and a caller who wants no progress pays a
+/// closure call per 64 KiB for it.
+///
+/// `&mut dyn FnMut` rather than a generic parameter, deliberately: this is
+/// reached from a worker thread in a graphical front end where the watcher
+/// writes into shared state, and a signature that cannot be put in a `Box` is
+/// one that pushes the caller into duplicating the loop after all.
+pub fn sha256_file_watched(path: &Path, watch: &mut dyn FnMut(u64)) -> Result<String, Error> {
     use std::io::Read;
 
     let mut file = std::fs::File::open(path)
@@ -174,6 +196,9 @@ pub fn sha256_file(path: &Path) -> Result<String, Error> {
             break;
         }
         hasher.update(&buffer[..read]);
+        // After the hashing rather than before it, so a watcher is never told
+        // about work that an error on the next line means never happened.
+        watch(read as u64);
     }
     Ok(hex_of(&hasher.finalize()))
 }
@@ -313,6 +338,21 @@ pub struct Checked {
 /// `SHA256SUMS` to go with it. Getting this order wrong produces a program that
 /// passes all its own tests and proves nothing.
 pub fn check_file(file: &Path, sums: &str, signature: &str) -> Result<Checked, Error> {
+    check_file_watched(file, sums, signature, &mut |_| {})
+}
+
+/// [`check_file`], saying how much of the file has been hashed as it goes.
+///
+/// The watcher covers the hash and nothing else, because the hash is the only
+/// step here with a countable size. Verifying the signature over the list is
+/// one operation over a few kilobytes: it has no measurable middle and it is
+/// over before a bar could draw, so it is not reported as though it had one.
+pub fn check_file_watched(
+    file: &Path,
+    sums: &str,
+    signature: &str,
+    watch: &mut dyn FnMut(u64),
+) -> Result<Checked, Error> {
     let key = key()?;
     verify_detached(&key, signature, sums.as_bytes())?;
 
@@ -325,7 +365,7 @@ pub fn check_file(file: &Path, sums: &str, signature: &str) -> Result<Checked, E
         .map(|n| n.to_string_lossy().into_owned())
         .ok_or_else(|| Error::Io(format!("{} does not name a file", file.display())))?;
     let expected = digest_from_sums(sums, &name).ok_or_else(|| Error::NotListed(name.clone()))?;
-    let actual = sha256_file(file)?;
+    let actual = sha256_file_watched(file, watch)?;
 
     Ok(Checked {
         matched: digests_match(&actual, &expected),
@@ -373,6 +413,42 @@ mod tests {
             .write_all(&data)
             .unwrap();
         assert_eq!(sha256_file(&path).unwrap(), sha256_bytes(&data));
+    }
+
+    /// The watcher is told about every byte of the file, once each.
+    ///
+    /// The count is what a progress bar divides by the file's length, so a
+    /// watcher that missed a chunk or was told about one twice would draw a bar
+    /// that stops short or runs past its end. Checked rather than assumed,
+    /// because both mistakes are one line and neither changes the digest, which
+    /// is the only thing the other tests here look at.
+    #[test]
+    fn the_watcher_is_told_about_the_whole_file_and_no_more() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("thing.bin");
+        // Not a multiple of the 64 KiB buffer, so the short final chunk is part
+        // of what is counted.
+        let data: Vec<u8> = (0..200_000u32).map(|n| (n % 251) as u8).collect();
+        std::fs::File::create(&path)
+            .unwrap()
+            .write_all(&data)
+            .unwrap();
+
+        let mut seen = 0u64;
+        let mut chunks = 0usize;
+        let digest = sha256_file_watched(&path, &mut |read| {
+            seen += read;
+            chunks += 1;
+        })
+        .unwrap();
+
+        assert_eq!(digest, sha256_bytes(&data), "watching changed the answer");
+        assert_eq!(seen, data.len() as u64);
+        assert!(
+            chunks > 1,
+            "the whole file arrived as one chunk, so the \
+                             counting was not exercised"
+        );
     }
 
     #[test]
