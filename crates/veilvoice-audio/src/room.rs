@@ -157,11 +157,21 @@ pub struct RoomSession {
     shared: Arc<Shared>,
 }
 
+/// The same arrangement as [`crate::live::Shared`], for a room rather than one
+/// voice: counted in the audio callbacks, read by the caller.
+///
+/// Separate from that type rather than shared with it because a room's
+/// statistics are per guest and a live session's are not, and a type holding
+/// both would have a half that is meaningless in each case.
 #[derive(Default)]
 struct Shared {
+    /// How the room has been going, for a caller that asks.
     stats: Mutex<RoomStats>,
+    /// How often a stream asked for samples that were not ready yet.
     starved: AtomicU64,
+    /// How many times any of the streams has reported trouble.
     troubles: AtomicU64,
+    /// The most recent one, for a caller that asks.
     trouble: Mutex<Option<crate::live::Interference>>,
 }
 

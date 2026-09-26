@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/raster.svg" alt="raster.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/raster.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 594 lines &middot; <a href="raster.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 602 lines &middot; <a href="raster.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-the-videos-pictures-are-drawn-here-rather-than-converted">Why the video&#x27;s pictures are drawn here rather than converted</a>
@@ -92,7 +92,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>594 lines defining <strong>17 functions</strong> (12 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>602 lines defining <strong>17 functions</strong> (12 public), <strong>2 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Canvas</code> <span style="color:var(--muted)">line 74</span> &middot; A picture being drawn, one byte per channel, three channels per pixel.</li>
 <li><code>struct Crc</code> <span style="color:var(--muted)">line 349</span> &middot; The CRC-32 PNG puts on every chunk.</li>
@@ -214,17 +214,17 @@
 <a href="raster.src.html#fn-crc-new">
 <rect x="313.3" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="359.6" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Crc::new</text>
-<text x="359.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 352</text>
+<text x="359.6" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 354</text>
 </a>
 <a href="raster.src.html#fn-crc-eat">
 <rect x="262.1" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="308.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Crc::eat</text>
-<text x="308.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 356</text>
+<text x="308.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 361</text>
 </a>
 <a href="raster.src.html#fn-crc-done">
 <rect x="380.6" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="430.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Crc::done</text>
-<text x="430.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 370</text>
+<text x="430.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 378</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -257,9 +257,9 @@ flowchart TD
     n_text_centred([&quot;Canvas::text_centred&lt;br/&gt;line 283&quot;])
     n_png([&quot;Canvas::png&lt;br/&gt;line 306&quot;])
     n_chunk[&quot;chunk&lt;br/&gt;line 335&quot;]
-    n_new[&quot;Crc::new&lt;br/&gt;line 352&quot;]
-    n_eat[&quot;Crc::eat&lt;br/&gt;line 356&quot;]
-    n_done[&quot;Crc::done&lt;br/&gt;line 370&quot;]
+    n_new[&quot;Crc::new&lt;br/&gt;line 354&quot;]
+    n_eat[&quot;Crc::eat&lt;br/&gt;line 361&quot;]
+    n_done[&quot;Crc::done&lt;br/&gt;line 378&quot;]
     n_chunk --&gt; n_new
     n_circle --&gt; n_blend
     n_png --&gt; n_chunk
@@ -284,9 +284,9 @@ flowchart TD
     click n_text_centred href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L283&quot; &quot;open the source&quot;
     click n_png href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L306&quot; &quot;open the source&quot;
     click n_chunk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L335&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L352&quot; &quot;open the source&quot;
-    click n_eat href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L356&quot; &quot;open the source&quot;
-    click n_done href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L370&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L354&quot; &quot;open the source&quot;
+    click n_eat href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L361&quot; &quot;open the source&quot;
+    click n_done href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L378&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_colour,n_width,n_height,n_rounded_rect,n_ring,n_text_centred,n_png entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -316,9 +316,9 @@ flowchart TD
 <tr><td><code>Canvas::png</code> <sub>pub fn</sub></td><td><a href="raster.src.html#fn-canvas-png">306</a></td><td>The picture as a PNG file.</td></tr>
 <tr><td><code>chunk</code> <sub>fn</sub></td><td><a href="raster.src.html#fn-chunk">335</a></td><td>Append one PNG chunk: length, type, data, and the checksum over both.</td></tr>
 <tr><td><code>Crc</code> <sub>struct</sub></td><td><a href="raster.src.html#fn-crc">349</a></td><td>The CRC-32 PNG puts on every chunk.</td></tr>
-<tr><td><code>Crc::new</code> <sub>fn</sub></td><td><a href="raster.src.html#fn-crc-new">352</a></td><td></td></tr>
-<tr><td><code>Crc::eat</code> <sub>fn</sub></td><td><a href="raster.src.html#fn-crc-eat">356</a></td><td></td></tr>
-<tr><td><code>Crc::done</code> <sub>fn</sub></td><td><a href="raster.src.html#fn-crc-done">370</a></td><td></td></tr>
+<tr><td><code>Crc::new</code> <sub>fn</sub></td><td><a href="raster.src.html#fn-crc-new">354</a></td><td>A fresh checksum, which PNG specifies as starting from all ones rather than from zero.</td></tr>
+<tr><td><code>Crc::eat</code> <sub>fn</sub></td><td><a href="raster.src.html#fn-crc-eat">361</a></td><td>Fold bytes in.</td></tr>
+<tr><td><code>Crc::done</code> <sub>fn</sub></td><td><a href="raster.src.html#fn-crc-done">378</a></td><td>The value to write, which is the running state inverted.</td></tr>
 </tbody></table>
 </section>
 </div></div>

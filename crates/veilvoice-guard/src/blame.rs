@@ -172,6 +172,12 @@ pub fn who_touched(path: &Path) -> Blame {
     }
 }
 
+/// Who changed a file, as far as Linux can be made to say.
+///
+/// There is no record kept of this by default, so everything here asks a
+/// package manager whether the file is one of theirs and reports that rather
+/// than inventing a culprit. A file nothing claims is reported as unclaimed,
+/// which is the answer, not a failure to find one.
 #[cfg(target_os = "linux")]
 mod linux {
     use super::{unconfigured, Blame};
@@ -250,6 +256,12 @@ mod linux {
     }
 }
 
+/// The same question on Windows, asked of the installer database instead.
+///
+/// Its own module rather than a `cfg` inside one function, because the two
+/// platforms have nothing in common here but the question: neither's answer can
+/// be expressed in the other's terms, and a single function would be two
+/// functions sharing a name.
 #[cfg(windows)]
 mod windows {
     use super::{unconfigured, Blame};

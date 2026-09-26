@@ -110,11 +110,11 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>242 lines"])
     n_aead["aead.rs<br/>280 lines"]
-    n_amnesia["amnesia.rs<br/>468 lines"]
-    n_container["container.rs<br/>618 lines"]
-    n_decoy["decoy.rs<br/>464 lines"]
+    n_amnesia["amnesia.rs<br/>472 lines"]
+    n_container["container.rs<br/>627 lines"]
+    n_decoy["decoy.rs<br/>471 lines"]
     n_hoard["hoard.rs<br/>1099 lines"]
-    n_hybrid["hybrid.rs<br/>524 lines"]
+    n_hybrid["hybrid.rs<br/>531 lines"]
     n_kdf["kdf.rs<br/>633 lines"]
     n_layout["layout.rs<br/>331 lines"]
     n_lock["lock.rs<br/>2264 lines"]
@@ -122,8 +122,8 @@ flowchart TD
     n_shred["shred.rs<br/>417 lines"]
     n_studio["studio.rs<br/>1522 lines"]
     n_tape["tape.rs<br/>391 lines"]
-    n_vault["vault.rs<br/>688 lines"]
-    n_weave["weave.rs<br/>1727 lines"]
+    n_vault["vault.rs<br/>696 lines"]
+    n_weave["weave.rs<br/>1770 lines"]
     n_hoard --> n_amnesia
     n_hoard --> n_privatefile
     n_hoard --> n_weave
@@ -162,11 +162,11 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 280 | Authenticated encryption with XChaCha20-Poly1305. |
-| [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 468 | Amnesic secret storage: page-locked, zeroized, and never printed. |
-| [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 618 | The .veil encrypted container format. |
-| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 464 | A second passphrase that opens a different, empty VeilVoice. |
+| [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 472 | Amnesic secret storage: page-locked, zeroized, and never printed. |
+| [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 627 | The .veil encrypted container format. |
+| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 471 | A second passphrase that opens a different, empty VeilVoice. |
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
-| [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 524 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
+| [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 531 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 633 | Password-based key derivation with Argon2id. |
 | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | 331 | Everything VeilVoice keeps between runs, in one list. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 242 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
@@ -175,8 +175,8 @@ flowchart TD
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 417 | Secure erasure, the self-destruct. |
 | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1522 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | 391 | A recording held in locked, zeroizing memory while it is still being made. |
-| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 688 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
-| [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1727 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
+| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 696 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1770 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |

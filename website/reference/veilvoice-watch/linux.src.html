@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-watch/src/linux.rs</code></h1>
-<p style="color:var(--muted)"><a href="linux.html">what this file is for</a> &middot; <a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 201 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="linux.html">what this file is for</a> &middot; <a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 218 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -112,171 +112,188 @@
 <span class="ln" id="L44"><span class="tok-kw">use</span> std::time::{Duration, SystemTime};</span>
 <span class="ln" id="L45"></span>
 <span class="src-item" id="fn-scan">
-<span class="ln" id="L46"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">scan</span>() -&gt; Result&lt;Vec&lt;DeviceUse&gt;, Error&gt; {</span>
-<span class="ln" id="L47">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L48"></span>
-<span class="ln" id="L49">    <span class="tok-kw">let</span> entries = <span class="tok-kw">match</span> fs::<span class="tok-fn">read_dir</span>(<span class="tok-str">&quot;/proc&quot;</span>) {</span>
-<span class="ln" id="L50">        <span class="tok-fn">Ok</span>(e) =&gt; e,</span>
-<span class="ln" id="L51">        <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Io</span>(e)),</span>
-<span class="ln" id="L52">    };</span>
-<span class="ln" id="L53"></span>
-<span class="ln" id="L54">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L55">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(pid) = entry</span>
-<span class="ln" id="L56">            .<span class="tok-fn">file_name</span>()</span>
-<span class="ln" id="L57">            .<span class="tok-fn">to_str</span>()</span>
-<span class="ln" id="L58">            .<span class="tok-fn">and_then</span>(|n| n.parse::&lt;u32&gt;().<span class="tok-fn">ok</span>())</span>
-<span class="ln" id="L59">        <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L60">            continue;</span>
-<span class="ln" id="L61">        };</span>
-<span class="ln" id="L62">        <span class="tok-kw">let</span> fd_dir = entry.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;fd&quot;</span>);</span>
-<span class="ln" id="L63">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(handles) = fs::<span class="tok-fn">read_dir</span>(&amp;fd_dir) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L64">            <span class="tok-com">// Not ours to inspect, or the process exited between listing and</span></span>
-<span class="ln" id="L65">            <span class="tok-com">// opening. Either way, skip it rather than fail the whole scan.</span></span>
-<span class="ln" id="L66">            continue;</span>
-<span class="ln" id="L67">        };</span>
-<span class="ln" id="L68"></span>
-<span class="ln" id="L69">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L70">        <span class="tok-kw">for</span> handle <span class="tok-kw">in</span> handles.<span class="tok-fn">flatten</span>() {</span>
-<span class="ln" id="L71">            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(target) = fs::<span class="tok-fn">read_link</span>(handle.<span class="tok-fn">path</span>()) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L72">                continue;</span>
-<span class="ln" id="L73">            };</span>
-<span class="ln" id="L74">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(kind) = <span class="tok-fn">classify</span>(&amp;target) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L75">                continue;</span>
-<span class="ln" id="L76">            };</span>
-<span class="ln" id="L77">            <span class="tok-kw">if</span> seen.<span class="tok-fn">contains</span>(&amp;kind) {</span>
-<span class="ln" id="L78">                continue; <span class="tok-com">// one entry per process per device kind</span></span>
-<span class="ln" id="L79">            }</span>
-<span class="ln" id="L80">            seen.<span class="tok-fn">push</span>(kind);</span>
-<span class="ln" id="L81"></span>
-<span class="ln" id="L82">            found.<span class="tok-fn">push</span>(DeviceUse {</span>
-<span class="ln" id="L83">                kind,</span>
-<span class="ln" id="L84">                app: <span class="tok-fn">process_name</span>(pid).<span class="tok-fn">unwrap_or_else</span>(|| format!(<span class="tok-str">&quot;pid {pid}&quot;</span>)),</span>
-<span class="ln" id="L85">                path: fs::<span class="tok-fn">read_link</span>(entry.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;exe&quot;</span>))</span>
-<span class="ln" id="L86">                    .<span class="tok-fn">ok</span>()</span>
-<span class="ln" id="L87">                    .<span class="tok-fn">map</span>(|p| p.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L88">                pid: <span class="tok-fn">Some</span>(pid),</span>
-<span class="ln" id="L89">                since: <span class="tok-fn">started_at</span>(&amp;entry.<span class="tok-fn">path</span>()),</span>
-<span class="ln" id="L90">                device: <span class="tok-fn">Some</span>(target.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L91">            });</span>
-<span class="ln" id="L92">        }</span>
-<span class="ln" id="L93">    }</span>
-<span class="ln" id="L94"></span>
-<span class="ln" id="L95">    found.<span class="tok-fn">sort_by_key</span>(|u| (u.kind, u.pid));</span>
-<span class="ln" id="L96">    <span class="tok-fn">Ok</span>(found)</span>
-<span class="ln" id="L97">}</span>
+<span class="ln" id="L46"><span class="tok-com">/// Every process on this machine holding a microphone or a camera open.</span></span>
+<span class="ln" id="L47"><span class="tok-com">///</span></span>
+<span class="ln" id="L48"><span class="tok-com">/// Read out of `/proc`: each process&#x27;s open file descriptors are links, and one</span></span>
+<span class="ln" id="L49"><span class="tok-com">/// pointing at `/dev/video*` or at ALSA&#x27;s own `/dev/snd/*` is a device in use</span></span>
+<span class="ln" id="L50"><span class="tok-com">/// right now. There is no permission to ask for and nothing to install, and it</span></span>
+<span class="ln" id="L51"><span class="tok-com">/// is the truth rather than a record of who asked, which is what the Windows</span></span>
+<span class="ln" id="L52"><span class="tok-com">/// half has to settle for.</span></span>
+<span class="ln" id="L53"><span class="tok-com">///</span></span>
+<span class="ln" id="L54"><span class="tok-com">/// A process this user may not look inside is skipped rather than failing the</span></span>
+<span class="ln" id="L55"><span class="tok-com">/// scan. On any ordinary machine most of `/proc` belongs to somebody else, so a</span></span>
+<span class="ln" id="L56"><span class="tok-com">/// scan that gave up at the first unreadable entry would report almost nothing</span></span>
+<span class="ln" id="L57"><span class="tok-com">/// and would look like it had worked.</span></span>
+<span class="ln" id="L58"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">scan</span>() -&gt; Result&lt;Vec&lt;DeviceUse&gt;, Error&gt; {</span>
+<span class="ln" id="L59">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L60"></span>
+<span class="ln" id="L61">    <span class="tok-kw">let</span> entries = <span class="tok-kw">match</span> fs::<span class="tok-fn">read_dir</span>(<span class="tok-str">&quot;/proc&quot;</span>) {</span>
+<span class="ln" id="L62">        <span class="tok-fn">Ok</span>(e) =&gt; e,</span>
+<span class="ln" id="L63">        <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Io</span>(e)),</span>
+<span class="ln" id="L64">    };</span>
+<span class="ln" id="L65"></span>
+<span class="ln" id="L66">    <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> entries.<span class="tok-fn">flatten</span>() {</span>
+<span class="ln" id="L67">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(pid) = entry</span>
+<span class="ln" id="L68">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L69">            .<span class="tok-fn">to_str</span>()</span>
+<span class="ln" id="L70">            .<span class="tok-fn">and_then</span>(|n| n.parse::&lt;u32&gt;().<span class="tok-fn">ok</span>())</span>
+<span class="ln" id="L71">        <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L72">            continue;</span>
+<span class="ln" id="L73">        };</span>
+<span class="ln" id="L74">        <span class="tok-kw">let</span> fd_dir = entry.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;fd&quot;</span>);</span>
+<span class="ln" id="L75">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(handles) = fs::<span class="tok-fn">read_dir</span>(&amp;fd_dir) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L76">            <span class="tok-com">// Not ours to inspect, or the process exited between listing and</span></span>
+<span class="ln" id="L77">            <span class="tok-com">// opening. Either way, skip it rather than fail the whole scan.</span></span>
+<span class="ln" id="L78">            continue;</span>
+<span class="ln" id="L79">        };</span>
+<span class="ln" id="L80"></span>
+<span class="ln" id="L81">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L82">        <span class="tok-kw">for</span> handle <span class="tok-kw">in</span> handles.<span class="tok-fn">flatten</span>() {</span>
+<span class="ln" id="L83">            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(target) = fs::<span class="tok-fn">read_link</span>(handle.<span class="tok-fn">path</span>()) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L84">                continue;</span>
+<span class="ln" id="L85">            };</span>
+<span class="ln" id="L86">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(kind) = <span class="tok-fn">classify</span>(&amp;target) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L87">                continue;</span>
+<span class="ln" id="L88">            };</span>
+<span class="ln" id="L89">            <span class="tok-kw">if</span> seen.<span class="tok-fn">contains</span>(&amp;kind) {</span>
+<span class="ln" id="L90">                continue; <span class="tok-com">// one entry per process per device kind</span></span>
+<span class="ln" id="L91">            }</span>
+<span class="ln" id="L92">            seen.<span class="tok-fn">push</span>(kind);</span>
+<span class="ln" id="L93"></span>
+<span class="ln" id="L94">            found.<span class="tok-fn">push</span>(DeviceUse {</span>
+<span class="ln" id="L95">                kind,</span>
+<span class="ln" id="L96">                app: <span class="tok-fn">process_name</span>(pid).<span class="tok-fn">unwrap_or_else</span>(|| format!(<span class="tok-str">&quot;pid {pid}&quot;</span>)),</span>
+<span class="ln" id="L97">                path: fs::<span class="tok-fn">read_link</span>(entry.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;exe&quot;</span>))</span>
+<span class="ln" id="L98">                    .<span class="tok-fn">ok</span>()</span>
+<span class="ln" id="L99">                    .<span class="tok-fn">map</span>(|p| p.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L100">                pid: <span class="tok-fn">Some</span>(pid),</span>
+<span class="ln" id="L101">                since: <span class="tok-fn">started_at</span>(&amp;entry.<span class="tok-fn">path</span>()),</span>
+<span class="ln" id="L102">                device: <span class="tok-fn">Some</span>(target.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L103">            });</span>
+<span class="ln" id="L104">        }</span>
+<span class="ln" id="L105">    }</span>
+<span class="ln" id="L106"></span>
+<span class="ln" id="L107">    found.<span class="tok-fn">sort_by_key</span>(|u| (u.kind, u.pid));</span>
+<span class="ln" id="L108">    <span class="tok-fn">Ok</span>(found)</span>
+<span class="ln" id="L109">}</span>
 </span>
-<span class="ln" id="L98"></span>
+<span class="ln" id="L110"></span>
 <span class="src-item" id="fn-classify">
-<span class="ln" id="L99"><span class="tok-com">/// Decide whether an open handle means capture.</span></span>
-<span class="ln" id="L100"><span class="tok-com">///</span></span>
-<span class="ln" id="L101"><span class="tok-com">/// Returns `None` for playback devices, control nodes and everything else, so</span></span>
-<span class="ln" id="L102"><span class="tok-com">/// a music player is never mistaken for something listening.</span></span>
-<span class="ln" id="L103"><span class="tok-kw">fn</span> <span class="tok-fn">classify</span>(target: &amp;Path) -&gt; Option&lt;DeviceKind&gt; {</span>
-<span class="ln" id="L104">    <span class="tok-kw">let</span> path = target.<span class="tok-fn">to_str</span>()?;</span>
-<span class="ln" id="L105"></span>
-<span class="ln" id="L106">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(node) = path.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;/dev/snd/&quot;</span>) {</span>
-<span class="ln" id="L107">        <span class="tok-com">// pcmC0D0c is capture, pcmC0D0p is playback. Only the former counts.</span></span>
-<span class="ln" id="L108">        <span class="tok-kw">if</span> node.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;pcm&quot;</span>) &amp;&amp; node.<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;c&#x27;</span>) {</span>
-<span class="ln" id="L109">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(DeviceKind::Microphone);</span>
-<span class="ln" id="L110">        }</span>
-<span class="ln" id="L111">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L112">    }</span>
-<span class="ln" id="L113"></span>
-<span class="ln" id="L114">    <span class="tok-kw">if</span> path.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;/dev/video&quot;</span>) {</span>
-<span class="ln" id="L115">        <span class="tok-com">// /dev/video1 may be a metadata node rather than a capture stream, but</span></span>
-<span class="ln" id="L116">        <span class="tok-com">// an open handle on it still means the camera subsystem is in use, and</span></span>
-<span class="ln" id="L117">        <span class="tok-com">// over-reporting a camera is the safer direction to err.</span></span>
-<span class="ln" id="L118">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(DeviceKind::Camera);</span>
-<span class="ln" id="L119">    }</span>
-<span class="ln" id="L120"></span>
-<span class="ln" id="L121">    None</span>
-<span class="ln" id="L122">}</span>
+<span class="ln" id="L111"><span class="tok-com">/// Decide whether an open handle means capture.</span></span>
+<span class="ln" id="L112"><span class="tok-com">///</span></span>
+<span class="ln" id="L113"><span class="tok-com">/// Returns `None` for playback devices, control nodes and everything else, so</span></span>
+<span class="ln" id="L114"><span class="tok-com">/// a music player is never mistaken for something listening.</span></span>
+<span class="ln" id="L115"><span class="tok-kw">fn</span> <span class="tok-fn">classify</span>(target: &amp;Path) -&gt; Option&lt;DeviceKind&gt; {</span>
+<span class="ln" id="L116">    <span class="tok-kw">let</span> path = target.<span class="tok-fn">to_str</span>()?;</span>
+<span class="ln" id="L117"></span>
+<span class="ln" id="L118">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(node) = path.<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;/dev/snd/&quot;</span>) {</span>
+<span class="ln" id="L119">        <span class="tok-com">// pcmC0D0c is capture, pcmC0D0p is playback. Only the former counts.</span></span>
+<span class="ln" id="L120">        <span class="tok-kw">if</span> node.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;pcm&quot;</span>) &amp;&amp; node.<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;c&#x27;</span>) {</span>
+<span class="ln" id="L121">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(DeviceKind::Microphone);</span>
+<span class="ln" id="L122">        }</span>
+<span class="ln" id="L123">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L124">    }</span>
+<span class="ln" id="L125"></span>
+<span class="ln" id="L126">    <span class="tok-kw">if</span> path.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;/dev/video&quot;</span>) {</span>
+<span class="ln" id="L127">        <span class="tok-com">// /dev/video1 may be a metadata node rather than a capture stream, but</span></span>
+<span class="ln" id="L128">        <span class="tok-com">// an open handle on it still means the camera subsystem is in use, and</span></span>
+<span class="ln" id="L129">        <span class="tok-com">// over-reporting a camera is the safer direction to err.</span></span>
+<span class="ln" id="L130">        <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(DeviceKind::Camera);</span>
+<span class="ln" id="L131">    }</span>
+<span class="ln" id="L132"></span>
+<span class="ln" id="L133">    None</span>
+<span class="ln" id="L134">}</span>
 </span>
-<span class="ln" id="L123"></span>
+<span class="ln" id="L135"></span>
 <span class="src-item" id="fn-process_name">
-<span class="ln" id="L124"><span class="tok-kw">fn</span> <span class="tok-fn">process_name</span>(pid: u32) -&gt; Option&lt;String&gt; {</span>
-<span class="ln" id="L125">    <span class="tok-kw">let</span> comm = fs::<span class="tok-fn">read_to_string</span>(format!(<span class="tok-str">&quot;/proc/{pid}/comm&quot;</span>)).<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L126">    <span class="tok-kw">let</span> name = comm.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L127">    (!name.<span class="tok-fn">is_empty</span>()).<span class="tok-fn">then</span>(|| name.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L128">}</span>
+<span class="ln" id="L136"><span class="tok-com">/// What a process calls itself, from `/proc/&lt;pid&gt;/comm`.</span></span>
+<span class="ln" id="L137"><span class="tok-com">///</span></span>
+<span class="ln" id="L138"><span class="tok-com">/// `comm` rather than the command line, deliberately: it is at most fifteen</span></span>
+<span class="ln" id="L139"><span class="tok-com">/// characters and holds no arguments, so a name shown in the monitor cannot</span></span>
+<span class="ln" id="L140"><span class="tok-com">/// carry a path or a passphrase somebody typed on a command line.</span></span>
+<span class="ln" id="L141"><span class="tok-kw">fn</span> <span class="tok-fn">process_name</span>(pid: u32) -&gt; Option&lt;String&gt; {</span>
+<span class="ln" id="L142">    <span class="tok-kw">let</span> comm = fs::<span class="tok-fn">read_to_string</span>(format!(<span class="tok-str">&quot;/proc/{pid}/comm&quot;</span>)).<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L143">    <span class="tok-kw">let</span> name = comm.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L144">    (!name.<span class="tok-fn">is_empty</span>()).<span class="tok-fn">then</span>(|| name.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L145">}</span>
 </span>
-<span class="ln" id="L129"></span>
+<span class="ln" id="L146"></span>
 <span class="src-item" id="fn-started_at">
-<span class="ln" id="L130"><span class="tok-com">/// When the process started, from the modification time of its `/proc` entry.</span></span>
-<span class="ln" id="L131"><span class="tok-com">///</span></span>
-<span class="ln" id="L132"><span class="tok-com">/// This is the process start time, not the moment it opened the device. The</span></span>
-<span class="ln" id="L133"><span class="tok-com">/// kernel does not record the latter. It is reported as the best available</span></span>
-<span class="ln" id="L134"><span class="tok-com">/// answer rather than omitted, since &quot;running since&quot; is still useful context.</span></span>
-<span class="ln" id="L135"><span class="tok-kw">fn</span> <span class="tok-fn">started_at</span>(proc_dir: &amp;Path) -&gt; Option&lt;SystemTime&gt; {</span>
-<span class="ln" id="L136">    fs::<span class="tok-fn">metadata</span>(proc_dir).<span class="tok-fn">ok</span>()?.<span class="tok-fn">modified</span>().<span class="tok-fn">ok</span>()</span>
-<span class="ln" id="L137">}</span>
+<span class="ln" id="L147"><span class="tok-com">/// When the process started, from the modification time of its `/proc` entry.</span></span>
+<span class="ln" id="L148"><span class="tok-com">///</span></span>
+<span class="ln" id="L149"><span class="tok-com">/// This is the process start time, not the moment it opened the device. The</span></span>
+<span class="ln" id="L150"><span class="tok-com">/// kernel does not record the latter. It is reported as the best available</span></span>
+<span class="ln" id="L151"><span class="tok-com">/// answer rather than omitted, since &quot;running since&quot; is still useful context.</span></span>
+<span class="ln" id="L152"><span class="tok-kw">fn</span> <span class="tok-fn">started_at</span>(proc_dir: &amp;Path) -&gt; Option&lt;SystemTime&gt; {</span>
+<span class="ln" id="L153">    fs::<span class="tok-fn">metadata</span>(proc_dir).<span class="tok-fn">ok</span>()?.<span class="tok-fn">modified</span>().<span class="tok-fn">ok</span>()</span>
+<span class="ln" id="L154">}</span>
 </span>
-<span class="ln" id="L138"></span>
+<span class="ln" id="L155"></span>
 <span class="src-item" id="fn-approx_now_minus">
-<span class="ln" id="L139"><span class="tok-com">/// Unused today; kept because a future PipeWire client lookup will want it.</span></span>
-<span class="ln" id="L140"><span class="tok-attr">#[allow</span>(dead_code)]</span>
-<span class="ln" id="L141"><span class="tok-kw">fn</span> <span class="tok-fn">approx_now_minus</span>(seconds: u64) -&gt; Option&lt;SystemTime&gt; {</span>
-<span class="ln" id="L142">    SystemTime::<span class="tok-fn">now</span>().<span class="tok-fn">checked_sub</span>(Duration::<span class="tok-fn">from_secs</span>(seconds))</span>
-<span class="ln" id="L143">}</span>
+<span class="ln" id="L156"><span class="tok-com">/// Unused today; kept because a future PipeWire client lookup will want it.</span></span>
+<span class="ln" id="L157"><span class="tok-attr">#[allow</span>(dead_code)]</span>
+<span class="ln" id="L158"><span class="tok-kw">fn</span> <span class="tok-fn">approx_now_minus</span>(seconds: u64) -&gt; Option&lt;SystemTime&gt; {</span>
+<span class="ln" id="L159">    SystemTime::<span class="tok-fn">now</span>().<span class="tok-fn">checked_sub</span>(Duration::<span class="tok-fn">from_secs</span>(seconds))</span>
+<span class="ln" id="L160">}</span>
 </span>
-<span class="ln" id="L144"></span>
-<span class="ln" id="L145"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L146"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L147">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L148"></span>
-<span class="ln" id="L149">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L150">    <span class="tok-kw">fn</span> <span class="tok-fn">capture_nodes_are_recognised</span>() {</span>
-<span class="ln" id="L151">        assert_eq!(</span>
-<span class="ln" id="L152">            <span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/pcmC0D0c&quot;</span>)),</span>
-<span class="ln" id="L153">            <span class="tok-fn">Some</span>(DeviceKind::Microphone)</span>
-<span class="ln" id="L154">        );</span>
-<span class="ln" id="L155">        assert_eq!(</span>
-<span class="ln" id="L156">            <span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/pcmC1D2c&quot;</span>)),</span>
-<span class="ln" id="L157">            <span class="tok-fn">Some</span>(DeviceKind::Microphone)</span>
-<span class="ln" id="L158">        );</span>
-<span class="ln" id="L159">    }</span>
-<span class="ln" id="L160"></span>
-<span class="ln" id="L161">    <span class="tok-com">/// The distinction that keeps this feature trustworthy: playing music must</span></span>
-<span class="ln" id="L162">    <span class="tok-com">/// never be reported as using the microphone.</span></span>
-<span class="ln" id="L163">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L164">    <span class="tok-kw">fn</span> <span class="tok-fn">playback_nodes_are_not_microphone_use</span>() {</span>
-<span class="ln" id="L165">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/pcmC0D0p&quot;</span>)), None);</span>
-<span class="ln" id="L166">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/controlC0&quot;</span>)), None);</span>
-<span class="ln" id="L167">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/timer&quot;</span>)), None);</span>
-<span class="ln" id="L168">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/seq&quot;</span>)), None);</span>
-<span class="ln" id="L169">    }</span>
-<span class="ln" id="L170"></span>
-<span class="ln" id="L171">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L172">    <span class="tok-kw">fn</span> <span class="tok-fn">video_nodes_are_camera_use</span>() {</span>
-<span class="ln" id="L173">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/video0&quot;</span>)), <span class="tok-fn">Some</span>(DeviceKind::Camera));</span>
-<span class="ln" id="L174">        assert_eq!(</span>
-<span class="ln" id="L175">            <span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/video12&quot;</span>)),</span>
-<span class="ln" id="L176">            <span class="tok-fn">Some</span>(DeviceKind::Camera)</span>
-<span class="ln" id="L177">        );</span>
-<span class="ln" id="L178">    }</span>
-<span class="ln" id="L179"></span>
+<span class="ln" id="L161"></span>
+<span class="ln" id="L162"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L163"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L164">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L165"></span>
+<span class="ln" id="L166">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L167">    <span class="tok-kw">fn</span> <span class="tok-fn">capture_nodes_are_recognised</span>() {</span>
+<span class="ln" id="L168">        assert_eq!(</span>
+<span class="ln" id="L169">            <span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/pcmC0D0c&quot;</span>)),</span>
+<span class="ln" id="L170">            <span class="tok-fn">Some</span>(DeviceKind::Microphone)</span>
+<span class="ln" id="L171">        );</span>
+<span class="ln" id="L172">        assert_eq!(</span>
+<span class="ln" id="L173">            <span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/pcmC1D2c&quot;</span>)),</span>
+<span class="ln" id="L174">            <span class="tok-fn">Some</span>(DeviceKind::Microphone)</span>
+<span class="ln" id="L175">        );</span>
+<span class="ln" id="L176">    }</span>
+<span class="ln" id="L177"></span>
+<span class="ln" id="L178">    <span class="tok-com">/// The distinction that keeps this feature trustworthy: playing music must</span></span>
+<span class="ln" id="L179">    <span class="tok-com">/// never be reported as using the microphone.</span></span>
 <span class="ln" id="L180">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L181">    <span class="tok-kw">fn</span> <span class="tok-fn">ordinary_files_are_ignored</span>() {</span>
-<span class="ln" id="L182">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L183">            <span class="tok-str">&quot;/home/user/notes.txt&quot;</span>,</span>
-<span class="ln" id="L184">            <span class="tok-str">&quot;/dev/null&quot;</span>,</span>
-<span class="ln" id="L185">            <span class="tok-str">&quot;/dev/urandom&quot;</span>,</span>
-<span class="ln" id="L186">            <span class="tok-str">&quot;/tmp/x&quot;</span>,</span>
-<span class="ln" id="L187">        ] {</span>
-<span class="ln" id="L188">            assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(path)), None, <span class="tok-str">&quot;{path}&quot;</span>);</span>
-<span class="ln" id="L189">        }</span>
-<span class="ln" id="L190">    }</span>
-<span class="ln" id="L191"></span>
-<span class="ln" id="L192">    <span class="tok-com">/// Scanning must survive a machine where most of /proc is unreadable.</span></span>
-<span class="ln" id="L193">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L194">    <span class="tok-kw">fn</span> <span class="tok-fn">scanning_does_not_fail_on_inaccessible_processes</span>() {</span>
-<span class="ln" id="L195">        <span class="tok-kw">let</span> entries = <span class="tok-fn">scan</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a scan should not fail outright&quot;</span>);</span>
-<span class="ln" id="L196">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> &amp;entries {</span>
-<span class="ln" id="L197">            assert!(entry.pid.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;Linux always knows the PID&quot;</span>);</span>
-<span class="ln" id="L198">            assert!(!entry.app.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L199">        }</span>
-<span class="ln" id="L200">    }</span>
-<span class="ln" id="L201">}</span>
+<span class="ln" id="L181">    <span class="tok-kw">fn</span> <span class="tok-fn">playback_nodes_are_not_microphone_use</span>() {</span>
+<span class="ln" id="L182">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/pcmC0D0p&quot;</span>)), None);</span>
+<span class="ln" id="L183">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/controlC0&quot;</span>)), None);</span>
+<span class="ln" id="L184">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/timer&quot;</span>)), None);</span>
+<span class="ln" id="L185">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/snd/seq&quot;</span>)), None);</span>
+<span class="ln" id="L186">    }</span>
+<span class="ln" id="L187"></span>
+<span class="ln" id="L188">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L189">    <span class="tok-kw">fn</span> <span class="tok-fn">video_nodes_are_camera_use</span>() {</span>
+<span class="ln" id="L190">        assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/video0&quot;</span>)), <span class="tok-fn">Some</span>(DeviceKind::Camera));</span>
+<span class="ln" id="L191">        assert_eq!(</span>
+<span class="ln" id="L192">            <span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/dev/video12&quot;</span>)),</span>
+<span class="ln" id="L193">            <span class="tok-fn">Some</span>(DeviceKind::Camera)</span>
+<span class="ln" id="L194">        );</span>
+<span class="ln" id="L195">    }</span>
+<span class="ln" id="L196"></span>
+<span class="ln" id="L197">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L198">    <span class="tok-kw">fn</span> <span class="tok-fn">ordinary_files_are_ignored</span>() {</span>
+<span class="ln" id="L199">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L200">            <span class="tok-str">&quot;/home/user/notes.txt&quot;</span>,</span>
+<span class="ln" id="L201">            <span class="tok-str">&quot;/dev/null&quot;</span>,</span>
+<span class="ln" id="L202">            <span class="tok-str">&quot;/dev/urandom&quot;</span>,</span>
+<span class="ln" id="L203">            <span class="tok-str">&quot;/tmp/x&quot;</span>,</span>
+<span class="ln" id="L204">        ] {</span>
+<span class="ln" id="L205">            assert_eq!(<span class="tok-fn">classify</span>(Path::<span class="tok-fn">new</span>(path)), None, <span class="tok-str">&quot;{path}&quot;</span>);</span>
+<span class="ln" id="L206">        }</span>
+<span class="ln" id="L207">    }</span>
+<span class="ln" id="L208"></span>
+<span class="ln" id="L209">    <span class="tok-com">/// Scanning must survive a machine where most of /proc is unreadable.</span></span>
+<span class="ln" id="L210">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L211">    <span class="tok-kw">fn</span> <span class="tok-fn">scanning_does_not_fail_on_inaccessible_processes</span>() {</span>
+<span class="ln" id="L212">        <span class="tok-kw">let</span> entries = <span class="tok-fn">scan</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a scan should not fail outright&quot;</span>);</span>
+<span class="ln" id="L213">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> &amp;entries {</span>
+<span class="ln" id="L214">            assert!(entry.pid.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;Linux always knows the PID&quot;</span>);</span>
+<span class="ln" id="L215">            assert!(!entry.app.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L216">        }</span>
+<span class="ln" id="L217">    }</span>
+<span class="ln" id="L218">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

@@ -438,6 +438,13 @@ impl Policy {
     }
 }
 
+/// One line of a policy file as the requirement it names.
+///
+/// The name is matched exactly and an unknown one is an error rather than a
+/// line to skip. A policy is somebody else's instruction about what this
+/// program may do, so a requirement that is quietly ignored because it was
+/// misspelled is the worst outcome available: the person who wrote it believes
+/// it is in force. The line number is carried in so the error can say where.
 fn requirement_from(name: &str, argument: Option<&str>, line: usize) -> Result<Requirement, Error> {
     match name {
         "encrypt-recordings" => Ok(Requirement::EncryptRecordings),

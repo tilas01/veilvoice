@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-meta/src/wav.rs</code></h1>
-<p style="color:var(--muted)"><a href="wav.html">what this file is for</a> &middot; <a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 425 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="wav.html">what this file is for</a> &middot; <a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 432 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -238,271 +238,278 @@
 </span>
 <span class="ln" id="L161"></span>
 <span class="src-item" id="fn-show">
-<span class="ln" id="L162"><span class="tok-kw">fn</span> <span class="tok-fn">show</span>(id: &amp;[u8; <span class="tok-num">4</span>]) -&gt; String {</span>
-<span class="ln" id="L163">    String::<span class="tok-fn">from_utf8_lossy</span>(id).<span class="tok-fn">trim_end</span>().<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L164">}</span>
+<span class="ln" id="L162"><span class="tok-com">/// A four-character chunk identifier as text, for a report a person reads.</span></span>
+<span class="ln" id="L163"><span class="tok-com">///</span></span>
+<span class="ln" id="L164"><span class="tok-com">/// Lossy on purpose: an identifier is four bytes and nothing guarantees they</span></span>
+<span class="ln" id="L165"><span class="tok-com">/// are ASCII, so a malformed file must be describable rather than able to stop</span></span>
+<span class="ln" id="L166"><span class="tok-com">/// the report being written. Trailing spaces go because the format pads short</span></span>
+<span class="ln" id="L167"><span class="tok-com">/// identifiers with them, and `LIST ` in a list of what was removed reads as a</span></span>
+<span class="ln" id="L168"><span class="tok-com">/// typo.</span></span>
+<span class="ln" id="L169"><span class="tok-kw">fn</span> <span class="tok-fn">show</span>(id: &amp;[u8; <span class="tok-num">4</span>]) -&gt; String {</span>
+<span class="ln" id="L170">    String::<span class="tok-fn">from_utf8_lossy</span>(id).<span class="tok-fn">trim_end</span>().<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L171">}</span>
 </span>
-<span class="ln" id="L165"></span>
-<span class="ln" id="L166"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L167"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L168">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L169"></span>
-<span class="ln" id="L170">    <span class="tok-kw">fn</span> <span class="tok-fn">chunk</span>(id: &amp;[u8; <span class="tok-num">4</span>], payload: &amp;[u8]) -&gt; Vec&lt;u8&gt; {</span>
-<span class="ln" id="L171">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> c = Vec::<span class="tok-fn">from</span>(*id);</span>
-<span class="ln" id="L172">        c.<span class="tok-fn">extend_from_slice</span>(&amp;(payload.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L173">        c.<span class="tok-fn">extend_from_slice</span>(payload);</span>
-<span class="ln" id="L174">        <span class="tok-kw">if</span> payload.<span class="tok-fn">len</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L175">            c.<span class="tok-fn">push</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L176">        }</span>
-<span class="ln" id="L177">        c</span>
-<span class="ln" id="L178">    }</span>
-<span class="ln" id="L179"></span>
-<span class="ln" id="L180">    <span class="tok-com">/// A WAV carrying audio plus several places metadata likes to hide.</span></span>
-<span class="ln" id="L181">    <span class="tok-kw">fn</span> <span class="tok-fn">dirty_wav</span>() -&gt; Vec&lt;u8&gt; {</span>
-<span class="ln" id="L182">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L183">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(</span>
-<span class="ln" id="L184">            b<span class="tok-str">&quot;fmt &quot;</span>,</span>
-<span class="ln" id="L185">            &amp;[<span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">128</span>, <span class="tok-num">187</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">119</span>, <span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-num">16</span>, <span class="tok-num">0</span>],</span>
-<span class="ln" id="L186">        ));</span>
-<span class="ln" id="L187">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;LIST&quot;</span>, b<span class="tok-str">&quot;INFOIART\x0f\x00\x00\x00Jane Real Name\0&quot;</span>));</span>
-<span class="ln" id="L188">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(</span>
-<span class="ln" id="L189">            b<span class="tok-str">&quot;id3 &quot;</span>,</span>
-<span class="ln" id="L190">            b<span class="tok-str">&quot;ID3\x03\x00\x00\x00\x00\x00\x00TPE1 Jane Real Name&quot;</span>,</span>
-<span class="ln" id="L191">        ));</span>
-<span class="ln" id="L192">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;bext&quot;</span>, b<span class="tok-str">&quot;Originator: SomePhone SN#12345&quot;</span>));</span>
-<span class="ln" id="L193">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;data&quot;</span>, &amp;[1u8, <span class="tok-num">2</span>, <span class="tok-num">3</span>, <span class="tok-num">4</span>, <span class="tok-num">5</span>, <span class="tok-num">6</span>, <span class="tok-num">7</span>, <span class="tok-num">8</span>]));</span>
-<span class="ln" id="L194">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(</span>
-<span class="ln" id="L195">            b<span class="tok-str">&quot;iXML&quot;</span>,</span>
-<span class="ln" id="L196">            b<span class="tok-str">&quot;&lt;BWFXML&gt;&lt;PROJECT&gt;Secret&lt;/PROJECT&gt;&lt;/BWFXML&gt;&quot;</span>,</span>
-<span class="ln" id="L197">        ));</span>
-<span class="ln" id="L198"></span>
-<span class="ln" id="L199">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L200">        out.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L201">        out.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
-<span class="ln" id="L202">        out.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
-<span class="ln" id="L203">        out</span>
-<span class="ln" id="L204">    }</span>
+<span class="ln" id="L172"></span>
+<span class="ln" id="L173"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L174"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L175">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L176"></span>
+<span class="ln" id="L177">    <span class="tok-kw">fn</span> <span class="tok-fn">chunk</span>(id: &amp;[u8; <span class="tok-num">4</span>], payload: &amp;[u8]) -&gt; Vec&lt;u8&gt; {</span>
+<span class="ln" id="L178">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> c = Vec::<span class="tok-fn">from</span>(*id);</span>
+<span class="ln" id="L179">        c.<span class="tok-fn">extend_from_slice</span>(&amp;(payload.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L180">        c.<span class="tok-fn">extend_from_slice</span>(payload);</span>
+<span class="ln" id="L181">        <span class="tok-kw">if</span> payload.<span class="tok-fn">len</span>() % <span class="tok-num">2</span> == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L182">            c.<span class="tok-fn">push</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L183">        }</span>
+<span class="ln" id="L184">        c</span>
+<span class="ln" id="L185">    }</span>
+<span class="ln" id="L186"></span>
+<span class="ln" id="L187">    <span class="tok-com">/// A WAV carrying audio plus several places metadata likes to hide.</span></span>
+<span class="ln" id="L188">    <span class="tok-kw">fn</span> <span class="tok-fn">dirty_wav</span>() -&gt; Vec&lt;u8&gt; {</span>
+<span class="ln" id="L189">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L190">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(</span>
+<span class="ln" id="L191">            b<span class="tok-str">&quot;fmt &quot;</span>,</span>
+<span class="ln" id="L192">            &amp;[<span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">128</span>, <span class="tok-num">187</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">119</span>, <span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-num">16</span>, <span class="tok-num">0</span>],</span>
+<span class="ln" id="L193">        ));</span>
+<span class="ln" id="L194">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;LIST&quot;</span>, b<span class="tok-str">&quot;INFOIART\x0f\x00\x00\x00Jane Real Name\0&quot;</span>));</span>
+<span class="ln" id="L195">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(</span>
+<span class="ln" id="L196">            b<span class="tok-str">&quot;id3 &quot;</span>,</span>
+<span class="ln" id="L197">            b<span class="tok-str">&quot;ID3\x03\x00\x00\x00\x00\x00\x00TPE1 Jane Real Name&quot;</span>,</span>
+<span class="ln" id="L198">        ));</span>
+<span class="ln" id="L199">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;bext&quot;</span>, b<span class="tok-str">&quot;Originator: SomePhone SN#12345&quot;</span>));</span>
+<span class="ln" id="L200">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;data&quot;</span>, &amp;[1u8, <span class="tok-num">2</span>, <span class="tok-num">3</span>, <span class="tok-num">4</span>, <span class="tok-num">5</span>, <span class="tok-num">6</span>, <span class="tok-num">7</span>, <span class="tok-num">8</span>]));</span>
+<span class="ln" id="L201">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(</span>
+<span class="ln" id="L202">            b<span class="tok-str">&quot;iXML&quot;</span>,</span>
+<span class="ln" id="L203">            b<span class="tok-str">&quot;&lt;BWFXML&gt;&lt;PROJECT&gt;Secret&lt;/PROJECT&gt;&lt;/BWFXML&gt;&quot;</span>,</span>
+<span class="ln" id="L204">        ));</span>
 <span class="ln" id="L205"></span>
-<span class="ln" id="L206">    <span class="tok-kw">fn</span> <span class="tok-fn">find</span>(bytes: &amp;[u8], needle: &amp;[u8]) -&gt; bool {</span>
-<span class="ln" id="L207">        bytes.<span class="tok-fn">windows</span>(needle.<span class="tok-fn">len</span>()).<span class="tok-fn">any</span>(|w| w == needle)</span>
-<span class="ln" id="L208">    }</span>
-<span class="ln" id="L209"></span>
-<span class="ln" id="L210">    <span class="tok-com">/// The bland tags written in are themselves a well-formed RIFF list.</span></span>
-<span class="ln" id="L211">    <span class="tok-com">///</span></span>
-<span class="ln" id="L212">    <span class="tok-com">/// Stripping metadata is a signal, so plausible tags go in instead; that</span></span>
-<span class="ln" id="L213">    <span class="tok-com">/// only works if a reader walking them by declared length lands on the end.</span></span>
-<span class="ln" id="L214">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L215">    <span class="tok-kw">fn</span> <span class="tok-fn">the_bland_metadata_written_in_is_word_aligned_and_walkable</span>() {</span>
-<span class="ln" id="L216">        <span class="tok-kw">let</span> whole = <span class="tok-fn">info_chunk</span>();</span>
-<span class="ln" id="L217">        assert_eq!(&amp;whole[..<span class="tok-num">4</span>], b<span class="tok-str">&quot;LIST&quot;</span>, <span class="tok-str">&quot;the tags are carried in a LIST chunk&quot;</span>);</span>
-<span class="ln" id="L218">        <span class="tok-kw">let</span> declared = u32::<span class="tok-fn">from_le_bytes</span>(whole[<span class="tok-num">4</span>..<span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
-<span class="ln" id="L219">        assert_eq!(</span>
-<span class="ln" id="L220">            declared,</span>
-<span class="ln" id="L221">            whole.<span class="tok-fn">len</span>() - <span class="tok-num">8</span>,</span>
-<span class="ln" id="L222">            <span class="tok-str">&quot;the LIST header must describe exactly what follows it&quot;</span></span>
-<span class="ln" id="L223">        );</span>
-<span class="ln" id="L224">        <span class="tok-kw">let</span> info = &amp;whole[<span class="tok-num">8</span>..];</span>
-<span class="ln" id="L225">        assert_eq!(&amp;info[..<span class="tok-num">4</span>], b<span class="tok-str">&quot;INFO&quot;</span>, <span class="tok-str">&quot;a LIST body starts by naming its type&quot;</span>);</span>
-<span class="ln" id="L226"></span>
-<span class="ln" id="L227">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pos = <span class="tok-num">4</span>;</span>
-<span class="ln" id="L228">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = <span class="tok-num">0</span>;</span>
-<span class="ln" id="L229">        while pos &lt; info.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L230">            assert!(</span>
-<span class="ln" id="L231">                pos + <span class="tok-num">8</span> &lt;= info.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L232">                <span class="tok-str">&quot;an INFO entry needs eight bytes of header and only {} remain&quot;</span>,</span>
-<span class="ln" id="L233">                info.<span class="tok-fn">len</span>() - pos</span>
-<span class="ln" id="L234">            );</span>
-<span class="ln" id="L235">            <span class="tok-kw">let</span> size = u32::<span class="tok-fn">from_le_bytes</span>(info[pos + <span class="tok-num">4</span>..pos + <span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
-<span class="ln" id="L236">            assert_eq!(</span>
-<span class="ln" id="L237">                size % <span class="tok-num">2</span>,</span>
-<span class="ln" id="L238">                <span class="tok-num">0</span>,</span>
-<span class="ln" id="L239">                <span class="tok-str">&quot;entry {} declares {size} bytes, which is not word aligned&quot;</span>,</span>
-<span class="ln" id="L240">                <span class="tok-fn">show</span>(&amp;info[pos..pos + <span class="tok-num">4</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>())</span>
+<span class="ln" id="L206">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L207">        out.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L208">        out.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
+<span class="ln" id="L209">        out.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
+<span class="ln" id="L210">        out</span>
+<span class="ln" id="L211">    }</span>
+<span class="ln" id="L212"></span>
+<span class="ln" id="L213">    <span class="tok-kw">fn</span> <span class="tok-fn">find</span>(bytes: &amp;[u8], needle: &amp;[u8]) -&gt; bool {</span>
+<span class="ln" id="L214">        bytes.<span class="tok-fn">windows</span>(needle.<span class="tok-fn">len</span>()).<span class="tok-fn">any</span>(|w| w == needle)</span>
+<span class="ln" id="L215">    }</span>
+<span class="ln" id="L216"></span>
+<span class="ln" id="L217">    <span class="tok-com">/// The bland tags written in are themselves a well-formed RIFF list.</span></span>
+<span class="ln" id="L218">    <span class="tok-com">///</span></span>
+<span class="ln" id="L219">    <span class="tok-com">/// Stripping metadata is a signal, so plausible tags go in instead; that</span></span>
+<span class="ln" id="L220">    <span class="tok-com">/// only works if a reader walking them by declared length lands on the end.</span></span>
+<span class="ln" id="L221">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L222">    <span class="tok-kw">fn</span> <span class="tok-fn">the_bland_metadata_written_in_is_word_aligned_and_walkable</span>() {</span>
+<span class="ln" id="L223">        <span class="tok-kw">let</span> whole = <span class="tok-fn">info_chunk</span>();</span>
+<span class="ln" id="L224">        assert_eq!(&amp;whole[..<span class="tok-num">4</span>], b<span class="tok-str">&quot;LIST&quot;</span>, <span class="tok-str">&quot;the tags are carried in a LIST chunk&quot;</span>);</span>
+<span class="ln" id="L225">        <span class="tok-kw">let</span> declared = u32::<span class="tok-fn">from_le_bytes</span>(whole[<span class="tok-num">4</span>..<span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L226">        assert_eq!(</span>
+<span class="ln" id="L227">            declared,</span>
+<span class="ln" id="L228">            whole.<span class="tok-fn">len</span>() - <span class="tok-num">8</span>,</span>
+<span class="ln" id="L229">            <span class="tok-str">&quot;the LIST header must describe exactly what follows it&quot;</span></span>
+<span class="ln" id="L230">        );</span>
+<span class="ln" id="L231">        <span class="tok-kw">let</span> info = &amp;whole[<span class="tok-num">8</span>..];</span>
+<span class="ln" id="L232">        assert_eq!(&amp;info[..<span class="tok-num">4</span>], b<span class="tok-str">&quot;INFO&quot;</span>, <span class="tok-str">&quot;a LIST body starts by naming its type&quot;</span>);</span>
+<span class="ln" id="L233"></span>
+<span class="ln" id="L234">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pos = <span class="tok-num">4</span>;</span>
+<span class="ln" id="L235">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L236">        while pos &lt; info.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L237">            assert!(</span>
+<span class="ln" id="L238">                pos + <span class="tok-num">8</span> &lt;= info.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L239">                <span class="tok-str">&quot;an INFO entry needs eight bytes of header and only {} remain&quot;</span>,</span>
+<span class="ln" id="L240">                info.<span class="tok-fn">len</span>() - pos</span>
 <span class="ln" id="L241">            );</span>
-<span class="ln" id="L242">            <span class="tok-kw">let</span> text = &amp;info[pos + <span class="tok-num">8</span>..pos + <span class="tok-num">8</span> + size];</span>
-<span class="ln" id="L243">            assert!(</span>
-<span class="ln" id="L244">                text.<span class="tok-fn">contains</span>(&amp;<span class="tok-num">0</span>),</span>
-<span class="ln" id="L245">                <span class="tok-str">&quot;an INFO string is NUL terminated: {text:?}&quot;</span></span>
-<span class="ln" id="L246">            );</span>
-<span class="ln" id="L247">            pos += <span class="tok-num">8</span> + size;</span>
-<span class="ln" id="L248">            seen += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L249">        }</span>
-<span class="ln" id="L250">        assert_eq!(pos, info.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;the entries must consume the whole chunk&quot;</span>);</span>
-<span class="ln" id="L251">        assert_eq!(</span>
-<span class="ln" id="L252">            seen,</span>
-<span class="ln" id="L253">            REALISTIC_INFO.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L254">            <span class="tok-str">&quot;every tag in the table has to come out the other side&quot;</span></span>
-<span class="ln" id="L255">        );</span>
-<span class="ln" id="L256">    }</span>
-<span class="ln" id="L257"></span>
-<span class="ln" id="L258">    <span class="tok-com">/// An odd-sized last chunk with no pad byte after it, which is what a</span></span>
-<span class="ln" id="L259">    <span class="tok-com">/// truncated recording looks like.</span></span>
-<span class="ln" id="L260">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L261">    <span class="tok-kw">fn</span> <span class="tok-fn">an_odd_chunk_at_the_very_end_is_not_read_past</span>() {</span>
-<span class="ln" id="L262">        <span class="tok-com">// `data` with three bytes and no pad byte after it: technically</span></span>
-<span class="ln" id="L263">        <span class="tok-com">// malformed, and exactly what a truncated recording looks like.</span></span>
-<span class="ln" id="L264">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;fmt &quot;</span>);</span>
-<span class="ln" id="L265">        body.<span class="tok-fn">extend_from_slice</span>(&amp;16u32.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L266">        body.<span class="tok-fn">extend_from_slice</span>(&amp;[<span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">128</span>, <span class="tok-num">187</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">119</span>, <span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-num">16</span>, <span class="tok-num">0</span>]);</span>
-<span class="ln" id="L267">        body.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;data&quot;</span>);</span>
-<span class="ln" id="L268">        body.<span class="tok-fn">extend_from_slice</span>(&amp;3u32.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L269">        body.<span class="tok-fn">extend_from_slice</span>(&amp;[<span class="tok-num">9</span>, <span class="tok-num">9</span>, <span class="tok-num">9</span>]);</span>
-<span class="ln" id="L270"></span>
-<span class="ln" id="L271">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L272">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L273">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
-<span class="ln" id="L274">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
-<span class="ln" id="L275"></span>
-<span class="ln" id="L276">        <span class="tok-kw">let</span> (cleaned, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip)</span>
-<span class="ln" id="L277">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a last chunk without its pad byte is still readable&quot;</span>);</span>
-<span class="ln" id="L278"></span>
-<span class="ln" id="L279">        <span class="tok-com">// The three bytes come through, and nothing that was never in the file</span></span>
-<span class="ln" id="L280">        <span class="tok-com">// comes with them.</span></span>
-<span class="ln" id="L281">        assert!(<span class="tok-fn">find</span>(&amp;cleaned, &amp;[<span class="tok-num">9</span>, <span class="tok-num">9</span>, <span class="tok-num">9</span>]), <span class="tok-str">&quot;the samples survive&quot;</span>);</span>
-<span class="ln" id="L282">        assert_eq!(</span>
-<span class="ln" id="L283">            cleaned.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L284">            wav.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L285">            <span class="tok-str">&quot;and nothing was invented to pad them: {} in, {} out&quot;</span>,</span>
-<span class="ln" id="L286">            wav.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L287">            cleaned.<span class="tok-fn">len</span>()</span>
-<span class="ln" id="L288">        );</span>
-<span class="ln" id="L289">    }</span>
-<span class="ln" id="L290"></span>
-<span class="ln" id="L291">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L292">    <span class="tok-kw">fn</span> <span class="tok-fn">recognises_wav</span>() {</span>
-<span class="ln" id="L293">        assert!(<span class="tok-fn">is_wav</span>(&amp;<span class="tok-fn">dirty_wav</span>()));</span>
-<span class="ln" id="L294">        assert!(!<span class="tok-fn">is_wav</span>(b<span class="tok-str">&quot;not a wav file at all&quot;</span>));</span>
-<span class="ln" id="L295">        assert!(!<span class="tok-fn">is_wav</span>(b<span class="tok-str">&quot;RIFF____AVI &quot;</span>));</span>
+<span class="ln" id="L242">            <span class="tok-kw">let</span> size = u32::<span class="tok-fn">from_le_bytes</span>(info[pos + <span class="tok-num">4</span>..pos + <span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L243">            assert_eq!(</span>
+<span class="ln" id="L244">                size % <span class="tok-num">2</span>,</span>
+<span class="ln" id="L245">                <span class="tok-num">0</span>,</span>
+<span class="ln" id="L246">                <span class="tok-str">&quot;entry {} declares {size} bytes, which is not word aligned&quot;</span>,</span>
+<span class="ln" id="L247">                <span class="tok-fn">show</span>(&amp;info[pos..pos + <span class="tok-num">4</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>())</span>
+<span class="ln" id="L248">            );</span>
+<span class="ln" id="L249">            <span class="tok-kw">let</span> text = &amp;info[pos + <span class="tok-num">8</span>..pos + <span class="tok-num">8</span> + size];</span>
+<span class="ln" id="L250">            assert!(</span>
+<span class="ln" id="L251">                text.<span class="tok-fn">contains</span>(&amp;<span class="tok-num">0</span>),</span>
+<span class="ln" id="L252">                <span class="tok-str">&quot;an INFO string is NUL terminated: {text:?}&quot;</span></span>
+<span class="ln" id="L253">            );</span>
+<span class="ln" id="L254">            pos += <span class="tok-num">8</span> + size;</span>
+<span class="ln" id="L255">            seen += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L256">        }</span>
+<span class="ln" id="L257">        assert_eq!(pos, info.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;the entries must consume the whole chunk&quot;</span>);</span>
+<span class="ln" id="L258">        assert_eq!(</span>
+<span class="ln" id="L259">            seen,</span>
+<span class="ln" id="L260">            REALISTIC_INFO.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L261">            <span class="tok-str">&quot;every tag in the table has to come out the other side&quot;</span></span>
+<span class="ln" id="L262">        );</span>
+<span class="ln" id="L263">    }</span>
+<span class="ln" id="L264"></span>
+<span class="ln" id="L265">    <span class="tok-com">/// An odd-sized last chunk with no pad byte after it, which is what a</span></span>
+<span class="ln" id="L266">    <span class="tok-com">/// truncated recording looks like.</span></span>
+<span class="ln" id="L267">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L268">    <span class="tok-kw">fn</span> <span class="tok-fn">an_odd_chunk_at_the_very_end_is_not_read_past</span>() {</span>
+<span class="ln" id="L269">        <span class="tok-com">// `data` with three bytes and no pad byte after it: technically</span></span>
+<span class="ln" id="L270">        <span class="tok-com">// malformed, and exactly what a truncated recording looks like.</span></span>
+<span class="ln" id="L271">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;fmt &quot;</span>);</span>
+<span class="ln" id="L272">        body.<span class="tok-fn">extend_from_slice</span>(&amp;16u32.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L273">        body.<span class="tok-fn">extend_from_slice</span>(&amp;[<span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">128</span>, <span class="tok-num">187</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">119</span>, <span class="tok-num">1</span>, <span class="tok-num">0</span>, <span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-num">16</span>, <span class="tok-num">0</span>]);</span>
+<span class="ln" id="L274">        body.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;data&quot;</span>);</span>
+<span class="ln" id="L275">        body.<span class="tok-fn">extend_from_slice</span>(&amp;3u32.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L276">        body.<span class="tok-fn">extend_from_slice</span>(&amp;[<span class="tok-num">9</span>, <span class="tok-num">9</span>, <span class="tok-num">9</span>]);</span>
+<span class="ln" id="L277"></span>
+<span class="ln" id="L278">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L279">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L280">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
+<span class="ln" id="L281">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
+<span class="ln" id="L282"></span>
+<span class="ln" id="L283">        <span class="tok-kw">let</span> (cleaned, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip)</span>
+<span class="ln" id="L284">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a last chunk without its pad byte is still readable&quot;</span>);</span>
+<span class="ln" id="L285"></span>
+<span class="ln" id="L286">        <span class="tok-com">// The three bytes come through, and nothing that was never in the file</span></span>
+<span class="ln" id="L287">        <span class="tok-com">// comes with them.</span></span>
+<span class="ln" id="L288">        assert!(<span class="tok-fn">find</span>(&amp;cleaned, &amp;[<span class="tok-num">9</span>, <span class="tok-num">9</span>, <span class="tok-num">9</span>]), <span class="tok-str">&quot;the samples survive&quot;</span>);</span>
+<span class="ln" id="L289">        assert_eq!(</span>
+<span class="ln" id="L290">            cleaned.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L291">            wav.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L292">            <span class="tok-str">&quot;and nothing was invented to pad them: {} in, {} out&quot;</span>,</span>
+<span class="ln" id="L293">            wav.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L294">            cleaned.<span class="tok-fn">len</span>()</span>
+<span class="ln" id="L295">        );</span>
 <span class="ln" id="L296">    }</span>
 <span class="ln" id="L297"></span>
 <span class="ln" id="L298">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L299">    <span class="tok-kw">fn</span> <span class="tok-fn">every_metadata_chunk_is_dropped</span>() {</span>
-<span class="ln" id="L300">        <span class="tok-kw">let</span> (clean, report) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L301">        assert!(report.changed);</span>
-<span class="ln" id="L302">        <span class="tok-kw">for</span> id <span class="tok-kw">in</span> [<span class="tok-str">&quot;LIST&quot;</span>, <span class="tok-str">&quot;id3&quot;</span>, <span class="tok-str">&quot;bext&quot;</span>, <span class="tok-str">&quot;iXML&quot;</span>] {</span>
-<span class="ln" id="L303">            assert!(report.removed.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|r| r == id), <span class="tok-str">&quot;{id} not reported&quot;</span>);</span>
-<span class="ln" id="L304">            assert!(!<span class="tok-fn">find</span>(&amp;clean, id.<span class="tok-fn">as_bytes</span>()), <span class="tok-str">&quot;{id} chunk survived&quot;</span>);</span>
-<span class="ln" id="L305">        }</span>
-<span class="ln" id="L306">    }</span>
-<span class="ln" id="L307"></span>
-<span class="ln" id="L308">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L309">    <span class="tok-kw">fn</span> <span class="tok-fn">identifying_strings_are_gone</span>() {</span>
-<span class="ln" id="L310">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L311">        <span class="tok-kw">for</span> needle <span class="tok-kw">in</span> [&amp;b<span class="tok-str">&quot;Jane Real Name&quot;</span>[..], b<span class="tok-str">&quot;SomePhone&quot;</span>, b<span class="tok-str">&quot;SN#12345&quot;</span>, b<span class="tok-str">&quot;Secret&quot;</span>] {</span>
-<span class="ln" id="L312">            assert!(</span>
-<span class="ln" id="L313">                !<span class="tok-fn">find</span>(&amp;clean, needle),</span>
-<span class="ln" id="L314">                <span class="tok-str">&quot;{} survived&quot;</span>,</span>
-<span class="ln" id="L315">                String::<span class="tok-fn">from_utf8_lossy</span>(needle)</span>
-<span class="ln" id="L316">            );</span>
-<span class="ln" id="L317">        }</span>
-<span class="ln" id="L318">    }</span>
-<span class="ln" id="L319"></span>
-<span class="ln" id="L320">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L321">    <span class="tok-kw">fn</span> <span class="tok-fn">audio_and_format_survive_intact</span>() {</span>
-<span class="ln" id="L322">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L323">        assert!(<span class="tok-fn">is_wav</span>(&amp;clean));</span>
-<span class="ln" id="L324">        assert!(<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;fmt &quot;</span>), <span class="tok-str">&quot;format chunk lost&quot;</span>);</span>
-<span class="ln" id="L325">        assert!(<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;data&quot;</span>), <span class="tok-str">&quot;audio chunk lost&quot;</span>);</span>
-<span class="ln" id="L326">        assert!(<span class="tok-fn">find</span>(&amp;clean, &amp;[1u8, <span class="tok-num">2</span>, <span class="tok-num">3</span>, <span class="tok-num">4</span>, <span class="tok-num">5</span>, <span class="tok-num">6</span>, <span class="tok-num">7</span>, <span class="tok-num">8</span>]), <span class="tok-str">&quot;samples lost&quot;</span>);</span>
-<span class="ln" id="L327">    }</span>
-<span class="ln" id="L328"></span>
-<span class="ln" id="L329">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L330">    <span class="tok-kw">fn</span> <span class="tok-fn">the_riff_size_header_is_corrected</span>() {</span>
-<span class="ln" id="L331">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L332">        <span class="tok-kw">let</span> declared = u32::<span class="tok-fn">from_le_bytes</span>(clean[<span class="tok-num">4</span>..<span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
-<span class="ln" id="L333">        assert_eq!(</span>
-<span class="ln" id="L334">            declared + <span class="tok-num">8</span>,</span>
-<span class="ln" id="L335">            clean.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L336">            <span class="tok-str">&quot;RIFF size must match the new length&quot;</span></span>
-<span class="ln" id="L337">        );</span>
-<span class="ln" id="L338">    }</span>
-<span class="ln" id="L339"></span>
-<span class="ln" id="L340">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L341">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_chunks_are_dropped_by_default</span>() {</span>
-<span class="ln" id="L342">        <span class="tok-com">// The whitelist bias: a chunk nobody has heard of must not survive.</span></span>
-<span class="ln" id="L343">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L344">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;fmt &quot;</span>, &amp;[0u8; <span class="tok-num">16</span>]));</span>
-<span class="ln" id="L345">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;data&quot;</span>, &amp;[9u8; <span class="tok-num">4</span>]));</span>
-<span class="ln" id="L346">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;zZz9&quot;</span>, b<span class="tok-str">&quot;invented chunk with a name inside&quot;</span>));</span>
-<span class="ln" id="L347">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L348">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L349">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
-<span class="ln" id="L350">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
-<span class="ln" id="L351"></span>
-<span class="ln" id="L352">        <span class="tok-kw">let</span> (clean, report) = <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L353">        assert!(report.removed.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|r| r == <span class="tok-str">&quot;zZz9&quot;</span>));</span>
-<span class="ln" id="L354">        assert!(!<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;invented chunk&quot;</span>));</span>
-<span class="ln" id="L355">    }</span>
-<span class="ln" id="L356"></span>
-<span class="ln" id="L357">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L358">    <span class="tok-kw">fn</span> <span class="tok-fn">odd_sized_chunks_keep_their_alignment</span>() {</span>
-<span class="ln" id="L359">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L360">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;fmt &quot;</span>, &amp;[0u8; <span class="tok-num">16</span>]));</span>
-<span class="ln" id="L361">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;data&quot;</span>, &amp;[7u8; <span class="tok-num">5</span>])); <span class="tok-com">// odd, needs a pad</span></span>
-<span class="ln" id="L362">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;LIST&quot;</span>, b<span class="tok-str">&quot;INFOsomething&quot;</span>));</span>
-<span class="ln" id="L363">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L364">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L365">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
-<span class="ln" id="L366">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
-<span class="ln" id="L367"></span>
-<span class="ln" id="L368">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L369">        <span class="tok-com">// Walk the result: every chunk must parse and land on an even boundary.</span></span>
-<span class="ln" id="L370">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pos = <span class="tok-num">12</span>;</span>
-<span class="ln" id="L371">        while pos + <span class="tok-num">8</span> &lt;= clean.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L372">            <span class="tok-kw">let</span> size = u32::<span class="tok-fn">from_le_bytes</span>(clean[pos + <span class="tok-num">4</span>..pos + <span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
-<span class="ln" id="L373">            pos += <span class="tok-num">8</span> + size + (size % <span class="tok-num">2</span>);</span>
-<span class="ln" id="L374">        }</span>
-<span class="ln" id="L375">        assert_eq!(</span>
-<span class="ln" id="L376">            pos,</span>
-<span class="ln" id="L377">            clean.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L378">            <span class="tok-str">&quot;chunk walk did not land exactly at the end&quot;</span></span>
-<span class="ln" id="L379">        );</span>
-<span class="ln" id="L380">    }</span>
-<span class="ln" id="L381"></span>
-<span class="ln" id="L382">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L383">    <span class="tok-kw">fn</span> <span class="tok-fn">realistic_mode_leaves_bland_tags_only</span>() {</span>
-<span class="ln" id="L384">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Realistic).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L385">        assert!(<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;Unknown Artist&quot;</span>), <span class="tok-str">&quot;expected placeholder tags&quot;</span>);</span>
-<span class="ln" id="L386">        assert!(!<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;Jane Real Name&quot;</span>), <span class="tok-str">&quot;real name survived&quot;</span>);</span>
+<span class="ln" id="L299">    <span class="tok-kw">fn</span> <span class="tok-fn">recognises_wav</span>() {</span>
+<span class="ln" id="L300">        assert!(<span class="tok-fn">is_wav</span>(&amp;<span class="tok-fn">dirty_wav</span>()));</span>
+<span class="ln" id="L301">        assert!(!<span class="tok-fn">is_wav</span>(b<span class="tok-str">&quot;not a wav file at all&quot;</span>));</span>
+<span class="ln" id="L302">        assert!(!<span class="tok-fn">is_wav</span>(b<span class="tok-str">&quot;RIFF____AVI &quot;</span>));</span>
+<span class="ln" id="L303">    }</span>
+<span class="ln" id="L304"></span>
+<span class="ln" id="L305">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L306">    <span class="tok-kw">fn</span> <span class="tok-fn">every_metadata_chunk_is_dropped</span>() {</span>
+<span class="ln" id="L307">        <span class="tok-kw">let</span> (clean, report) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L308">        assert!(report.changed);</span>
+<span class="ln" id="L309">        <span class="tok-kw">for</span> id <span class="tok-kw">in</span> [<span class="tok-str">&quot;LIST&quot;</span>, <span class="tok-str">&quot;id3&quot;</span>, <span class="tok-str">&quot;bext&quot;</span>, <span class="tok-str">&quot;iXML&quot;</span>] {</span>
+<span class="ln" id="L310">            assert!(report.removed.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|r| r == id), <span class="tok-str">&quot;{id} not reported&quot;</span>);</span>
+<span class="ln" id="L311">            assert!(!<span class="tok-fn">find</span>(&amp;clean, id.<span class="tok-fn">as_bytes</span>()), <span class="tok-str">&quot;{id} chunk survived&quot;</span>);</span>
+<span class="ln" id="L312">        }</span>
+<span class="ln" id="L313">    }</span>
+<span class="ln" id="L314"></span>
+<span class="ln" id="L315">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L316">    <span class="tok-kw">fn</span> <span class="tok-fn">identifying_strings_are_gone</span>() {</span>
+<span class="ln" id="L317">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L318">        <span class="tok-kw">for</span> needle <span class="tok-kw">in</span> [&amp;b<span class="tok-str">&quot;Jane Real Name&quot;</span>[..], b<span class="tok-str">&quot;SomePhone&quot;</span>, b<span class="tok-str">&quot;SN#12345&quot;</span>, b<span class="tok-str">&quot;Secret&quot;</span>] {</span>
+<span class="ln" id="L319">            assert!(</span>
+<span class="ln" id="L320">                !<span class="tok-fn">find</span>(&amp;clean, needle),</span>
+<span class="ln" id="L321">                <span class="tok-str">&quot;{} survived&quot;</span>,</span>
+<span class="ln" id="L322">                String::<span class="tok-fn">from_utf8_lossy</span>(needle)</span>
+<span class="ln" id="L323">            );</span>
+<span class="ln" id="L324">        }</span>
+<span class="ln" id="L325">    }</span>
+<span class="ln" id="L326"></span>
+<span class="ln" id="L327">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L328">    <span class="tok-kw">fn</span> <span class="tok-fn">audio_and_format_survive_intact</span>() {</span>
+<span class="ln" id="L329">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L330">        assert!(<span class="tok-fn">is_wav</span>(&amp;clean));</span>
+<span class="ln" id="L331">        assert!(<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;fmt &quot;</span>), <span class="tok-str">&quot;format chunk lost&quot;</span>);</span>
+<span class="ln" id="L332">        assert!(<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;data&quot;</span>), <span class="tok-str">&quot;audio chunk lost&quot;</span>);</span>
+<span class="ln" id="L333">        assert!(<span class="tok-fn">find</span>(&amp;clean, &amp;[1u8, <span class="tok-num">2</span>, <span class="tok-num">3</span>, <span class="tok-num">4</span>, <span class="tok-num">5</span>, <span class="tok-num">6</span>, <span class="tok-num">7</span>, <span class="tok-num">8</span>]), <span class="tok-str">&quot;samples lost&quot;</span>);</span>
+<span class="ln" id="L334">    }</span>
+<span class="ln" id="L335"></span>
+<span class="ln" id="L336">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L337">    <span class="tok-kw">fn</span> <span class="tok-fn">the_riff_size_header_is_corrected</span>() {</span>
+<span class="ln" id="L338">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L339">        <span class="tok-kw">let</span> declared = u32::<span class="tok-fn">from_le_bytes</span>(clean[<span class="tok-num">4</span>..<span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L340">        assert_eq!(</span>
+<span class="ln" id="L341">            declared + <span class="tok-num">8</span>,</span>
+<span class="ln" id="L342">            clean.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L343">            <span class="tok-str">&quot;RIFF size must match the new length&quot;</span></span>
+<span class="ln" id="L344">        );</span>
+<span class="ln" id="L345">    }</span>
+<span class="ln" id="L346"></span>
+<span class="ln" id="L347">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L348">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_chunks_are_dropped_by_default</span>() {</span>
+<span class="ln" id="L349">        <span class="tok-com">// The whitelist bias: a chunk nobody has heard of must not survive.</span></span>
+<span class="ln" id="L350">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L351">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;fmt &quot;</span>, &amp;[0u8; <span class="tok-num">16</span>]));</span>
+<span class="ln" id="L352">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;data&quot;</span>, &amp;[9u8; <span class="tok-num">4</span>]));</span>
+<span class="ln" id="L353">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;zZz9&quot;</span>, b<span class="tok-str">&quot;invented chunk with a name inside&quot;</span>));</span>
+<span class="ln" id="L354">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L355">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L356">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
+<span class="ln" id="L357">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
+<span class="ln" id="L358"></span>
+<span class="ln" id="L359">        <span class="tok-kw">let</span> (clean, report) = <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L360">        assert!(report.removed.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|r| r == <span class="tok-str">&quot;zZz9&quot;</span>));</span>
+<span class="ln" id="L361">        assert!(!<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;invented chunk&quot;</span>));</span>
+<span class="ln" id="L362">    }</span>
+<span class="ln" id="L363"></span>
+<span class="ln" id="L364">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L365">    <span class="tok-kw">fn</span> <span class="tok-fn">odd_sized_chunks_keep_their_alignment</span>() {</span>
+<span class="ln" id="L366">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L367">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;fmt &quot;</span>, &amp;[0u8; <span class="tok-num">16</span>]));</span>
+<span class="ln" id="L368">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;data&quot;</span>, &amp;[7u8; <span class="tok-num">5</span>])); <span class="tok-com">// odd, needs a pad</span></span>
+<span class="ln" id="L369">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;LIST&quot;</span>, b<span class="tok-str">&quot;INFOsomething&quot;</span>));</span>
+<span class="ln" id="L370">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L371">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L372">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
+<span class="ln" id="L373">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
+<span class="ln" id="L374"></span>
+<span class="ln" id="L375">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L376">        <span class="tok-com">// Walk the result: every chunk must parse and land on an even boundary.</span></span>
+<span class="ln" id="L377">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pos = <span class="tok-num">12</span>;</span>
+<span class="ln" id="L378">        while pos + <span class="tok-num">8</span> &lt;= clean.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L379">            <span class="tok-kw">let</span> size = u32::<span class="tok-fn">from_le_bytes</span>(clean[pos + <span class="tok-num">4</span>..pos + <span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L380">            pos += <span class="tok-num">8</span> + size + (size % <span class="tok-num">2</span>);</span>
+<span class="ln" id="L381">        }</span>
+<span class="ln" id="L382">        assert_eq!(</span>
+<span class="ln" id="L383">            pos,</span>
+<span class="ln" id="L384">            clean.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L385">            <span class="tok-str">&quot;chunk walk did not land exactly at the end&quot;</span></span>
+<span class="ln" id="L386">        );</span>
 <span class="ln" id="L387">    }</span>
 <span class="ln" id="L388"></span>
 <span class="ln" id="L389">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L390">    <span class="tok-kw">fn</span> <span class="tok-fn">cleaning_twice_is_stable</span>() {</span>
-<span class="ln" id="L391">        <span class="tok-kw">let</span> (once, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L392">        <span class="tok-kw">let</span> (twice, report) = <span class="tok-fn">clean_wav_bytes</span>(&amp;once, Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L393">        assert!(!report.changed, <span class="tok-str">&quot;a clean WAV needs no second pass&quot;</span>);</span>
-<span class="ln" id="L394">        assert_eq!(once, twice);</span>
-<span class="ln" id="L395">    }</span>
-<span class="ln" id="L396"></span>
-<span class="ln" id="L397">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L398">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lying_chunk_size_is_rejected_not_panicked</span>() {</span>
-<span class="ln" id="L399">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L400">        <span class="tok-kw">let</span> body_len = <span class="tok-num">8</span> + <span class="tok-num">8</span> + <span class="tok-num">4</span>;</span>
-<span class="ln" id="L401">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body_len + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L402">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
-<span class="ln" id="L403">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;fmt &quot;</span>);</span>
-<span class="ln" id="L404">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;0xFFFF_FFFFu32.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// absurd size</span></span>
-<span class="ln" id="L405">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;[0u8; <span class="tok-num">4</span>]);</span>
-<span class="ln" id="L406">        assert!(matches!(</span>
-<span class="ln" id="L407">            <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip),</span>
-<span class="ln" id="L408">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(_))</span>
-<span class="ln" id="L409">        ));</span>
-<span class="ln" id="L410">    }</span>
-<span class="ln" id="L411"></span>
-<span class="ln" id="L412">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L413">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wav_with_no_audio_is_rejected</span>() {</span>
-<span class="ln" id="L414">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L415">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;LIST&quot;</span>, b<span class="tok-str">&quot;INFOnothing useful&quot;</span>));</span>
-<span class="ln" id="L416">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L417">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L418">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
-<span class="ln" id="L419">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
-<span class="ln" id="L420">        assert!(matches!(</span>
-<span class="ln" id="L421">            <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip),</span>
-<span class="ln" id="L422">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(_))</span>
-<span class="ln" id="L423">        ));</span>
-<span class="ln" id="L424">    }</span>
-<span class="ln" id="L425">}</span>
+<span class="ln" id="L390">    <span class="tok-kw">fn</span> <span class="tok-fn">realistic_mode_leaves_bland_tags_only</span>() {</span>
+<span class="ln" id="L391">        <span class="tok-kw">let</span> (clean, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Realistic).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L392">        assert!(<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;Unknown Artist&quot;</span>), <span class="tok-str">&quot;expected placeholder tags&quot;</span>);</span>
+<span class="ln" id="L393">        assert!(!<span class="tok-fn">find</span>(&amp;clean, b<span class="tok-str">&quot;Jane Real Name&quot;</span>), <span class="tok-str">&quot;real name survived&quot;</span>);</span>
+<span class="ln" id="L394">    }</span>
+<span class="ln" id="L395"></span>
+<span class="ln" id="L396">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L397">    <span class="tok-kw">fn</span> <span class="tok-fn">cleaning_twice_is_stable</span>() {</span>
+<span class="ln" id="L398">        <span class="tok-kw">let</span> (once, _) = <span class="tok-fn">clean_wav_bytes</span>(&amp;<span class="tok-fn">dirty_wav</span>(), Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L399">        <span class="tok-kw">let</span> (twice, report) = <span class="tok-fn">clean_wav_bytes</span>(&amp;once, Policy::Strip).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L400">        assert!(!report.changed, <span class="tok-str">&quot;a clean WAV needs no second pass&quot;</span>);</span>
+<span class="ln" id="L401">        assert_eq!(once, twice);</span>
+<span class="ln" id="L402">    }</span>
+<span class="ln" id="L403"></span>
+<span class="ln" id="L404">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L405">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lying_chunk_size_is_rejected_not_panicked</span>() {</span>
+<span class="ln" id="L406">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L407">        <span class="tok-kw">let</span> body_len = <span class="tok-num">8</span> + <span class="tok-num">8</span> + <span class="tok-num">4</span>;</span>
+<span class="ln" id="L408">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body_len + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L409">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
+<span class="ln" id="L410">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;fmt &quot;</span>);</span>
+<span class="ln" id="L411">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;0xFFFF_FFFFu32.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// absurd size</span></span>
+<span class="ln" id="L412">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;[0u8; <span class="tok-num">4</span>]);</span>
+<span class="ln" id="L413">        assert!(matches!(</span>
+<span class="ln" id="L414">            <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip),</span>
+<span class="ln" id="L415">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(_))</span>
+<span class="ln" id="L416">        ));</span>
+<span class="ln" id="L417">    }</span>
+<span class="ln" id="L418"></span>
+<span class="ln" id="L419">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L420">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wav_with_no_audio_is_rejected</span>() {</span>
+<span class="ln" id="L421">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L422">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">chunk</span>(b<span class="tok-str">&quot;LIST&quot;</span>, b<span class="tok-str">&quot;INFOnothing useful&quot;</span>));</span>
+<span class="ln" id="L423">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wav = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L424">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L425">        wav.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
+<span class="ln" id="L426">        wav.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
+<span class="ln" id="L427">        assert!(matches!(</span>
+<span class="ln" id="L428">            <span class="tok-fn">clean_wav_bytes</span>(&amp;wav, Policy::Strip),</span>
+<span class="ln" id="L429">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(_))</span>
+<span class="ln" id="L430">        ));</span>
+<span class="ln" id="L431">    }</span>
+<span class="ln" id="L432">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

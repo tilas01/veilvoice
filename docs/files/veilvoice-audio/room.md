@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-audio/src/room.rs`
 
-[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 614 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs)
+[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 624 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs)
 
 ## Contents
 
@@ -90,7 +90,7 @@ reaches the top, the computer cannot keep up and the sound will break.
 
 ## What this file contains
 
-614 lines defining **5 functions** (4 public), **7 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+624 lines defining **5 functions** (4 public), **7 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -99,15 +99,15 @@ reaches the top, the computer cannot keep up and the sound will break.
 - `struct RoomStats` (line 118) -- What a running room is doing, safe to read from the interface.
 - `struct KeptRoom` (line 145) -- The recorders a room was asked for.
 - `struct RoomSession` (line 153) -- A running room.
-- `struct Shared` (line 161)
-- `struct Voice` (line 192) -- Everything one guest's engine needs, owned by the output callback.
+- `struct Shared` (line 167) -- The same arrangement as crate::live::Shared, for a room rather than one voice: counted in the audio callbacks, read by the caller.
+- `struct Voice` (line 202) -- Everything one guest's engine needs, owned by the output callback.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `RoomSession::start` (line 208) -- Open every guest's microphone, veil each, and mix into output.
-- `RoomSession::guests` (line 448) -- How many guests this room opened.
-- `RoomSession::stats` (line 460) -- Read the counters, resetting the peak meters.
-- `RoomSession::interference` (line 483) -- What the platform last reported about any of the streams.
+- `RoomSession::start` (line 218) -- Open every guest's microphone, veil each, and mix into output.
+- `RoomSession::guests` (line 458) -- How many guests this room opened.
+- `RoomSession::stats` (line 470) -- Read the counters, resetting the peak meters.
+- `RoomSession::interference` (line 493) -- What the platform last reported about any of the streams.
 
 ## What calls what
 
@@ -129,16 +129,16 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_report["Shared::report<br/>line 174"]
-    n_start(["RoomSession::start<br/>line 208"])
-    n_guests(["RoomSession::guests<br/>line 448"])
-    n_stats(["RoomSession::stats<br/>line 460"])
-    n_interference(["RoomSession::interference<br/>line 483"])
-    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L174" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L208" "open the source"
-    click n_guests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L448" "open the source"
-    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L460" "open the source"
-    click n_interference href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L483" "open the source"
+    n_report["Shared::report<br/>line 184"]
+    n_start(["RoomSession::start<br/>line 218"])
+    n_guests(["RoomSession::guests<br/>line 458"])
+    n_stats(["RoomSession::stats<br/>line 470"])
+    n_interference(["RoomSession::interference<br/>line 493"])
+    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L184" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L218" "open the source"
+    click n_guests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L458" "open the source"
+    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L470" "open the source"
+    click n_interference href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L493" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_guests,n_stats,n_interference entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -157,13 +157,13 @@ flowchart TD
 | `RoomStats` <sub>pub struct</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L118) | What a running room is doing, safe to read from the interface. |
 | `KeptRoom` <sub>pub struct</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L145) | The recorders a room was asked for. |
 | `RoomSession` <sub>pub struct</sub> | [153](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L153) | A running room. |
-| `Shared` <sub>struct</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L161) |  |
-| `Shared::report` <sub>fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L174) | Record what the platform said about one of the streams. |
-| `Voice` <sub>struct</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L192) | Everything one guest's engine needs, owned by the output callback. |
-| `RoomSession::start` <sub>pub fn</sub> | [208](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L208) | Open every guest's microphone, veil each, and mix into output. |
-| `RoomSession::guests` <sub>pub fn</sub> | [448](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L448) | How many guests this room opened. |
-| `RoomSession::stats` <sub>pub fn</sub> | [460](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L460) | Read the counters, resetting the peak meters. |
-| `RoomSession::interference` <sub>pub fn</sub> | [483](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L483) | What the platform last reported about any of the streams. |
+| `Shared` <sub>struct</sub> | [167](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L167) | The same arrangement as crate::live::Shared, for a room rather than one voice: counted in the audio callbacks, read by the caller. |
+| `Shared::report` <sub>fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L184) | Record what the platform said about one of the streams. |
+| `Voice` <sub>struct</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L202) | Everything one guest's engine needs, owned by the output callback. |
+| `RoomSession::start` <sub>pub fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L218) | Open every guest's microphone, veil each, and mix into output. |
+| `RoomSession::guests` <sub>pub fn</sub> | [458](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L458) | How many guests this room opened. |
+| `RoomSession::stats` <sub>pub fn</sub> | [470](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L470) | Read the counters, resetting the peak meters. |
+| `RoomSession::interference` <sub>pub fn</sub> | [493](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L493) | What the platform last reported about any of the streams. |
 
 ---
 

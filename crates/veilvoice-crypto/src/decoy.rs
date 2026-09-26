@@ -101,6 +101,13 @@ struct Verifier {
 }
 
 impl Verifier {
+    /// Derive from `passphrase` once and keep what it produced, with the salt
+    /// that produced it, so a later attempt can be compared against it.
+    ///
+    /// What is kept is the derived key itself rather than a hash of it, because
+    /// [`Verifier::matches`] must do the whole derivation every time: a cheaper
+    /// comparison would answer faster for a wrong passphrase than a right one,
+    /// and how long an answer took is the one thing a decoy must not reveal.
     fn create(passphrase: &[u8], params: kdf::KdfParams) -> Result<Self, Error> {
         let salt = kdf::random_salt()?;
         let key = kdf::derive_key(passphrase, &salt, params)?;

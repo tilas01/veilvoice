@@ -43,6 +43,18 @@ use std::fs;
 use std::path::Path;
 use std::time::{Duration, SystemTime};
 
+/// Every process on this machine holding a microphone or a camera open.
+///
+/// Read out of `/proc`: each process's open file descriptors are links, and one
+/// pointing at `/dev/video*` or at ALSA's own `/dev/snd/*` is a device in use
+/// right now. There is no permission to ask for and nothing to install, and it
+/// is the truth rather than a record of who asked, which is what the Windows
+/// half has to settle for.
+///
+/// A process this user may not look inside is skipped rather than failing the
+/// scan. On any ordinary machine most of `/proc` belongs to somebody else, so a
+/// scan that gave up at the first unreadable entry would report almost nothing
+/// and would look like it had worked.
 pub fn scan() -> Result<Vec<DeviceUse>, Error> {
     let mut found = Vec::new();
 
@@ -121,6 +133,11 @@ fn classify(target: &Path) -> Option<DeviceKind> {
     None
 }
 
+/// What a process calls itself, from `/proc/<pid>/comm`.
+///
+/// `comm` rather than the command line, deliberately: it is at most fifteen
+/// characters and holds no arguments, so a name shown in the monitor cannot
+/// carry a path or a passphrase somebody typed on a command line.
 fn process_name(pid: u32) -> Option<String> {
     let comm = fs::read_to_string(format!("/proc/{pid}/comm")).ok()?;
     let name = comm.trim();

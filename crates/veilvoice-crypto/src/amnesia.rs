@@ -113,6 +113,10 @@ fn page_size() -> usize {
     region::page::size()
 }
 
+/// The browser's answer, which is a number rather than a question asked of the
+/// host: see the note on the other half of this pair for why 4 KiB and not
+/// WebAssembly's own 64 KiB page. Both halves carry a comment because a
+/// generated page lists both, and a `cfg` is not a doc comment.
 #[cfg(target_arch = "wasm32")]
 fn page_size() -> usize {
     4096

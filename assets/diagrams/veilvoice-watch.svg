@@ -27,7 +27,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" target="_blank" rel="noopener noreferrer">
 <rect x="399.6" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="449.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">linux.rs</text>
-<text x="449.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">201 lines</text>
+<text x="449.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">218 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs" target="_blank" rel="noopener noreferrer">
 <rect x="130.4" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -42,7 +42,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" target="_blank" rel="noopener noreferrer">
 <rect x="281.1" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="335.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">windows.rs</text>
-<text x="335.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">606 lines</text>
+<text x="335.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">622 lines</text>
 </a>
 <text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The files in veilvoice-watch, and which of them names which. An edge</text>
 <text x="20.0" y="328.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">means the name appears in the other file, which is a reading of the</text>

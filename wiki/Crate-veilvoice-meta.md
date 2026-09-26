@@ -70,10 +70,10 @@ removing the parts of the file that hold them.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>121 lines"])
+    n_lib(["lib.rs<br/>127 lines"])
     n_audio["audio.rs<br/>278 lines"]
     n_image["image.rs<br/>210 lines"]
-    n_wav["wav.rs<br/>425 lines"]
+    n_wav["wav.rs<br/>432 lines"]
     n_audio --> n_wav
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs" "open the source"
     click n_audio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" "open the source"
@@ -89,8 +89,8 @@ flowchart TD
 |---|---:|---|
 | [[`audio.rs`|File-veilvoice-meta-audio]] | 278 | Audio tag removal and replacement. |
 | [[`image.rs`|File-veilvoice-meta-image]] | 210 | Image EXIF/GPS removal. |
-| [[`lib.rs`|File-veilvoice-meta-lib]] | 121 | Strip or spoof the identifying metadata that rides along with media files. |
-| [[`wav.rs`|File-veilvoice-meta-wav]] | 425 | Chunk-level RIFF/WAVE metadata removal. |
+| [[`lib.rs`|File-veilvoice-meta-lib]] | 127 | Strip or spoof the identifying metadata that rides along with media files. |
+| [[`wav.rs`|File-veilvoice-meta-wav]] | 432 | Chunk-level RIFF/WAVE metadata removal. |
 | [[`wav_fuzz.rs`|File-veilvoice-meta-tests-wav_fuzz]] | 299 | Randomised robustness testing for the RIFF chunk walker. |
 
 **696 functional lines of Rust** in this crate. A functional line is a line

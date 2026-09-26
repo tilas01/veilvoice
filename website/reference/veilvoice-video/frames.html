@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/frames.svg" alt="frames.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/frames.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 686 lines &middot; <a href="frames.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 695 lines &middot; <a href="frames.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-finishes">What this finishes</a>
@@ -100,18 +100,18 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>686 lines defining <strong>7 functions</strong> (4 public), <strong>5 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>695 lines defining <strong>7 functions</strong> (4 public), <strong>5 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Signature</code> <span style="color:var(--muted)">line 76</span> &middot; What decides whether two moments look the same.</li>
-<li><code>struct Frame</code> <span style="color:var(--muted)">line 109</span> &middot; One picture, and how long the video shows it for.</li>
-<li><code>struct Plan</code> <span style="color:var(--muted)">line 118</span> &middot; The pictures a render will write, worked out without drawing any of them.</li>
-<li><code>struct Notes</code> <span style="color:var(--muted)">line 187</span> &middot; What a drawn frame carried with it.</li>
-<li><code>struct Written</code> <span style="color:var(--muted)">line 375</span> &middot; What a written sequence produced.</li>
+<li><code>struct Frame</code> <span style="color:var(--muted)">line 118</span> &middot; One picture, and how long the video shows it for.</li>
+<li><code>struct Plan</code> <span style="color:var(--muted)">line 127</span> &middot; The pictures a render will write, worked out without drawing any of them.</li>
+<li><code>struct Notes</code> <span style="color:var(--muted)">line 196</span> &middot; What a drawn frame carried with it.</li>
+<li><code>struct Written</code> <span style="color:var(--muted)">line 384</span> &middot; What a written sequence produced.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Plan::saving</code> <span style="color:var(--muted)">line 133</span> &middot; How many pictures were saved by holding the ones that did not change.
+<li><code>Plan::saving</code> <span style="color:var(--muted)">line 142</span> &middot; How many pictures were saved by holding the ones that did not change.
 </li>
-<li><code>write</code> <span style="color:var(--muted)">line 394</span> &middot; Draw and write the whole sequence into directory.
+<li><code>write</code> <span style="color:var(--muted)">line 403</span> &middot; Draw and write the whole sequence into directory.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>draw</code>, <code>plan</code>, <code>dim</code>, <code>draw_wave</code>, <code>at</code></span>
 </li>
 </ul>
@@ -137,37 +137,37 @@
 <a href="frames.src.html#fn-signature-at">
 <rect x="28.0" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="94.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Signature::at</text>
-<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 86</text>
+<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 95</text>
 </a>
 <a href="frames.src.html#fn-plan-saving">
 <rect x="186.8" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="249.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Plan::saving</text>
-<text x="249.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<text x="249.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 142</text>
 </a>
 <a href="frames.src.html#fn-plan-2">
 <rect x="337.5" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="383.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">plan</text>
-<text x="383.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 146</text>
+<text x="383.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 155</text>
 </a>
 <a href="frames.src.html#fn-draw">
 <rect x="456.0" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="502.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">draw</text>
-<text x="502.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
+<text x="502.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
 </a>
 <a href="frames.src.html#fn-dim">
 <rect x="178.7" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="225.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">dim</text>
-<text x="225.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 336</text>
+<text x="225.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 345</text>
 </a>
 <a href="frames.src.html#fn-draw_wave">
 <rect x="297.2" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="347.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">draw_wave</text>
-<text x="347.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 349</text>
+<text x="347.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 358</text>
 </a>
 <a href="frames.src.html#fn-write">
 <rect x="242.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="288.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write</text>
-<text x="288.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 394</text>
+<text x="288.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 403</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -186,25 +186,25 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_at[&quot;Signature::at&lt;br/&gt;line 86&quot;]
-    n_saving([&quot;Plan::saving&lt;br/&gt;line 133&quot;])
-    n_plan[&quot;plan&lt;br/&gt;line 146&quot;]
-    n_draw[&quot;draw&lt;br/&gt;line 200&quot;]
-    n_dim[&quot;dim&lt;br/&gt;line 336&quot;]
-    n_draw_wave[&quot;draw_wave&lt;br/&gt;line 349&quot;]
-    n_write([&quot;write&lt;br/&gt;line 394&quot;])
+    n_at[&quot;Signature::at&lt;br/&gt;line 95&quot;]
+    n_saving([&quot;Plan::saving&lt;br/&gt;line 142&quot;])
+    n_plan[&quot;plan&lt;br/&gt;line 155&quot;]
+    n_draw[&quot;draw&lt;br/&gt;line 209&quot;]
+    n_dim[&quot;dim&lt;br/&gt;line 345&quot;]
+    n_draw_wave[&quot;draw_wave&lt;br/&gt;line 358&quot;]
+    n_write([&quot;write&lt;br/&gt;line 403&quot;])
     n_draw --&gt; n_dim
     n_draw --&gt; n_draw_wave
     n_plan --&gt; n_at
     n_write --&gt; n_draw
     n_write --&gt; n_plan
-    click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L86&quot; &quot;open the source&quot;
-    click n_saving href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L133&quot; &quot;open the source&quot;
-    click n_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L146&quot; &quot;open the source&quot;
-    click n_draw href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L200&quot; &quot;open the source&quot;
-    click n_dim href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L336&quot; &quot;open the source&quot;
-    click n_draw_wave href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L349&quot; &quot;open the source&quot;
-    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L394&quot; &quot;open the source&quot;
+    click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L95&quot; &quot;open the source&quot;
+    click n_saving href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L142&quot; &quot;open the source&quot;
+    click n_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L155&quot; &quot;open the source&quot;
+    click n_draw href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L209&quot; &quot;open the source&quot;
+    click n_dim href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L345&quot; &quot;open the source&quot;
+    click n_draw_wave href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L358&quot; &quot;open the source&quot;
+    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L403&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_saving,n_write entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -218,17 +218,17 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Signature</code> <sub>struct</sub></td><td><a href="frames.src.html#fn-signature">76</a></td><td>What decides whether two moments look the same.</td></tr>
-<tr><td><code>Signature::at</code> <sub>fn</sub></td><td><a href="frames.src.html#fn-signature-at">86</a></td><td></td></tr>
-<tr><td><code>Frame</code> <sub>pub struct</sub></td><td><a href="frames.src.html#fn-frame">109</a></td><td>One picture, and how long the video shows it for.</td></tr>
-<tr><td><code>Plan</code> <sub>pub struct</sub></td><td><a href="frames.src.html#fn-plan">118</a></td><td>The pictures a render will write, worked out without drawing any of them.</td></tr>
-<tr><td><code>Plan::saving</code> <sub>pub fn</sub></td><td><a href="frames.src.html#fn-plan-saving">133</a></td><td>How many pictures were saved by holding the ones that did not change.</td></tr>
-<tr><td><code>plan</code> <sub>pub fn</sub></td><td><a href="frames.src.html#fn-plan-2">146</a></td><td>Work out which moments need a picture.</td></tr>
-<tr><td><code>Notes</code> <sub>pub struct</sub></td><td><a href="frames.src.html#fn-notes">187</a></td><td>What a drawn frame carried with it.</td></tr>
-<tr><td><code>draw</code> <sub>pub fn</sub></td><td><a href="frames.src.html#fn-draw">200</a></td><td>Draw the picture at at_secs.</td></tr>
-<tr><td><code>dim</code> <sub>fn</sub></td><td><a href="frames.src.html#fn-dim">336</a></td><td>Mix colour towards background, keeping amount of it.</td></tr>
-<tr><td><code>draw_wave</code> <sub>fn</sub></td><td><a href="frames.src.html#fn-draw_wave">349</a></td><td>The envelope as filled columns inside the waveform&#x27;s box.</td></tr>
-<tr><td><code>Written</code> <sub>pub struct</sub></td><td><a href="frames.src.html#fn-written">375</a></td><td>What a written sequence produced.</td></tr>
-<tr><td><code>write</code> <sub>pub fn</sub></td><td><a href="frames.src.html#fn-write">394</a></td><td>Draw and write the whole sequence into directory.</td></tr>
+<tr><td><code>Signature::at</code> <sub>fn</sub></td><td><a href="frames.src.html#fn-signature-at">95</a></td><td>Everything about one frame that could make it differ from its neighbour, at at_secs into the plan.</td></tr>
+<tr><td><code>Frame</code> <sub>pub struct</sub></td><td><a href="frames.src.html#fn-frame">118</a></td><td>One picture, and how long the video shows it for.</td></tr>
+<tr><td><code>Plan</code> <sub>pub struct</sub></td><td><a href="frames.src.html#fn-plan">127</a></td><td>The pictures a render will write, worked out without drawing any of them.</td></tr>
+<tr><td><code>Plan::saving</code> <sub>pub fn</sub></td><td><a href="frames.src.html#fn-plan-saving">142</a></td><td>How many pictures were saved by holding the ones that did not change.</td></tr>
+<tr><td><code>plan</code> <sub>pub fn</sub></td><td><a href="frames.src.html#fn-plan-2">155</a></td><td>Work out which moments need a picture.</td></tr>
+<tr><td><code>Notes</code> <sub>pub struct</sub></td><td><a href="frames.src.html#fn-notes">196</a></td><td>What a drawn frame carried with it.</td></tr>
+<tr><td><code>draw</code> <sub>pub fn</sub></td><td><a href="frames.src.html#fn-draw">209</a></td><td>Draw the picture at at_secs.</td></tr>
+<tr><td><code>dim</code> <sub>fn</sub></td><td><a href="frames.src.html#fn-dim">345</a></td><td>Mix colour towards background, keeping amount of it.</td></tr>
+<tr><td><code>draw_wave</code> <sub>fn</sub></td><td><a href="frames.src.html#fn-draw_wave">358</a></td><td>The envelope as filled columns inside the waveform&#x27;s box.</td></tr>
+<tr><td><code>Written</code> <sub>pub struct</sub></td><td><a href="frames.src.html#fn-written">384</a></td><td>What a written sequence produced.</td></tr>
+<tr><td><code>write</code> <sub>pub fn</sub></td><td><a href="frames.src.html#fn-write">403</a></td><td>Draw and write the whole sequence into directory.</td></tr>
 </tbody></table>
 </section>
 </div></div>

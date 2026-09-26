@@ -84,10 +84,10 @@ flowchart TD
     n_lib(["lib.rs<br/>423 lines"])
     n_appctl["appctl.rs<br/>798 lines"]
     n_input["input.rs<br/>605 lines"]
-    n_linux["linux.rs<br/>201 lines"]
+    n_linux["linux.rs<br/>218 lines"]
     n_privilege["privilege.rs<br/>404 lines"]
     n_proc["proc.rs<br/>274 lines"]
-    n_windows["windows.rs<br/>606 lines"]
+    n_windows["windows.rs<br/>622 lines"]
     n_input --> n_proc
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" "open the source"
     click n_appctl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/appctl.rs" "open the source"
@@ -107,10 +107,10 @@ flowchart TD
 | [`appctl.rs`](../../docs/files/veilvoice-watch/appctl.md) | 798 | Learn what normally runs on this machine, then notice what does not. |
 | [`input.rs`](../../docs/files/veilvoice-watch/input.md) | 605 | What on this machine could be watching the keyboard and the mouse. |
 | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | 423 | Find out which applications are using your microphone and camera, right now. |
-| [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) | 201 | Linux detection, via open file handles in /proc. |
+| [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) | 218 | Linux detection, via open file handles in /proc. |
 | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | 404 | What privilege VeilVoice is running with, and what each level can actually see. |
 | [`proc.rs`](../../docs/files/veilvoice-watch/proc.md) | 274 | Which processes are running, per platform, and what that cannot tell you. |
-| [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 606 | Windows detection, via the Capability Access Manager. |
+| [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 622 | Windows detection, via the Capability Access Manager. |
 | [`scan_once.rs`](../../docs/files/veilvoice-watch/examples-scan_once.md) | 30 | Print what is using the microphone and camera right now. |
 
 **3,917 functional lines of Rust** in this crate. A functional line is a line
@@ -149,7 +149,7 @@ counts blank lines and comments too. Both are produced by
 | `fn scan` | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | Take one snapshot of what is currently using the microphone and camera. |
 | `enum Change` | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | A change between two scans. |
 | `struct Monitor` | [`lib.rs`](../../docs/files/veilvoice-watch/lib.md) | Watches for changes between scans. |
-| `fn scan` | [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) |  |
+| `fn scan` | [`linux.rs`](../../docs/files/veilvoice-watch/linux.md) | Every process on this machine holding a microphone or a camera open. |
 | `enum Level` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | What VeilVoice is running with. |
 | `fn level` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | What VeilVoice is running with right now. |
 | `fn service_installed` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | Whether a background service is installed. |
@@ -158,7 +158,7 @@ counts blank lines and comments too. Both are produced by
 | `const NEVER_ELEVATES` | [`privilege.rs`](../../docs/files/veilvoice-watch/privilege.md) | What this crate will not do, and why that is deliberate. |
 | `fn running` | [`proc.rs`](../../docs/files/veilvoice-watch/proc.md) | Every process name this build can see, lower-cased and without a path. |
 | `const SCOPE` | [`proc.rs`](../../docs/files/veilvoice-watch/proc.md) | What a reader has to be told, in the words to show them. |
-| `fn scan` | [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) |  |
+| `fn scan` | [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | Every application Windows records as having used the microphone or camera, and which of them is using one now. |
 
 ## Reading it elsewhere
 

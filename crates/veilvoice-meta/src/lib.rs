@@ -77,6 +77,12 @@ pub struct Report {
 }
 
 impl Report {
+    /// Record that `what` was taken out, and that the file therefore changed.
+    ///
+    /// The two go together on purpose. `changed` decides whether anything is
+    /// written back, and setting it separately from adding to the list is how a
+    /// report ends up naming a removal that did not happen, or missing one that
+    /// did.
     fn note(&mut self, what: impl Into<String>) {
         self.removed.push(what.into());
         self.changed = true;

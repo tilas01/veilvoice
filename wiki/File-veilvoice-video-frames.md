@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/frames.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 686 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 695 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs)
 
 ## Contents
 
@@ -74,20 +74,20 @@ render writes hundreds of pictures rather than hundreds of thousands.
 
 ## What this file contains
 
-686 lines defining **7 functions** (4 public), **5 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+695 lines defining **7 functions** (4 public), **5 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Signature` (line 76) -- What decides whether two moments look the same.
-- `struct Frame` (line 109) -- One picture, and how long the video shows it for.
-- `struct Plan` (line 118) -- The pictures a render will write, worked out without drawing any of them.
-- `struct Notes` (line 187) -- What a drawn frame carried with it.
-- `struct Written` (line 375) -- What a written sequence produced.
+- `struct Frame` (line 118) -- One picture, and how long the video shows it for.
+- `struct Plan` (line 127) -- The pictures a render will write, worked out without drawing any of them.
+- `struct Notes` (line 196) -- What a drawn frame carried with it.
+- `struct Written` (line 384) -- What a written sequence produced.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Plan::saving` (line 133) -- How many pictures were saved by holding the ones that did not change.
-- `write` (line 394) -- Draw and write the whole sequence into directory.
+- `Plan::saving` (line 142) -- How many pictures were saved by holding the ones that did not change.
+- `write` (line 403) -- Draw and write the whole sequence into directory.
   - reaches: `draw`, `plan`, `dim`, `draw_wave`, `at`
 
 ## What calls what
@@ -104,25 +104,25 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_at["Signature::at<br/>line 86"]
-    n_saving(["Plan::saving<br/>line 133"])
-    n_plan["plan<br/>line 146"]
-    n_draw["draw<br/>line 200"]
-    n_dim["dim<br/>line 336"]
-    n_draw_wave["draw_wave<br/>line 349"]
-    n_write(["write<br/>line 394"])
+    n_at["Signature::at<br/>line 95"]
+    n_saving(["Plan::saving<br/>line 142"])
+    n_plan["plan<br/>line 155"]
+    n_draw["draw<br/>line 209"]
+    n_dim["dim<br/>line 345"]
+    n_draw_wave["draw_wave<br/>line 358"]
+    n_write(["write<br/>line 403"])
     n_draw --> n_dim
     n_draw --> n_draw_wave
     n_plan --> n_at
     n_write --> n_draw
     n_write --> n_plan
-    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L86" "open the source"
-    click n_saving href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L133" "open the source"
-    click n_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L146" "open the source"
-    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L200" "open the source"
-    click n_dim href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L336" "open the source"
-    click n_draw_wave href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L349" "open the source"
-    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L394" "open the source"
+    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L95" "open the source"
+    click n_saving href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L142" "open the source"
+    click n_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L155" "open the source"
+    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L209" "open the source"
+    click n_dim href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L345" "open the source"
+    click n_draw_wave href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L358" "open the source"
+    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L403" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_saving,n_write entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -138,14 +138,14 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `Signature` <sub>struct</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L76) | What decides whether two moments look the same. |
-| `Signature::at` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L86) |  |
-| `Frame` <sub>pub struct</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L109) | One picture, and how long the video shows it for. |
-| `Plan` <sub>pub struct</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L118) | The pictures a render will write, worked out without drawing any of them. |
-| `Plan::saving` <sub>pub fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L133) | How many pictures were saved by holding the ones that did not change. |
-| `plan` <sub>pub fn</sub> | [146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L146) | Work out which moments need a picture. |
-| `Notes` <sub>pub struct</sub> | [187](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L187) | What a drawn frame carried with it. |
-| `draw` <sub>pub fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L200) | Draw the picture at at_secs. |
-| `dim` <sub>fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L336) | Mix colour towards background, keeping amount of it. |
-| `draw_wave` <sub>fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L349) | The envelope as filled columns inside the waveform's box. |
-| `Written` <sub>pub struct</sub> | [375](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L375) | What a written sequence produced. |
-| `write` <sub>pub fn</sub> | [394](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L394) | Draw and write the whole sequence into directory. |
+| `Signature::at` <sub>fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L95) | Everything about one frame that could make it differ from its neighbour, at at_secs into the plan. |
+| `Frame` <sub>pub struct</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L118) | One picture, and how long the video shows it for. |
+| `Plan` <sub>pub struct</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L127) | The pictures a render will write, worked out without drawing any of them. |
+| `Plan::saving` <sub>pub fn</sub> | [142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L142) | How many pictures were saved by holding the ones that did not change. |
+| `plan` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L155) | Work out which moments need a picture. |
+| `Notes` <sub>pub struct</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L196) | What a drawn frame carried with it. |
+| `draw` <sub>pub fn</sub> | [209](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L209) | Draw the picture at at_secs. |
+| `dim` <sub>fn</sub> | [345](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L345) | Mix colour towards background, keeping amount of it. |
+| `draw_wave` <sub>fn</sub> | [358](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L358) | The envelope as filled columns inside the waveform's box. |
+| `Written` <sub>pub struct</sub> | [384](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L384) | What a written sequence produced. |
+| `write` <sub>pub fn</sub> | [403](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs#L403) | Draw and write the whole sequence into directory. |

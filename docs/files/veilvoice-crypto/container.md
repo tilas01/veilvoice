@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/container.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 618 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 627 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs)
 
 ## Contents
 
@@ -62,24 +62,24 @@ check, so it cannot be edited to make the rest open more easily.
 
 ## What this file contains
 
-618 lines defining **9 functions** (8 public), **2 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+627 lines defining **9 functions** (8 public), **2 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Mode` (line 56) -- How a container is locked.
-- `struct Header` (line 65) -- A parsed container header.
+- `enum Mode` (line 65) -- How a container is locked.
+- `struct Header` (line 74) -- A parsed container header.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Header::to_bytes` (line 81) -- Serialise exactly as it appears on disk.
-- `veil_path` (line 180) -- The conventional path of the sealed form of path.
-- `seal_with_password` (line 193) -- Encrypt plaintext under a password.
+- `Header::to_bytes` (line 90) -- Serialise exactly as it appears on disk.
+- `veil_path` (line 189) -- The conventional path of the sealed form of path.
+- `seal_with_password` (line 202) -- Encrypt plaintext under a password.
   - reaches: `finish`
-- `seal_to_public_key` (line 210) -- Encrypt plaintext to a recipient's hybrid public key.
+- `seal_to_public_key` (line 219) -- Encrypt plaintext to a recipient's hybrid public key.
   - reaches: `finish`
-- `open_with_password` (line 244) -- Decrypt a password-locked container.
+- `open_with_password` (line 253) -- Decrypt a password-locked container.
   - reaches: `open_with_password_within`, `parse`
-- `open_with_secret_key` (line 276) -- Decrypt a container addressed to recipient.
+- `open_with_secret_key` (line 285) -- Decrypt a container addressed to recipient.
   - reaches: `parse`
 
 ## What calls what
@@ -102,29 +102,29 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_to_bytes(["Header::to_bytes<br/>line 81"])
-    n_parse["Header::parse<br/>line 101"]
-    n_veil_path(["veil_path<br/>line 180"])
-    n_seal_with_password(["seal_with_password<br/>line 193"])
-    n_seal_to_public_key(["seal_to_public_key<br/>line 210"])
-    n_finish["finish<br/>line 235"]
-    n_open_with_password(["open_with_password<br/>line 244"])
-    n_open_with_password_within["open_with_password_within<br/>line 260"]
-    n_open_with_secret_key(["open_with_secret_key<br/>line 276"])
+    n_to_bytes(["Header::to_bytes<br/>line 90"])
+    n_parse["Header::parse<br/>line 110"]
+    n_veil_path(["veil_path<br/>line 189"])
+    n_seal_with_password(["seal_with_password<br/>line 202"])
+    n_seal_to_public_key(["seal_to_public_key<br/>line 219"])
+    n_finish["finish<br/>line 244"]
+    n_open_with_password(["open_with_password<br/>line 253"])
+    n_open_with_password_within["open_with_password_within<br/>line 269"]
+    n_open_with_secret_key(["open_with_secret_key<br/>line 285"])
     n_open_with_password --> n_open_with_password_within
     n_open_with_password_within --> n_parse
     n_open_with_secret_key --> n_parse
     n_seal_to_public_key --> n_finish
     n_seal_with_password --> n_finish
-    click n_to_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L81" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L101" "open the source"
-    click n_veil_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L180" "open the source"
-    click n_seal_with_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L193" "open the source"
-    click n_seal_to_public_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L210" "open the source"
-    click n_finish href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L235" "open the source"
-    click n_open_with_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L244" "open the source"
-    click n_open_with_password_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L260" "open the source"
-    click n_open_with_secret_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L276" "open the source"
+    click n_to_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L90" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L110" "open the source"
+    click n_veil_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L189" "open the source"
+    click n_seal_with_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L202" "open the source"
+    click n_seal_to_public_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L219" "open the source"
+    click n_finish href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L244" "open the source"
+    click n_open_with_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L253" "open the source"
+    click n_open_with_password_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L269" "open the source"
+    click n_open_with_secret_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L285" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_veil_path,n_seal_with_password,n_seal_to_public_key,n_open_with_password,n_open_with_secret_key entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -142,19 +142,19 @@ flowchart TD
 | `MAGIC` <sub>pub const</sub> | [45](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L45) | Magic bytes at the start of every container. |
 | `FORMAT_VERSION` <sub>pub const</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L47) | Format version this build writes. |
 | `HEADER_LEN` <sub>pub const</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L49) | Fixed header length in bytes, before any encapsulation. |
-| `MODE_PASSWORD` <sub>const</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L51) |  |
-| `MODE_HYBRID` <sub>const</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L52) |  |
-| `Mode` <sub>pub enum</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L56) | How a container is locked. |
-| `Header` <sub>pub struct</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L65) | A parsed container header. |
-| `Header::to_bytes` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L81) | Serialise exactly as it appears on disk. |
-| `Header::parse` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L101) | Parse a header, returning it with the offset at which ciphertext starts. |
-| `veil_path` <sub>pub fn</sub> | [180](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L180) | The conventional path of the sealed form of path. |
-| `seal_with_password` <sub>pub fn</sub> | [193](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L193) | Encrypt plaintext under a password. |
-| `seal_to_public_key` <sub>pub fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L210) | Encrypt plaintext to a recipient's hybrid public key. |
-| `finish` <sub>fn</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L235) | Seal plaintext under header and return the whole file. |
-| `open_with_password` <sub>pub fn</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L244) | Decrypt a password-locked container. |
-| `open_with_password_within` <sub>pub fn</sub> | [260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L260) | Decrypt a password-locked container, refusing one that declares a memory cost above max_m_cost. |
-| `open_with_secret_key` <sub>pub fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L276) | Decrypt a container addressed to recipient. |
+| `MODE_PASSWORD` <sub>const</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L59) | Locked with a passphrase, through Argon2id. |
+| `MODE_HYBRID` <sub>const</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L61) | Locked with a public key, X25519 and ML-KEM-768 together. |
+| `Mode` <sub>pub enum</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L65) | How a container is locked. |
+| `Header` <sub>pub struct</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L74) | A parsed container header. |
+| `Header::to_bytes` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L90) | Serialise exactly as it appears on disk. |
+| `Header::parse` <sub>pub fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L110) | Parse a header, returning it with the offset at which ciphertext starts. |
+| `veil_path` <sub>pub fn</sub> | [189](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L189) | The conventional path of the sealed form of path. |
+| `seal_with_password` <sub>pub fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L202) | Encrypt plaintext under a password. |
+| `seal_to_public_key` <sub>pub fn</sub> | [219](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L219) | Encrypt plaintext to a recipient's hybrid public key. |
+| `finish` <sub>fn</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L244) | Seal plaintext under header and return the whole file. |
+| `open_with_password` <sub>pub fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L253) | Decrypt a password-locked container. |
+| `open_with_password_within` <sub>pub fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L269) | Decrypt a password-locked container, refusing one that declares a memory cost above max_m_cost. |
+| `open_with_secret_key` <sub>pub fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L285) | Decrypt a container addressed to recipient. |
 
 ---
 

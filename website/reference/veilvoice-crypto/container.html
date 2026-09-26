@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/container.svg" alt="container.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/container.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 618 lines &middot; <a href="container.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 627 lines &middot; <a href="container.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -97,26 +97,26 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>618 lines defining <strong>9 functions</strong> (8 public), <strong>2 types</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>627 lines defining <strong>9 functions</strong> (8 public), <strong>2 types</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Mode</code> <span style="color:var(--muted)">line 56</span> &middot; How a container is locked.</li>
-<li><code>struct Header</code> <span style="color:var(--muted)">line 65</span> &middot; A parsed container header.</li>
+<li><code>enum Mode</code> <span style="color:var(--muted)">line 65</span> &middot; How a container is locked.</li>
+<li><code>struct Header</code> <span style="color:var(--muted)">line 74</span> &middot; A parsed container header.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Header::to_bytes</code> <span style="color:var(--muted)">line 81</span> &middot; Serialise exactly as it appears on disk.
+<li><code>Header::to_bytes</code> <span style="color:var(--muted)">line 90</span> &middot; Serialise exactly as it appears on disk.
 </li>
-<li><code>veil_path</code> <span style="color:var(--muted)">line 180</span> &middot; The conventional path of the sealed form of path.
+<li><code>veil_path</code> <span style="color:var(--muted)">line 189</span> &middot; The conventional path of the sealed form of path.
 </li>
-<li><code>seal_with_password</code> <span style="color:var(--muted)">line 193</span> &middot; Encrypt plaintext under a password.
+<li><code>seal_with_password</code> <span style="color:var(--muted)">line 202</span> &middot; Encrypt plaintext under a password.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>finish</code></span>
 </li>
-<li><code>seal_to_public_key</code> <span style="color:var(--muted)">line 210</span> &middot; Encrypt plaintext to a recipient&#x27;s hybrid public key.
+<li><code>seal_to_public_key</code> <span style="color:var(--muted)">line 219</span> &middot; Encrypt plaintext to a recipient&#x27;s hybrid public key.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>finish</code></span>
 </li>
-<li><code>open_with_password</code> <span style="color:var(--muted)">line 244</span> &middot; Decrypt a password-locked container.
+<li><code>open_with_password</code> <span style="color:var(--muted)">line 253</span> &middot; Decrypt a password-locked container.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>open_with_password_within</code>, <code>parse</code></span>
 </li>
-<li><code>open_with_secret_key</code> <span style="color:var(--muted)">line 276</span> &middot; Decrypt a container addressed to recipient.
+<li><code>open_with_secret_key</code> <span style="color:var(--muted)">line 285</span> &middot; Decrypt a container addressed to recipient.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>parse</code></span>
 </li>
 </ul>
@@ -142,47 +142,47 @@
 <a href="container.src.html#fn-header-to_bytes">
 <rect x="84.5" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="163.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Header::to_bytes</text>
-<text x="163.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 81</text>
+<text x="163.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
 </a>
 <a href="container.src.html#fn-header-parse">
 <rect x="267.4" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="333.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Header::parse</text>
-<text x="333.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
+<text x="333.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
 </a>
 <a href="container.src.html#fn-veil_path">
 <rect x="426.2" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="476.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">veil_path</text>
-<text x="476.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 180</text>
+<text x="476.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 189</text>
 </a>
 <a href="container.src.html#fn-seal_with_password">
 <rect x="20.0" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="106.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seal_with_password</text>
-<text x="106.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 193</text>
+<text x="106.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
 </a>
 <a href="container.src.html#fn-seal_to_public_key">
 <rect x="219.1" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="305.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seal_to_public_key</text>
-<text x="305.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 210</text>
+<text x="305.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 219</text>
 </a>
 <a href="container.src.html#fn-finish">
 <rect x="131.6" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="177.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">finish</text>
-<text x="177.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
+<text x="177.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 244</text>
 </a>
 <a href="container.src.html#fn-open_with_password">
 <rect x="418.2" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="504.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_with_password</text>
-<text x="504.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 244</text>
+<text x="504.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 253</text>
 </a>
 <a href="container.src.html#fn-open_with_password_within">
 <rect x="250.1" y="320.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="364.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_with_password_within</text>
-<text x="364.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 260</text>
+<text x="364.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 269</text>
 </a>
 <a href="container.src.html#fn-open_with_secret_key">
 <rect x="211.0" y="220.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="305.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_with_secret_key</text>
-<text x="305.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 276</text>
+<text x="305.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 285</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -201,29 +201,29 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_to_bytes([&quot;Header::to_bytes&lt;br/&gt;line 81&quot;])
-    n_parse[&quot;Header::parse&lt;br/&gt;line 101&quot;]
-    n_veil_path([&quot;veil_path&lt;br/&gt;line 180&quot;])
-    n_seal_with_password([&quot;seal_with_password&lt;br/&gt;line 193&quot;])
-    n_seal_to_public_key([&quot;seal_to_public_key&lt;br/&gt;line 210&quot;])
-    n_finish[&quot;finish&lt;br/&gt;line 235&quot;]
-    n_open_with_password([&quot;open_with_password&lt;br/&gt;line 244&quot;])
-    n_open_with_password_within[&quot;open_with_password_within&lt;br/&gt;line 260&quot;]
-    n_open_with_secret_key([&quot;open_with_secret_key&lt;br/&gt;line 276&quot;])
+    n_to_bytes([&quot;Header::to_bytes&lt;br/&gt;line 90&quot;])
+    n_parse[&quot;Header::parse&lt;br/&gt;line 110&quot;]
+    n_veil_path([&quot;veil_path&lt;br/&gt;line 189&quot;])
+    n_seal_with_password([&quot;seal_with_password&lt;br/&gt;line 202&quot;])
+    n_seal_to_public_key([&quot;seal_to_public_key&lt;br/&gt;line 219&quot;])
+    n_finish[&quot;finish&lt;br/&gt;line 244&quot;]
+    n_open_with_password([&quot;open_with_password&lt;br/&gt;line 253&quot;])
+    n_open_with_password_within[&quot;open_with_password_within&lt;br/&gt;line 269&quot;]
+    n_open_with_secret_key([&quot;open_with_secret_key&lt;br/&gt;line 285&quot;])
     n_open_with_password --&gt; n_open_with_password_within
     n_open_with_password_within --&gt; n_parse
     n_open_with_secret_key --&gt; n_parse
     n_seal_to_public_key --&gt; n_finish
     n_seal_with_password --&gt; n_finish
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L81&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L101&quot; &quot;open the source&quot;
-    click n_veil_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L180&quot; &quot;open the source&quot;
-    click n_seal_with_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L193&quot; &quot;open the source&quot;
-    click n_seal_to_public_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L210&quot; &quot;open the source&quot;
-    click n_finish href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L235&quot; &quot;open the source&quot;
-    click n_open_with_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L244&quot; &quot;open the source&quot;
-    click n_open_with_password_within href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L260&quot; &quot;open the source&quot;
-    click n_open_with_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L276&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L90&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L110&quot; &quot;open the source&quot;
+    click n_veil_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L189&quot; &quot;open the source&quot;
+    click n_seal_with_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L202&quot; &quot;open the source&quot;
+    click n_seal_to_public_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L219&quot; &quot;open the source&quot;
+    click n_finish href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L244&quot; &quot;open the source&quot;
+    click n_open_with_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L253&quot; &quot;open the source&quot;
+    click n_open_with_password_within href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L269&quot; &quot;open the source&quot;
+    click n_open_with_secret_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs#L285&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_veil_path,n_seal_with_password,n_seal_to_public_key,n_open_with_password,n_open_with_secret_key entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -239,19 +239,19 @@ flowchart TD
 <tr><td><code>MAGIC</code> <sub>pub const</sub></td><td><a href="container.src.html#fn-magic">45</a></td><td>Magic bytes at the start of every container.</td></tr>
 <tr><td><code>FORMAT_VERSION</code> <sub>pub const</sub></td><td><a href="container.src.html#fn-format_version">47</a></td><td>Format version this build writes.</td></tr>
 <tr><td><code>HEADER_LEN</code> <sub>pub const</sub></td><td><a href="container.src.html#fn-header_len">49</a></td><td>Fixed header length in bytes, before any encapsulation.</td></tr>
-<tr><td><code>MODE_PASSWORD</code> <sub>const</sub></td><td><a href="container.src.html#fn-mode_password">51</a></td><td></td></tr>
-<tr><td><code>MODE_HYBRID</code> <sub>const</sub></td><td><a href="container.src.html#fn-mode_hybrid">52</a></td><td></td></tr>
-<tr><td><code>Mode</code> <sub>pub enum</sub></td><td><a href="container.src.html#fn-mode">56</a></td><td>How a container is locked.</td></tr>
-<tr><td><code>Header</code> <sub>pub struct</sub></td><td><a href="container.src.html#fn-header">65</a></td><td>A parsed container header.</td></tr>
-<tr><td><code>Header::to_bytes</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-header-to_bytes">81</a></td><td>Serialise exactly as it appears on disk.</td></tr>
-<tr><td><code>Header::parse</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-header-parse">101</a></td><td>Parse a header, returning it with the offset at which ciphertext starts.</td></tr>
-<tr><td><code>veil_path</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-veil_path">180</a></td><td>The conventional path of the sealed form of path.</td></tr>
-<tr><td><code>seal_with_password</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-seal_with_password">193</a></td><td>Encrypt plaintext under a password.</td></tr>
-<tr><td><code>seal_to_public_key</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-seal_to_public_key">210</a></td><td>Encrypt plaintext to a recipient&#x27;s hybrid public key.</td></tr>
-<tr><td><code>finish</code> <sub>fn</sub></td><td><a href="container.src.html#fn-finish">235</a></td><td>Seal plaintext under header and return the whole file.</td></tr>
-<tr><td><code>open_with_password</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-open_with_password">244</a></td><td>Decrypt a password-locked container.</td></tr>
-<tr><td><code>open_with_password_within</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-open_with_password_within">260</a></td><td>Decrypt a password-locked container, refusing one that declares a memory cost above max_m_cost.</td></tr>
-<tr><td><code>open_with_secret_key</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-open_with_secret_key">276</a></td><td>Decrypt a container addressed to recipient.</td></tr>
+<tr><td><code>MODE_PASSWORD</code> <sub>const</sub></td><td><a href="container.src.html#fn-mode_password">59</a></td><td>Locked with a passphrase, through Argon2id.</td></tr>
+<tr><td><code>MODE_HYBRID</code> <sub>const</sub></td><td><a href="container.src.html#fn-mode_hybrid">61</a></td><td>Locked with a public key, X25519 and ML-KEM-768 together.</td></tr>
+<tr><td><code>Mode</code> <sub>pub enum</sub></td><td><a href="container.src.html#fn-mode">65</a></td><td>How a container is locked.</td></tr>
+<tr><td><code>Header</code> <sub>pub struct</sub></td><td><a href="container.src.html#fn-header">74</a></td><td>A parsed container header.</td></tr>
+<tr><td><code>Header::to_bytes</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-header-to_bytes">90</a></td><td>Serialise exactly as it appears on disk.</td></tr>
+<tr><td><code>Header::parse</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-header-parse">110</a></td><td>Parse a header, returning it with the offset at which ciphertext starts.</td></tr>
+<tr><td><code>veil_path</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-veil_path">189</a></td><td>The conventional path of the sealed form of path.</td></tr>
+<tr><td><code>seal_with_password</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-seal_with_password">202</a></td><td>Encrypt plaintext under a password.</td></tr>
+<tr><td><code>seal_to_public_key</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-seal_to_public_key">219</a></td><td>Encrypt plaintext to a recipient&#x27;s hybrid public key.</td></tr>
+<tr><td><code>finish</code> <sub>fn</sub></td><td><a href="container.src.html#fn-finish">244</a></td><td>Seal plaintext under header and return the whole file.</td></tr>
+<tr><td><code>open_with_password</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-open_with_password">253</a></td><td>Decrypt a password-locked container.</td></tr>
+<tr><td><code>open_with_password_within</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-open_with_password_within">269</a></td><td>Decrypt a password-locked container, refusing one that declares a memory cost above max_m_cost.</td></tr>
+<tr><td><code>open_with_secret_key</code> <sub>pub fn</sub></td><td><a href="container.src.html#fn-open_with_secret_key">285</a></td><td>Decrypt a container addressed to recipient.</td></tr>
 </tbody></table>
 </section>
 </div></div>

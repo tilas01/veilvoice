@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-policy/src/policy.rs`
 
-[[veilvoice-policy|Crate-veilvoice-policy]] &middot; 984 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs)
+[[veilvoice-policy|Crate-veilvoice-policy]] &middot; 991 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs)
 
 ## Contents
 
@@ -64,14 +64,14 @@ press the button.
 
 ## What this file contains
 
-984 lines defining **25 functions** (23 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+991 lines defining **25 functions** (23 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Requirement` (line 69) -- One thing a policy can insist on.
 - `struct Posture` (line 137) -- The settings a policy can reach, as a front end holds them.
 - `struct Policy` (line 194) -- A set of requirements, and an optional note from whoever wrote them.
-- `enum Verification` (line 473) -- What is known about the seal on a policy.
+- `enum Verification` (line 480) -- What is known about the seal on a policy.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -89,9 +89,9 @@ press the button.
   - reaches: `minimum_intensity`, `requires`
 - `Policy::save` (line 415) -- Write the plain policy into dir, and the sealed copy beside it.
   - reaches: `seal`, `to_text`
-- `Verification::describe` (line 493) -- One line for a front end.
-- `Verification::wants_attention` (line 518) -- Whether this is a state somebody should look at.
-- `verify` (line 530) -- Check the plain policy in dir against its sealed copy.
+- `Verification::describe` (line 500) -- One line for a front end.
+- `Verification::wants_attention` (line 525) -- Whether this is a state somebody should look at.
+- `verify` (line 537) -- Check the plain policy in dir against its sealed copy.
   - reaches: `load`, `open_sealed`, `parse`, `new`, `requirement_from`, `default`
 
 ## What calls what
@@ -130,8 +130,8 @@ flowchart TD
     n_open_sealed["Policy::open_sealed<br/>line 398"]
     n_save(["Policy::save<br/>line 415"])
     n_load["Policy::load<br/>line 432"]
-    n_requirement_from["requirement_from<br/>line 441"]
-    n_verify(["verify<br/>line 530"])
+    n_requirement_from["requirement_from<br/>line 448"]
+    n_verify(["verify<br/>line 537"])
     n_constrain --> n_minimum_intensity
     n_constrain --> n_requires
     n_load --> n_parse
@@ -164,8 +164,8 @@ flowchart TD
     click n_open_sealed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L398" "open the source"
     click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L415" "open the source"
     click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L432" "open the source"
-    click n_requirement_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L441" "open the source"
-    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L530" "open the source"
+    click n_requirement_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L448" "open the source"
+    click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L537" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_keyword,n_describe,n_most_permissive,n_is_at_least_as_strict_as,n_require,n_with_note,n_note,n_is_empty,n_len,n_constrain,n_save,n_verify entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -207,8 +207,8 @@ flowchart TD
 | `Policy::open_sealed` <sub>pub fn</sub> | [398](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L398) | Open a policy sealed by Policy::seal. |
 | `Policy::save` <sub>pub fn</sub> | [415](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L415) | Write the plain policy into dir, and the sealed copy beside it. |
 | `Policy::load` <sub>pub fn</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L432) | Read the plain policy from dir. |
-| `requirement_from` <sub>fn</sub> | [441](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L441) |  |
-| `Verification` <sub>pub enum</sub> | [473](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L473) | What is known about the seal on a policy. |
-| `Verification::describe` <sub>pub fn</sub> | [493](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L493) | One line for a front end. |
-| `Verification::wants_attention` <sub>pub fn</sub> | [518](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L518) | Whether this is a state somebody should look at. |
-| `verify` <sub>pub fn</sub> | [530](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L530) | Check the plain policy in dir against its sealed copy. |
+| `requirement_from` <sub>fn</sub> | [448](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L448) | One line of a policy file as the requirement it names. |
+| `Verification` <sub>pub enum</sub> | [480](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L480) | What is known about the seal on a policy. |
+| `Verification::describe` <sub>pub fn</sub> | [500](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L500) | One line for a front end. |
+| `Verification::wants_attention` <sub>pub fn</sub> | [525](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L525) | Whether this is a state somebody should look at. |
+| `verify` <sub>pub fn</sub> | [537](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs#L537) | Check the plain policy in dir against its sealed copy. |

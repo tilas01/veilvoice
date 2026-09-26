@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/vault.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 688 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 696 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs)
 
 ## Contents
 
@@ -78,26 +78,26 @@ cannot touch, and that part is not a speed bump.
 
 ## What this file contains
 
-688 lines defining **12 functions** (8 public), **2 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+696 lines defining **12 functions** (8 public), **2 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Found` (line 76) -- What Vault::load found when it went looking.
-- `struct Vault` (line 103) -- The two files a lock lives in, and the index that names them.
+- `enum Found` (line 84) -- What Vault::load found when it went looking.
+- `struct Vault` (line 111) -- The two files a lock lives in, and the index that names them.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Vault::at` (line 117) -- Resolve the vault under base, creating the index if there is none.
+- `Vault::at` (line 125) -- Resolve the vault under base, creating the index if there is none.
   - reaches: `name_for`
-- `Vault::primary` (line 164) -- The file the lock is read from and written to.
-- `Vault::shadow` (line 169) -- The second copy.
-- `Vault::index` (line 174) -- The index that names both.
-- `Vault::load` (line 184) -- Read the lock, restoring one copy from the other if it has to.
+- `Vault::primary` (line 172) -- The file the lock is read from and written to.
+- `Vault::shadow` (line 177) -- The second copy.
+- `Vault::index` (line 182) -- The index that names both.
+- `Vault::load` (line 192) -- Read the lock, restoring one copy from the other if it has to.
   - reaches: `read_masked`, `write_one`, `mask`
-- `Vault::store` (line 233) -- Write both copies, and say whether the spare is now current.
+- `Vault::store` (line 241) -- Write both copies, and say whether the spare is now current.
   - reaches: `write_one`, `mask`
-- `Vault::clear` (line 240) -- Remove both copies, and the index with them.
-- `admin_dir` (line 336) -- A directory only an administrator can write to, if this process can make one there.
+- `Vault::clear` (line 248) -- Remove both copies, and the index with them.
+- `admin_dir` (line 344) -- A directory only an administrator can write to, if this process can make one there.
 
 ## What calls what
 
@@ -119,36 +119,36 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_at(["Vault::at<br/>line 117"])
-    n_primary(["Vault::primary<br/>line 164"])
-    n_shadow(["Vault::shadow<br/>line 169"])
-    n_index(["Vault::index<br/>line 174"])
-    n_load(["Vault::load<br/>line 184"])
-    n_store(["Vault::store<br/>line 233"])
-    n_clear(["Vault::clear<br/>line 240"])
-    n_write_one["Vault::write_one<br/>line 260"]
-    n_read_masked["Vault::read_masked<br/>line 279"]
-    n_name_for["name_for<br/>line 287"]
-    n_mask["mask<br/>line 306"]
-    n_admin_dir(["admin_dir<br/>line 336"])
+    n_at(["Vault::at<br/>line 125"])
+    n_primary(["Vault::primary<br/>line 172"])
+    n_shadow(["Vault::shadow<br/>line 177"])
+    n_index(["Vault::index<br/>line 182"])
+    n_load(["Vault::load<br/>line 192"])
+    n_store(["Vault::store<br/>line 241"])
+    n_clear(["Vault::clear<br/>line 248"])
+    n_write_one["Vault::write_one<br/>line 268"]
+    n_read_masked["Vault::read_masked<br/>line 287"]
+    n_name_for["name_for<br/>line 295"]
+    n_mask["mask<br/>line 314"]
+    n_admin_dir(["admin_dir<br/>line 344"])
     n_at --> n_name_for
     n_load --> n_read_masked
     n_load --> n_write_one
     n_read_masked --> n_mask
     n_store --> n_write_one
     n_write_one --> n_mask
-    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L117" "open the source"
-    click n_primary href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L164" "open the source"
-    click n_shadow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L169" "open the source"
-    click n_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L174" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L184" "open the source"
-    click n_store href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L233" "open the source"
-    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L240" "open the source"
-    click n_write_one href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L260" "open the source"
-    click n_read_masked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L279" "open the source"
-    click n_name_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L287" "open the source"
-    click n_mask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L306" "open the source"
-    click n_admin_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L336" "open the source"
+    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L125" "open the source"
+    click n_primary href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L172" "open the source"
+    click n_shadow href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L177" "open the source"
+    click n_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L182" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L192" "open the source"
+    click n_store href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L241" "open the source"
+    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L248" "open the source"
+    click n_write_one href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L268" "open the source"
+    click n_read_masked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L287" "open the source"
+    click n_name_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L295" "open the source"
+    click n_mask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L314" "open the source"
+    click n_admin_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L344" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_at,n_primary,n_shadow,n_index,n_load,n_store,n_clear,n_admin_dir entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -164,23 +164,23 @@ flowchart TD
 | `SITE_LEN` <sub>const</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L61) | Length of the per-installation value the file names are derived from. |
 | `NAME_BYTES` <sub>const</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L64) | Bytes of hex in a derived file name. |
 | `INDEX_NAME` <sub>const</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L67) | Fixed name of the index. |
-| `LABEL_PRIMARY` <sub>const</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L70) | Domain separators, so the two names and the mask cannot coincide. |
-| `LABEL_SHADOW` <sub>const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L71) |  |
-| `LABEL_MASK` <sub>const</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L72) |  |
-| `Found` <sub>pub enum</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L76) | What Vault::load found when it went looking. |
-| `Vault` <sub>pub struct</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L103) | The two files a lock lives in, and the index that names them. |
-| `Vault::at` <sub>pub fn</sub> | [117](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L117) | Resolve the vault under base, creating the index if there is none. |
-| `Vault::primary` <sub>pub fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L164) | The file the lock is read from and written to. |
-| `Vault::shadow` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L169) | The second copy. |
-| `Vault::index` <sub>pub fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L174) | The index that names both. |
-| `Vault::load` <sub>pub fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L184) | Read the lock, restoring one copy from the other if it has to. |
-| `Vault::store` <sub>pub fn</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L233) | Write both copies, and say whether the spare is now current. |
-| `Vault::clear` <sub>pub fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L240) | Remove both copies, and the index with them. |
-| `Vault::write_one` <sub>fn</sub> | [260](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L260) | Mask bytes for this site and write them at path, creating the directory if it is not there. |
-| `Vault::read_masked` <sub>fn</sub> | [279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L279) | Read one file back and unmask it, or None if it is not a lock. |
-| `name_for` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L287) | The file name derived from site under label. |
-| `mask` <sub>fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L306) | Exclusive-or bytes with a keystream derived from site. |
-| `admin_dir` <sub>pub fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L336) | A directory only an administrator can write to, if this process can make one there. |
+| `LABEL_PRIMARY` <sub>const</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L75) | Derives the real vault's key from the material the unlock produced. |
+| `LABEL_SHADOW` <sub>const</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L78) | Derives the decoy vault's key from the same material, so the two keys are unrelated even though one passphrase leads to both. |
+| `LABEL_MASK` <sub>const</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L80) | Derives the mask that hides which of the two an index entry belongs to. |
+| `Found` <sub>pub enum</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L84) | What Vault::load found when it went looking. |
+| `Vault` <sub>pub struct</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L111) | The two files a lock lives in, and the index that names them. |
+| `Vault::at` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L125) | Resolve the vault under base, creating the index if there is none. |
+| `Vault::primary` <sub>pub fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L172) | The file the lock is read from and written to. |
+| `Vault::shadow` <sub>pub fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L177) | The second copy. |
+| `Vault::index` <sub>pub fn</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L182) | The index that names both. |
+| `Vault::load` <sub>pub fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L192) | Read the lock, restoring one copy from the other if it has to. |
+| `Vault::store` <sub>pub fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L241) | Write both copies, and say whether the spare is now current. |
+| `Vault::clear` <sub>pub fn</sub> | [248](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L248) | Remove both copies, and the index with them. |
+| `Vault::write_one` <sub>fn</sub> | [268](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L268) | Mask bytes for this site and write them at path, creating the directory if it is not there. |
+| `Vault::read_masked` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L287) | Read one file back and unmask it, or None if it is not a lock. |
+| `name_for` <sub>fn</sub> | [295](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L295) | The file name derived from site under label. |
+| `mask` <sub>fn</sub> | [314](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L314) | Exclusive-or bytes with a keystream derived from site. |
+| `admin_dir` <sub>pub fn</sub> | [344](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L344) | A directory only an administrator can write to, if this process can make one there. |
 
 ---
 

@@ -168,8 +168,17 @@ pub struct LiveSession {
     shared: Arc<Shared>,
 }
 
+/// What the audio callbacks and the caller both touch, held behind one handle.
+///
+/// The callbacks run on the platform's own audio thread and may not allocate,
+/// lock or print, so everything a caller wants to read afterwards is counted
+/// here with an atomic add and only summarised later. The two `Mutex` fields
+/// are read by a caller and written by a callback through `try_lock`, which
+/// drops the update rather than waiting: a figure for a panel is worth less
+/// than a sample.
 #[derive(Default)]
 struct Shared {
+    /// How the session has been going, for a caller that asks.
     stats: Mutex<LiveStats>,
     dropped: AtomicU64,
     starved: AtomicU64,

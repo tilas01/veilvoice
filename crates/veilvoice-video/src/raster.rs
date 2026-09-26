@@ -349,10 +349,15 @@ fn chunk(out: &mut Vec<u8>, kind: &[u8; 4], data: &[u8]) {
 struct Crc(u32);
 
 impl Crc {
+    /// A fresh checksum, which PNG specifies as starting from all ones rather
+    /// than from zero.
     fn new() -> Self {
         Self(0xffff_ffff)
     }
 
+    /// Fold `bytes` in. Called once per part of a chunk, so a chunk's type and
+    /// its data are checksummed together without being copied into one buffer
+    /// first.
     fn eat(&mut self, bytes: &[u8]) {
         for byte in bytes {
             self.0 ^= *byte as u32;
@@ -367,6 +372,9 @@ impl Crc {
         }
     }
 
+    /// The value to write, which is the running state inverted. Takes `self`
+    /// by value: a checksum that has been read is finished, and a further
+    /// `eat` after it would produce a number for nothing.
     fn done(self) -> u32 {
         self.0 ^ 0xffff_ffff
     }
