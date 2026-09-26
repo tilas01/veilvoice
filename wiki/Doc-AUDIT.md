@@ -1552,6 +1552,63 @@ than of a configuration file, an argument, or a redirect somebody else
 controls. That sentence is now in the source where the list lives.
 
 
+### F-227: the weekly campaign compared itself against a baseline covering half the files it runs
+
+`.github/workflows/mutants.yml` changes ten files a line at a time: eight of the
+cryptography crate and the two metadata readers. `tools/mutants/survivors.txt`
+is what its verdict step compares a campaign against, and a survivor missing
+from that list fails the build by design, because a survivor nobody has argued
+about is a claim about the tests that nobody has answered. The list answered for
+four of the ten.
+
+**The first run found the gap, and it is two mutants of one line.** The campaign
+became weekly in F-186's round and fired for the first time on 22 September
+against `main`. A runner shutdown ended it thirty-six minutes in, before it
+reached the verdict step, so the comparison never ran. It had already printed
+these, and a campaign over `kdf.rs` reproduces both:
+
+    crates/veilvoice-crypto/src/kdf.rs: replace > with == in KdfParams::checked
+    crates/veilvoice-crypto/src/kdf.rs: replace > with >= in KdfParams::checked
+
+**Both are unkillable, and that was established four rounds earlier.** `checked`
+enforces Argon2's eight KiB per lane in widened arithmetic and caps `m_cost` at
+four gibibytes, so no `p_cost` above `MAX_M_COST / 8`, which is 524,288, reaches
+the lane ceiling at all; `MAX_P_COST` is 16,777,215. Every input that would tell
+the mutants from the original is rejected by a line below them. F-180 found this
+pair, proved it, and wrote the proof into the doc comment above `checked`, where
+it still stands under the heading "Why mutating the parallelism ceiling changes
+nothing". `tools/mutants/check.py` cites the same pair in its own docstring as
+its example of what a genuine entry looks like. The one place the argument was
+not written is the file the build reads.
+
+**Why the gap has exactly the shape it has.** F-180 campaigned the AEAD, the key
+derivation, the container header and the hybrid combiner, and there was no
+committed list then, so its two unkillable survivors were recorded in prose.
+F-186 campaigned the other four, the app lock, the vault, the tape and the
+encodings, and built the list out of its own results: eighteen entries, every one
+of them from those four files. Nothing went back to F-180 to collect the two it
+had argued for, and nothing was in a position to notice. `check.py --lint`, which
+`tools/verify.py` runs on every push, establishes that every entry still points
+at a real line. It cannot miss an entry that was never written, and the half of
+the check that would have caught this needs the half-hour campaign.
+
+**The failure mode is the opposite of the one the list was built to prevent.**
+`check.py` argues at length against a list that over-claims, because an entry for
+a mutant that no longer survives is how a real survivor hides in it. This is a
+list that under-claims. It hides nothing; it turns the weekly build red over two
+lines that are correct, which is the failure that gets ignored after the second
+week.
+
+**What the campaign over the whole set found, since it had to be run to say any
+of this.** Ten files, 21 survivors: the two above, and nineteen already argued
+for. The AEAD, the container header, the hybrid combiner and both metadata
+readers have none at all. One survivor in the encodings is genuinely new, a
+comparison in the base-91 encoder, and it is held for the round that can measure
+it against a tree that is not moving underneath it: fourteen commits landed on
+`dev` during the ninety minutes the campaign took, three of them in the very
+files being measured, which is also why the line numbers in the list are left for
+that round rather than corrected against a tree that has already moved on.
+
 ## The half that could have damaged a machine
 
 `uninstall()` ended with `std::fs::remove_dir_all(prefix)`.
@@ -2409,7 +2466,7 @@ having looked.
 | `warn(missing_docs)` in every crate | yes | yes | present in every library; the two `main.rs` files do not carry it, which is right |
 | the seven coverage-guided fuzz targets | by hand | **now, weekly** | ten minutes each, no crash, no hang, no out-of-memory |
 | the deterministic parser campaigns | yes | yes | clean |
-| **mutation testing** | no | **now, weekly** | **fifteen survivors over four files (F-180), then eighty-one over four more (F-186)** |
+| **mutation testing** | no | **now, weekly** | **fifteen survivors over four files (F-180), then eighty-one over four more (F-186); the baseline answered for only the second four (F-227)** |
 | **a public item reached by nothing** | no | **now** | **five; F-182** |
 | **build output outside the root `target/`** | no | **now** | **one, at fifteen gigabytes, rebuilt on every run; F-185** |
 | a state file written one place and read another | by hand | **now** | nothing |
@@ -9484,7 +9541,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twenty-six defects found and fixed (F-1 to F-226), across
+**Two hundred and twenty-seven defects found and fixed (F-1 to F-227), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

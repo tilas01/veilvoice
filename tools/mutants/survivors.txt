@@ -8,9 +8,9 @@
 # claiming something untrue about the code.
 #
 # **Only a mutant that no test could kill belongs here.** Not one that has no
-# test yet: that is a missing test, and the campaign that produced this list
-# turned eighty-one survivors into sixteen by writing them. What is left falls
-# into three kinds, and each entry says which.
+# test yet: that is a missing test, and the campaign that produced most of this
+# list turned eighty-one survivors into eighteen by writing them. What is left
+# falls into three kinds, and each entry says which.
 #
 #   1. Equivalent by arithmetic. The mutated expression computes the same value
 #      as the original for every input the program can reach, so no observation
@@ -26,11 +26,20 @@
 # Format: one cargo-mutants line per entry, exactly as `missed.txt` writes it,
 # with the argument above it.
 #
-# **How completely this has been measured.** All four files have now been
-# campaigned end to end: the app lock 137 mutants, the vault 28, the tape 39,
-# and the encodings 463 as six shards of 78. A single run of the encodings does
-# not finish here, because `cargo mutants` dies on `pthread_create` partway
-# through even at `--jobs 1`; `--shard k/6` gets past whatever that limit is.
+# **What this list is measured over, and it is every file the campaign runs.**
+# `.github/workflows/mutants.yml` changes ten files a line at a time, and this
+# list has to answer for all ten of them or the weekly run fails on a survivor
+# nobody has argued about. F-186 campaigned four end to end: the app lock 137
+# mutants, the vault 28, the tape 39, and the encodings 463 as six shards of 78.
+# F-180 campaigned four more, the AEAD, the key derivation, the container header
+# and the hybrid combiner, and left the two entries at the end of kind 1 below.
+# The two metadata readers were campaigned to no survivors at all. F-227 is the
+# round that noticed the list held only the first four and that the weekly run
+# therefore could not pass.
+#
+# A single run of the encodings does not finish here, because `cargo mutants`
+# dies on `pthread_create` partway through even at `--jobs 1`; `--shard k/6`
+# gets past whatever that limit is.
 #
 # The shards found eight survivors in the encodings that the earlier partial run
 # never reached, all in the base conversions, and five of those eight are now
@@ -67,6 +76,22 @@ crates/veilvoice-crypto/src/weave.rs:994:66: replace | with ^ in sixbit_encode
 # empty, and the loop below shifts eight out at a time until fewer than eight
 # remain. So the two operands are disjoint here as well.
 crates/veilvoice-crypto/src/weave.rs:984:26: replace | with ^ in base91_decode
+
+# Argon2's ceiling on the number of lanes, which can never be the only test in
+# `checked` that fires. The same function enforces Argon2's eight KiB per lane,
+# in widened arithmetic, and caps `m_cost` at `MAX_M_COST`, four gibibytes. So
+# no `p_cost` above `MAX_M_COST / 8`, which is 524,288, can reach this line
+# whatever it says, and `MAX_P_COST` is 16,777,215. Both mutants therefore
+# return the same error the original does, for every input.
+#
+# The guard stays because it is the bound Argon2 documents, and because the
+# argument it belongs to is about the order the checks run in: a later change
+# that moved the lane relation would leave this the only thing between a header
+# and an overflow. F-180 found these two and wrote the argument into the doc
+# comment above `checked`. F-227 is why they are also here, where the campaign
+# compares against.
+crates/veilvoice-crypto/src/kdf.rs:239:44: replace > with == in KdfParams::checked
+crates/veilvoice-crypto/src/kdf.rs:239:44: replace > with >= in KdfParams::checked
 
 
 # --- 2. A property of the machine --------------------------------------------
