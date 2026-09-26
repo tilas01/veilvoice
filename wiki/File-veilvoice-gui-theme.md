@@ -52,7 +52,7 @@ next time.
 
 ## What this file contains
 
-802 lines defining **9 functions** (8 public), **1 type** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+802 lines defining **10 functions** (8 public), **1 type** and **4 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -82,6 +82,7 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
+    n_rgb["rgb<br/>line 90"]
     n_active["active<br/>line 264"]
     n_themes["themes<br/>line 281"]
     n_load_custom(["load_custom<br/>line 294"])
@@ -98,6 +99,7 @@ flowchart TD
     n_jetbrains_mono_path --> n_user_font_paths
     n_set_by_id --> n_by_id
     n_set_by_id --> n_install
+    click n_rgb href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L90" "open the source"
     click n_active href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L264" "open the source"
     click n_themes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L281" "open the source"
     click n_load_custom href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L294" "open the source"
@@ -112,7 +114,7 @@ flowchart TD
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_active,n_themes,n_by_id,n_install api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_user_font_paths helper
+    class n_rgb,n_user_font_paths helper
 ```
 
 </details>
@@ -123,7 +125,7 @@ flowchart TD
 |---|---:|---|
 | `TABLE` <sub>static</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L47) | The theme table, once the user's palettes have been folded in. |
 | `Theme` <sub>pub struct</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L54) | One complete colour scheme. |
-| `fn` <sub>const</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L90) |  |
+| `rgb` <sub>fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L90) |  |
 | `THEMES` <sub>pub const</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L101) | Every theme, in the order the picker shows them. |
 | `ACTIVE` <sub>static</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L258) | The index of the theme currently in force. |
 | `active` <sub>pub fn</sub> | [264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/theme.rs#L264) | The theme currently in force. |
