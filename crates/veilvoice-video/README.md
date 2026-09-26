@@ -16,6 +16,7 @@
 ## Contents
 
   - [What this produces, and what needs something else](#what-this-produces-and-what-needs-something-else)
+  - [An export, the way a recorder does it](#an-export-the-way-a-recorder-does-it)
   - [The page needs a little JavaScript, and says so](#the-page-needs-a-little-javascript-and-says-so)
   - [A picture is not veiled](#a-picture-is-not-veiled)
 - [In plain words](#in-plain-words)
@@ -45,6 +46,16 @@ there and nothing has failed.
 
 VeilVoice never downloads or runs `ffmpeg` on your behalf, exactly as it
 never installs any other companion.
+
+## An export, the way a recorder does it
+
+**Roadmap item 175.** `export` is the questions a recording tool asks
+before it writes a file: sound, picture or both; a container and a codec;
+a quality from a lossless master down to something that fits in a message.
+`motion` is the picture it writes: a wave that moves with the sound, in a
+look chosen from a template for every theme and several more, with a
+thumbnail of each recording drawn the same way. Whatever the picture is,
+**the sound is lossless**: FLAC, ALAC or PCM, never a lossy codec.
 
 ## The page needs a little JavaScript, and says so
 
@@ -90,16 +101,19 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>168 lines"])
+    n_lib(["lib.rs<br/>180 lines"])
     n_accel["accel.rs<br/>652 lines"]
+    n_export["export.rs<br/>891 lines"]
     n_ffmpeg["ffmpeg.rs<br/>718 lines"]
     n_font["font.rs<br/>418 lines"]
     n_frames["frames.rs<br/>695 lines"]
+    n_motion["motion.rs<br/>1116 lines"]
     n_page["page.rs<br/>1610 lines"]
     n_palette["palette.rs<br/>747 lines"]
-    n_raster["raster.rs<br/>602 lines"]
+    n_raster["raster.rs<br/>621 lines"]
     n_size["size.rs<br/>732 lines"]
     n_waveform["waveform.rs<br/>298 lines"]
+    n_export --> n_size
     n_ffmpeg --> n_size
     n_frames --> n_font
     n_frames --> n_page
@@ -107,14 +121,21 @@ flowchart TD
     n_frames --> n_raster
     n_frames --> n_size
     n_frames --> n_waveform
+    n_motion --> n_font
+    n_motion --> n_palette
+    n_motion --> n_raster
+    n_motion --> n_size
+    n_motion --> n_waveform
     n_page --> n_palette
     n_page --> n_waveform
     n_raster --> n_font
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/lib.rs" "open the source"
     click n_accel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/accel.rs" "open the source"
+    click n_export href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs" "open the source"
     click n_ffmpeg href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" "open the source"
     click n_font href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/font.rs" "open the source"
     click n_frames href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/frames.rs" "open the source"
+    click n_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs" "open the source"
     click n_page href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/page.rs" "open the source"
     click n_palette href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/palette.rs" "open the source"
     click n_raster href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs" "open the source"
@@ -129,17 +150,19 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | 652 | What hardware this machine has, and the one place VeilVoice can use it. |
+| [`export.rs`](../../docs/files/veilvoice-video/export.md) | 891 | What an export asks, and the ffmpeg command each answer turns into. |
 | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 718 | The video file, which needs a codec this project does not ship. |
 | [`font.rs`](../../docs/files/veilvoice-video/font.md) | 418 | A monospace face, five pixels by seven, drawn here. |
 | [`frames.rs`](../../docs/files/veilvoice-video/frames.md) | 695 | The video's pictures, and how many of them there really are. |
-| [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 168 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
+| [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 180 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
+| [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | 1116 | The moving picture an export draws, and the templates it starts from. |
 | [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1610 | The picture: one still for a preview, and one page that plays. |
 | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 747 | Colours: the site's own tokens, and one per speaker. |
-| [`raster.rs`](../../docs/files/veilvoice-video/raster.md) | 602 | Pixels, and a PNG to put them in. |
+| [`raster.rs`](../../docs/files/veilvoice-video/raster.md) | 621 | Pixels, and a PNG to put them in. |
 | [`size.rs`](../../docs/files/veilvoice-video/size.md) | 732 | The size and frame rate a video is rendered at. |
 | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 298 | The shape of the audio, reduced to something a page can draw. |
 
-**4,471 functional lines of Rust** in this crate. A functional line is a line
+**6,010 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -157,6 +180,13 @@ counts blank lines and comments too. Both are produced by
 | `fn usable_threads` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | How many threads this machine can usefully run at once. |
 | `const WHY_NOT_THE_ENGINE` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | Why the audio engine is not offered a graphics card, with the numbers. |
 | `const WHAT_IT_CHANGES` | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | What hardware encoding is for, and what it does not change. |
+| `enum Content` | [`export.rs`](../../docs/files/veilvoice-video/export.md) | What an export writes. |
+| `enum Container` | [`export.rs`](../../docs/files/veilvoice-video/export.md) | The file a video goes into. |
+| `enum VideoCodec` | [`export.rs`](../../docs/files/veilvoice-video/export.md) | How the picture is compressed. |
+| `enum AudioCodec` | [`export.rs`](../../docs/files/veilvoice-video/export.md) | The lossless audio an export carries. |
+| `enum Quality` | [`export.rs`](../../docs/files/veilvoice-video/export.md) | How good the picture is, and so how large the file is. |
+| `enum AudioFile` | [`export.rs`](../../docs/files/veilvoice-video/export.md) | The lossless audio-only file. |
+| `struct Export` | [`export.rs`](../../docs/files/veilvoice-video/export.md) | Every answer an export needs. |
 | `fn found` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | Where ffmpeg is, if this machine has one. |
 | `struct Encoding` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | How to render the file. |
 | `fn command` | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | The command that turns a directory of numbered frames and a WAV into a video file. |
@@ -186,6 +216,22 @@ counts blank lines and comments too. Both are produced by
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | Crate version string, surfaced in the About panel. |
 | `const SCOPE` | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | What a rendered video is worth, in the words a front end should show. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | Everything that can go wrong in this crate. |
+| `enum Face` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | How the title and the times are lettered. |
+| `enum Direction` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Which way a gradient runs. |
+| `enum Fill` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | A colour, or two with a gradient between them. |
+| `enum Style` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | The shape the wave is drawn as. |
+| `const RESPONSE_RANGE` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | The smallest and largest Motion::response. |
+| `const WINDOW_RANGE` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | The shortest and longest Motion::window_secs. |
+| `const SETTLE_RANGE` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | The shortest and longest Motion::settle_secs. |
+| `struct Motion` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | The whole look of a video. |
+| `struct Template` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | A named starting point. |
+| `fn templates` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Every template: one per theme, in the themes' own order, then the extras. |
+| `fn template` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | The template with this identifier. |
+| `const HOP_SECS` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Seconds between two entries of a Levels timeline. |
+| `struct Levels` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | How loud the recording is, every five milliseconds, already settled. |
+| `fn levels` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Reduce a recording to the timeline a picture is drawn from. |
+| `struct Renderer` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Draws the frames of one export. |
+| `fn thumbnail` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | A picture of a whole recording, for a list of them. |
 | `struct Look` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | What the picture looks like. |
 | `enum Background` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | What sits behind the picture. |
 | `struct Layout` | [`page.rs`](../../docs/files/veilvoice-video/page.md) | Where each part of the picture goes. |

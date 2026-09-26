@@ -23,6 +23,16 @@
 //! VeilVoice never downloads or runs `ffmpeg` on your behalf, exactly as it
 //! never installs any other companion.
 //!
+//! ## An export, the way a recorder does it
+//!
+//! **Roadmap item 175.** [`export`] is the questions a recording tool asks
+//! before it writes a file: sound, picture or both; a container and a codec;
+//! a quality from a lossless master down to something that fits in a message.
+//! [`motion`] is the picture it writes: a wave that moves with the sound, in a
+//! look chosen from a template for every theme and several more, with a
+//! thumbnail of each recording drawn the same way. Whatever the picture is,
+//! **the sound is lossless**: FLAC, ALAC or PCM, never a lossy codec.
+//!
 //! ## The page needs a little JavaScript, and says so
 //!
 //! Lighting the right circle means knowing where the audio has got to, and only
@@ -53,11 +63,13 @@
 #![warn(missing_docs)]
 
 pub mod accel;
+pub mod export;
 pub mod ffmpeg;
 /// The monospace face the video frames are lettered with.
 pub mod font;
 /// The video pictures, drawn as pixels and written as PNG.
 pub mod frames;
+pub mod motion;
 pub mod page;
 pub mod palette;
 /// Pixels, and the PNG they are written into.
