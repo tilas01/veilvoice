@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/layout.rs</code></h1>
-<p style="color:var(--muted)"><a href="layout.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 318 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="layout.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 331 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -129,273 +129,286 @@
 <span class="ln" id="L60">    SessionMarker,</span>
 <span class="ln" id="L61">    <span class="tok-com">/// The screen-recorder allowlist.</span></span>
 <span class="ln" id="L62">    Captures,</span>
-<span class="ln" id="L63">    <span class="tok-com">/// The canaries and the rate limits.</span></span>
-<span class="ln" id="L64">    Sentry,</span>
-<span class="ln" id="L65">    <span class="tok-com">/// The app lock, and everything that opens with it.</span></span>
-<span class="ln" id="L66">    AppLock,</span>
-<span class="ln" id="L67">}</span>
+<span class="ln" id="L63">    <span class="tok-com">/// Which optional companions somebody has said not to offer again.</span></span>
+<span class="ln" id="L64">    Companions,</span>
+<span class="ln" id="L65">    <span class="tok-com">/// The canaries and the rate limits.</span></span>
+<span class="ln" id="L66">    Sentry,</span>
+<span class="ln" id="L67">    <span class="tok-com">/// The app lock, and everything that opens with it.</span></span>
+<span class="ln" id="L68">    AppLock,</span>
+<span class="ln" id="L69">}</span>
 </span>
-<span class="ln" id="L68"></span>
+<span class="ln" id="L70"></span>
 <span class="src-item" id="fn-entry">
-<span class="ln" id="L69"><span class="tok-com">/// One entry: what it is called, what it is, and what losing it costs.</span></span>
-<span class="ln" id="L70"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Entry {</span>
-<span class="ln" id="L71">    <span class="tok-com">/// Which thing this is.</span></span>
-<span class="ln" id="L72">    <span class="tok-kw">pub</span> item: Item,</span>
-<span class="ln" id="L73">    <span class="tok-com">/// Its name inside the folder [`dir`] answers with.</span></span>
-<span class="ln" id="L74">    <span class="tok-com">///</span></span>
-<span class="ln" id="L75">    <span class="tok-com">/// The app lock&#x27;s entry names its index rather than the lock itself,</span></span>
-<span class="ln" id="L76">    <span class="tok-com">/// because the lock&#x27;s own two copies are kept under names derived from</span></span>
-<span class="ln" id="L77">    <span class="tok-com">/// that index. See [`crate::vault`], which is the one place that knows</span></span>
-<span class="ln" id="L78">    <span class="tok-com">/// them.</span></span>
-<span class="ln" id="L79">    <span class="tok-kw">pub</span> name: &amp;&#x27;<span class="tok-kw">static</span> str,</span>
-<span class="ln" id="L80">    <span class="tok-com">/// Whether it is a folder rather than a file.</span></span>
-<span class="ln" id="L81">    <span class="tok-kw">pub</span> folder: bool,</span>
-<span class="ln" id="L82">    <span class="tok-com">/// What it is, in the words the About tab uses.</span></span>
-<span class="ln" id="L83">    <span class="tok-kw">pub</span> label: &amp;&#x27;<span class="tok-kw">static</span> str,</span>
-<span class="ln" id="L84">    <span class="tok-com">/// One line for somebody deciding whether to remove it.</span></span>
-<span class="ln" id="L85">    <span class="tok-kw">pub</span> note: &amp;&#x27;<span class="tok-kw">static</span> str,</span>
-<span class="ln" id="L86">    <span class="tok-com">/// Whether this is part of what &quot;keep the keys&quot; keeps.</span></span>
-<span class="ln" id="L87">    <span class="tok-kw">pub</span> keys: bool,</span>
-<span class="ln" id="L88">    <span class="tok-com">/// Whether nothing can put it back.</span></span>
-<span class="ln" id="L89">    <span class="tok-com">///</span></span>
-<span class="ln" id="L90">    <span class="tok-com">/// The distinction the reset asks somebody to type a word about. Settings</span></span>
-<span class="ln" id="L91">    <span class="tok-com">/// have defaults and the integrity record is taken again on the next</span></span>
-<span class="ln" id="L92">    <span class="tok-com">/// launch; a recording and a colour scheme somebody wrote are gone.</span></span>
-<span class="ln" id="L93">    <span class="tok-kw">pub</span> irreplaceable: bool,</span>
-<span class="ln" id="L94">}</span>
+<span class="ln" id="L71"><span class="tok-com">/// One entry: what it is called, what it is, and what losing it costs.</span></span>
+<span class="ln" id="L72"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Entry {</span>
+<span class="ln" id="L73">    <span class="tok-com">/// Which thing this is.</span></span>
+<span class="ln" id="L74">    <span class="tok-kw">pub</span> item: Item,</span>
+<span class="ln" id="L75">    <span class="tok-com">/// Its name inside the folder [`dir`] answers with.</span></span>
+<span class="ln" id="L76">    <span class="tok-com">///</span></span>
+<span class="ln" id="L77">    <span class="tok-com">/// The app lock&#x27;s entry names its index rather than the lock itself,</span></span>
+<span class="ln" id="L78">    <span class="tok-com">/// because the lock&#x27;s own two copies are kept under names derived from</span></span>
+<span class="ln" id="L79">    <span class="tok-com">/// that index. See [`crate::vault`], which is the one place that knows</span></span>
+<span class="ln" id="L80">    <span class="tok-com">/// them.</span></span>
+<span class="ln" id="L81">    <span class="tok-kw">pub</span> name: &amp;&#x27;<span class="tok-kw">static</span> str,</span>
+<span class="ln" id="L82">    <span class="tok-com">/// Whether it is a folder rather than a file.</span></span>
+<span class="ln" id="L83">    <span class="tok-kw">pub</span> folder: bool,</span>
+<span class="ln" id="L84">    <span class="tok-com">/// What it is, in the words the About tab uses.</span></span>
+<span class="ln" id="L85">    <span class="tok-kw">pub</span> label: &amp;&#x27;<span class="tok-kw">static</span> str,</span>
+<span class="ln" id="L86">    <span class="tok-com">/// One line for somebody deciding whether to remove it.</span></span>
+<span class="ln" id="L87">    <span class="tok-kw">pub</span> note: &amp;&#x27;<span class="tok-kw">static</span> str,</span>
+<span class="ln" id="L88">    <span class="tok-com">/// Whether this is part of what &quot;keep the keys&quot; keeps.</span></span>
+<span class="ln" id="L89">    <span class="tok-kw">pub</span> keys: bool,</span>
+<span class="ln" id="L90">    <span class="tok-com">/// Whether nothing can put it back.</span></span>
+<span class="ln" id="L91">    <span class="tok-com">///</span></span>
+<span class="ln" id="L92">    <span class="tok-com">/// The distinction the reset asks somebody to type a word about. Settings</span></span>
+<span class="ln" id="L93">    <span class="tok-com">/// have defaults and the integrity record is taken again on the next</span></span>
+<span class="ln" id="L94">    <span class="tok-com">/// launch; a recording and a colour scheme somebody wrote are gone.</span></span>
+<span class="ln" id="L95">    <span class="tok-kw">pub</span> irreplaceable: bool,</span>
+<span class="ln" id="L96">}</span>
 </span>
-<span class="ln" id="L95"></span>
+<span class="ln" id="L97"></span>
 <span class="src-item" id="fn-all">
-<span class="ln" id="L96"><span class="tok-com">/// Every named thing, in the order a person meets it.</span></span>
-<span class="ln" id="L97"><span class="tok-com">///</span></span>
-<span class="ln" id="L98"><span class="tok-com">/// Ordered by what it costs to lose rather than alphabetically: the things</span></span>
-<span class="ln" id="L99"><span class="tok-com">/// somebody would miss are at the top, where a reader who stops reading has</span></span>
-<span class="ln" id="L100"><span class="tok-com">/// still seen them.</span></span>
-<span class="ln" id="L101"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ALL: &amp;[Entry] = &amp;[</span>
-<span class="ln" id="L102">    Entry {</span>
-<span class="ln" id="L103">        item: Item::AppLock,</span>
-<span class="ln" id="L104">        name: <span class="tok-str">&quot;applock.index&quot;</span>,</span>
-<span class="ln" id="L105">        folder: false,</span>
-<span class="ln" id="L106">        label: <span class="tok-str">&quot;app lock&quot;</span>,</span>
-<span class="ln" id="L107">        note: <span class="tok-str">&quot;the password on VeilVoice itself, and the key to everything \</span></span>
-<span class="ln" id="L108"><span class="tok-str">               sealed with it. Kept under names derived from an index, which \</span></span>
-<span class="ln" id="L109"><span class="tok-str">               is why this shows the folder rather than the files&quot;</span>,</span>
-<span class="ln" id="L110">        keys: true,</span>
-<span class="ln" id="L111">        irreplaceable: true,</span>
-<span class="ln" id="L112">    },</span>
+<span class="ln" id="L98"><span class="tok-com">/// Every named thing, in the order a person meets it.</span></span>
+<span class="ln" id="L99"><span class="tok-com">///</span></span>
+<span class="ln" id="L100"><span class="tok-com">/// Ordered by what it costs to lose rather than alphabetically: the things</span></span>
+<span class="ln" id="L101"><span class="tok-com">/// somebody would miss are at the top, where a reader who stops reading has</span></span>
+<span class="ln" id="L102"><span class="tok-com">/// still seen them.</span></span>
+<span class="ln" id="L103"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ALL: &amp;[Entry] = &amp;[</span>
+<span class="ln" id="L104">    Entry {</span>
+<span class="ln" id="L105">        item: Item::AppLock,</span>
+<span class="ln" id="L106">        name: <span class="tok-str">&quot;applock.index&quot;</span>,</span>
+<span class="ln" id="L107">        folder: false,</span>
+<span class="ln" id="L108">        label: <span class="tok-str">&quot;app lock&quot;</span>,</span>
+<span class="ln" id="L109">        note: <span class="tok-str">&quot;the password on VeilVoice itself, and the key to everything \</span></span>
+<span class="ln" id="L110"><span class="tok-str">               sealed with it. Kept under names derived from an index, which \</span></span>
+<span class="ln" id="L111"><span class="tok-str">               is why this shows the folder rather than the files&quot;</span>,</span>
+<span class="ln" id="L112">        keys: true,</span>
+<span class="ln" id="L113">        irreplaceable: true,</span>
+<span class="ln" id="L114">    },</span>
 </span>
-<span class="ln" id="L113">    Entry {</span>
-<span class="ln" id="L114">        item: Item::Vaults,</span>
-<span class="ln" id="L115">        name: <span class="tok-str">&quot;studio&quot;</span>,</span>
-<span class="ln" id="L116">        folder: true,</span>
-<span class="ln" id="L117">        label: <span class="tok-str">&quot;vaults&quot;</span>,</span>
-<span class="ln" id="L118">        note: <span class="tok-str">&quot;the Studio&#x27;s recordings, and any decoys made beside them&quot;</span>,</span>
-<span class="ln" id="L119">        keys: false,</span>
-<span class="ln" id="L120">        irreplaceable: true,</span>
-<span class="ln" id="L121">    },</span>
-<span class="ln" id="L122">    Entry {</span>
-<span class="ln" id="L123">        item: Item::Palettes,</span>
-<span class="ln" id="L124">        name: <span class="tok-str">&quot;palettes&quot;</span>,</span>
-<span class="ln" id="L125">        folder: true,</span>
-<span class="ln" id="L126">        label: <span class="tok-str">&quot;palettes&quot;</span>,</span>
-<span class="ln" id="L127">        note: <span class="tok-str">&quot;colour schemes you wrote, read at startup&quot;</span>,</span>
-<span class="ln" id="L128">        keys: false,</span>
-<span class="ln" id="L129">        irreplaceable: true,</span>
-<span class="ln" id="L130">    },</span>
-<span class="ln" id="L131">    Entry {</span>
-<span class="ln" id="L132">        item: Item::Settings,</span>
-<span class="ln" id="L133">        name: <span class="tok-str">&quot;settings.conf&quot;</span>,</span>
-<span class="ln" id="L134">        folder: false,</span>
-<span class="ln" id="L135">        label: <span class="tok-str">&quot;settings&quot;</span>,</span>
-<span class="ln" id="L136">        note: <span class="tok-str">&quot;the palette, the motion setting, the device choices, and what \</span></span>
-<span class="ln" id="L137"><span class="tok-str">               the walkthrough has already shown you&quot;</span>,</span>
-<span class="ln" id="L138">        keys: false,</span>
-<span class="ln" id="L139">        irreplaceable: false,</span>
-<span class="ln" id="L140">    },</span>
-<span class="ln" id="L141">    Entry {</span>
-<span class="ln" id="L142">        item: Item::Policies,</span>
-<span class="ln" id="L143">        name: <span class="tok-str">&quot;policy&quot;</span>,</span>
-<span class="ln" id="L144">        folder: true,</span>
-<span class="ln" id="L145">        label: <span class="tok-str">&quot;policies&quot;</span>,</span>
-<span class="ln" id="L146">        note: <span class="tok-str">&quot;settings somebody else decided, if any are in force&quot;</span>,</span>
-<span class="ln" id="L147">        keys: false,</span>
-<span class="ln" id="L148">        irreplaceable: false,</span>
-<span class="ln" id="L149">    },</span>
-<span class="ln" id="L150">    Entry {</span>
-<span class="ln" id="L151">        item: Item::Mandate,</span>
-<span class="ln" id="L152">        name: <span class="tok-str">&quot;mandate.conf&quot;</span>,</span>
-<span class="ln" id="L153">        folder: false,</span>
-<span class="ln" id="L154">        label: <span class="tok-str">&quot;the mandate&quot;</span>,</span>
-<span class="ln" id="L155">        note: <span class="tok-str">&quot;which protections `veilvoice mandate` insists on for this copy&quot;</span>,</span>
-<span class="ln" id="L156">        keys: false,</span>
-<span class="ln" id="L157">        irreplaceable: false,</span>
-<span class="ln" id="L158">    },</span>
-<span class="ln" id="L159">    Entry {</span>
-<span class="ln" id="L160">        item: Item::Captures,</span>
-<span class="ln" id="L161">        name: <span class="tok-str">&quot;capture&quot;</span>,</span>
-<span class="ln" id="L162">        folder: true,</span>
-<span class="ln" id="L163">        label: <span class="tok-str">&quot;screen-recorder allowlist&quot;</span>,</span>
-<span class="ln" id="L164">        note: <span class="tok-str">&quot;which recorders you have said are yours&quot;</span>,</span>
-<span class="ln" id="L165">        keys: false,</span>
-<span class="ln" id="L166">        irreplaceable: false,</span>
-<span class="ln" id="L167">    },</span>
-<span class="ln" id="L168">    Entry {</span>
-<span class="ln" id="L169">        item: Item::Sentry,</span>
-<span class="ln" id="L170">        name: <span class="tok-str">&quot;sentry&quot;</span>,</span>
-<span class="ln" id="L171">        folder: true,</span>
-<span class="ln" id="L172">        label: <span class="tok-str">&quot;the sentry&#x27;s own files&quot;</span>,</span>
-<span class="ln" id="L173">        note: <span class="tok-str">&quot;the canaries it watches and the limits it counts against&quot;</span>,</span>
-<span class="ln" id="L174">        keys: false,</span>
-<span class="ln" id="L175">        irreplaceable: false,</span>
-<span class="ln" id="L176">    },</span>
-<span class="ln" id="L177">    Entry {</span>
-<span class="ln" id="L178">        item: Item::Integrity,</span>
-<span class="ln" id="L179">        name: <span class="tok-str">&quot;integrity.manifest&quot;</span>,</span>
-<span class="ln" id="L180">        folder: false,</span>
-<span class="ln" id="L181">        label: <span class="tok-str">&quot;integrity record&quot;</span>,</span>
-<span class="ln" id="L182">        note: <span class="tok-str">&quot;what VeilVoice&#x27;s own files measured, taken again when it is not \</span></span>
-<span class="ln" id="L183"><span class="tok-str">               there&quot;</span>,</span>
-<span class="ln" id="L184">        keys: false,</span>
-<span class="ln" id="L185">        irreplaceable: false,</span>
-<span class="ln" id="L186">    },</span>
-<span class="ln" id="L187">    Entry {</span>
-<span class="ln" id="L188">        item: Item::CrashReport,</span>
-<span class="ln" id="L189">        name: <span class="tok-str">&quot;last-crash.txt&quot;</span>,</span>
-<span class="ln" id="L190">        folder: false,</span>
-<span class="ln" id="L191">        label: <span class="tok-str">&quot;crash report&quot;</span>,</span>
-<span class="ln" id="L192">        note: <span class="tok-str">&quot;written only by a failure, and offered on the next launch&quot;</span>,</span>
-<span class="ln" id="L193">        keys: false,</span>
-<span class="ln" id="L194">        irreplaceable: false,</span>
-<span class="ln" id="L195">    },</span>
-<span class="ln" id="L196">    Entry {</span>
-<span class="ln" id="L197">        item: Item::SessionMarker,</span>
-<span class="ln" id="L198">        name: <span class="tok-str">&quot;session.running&quot;</span>,</span>
-<span class="ln" id="L199">        folder: false,</span>
-<span class="ln" id="L200">        label: <span class="tok-str">&quot;session marker&quot;</span>,</span>
-<span class="ln" id="L201">        note: <span class="tok-str">&quot;present while a session is running, so the next launch knows \</span></span>
-<span class="ln" id="L202"><span class="tok-str">               the last one did not finish&quot;</span>,</span>
-<span class="ln" id="L203">        keys: false,</span>
-<span class="ln" id="L204">        irreplaceable: false,</span>
-<span class="ln" id="L205">    },</span>
-<span class="ln" id="L206">];</span>
-<span class="ln" id="L207"></span>
+<span class="ln" id="L115">    Entry {</span>
+<span class="ln" id="L116">        item: Item::Vaults,</span>
+<span class="ln" id="L117">        name: <span class="tok-str">&quot;studio&quot;</span>,</span>
+<span class="ln" id="L118">        folder: true,</span>
+<span class="ln" id="L119">        label: <span class="tok-str">&quot;vaults&quot;</span>,</span>
+<span class="ln" id="L120">        note: <span class="tok-str">&quot;the Studio&#x27;s recordings, and any decoys made beside them&quot;</span>,</span>
+<span class="ln" id="L121">        keys: false,</span>
+<span class="ln" id="L122">        irreplaceable: true,</span>
+<span class="ln" id="L123">    },</span>
+<span class="ln" id="L124">    Entry {</span>
+<span class="ln" id="L125">        item: Item::Palettes,</span>
+<span class="ln" id="L126">        name: <span class="tok-str">&quot;palettes&quot;</span>,</span>
+<span class="ln" id="L127">        folder: true,</span>
+<span class="ln" id="L128">        label: <span class="tok-str">&quot;palettes&quot;</span>,</span>
+<span class="ln" id="L129">        note: <span class="tok-str">&quot;colour schemes you wrote, read at startup&quot;</span>,</span>
+<span class="ln" id="L130">        keys: false,</span>
+<span class="ln" id="L131">        irreplaceable: true,</span>
+<span class="ln" id="L132">    },</span>
+<span class="ln" id="L133">    Entry {</span>
+<span class="ln" id="L134">        item: Item::Settings,</span>
+<span class="ln" id="L135">        name: <span class="tok-str">&quot;settings.conf&quot;</span>,</span>
+<span class="ln" id="L136">        folder: false,</span>
+<span class="ln" id="L137">        label: <span class="tok-str">&quot;settings&quot;</span>,</span>
+<span class="ln" id="L138">        note: <span class="tok-str">&quot;the palette, the motion setting, the device choices, and what \</span></span>
+<span class="ln" id="L139"><span class="tok-str">               the walkthrough has already shown you&quot;</span>,</span>
+<span class="ln" id="L140">        keys: false,</span>
+<span class="ln" id="L141">        irreplaceable: false,</span>
+<span class="ln" id="L142">    },</span>
+<span class="ln" id="L143">    Entry {</span>
+<span class="ln" id="L144">        item: Item::Policies,</span>
+<span class="ln" id="L145">        name: <span class="tok-str">&quot;policy&quot;</span>,</span>
+<span class="ln" id="L146">        folder: true,</span>
+<span class="ln" id="L147">        label: <span class="tok-str">&quot;policies&quot;</span>,</span>
+<span class="ln" id="L148">        note: <span class="tok-str">&quot;settings somebody else decided, if any are in force&quot;</span>,</span>
+<span class="ln" id="L149">        keys: false,</span>
+<span class="ln" id="L150">        irreplaceable: false,</span>
+<span class="ln" id="L151">    },</span>
+<span class="ln" id="L152">    Entry {</span>
+<span class="ln" id="L153">        item: Item::Mandate,</span>
+<span class="ln" id="L154">        name: <span class="tok-str">&quot;mandate.conf&quot;</span>,</span>
+<span class="ln" id="L155">        folder: false,</span>
+<span class="ln" id="L156">        label: <span class="tok-str">&quot;the mandate&quot;</span>,</span>
+<span class="ln" id="L157">        note: <span class="tok-str">&quot;which protections `veilvoice mandate` insists on for this copy&quot;</span>,</span>
+<span class="ln" id="L158">        keys: false,</span>
+<span class="ln" id="L159">        irreplaceable: false,</span>
+<span class="ln" id="L160">    },</span>
+<span class="ln" id="L161">    Entry {</span>
+<span class="ln" id="L162">        item: Item::Captures,</span>
+<span class="ln" id="L163">        name: <span class="tok-str">&quot;capture&quot;</span>,</span>
+<span class="ln" id="L164">        folder: true,</span>
+<span class="ln" id="L165">        label: <span class="tok-str">&quot;screen-recorder allowlist&quot;</span>,</span>
+<span class="ln" id="L166">        note: <span class="tok-str">&quot;which recorders you have said are yours&quot;</span>,</span>
+<span class="ln" id="L167">        keys: false,</span>
+<span class="ln" id="L168">        irreplaceable: false,</span>
+<span class="ln" id="L169">    },</span>
+<span class="ln" id="L170">    Entry {</span>
+<span class="ln" id="L171">        item: Item::Companions,</span>
+<span class="ln" id="L172">        name: <span class="tok-str">&quot;companions-declined.txt&quot;</span>,</span>
+<span class="ln" id="L173">        folder: false,</span>
+<span class="ln" id="L174">        label: <span class="tok-str">&quot;companions you have declined&quot;</span>,</span>
+<span class="ln" id="L175">        note: <span class="tok-str">&quot;which optional software you have said not to offer again at \</span></span>
+<span class="ln" id="L176"><span class="tok-str">               launch, one name per line, with a heading that says so&quot;</span>,</span>
+<span class="ln" id="L177">        keys: false,</span>
+<span class="ln" id="L178">        irreplaceable: false,</span>
+<span class="ln" id="L179">    },</span>
+<span class="ln" id="L180">    Entry {</span>
+<span class="ln" id="L181">        item: Item::Sentry,</span>
+<span class="ln" id="L182">        name: <span class="tok-str">&quot;sentry&quot;</span>,</span>
+<span class="ln" id="L183">        folder: true,</span>
+<span class="ln" id="L184">        label: <span class="tok-str">&quot;the sentry&#x27;s own files&quot;</span>,</span>
+<span class="ln" id="L185">        note: <span class="tok-str">&quot;the canaries it watches and the limits it counts against&quot;</span>,</span>
+<span class="ln" id="L186">        keys: false,</span>
+<span class="ln" id="L187">        irreplaceable: false,</span>
+<span class="ln" id="L188">    },</span>
+<span class="ln" id="L189">    Entry {</span>
+<span class="ln" id="L190">        item: Item::Integrity,</span>
+<span class="ln" id="L191">        name: <span class="tok-str">&quot;integrity.manifest&quot;</span>,</span>
+<span class="ln" id="L192">        folder: false,</span>
+<span class="ln" id="L193">        label: <span class="tok-str">&quot;integrity record&quot;</span>,</span>
+<span class="ln" id="L194">        note: <span class="tok-str">&quot;what VeilVoice&#x27;s own files measured, taken again when it is not \</span></span>
+<span class="ln" id="L195"><span class="tok-str">               there&quot;</span>,</span>
+<span class="ln" id="L196">        keys: false,</span>
+<span class="ln" id="L197">        irreplaceable: false,</span>
+<span class="ln" id="L198">    },</span>
+<span class="ln" id="L199">    Entry {</span>
+<span class="ln" id="L200">        item: Item::CrashReport,</span>
+<span class="ln" id="L201">        name: <span class="tok-str">&quot;last-crash.txt&quot;</span>,</span>
+<span class="ln" id="L202">        folder: false,</span>
+<span class="ln" id="L203">        label: <span class="tok-str">&quot;crash report&quot;</span>,</span>
+<span class="ln" id="L204">        note: <span class="tok-str">&quot;written only by a failure, and offered on the next launch&quot;</span>,</span>
+<span class="ln" id="L205">        keys: false,</span>
+<span class="ln" id="L206">        irreplaceable: false,</span>
+<span class="ln" id="L207">    },</span>
+<span class="ln" id="L208">    Entry {</span>
+<span class="ln" id="L209">        item: Item::SessionMarker,</span>
+<span class="ln" id="L210">        name: <span class="tok-str">&quot;session.running&quot;</span>,</span>
+<span class="ln" id="L211">        folder: false,</span>
+<span class="ln" id="L212">        label: <span class="tok-str">&quot;session marker&quot;</span>,</span>
+<span class="ln" id="L213">        note: <span class="tok-str">&quot;present while a session is running, so the next launch knows \</span></span>
+<span class="ln" id="L214"><span class="tok-str">               the last one did not finish&quot;</span>,</span>
+<span class="ln" id="L215">        keys: false,</span>
+<span class="ln" id="L216">        irreplaceable: false,</span>
+<span class="ln" id="L217">    },</span>
+<span class="ln" id="L218">];</span>
+<span class="ln" id="L219"></span>
 <span class="src-item" id="fn-dir">
-<span class="ln" id="L208"><span class="tok-com">/// The folder all of this is in, if this platform says where one is.</span></span>
-<span class="ln" id="L209"><span class="tok-com">///</span></span>
-<span class="ln" id="L210"><span class="tok-com">/// The same answer [`crate::lock::default_dir`] gives, because it is that</span></span>
-<span class="ln" id="L211"><span class="tok-com">/// answer: a second way of working out where the state lives is the defect</span></span>
-<span class="ln" id="L212"><span class="tok-com">/// `tools/audit/state_paths.py` exists to catch.</span></span>
-<span class="ln" id="L213"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">dir</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L214">    <span class="tok-kw">crate</span>::lock::<span class="tok-fn">default_dir</span>()</span>
-<span class="ln" id="L215">}</span>
+<span class="ln" id="L220"><span class="tok-com">/// The folder all of this is in, if this platform says where one is.</span></span>
+<span class="ln" id="L221"><span class="tok-com">///</span></span>
+<span class="ln" id="L222"><span class="tok-com">/// The same answer [`crate::lock::default_dir`] gives, because it is that</span></span>
+<span class="ln" id="L223"><span class="tok-com">/// answer: a second way of working out where the state lives is the defect</span></span>
+<span class="ln" id="L224"><span class="tok-com">/// `tools/audit/state_paths.py` exists to catch.</span></span>
+<span class="ln" id="L225"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">dir</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L226">    <span class="tok-kw">crate</span>::lock::<span class="tok-fn">default_dir</span>()</span>
+<span class="ln" id="L227">}</span>
 </span>
-<span class="ln" id="L216"></span>
+<span class="ln" id="L228"></span>
 <span class="src-item" id="fn-entry-2">
-<span class="ln" id="L217"><span class="tok-com">/// The entry for one thing.</span></span>
-<span class="ln" id="L218"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">entry</span>(item: Item) -&gt; &amp;&#x27;<span class="tok-kw">static</span> Entry {</span>
-<span class="ln" id="L219">    ALL.<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L220">        .<span class="tok-fn">find</span>(|entry| entry.item == item)</span>
-<span class="ln" id="L221">        <span class="tok-com">// Every variant is in `ALL` and a test refuses a build where one is</span></span>
-<span class="ln" id="L222">        <span class="tok-com">// not, so this cannot be reached. It is stated rather than returned as</span></span>
-<span class="ln" id="L223">        <span class="tok-com">// an `Option` a dozen callers would each have to answer.</span></span>
-<span class="ln" id="L224">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every item is listed&quot;</span>)</span>
-<span class="ln" id="L225">}</span>
+<span class="ln" id="L229"><span class="tok-com">/// The entry for one thing.</span></span>
+<span class="ln" id="L230"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">entry</span>(item: Item) -&gt; &amp;&#x27;<span class="tok-kw">static</span> Entry {</span>
+<span class="ln" id="L231">    ALL.<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L232">        .<span class="tok-fn">find</span>(|entry| entry.item == item)</span>
+<span class="ln" id="L233">        <span class="tok-com">// Every variant is in `ALL` and a test refuses a build where one is</span></span>
+<span class="ln" id="L234">        <span class="tok-com">// not, so this cannot be reached. It is stated rather than returned as</span></span>
+<span class="ln" id="L235">        <span class="tok-com">// an `Option` a dozen callers would each have to answer.</span></span>
+<span class="ln" id="L236">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;every item is listed&quot;</span>)</span>
+<span class="ln" id="L237">}</span>
 </span>
-<span class="ln" id="L226"></span>
+<span class="ln" id="L238"></span>
 <span class="src-item" id="fn-path">
-<span class="ln" id="L227"><span class="tok-com">/// Where one thing is, if this platform says where anything is.</span></span>
-<span class="ln" id="L228"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">path</span>(item: Item) -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L229">    <span class="tok-fn">dir</span>().<span class="tok-fn">map</span>(|dir| dir.<span class="tok-fn">join</span>(<span class="tok-fn">entry</span>(item).name))</span>
-<span class="ln" id="L230">}</span>
+<span class="ln" id="L239"><span class="tok-com">/// Where one thing is, if this platform says where anything is.</span></span>
+<span class="ln" id="L240"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">path</span>(item: Item) -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L241">    <span class="tok-fn">dir</span>().<span class="tok-fn">map</span>(|dir| dir.<span class="tok-fn">join</span>(<span class="tok-fn">entry</span>(item).name))</span>
+<span class="ln" id="L242">}</span>
 </span>
-<span class="ln" id="L231"></span>
-<span class="ln" id="L232"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L233"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L234">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L235"></span>
-<span class="ln" id="L236">    <span class="tok-com">/// Every variant is listed, and listed once.</span></span>
-<span class="ln" id="L237">    <span class="tok-com">///</span></span>
-<span class="ln" id="L238">    <span class="tok-com">/// [`entry`] asserts this at runtime for lack of anywhere better to say</span></span>
-<span class="ln" id="L239">    <span class="tok-com">/// it, so this is what makes that assertion unreachable rather than</span></span>
-<span class="ln" id="L240">    <span class="tok-com">/// hopeful.</span></span>
-<span class="ln" id="L241">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L242">    <span class="tok-kw">fn</span> <span class="tok-fn">every_item_is_listed_exactly_once</span>() {</span>
-<span class="ln" id="L243">        <span class="tok-kw">for</span> item <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L244">            Item::Settings,</span>
-<span class="ln" id="L245">            Item::Palettes,</span>
-<span class="ln" id="L246">            Item::Vaults,</span>
-<span class="ln" id="L247">            Item::Policies,</span>
-<span class="ln" id="L248">            Item::Mandate,</span>
-<span class="ln" id="L249">            Item::Integrity,</span>
-<span class="ln" id="L250">            Item::CrashReport,</span>
-<span class="ln" id="L251">            Item::SessionMarker,</span>
-<span class="ln" id="L252">            Item::Captures,</span>
-<span class="ln" id="L253">            Item::Sentry,</span>
-<span class="ln" id="L254">            Item::AppLock,</span>
-<span class="ln" id="L255">        ] {</span>
-<span class="ln" id="L256">            <span class="tok-kw">let</span> found = ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|entry| entry.item == item).<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L257">            assert_eq!(found, <span class="tok-num">1</span>, <span class="tok-str">&quot;{item:?} is listed {found} times&quot;</span>);</span>
-<span class="ln" id="L258">        }</span>
-<span class="ln" id="L259">        assert_eq!(ALL.<span class="tok-fn">len</span>(), <span class="tok-num">11</span>, <span class="tok-str">&quot;something is listed that no item names&quot;</span>);</span>
-<span class="ln" id="L260">    }</span>
-<span class="ln" id="L261"></span>
-<span class="ln" id="L262">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L263">    <span class="tok-kw">fn</span> <span class="tok-fn">no_two_things_share_a_name</span>() {</span>
-<span class="ln" id="L264">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> names: Vec&lt;&amp;str&gt; = ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|entry| entry.name).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L265">        <span class="tok-kw">let</span> before = names.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L266">        names.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L267">        names.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L268">        assert_eq!(names.<span class="tok-fn">len</span>(), before, <span class="tok-str">&quot;two entries name one file&quot;</span>);</span>
-<span class="ln" id="L269">    }</span>
-<span class="ln" id="L270"></span>
-<span class="ln" id="L271">    <span class="tok-com">/// A name here is a name on somebody&#x27;s disk, so it has to be one.</span></span>
-<span class="ln" id="L272">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L273">    <span class="tok-kw">fn</span> <span class="tok-fn">every_name_is_a_plain_name_rather_than_a_path</span>() {</span>
-<span class="ln" id="L274">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L275">            assert!(!entry.name.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{:?} has no name&quot;</span>, entry.item);</span>
-<span class="ln" id="L276">            assert!(</span>
-<span class="ln" id="L277">                !entry.name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;/&#x27;</span>) &amp;&amp; !entry.name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\\&#x27;</span>),</span>
-<span class="ln" id="L278">                <span class="tok-str">&quot;{} is a path rather than a name, so it would escape the folder&quot;</span>,</span>
-<span class="ln" id="L279">                entry.name</span>
-<span class="ln" id="L280">            );</span>
-<span class="ln" id="L281">            assert!(</span>
-<span class="ln" id="L282">                !entry.label.<span class="tok-fn">is_empty</span>() &amp;&amp; entry.note.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>,</span>
-<span class="ln" id="L283">                <span class="tok-str">&quot;{} is listed without saying what it is&quot;</span>,</span>
-<span class="ln" id="L284">                entry.name</span>
-<span class="ln" id="L285">            );</span>
-<span class="ln" id="L286">        }</span>
-<span class="ln" id="L287">    }</span>
-<span class="ln" id="L288"></span>
-<span class="ln" id="L289">    <span class="tok-com">/// The keys are the app lock and nothing else.</span></span>
-<span class="ln" id="L290">    <span class="tok-com">///</span></span>
-<span class="ln" id="L291">    <span class="tok-com">/// &quot;Keep the keys&quot; is an offer about one thing, and a second entry</span></span>
-<span class="ln" id="L292">    <span class="tok-com">/// quietly marked `keys` would widen what a reset leaves behind without</span></span>
-<span class="ln" id="L293">    <span class="tok-com">/// anybody deciding to.</span></span>
-<span class="ln" id="L294">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L295">    <span class="tok-kw">fn</span> <span class="tok-fn">the_only_key_is_the_app_lock</span>() {</span>
-<span class="ln" id="L296">        <span class="tok-kw">let</span> keys: Vec&lt;Item&gt; = ALL</span>
-<span class="ln" id="L297">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L298">            .<span class="tok-fn">filter</span>(|entry| entry.keys)</span>
-<span class="ln" id="L299">            .<span class="tok-fn">map</span>(|entry| entry.item)</span>
-<span class="ln" id="L300">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L301">        assert_eq!(keys, vec![Item::AppLock]);</span>
-<span class="ln" id="L302">    }</span>
-<span class="ln" id="L303"></span>
-<span class="ln" id="L304">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L305">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_is_inside_the_folder_it_says_it_is</span>() {</span>
-<span class="ln" id="L306">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dir) = <span class="tok-fn">dir</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L307">            <span class="tok-kw">return</span>; <span class="tok-com">// a platform that does not say where configuration goes</span></span>
-<span class="ln" id="L308">        };</span>
-<span class="ln" id="L309">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> ALL {</span>
-<span class="ln" id="L310">            <span class="tok-kw">let</span> path = <span class="tok-fn">path</span>(entry.item).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a folder means every path resolves&quot;</span>);</span>
-<span class="ln" id="L311">            assert_eq!(path.<span class="tok-fn">parent</span>(), <span class="tok-fn">Some</span>(dir.<span class="tok-fn">as_path</span>()));</span>
-<span class="ln" id="L312">            assert_eq!(</span>
-<span class="ln" id="L313">                path.<span class="tok-fn">file_name</span>().<span class="tok-fn">map</span>(|n| n.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L314">                <span class="tok-fn">Some</span>(entry.name.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L315">            );</span>
-<span class="ln" id="L316">        }</span>
-<span class="ln" id="L317">    }</span>
-<span class="ln" id="L318">}</span>
+<span class="ln" id="L243"></span>
+<span class="ln" id="L244"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L245"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L246">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L247"></span>
+<span class="ln" id="L248">    <span class="tok-com">/// Every variant is listed, and listed once.</span></span>
+<span class="ln" id="L249">    <span class="tok-com">///</span></span>
+<span class="ln" id="L250">    <span class="tok-com">/// [`entry`] asserts this at runtime for lack of anywhere better to say</span></span>
+<span class="ln" id="L251">    <span class="tok-com">/// it, so this is what makes that assertion unreachable rather than</span></span>
+<span class="ln" id="L252">    <span class="tok-com">/// hopeful.</span></span>
+<span class="ln" id="L253">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L254">    <span class="tok-kw">fn</span> <span class="tok-fn">every_item_is_listed_exactly_once</span>() {</span>
+<span class="ln" id="L255">        <span class="tok-kw">for</span> item <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L256">            Item::Settings,</span>
+<span class="ln" id="L257">            Item::Palettes,</span>
+<span class="ln" id="L258">            Item::Vaults,</span>
+<span class="ln" id="L259">            Item::Policies,</span>
+<span class="ln" id="L260">            Item::Mandate,</span>
+<span class="ln" id="L261">            Item::Integrity,</span>
+<span class="ln" id="L262">            Item::CrashReport,</span>
+<span class="ln" id="L263">            Item::SessionMarker,</span>
+<span class="ln" id="L264">            Item::Captures,</span>
+<span class="ln" id="L265">            Item::Companions,</span>
+<span class="ln" id="L266">            Item::Sentry,</span>
+<span class="ln" id="L267">            Item::AppLock,</span>
+<span class="ln" id="L268">        ] {</span>
+<span class="ln" id="L269">            <span class="tok-kw">let</span> found = ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|entry| entry.item == item).<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L270">            assert_eq!(found, <span class="tok-num">1</span>, <span class="tok-str">&quot;{item:?} is listed {found} times&quot;</span>);</span>
+<span class="ln" id="L271">        }</span>
+<span class="ln" id="L272">        assert_eq!(ALL.<span class="tok-fn">len</span>(), <span class="tok-num">12</span>, <span class="tok-str">&quot;something is listed that no item names&quot;</span>);</span>
+<span class="ln" id="L273">    }</span>
+<span class="ln" id="L274"></span>
+<span class="ln" id="L275">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L276">    <span class="tok-kw">fn</span> <span class="tok-fn">no_two_things_share_a_name</span>() {</span>
+<span class="ln" id="L277">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> names: Vec&lt;&amp;str&gt; = ALL.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|entry| entry.name).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L278">        <span class="tok-kw">let</span> before = names.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L279">        names.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L280">        names.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L281">        assert_eq!(names.<span class="tok-fn">len</span>(), before, <span class="tok-str">&quot;two entries name one file&quot;</span>);</span>
+<span class="ln" id="L282">    }</span>
+<span class="ln" id="L283"></span>
+<span class="ln" id="L284">    <span class="tok-com">/// A name here is a name on somebody&#x27;s disk, so it has to be one.</span></span>
+<span class="ln" id="L285">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L286">    <span class="tok-kw">fn</span> <span class="tok-fn">every_name_is_a_plain_name_rather_than_a_path</span>() {</span>
+<span class="ln" id="L287">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L288">            assert!(!entry.name.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{:?} has no name&quot;</span>, entry.item);</span>
+<span class="ln" id="L289">            assert!(</span>
+<span class="ln" id="L290">                !entry.name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;/&#x27;</span>) &amp;&amp; !entry.name.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\\&#x27;</span>),</span>
+<span class="ln" id="L291">                <span class="tok-str">&quot;{} is a path rather than a name, so it would escape the folder&quot;</span>,</span>
+<span class="ln" id="L292">                entry.name</span>
+<span class="ln" id="L293">            );</span>
+<span class="ln" id="L294">            assert!(</span>
+<span class="ln" id="L295">                !entry.label.<span class="tok-fn">is_empty</span>() &amp;&amp; entry.note.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>,</span>
+<span class="ln" id="L296">                <span class="tok-str">&quot;{} is listed without saying what it is&quot;</span>,</span>
+<span class="ln" id="L297">                entry.name</span>
+<span class="ln" id="L298">            );</span>
+<span class="ln" id="L299">        }</span>
+<span class="ln" id="L300">    }</span>
+<span class="ln" id="L301"></span>
+<span class="ln" id="L302">    <span class="tok-com">/// The keys are the app lock and nothing else.</span></span>
+<span class="ln" id="L303">    <span class="tok-com">///</span></span>
+<span class="ln" id="L304">    <span class="tok-com">/// &quot;Keep the keys&quot; is an offer about one thing, and a second entry</span></span>
+<span class="ln" id="L305">    <span class="tok-com">/// quietly marked `keys` would widen what a reset leaves behind without</span></span>
+<span class="ln" id="L306">    <span class="tok-com">/// anybody deciding to.</span></span>
+<span class="ln" id="L307">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L308">    <span class="tok-kw">fn</span> <span class="tok-fn">the_only_key_is_the_app_lock</span>() {</span>
+<span class="ln" id="L309">        <span class="tok-kw">let</span> keys: Vec&lt;Item&gt; = ALL</span>
+<span class="ln" id="L310">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L311">            .<span class="tok-fn">filter</span>(|entry| entry.keys)</span>
+<span class="ln" id="L312">            .<span class="tok-fn">map</span>(|entry| entry.item)</span>
+<span class="ln" id="L313">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L314">        assert_eq!(keys, vec![Item::AppLock]);</span>
+<span class="ln" id="L315">    }</span>
+<span class="ln" id="L316"></span>
+<span class="ln" id="L317">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L318">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_is_inside_the_folder_it_says_it_is</span>() {</span>
+<span class="ln" id="L319">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dir) = <span class="tok-fn">dir</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L320">            <span class="tok-kw">return</span>; <span class="tok-com">// a platform that does not say where configuration goes</span></span>
+<span class="ln" id="L321">        };</span>
+<span class="ln" id="L322">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> ALL {</span>
+<span class="ln" id="L323">            <span class="tok-kw">let</span> path = <span class="tok-fn">path</span>(entry.item).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a folder means every path resolves&quot;</span>);</span>
+<span class="ln" id="L324">            assert_eq!(path.<span class="tok-fn">parent</span>(), <span class="tok-fn">Some</span>(dir.<span class="tok-fn">as_path</span>()));</span>
+<span class="ln" id="L325">            assert_eq!(</span>
+<span class="ln" id="L326">                path.<span class="tok-fn">file_name</span>().<span class="tok-fn">map</span>(|n| n.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L327">                <span class="tok-fn">Some</span>(entry.name.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L328">            );</span>
+<span class="ln" id="L329">        }</span>
+<span class="ln" id="L330">    }</span>
+<span class="ln" id="L331">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

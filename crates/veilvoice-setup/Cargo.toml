@@ -9,3 +9,12 @@ repository.workspace = true
 description = "Per-user installation and companion-software detection, shared by the command line and the desktop app."
 
 [dependencies]
+# Roadmap item 163. One answer to where this platform keeps per-user
+# configuration, so the launch check can remember a no beside the app lock, the
+# integrity record and everything else, rather than being a fourth copy of the
+# APPDATA/XDG_CONFIG_HOME/HOME arithmetic. `lock::default_path` also knows
+# about a portable copy, which is exactly the case roadmap item 163 is about.
+#
+# This adds nothing to either shipped binary: `veilvoice` and `veilvoice-gui`
+# are the only two and both already depend on it directly.
+veilvoice-crypto = { path = "../veilvoice-crypto" }

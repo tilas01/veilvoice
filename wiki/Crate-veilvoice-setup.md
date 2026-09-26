@@ -95,16 +95,20 @@ you who makes each one, and installs none of them unless you say so.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>224 lines"])
+    n_lib(["lib.rs<br/>226 lines"])
     n_companions["companions.rs<br/>1088 lines"]
     n_install["install.rs<br/>861 lines"]
+    n_needs["needs.rs<br/>565 lines"]
     n_space["space.rs<br/>170 lines"]
     n_update["update.rs<br/>892 lines"]
     n_volumes["volumes.rs<br/>580 lines"]
+    n_needs --> n_companions
+    n_needs --> n_install
     n_volumes --> n_companions
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
     click n_companions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" "open the source"
     click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" "open the source"
+    click n_needs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/needs.rs" "open the source"
     click n_space href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs" "open the source"
     click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs" "open the source"
     click n_volumes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs" "open the source"
@@ -118,12 +122,13 @@ flowchart TD
 |---|---:|---|
 | [[`companions.rs`|File-veilvoice-setup-companions]] | 1088 | Optional third-party software, detected rather than assumed. |
 | [[`install.rs`|File-veilvoice-setup-install]] | 861 | Put this program somewhere the system can find it. |
-| [[`lib.rs`|File-veilvoice-setup-lib]] | 224 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [[`lib.rs`|File-veilvoice-setup-lib]] | 226 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [[`needs.rs`|File-veilvoice-setup-needs]] | 565 | What this machine is missing, asked once and at the right moment. |
 | [[`space.rs`|File-veilvoice-setup-space]] | 170 | How much room is actually free where VeilVoice keeps things. |
 | [[`update.rs`|File-veilvoice-setup-update]] | 892 | Ask, only when told to, whether a newer VeilVoice release exists. |
 | [[`volumes.rs`|File-veilvoice-setup-volumes]] | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**2,440 functional lines of Rust** in this crate. A functional line is a line
+**2,793 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

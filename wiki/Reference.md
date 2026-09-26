@@ -180,6 +180,7 @@ Per-user installation and companion-software detection, shared by the command li
 - [[`companions.rs`|File-veilvoice-setup-companions]] &middot; Optional third-party software, detected rather than assumed.
 - [[`install.rs`|File-veilvoice-setup-install]] &middot; Put this program somewhere the system can find it.
 - [[`lib.rs`|File-veilvoice-setup-lib]] &middot; Everything that puts VeilVoice on a machine, and everything that reports what is already on it.
+- [[`needs.rs`|File-veilvoice-setup-needs]] &middot; What this machine is missing, asked once and at the right moment.
 - [[`space.rs`|File-veilvoice-setup-space]] &middot; How much room is actually free where VeilVoice keeps things.
 - [[`update.rs`|File-veilvoice-setup-update]] &middot; Ask, only when told to, whether a newer VeilVoice release exists.
 - [[`volumes.rs`|File-veilvoice-setup-volumes]] &middot; Encrypted volumes this machine already has: Cryptomator and VeraCrypt.

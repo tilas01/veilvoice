@@ -72,6 +72,7 @@
 
 pub mod companions;
 pub mod install;
+pub mod needs;
 pub mod space;
 pub mod update;
 pub mod volumes;
@@ -163,6 +164,7 @@ mod tests {
                 "companions.rs",
                 include_str!("companions.rs").replace("\r\n", "\n"),
             ),
+            ("needs.rs", include_str!("needs.rs").replace("\r\n", "\n")),
             ("space.rs", include_str!("space.rs").replace("\r\n", "\n")),
             ("update.rs", include_str!("update.rs").replace("\r\n", "\n")),
             (

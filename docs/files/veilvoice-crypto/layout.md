@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/layout.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 318 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 331 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs)
 
 ## Contents
 
@@ -59,16 +59,16 @@ about the same files.
 
 ## What this file contains
 
-318 lines defining **3 functions** (3 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+331 lines defining **3 functions** (3 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Item` (line 44) -- One thing VeilVoice keeps between runs.
-- `struct Entry` (line 70) -- One entry: what it is called, what it is, and what losing it costs.
+- `struct Entry` (line 72) -- One entry: what it is called, what it is, and what losing it costs.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `path` (line 228) -- Where one thing is, if this platform says where anything is.
+- `path` (line 240) -- Where one thing is, if this platform says where anything is.
   - reaches: `dir`, `entry`
 
 ## What calls what
@@ -91,14 +91,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_dir["dir<br/>line 213"]
-    n_entry["entry<br/>line 218"]
-    n_path(["path<br/>line 228"])
+    n_dir["dir<br/>line 225"]
+    n_entry["entry<br/>line 230"]
+    n_path(["path<br/>line 240"])
     n_path --> n_dir
     n_path --> n_entry
-    click n_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L213" "open the source"
-    click n_entry href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L218" "open the source"
-    click n_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L228" "open the source"
+    click n_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L225" "open the source"
+    click n_entry href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L230" "open the source"
+    click n_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L240" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_path entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -112,11 +112,11 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `Item` <sub>pub enum</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L44) | One thing VeilVoice keeps between runs. |
-| `Entry` <sub>pub struct</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L70) | One entry: what it is called, what it is, and what losing it costs. |
-| `ALL` <sub>pub const</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L101) | Every named thing, in the order a person meets it. |
-| `dir` <sub>pub fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L213) | The folder all of this is in, if this platform says where one is. |
-| `entry` <sub>pub fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L218) | The entry for one thing. |
-| `path` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L228) | Where one thing is, if this platform says where anything is. |
+| `Entry` <sub>pub struct</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L72) | One entry: what it is called, what it is, and what losing it costs. |
+| `ALL` <sub>pub const</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L103) | Every named thing, in the order a person meets it. |
+| `dir` <sub>pub fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L225) | The folder all of this is in, if this platform says where one is. |
+| `entry` <sub>pub fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L230) | The entry for one thing. |
+| `path` <sub>pub fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L240) | Where one thing is, if this platform says where anything is. |
 
 ---
 

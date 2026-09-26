@@ -10,5 +10,13 @@ Options:
       --install <NAME>
           Install one, by name. Without this, nothing is installed
 
+      --no <NAME>
+          Stop offering this one at launch. It is still listed here.
+          
+          **Roadmap item 163.** A question asked at every launch is a question people learn to dismiss without reading. The answer is remembered in a small text file you can open and delete.
+
+      --ask-again [<NAME>]
+          Be offered this one again. With no name, all of them
+
   -h, --help
           Print help (see a summary with '-h')
