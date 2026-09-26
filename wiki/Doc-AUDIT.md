@@ -746,6 +746,121 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-224: the audit outgrew the search index, and the index said nothing
+
+Found by pushing the audit past 512 KB while writing F-223 up.
+
+`tools/search-index/generate.py` walks every tracked file and skips anything
+larger than `MAX_FILE_BYTES`, which was 512 KB. `docs/AUDIT.md` reached 527 KB
+with the F-223 write-up in it, so the audit stopped being in the search index.
+Nothing said so. The generator printed its usual "449 files, 24373 sections" and
+the number was 447, which is not a number anybody reads twice.
+
+What did fail was a website suite, two steps later in `tools/verify.py`, on a
+check called **"the audit is indexed"**. That check exists, it is the reason this
+was caught at all, and it names neither the file nor the size nor the limit: it
+asserts that one particular document is searchable and reports `FAIL` when it is
+not. Working back from there to a constant in a different tool took reading three
+files.
+
+**Why the limit was in the wrong place.** Its own comment says it is there so
+that "a file nobody expected -- a vendored blob, a generated table, a lock file
+that grew -- cannot silently turn the index into something a phone has to
+download". But what a document costs the index is bounded by
+`MAX_SECTIONS_PER_DOC`, four hundred sections of at most `MAX_EXCERPT`
+characters, which is about 96 KB whatever the file's length is. The file-size
+limit was not protecting the index's weight. It was only deciding, silently,
+which documents are searchable.
+
+And it was pointed at the one document in this repository that grows by design.
+Every finding in this audit adds a write-up, this project's own rule requires
+one per fix, and `CHANGELOG.md` behind it is 328 KB on the same trajectory. A
+limit set just above today's largest document is a limit that will be reached,
+by the document whose whole purpose is to keep growing.
+
+**What it is now.** Two changes, and the second is the one that matters.
+
+The limit is 2 MB, chosen to be far above rather than just above, with the
+reasoning in the comment so the next person to move it knows what it is for.
+
+Past the limit is now a **refusal**, not a skip. The generator names the file,
+its size, the limit, and the two things that can be done about it, and exits
+non-zero, so `verify.py` fails on the tool that knows what happened rather than
+on a suite three checks later that does not. A document that has outgrown this
+is a decision somebody has to take, most likely splitting the audit by release;
+the one thing it cannot be is a file that quietly stops being searchable.
+
+**The shape, again.** F-210, F-212, F-216, F-219, F-220 and this one are the
+same finding wearing different clothes: **a check written at the scope of the
+thing that prompted it, and the defect somewhere else.** Here the check was even
+correct, and still useless at the job of saying what had gone wrong, because it
+was watching the symptom from the far end. The fix is not a better website
+suite. It is the tool that made the decision being the tool that reports it.
+
+### F-223: twelve panels drew a spinner, and a spinner cannot be asked to stop
+
+Roadmap item 169, and it is an accessibility defect rather than a tidying job.
+
+`reduced_motion.rs` exists because this project decided that a system setting
+saying "movement hurts" is somebody's answer and not a hint. `prefs::Motion`
+resolves it once a frame against the setting, an environment override and the
+preference, and `Motion::secs` exists so that a caller cannot forget to consult
+it: pass the wanted duration through and get zero when movement is not wanted.
+
+Twelve panels then drew `ui.spinner()`, which consults nothing. egui's spinner
+takes no setting and reads none: it animates. So the window honoured the
+reduce-motion setting in its header mark, its transitions and its Setup progress
+bar, and ignored it in every place where something was being waited for, which
+is exactly where a person is made to look at the moving thing.
+
+**Why a spinner was the wrong shape, not just a wrongly configured one.** There
+is no still spinner. A stopped spinner reads as a hung window, which is the
+opposite of the thing it is drawn to say, so the setting cannot be honoured by
+freezing it. A bar can hold still and still mean something, and Setup had
+already worked this out: a quarter-width highlight travelling when motion is
+allowed, and a third of the bar filled and static when it is not, with the
+comment "still, but not empty: an empty bar reads as stuck". That drawing was
+correct and it was in one panel.
+
+**What changed.** `progress::strip` is the only thing in this crate that draws
+"work is happening". Setup's drawing moved into it rather than being written a
+second time, so the reasoning moved with the code. Every one of the twelve
+spinners is now a call to it: the app lock deriving a key, the recording
+passphrase doing the same, the integrity record, the anonymise run, the group
+render, the update check, the first-run machine card, the companion probe, the
+verifier's hash, the vault unlock, the decoy round and the export. Each says
+what it is doing in words, and each either gives a fraction or says why it
+cannot, which is F-221's rule inherited rather than repeated.
+
+`strip` takes the resolved `Motion` rather than reading the preference itself.
+Two readers of one setting is two answers to one question, and the resolution
+already happens once a frame in `App::ui` where the system setting and the
+override are both in hand. The cost is a parameter on eleven drawing functions,
+which is the mechanical part; the alternative was a second resolution inside the
+indicator, which is the part that would have gone wrong.
+
+**One thing deliberately keeps moving under the setting.** A bar with a real
+fraction goes on filling. The setting is about decoration, and a measurement is
+not decoration: answering a request not to animate by withholding the
+information the indicator exists to give would be the wrong reading of it. What
+stops is everything that moves without saying anything.
+
+**Two guards, because the sweep is the easy half.** One reads the whole crate
+and fails on `ui.spinner()` or `egui::ProgressBar::new` anywhere, so the next
+panel cannot quietly add a thirteenth; it is written at the crate rather than at
+the files that had one, which is F-210 and F-220's lesson applied in advance for
+once. The other drives the indicator twice, one second apart, and fails if it
+moved while motion was reduced **or** if it did not move while motion was
+allowed. The second half matters: without it, an indicator that painted nothing
+at all would pass.
+
+**And a test that was coupled to a signature.** `the_studio_meters_what_goes_in_as_well_as_what_comes_out`
+found the tab by splitting the source on the exact text
+`fn studio_tab(&mut self, ui: &mut egui::Ui) {`, so adding a parameter broke a
+test about meters. It splits on the name now. A guard that reads source has to
+name the least it can get away with, or every signature is frozen by whichever
+test happened to quote it.
+
 ### F-221: a spinner that spins for four minutes is an indicator that says nothing
 
 The last of roadmap item 167, and the half of it that is not about threads.
@@ -7635,7 +7750,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1801 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1803 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9283,7 +9398,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twenty-two defects found and fixed (F-1 to F-222), across
+**Two hundred and twenty-four defects found and fixed (F-1 to F-224), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

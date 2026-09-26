@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/offthread.svg" alt="offthread.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/offthread.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 265 lines &middot; <a href="offthread.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 267 lines &middot; <a href="offthread.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -86,7 +86,9 @@
 <pre><code>self.machine.ask_once(ui.ctx(), measure);   // spawns, returns at once
 match self.machine.get() {
 Some(machine) =&gt; draw(ui, machine),
-None =&gt; ui.spinner(),                   // still being read
+// Still being read. One indicator, from `crate::progress`, which says
+// what is happening and honours the reduce-motion setting.
+None =&gt; crate::progress::strip(ui, &quot;reading this machine&quot;, &amp;reach, motion),
 }</code></pre>
 <p>The thread with the news asks for the repaint, because it is the only thing that knows there is any. That rule is why an untouched window draws nothing at all, and a poller here would have quietly undone it.</p>
 <h2 id="what-it-deliberately-does-not-do">What it deliberately does not do</h2>
@@ -97,22 +99,22 @@ None =&gt; ui.spinner(),                   // still being read
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>265 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>267 lines defining <strong>7 functions</strong> (6 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Answer</code> <span style="color:var(--muted)">line 62</span> &middot; One value, worked out off the drawing thread.</li>
+<li><code>struct Answer</code> <span style="color:var(--muted)">line 64</span> &middot; One value, worked out off the drawing thread.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Answer&lt;T&gt;::new</code> <span style="color:var(--muted)">line 82</span> &middot; Nothing asked yet.
+<li><code>Answer&lt;T&gt;::new</code> <span style="color:var(--muted)">line 84</span> &middot; Nothing asked yet.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>default</code></span>
 </li>
-<li><code>Answer&lt;T&gt;::ask_once</code> <span style="color:var(--muted)">line 111</span> &middot; Start the work, unless it has been started before.
+<li><code>Answer&lt;T&gt;::ask_once</code> <span style="color:var(--muted)">line 113</span> &middot; Start the work, unless it has been started before.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>ask</code></span>
 </li>
-<li><code>Answer&lt;T&gt;::get</code> <span style="color:var(--muted)">line 122</span> &middot; The answer, if there is one.
+<li><code>Answer&lt;T&gt;::get</code> <span style="color:var(--muted)">line 124</span> &middot; The answer, if there is one.
 </li>
-<li><code>Answer&lt;T&gt;::is_waiting</code> <span style="color:var(--muted)">line 143</span> &middot; Whether the work is still running.
+<li><code>Answer&lt;T&gt;::is_waiting</code> <span style="color:var(--muted)">line 145</span> &middot; Whether the work is still running.
 </li>
-<li><code>Answer&lt;T&gt;::forget</code> <span style="color:var(--muted)">line 149</span> &middot; Throw the answer away, so the next ask_once asks again.
+<li><code>Answer&lt;T&gt;::forget</code> <span style="color:var(--muted)">line 151</span> &middot; Throw the answer away, so the next ask_once asks again.
 </li>
 </ul>
 </section>
@@ -134,37 +136,37 @@ None =&gt; ui.spinner(),                   // still being read
 <a href="offthread.src.html#fn-answer-t-default">
 <rect x="52.2" y="20.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="138.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Answer&lt;T&gt;::default</text>
-<text x="138.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 71</text>
+<text x="138.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 73</text>
 </a>
 <a href="offthread.src.html#fn-answer-t-new">
 <rect x="251.3" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="321.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Answer&lt;T&gt;::new</text>
-<text x="321.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 82</text>
+<text x="321.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 84</text>
 </a>
 <a href="offthread.src.html#fn-answer-t-ask">
 <rect x="418.2" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="488.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Answer&lt;T&gt;::ask</text>
-<text x="488.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<text x="488.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
 </a>
 <a href="offthread.src.html#fn-answer-t-ask_once">
 <rect x="20.0" y="120.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="110.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Answer&lt;T&gt;::ask_once</text>
-<text x="110.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
+<text x="110.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 113</text>
 </a>
 <a href="offthread.src.html#fn-answer-t-get">
 <rect x="227.1" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="297.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Answer&lt;T&gt;::get</text>
-<text x="297.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
+<text x="297.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
 </a>
 <a href="offthread.src.html#fn-answer-t-is_waiting">
 <rect x="394.0" y="120.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="492.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Answer&lt;T&gt;::is_waiting</text>
-<text x="492.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
+<text x="492.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 145</text>
 </a>
 <a href="offthread.src.html#fn-answer-t-forget">
 <rect x="223.1" y="220.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="305.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Answer&lt;T&gt;::forget</text>
-<text x="305.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 149</text>
+<text x="305.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 151</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -183,22 +185,22 @@ None =&gt; ui.spinner(),                   // still being read
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_default[&quot;Answer&lt;T&gt;::default&lt;br/&gt;line 71&quot;]
-    n_new([&quot;Answer&lt;T&gt;::new&lt;br/&gt;line 82&quot;])
-    n_ask[&quot;Answer&lt;T&gt;::ask&lt;br/&gt;line 92&quot;]
-    n_ask_once([&quot;Answer&lt;T&gt;::ask_once&lt;br/&gt;line 111&quot;])
-    n_get([&quot;Answer&lt;T&gt;::get&lt;br/&gt;line 122&quot;])
-    n_is_waiting([&quot;Answer&lt;T&gt;::is_waiting&lt;br/&gt;line 143&quot;])
-    n_forget([&quot;Answer&lt;T&gt;::forget&lt;br/&gt;line 149&quot;])
+    n_default[&quot;Answer&lt;T&gt;::default&lt;br/&gt;line 73&quot;]
+    n_new([&quot;Answer&lt;T&gt;::new&lt;br/&gt;line 84&quot;])
+    n_ask[&quot;Answer&lt;T&gt;::ask&lt;br/&gt;line 94&quot;]
+    n_ask_once([&quot;Answer&lt;T&gt;::ask_once&lt;br/&gt;line 113&quot;])
+    n_get([&quot;Answer&lt;T&gt;::get&lt;br/&gt;line 124&quot;])
+    n_is_waiting([&quot;Answer&lt;T&gt;::is_waiting&lt;br/&gt;line 145&quot;])
+    n_forget([&quot;Answer&lt;T&gt;::forget&lt;br/&gt;line 151&quot;])
     n_ask_once --&gt; n_ask
     n_new --&gt; n_default
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L71&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L82&quot; &quot;open the source&quot;
-    click n_ask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L92&quot; &quot;open the source&quot;
-    click n_ask_once href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L111&quot; &quot;open the source&quot;
-    click n_get href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L122&quot; &quot;open the source&quot;
-    click n_is_waiting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L143&quot; &quot;open the source&quot;
-    click n_forget href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L149&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L73&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L84&quot; &quot;open the source&quot;
+    click n_ask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L94&quot; &quot;open the source&quot;
+    click n_ask_once href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L113&quot; &quot;open the source&quot;
+    click n_get href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L124&quot; &quot;open the source&quot;
+    click n_is_waiting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L145&quot; &quot;open the source&quot;
+    click n_forget href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L151&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_ask_once,n_get,n_is_waiting,n_forget entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -211,14 +213,14 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Answer</code> <sub>pub struct</sub></td><td><a href="offthread.src.html#fn-answer">62</a></td><td>One value, worked out off the drawing thread.</td></tr>
-<tr><td><code>Answer&lt;T&gt;::default</code> <sub>fn</sub></td><td><a href="offthread.src.html#fn-answer-t-default">71</a></td><td></td></tr>
-<tr><td><code>Answer&lt;T&gt;::new</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-new">82</a></td><td>Nothing asked yet.</td></tr>
-<tr><td><code>Answer&lt;T&gt;::ask</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-ask">92</a></td><td>Start the work, replacing anything already in flight.</td></tr>
-<tr><td><code>Answer&lt;T&gt;::ask_once</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-ask_once">111</a></td><td>Start the work, unless it has been started before.</td></tr>
-<tr><td><code>Answer&lt;T&gt;::get</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-get">122</a></td><td>The answer, if there is one.</td></tr>
-<tr><td><code>Answer&lt;T&gt;::is_waiting</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-is_waiting">143</a></td><td>Whether the work is still running.</td></tr>
-<tr><td><code>Answer&lt;T&gt;::forget</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-forget">149</a></td><td>Throw the answer away, so the next ask_once asks again.</td></tr>
+<tr><td><code>Answer</code> <sub>pub struct</sub></td><td><a href="offthread.src.html#fn-answer">64</a></td><td>One value, worked out off the drawing thread.</td></tr>
+<tr><td><code>Answer&lt;T&gt;::default</code> <sub>fn</sub></td><td><a href="offthread.src.html#fn-answer-t-default">73</a></td><td></td></tr>
+<tr><td><code>Answer&lt;T&gt;::new</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-new">84</a></td><td>Nothing asked yet.</td></tr>
+<tr><td><code>Answer&lt;T&gt;::ask</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-ask">94</a></td><td>Start the work, replacing anything already in flight.</td></tr>
+<tr><td><code>Answer&lt;T&gt;::ask_once</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-ask_once">113</a></td><td>Start the work, unless it has been started before.</td></tr>
+<tr><td><code>Answer&lt;T&gt;::get</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-get">124</a></td><td>The answer, if there is one.</td></tr>
+<tr><td><code>Answer&lt;T&gt;::is_waiting</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-is_waiting">145</a></td><td>Whether the work is still running.</td></tr>
+<tr><td><code>Answer&lt;T&gt;::forget</code> <sub>pub fn</sub></td><td><a href="offthread.src.html#fn-answer-t-forget">151</a></td><td>Throw the answer away, so the next ask_once asks again.</td></tr>
 </tbody></table>
 </section>
 </div></div>

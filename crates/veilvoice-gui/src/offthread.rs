@@ -23,7 +23,9 @@
 //! self.machine.ask_once(ui.ctx(), measure);   // spawns, returns at once
 //! match self.machine.get() {
 //!     Some(machine) => draw(ui, machine),
-//!     None => ui.spinner(),                   // still being read
+//!     // Still being read. One indicator, from `crate::progress`, which says
+//!     // what is happening and honours the reduce-motion setting.
+//!     None => crate::progress::strip(ui, "reading this machine", &reach, motion),
 //! }
 //! ```
 //!

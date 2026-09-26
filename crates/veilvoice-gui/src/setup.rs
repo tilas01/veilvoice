@@ -241,7 +241,7 @@ impl Setup {
         ui.add_space(18.0);
         ui.separator();
         ui.add_space(12.0);
-        self.companion_rows(ui);
+        self.companion_rows(ui, motion);
     }
 
     /// Why this tab is here, and how to make it not be.
@@ -542,55 +542,31 @@ impl Setup {
         });
     }
 
-    /// The progress strip: a travelling highlight, or a plain bar when motion
-    /// is off.
+    /// The progress strip, from [`crate::progress`].
+    ///
+    /// This drawing used to live here: a travelling highlight when motion was
+    /// allowed and a still bar when it was not, with the reasoning for both in
+    /// its own comment. Roadmap item 169 is that drawing being the only one in
+    /// the window rather than the best one in it, so the code moved and this
+    /// calls it. An installer reports nothing as it goes, so there is no
+    /// fraction to give and the reason is said rather than guessed at.
     fn progress(&self, ui: &mut Ui, motion: crate::prefs::Motion) {
         let label = self.busy.clone().unwrap_or_else(|| "working".to_string());
-        ui.horizontal(|ui| {
-            ui.label(RichText::new(format!("{label}…")).color(p::cyan()));
-        });
-        ui.add_space(4.0);
-
-        let (rect, _) = ui.allocate_exact_size(
-            egui::vec2(ui.available_width().min(420.0), 8.0),
-            egui::Sense::hover(),
+        crate::progress::strip(
+            ui,
+            &label,
+            &crate::progress::Reach::unmeasurable(
+                "reg.exe and a system package manager report nothing as they run, \
+                 so a bar would be filling to a number nobody measured",
+            ),
+            motion,
         );
-        let painter = ui.painter();
-        painter.rect_filled(rect, 3.0, p::bg_dark());
-        painter.rect_stroke(
-            rect,
-            3.0,
-            egui::Stroke::new(1.0, p::border()),
-            egui::StrokeKind::Inside,
-        );
-
-        if motion.enabled {
-            // A quarter-width highlight travelling left to right, so the
-            // window is visibly alive without claiming to know a percentage.
-            // It does not: `reg.exe` and a package manager report no progress,
-            // and a bar that fills to 90% and waits is a lie with a shape.
-            let time = ui.input(|i| i.time) as f32;
-            let width = rect.width() * 0.25;
-            let travel = rect.width() + width;
-            let position = (time * 0.45).fract() * travel - width;
-            let mut lit = rect;
-            lit.min.x = rect.min.x + position.max(0.0);
-            lit.max.x = (rect.min.x + position + width).min(rect.max.x);
-            if lit.max.x > lit.min.x {
-                painter.rect_filled(lit, 3.0, p::blue());
-            }
-        } else {
-            // Still, but not empty: an empty bar reads as "stuck".
-            let mut lit = rect;
-            lit.set_width(rect.width() * 0.35);
-            painter.rect_filled(lit, 3.0, p::blend(p::blue(), p::bg_dark(), 0.45));
-        }
     }
 
     // --- the companions ----------------------------------------------------
 
     /// One row per companion: whether it is here, and how to get it if not.
-    fn companion_rows(&mut self, ui: &mut Ui) {
+    fn companion_rows(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         ui.label(RichText::new("Companion software").color(p::blue()).small());
         ui.add_space(6.0);
         ui.label(
@@ -619,6 +595,7 @@ impl Setup {
                     "each one is a separate look, and on Windows finding out \
                      whether GnuPG is inside WSL means starting WSL",
                 ),
+                motion,
             );
         } else if ui
             .button(RichText::new("look again").color(p::muted()).small())
@@ -1090,9 +1067,11 @@ mod companion_tests {
         let rows = &shipped[at..];
         let rows = rows.split("\n    fn ").next().unwrap_or(rows);
         assert!(
-            rows.contains("progress::strip(") || rows.contains("ui.spinner()"),
+            rows.contains("progress::strip("),
             "nothing on screen says the probe is running, so the button reads \
-             as dead"
+             as dead. It is the shared indicator or nothing: roadmap item 169 \
+             left one in this crate and a second would not honour the \
+             reduce-motion setting."
         );
     }
 

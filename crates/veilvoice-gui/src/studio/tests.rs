@@ -656,7 +656,10 @@ fn the_studio_meters_what_goes_in_as_well_as_what_comes_out() {
     // only the file it reads has moved.
     let source = std::fs::read_to_string("src/app.rs").expect("the window's source");
     let body = source
-        .split("fn studio_tab(&mut self, ui: &mut egui::Ui) {")
+        // Split on the name alone: the signature gained the resolved motion
+        // setting in roadmap item 169, and a test that names a whole signature
+        // fails on the next parameter rather than on the property it checks.
+        .split("fn studio_tab(")
         .nth(1)
         .and_then(|rest| rest.split("\n    fn ").next())
         .expect("the Studio tab has to be findable");

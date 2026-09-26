@@ -1553,6 +1553,7 @@ impl Studio {
         config: DeidConfig,
         input: Option<&str>,
         output: Option<&str>,
+        motion: crate::prefs::Motion,
     ) {
         // The workers' answers, before anything is drawn from them. Both are
         // drained here and in `browser`, because the shut panel and the decoy
@@ -1563,7 +1564,7 @@ impl Studio {
         ui.add_space(4.0);
 
         match self.phase() {
-            Phase::Shut => self.shut_panel(ui),
+            Phase::Shut => self.shut_panel(ui, motion),
             Phase::Idle => {
                 self.take_form(ui);
                 ui.add_space(10.0);
@@ -1684,7 +1685,7 @@ impl Studio {
     }
 
     /// The Recording Browser tab.
-    pub fn browser(&mut self, ui: &mut Ui) {
+    pub fn browser(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         self.poll_unlock();
         self.poll_decoys();
         ui.add_space(4.0);
@@ -1748,12 +1749,13 @@ impl Studio {
                     "a video is rendered by ffmpeg in one command, which reports \
                      nothing back that this window can read",
                 ),
+                motion,
             );
             ui.add_space(6.0);
         }
 
         if self.vault.is_none() {
-            self.shut_panel(ui);
+            self.shut_panel(ui, motion);
             self.say(ui);
             return;
         }
@@ -1765,7 +1767,7 @@ impl Studio {
                 )
                 .color(p::muted()),
             );
-            self.decoy_panel(ui);
+            self.decoy_panel(ui, motion);
             self.say(ui);
             return;
         }
@@ -1942,7 +1944,7 @@ impl Studio {
             .small(),
         );
 
-        self.decoy_panel(ui);
+        self.decoy_panel(ui, motion);
         self.say(ui);
     }
 
@@ -1951,7 +1953,7 @@ impl Studio {
     /// Here rather than in the Studio tab because it is about the folder the
     /// vault is in rather than about making a recording, and this is the tab
     /// that already shows what is on the disk.
-    fn decoy_panel(&mut self, ui: &mut Ui) {
+    fn decoy_panel(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         if self.vault.is_none() {
             return;
         }
@@ -1970,12 +1972,17 @@ impl Studio {
         }
         if let Some(reach) = &self.decoys_made {
             // A real bar, because the total is the number that was asked for.
-            crate::progress::strip(ui, "making them, each the size of the real one", reach);
+            crate::progress::strip(
+                ui,
+                "making them, each the size of the real one",
+                reach,
+                motion,
+            );
         }
     }
 
     /// The panel shown while the vault is shut, in both tabs.
-    fn shut_panel(&mut self, ui: &mut Ui) {
+    fn shut_panel(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         ui.label(RichText::new("The vault is shut").color(p::blue()).small());
         ui.add_space(4.0);
         ui.label(
@@ -2036,11 +2043,8 @@ impl Studio {
             crate::progress::strip(
                 ui,
                 "trying the folder",
-                &crate::progress::Reach::unmeasurable(
-                    "deriving the key is one long computation with no countable \
-                     middle, which is the same property that makes a passphrase \
-                     expensive to guess",
-                ),
+                &crate::progress::Reach::unmeasurable(crate::progress::KEY_DERIVATION),
+                motion,
             );
         }
         if !ready && self.unlocking.is_none() {

@@ -696,7 +696,7 @@ impl Security {
     }
 
     /// Whether a lock operation is running, so the window keeps repainting and
-    /// the spinner actually spins.
+    /// the indicator beside the field keeps moving.
     pub fn is_busy(&self) -> bool {
         self.busy()
     }
@@ -810,8 +810,12 @@ impl Security {
 
         if busy {
             crate::layout::centred_row(ui, |ui| {
-                ui.spinner();
-                ui.label(RichText::new("deriving key…").color(p::muted()));
+                crate::progress::strip(
+                    ui,
+                    "deriving the key",
+                    &crate::progress::Reach::unmeasurable(crate::progress::KEY_DERIVATION),
+                    motion,
+                );
             });
         }
 
@@ -904,7 +908,7 @@ impl Security {
     }
 
     /// The security tab: manage the lock, and see what it is worth.
-    pub fn tab(&mut self, ui: &mut egui::Ui) {
+    pub fn tab(&mut self, ui: &mut egui::Ui, motion: crate::prefs::Motion) {
         self.poll();
 
         // Whatever the key picker answered while the reader was browsing. Taken
@@ -1044,10 +1048,12 @@ impl Security {
         }
 
         if busy {
-            ui.horizontal(|ui| {
-                ui.spinner();
-                ui.label(RichText::new("deriving key…").color(p::muted()));
-            });
+            crate::progress::strip(
+                ui,
+                "deriving the key",
+                &crate::progress::Reach::unmeasurable(crate::progress::KEY_DERIVATION),
+                motion,
+            );
         }
         if let Some((text, colour)) = &self.message {
             ui.label(RichText::new(text).color(*colour));

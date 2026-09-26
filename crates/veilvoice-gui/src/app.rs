@@ -617,7 +617,11 @@ impl VeilVoiceApp {
     /// It says which of the two records was consulted, because a sealed record
     /// and a plain one are worth different amounts and a reader who is not told
     /// which they have will assume the better one.
-    fn integrity_panel(ui: &mut egui::Ui, state: &crate::integrity::State) {
+    fn integrity_panel(
+        ui: &mut egui::Ui,
+        state: &crate::integrity::State,
+        motion: crate::prefs::Motion,
+    ) {
         use crate::integrity::State;
 
         ui.add_space(16.0);
@@ -629,10 +633,15 @@ impl VeilVoiceApp {
                 ui.label(RichText::new("not checked this session").color(p::muted()));
             }
             State::Working => {
-                ui.horizontal(|ui| {
-                    ui.spinner();
-                    ui.label(RichText::new("reading and hashing…").color(p::muted()));
-                });
+                crate::progress::strip(
+                    ui,
+                    "reading and hashing its own files",
+                    &crate::progress::Reach::unmeasurable(
+                        "the list of files is built as it goes rather than counted \
+                         first",
+                    ),
+                    motion,
+                );
             }
             State::Recorded { sealed } => {
                 ui.label(
@@ -1413,10 +1422,13 @@ impl eframe::App for VeilVoiceApp {
                     // enumerator cost on Windows, and the card used to make
                     // one per frame.
                     let devices = (self.inputs.len(), self.outputs.len());
-                    if self
-                        .first_run
-                        .panel(ui, &mut self.preferences, &mut self.security, devices)
-                        == crate::firstrun::Outcome::Finished
+                    if self.first_run.panel(
+                        ui,
+                        &mut self.preferences,
+                        &mut self.security,
+                        devices,
+                        motion,
+                    ) == crate::firstrun::Outcome::Finished
                     {
                         self.preferences.finish_first_run();
                         // Roadmap item 171. The walkthrough starts the moment
@@ -1455,14 +1467,14 @@ impl eframe::App for VeilVoiceApp {
                 egui::ScrollArea::vertical()
                     .auto_shrink([false, false])
                     .show(ui, |ui| match self.tab {
-                        Tab::File => self.file_tab(ui),
-                        Tab::Group => self.group.tab(ui, &mut self.preferences),
-                        Tab::Studio => self.studio_tab(ui),
-                        Tab::Browser => self.studio.browser(ui),
+                        Tab::File => self.file_tab(ui, motion),
+                        Tab::Group => self.group.tab(ui, &mut self.preferences, motion),
+                        Tab::Studio => self.studio_tab(ui, motion),
+                        Tab::Browser => self.studio.browser(ui, motion),
                         Tab::Watch => self.watch_tab(ui),
                         Tab::Security => {
-                            self.security.tab(ui);
-                            Self::integrity_panel(ui, self.integrity.state());
+                            self.security.tab(ui, motion);
+                            Self::integrity_panel(ui, self.integrity.state(), motion);
                             // Roadmap items 82 to 84. Returns true when the choice
                             // changed, which is when it is worth a write to
                             // the settings file rather than every frame.
@@ -1470,10 +1482,10 @@ impl eframe::App for VeilVoiceApp {
                                 self.preferences.set_destination(&self.storage.destination);
                             }
                         }
-                        Tab::Verify => self.verify.tab(ui),
+                        Tab::Verify => self.verify.tab(ui, motion),
                         Tab::Preferences => self.preferences.tab(ui, ctx),
                         Tab::Setup => self.setup.tab(ui, motion),
-                        Tab::About => self.about_tab(ui),
+                        Tab::About => self.about_tab(ui, motion),
                     });
             });
         });
@@ -1563,9 +1575,9 @@ impl eframe::App for VeilVoiceApp {
             || self.integrity.is_busy()
             || self.setup.is_busy()
         {
-            // Progress bars and spinners, at the same rate as everything else
-            // that moves. Fifty milliseconds here was twenty a second beside a
-            // header animating at its own rate, which is what the judder was.
+            // The one indicator, at the same rate as everything else that moves.
+            // Fifty milliseconds here was twenty a second beside a header
+            // animating at its own rate, which is what the judder was.
             crate::pace::next_frame(ctx);
         } else if autolock.enabled && !self.security.is_locked() {
             // Roadmap item 92. Once a second is enough to notice a delay measured in
@@ -1737,7 +1749,7 @@ impl VeilVoiceApp {
     }
 
     /// Draw the File tab: pick a recording, veil it, write it somewhere else.
-    fn file_tab(&mut self, ui: &mut egui::Ui) {
+    fn file_tab(&mut self, ui: &mut egui::Ui, motion: crate::prefs::Motion) {
         ui.add_space(4.0);
         ui.label(RichText::new("Input").color(p::blue()).small());
         ui.horizontal(|ui| {
@@ -1812,10 +1824,15 @@ impl VeilVoiceApp {
             ui.label(RichText::new(reason).color(p::yellow()).small());
         }
         if busy {
-            ui.horizontal(|ui| {
-                ui.spinner();
-                ui.label(RichText::new("processing…").color(p::muted()));
-            });
+            crate::progress::strip(
+                ui,
+                "processing",
+                &crate::progress::Reach::unmeasurable(
+                    "the engine reports each speaker's turns separately rather than \
+                     the recording as one number",
+                ),
+                motion,
+            );
         }
 
         if let Some((message, colour)) = &self.status {
@@ -2035,7 +2052,7 @@ impl VeilVoiceApp {
     }
 
     /// Draw the Recording Studio: record into the vault, veiled on the way in.
-    fn studio_tab(&mut self, ui: &mut egui::Ui) {
+    fn studio_tab(&mut self, ui: &mut egui::Ui, motion: crate::prefs::Motion) {
         let veiling = self.studio.is_veiling();
 
         ui.add_space(4.0);
@@ -2389,7 +2406,7 @@ impl VeilVoiceApp {
         let input = self.chosen_input.clone();
         let output = self.chosen_output.clone();
         self.studio
-            .tab(ui, config, input.as_deref(), output.as_deref());
+            .tab(ui, config, input.as_deref(), output.as_deref(), motion);
     }
 
     /// Veil to this machine's own output, and say where it is going.
@@ -2683,7 +2700,7 @@ impl VeilVoiceApp {
     }
 
     /// Draw the About tab: versions, where files live, and the companion list.
-    fn about_tab(&mut self, ui: &mut egui::Ui) {
+    fn about_tab(&mut self, ui: &mut egui::Ui, motion: crate::prefs::Motion) {
         ui.add_space(4.0);
         field(ui, "app", env!("CARGO_PKG_VERSION"));
         // **Roadmap item 165.** Which stream this build came from. Read from the
@@ -2775,7 +2792,7 @@ impl VeilVoiceApp {
         paths_section(ui);
 
         ui.add_space(16.0);
-        self.updates.section(ui, env!("CARGO_PKG_VERSION"));
+        self.updates.section(ui, env!("CARGO_PKG_VERSION"), motion);
 
         ui.add_space(16.0);
         ui.label(RichText::new("What this protects").color(p::blue()).small());
