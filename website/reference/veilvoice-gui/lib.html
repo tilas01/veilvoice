@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/lib.svg" alt="lib.rs" width="1200" height="188" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 382 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 387 lines &middot; <a href="lib.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-modules">The modules</a>
@@ -91,7 +91,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>382 lines defining <strong>7 functions</strong> (3 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>387 lines defining <strong>7 functions</strong> (3 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>tabs</code> <span style="color:var(--muted)">line 68</span> &middot; The name of every tab the window shows, in the order it shows them.
 </li>
@@ -148,7 +148,7 @@
 <a href="lib.src.html#fn-headless_frame">
 <rect x="238.0" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="308.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">headless_frame</text>
-<text x="308.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 193</text>
+<text x="308.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 194</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -171,7 +171,7 @@ flowchart TD
     n_hide_console[&quot;hide_console&lt;br/&gt;line 122&quot;]
     n_hide_console[&quot;hide_console&lt;br/&gt;line 132&quot;]
     n_jetbrains_mono_path([&quot;jetbrains_mono_path&lt;br/&gt;line 140&quot;])
-    n_headless_frame[&quot;headless_frame&lt;br/&gt;line 193&quot;]
+    n_headless_frame[&quot;headless_frame&lt;br/&gt;line 194&quot;]
     n_command --&gt; n_hide_console
     click n_tabs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68&quot; &quot;open the source&quot;
     click n_settings_pages href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L84&quot; &quot;open the source&quot;
@@ -179,7 +179,7 @@ flowchart TD
     click n_hide_console href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L122&quot; &quot;open the source&quot;
     click n_hide_console href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L132&quot; &quot;open the source&quot;
     click n_jetbrains_mono_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L140&quot; &quot;open the source&quot;
-    click n_headless_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L193&quot; &quot;open the source&quot;
+    click n_headless_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L194&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_tabs,n_settings_pages,n_jetbrains_mono_path entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -196,9 +196,9 @@ flowchart TD
 <tr><td><code>hide_console</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-hide_console">122</a></td><td>The Windows half of command.</td></tr>
 <tr><td><code>hide_console</code> <sub>fn</sub></td><td><a href="lib.src.html#fn-hide_console-2">132</a></td><td>The everywhere-else half of command: no console is created by spawning a process in the first place, so there is nothing to suppress.</td></tr>
 <tr><td><code>jetbrains_mono_path</code> <sub>pub fn</sub></td><td><a href="lib.src.html#fn-jetbrains_mono_path">140</a></td><td>Where JetBrains Mono is on this machine, if it is anywhere.</td></tr>
-<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-version">180</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
-<tr><td><code>headless_frame</code> <sub>pub(crate) fn</sub></td><td><a href="lib.src.html#fn-headless_frame">193</a></td><td>Draw one frame with no window, and discard what a real backend would have uploaded.</td></tr>
-<tr><td><code>spawn_tests</code> <sub>mod</sub></td><td><a href="lib.src.html#fn-spawn_tests">204</a></td><td></td></tr>
+<tr><td><code>VERSION</code> <sub>pub const</sub></td><td><a href="lib.src.html#fn-version">181</a></td><td>Crate version string, surfaced in the About panel.</td></tr>
+<tr><td><code>headless_frame</code> <sub>pub(crate) fn</sub></td><td><a href="lib.src.html#fn-headless_frame">194</a></td><td>Draw one frame with no window, and discard what a real backend would have uploaded.</td></tr>
+<tr><td><code>spawn_tests</code> <sub>mod</sub></td><td><a href="lib.src.html#fn-spawn_tests">205</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

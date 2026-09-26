@@ -111,6 +111,11 @@ pub struct FirstRun {
     same_passphrase: bool,
     /// Set once the lock has been asked for, so the card stops offering.
     lock_requested: bool,
+    /// What the last card reads from this machine, read once and elsewhere.
+    ///
+    /// Not a set of fields here, because the point is that none of them exists
+    /// until a worker has been and got them. See [`Reading`] and F-216.
+    reading: crate::offthread::Answer<Reading>,
 }
 
 /// What the panel wants the application to do after drawing.
@@ -134,6 +139,7 @@ impl FirstRun {
         ui: &mut Ui,
         prefs: &mut crate::settings::Settings,
         security: &mut crate::security::Security,
+        devices: (usize, usize),
     ) -> Outcome {
         ui.add_space(18.0);
         ui.vertical_centered(|ui| {
@@ -161,7 +167,7 @@ impl FirstRun {
             Step::AppLock => self.app_lock(ui, security),
             Step::Recording => self.recording(ui, security),
             Step::Autolock => self.autolock(ui, prefs),
-            Step::Machine => self.machine(ui, prefs),
+            Step::Machine => self.machine(ui, prefs, devices),
         };
 
         if advance {
@@ -361,18 +367,38 @@ impl FirstRun {
         advance || next
     }
 
-    /// What this machine says about itself, and the one choice that follows.
+    /// The machine card: what this computer says, read once rather than per frame.
     ///
-    /// **Roadmap item 135.** Every number here is read from the machine at the moment
-    /// the card is drawn. None of it is a default written into this program: a
-    /// setup screen that asserts how much room there is, or that the graphics
-    /// will be fine, is guessing on somebody else's hardware and sounding
-    /// certain about it.
+    /// # Why the reading is not done here
     ///
-    /// Where the machine will not say, the card says that instead. "This system
-    /// would not tell us" is a real answer and is a different one from a
-    /// number.
-    fn machine(&mut self, ui: &mut Ui, prefs: &mut crate::settings::Settings) -> bool {
+    /// Every answer on this card is a question with a cost.
+    /// `veilvoice_setup::space::free_bytes` spawns `df` on Unix and
+    /// `fsutil.exe` on Windows; the graphics probe asks the driver. Written
+    /// inline, which is how this card was written, each of them ran **once per
+    /// frame** for as long as the card was on screen: a process forked sixty
+    /// times a second to print a number that changes about as often as
+    /// somebody empties a bin. See F-216.
+    ///
+    /// So the reading happens on a worker and the card draws whatever has come
+    /// back. The card still measures rather than asserting, which is roadmap
+    /// item 135's whole point; it measures once.
+    ///
+    /// # And the device counts come from the caller
+    ///
+    /// There is one enumeration of the audio hardware in this program, in
+    /// `app`, at startup. **F-165** is what a second one cost: two enumerators
+    /// running beside each other killed the process on Windows. This card used
+    /// to make its own, per frame, which is the same defect with a worse
+    /// multiplier. It now takes the count from the place that already has it,
+    /// so there is one answer rather than two that could disagree.
+    fn machine(
+        &mut self,
+        ui: &mut Ui,
+        prefs: &mut crate::settings::Settings,
+        devices: (usize, usize),
+    ) -> bool {
+        self.reading.ask_once(ui.ctx(), read_machine);
+        let reading = self.reading.get();
         card(ui, "What this machine says", |ui| {
             ui.label(
                 RichText::new(
@@ -389,15 +415,31 @@ impl FirstRun {
             // disk with nothing left on it are the same problem to somebody
             // whose recording did not save.
             ui.label(RichText::new("Where recordings will go").color(p::blue()));
-            match veilvoice_crypto::lock::default_dir() {
-                Some(dir) => {
+            match reading {
+                None => still_reading(ui),
+                Some(Reading { dir: None, .. }) => {
+                    ui.label(
+                        RichText::new(
+                            "This system does not say where an application should \
+                             keep its files, so nothing will be kept between runs \
+                             and the vault cannot be opened. The About tab says \
+                             the same thing in more detail.",
+                        )
+                        .color(p::red()),
+                    );
+                }
+                Some(Reading {
+                    dir: Some(dir),
+                    free,
+                    ..
+                }) => {
                     ui.label(RichText::new(dir.display().to_string()).color(p::cyan()));
                     ui.label(
-                        RichText::new(match veilvoice_setup::space::free_bytes(&dir) {
+                        RichText::new(match free {
                             Some(free) => format!(
                                 "{} free there, which is room for about {} of an \
                                  hour's veiled audio.",
-                                crate::studio::size(usize::try_from(free).unwrap_or(usize::MAX)),
+                                crate::studio::size(usize::try_from(*free).unwrap_or(usize::MAX)),
                                 // An hour of 48 kHz mono 16-bit audio, which is
                                 // what the recorder writes. Worked out from the
                                 // free space rather than stated, so it is this
@@ -414,22 +456,11 @@ impl FirstRun {
                         .color(p::muted()),
                     );
                 }
-                None => {
-                    ui.label(
-                        RichText::new(
-                            "This system does not say where an application should \
-                             keep its files, so nothing will be kept between runs \
-                             and the vault cannot be opened. The About tab says \
-                             the same thing in more detail.",
-                        )
-                        .color(p::red()),
-                    );
-                }
             }
 
             ui.add_space(12.0);
             ui.label(RichText::new("Sound devices").color(p::blue()));
-            let (inputs, outputs) = device_counts();
+            let (inputs, outputs) = devices;
             ui.label(
                 RichText::new(match (inputs, outputs) {
                     (0, 0) => "None found. Anonymising a file still works; the \
@@ -449,6 +480,9 @@ impl FirstRun {
 
             ui.add_space(12.0);
             ui.label(RichText::new("Drawing the window").color(p::blue()));
+            // Outside the reading, and deliberately: this is a preference
+            // rather than a measurement, so it is there to be changed on the
+            // first frame whether or not the driver has answered yet.
             let mut accelerated = prefs.acceleration();
             if ui
                 .checkbox(
@@ -464,25 +498,31 @@ impl FirstRun {
             // every machine. This card is called "What this machine says" and
             // this was the one section on it that did not say anything about
             // the machine.
-            ui.label(
-                RichText::new(crate::probe::look().acceleration_reason.as_str())
-                    .small()
-                    .color(p::muted()),
-            );
-            // And a plain statement of whether the sentence above is a finding
-            // or a fallback. A reader deciding whether to touch the tick needs
-            // to know which, and an interface that reads the same either way is
-            // claiming a measurement it may not have taken.
-            if !crate::probe::look().graphics_answered {
-                ui.label(
-                    RichText::new(
-                        "This is the setting every machine started on before it \
-                         could be asked, so nothing is lost by it. The About tab \
-                         shows what the driver actually gave.",
-                    )
-                    .small()
-                    .color(p::muted()),
-                );
+            match reading {
+                None => still_reading(ui),
+                Some(machine) => {
+                    ui.label(
+                        RichText::new(machine.acceleration_reason.as_str())
+                            .small()
+                            .color(p::muted()),
+                    );
+                    // And a plain statement of whether the sentence above is a
+                    // finding or a fallback. A reader deciding whether to touch
+                    // the tick needs to know which, and an interface that reads
+                    // the same either way is claiming a measurement it may not
+                    // have taken.
+                    if !machine.graphics_answered {
+                        ui.label(
+                            RichText::new(
+                                "This is the setting every machine started on before it \
+                                 could be asked, so nothing is lost by it. The About tab \
+                                 shows what the driver actually gave.",
+                            )
+                            .small()
+                            .color(p::muted()),
+                        );
+                    }
+                }
             }
         });
         buttons(ui, "finish", None).0
@@ -527,37 +567,66 @@ fn card(ui: &mut Ui, title: &str, contents: impl FnOnce(&mut Ui)) {
         });
 }
 
-/// How many recording and playback devices this machine has.
+/// What the last card of the tour reads from this computer.
 ///
-/// Counted rather than listed on the setup card: the names are long, the list
-/// belongs in Settings where it can be chosen from, and the question at first
-/// run is "is there one at all", which a number answers.
+/// One struct rather than four calls, because the point is that they happen
+/// together, once, somewhere that is not the thread drawing the window. Each
+/// field is an answer that has already been got; a card holding these is a
+/// card that cannot ask again by accident. See [`crate::offthread`] and F-216.
 ///
-/// A platform that will not enumerate reports zero of each, which the card
-/// reads the same way as a machine with no sound card. That is the right
-/// reading here: from the person's side, "we cannot see a microphone" and
-/// "there is no microphone" have the same consequence.
-///
-/// # Not called by any test, and that is deliberate
-///
-/// This asks the platform for its real devices, and a test that did so was
-/// **F-165**: the desktop crate's test binary already enumerates once, on
-/// purpose, in `app`, and a second enumerator running beside it killed the
-/// process on Windows. One enumeration, in one place, is what this crate does.
-/// What can be checked without a device is that the card calls this rather than
-/// carrying a number, and a test reads the card's source for exactly that.
-fn device_counts() -> (usize, usize) {
-    use veilvoice_audio::devices::Direction;
-    (
-        veilvoice_audio::devices::list(Direction::Input)
-            .map(|d| d.len())
-            .unwrap_or(0),
-        veilvoice_audio::devices::list(Direction::Output)
-            .map(|d| d.len())
-            .unwrap_or(0),
-    )
+/// **Roadmap item 135's whole point** is that this card reads the machine
+/// rather than carrying numbers written here, because a constant would be a
+/// claim about somebody else's hardware stated with the confidence of a
+/// measurement. That is unchanged: these are measurements. They are taken
+/// once.
+struct Reading {
+    /// Where recordings will go, if this system says where an application
+    /// should keep its files.
+    dir: Option<std::path::PathBuf>,
+    /// Free bytes there, if the system would say. `None` is reported as not
+    /// known rather than as zero, which would read as a full disk.
+    free: Option<u64>,
+    /// The graphics probe's own sentence about this machine.
+    acceleration_reason: String,
+    /// Whether that sentence is a finding or the fallback everything starts on.
+    graphics_answered: bool,
 }
 
+/// Ask this computer everything the last card shows, on a worker thread.
+///
+/// The device counts are **not** here. There is one enumeration of the audio
+/// hardware in this program, in `app`, and F-165 is what a second one cost.
+/// The card takes that count from its caller instead.
+fn read_machine() -> Reading {
+    let dir = veilvoice_crypto::lock::default_dir();
+    let free = dir.as_deref().and_then(veilvoice_setup::space::free_bytes);
+    // `look` keeps its answer in a `OnceLock`, so asking here both fills this
+    // card and means the first frame of the About tab finds the answer already
+    // made rather than waiting for the driver itself.
+    let probe = crate::probe::look();
+    Reading {
+        dir,
+        free,
+        acceleration_reason: probe.acceleration_reason.clone(),
+        graphics_answered: probe.graphics_answered,
+    }
+}
+
+/// The line a card shows where an answer will go, while it is being got.
+///
+/// Said rather than left blank. A section that is empty for a moment and then
+/// is not reads as the window having glitched, and the spinner is the
+/// difference between "being read" and "this machine has none".
+fn still_reading(ui: &mut Ui) {
+    ui.horizontal(|ui| {
+        ui.spinner();
+        ui.label(
+            RichText::new("reading this machine")
+                .small()
+                .color(p::muted()),
+        );
+    });
+}
 /// A password field with its label, laid out like the rest of the application.
 fn field(ui: &mut Ui, label: &str, value: &mut String) {
     ui.horizontal(|ui| {
@@ -647,34 +716,113 @@ mod tests {
         assert!(!run.should_skip(Step::Autolock, &security));
     }
 
-    /// **Roadmap item 135's whole point.** The card has to read the machine rather
-    /// than carry numbers written here. A constant would be a claim about
-    /// somebody else's hardware, stated with the confidence of a measurement.
+    /// **Roadmap item 135's whole point.** The card has to read the machine
+    /// rather than carry numbers written here. A constant would be a claim
+    /// about somebody else's hardware, stated with the confidence of a
+    /// measurement.
+    ///
+    /// The reading moved off the drawing thread under F-216, so the
+    /// measurement is looked for in [`super::read_machine`] rather than in the
+    /// card. That is the same requirement about a different function, and the
+    /// test below is what stops it moving back.
     #[test]
     fn the_machine_card_measures_rather_than_asserts() {
         let source = include_str!("firstrun.rs");
-        let at = source.find("fn machine").expect("the card exists");
+        let at = source.find("fn read_machine").expect("the reading exists");
         let rest = &source[at..];
-        let body = rest.split("\n    fn ").next().unwrap_or(rest);
+        let reading = rest.split("\n/// ").next().unwrap_or(rest);
 
         for reads in [
             "veilvoice_setup::space::free_bytes",
             "veilvoice_crypto::lock::default_dir",
-            "device_counts()",
-            "prefs.acceleration()",
+            "crate::probe::look()",
         ] {
             assert!(
-                body.contains(reads),
-                "the card no longer reads {reads}, so it is asserting something \
-                 about this machine instead of measuring it"
+                reading.contains(reads),
+                "the reading no longer asks this machine for {reads}, so the \
+                 card is asserting something about somebody else's hardware \
+                 instead of measuring this one"
             );
+        }
+
+        let at = source.find("fn machine(").expect("the card exists");
+        let rest = &source[at..];
+        let card = rest.split("\n    fn ").next().unwrap_or(rest);
+        // The card shows what was read, and offers the one thing on it that is
+        // a preference rather than a measurement.
+        for shows in ["self.reading", "prefs.acceleration()"] {
+            assert!(card.contains(shows), "the card no longer draws {shows}");
         }
         // And it says so when the machine will not answer, rather than
         // printing a number it did not get.
         assert!(
-            body.contains("would not say"),
+            card.contains("would not say"),
             "the card has no answer for a system that will not say how much \
              room is free, so it would show one that was never measured"
+        );
+    }
+
+    /// **F-216.** The card asks this machine once, not once per frame.
+    ///
+    /// `free_bytes` spawns `df` on Unix and `fsutil.exe` on Windows, and the
+    /// graphics probe queries the driver. Written inline in the card, which is
+    /// where they were, each of those ran on every frame the card was on
+    /// screen: a process forked sixty times a second, on the thread that draws.
+    ///
+    /// Read from the source, because a frame count is not observable from here
+    /// and the defect is a shape rather than a timing: a machine read written
+    /// inside the drawing function is the defect, wherever it ends up costing.
+    #[test]
+    fn the_card_does_not_read_the_machine_while_drawing() {
+        let source = include_str!("firstrun.rs");
+        let at = source.find("fn machine(").expect("the card exists");
+        let rest = &source[at..];
+        let card = rest.split("\n    fn ").next().unwrap_or(rest);
+        let card: String = card
+            .lines()
+            .filter(|line| !line.trim_start().starts_with("//"))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        for waits in [
+            "space::free_bytes",
+            "devices::list",
+            "crate::probe::look()",
+            "default_dir()",
+        ] {
+            assert!(
+                !card.contains(waits),
+                "the card calls {waits} while drawing, so it runs once per \
+                 frame on the thread that paints. Read it in `read_machine` \
+                 and hand it over, as F-216 did."
+            );
+        }
+        assert!(
+            card.contains("ask_once"),
+            "the reading is no longer started once, so whatever starts it \
+             starts it again on every frame"
+        );
+    }
+
+    /// The counts come from the one enumeration this program makes.
+    ///
+    /// **F-165.** Two enumerators of the audio hardware running beside each
+    /// other killed the process on Windows, so there is one, in `app`, at
+    /// startup. This card used to make its own, inside the frame.
+    #[test]
+    fn the_device_counts_are_not_enumerated_a_second_time() {
+        let source = include_str!("firstrun.rs");
+        let shipped = source.split("#[cfg(test)]").next().unwrap_or(source);
+        assert!(
+            !shipped.contains("devices::list"),
+            "the tour enumerates the audio hardware itself. There is one \
+             enumeration in this program, in `app`; the count is handed to \
+             `panel` rather than made again here. See F-165."
+        );
+        assert!(
+            shipped.contains("devices: (usize, usize)"),
+            "the panel no longer takes the counts, so whatever draws them is \
+             getting them from somewhere else"
         );
     }
 

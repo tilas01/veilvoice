@@ -178,6 +178,23 @@ pub struct Verify {
     /// whichever slot happened to be drawn when the dialog closed.
     choosing_for: Option<Slot>,
 
+    /// The signing key sitting beside the chosen hash list, if one shipped.
+    ///
+    /// **F-216.** This was `key.is_file()`, written where the commands are
+    /// built, which put a `stat` on the drawing thread on every frame the tab
+    /// was open. Cheap on a warm local disk and not cheap on a network share
+    /// or a drive that has spun down, which is where somebody checking a
+    /// download they were careful about is quite likely to have put it.
+    ///
+    /// Asked once per chosen hash list instead, off the thread.
+    key_beside: crate::offthread::Answer<Option<PathBuf>>,
+    /// Which hash list [`Verify::key_beside`] was asked about.
+    ///
+    /// The hash list is chosen in three different places, so the question is
+    /// asked from the one place that draws the answer rather than from each of
+    /// them: a memo of what was asked cannot fall out of step with the asking.
+    key_beside_for: Option<PathBuf>,
+
     /// Which OpenPGP implementation the reader chose, if any.
     ///
     /// `None` is not "decide for me": it is the ordinary state, and it means
@@ -657,8 +674,15 @@ impl Verify {
         };
 
         // The signing key beside the hash list, when the release shipped one.
-        let key = sums.with_file_name("veilvoice-signing-key.asc");
-        let key = key.is_file().then_some(key);
+        // Asked for once per hash list and answered elsewhere: see
+        // `key_beside`, and F-216 for what it cost per frame.
+        if self.key_beside_for.as_ref() != Some(&sums) {
+            self.key_beside_for = Some(sums.clone());
+            let beside = sums.with_file_name("veilvoice-signing-key.asc");
+            self.key_beside
+                .ask(ui.ctx(), move || beside.is_file().then_some(beside));
+        }
+        let key = self.key_beside.get().cloned().flatten();
         let commands = veilvoice_verify::gnupg::commands(&sums, &signature, key.as_deref());
 
         ui.add_space(4.0);
@@ -1522,6 +1546,58 @@ mod tests {
                 !body.contains(forbidden),
                 "the window runs {forbidden:?}: the independent check is \
                  independent because the person runs it"
+            );
+        }
+    }
+
+    /// **F-216.** The section does not ask the filesystem anything while drawing.
+    ///
+    /// The commands name the signing key when the release shipped one beside
+    /// the hash list, and finding that out was `key.is_file()`, written where
+    /// the commands are built. That runs on every frame the Verify tab is
+    /// open: cheap on a warm local disk, and not cheap on a network share or a
+    /// drive that has spun down, which is where somebody checking a download
+    /// they were careful about is quite likely to have put it.
+    ///
+    /// It is asked once per chosen hash list now, off the thread. Read from
+    /// the source, because a stat is not observable from a test and the defect
+    /// is the shape rather than any one machine's timing.
+    #[test]
+    fn the_gnupg_section_does_not_touch_the_disk_while_drawing() {
+        let source = include_str!("verify.rs").replace("\r\n", "\n");
+        let source = source.split("\n#[cfg(test)]").next().unwrap();
+        let start = source
+            .find("fn gnupg_section(")
+            .expect("the section exists");
+        let end = source[start..]
+            .find("\n    /// The answer, in the colour")
+            .map(|at| start + at)
+            .unwrap_or(source.len());
+        let body: String = source[start..end]
+            .lines()
+            .filter(|line| !line.trim_start().starts_with("//"))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        // The ask is allowed; it is a closure handed to a worker. What must
+        // not be here is the answer being worked out on the way past.
+        let asking = body.find("self.key_beside\n                .ask(");
+        assert!(
+            asking.is_some(),
+            "the signing key beside the hash list is no longer asked for off \
+             the thread, so whatever answers it answers it in the frame"
+        );
+        let drawing: String = body
+            .lines()
+            .filter(|line| !line.contains("beside.is_file()"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        for waits in [".is_file()", ".exists()", "read_to_string", "std::fs::"] {
+            assert!(
+                !drawing.contains(waits),
+                "the section calls {waits} while drawing, so it runs once per \
+                 frame on the thread that paints. Ask for it once, as the \
+                 signing key is asked for. See F-216."
             );
         }
     }

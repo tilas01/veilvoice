@@ -133,6 +133,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`main.rs`|File-veilvoice-gui-main]] &middot; Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way.
 - [[`monitor.rs`|File-veilvoice-gui-monitor]] &middot; The live monitor: what is going in, and what is coming out, wherever you are.
 - [[`notify.rs`|File-veilvoice-gui-notify]] &middot; How the application tells you something, and the three ways to be told.
+- [[`offthread.rs`|File-veilvoice-gui-offthread]] &middot; One answer, worked out somewhere that is not the thread drawing the window.
 - [[`pace.rs`|File-veilvoice-gui-pace]] &middot; How often the window draws while something in it is moving, and what that actually came to.
 - [[`palettes.rs`|File-veilvoice-gui-palettes]] &middot; User-defined colour schemes, and the contrast check that keeps them usable.
 - [[`paths.rs`|File-veilvoice-gui-paths]] &middot; Exactly where this copy of VeilVoice is keeping things.
