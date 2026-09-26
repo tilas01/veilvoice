@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-cli/src/guard.rs`
 
-[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 362 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs)
+[`veilvoice-cli`](../../../crates/veilvoice-cli/README.md) &middot; 369 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs)
 
 ## Contents
 
@@ -71,15 +71,15 @@ so, because a check somebody believes is a lock is worse than no check.
 
 ## What this file contains
 
-362 lines defining **9 functions** (1 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+369 lines defining **9 functions** (1 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Action` (line 54)
+- `enum Action` (line 61) -- What veilvoice guard can be asked to do.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `run` (line 120) -- Dispatch veilvoice guard to the subcommand that was asked for.
+- `run` (line 127) -- Dispatch veilvoice guard to the subcommand that was asked for.
   - reaches: `check`, `init`, `manifest_path`, `status`, `load`, `print_scope`, `sealed_path`, `default_targets`
 
 ## What calls what
@@ -102,15 +102,15 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_manifest_path["manifest_path<br/>line 79"]
-    n_sealed_path["sealed_path<br/>line 91"]
-    n_print_scope["print_scope<br/>line 97"]
-    n_default_targets["default_targets<br/>line 106"]
-    n_run(["run<br/>line 120"])
-    n_init["init<br/>line 137"]
-    n_load["load<br/>line 200"]
-    n_check["check<br/>line 217"]
-    n_status["status<br/>line 287"]
+    n_manifest_path["manifest_path<br/>line 86"]
+    n_sealed_path["sealed_path<br/>line 98"]
+    n_print_scope["print_scope<br/>line 104"]
+    n_default_targets["default_targets<br/>line 113"]
+    n_run(["run<br/>line 127"])
+    n_init["init<br/>line 144"]
+    n_load["load<br/>line 207"]
+    n_check["check<br/>line 224"]
+    n_status["status<br/>line 294"]
     n_check --> n_load
     n_check --> n_print_scope
     n_check --> n_sealed_path
@@ -124,15 +124,15 @@ flowchart TD
     n_run --> n_status
     n_status --> n_print_scope
     n_status --> n_sealed_path
-    click n_manifest_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L79" "open the source"
-    click n_sealed_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L91" "open the source"
-    click n_print_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L97" "open the source"
-    click n_default_targets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L106" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L120" "open the source"
-    click n_init href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L137" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L200" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L217" "open the source"
-    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L287" "open the source"
+    click n_manifest_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L86" "open the source"
+    click n_sealed_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L98" "open the source"
+    click n_print_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L104" "open the source"
+    click n_default_targets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L113" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L127" "open the source"
+    click n_init href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L144" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L207" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L224" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L294" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -145,16 +145,16 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Action` <sub>pub enum</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L54) |  |
-| `manifest_path` <sub>fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L79) | Where the manifest lives, beside the app lock. |
-| `sealed_path` <sub>fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L91) | A sealed manifest sits beside the plain one, with a different suffix. |
-| `print_scope` <sub>fn</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L97) | Say what the integrity record detects and what it cannot, before it is used. |
-| `default_targets` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L106) | The files worth watching when the user names none: the running binary, and the app lock beside it. |
-| `run` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L120) | Dispatch veilvoice guard to the subcommand that was asked for. |
-| `init` <sub>fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L137) | veilvoice guard init: record what these files are now. |
-| `load` <sub>fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L200) | Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there. |
-| `check` <sub>fn</sub> | [217](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L217) | veilvoice guard check: compare the files against the record and report. |
-| `status` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L287) | veilvoice guard status: what the record covers, and when it was taken. |
+| `Action` <sub>pub enum</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L61) | What veilvoice guard can be asked to do. |
+| `manifest_path` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L86) | Where the manifest lives, beside the app lock. |
+| `sealed_path` <sub>fn</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L98) | A sealed manifest sits beside the plain one, with a different suffix. |
+| `print_scope` <sub>fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L104) | Say what the integrity record detects and what it cannot, before it is used. |
+| `default_targets` <sub>fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L113) | The files worth watching when the user names none: the running binary, and the app lock beside it. |
+| `run` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L127) | Dispatch veilvoice guard to the subcommand that was asked for. |
+| `init` <sub>fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L144) | veilvoice guard init: record what these files are now. |
+| `load` <sub>fn</sub> | [207](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L207) | Load whichever form of the record exists, asking for a passphrase only if the sealed one is the one that is there. |
+| `check` <sub>fn</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L224) | veilvoice guard check: compare the files against the record and report. |
+| `status` <sub>fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/guard.rs#L294) | veilvoice guard status: what the record covers, and when it was taken. |
 
 ---
 

@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/policy.svg" alt="policy.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/policy.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 243 lines &middot; <a href="policy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 249 lines &middot; <a href="policy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#where-the-policy-lives">Where the policy lives</a>
@@ -90,18 +90,18 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>243 lines defining <strong>6 functions</strong> (5 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>249 lines defining <strong>6 functions</strong> (5 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>status</code> <span style="color:var(--muted)">line 58</span> &middot; What is in force, and what is known about the seal.
+<li><code>status</code> <span style="color:var(--muted)">line 64</span> &middot; What is in force, and what is known about the seal.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>dir</code>, <code>policy_dir</code></span>
 </li>
-<li><code>seal</code> <span style="color:var(--muted)">line 105</span> &middot; Write a policy and seal it.
+<li><code>seal</code> <span style="color:var(--muted)">line 111</span> &middot; Write a policy and seal it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>dir</code>, <code>policy_dir</code></span>
 </li>
-<li><code>verify</code> <span style="color:var(--muted)">line 162</span> &middot; Check the plain policy against its sealed copy.
+<li><code>verify</code> <span style="color:var(--muted)">line 168</span> &middot; Check the plain policy against its sealed copy.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>dir</code>, <code>policy_dir</code></span>
 </li>
-<li><code>remove</code> <span style="color:var(--muted)">line 189</span> &middot; Delete both files.
+<li><code>remove</code> <span style="color:var(--muted)">line 195</span> &middot; Delete both files.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>dir</code>, <code>policy_dir</code></span>
 </li>
 </ul>
@@ -132,27 +132,27 @@
 <a href="policy.src.html#fn-dir">
 <rect x="162.6" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="204.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">dir</text>
-<text x="204.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 49</text>
+<text x="204.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 55</text>
 </a>
 <a href="policy.src.html#fn-status">
 <rect x="273.0" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="315.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status</text>
-<text x="315.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 58</text>
+<text x="315.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 64</text>
 </a>
 <a href="policy.src.html#fn-seal">
 <rect x="383.4" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="429.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">seal</text>
-<text x="429.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
+<text x="429.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 111</text>
 </a>
 <a href="policy.src.html#fn-verify">
 <rect x="501.9" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="548.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">verify</text>
-<text x="548.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
+<text x="548.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 168</text>
 </a>
 <a href="policy.src.html#fn-remove">
 <rect x="265.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="311.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove</text>
-<text x="311.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 189</text>
+<text x="311.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 195</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -172,22 +172,22 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_policy_dir[&quot;policy_dir&lt;br/&gt;line 45&quot;]
-    n_dir[&quot;dir&lt;br/&gt;line 49&quot;]
-    n_status([&quot;status&lt;br/&gt;line 58&quot;])
-    n_seal([&quot;seal&lt;br/&gt;line 105&quot;])
-    n_verify([&quot;verify&lt;br/&gt;line 162&quot;])
-    n_remove([&quot;remove&lt;br/&gt;line 189&quot;])
+    n_dir[&quot;dir&lt;br/&gt;line 55&quot;]
+    n_status([&quot;status&lt;br/&gt;line 64&quot;])
+    n_seal([&quot;seal&lt;br/&gt;line 111&quot;])
+    n_verify([&quot;verify&lt;br/&gt;line 168&quot;])
+    n_remove([&quot;remove&lt;br/&gt;line 195&quot;])
     n_dir --&gt; n_policy_dir
     n_remove --&gt; n_dir
     n_seal --&gt; n_dir
     n_status --&gt; n_dir
     n_verify --&gt; n_dir
     click n_policy_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L45&quot; &quot;open the source&quot;
-    click n_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L49&quot; &quot;open the source&quot;
-    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L58&quot; &quot;open the source&quot;
-    click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L105&quot; &quot;open the source&quot;
-    click n_verify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L162&quot; &quot;open the source&quot;
-    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L189&quot; &quot;open the source&quot;
+    click n_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L55&quot; &quot;open the source&quot;
+    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L64&quot; &quot;open the source&quot;
+    click n_seal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L111&quot; &quot;open the source&quot;
+    click n_verify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L168&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs#L195&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_seal,n_verify,n_remove entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -201,11 +201,11 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>policy_dir</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-policy_dir">45</a></td><td>Where the policy files live.</td></tr>
-<tr><td><code>dir</code> <sub>fn</sub></td><td><a href="policy.src.html#fn-dir">49</a></td><td></td></tr>
-<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-status">58</a></td><td>What is in force, and what is known about the seal.</td></tr>
-<tr><td><code>seal</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-seal">105</a></td><td>Write a policy and seal it.</td></tr>
-<tr><td><code>verify</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-verify">162</a></td><td>Check the plain policy against its sealed copy.</td></tr>
-<tr><td><code>remove</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-remove">189</a></td><td>Delete both files.</td></tr>
+<tr><td><code>dir</code> <sub>fn</sub></td><td><a href="policy.src.html#fn-dir">55</a></td><td>Where policies are kept, or why this machine cannot say.</td></tr>
+<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-status">64</a></td><td>What is in force, and what is known about the seal.</td></tr>
+<tr><td><code>seal</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-seal">111</a></td><td>Write a policy and seal it.</td></tr>
+<tr><td><code>verify</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-verify">168</a></td><td>Check the plain policy against its sealed copy.</td></tr>
+<tr><td><code>remove</code> <sub>pub fn</sub></td><td><a href="policy.src.html#fn-remove">195</a></td><td>Delete both files.</td></tr>
 </tbody></table>
 </section>
 </div></div>

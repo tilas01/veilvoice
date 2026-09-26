@@ -312,6 +312,12 @@ fn add_to_path(dir: &Path) -> Result<bool, String> {
     Ok(true)
 }
 
+/// What reading this user's `PATH` out of the registry found.
+///
+/// Three outcomes rather than two, and the distinction is the point: a value
+/// that is there, a value the registry says is absent, and a query that failed,
+/// which is the error case the caller gets instead of this type. See the note on
+/// the function below for the defect that made it necessary.
 #[cfg(windows)]
 enum UserPath {
     /// Read successfully. This is the value to append to.

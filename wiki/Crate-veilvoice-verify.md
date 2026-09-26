@@ -80,12 +80,12 @@ Give it arguments and it does exactly what you asked.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>2502 lines"])
+    n_lib(["lib.rs<br/>2520 lines"])
     n_builder["builder.rs<br/>1210 lines"]
     n_deps["deps.rs<br/>652 lines"]
     n_discover["discover.rs<br/>460 lines"]
     n_extracted["extracted.rs<br/>316 lines"]
-    n_fetch["fetch.rs<br/>329 lines"]
+    n_fetch["fetch.rs<br/>337 lines"]
     n_report["report.rs<br/>385 lines"]
     n_tests["tests.rs<br/>1743 lines"]
     n_update["update.rs<br/>1333 lines"]
@@ -117,8 +117,8 @@ flowchart TD
 | [[`deps.rs`|File-veilvoice-verify-deps]] | 652 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [[`discover.rs`|File-veilvoice-verify-discover]] | 460 | Finding a release to check, without being told where it is. |
 | [[`extracted.rs`|File-veilvoice-verify-extracted]] | 316 | What came out of the archive, and the GnuPG somebody already has. |
-| [[`fetch.rs`|File-veilvoice-verify-fetch]] | 329 | Download a release, without putting an HTTP client in the dependency graph. |
-| [[`lib.rs`|File-veilvoice-verify-lib]] | 2502 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [[`fetch.rs`|File-veilvoice-verify-fetch]] | 337 | Download a release, without putting an HTTP client in the dependency graph. |
+| [[`lib.rs`|File-veilvoice-verify-lib]] | 2520 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |
 | [[`tests.rs`|File-veilvoice-verify-tests]] | 1743 | The verifier's own tests. |
 | [[`update.rs`|File-veilvoice-verify-update]] | 1333 | The update that does the update. |

@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/appctl.svg" alt="appctl.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/appctl.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 286 lines &middot; <a href="appctl.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 295 lines &middot; <a href="appctl.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -82,21 +82,21 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>286 lines defining <strong>10 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>295 lines defining <strong>10 functions</strong> (6 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>learn</code> <span style="color:var(--muted)">line 81</span> &middot; Record what is running as ordinary.
+<li><code>learn</code> <span style="color:var(--muted)">line 90</span> &middot; Record what is running as ordinary.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>running</code>, <code>save</code>, <code>scope</code></span>
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 134</span> &middot; Compare what is running against the baseline.
+<li><code>check</code> <span style="color:var(--muted)">line 143</span> &middot; Compare what is running against the baseline.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>running</code>, <code>save</code>, <code>scope</code></span>
 </li>
-<li><code>allow</code> <span style="color:var(--muted)">line 209</span> &middot; Allow a program, for a while or for good.
+<li><code>allow</code> <span style="color:var(--muted)">line 218</span> &middot; Allow a program, for a while or for good.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>save</code>, <code>scope</code></span>
 </li>
-<li><code>revoke</code> <span style="color:var(--muted)">line 242</span> &middot; Withdraw a grant.
+<li><code>revoke</code> <span style="color:var(--muted)">line 251</span> &middot; Withdraw a grant.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>save</code>, <code>scope</code></span>
 </li>
-<li><code>log</code> <span style="color:var(--muted)">line 254</span> &middot; Show the decision log.
+<li><code>log</code> <span style="color:var(--muted)">line 263</span> &middot; Show the decision log.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baseline_path</code>, <code>load</code>, <code>scope</code></span>
 </li>
 </ul>
@@ -143,47 +143,47 @@
 <a href="appctl.src.html#fn-load">
 <rect x="186.8" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="229.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load</text>
-<text x="229.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 37</text>
+<text x="229.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 44</text>
 </a>
 <a href="appctl.src.html#fn-save">
 <rect x="297.2" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="339.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save</text>
-<text x="339.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 45</text>
+<text x="339.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 54</text>
 </a>
 <a href="appctl.src.html#fn-scope">
 <rect x="407.6" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="449.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scope</text>
-<text x="449.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
+<text x="449.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 76</text>
 </a>
 <a href="appctl.src.html#fn-running">
 <rect x="518.0" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="560.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">running</text>
-<text x="560.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 76</text>
+<text x="560.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 85</text>
 </a>
 <a href="appctl.src.html#fn-learn">
 <rect x="36.1" y="120.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="78.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">learn</text>
-<text x="78.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 81</text>
+<text x="78.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 90</text>
 </a>
 <a href="appctl.src.html#fn-check">
 <rect x="146.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="192.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="192.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
+<text x="192.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
 </a>
 <a href="appctl.src.html#fn-allow">
 <rect x="265.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="311.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">allow</text>
-<text x="311.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
+<text x="311.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 218</text>
 </a>
 <a href="appctl.src.html#fn-revoke">
 <rect x="383.4" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="429.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">revoke</text>
-<text x="429.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 242</text>
+<text x="429.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 251</text>
 </a>
 <a href="appctl.src.html#fn-log">
 <rect x="501.9" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="548.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">log</text>
-<text x="548.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 254</text>
+<text x="548.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 263</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -203,15 +203,15 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_baseline_path[&quot;baseline_path&lt;br/&gt;line 23&quot;]
-    n_load[&quot;load&lt;br/&gt;line 37&quot;]
-    n_save[&quot;save&lt;br/&gt;line 45&quot;]
-    n_scope[&quot;scope&lt;br/&gt;line 67&quot;]
-    n_running[&quot;running&lt;br/&gt;line 76&quot;]
-    n_learn([&quot;learn&lt;br/&gt;line 81&quot;])
-    n_check([&quot;check&lt;br/&gt;line 134&quot;])
-    n_allow([&quot;allow&lt;br/&gt;line 209&quot;])
-    n_revoke([&quot;revoke&lt;br/&gt;line 242&quot;])
-    n_log([&quot;log&lt;br/&gt;line 254&quot;])
+    n_load[&quot;load&lt;br/&gt;line 44&quot;]
+    n_save[&quot;save&lt;br/&gt;line 54&quot;]
+    n_scope[&quot;scope&lt;br/&gt;line 76&quot;]
+    n_running[&quot;running&lt;br/&gt;line 85&quot;]
+    n_learn([&quot;learn&lt;br/&gt;line 90&quot;])
+    n_check([&quot;check&lt;br/&gt;line 143&quot;])
+    n_allow([&quot;allow&lt;br/&gt;line 218&quot;])
+    n_revoke([&quot;revoke&lt;br/&gt;line 251&quot;])
+    n_log([&quot;log&lt;br/&gt;line 263&quot;])
     n_allow --&gt; n_baseline_path
     n_allow --&gt; n_load
     n_allow --&gt; n_save
@@ -234,15 +234,15 @@ flowchart TD
     n_revoke --&gt; n_save
     n_revoke --&gt; n_scope
     click n_baseline_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L23&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L37&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L45&quot; &quot;open the source&quot;
-    click n_scope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L67&quot; &quot;open the source&quot;
-    click n_running href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L76&quot; &quot;open the source&quot;
-    click n_learn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L81&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L134&quot; &quot;open the source&quot;
-    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L209&quot; &quot;open the source&quot;
-    click n_revoke href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L242&quot; &quot;open the source&quot;
-    click n_log href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L254&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L44&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L54&quot; &quot;open the source&quot;
+    click n_scope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L76&quot; &quot;open the source&quot;
+    click n_running href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L85&quot; &quot;open the source&quot;
+    click n_learn href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L90&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L143&quot; &quot;open the source&quot;
+    click n_allow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L218&quot; &quot;open the source&quot;
+    click n_revoke href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L251&quot; &quot;open the source&quot;
+    click n_log href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/appctl.rs#L263&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_learn,n_check,n_allow,n_revoke,n_log entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -256,15 +256,15 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>baseline_path</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-baseline_path">23</a></td><td>Where the baseline is kept.</td></tr>
-<tr><td><code>load</code> <sub>fn</sub></td><td><a href="appctl.src.html#fn-load">37</a></td><td></td></tr>
-<tr><td><code>save</code> <sub>fn</sub></td><td><a href="appctl.src.html#fn-save">45</a></td><td></td></tr>
-<tr><td><code>scope</code> <sub>fn</sub></td><td><a href="appctl.src.html#fn-scope">67</a></td><td>The note that goes with every answer.</td></tr>
-<tr><td><code>running</code> <sub>fn</sub></td><td><a href="appctl.src.html#fn-running">76</a></td><td>What is running now, through the shared listing.</td></tr>
-<tr><td><code>learn</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-learn">81</a></td><td>Record what is running as ordinary.</td></tr>
-<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-check">134</a></td><td>Compare what is running against the baseline.</td></tr>
-<tr><td><code>allow</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-allow">209</a></td><td>Allow a program, for a while or for good.</td></tr>
-<tr><td><code>revoke</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-revoke">242</a></td><td>Withdraw a grant.</td></tr>
-<tr><td><code>log</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-log">254</a></td><td>Show the decision log.</td></tr>
+<tr><td><code>load</code> <sub>fn</sub></td><td><a href="appctl.src.html#fn-load">44</a></td><td>The baseline at path, or an empty one if there is no file yet.</td></tr>
+<tr><td><code>save</code> <sub>fn</sub></td><td><a href="appctl.src.html#fn-save">54</a></td><td>Write baseline to path, creating the directory if it is not there, and readable by this account alone.</td></tr>
+<tr><td><code>scope</code> <sub>fn</sub></td><td><a href="appctl.src.html#fn-scope">76</a></td><td>The note that goes with every answer.</td></tr>
+<tr><td><code>running</code> <sub>fn</sub></td><td><a href="appctl.src.html#fn-running">85</a></td><td>What is running now, through the shared listing.</td></tr>
+<tr><td><code>learn</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-learn">90</a></td><td>Record what is running as ordinary.</td></tr>
+<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-check">143</a></td><td>Compare what is running against the baseline.</td></tr>
+<tr><td><code>allow</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-allow">218</a></td><td>Allow a program, for a while or for good.</td></tr>
+<tr><td><code>revoke</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-revoke">251</a></td><td>Withdraw a grant.</td></tr>
+<tr><td><code>log</code> <sub>pub fn</sub></td><td><a href="appctl.src.html#fn-log">263</a></td><td>Show the decision log.</td></tr>
 </tbody></table>
 </section>
 </div></div>

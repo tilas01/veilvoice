@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/conversation.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 1090 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 1095 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs)
 
 ## Contents
 
@@ -77,7 +77,7 @@ you typed, prints what it is about to do, and reports what it wrote.
 
 ## What this file contains
 
-1090 lines defining **10 functions** (5 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+1095 lines defining **10 functions** (5 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -118,7 +118,7 @@ flowchart TD
     n_file_name["file_name<br/>line 702"]
     n_load_plan["load_plan<br/>line 709"]
     n_write_private["write_private<br/>line 725"]
-    n_with_extension["with_extension<br/>line 730"]
+    n_with_extension["with_extension<br/>line 735"]
     n_fix --> n_describe
     n_fix --> n_load_plan
     n_inspect --> n_load_plan
@@ -138,7 +138,7 @@ flowchart TD
     click n_file_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L702" "open the source"
     click n_load_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L709" "open the source"
     click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L725" "open the source"
-    click n_with_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L730" "open the source"
+    click n_with_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L735" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_fix,n_look_from,n_inspect,n_run,n_preview entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -162,4 +162,4 @@ flowchart TD
 | `file_name` <sub>fn</sub> | [702](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L702) | The last component of a path, for writing into a page as a relative link. |
 | `load_plan` <sub>fn</sub> | [709](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L709) | Read a plan, and say where it went wrong rather than only that it did. |
 | `write_private` <sub>fn</sub> | [725](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L725) | Replace the last extension, keeping any .veiled before it. |
-| `with_extension` <sub>fn</sub> | [730](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L730) |  |
+| `with_extension` <sub>fn</sub> | [735](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs#L735) | path with its last extension replaced by extension. |

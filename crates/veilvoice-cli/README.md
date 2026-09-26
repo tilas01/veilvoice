@@ -110,25 +110,25 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>3680 lines"])
+    n_main(["main.rs<br/>3711 lines"])
     n_accel["accel.rs<br/>90 lines"]
-    n_appctl["appctl.rs<br/>286 lines"]
+    n_appctl["appctl.rs<br/>295 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
     n_capture["capture.rs<br/>339 lines"]
-    n_conversation["conversation.rs<br/>1090 lines"]
+    n_conversation["conversation.rs<br/>1095 lines"]
     n_decoy["decoy.rs<br/>58 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
-    n_guard["guard.rs<br/>362 lines"]
+    n_guard["guard.rs<br/>369 lines"]
     n_gui["gui.rs<br/>247 lines"]
     n_input["input.rs<br/>120 lines"]
-    n_lock["lock.rs<br/>347 lines"]
+    n_lock["lock.rs<br/>354 lines"]
     n_mandate["mandate.rs<br/>339 lines"]
     n_meter["meter.rs<br/>259 lines"]
-    n_policy["policy.rs<br/>243 lines"]
+    n_policy["policy.rs<br/>249 lines"]
     n_priv_mode["priv_mode.rs<br/>46 lines"]
     n_record["record.rs<br/>406 lines"]
-    n_sentry["sentry.rs<br/>386 lines"]
-    n_theme["theme.rs<br/>144 lines"]
+    n_sentry["sentry.rs<br/>392 lines"]
+    n_theme["theme.rs<br/>152 lines"]
     n_update["update.rs<br/>246 lines"]
     n_accel --> n_sentry
     n_accel --> n_theme
@@ -197,24 +197,24 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`accel.rs`](../../docs/files/veilvoice-cli/accel.md) | 90 | veilvoice accel reports the graphics hardware here, and what it is good for. |
-| [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | 286 | veilvoice appctl learns what normally runs, so it can notice what does not. |
+| [`appctl.rs`](../../docs/files/veilvoice-cli/appctl.md) | 295 | veilvoice appctl learns what normally runs, so it can notice what does not. |
 | [`atrest.rs`](../../docs/files/veilvoice-cli/atrest.md) | 455 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [`capture.rs`](../../docs/files/veilvoice-cli/capture.md) | 339 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
-| [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 1090 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
+| [`conversation.rs`](../../docs/files/veilvoice-cli/conversation.md) | 1095 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
 | [`decoy.rs`](../../docs/files/veilvoice-cli/decoy.md) | 58 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
 | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | 112 | veilvoice failsafe is the safety catch. |
-| [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 362 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | 369 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | 247 | veilvoice gui opens the desktop application from the command line. |
 | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
-| [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 347 | veilvoice lock manages the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 3680 | veilvoice, the command-line interface. |
+| [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 354 | veilvoice lock manages the application lock from the command line. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 3711 | veilvoice, the command-line interface. |
 | [`mandate.rs`](../../docs/files/veilvoice-cli/mandate.md) | 339 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 259 | Level meters for veilvoice live, on a scale that means something. |
-| [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 243 | veilvoice policy -- settings that can only be tightened. |
+| [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 249 | veilvoice policy -- settings that can only be tightened. |
 | [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |
 | [`record.rs`](../../docs/files/veilvoice-cli/record.md) | 406 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
-| [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 386 | veilvoice sentry -- canaries, baselines, and what changed since. |
-| [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 144 | Tokyo Night colouring for the terminal. |
+| [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 392 | veilvoice sentry -- canaries, baselines, and what changed since. |
+| [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 152 | Tokyo Night colouring for the terminal. |
 | [`update.rs`](../../docs/files/veilvoice-cli/update.md) | 246 | veilvoice update: fetch the new release, check it, and put it in place. |
 
 **6,384 functional lines of Rust** in this crate. A functional line is a line
@@ -257,14 +257,14 @@ counts blank lines and comments too. Both are produced by
 | `fn explain` | [`decoy.rs`](../../docs/files/veilvoice-cli/decoy.md) | Explain the feature and its limits. |
 | `fn show` | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | Show what Failsafe would make of this machine right now. |
 | `fn describe` | [`failsafe.rs`](../../docs/files/veilvoice-cli/failsafe.md) | A named finding, for the tests to reach without a machine. |
-| `enum Action` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) |  |
+| `enum Action` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | What veilvoice guard can be asked to do. |
 | `fn run` | [`guard.rs`](../../docs/files/veilvoice-cli/guard.md) | Dispatch veilvoice guard to the subcommand that was asked for. |
 | `fn candidates` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | Everywhere this looks, in order, and whether each had it. |
 | `fn find` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | The desktop application, wherever it is. |
 | `fn open` | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | Open the window. |
 | `fn look` | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | Show what can see input on this machine. |
 | `fn known` | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | Everything this build knows how to recognise, whether running or not. |
-| `enum Action` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) |  |
+| `enum Action` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | What veilvoice lock can be asked to do. |
 | `fn wrap` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | Greedy word wrap. |
 | `fn run` | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | Dispatch veilvoice lock to the subcommand that was asked for. |
 | `fn status` | [`mandate.rs`](../../docs/files/veilvoice-cli/mandate.md) | What is required now, and how it got that way. |

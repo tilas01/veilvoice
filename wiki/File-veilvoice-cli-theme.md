@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/theme.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 144 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 152 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs)
 
 ## Contents
 
@@ -51,19 +51,19 @@ noise.
 
 ## What this file contains
 
-144 lines defining **7 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+152 lines defining **7 functions** (6 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `ok` (line 91) -- A success line.
+- `ok` (line 99) -- A success line.
   - reaches: `paint`, `enabled`
-- `warn` (line 96) -- A warning line.
+- `warn` (line 104) -- A warning line.
   - reaches: `paint`, `enabled`
-- `err` (line 101) -- An error line.
+- `err` (line 109) -- An error line.
   - reaches: `paint`, `enabled`
-- `heading` (line 106) -- A section heading.
+- `heading` (line 114) -- A section heading.
   - reaches: `paint`, `enabled`
-- `field` (line 111) -- A label: value line with the value highlighted.
+- `field` (line 119) -- A label: value line with the value highlighted.
   - reaches: `paint`, `enabled`
 
 ## What calls what
@@ -80,26 +80,26 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_enabled["enabled<br/>line 68"]
-    n_paint["paint<br/>line 82"]
-    n_ok(["ok<br/>line 91"])
-    n_warn(["warn<br/>line 96"])
-    n_err(["err<br/>line 101"])
-    n_heading(["heading<br/>line 106"])
-    n_field(["field<br/>line 111"])
+    n_enabled["enabled<br/>line 76"]
+    n_paint["paint<br/>line 90"]
+    n_ok(["ok<br/>line 99"])
+    n_warn(["warn<br/>line 104"])
+    n_err(["err<br/>line 109"])
+    n_heading(["heading<br/>line 114"])
+    n_field(["field<br/>line 119"])
     n_err --> n_paint
     n_field --> n_paint
     n_heading --> n_paint
     n_ok --> n_paint
     n_paint --> n_enabled
     n_warn --> n_paint
-    click n_enabled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L68" "open the source"
-    click n_paint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82" "open the source"
-    click n_ok href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L91" "open the source"
-    click n_warn href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L96" "open the source"
-    click n_err href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L101" "open the source"
-    click n_heading href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L106" "open the source"
-    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L111" "open the source"
+    click n_enabled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L76" "open the source"
+    click n_paint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L90" "open the source"
+    click n_ok href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L99" "open the source"
+    click n_warn href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L104" "open the source"
+    click n_err href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L109" "open the source"
+    click n_heading href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L114" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L119" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_ok,n_warn,n_err,n_heading,n_field entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -115,10 +115,10 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `colour` <sub>pub mod</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L49) | Tokyo Night, as 24-bit foreground escape sequences. |
-| `enabled` <sub>fn</sub> | [68](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L68) |  |
-| `paint` <sub>pub fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L82) | Wrap text in colour, or return it unchanged when colour is off. |
-| `ok` <sub>pub fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L91) | A success line. |
-| `warn` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L96) | A warning line. |
-| `err` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L101) | An error line. |
-| `heading` <sub>pub fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L106) | A section heading. |
-| `field` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L111) | A label: value line with the value highlighted. |
+| `enabled` <sub>fn</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L76) | Whether to colour the output, decided once and remembered. |
+| `paint` <sub>pub fn</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L90) | Wrap text in colour, or return it unchanged when colour is off. |
+| `ok` <sub>pub fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L99) | A success line. |
+| `warn` <sub>pub fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L104) | A warning line. |
+| `err` <sub>pub fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L109) | An error line. |
+| `heading` <sub>pub fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L114) | A section heading. |
+| `field` <sub>pub fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs#L119) | A label: value line with the value highlighted. |

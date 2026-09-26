@@ -727,6 +727,11 @@ fn write_private(path: &Path, bytes: &[u8]) -> Result<(), String> {
         .map_err(|error| format!("{}: {error}", path.display()))
 }
 
+/// `path` with its last extension replaced by `extension`.
+///
+/// The doc comment above the pair of functions between here and the top of this
+/// group describes the writer, not this: this is the plain rename, used to put
+/// the render beside the plan it was rendered from.
 fn with_extension(path: &Path, extension: &str) -> PathBuf {
     let mut out = path.to_path_buf();
     out.set_extension(extension);
