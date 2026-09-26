@@ -345,9 +345,20 @@ def source_files(root, crate):
 # body" -- which is true, useful, and not the same as a type-resolved call
 # graph. The pages say so rather than implying more.
 
+# `const` appears twice on purpose, and the order of the two is what makes a
+# `const fn` a function. As a modifier it is optional and comes before `async`,
+# which is where Rust puts it; as a kind it is one of the alternatives at the
+# end. So `const fn rgb` matches the modifier, then `fn` as the kind and `rgb`
+# as the name, while `const NAME: u8` finds no kind keyword after the
+# modifier, backtracks, and matches `const` as the kind. Without the modifier,
+# `const fn rgb` read as a constant called `fn`: the published page for
+# `theme.rs` carried a row named `fn` with nothing under it, and the one for
+# `update.rs` carried the same row with a paragraph about download labels.
+# F-215.
 ITEM = re.compile(
     r"^(?P<vis>pub(?:\s*\([^)]*\))?\s+)?"
-    r"(?:default\s+)?(?:async\s+)?(?:unsafe\s+)?(?:extern\s+\"[^\"]*\"\s+)?"
+    r"(?:default\s+)?(?:const\s+)?(?:async\s+)?(?:unsafe\s+)?"
+    r"(?:extern\s+\"[^\"]*\"\s+)?"
     r"(?P<kind>fn|struct|enum|trait|mod|type|const|static|union)\s+"
     r"(?P<name>[A-Za-z_][A-Za-z0-9_]*)"
 )

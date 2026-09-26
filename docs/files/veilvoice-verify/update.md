@@ -144,7 +144,7 @@ that record is locked with the same passphrase.
 
 ## What this file contains
 
-1333 lines defining **19 functions** (7 public), **5 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1333 lines defining **20 functions** (7 public), **5 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -182,6 +182,7 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
+    n_this_platform["this_platform<br/>line 162"]
     n_archive_for["archive_for<br/>line 204"]
     n_fmt["Error::fmt<br/>line 240"]
     n_offered(["offered<br/>line 287"])
@@ -216,6 +217,7 @@ flowchart TD
     n_update_within --> n_put_in_place
     n_update_within --> n_retake_record
     n_workspace --> n_installation
+    click n_this_platform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L162" "open the source"
     click n_archive_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L204" "open the source"
     click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L240" "open the source"
     click n_offered href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L287" "open the source"
@@ -240,7 +242,7 @@ flowchart TD
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_archive_for,n_lock_is_set,n_installation,n_workspace api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_fmt,n_update_within,n_proved_contents,n_archive_name,n_open_archive,n_extract,n_tar_program,n_put_in_place,n_carry_over_permissions,n_carry_over_permissions,n_retake_record,n_write_beside helper
+    class n_this_platform,n_fmt,n_update_within,n_proved_contents,n_archive_name,n_open_archive,n_extract,n_tar_program,n_put_in_place,n_carry_over_permissions,n_carry_over_permissions,n_retake_record,n_write_beside helper
 ```
 
 </details>
@@ -251,7 +253,7 @@ flowchart TD
 |---|---:|---|
 | `PUBLISHED` <sub>pub const</sub> | [131](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L131) | Every platform label the release workflow publishes an archive for. |
 | `PLATFORM` <sub>pub const</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L152) | This build's label, or None for a build of a kind nothing is published for. |
-| `fn` <sub>const</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L162) | The label picked apart by target, as the workflow's matrix picks it. |
+| `this_platform` <sub>fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L162) | The label picked apart by target, as the workflow's matrix picks it. |
 | `archive_for` <sub>pub fn</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L204) | The archive this platform's release is published under. |
 | `Error` <sub>pub enum</sub> | [216](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L216) | Everything that can stop an update, in the words the reader is given. |
 | `Error::fmt` <sub>fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L240) |  |

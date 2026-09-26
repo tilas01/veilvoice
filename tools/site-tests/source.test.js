@@ -146,7 +146,48 @@ function run() {
     pass(`all ${boxes} flowchart boxes open the source on this site`);
   }
 
-  // ---- 4. the mark is in the stylesheet, and needs no script --------------
+  // ---- 4. no item on a reference page is named after a keyword -----------
+  //
+  // The generator reads items with one regular expression, and every kind it
+  // knows is also a word that can appear in front of a different kind:
+  // `const fn rgb` is a function, and read wrongly it is a constant called
+  // `fn`. That produced a real row on two published pages, one of them with
+  // an empty description and one with a paragraph about download labels, and
+  // nothing noticed because a page with a wrong row looks exactly like a page
+  // with a right one. Asserting the general shape rather than those two rows:
+  // no Rust keyword is the name of anything, so a keyword in the name column
+  // means a modifier was read as the item. F-215.
+  const KEYWORDS = new Set([
+    "as", "async", "await", "break", "const", "continue", "crate", "default",
+    "dyn", "else", "enum", "extern", "false", "fn", "for", "if", "impl", "in",
+    "let", "loop", "match", "mod", "move", "mut", "pub", "ref", "return",
+    "self", "static", "struct", "super", "trait", "true", "type", "union",
+    "unsafe", "use", "where", "while"
+  ]);
+  const keyworded = [];
+  let named = 0;
+  for (const page of walk(REFERENCE)) {
+    if (page.endsWith(".src.html")) continue;
+    const html = fs.readFileSync(page, "utf8");
+    for (const m of html.matchAll(/<td><code>([^<]+)<\/code>\s*<sub>([a-z]+)<\/sub><\/td>/g)) {
+      named++;
+      if (KEYWORDS.has(m[1])) {
+        keyworded.push(
+          `${path.relative(ROOT, page).replace(/\\/g, "/")} lists an item called ` +
+          `"${m[1]}" of kind ${m[2]}, which is a keyword and not a name`);
+      }
+    }
+  }
+  if (keyworded.length) {
+    keyworded.slice(0, 10).forEach(fail);
+    if (keyworded.length > 10) fail(`and ${keyworded.length - 10} more`);
+  } else if (named === 0) {
+    fail("no reference page lists a single named item");
+  } else {
+    pass(`none of the ${named} items listed on a reference page is a keyword`);
+  }
+
+  // ---- 5. the mark is in the stylesheet, and needs no script --------------
   const css = fs.readFileSync(path.join(SITE, "css", "main.css"), "utf8");
   const bare = css.replace(/\/\*[\s\S]*?\*\//g, "");
   const wanted = [

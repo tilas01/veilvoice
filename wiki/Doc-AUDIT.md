@@ -911,6 +911,46 @@ document is checked against the tree by a build step, and the shell script is
 what a reader follows step by step, while `install()` is a function whose
 result nobody had typed `veilvoice` after.
 
+### F-215: `const fn` was read as a constant called `fn`, on two published pages
+
+`tools/docs/generate.py` finds the items in a source file with one regular
+expression, and the list of kinds it knows, `fn|struct|enum|trait|mod|type|
+const|static|union`, is also a list of words that can stand in front of a
+different kind. `const` is the one that does. Given `const fn rgb(hex: u32)`,
+the expression matched `const` as the kind and then took the next identifier
+as the name, which is `fn`.
+
+Two functions in the workspace are `const fn`, and both pages carried the
+result. `theme.rs` listed an item called `fn`, of kind `const`, linking to
+line 90, with an empty description, because `rgb` has no doc comment.
+`update.rs` listed an item called `fn`, of kind `const`, carrying
+`this_platform`'s comment about why the download labels are written out one
+per row. So one page showed a reader a blank row and the other showed them a
+paragraph filed under a name that does not exist, and `rgb` and
+`this_platform` appeared on neither page at all.
+
+Nothing noticed, and the reason is the one worth writing down: a page with a
+wrong row and a page with a right one are the same shape. Every check over
+these pages asked whether a row resolved, whether a link landed and whether
+the line count matched the file, and all of those passed, because the row was
+well formed. `tools/audit/documented.py` came closest: it reported `fn` as an
+item with nothing under it, in a list of eighty-one, where it read as one more
+function somebody had not got to.
+
+The expression now takes `const` as an optional modifier before `async`, which
+is where Rust's own grammar puts it, as well as keeping it in the list of
+kinds. Order decides which: `const fn rgb` matches the modifier, then `fn` as
+the kind and `rgb` as the name; `const MODE_HYBRID: u8` finds no kind keyword
+after the modifier, backtracks, and matches `const` as the kind. One
+expression still, because two would disagree.
+
+The regression test asserts the shape rather than those two rows. No Rust
+keyword is the name of anything, so a keyword in the name column of a
+reference page means a modifier was read as an item, whichever modifier it was
+next time. It was run against the pages as they stood and failed on both of
+them before the parser was changed.
+
+
 ## The half that could have damaged a machine
 
 `uninstall()` ended with `std::fs::remove_dir_all(prefix)`.
@@ -8757,7 +8797,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and fourteen defects found and fixed (F-1 to F-214), across
+**Two hundred and fifteen defects found and fixed (F-1 to F-215), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
