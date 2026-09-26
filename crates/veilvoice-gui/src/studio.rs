@@ -89,6 +89,8 @@
 //! anybody who can open the cupboard can then hear who was talking.
 
 use egui::{Color32, RichText, Ui};
+use std::path::Path;
+use std::sync::mpsc;
 use veilvoice_core::DeidConfig;
 use veilvoice_crypto::studio::{Entry, Studio as Vault, StudioKey};
 use veilvoice_crypto::Secret;
@@ -332,7 +334,13 @@ pub enum Reading {
 #[derive(Default)]
 pub struct Studio {
     /// The open vault. `None` is the shut state, and is the default.
-    vault: Option<Vault>,
+    ///
+    /// Shared rather than owned, since F-219, so that an export can read a
+    /// recording on a worker thread. `StudioKey` deliberately has no `Clone`,
+    /// and this does not give it one: there is one key, in one place, wiped
+    /// when the last holder drops it. What is shared is the right to read
+    /// through it.
+    vault: Option<std::sync::Arc<Vault>>,
     /// The listing, read when the vault opens and after every change rather
     /// than every frame: a frame is 16 milliseconds and this decrypts a file.
     entries: Vec<Entry>,
@@ -411,6 +419,11 @@ pub struct Studio {
     playing: Option<(String, veilvoice_audio::playback::Playing)>,
     /// The folder picker, while it is open.
     picker: crate::dialog::Pending,
+    /// An export being carried out, on a thread.
+    ///
+    /// **F-219.** This work used to happen on the frame the picker's answer
+    /// arrived, and it ends in `ffmpeg` rendering a video, which is minutes.
+    exporting: Option<mpsc::Receiver<(String, Tone)>>,
     /// What the picker is open for: which take, and what to make of it.
     choosing: Option<(String, Render)>,
 
@@ -817,7 +830,7 @@ impl Studio {
                 Ok(entries) => {
                     let count = entries.len();
                     self.entries = entries;
-                    self.vault = Some(vault);
+                    self.vault = Some(std::sync::Arc::new(vault));
                     self.measure(&dir);
                     self.message = Some((
                         match count {
@@ -1333,7 +1346,7 @@ impl Studio {
         }
     }
 
-    /// Turn a take into a page, a video, or both, in `into`.
+    /// Start turning a take into a page, a video, or both, in `into`.
     ///
     /// # Leaving the vault is the point, and is said out loud
     ///
@@ -1344,7 +1357,20 @@ impl Studio {
     ///
     /// The audio is still veiled, because it was veiled before it was ever
     /// stored. What leaves is a recording of a voice that is not anybody's.
-    fn export(&mut self, id: &str, what: Render, into: &std::path::Path) {
+    ///
+    /// # Why this only starts it
+    ///
+    /// **F-219.** This used to do the whole export on the frame the folder
+    /// picker's answer arrived: read and decrypt the recording, write the
+    /// audio, write the player page and its subtitles and its drawing, and then
+    /// run `ffmpeg` and **wait for it to finish rendering the video**. The
+    /// picker itself had already been moved off the drawing thread, with a
+    /// comment saying why; the work the picker leads to had not, and it is the
+    /// part that takes minutes rather than seconds.
+    ///
+    /// So the answer to the picker starts a worker. The vault is shared into it
+    /// rather than copied, which is why [`Studio::vault`] is an `Arc`.
+    fn start_export(&mut self, ctx: &egui::Context, id: &str, what: Render, into: &Path) {
         let Some(vault) = &self.vault else {
             return;
         };
@@ -1356,106 +1382,64 @@ impl Studio {
             return;
         };
 
-        let wav = match vault.load(id) {
-            Ok(wav) => wav,
-            Err(error) => {
-                self.message = Some((error.to_string(), p::red()));
-                return;
-            }
+        let job = ExportJob {
+            vault: std::sync::Arc::clone(vault),
+            id: id.to_string(),
+            name: entry.name.clone(),
+            what,
+            into: into.to_path_buf(),
         };
-        let Some((_rate, seconds)) = wav_shape(wav.expose()) else {
+        let (tx, rx) = mpsc::channel();
+        self.exporting = Some(rx);
+        // Said on screen by `browser`, because a button that goes quiet for the
+        // length of a video render reads as a window that has died.
+        self.message = None;
+        let ctx = ctx.clone();
+        std::thread::spawn(move || {
+            // The receiver is gone if the vault was shut while this ran, which
+            // is ordinary: the files are still written, and there is nobody
+            // left to tell about them.
+            let _ = tx.send(export_now(job));
+            ctx.request_repaint();
+        });
+    }
+
+    /// Export here and now, for tests only.
+    ///
+    /// `#[cfg(test)]`, so the window cannot call it: the compiler forbids the
+    /// blocking path in a shipped build, which is a stronger statement than a
+    /// guard reading the source for it. The tests below are about what an export
+    /// writes and where, not about which thread writes it, and each spinning a
+    /// worker would test the channel a dozen times over. The threading itself
+    /// has its own test.
+    #[cfg(test)]
+    fn export(&mut self, id: &str, what: Render, into: &Path) {
+        let Some(vault) = &self.vault else { return };
+        let Some(entry) = self.entries.iter().find(|e| e.id == id).cloned() else {
             self.message = Some((
-                "That recording does not have a WAV header this can read, so its \
-                 length is unknown and nothing was written."
-                    .into(),
+                "That recording is not in the listing any more.".into(),
                 p::red(),
             ));
             return;
         };
-
-        let stem = safe_stem(&entry.name);
-        let audio_path = into.join(format!("{stem}.wav"));
-        let plan = match plan_for(&entry.name, seconds) {
-            Ok(plan) => plan,
-            Err(why) => {
-                self.message = Some((why, p::red()));
-                return;
-            }
-        };
-
-        // The audio first, because both outputs need it and neither is worth
-        // writing without it.
-        if let Err(error) =
-            veilvoice_crypto::privatefile::write_owner_only(&audio_path, wav.expose())
-        {
-            self.message = Some((error.to_string(), p::red()));
-            return;
-        }
-
-        let mut wrote = vec![audio_path.clone()];
-
-        if what.wants_page() {
-            match self.write_page(&plan, wav.expose(), &stem, into, &audio_path) {
-                Ok(mut paths) => wrote.append(&mut paths),
-                Err(why) => {
-                    self.message = Some((why, p::red()));
-                    return;
-                }
-            }
-        }
-
-        if what.wants_video() {
-            let video = into.join(format!("{stem}.mp4"));
-            match veilvoice_video::ffmpeg::found() {
-                Some(_) => match run_ffmpeg(&audio_path, &video) {
-                    Ok(()) => wrote.push(video),
-                    Err(why) => {
-                        self.message = Some((why, p::red()));
-                        return;
-                    }
-                },
-                // The same answer the command line gives: the exact command,
-                // rather than an offer to fetch a program this does not ship.
-                None => {
-                    let argv = veilvoice_video::ffmpeg::black_command(
-                        &audio_path,
-                        &video,
-                        veilvoice_video::ffmpeg::Encoding::default(),
-                    );
-                    self.message = Some((
-                        format!(
-                            "The audio and the page are written. `ffmpeg` is not on this \
-                             machine, so the video is not.\n\nThe Setup tab lists \
-                             `ffmpeg` under companion software, with the install command \
-                             for this system and a button to run it. Or run this yourself, \
-                             which is the same command:\n\n{}",
-                            veilvoice_video::ffmpeg::command_line(&argv)
-                        ),
-                        p::yellow(),
-                    ));
-                    return;
-                }
-            }
-        }
-
-        let names: Vec<String> = wrote
-            .iter()
-            .filter_map(|path| path.file_name().map(|n| n.to_string_lossy().into_owned()))
-            .collect();
-        self.message = Some((
-            format!(
-                "Wrote {} into {}. None of it is sealed: what leaves the vault is \
-                 an ordinary file, and the voice in it is still a voice nobody owns.",
-                names.join(", "),
-                into.display()
-            ),
-            p::green(),
-        ));
+        let (said, tone) = export_now(ExportJob {
+            vault: std::sync::Arc::clone(vault),
+            id: id.to_string(),
+            name: entry.name.clone(),
+            what,
+            into: into.to_path_buf(),
+        });
+        self.message = Some((said, tone.colour()));
     }
 
     /// The player page, its subtitles, and the drawing they sit in.
+    ///
+    /// No receiver since F-219, because it never read anything from `self` and
+    /// an export runs on a worker now. The `&self` was dropped rather than left
+    /// in place and ignored: a receiver nothing uses is a promise that the next
+    /// person will find a use for it, and here it would be a promise to put the
+    /// drawing thread's state back into a worker.
     fn write_page(
-        &self,
         plan: &veilvoice_conversation::Conversation,
         wav: &[u8],
         stem: &str,
@@ -1672,11 +1656,50 @@ impl Studio {
         if let Some(answer) = self.picker.poll() {
             if let Some((id, what)) = self.choosing.take() {
                 match answer {
-                    Some(into) => self.export(&id, what, &into),
+                    Some(into) => self.start_export(ui.ctx(), &id, what, &into),
                     // Cancelled. Not an error, and not worth a message.
                     None => self.message = None,
                 }
             }
+        }
+
+        // And the export's own answer, on whichever later frame it arrives.
+        // F-219: this was done inside the frame above, `ffmpeg` and all.
+        if let Some(rx) = &self.exporting {
+            match rx.try_recv() {
+                Ok((said, tone)) => {
+                    self.message = Some((said, tone.colour()));
+                    self.exporting = None;
+                }
+                Err(mpsc::TryRecvError::Empty) => {}
+                Err(mpsc::TryRecvError::Disconnected) => {
+                    self.message = Some((
+                        "the export stopped without saying what it wrote. Look in \
+                         the folder you chose before running it again."
+                            .to_string(),
+                        p::red(),
+                    ));
+                    self.exporting = None;
+                }
+            }
+        }
+        if self.exporting.is_some() {
+            // The window has to keep drawing for the line below to appear at
+            // all, and for the answer to be collected on some frame.
+            ui.ctx()
+                .request_repaint_after(std::time::Duration::from_millis(200));
+            ui.horizontal(|ui| {
+                ui.spinner();
+                ui.label(
+                    RichText::new(
+                        "writing what you asked for. A video takes as long as it \
+                         takes; this window keeps working while it does.",
+                    )
+                    .small()
+                    .color(p::muted()),
+                );
+            });
+            ui.add_space(6.0);
         }
 
         if self.vault.is_none() {
@@ -2359,6 +2382,152 @@ fn safe_stem(name: &str) -> String {
 }
 
 /// Run `ffmpeg` to put the audio in a video with a black picture.
+/// How a message about an export reads, without saying in what colour.
+///
+/// The colour is chosen where the message is drawn, not where it is written.
+/// `theme::palette` answers from the palette that is active *now*, which the
+/// drawing thread changes; a colour captured on a worker at the start of a video
+/// render would be the colour of whatever theme was on five minutes ago.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum Tone {
+    /// It worked.
+    Good,
+    /// It partly worked, and what is missing is nameable.
+    Warn,
+    /// It did not work.
+    Bad,
+}
+
+impl Tone {
+    /// The colour for this tone, from the palette that is active now.
+    ///
+    /// Called where the message is drawn and nowhere else, which is the whole
+    /// reason [`Tone`] exists.
+    fn colour(self) -> Color32 {
+        match self {
+            Tone::Good => p::green(),
+            Tone::Warn => p::yellow(),
+            Tone::Bad => p::red(),
+        }
+    }
+}
+
+/// Everything one export needs, taken at the moment the folder was chosen.
+///
+/// The vault is shared in rather than copied: `StudioKey` has no `Clone` on
+/// purpose, and this does not give it one. There is one key; what crosses to
+/// the worker is the right to read through it.
+struct ExportJob {
+    vault: std::sync::Arc<Vault>,
+    id: String,
+    name: String,
+    what: Render,
+    into: std::path::PathBuf,
+}
+
+/// Do the export. Runs on a worker; see [`Studio::start_export`].
+///
+/// Every failure is a sentence and a tone rather than an early `self.message`,
+/// because the thread doing this owns nothing of the window's.
+///
+/// # The vault is let go of as early as it can be
+///
+/// Taken by value, and the shared vault dropped as soon as the recording is out
+/// of it. The key lives as long as somebody holds the vault, and a video render
+/// is minutes: holding it for the whole export would mean that shutting the
+/// vault did not wipe the key until `ffmpeg` had finished, which is not what
+/// "shut" is understood to mean. After the load this function holds decrypted
+/// audio and no key.
+fn export_now(job: ExportJob) -> (String, Tone) {
+    let ExportJob {
+        vault,
+        id,
+        name,
+        what,
+        into,
+    } = job;
+    let loaded = vault.load(&id);
+    drop(vault);
+    let wav = match loaded {
+        Ok(wav) => wav,
+        Err(error) => return (error.to_string(), Tone::Bad),
+    };
+    let Some((_rate, seconds)) = wav_shape(wav.expose()) else {
+        return (
+            "That recording does not have a WAV header this can read, so its \
+             length is unknown and nothing was written."
+                .into(),
+            Tone::Bad,
+        );
+    };
+
+    let stem = safe_stem(&name);
+    let audio_path = into.join(format!("{stem}.wav"));
+    let plan = match plan_for(&name, seconds) {
+        Ok(plan) => plan,
+        Err(why) => return (why, Tone::Bad),
+    };
+
+    // The audio first, because both outputs need it and neither is worth
+    // writing without it.
+    if let Err(error) = veilvoice_crypto::privatefile::write_owner_only(&audio_path, wav.expose()) {
+        return (error.to_string(), Tone::Bad);
+    }
+
+    let mut wrote = vec![audio_path.clone()];
+
+    if what.wants_page() {
+        match Studio::write_page(&plan, wav.expose(), &stem, &into, &audio_path) {
+            Ok(mut paths) => wrote.append(&mut paths),
+            Err(why) => return (why, Tone::Bad),
+        }
+    }
+
+    if what.wants_video() {
+        let video = into.join(format!("{stem}.mp4"));
+        match veilvoice_video::ffmpeg::found() {
+            Some(_) => match run_ffmpeg(&audio_path, &video) {
+                Ok(()) => wrote.push(video),
+                Err(why) => return (why, Tone::Bad),
+            },
+            // The same answer the command line gives: the exact command,
+            // rather than an offer to fetch a program this does not ship.
+            None => {
+                let argv = veilvoice_video::ffmpeg::black_command(
+                    &audio_path,
+                    &video,
+                    veilvoice_video::ffmpeg::Encoding::default(),
+                );
+                return (
+                    format!(
+                        "The audio and the page are written. `ffmpeg` is not on this \
+                         machine, so the video is not.\n\nThe Setup tab lists \
+                         `ffmpeg` under companion software, with the install command \
+                         for this system and a button to run it. Or run this yourself, \
+                         which is the same command:\n\n{}",
+                        veilvoice_video::ffmpeg::command_line(&argv)
+                    ),
+                    Tone::Warn,
+                );
+            }
+        }
+    }
+
+    let names: Vec<String> = wrote
+        .iter()
+        .filter_map(|path| path.file_name().map(|n| n.to_string_lossy().into_owned()))
+        .collect();
+    (
+        format!(
+            "Wrote {} into {}. None of it is sealed: what leaves the vault is \
+             an ordinary file, and the voice in it is still a voice nobody owns.",
+            names.join(", "),
+            into.display()
+        ),
+        Tone::Good,
+    )
+}
+
 fn run_ffmpeg(audio: &std::path::Path, video: &std::path::Path) -> Result<(), String> {
     let argv = veilvoice_video::ffmpeg::black_command(
         audio,
