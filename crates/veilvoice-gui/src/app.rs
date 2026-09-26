@@ -1033,26 +1033,33 @@ impl eframe::App for VeilVoiceApp {
         // shut. See `crate::vault_store` for what that is worth and, just as
         // importantly, what it is not.
         if let Some(key) = self.security.take_unlock_store_key() {
-            match self.files.unlocked(key) {
-                Ok(audit) => {
-                    if !audit.is_clean() {
-                        // Said to somebody who has just proved the passphrase,
-                        // which is the only person it should be said to. The
-                        // count is what is actionable; which record it was is
-                        // on the security tab.
-                        let touched = audit.tampered.len() + audit.missing.len();
-                        self.notice = Some(crate::notify::Notice::warn(format!(
-                            "{touched} of VeilVoice's own files changed while it was \
-                             closed. The security tab says which."
-                        )));
-                    }
-                }
-                Err(why) => {
+            self.files.start_unlocking(ctx, key);
+        }
+        // And its answer, on whichever later frame it arrives. Opening the
+        // folder reads every record, writes each one back encrypted, shreds the
+        // original with three passes and audits the folder twice; that used to
+        // happen here, inside this frame, with the window stopped for the whole
+        // of it. See F-218.
+        match self.files.poll() {
+            Some(Ok(audit)) => {
+                if !audit.is_clean() {
+                    // Said to somebody who has just proved the passphrase,
+                    // which is the only person it should be said to. The
+                    // count is what is actionable; which record it was is
+                    // on the security tab.
+                    let touched = audit.tampered.len() + audit.missing.len();
                     self.notice = Some(crate::notify::Notice::warn(format!(
-                        "the program folder could not be opened: {why}"
-                    )))
+                        "{touched} of VeilVoice's own files changed while it was \
+                         closed. The security tab says which."
+                    )));
                 }
             }
+            Some(Err(why)) => {
+                self.notice = Some(crate::notify::Notice::warn(format!(
+                    "the program folder could not be opened: {why}"
+                )))
+            }
+            None => {}
         }
         if self.security.is_locked() {
             self.files.locked();

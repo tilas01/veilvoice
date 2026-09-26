@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/vault_store.svg" alt="vault_store.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/vault_store.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 589 lines &middot; <a href="vault_store.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 807 lines &middot; <a href="vault_store.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-short-version-and-it-is-the-honest-one">The short version, and it is the honest one</a>
@@ -95,40 +95,48 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>589 lines defining <strong>11 functions</strong> (10 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>807 lines defining <strong>15 functions</strong> (13 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct VaultStore</code> <span style="color:var(--muted)">line 124</span> &middot; The application&#x27;s own storage, locked or not.</li>
-<li><code>struct Measured</code> <span style="color:var(--muted)">line 440</span> &middot; What the application measured about its own running, kept between sessions.</li>
+<li><code>struct VaultStore</code> <span style="color:var(--muted)">line 125</span> &middot; The application&#x27;s own storage, locked or not.</li>
+<li><code>struct Measured</code> <span style="color:var(--muted)">line 658</span> &middot; What the application measured about its own running, kept between sessions.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>VaultStore::new</code> <span style="color:var(--muted)">line 133</span> &middot; Point at the program folder.
+<li><code>VaultStore::new</code> <span style="color:var(--muted)">line 143</span> &middot; Point at the program folder.
 </li>
-<li><code>VaultStore::dir</code> <span style="color:var(--muted)">line 138</span> &middot; The program folder, if this platform has one.
+<li><code>VaultStore::dir</code> <span style="color:var(--muted)">line 152</span> &middot; The program folder, if this platform has one.
 </li>
-<li><code>VaultStore::is_obfuscated</code> <span style="color:var(--muted)">line 147</span> &middot; Whether records are currently obfuscated.
+<li><code>VaultStore::is_obfuscated</code> <span style="color:var(--muted)">line 161</span> &middot; Whether records are currently obfuscated.
 </li>
-<li><code>VaultStore::unlocked</code> <span style="color:var(--muted)">line 156</span> &middot; Take the key from an unlock and open the hoard with it.
+<li><code>VaultStore::start_unlocking</code> <span style="color:var(--muted)">line 176</span> &middot; Take the key from an unlock and start opening the hoard with it.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>open_with</code></span>
 </li>
-<li><code>VaultStore::locked</code> <span style="color:var(--muted)">line 194</span> &middot; Forget the key.
+<li><code>VaultStore::is_opening</code> <span style="color:var(--muted)">line 195</span> &middot; Whether an unlock is still being carried out.
 </li>
-<li><code>VaultStore::read</code> <span style="color:var(--muted)">line 200</span> &middot; Read a record, from the hoard if it is open and from the plain file if it is not.
+<li><code>VaultStore::poll</code> <span style="color:var(--muted)">line 203</span> &middot; Collect a finished unlock, installing the key.
+</li>
+<li><code>VaultStore::unlocked</code> <span style="color:var(--muted)">line 235</span> &middot; Open the hoard here and now, for tests only.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>open_with</code></span>
+</li>
+<li><code>VaultStore::locked</code> <span style="color:var(--muted)">line 252</span> &middot; Forget the key.
+</li>
+<li><code>VaultStore::read</code> <span style="color:var(--muted)">line 259</span> &middot; Read a record, from the hoard if it is open and from the plain file if it is not.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>plain_path</code></span>
 </li>
-<li><code>VaultStore::write</code> <span style="color:var(--muted)">line 215</span> &middot; Write a record, obfuscated if there is a key and plain if there is not.
+<li><code>VaultStore::write</code> <span style="color:var(--muted)">line 274</span> &middot; Write a record, obfuscated if there is a key and plain if there is not.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>plain_path</code></span>
 </li>
-<li><code>Measured::load</code> <span style="color:var(--muted)">line 457</span> &middot; Read it back, or the defaults if nothing has been recorded.
+<li><code>Measured::load</code> <span style="color:var(--muted)">line 675</span> &middot; Read it back, or the defaults if nothing has been recorded.
 </li>
-<li><code>Measured::save</code> <span style="color:var(--muted)">line 480</span> &middot; Write it, obfuscated when there is a key and plain when there is not.
+<li><code>Measured::save</code> <span style="color:var(--muted)">line 698</span> &middot; Write it, obfuscated when there is a key and plain when there is not.
 </li>
-<li><code>Measured::record</code> <span style="color:var(--muted)">line 494</span> &middot; Fold this session&#x27;s numbers in.
+<li><code>Measured::record</code> <span style="color:var(--muted)">line 712</span> &middot; Fold this session&#x27;s numbers in.
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 619 615" width="619" height="615" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 619 715" width="619" height="715" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -137,129 +145,165 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="619" height="615" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M516.8 174.0 C 516.8 194.0, 309.6 400.0, 309.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M142.8 274.0 C 142.8 294.0, 309.6 400.0, 309.6 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<rect x="0" y="0" width="619" height="715" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M130.7 374.0 C 130.7 394.0, 246.4 500.0, 246.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M194.0 174.0 C 194.0 194.0, 425.3 500.0, 425.3 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M301.6 274.0 C 301.6 294.0, 425.3 500.0, 425.3 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M317.7 374.0 C 317.7 394.0, 246.4 500.0, 246.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="vault_store.src.html#fn-vaultstore-new">
 <rect x="20.0" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="94.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::new</text>
-<text x="94.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<text x="94.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
 </a>
 <a href="vault_store.src.html#fn-vaultstore-dir">
 <rect x="194.9" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="269.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::dir</text>
-<text x="269.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 138</text>
+<text x="269.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 152</text>
 </a>
 <a href="vault_store.src.html#fn-vaultstore-is_obfuscated">
 <rect x="369.8" y="20.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="484.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::is_obfuscated</text>
-<text x="484.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
+<text x="484.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
+</a>
+<a href="vault_store.src.html#fn-vaultstore-start_unlocking">
+<rect x="71.2" y="120.0" width="245.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="194.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::start_unlocking</text>
+<text x="194.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 176</text>
+</a>
+<a href="vault_store.src.html#fn-vaultstore-is_opening">
+<rect x="342.8" y="120.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="445.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::is_opening</text>
+<text x="445.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 195</text>
+</a>
+<a href="vault_store.src.html#fn-vaultstore-poll">
+<rect x="24.0" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="102.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::poll</text>
+<text x="102.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
 </a>
 <a href="vault_store.src.html#fn-vaultstore-unlocked">
-<rect x="24.0" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="118.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::unlocked</text>
-<text x="118.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 156</text>
+<rect x="207.0" y="220.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="301.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::unlocked</text>
+<text x="301.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
 </a>
 <a href="vault_store.src.html#fn-vaultstore-locked">
-<rect x="239.2" y="120.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="325.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::locked</text>
-<text x="325.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 194</text>
+<rect x="422.2" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="508.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::locked</text>
+<text x="508.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 252</text>
 </a>
 <a href="vault_store.src.html#fn-vaultstore-read">
-<rect x="438.3" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="516.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::read</text>
-<text x="516.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
+<rect x="52.2" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="130.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::read</text>
+<text x="130.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 259</text>
 </a>
 <a href="vault_store.src.html#fn-vaultstore-write">
-<rect x="60.3" y="220.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="142.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::write</text>
-<text x="142.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 215</text>
+<rect x="235.2" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="317.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::write</text>
+<text x="317.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 274</text>
 </a>
 <a href="vault_store.src.html#fn-vaultstore-plain_path">
-<rect x="207.0" y="420.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="309.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::plain_path</text>
-<text x="309.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 229</text>
+<rect x="143.7" y="520.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="246.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">VaultStore::plain_path</text>
+<text x="246.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 288</text>
+</a>
+<a href="vault_store.src.html#fn-open_with">
+<rect x="375.0" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="425.3" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_with</text>
+<text x="425.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
 </a>
 <a href="vault_store.src.html#fn-measured-load">
-<rect x="251.3" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="321.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Measured::load</text>
-<text x="321.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 457</text>
+<rect x="426.2" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="496.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Measured::load</text>
+<text x="496.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 675</text>
 </a>
 <a href="vault_store.src.html#fn-measured-save">
-<rect x="418.2" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="488.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Measured::save</text>
-<text x="488.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 480</text>
+<rect x="147.7" y="420.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="218.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Measured::save</text>
+<text x="218.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 698</text>
 </a>
 <a href="vault_store.src.html#fn-measured-record">
-<rect x="231.2" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="309.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Measured::record</text>
-<text x="309.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 494</text>
+<rect x="314.6" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="393.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Measured::record</text>
+<text x="393.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 712</text>
 </a>
-<rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="520.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="529.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 540.5 L29.0 540.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="545.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="567.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="582.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="597.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
+<rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="620.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="629.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 640.5 L29.0 640.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="645.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="667.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="682.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="697.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_new([&quot;VaultStore::new&lt;br/&gt;line 133&quot;])
-    n_dir([&quot;VaultStore::dir&lt;br/&gt;line 138&quot;])
-    n_is_obfuscated([&quot;VaultStore::is_obfuscated&lt;br/&gt;line 147&quot;])
-    n_unlocked([&quot;VaultStore::unlocked&lt;br/&gt;line 156&quot;])
-    n_locked([&quot;VaultStore::locked&lt;br/&gt;line 194&quot;])
-    n_read([&quot;VaultStore::read&lt;br/&gt;line 200&quot;])
-    n_write([&quot;VaultStore::write&lt;br/&gt;line 215&quot;])
-    n_plain_path[&quot;VaultStore::plain_path&lt;br/&gt;line 229&quot;]
-    n_load([&quot;Measured::load&lt;br/&gt;line 457&quot;])
-    n_save([&quot;Measured::save&lt;br/&gt;line 480&quot;])
-    n_record([&quot;Measured::record&lt;br/&gt;line 494&quot;])
+    n_new([&quot;VaultStore::new&lt;br/&gt;line 143&quot;])
+    n_dir([&quot;VaultStore::dir&lt;br/&gt;line 152&quot;])
+    n_is_obfuscated([&quot;VaultStore::is_obfuscated&lt;br/&gt;line 161&quot;])
+    n_start_unlocking([&quot;VaultStore::start_unlocking&lt;br/&gt;line 176&quot;])
+    n_is_opening([&quot;VaultStore::is_opening&lt;br/&gt;line 195&quot;])
+    n_poll([&quot;VaultStore::poll&lt;br/&gt;line 203&quot;])
+    n_unlocked([&quot;VaultStore::unlocked&lt;br/&gt;line 235&quot;])
+    n_locked([&quot;VaultStore::locked&lt;br/&gt;line 252&quot;])
+    n_read([&quot;VaultStore::read&lt;br/&gt;line 259&quot;])
+    n_write([&quot;VaultStore::write&lt;br/&gt;line 274&quot;])
+    n_plain_path[&quot;VaultStore::plain_path&lt;br/&gt;line 288&quot;]
+    n_open_with[&quot;open_with&lt;br/&gt;line 316&quot;]
+    n_load([&quot;Measured::load&lt;br/&gt;line 675&quot;])
+    n_save([&quot;Measured::save&lt;br/&gt;line 698&quot;])
+    n_record([&quot;Measured::record&lt;br/&gt;line 712&quot;])
     n_read --&gt; n_plain_path
+    n_start_unlocking --&gt; n_open_with
+    n_unlocked --&gt; n_open_with
     n_write --&gt; n_plain_path
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L133&quot; &quot;open the source&quot;
-    click n_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L138&quot; &quot;open the source&quot;
-    click n_is_obfuscated href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L147&quot; &quot;open the source&quot;
-    click n_unlocked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L156&quot; &quot;open the source&quot;
-    click n_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L194&quot; &quot;open the source&quot;
-    click n_read href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L200&quot; &quot;open the source&quot;
-    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L215&quot; &quot;open the source&quot;
-    click n_plain_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L229&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L457&quot; &quot;open the source&quot;
-    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L480&quot; &quot;open the source&quot;
-    click n_record href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L494&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L143&quot; &quot;open the source&quot;
+    click n_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L152&quot; &quot;open the source&quot;
+    click n_is_obfuscated href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L161&quot; &quot;open the source&quot;
+    click n_start_unlocking href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L176&quot; &quot;open the source&quot;
+    click n_is_opening href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L195&quot; &quot;open the source&quot;
+    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L203&quot; &quot;open the source&quot;
+    click n_unlocked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L235&quot; &quot;open the source&quot;
+    click n_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L252&quot; &quot;open the source&quot;
+    click n_read href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L259&quot; &quot;open the source&quot;
+    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L274&quot; &quot;open the source&quot;
+    click n_plain_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L288&quot; &quot;open the source&quot;
+    click n_open_with href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L316&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L675&quot; &quot;open the source&quot;
+    click n_save href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L698&quot; &quot;open the source&quot;
+    click n_record href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L712&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_new,n_dir,n_is_obfuscated,n_unlocked,n_locked,n_read,n_write,n_load,n_save,n_record entry
+    class n_new,n_dir,n_is_obfuscated,n_start_unlocking,n_is_opening,n_poll,n_unlocked,n_locked,n_read,n_write,n_load,n_save,n_record entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_plain_path helper</code></pre>
+    class n_plain_path,n_open_with helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>records</code> <sub>pub mod</sub></td><td><a href="vault_store.src.html#fn-records">85</a></td><td>The logical names of every record the application keeps.</td></tr>
-<tr><td><code>DECOYS</code> <sub>const</sub></td><td><a href="vault_store.src.html#fn-decoys">120</a></td><td>How many decoys a folder is kept stocked with.</td></tr>
-<tr><td><code>VaultStore</code> <sub>pub struct</sub></td><td><a href="vault_store.src.html#fn-vaultstore">124</a></td><td>The application&#x27;s own storage, locked or not.</td></tr>
-<tr><td><code>VaultStore::new</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-new">133</a></td><td>Point at the program folder.</td></tr>
-<tr><td><code>VaultStore::dir</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-dir">138</a></td><td>The program folder, if this platform has one.</td></tr>
-<tr><td><code>VaultStore::is_obfuscated</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-is_obfuscated">147</a></td><td>Whether records are currently obfuscated.</td></tr>
-<tr><td><code>VaultStore::unlocked</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-unlocked">156</a></td><td>Take the key from an unlock and open the hoard with it.</td></tr>
-<tr><td><code>VaultStore::locked</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-locked">194</a></td><td>Forget the key.</td></tr>
-<tr><td><code>VaultStore::read</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-read">200</a></td><td>Read a record, from the hoard if it is open and from the plain file if it is not.</td></tr>
-<tr><td><code>VaultStore::write</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-write">215</a></td><td>Write a record, obfuscated if there is a key and plain if there is not.</td></tr>
-<tr><td><code>VaultStore::plain_path</code> <sub>fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-plain_path">229</a></td><td>Where a record sits when nothing is obfuscating it.</td></tr>
-<tr><td><code>Measured</code> <sub>pub struct</sub></td><td><a href="vault_store.src.html#fn-measured">440</a></td><td>What the application measured about its own running, kept between sessions.</td></tr>
-<tr><td><code>Measured::load</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-measured-load">457</a></td><td>Read it back, or the defaults if nothing has been recorded.</td></tr>
-<tr><td><code>Measured::save</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-measured-save">480</a></td><td>Write it, obfuscated when there is a key and plain when there is not.</td></tr>
-<tr><td><code>Measured::record</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-measured-record">494</a></td><td>Fold this session&#x27;s numbers in.</td></tr>
-<tr><td><code>measured_tests</code> <sub>mod</sub></td><td><a href="vault_store.src.html#fn-measured_tests">505</a></td><td></td></tr>
+<tr><td><code>records</code> <sub>pub mod</sub></td><td><a href="vault_store.src.html#fn-records">86</a></td><td>The logical names of every record the application keeps.</td></tr>
+<tr><td><code>DECOYS</code> <sub>const</sub></td><td><a href="vault_store.src.html#fn-decoys">121</a></td><td>How many decoys a folder is kept stocked with.</td></tr>
+<tr><td><code>VaultStore</code> <sub>pub struct</sub></td><td><a href="vault_store.src.html#fn-vaultstore">125</a></td><td>The application&#x27;s own storage, locked or not.</td></tr>
+<tr><td><code>VaultStore::new</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-new">143</a></td><td>Point at the program folder.</td></tr>
+<tr><td><code>VaultStore::dir</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-dir">152</a></td><td>The program folder, if this platform has one.</td></tr>
+<tr><td><code>VaultStore::is_obfuscated</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-is_obfuscated">161</a></td><td>Whether records are currently obfuscated.</td></tr>
+<tr><td><code>VaultStore::start_unlocking</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-start_unlocking">176</a></td><td>Take the key from an unlock and start opening the hoard with it.</td></tr>
+<tr><td><code>VaultStore::is_opening</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-is_opening">195</a></td><td>Whether an unlock is still being carried out.</td></tr>
+<tr><td><code>VaultStore::poll</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-poll">203</a></td><td>Collect a finished unlock, installing the key.</td></tr>
+<tr><td><code>VaultStore::unlocked</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-unlocked">235</a></td><td>Open the hoard here and now, for tests only.</td></tr>
+<tr><td><code>VaultStore::locked</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-locked">252</a></td><td>Forget the key.</td></tr>
+<tr><td><code>VaultStore::read</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-read">259</a></td><td>Read a record, from the hoard if it is open and from the plain file if it is not.</td></tr>
+<tr><td><code>VaultStore::write</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-write">274</a></td><td>Write a record, obfuscated if there is a key and plain if there is not.</td></tr>
+<tr><td><code>VaultStore::plain_path</code> <sub>fn</sub></td><td><a href="vault_store.src.html#fn-vaultstore-plain_path">288</a></td><td>Where a record sits when nothing is obfuscating it.</td></tr>
+<tr><td><code>open_with</code> <sub>fn</sub></td><td><a href="vault_store.src.html#fn-open_with">316</a></td><td>Open the hoard in dir with key, migrating and auditing.</td></tr>
+<tr><td><code>Measured</code> <sub>pub struct</sub></td><td><a href="vault_store.src.html#fn-measured">658</a></td><td>What the application measured about its own running, kept between sessions.</td></tr>
+<tr><td><code>Measured::load</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-measured-load">675</a></td><td>Read it back, or the defaults if nothing has been recorded.</td></tr>
+<tr><td><code>Measured::save</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-measured-save">698</a></td><td>Write it, obfuscated when there is a key and plain when there is not.</td></tr>
+<tr><td><code>Measured::record</code> <sub>pub fn</sub></td><td><a href="vault_store.src.html#fn-measured-record">712</a></td><td>Fold this session&#x27;s numbers in.</td></tr>
+<tr><td><code>measured_tests</code> <sub>mod</sub></td><td><a href="vault_store.src.html#fn-measured_tests">723</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/vault_store.rs</code></h1>
-<p style="color:var(--muted)"><a href="vault_store.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 589 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="vault_store.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 807 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -117,575 +117,801 @@
 <span class="ln" id="L49"><span class="tok-com">//! loud rather than burying it.</span></span>
 <span class="ln" id="L50"></span>
 <span class="ln" id="L51"><span class="tok-kw">use</span> std::path::{Path, PathBuf};</span>
-<span class="ln" id="L52"></span>
-<span class="ln" id="L53"><span class="tok-kw">use</span> veilvoice_crypto::hoard::{Audit, Hoard, StoreKey};</span>
-<span class="ln" id="L54"></span>
+<span class="ln" id="L52"><span class="tok-kw">use</span> std::sync::mpsc;</span>
+<span class="ln" id="L53"></span>
+<span class="ln" id="L54"><span class="tok-kw">use</span> veilvoice_crypto::hoard::{Audit, Hoard, StoreKey};</span>
+<span class="ln" id="L55"></span>
 <span class="src-item" id="fn-records">
-<span class="ln" id="L55"><span class="tok-com">/// The logical names of every record the application keeps.</span></span>
-<span class="ln" id="L56"><span class="tok-com">///</span></span>
-<span class="ln" id="L57"><span class="tok-com">/// Named here rather than spelled at each call site so that the migration, the</span></span>
-<span class="ln" id="L58"><span class="tok-com">/// audit and the readers cannot disagree about what exists. A record not in</span></span>
-<span class="ln" id="L59"><span class="tok-com">/// this list is not migrated and not audited.</span></span>
-<span class="ln" id="L60"><span class="tok-com">///</span></span>
-<span class="ln" id="L61"><span class="tok-com">/// # What is deliberately not here, and why</span></span>
-<span class="ln" id="L62"><span class="tok-com">///</span></span>
-<span class="ln" id="L63"><span class="tok-com">/// `settings.conf` is **not** an obfuscated record, and this is the one place</span></span>
-<span class="ln" id="L64"><span class="tok-com">/// that decision is explained rather than assumed.</span></span>
-<span class="ln" id="L65"><span class="tok-com">///</span></span>
-<span class="ln" id="L66"><span class="tok-com">/// The settings file says which theme to use, how big the window was, and</span></span>
-<span class="ln" id="L67"><span class="tok-com">/// whether movement is reduced. All three are needed to draw the window --</span></span>
-<span class="ln" id="L68"><span class="tok-com">/// including the lock screen itself, which is the first thing drawn and the</span></span>
-<span class="ln" id="L69"><span class="tok-com">/// last thing that could wait. A record inside the hoard cannot be read until</span></span>
-<span class="ln" id="L70"><span class="tok-com">/// a passphrase has produced a key, and a passphrase cannot be typed until</span></span>
-<span class="ln" id="L71"><span class="tok-com">/// there is a window to type it into. Putting the settings in there would mean</span></span>
-<span class="ln" id="L72"><span class="tok-com">/// every locked VeilVoice opened with the default theme at the default size</span></span>
-<span class="ln" id="L73"><span class="tok-com">/// and then jumped to the user&#x27;s when they unlocked.</span></span>
-<span class="ln" id="L74"><span class="tok-com">///</span></span>
-<span class="ln" id="L75"><span class="tok-com">/// So the settings stay in the open, and what that costs is stated plainly:</span></span>
-<span class="ln" id="L76"><span class="tok-com">/// somebody reading the folder learns which theme you chose, roughly how big</span></span>
-<span class="ln" id="L77"><span class="tok-com">/// your window is, and which optional features you switched on. They do not</span></span>
-<span class="ln" id="L78"><span class="tok-com">/// learn what you have processed, what VeilVoice measured while doing it, what</span></span>
-<span class="ln" id="L79"><span class="tok-com">/// it found when it checked itself, or what any of the other records hold.</span></span>
-<span class="ln" id="L80"><span class="tok-com">///</span></span>
-<span class="ln" id="L81"><span class="tok-com">/// This is a real limit rather than a temporary one. Closing it properly means</span></span>
-<span class="ln" id="L82"><span class="tok-com">/// splitting appearance out from everything else so only the handful of</span></span>
-<span class="ln" id="L83"><span class="tok-com">/// drawing settings sit in the open, and that is worth doing; it is not worth</span></span>
-<span class="ln" id="L84"><span class="tok-com">/// pretending is already done.</span></span>
-<span class="ln" id="L85"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> records {</span>
-<span class="ln" id="L86">    <span class="tok-com">/// What the application measured about its own running.</span></span>
-<span class="ln" id="L87">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MEASURED: &amp;str = <span class="tok-str">&quot;measured&quot;</span>;</span>
-<span class="ln" id="L88"></span>
-<span class="ln" id="L89">    <span class="tok-com">/// Every record, with the plain filename each one migrates from.</span></span>
-<span class="ln" id="L90">    <span class="tok-com">///</span></span>
-<span class="ln" id="L91">    <span class="tok-com">/// The plain name is what the file was called before there was a lock, and</span></span>
-<span class="ln" id="L92">    <span class="tok-com">/// is what it goes back to being if the lock is removed.</span></span>
-<span class="ln" id="L93">    <span class="tok-com">///</span></span>
-<span class="ln" id="L94">    <span class="tok-com">/// # Adding to this list is not free</span></span>
-<span class="ln" id="L95">    <span class="tok-com">///</span></span>
-<span class="ln" id="L96">    <span class="tok-com">/// A name here is migrated in on the first unlock and the plain file is</span></span>
-<span class="ln" id="L97">    <span class="tok-com">/// **shredded**. So a file listed here that anything still reads by its</span></span>
-<span class="ln" id="L98">    <span class="tok-com">/// plain path is a file that gets destroyed, silently, on somebody&#x27;s next</span></span>
-<span class="ln" id="L99">    <span class="tok-com">/// unlock. `every_record_is_actually_read_through_the_store` refuses that,</span></span>
-<span class="ln" id="L100">    <span class="tok-com">/// and it exists because the first version of this module listed three</span></span>
-<span class="ln" id="L101">    <span class="tok-com">/// records and read one.</span></span>
-<span class="ln" id="L102">    <span class="tok-com">///</span></span>
-<span class="ln" id="L103">    <span class="tok-com">/// `integrity.manifest` and `last-crash.txt` were on this list and are</span></span>
-<span class="ln" id="L104">    <span class="tok-com">/// deliberately not now. Both are still read elsewhere by their plain</span></span>
-<span class="ln" id="L105">    <span class="tok-com">/// paths, and the manifest is read by `veilvoice guard` from the *command</span></span>
-<span class="ln" id="L106">    <span class="tok-com">/// line*, which has no unlocked session and therefore no key. Moving it in</span></span>
-<span class="ln" id="L107">    <span class="tok-com">/// would mean prompting for the app-lock passphrase on every</span></span>
-<span class="ln" id="L108">    <span class="tok-com">/// `veilvoice guard` run: a different feature with a different argument,</span></span>
-<span class="ln" id="L109">    <span class="tok-com">/// not a detail of this one.</span></span>
-<span class="ln" id="L110">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> ALL: &amp;[(&amp;str, &amp;str)] = &amp;[(MEASURED, <span class="tok-str">&quot;measured.dat&quot;</span>)];</span>
-<span class="ln" id="L111">}</span>
+<span class="ln" id="L56"><span class="tok-com">/// The logical names of every record the application keeps.</span></span>
+<span class="ln" id="L57"><span class="tok-com">///</span></span>
+<span class="ln" id="L58"><span class="tok-com">/// Named here rather than spelled at each call site so that the migration, the</span></span>
+<span class="ln" id="L59"><span class="tok-com">/// audit and the readers cannot disagree about what exists. A record not in</span></span>
+<span class="ln" id="L60"><span class="tok-com">/// this list is not migrated and not audited.</span></span>
+<span class="ln" id="L61"><span class="tok-com">///</span></span>
+<span class="ln" id="L62"><span class="tok-com">/// # What is deliberately not here, and why</span></span>
+<span class="ln" id="L63"><span class="tok-com">///</span></span>
+<span class="ln" id="L64"><span class="tok-com">/// `settings.conf` is **not** an obfuscated record, and this is the one place</span></span>
+<span class="ln" id="L65"><span class="tok-com">/// that decision is explained rather than assumed.</span></span>
+<span class="ln" id="L66"><span class="tok-com">///</span></span>
+<span class="ln" id="L67"><span class="tok-com">/// The settings file says which theme to use, how big the window was, and</span></span>
+<span class="ln" id="L68"><span class="tok-com">/// whether movement is reduced. All three are needed to draw the window --</span></span>
+<span class="ln" id="L69"><span class="tok-com">/// including the lock screen itself, which is the first thing drawn and the</span></span>
+<span class="ln" id="L70"><span class="tok-com">/// last thing that could wait. A record inside the hoard cannot be read until</span></span>
+<span class="ln" id="L71"><span class="tok-com">/// a passphrase has produced a key, and a passphrase cannot be typed until</span></span>
+<span class="ln" id="L72"><span class="tok-com">/// there is a window to type it into. Putting the settings in there would mean</span></span>
+<span class="ln" id="L73"><span class="tok-com">/// every locked VeilVoice opened with the default theme at the default size</span></span>
+<span class="ln" id="L74"><span class="tok-com">/// and then jumped to the user&#x27;s when they unlocked.</span></span>
+<span class="ln" id="L75"><span class="tok-com">///</span></span>
+<span class="ln" id="L76"><span class="tok-com">/// So the settings stay in the open, and what that costs is stated plainly:</span></span>
+<span class="ln" id="L77"><span class="tok-com">/// somebody reading the folder learns which theme you chose, roughly how big</span></span>
+<span class="ln" id="L78"><span class="tok-com">/// your window is, and which optional features you switched on. They do not</span></span>
+<span class="ln" id="L79"><span class="tok-com">/// learn what you have processed, what VeilVoice measured while doing it, what</span></span>
+<span class="ln" id="L80"><span class="tok-com">/// it found when it checked itself, or what any of the other records hold.</span></span>
+<span class="ln" id="L81"><span class="tok-com">///</span></span>
+<span class="ln" id="L82"><span class="tok-com">/// This is a real limit rather than a temporary one. Closing it properly means</span></span>
+<span class="ln" id="L83"><span class="tok-com">/// splitting appearance out from everything else so only the handful of</span></span>
+<span class="ln" id="L84"><span class="tok-com">/// drawing settings sit in the open, and that is worth doing; it is not worth</span></span>
+<span class="ln" id="L85"><span class="tok-com">/// pretending is already done.</span></span>
+<span class="ln" id="L86"><span class="tok-kw">pub</span> <span class="tok-kw">mod</span> records {</span>
+<span class="ln" id="L87">    <span class="tok-com">/// What the application measured about its own running.</span></span>
+<span class="ln" id="L88">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MEASURED: &amp;str = <span class="tok-str">&quot;measured&quot;</span>;</span>
+<span class="ln" id="L89"></span>
+<span class="ln" id="L90">    <span class="tok-com">/// Every record, with the plain filename each one migrates from.</span></span>
+<span class="ln" id="L91">    <span class="tok-com">///</span></span>
+<span class="ln" id="L92">    <span class="tok-com">/// The plain name is what the file was called before there was a lock, and</span></span>
+<span class="ln" id="L93">    <span class="tok-com">/// is what it goes back to being if the lock is removed.</span></span>
+<span class="ln" id="L94">    <span class="tok-com">///</span></span>
+<span class="ln" id="L95">    <span class="tok-com">/// # Adding to this list is not free</span></span>
+<span class="ln" id="L96">    <span class="tok-com">///</span></span>
+<span class="ln" id="L97">    <span class="tok-com">/// A name here is migrated in on the first unlock and the plain file is</span></span>
+<span class="ln" id="L98">    <span class="tok-com">/// **shredded**. So a file listed here that anything still reads by its</span></span>
+<span class="ln" id="L99">    <span class="tok-com">/// plain path is a file that gets destroyed, silently, on somebody&#x27;s next</span></span>
+<span class="ln" id="L100">    <span class="tok-com">/// unlock. `every_record_is_actually_read_through_the_store` refuses that,</span></span>
+<span class="ln" id="L101">    <span class="tok-com">/// and it exists because the first version of this module listed three</span></span>
+<span class="ln" id="L102">    <span class="tok-com">/// records and read one.</span></span>
+<span class="ln" id="L103">    <span class="tok-com">///</span></span>
+<span class="ln" id="L104">    <span class="tok-com">/// `integrity.manifest` and `last-crash.txt` were on this list and are</span></span>
+<span class="ln" id="L105">    <span class="tok-com">/// deliberately not now. Both are still read elsewhere by their plain</span></span>
+<span class="ln" id="L106">    <span class="tok-com">/// paths, and the manifest is read by `veilvoice guard` from the *command</span></span>
+<span class="ln" id="L107">    <span class="tok-com">/// line*, which has no unlocked session and therefore no key. Moving it in</span></span>
+<span class="ln" id="L108">    <span class="tok-com">/// would mean prompting for the app-lock passphrase on every</span></span>
+<span class="ln" id="L109">    <span class="tok-com">/// `veilvoice guard` run: a different feature with a different argument,</span></span>
+<span class="ln" id="L110">    <span class="tok-com">/// not a detail of this one.</span></span>
+<span class="ln" id="L111">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> ALL: &amp;[(&amp;str, &amp;str)] = &amp;[(MEASURED, <span class="tok-str">&quot;measured.dat&quot;</span>)];</span>
+<span class="ln" id="L112">}</span>
 </span>
-<span class="ln" id="L112"></span>
+<span class="ln" id="L113"></span>
 <span class="src-item" id="fn-decoys">
-<span class="ln" id="L113"><span class="tok-com">/// How many decoys a folder is kept stocked with.</span></span>
-<span class="ln" id="L114"><span class="tok-com">///</span></span>
-<span class="ln" id="L115"><span class="tok-com">/// Enough that the real records are a minority of what is there, few enough</span></span>
-<span class="ln" id="L116"><span class="tok-com">/// that the folder is not absurd. The exact number is not a security</span></span>
-<span class="ln" id="L117"><span class="tok-com">/// parameter: it blurs the count of real records, it does not hide it, and</span></span>
-<span class="ln" id="L118"><span class="tok-com">/// pretending otherwise would be the overstatement this project spends its</span></span>
-<span class="ln" id="L119"><span class="tok-com">/// time avoiding.</span></span>
-<span class="ln" id="L120"><span class="tok-kw">const</span> DECOYS: usize = <span class="tok-num">24</span>;</span>
+<span class="ln" id="L114"><span class="tok-com">/// How many decoys a folder is kept stocked with.</span></span>
+<span class="ln" id="L115"><span class="tok-com">///</span></span>
+<span class="ln" id="L116"><span class="tok-com">/// Enough that the real records are a minority of what is there, few enough</span></span>
+<span class="ln" id="L117"><span class="tok-com">/// that the folder is not absurd. The exact number is not a security</span></span>
+<span class="ln" id="L118"><span class="tok-com">/// parameter: it blurs the count of real records, it does not hide it, and</span></span>
+<span class="ln" id="L119"><span class="tok-com">/// pretending otherwise would be the overstatement this project spends its</span></span>
+<span class="ln" id="L120"><span class="tok-com">/// time avoiding.</span></span>
+<span class="ln" id="L121"><span class="tok-kw">const</span> DECOYS: usize = <span class="tok-num">24</span>;</span>
 </span>
-<span class="ln" id="L121"></span>
+<span class="ln" id="L122"></span>
 <span class="src-item" id="fn-vaultstore">
-<span class="ln" id="L122"><span class="tok-com">/// The application&#x27;s own storage, locked or not.</span></span>
-<span class="ln" id="L123"><span class="tok-attr">#[derive</span>(Default)]</span>
-<span class="ln" id="L124"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> VaultStore {</span>
-<span class="ln" id="L125">    <span class="tok-com">/// The directory everything lives in, whether obfuscated or not.</span></span>
-<span class="ln" id="L126">    dir: Option&lt;PathBuf&gt;,</span>
-<span class="ln" id="L127">    <span class="tok-com">/// The obfuscated store, once a passphrase has produced its key.</span></span>
-<span class="ln" id="L128">    hoard: Option&lt;Hoard&gt;,</span>
-<span class="ln" id="L129">}</span>
+<span class="ln" id="L123"><span class="tok-com">/// The application&#x27;s own storage, locked or not.</span></span>
+<span class="ln" id="L124"><span class="tok-attr">#[derive</span>(Default)]</span>
+<span class="ln" id="L125"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> VaultStore {</span>
+<span class="ln" id="L126">    <span class="tok-com">/// The directory everything lives in, whether obfuscated or not.</span></span>
+<span class="ln" id="L127">    dir: Option&lt;PathBuf&gt;,</span>
+<span class="ln" id="L128">    <span class="tok-com">/// The obfuscated store, once a passphrase has produced its key.</span></span>
+<span class="ln" id="L129">    hoard: Option&lt;Hoard&gt;,</span>
+<span class="ln" id="L130">    <span class="tok-com">/// An unlock being carried out, on a thread.</span></span>
+<span class="ln" id="L131">    <span class="tok-com">///</span></span>
+<span class="ln" id="L132">    <span class="tok-com">/// **F-218.** Opening the folder is the one expensive thing this module</span></span>
+<span class="ln" id="L133">    <span class="tok-com">/// does, and it was done on the frame the passphrase was accepted: each</span></span>
+<span class="ln" id="L134">    <span class="tok-com">/// plain record read and re-written encrypted, each original **shredded</span></span>
+<span class="ln" id="L135">    <span class="tok-com">/// with three passes**, the folder audited twice and decoys sown. The</span></span>
+<span class="ln" id="L136">    <span class="tok-com">/// window stopped for all of it, at the moment somebody had just proved</span></span>
+<span class="ln" id="L137">    <span class="tok-com">/// they owned the machine and was watching to see what happened.</span></span>
+<span class="ln" id="L138">    opening: Option&lt;mpsc::Receiver&lt;Result&lt;(Hoard, Audit), String&gt;&gt;&gt;,</span>
+<span class="ln" id="L139">}</span>
 </span>
-<span class="ln" id="L130"></span>
-<span class="ln" id="L131"><span class="tok-kw">impl</span> VaultStore {</span>
+<span class="ln" id="L140"></span>
+<span class="ln" id="L141"><span class="tok-kw">impl</span> VaultStore {</span>
 <span class="src-item" id="fn-vaultstore-new">
-<span class="ln" id="L132">    <span class="tok-com">/// Point at the program folder. Nothing is read or written yet.</span></span>
-<span class="ln" id="L133">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(dir: Option&lt;PathBuf&gt;) -&gt; Self {</span>
-<span class="ln" id="L134">        Self { dir, hoard: None }</span>
-<span class="ln" id="L135">    }</span>
-</span>
-<span class="ln" id="L136"></span>
-<span class="src-item" id="fn-vaultstore-dir">
-<span class="ln" id="L137">    <span class="tok-com">/// The program folder, if this platform has one.</span></span>
-<span class="ln" id="L138">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">dir</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;Path&gt; {</span>
-<span class="ln" id="L139">        <span class="tok-kw">self</span>.dir.<span class="tok-fn">as_deref</span>()</span>
-<span class="ln" id="L140">    }</span>
-</span>
-<span class="ln" id="L141"></span>
-<span class="src-item" id="fn-vaultstore-is_obfuscated">
-<span class="ln" id="L142">    <span class="tok-com">/// Whether records are currently obfuscated.</span></span>
-<span class="ln" id="L143">    <span class="tok-com">///</span></span>
-<span class="ln" id="L144">    <span class="tok-com">/// False before an unlock and false when there is no lock at all, which</span></span>
-<span class="ln" id="L145">    <span class="tok-com">/// are different situations with the same answer: in neither of them is</span></span>
-<span class="ln" id="L146">    <span class="tok-com">/// anything hidden.</span></span>
-<span class="ln" id="L147">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_obfuscated</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L148">        <span class="tok-kw">self</span>.hoard.<span class="tok-fn">is_some</span>()</span>
+<span class="ln" id="L142">    <span class="tok-com">/// Point at the program folder. Nothing is read or written yet.</span></span>
+<span class="ln" id="L143">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(dir: Option&lt;PathBuf&gt;) -&gt; Self {</span>
+<span class="ln" id="L144">        Self {</span>
+<span class="ln" id="L145">            dir,</span>
+<span class="ln" id="L146">            hoard: None,</span>
+<span class="ln" id="L147">            opening: None,</span>
+<span class="ln" id="L148">        }</span>
 <span class="ln" id="L149">    }</span>
 </span>
 <span class="ln" id="L150"></span>
-<span class="src-item" id="fn-vaultstore-unlocked">
-<span class="ln" id="L151">    <span class="tok-com">/// Take the key from an unlock and open the hoard with it.</span></span>
-<span class="ln" id="L152">    <span class="tok-com">///</span></span>
-<span class="ln" id="L153">    <span class="tok-com">/// Migrates any plain files in on the way, and tops the decoys up. Returns</span></span>
-<span class="ln" id="L154">    <span class="tok-com">/// what the audit found, so the caller can put a tamper report in front of</span></span>
-<span class="ln" id="L155">    <span class="tok-com">/// somebody who has just proved they own the machine.</span></span>
-<span class="ln" id="L156">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">unlocked</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, key: StoreKey) -&gt; Result&lt;Audit, String&gt; {</span>
-<span class="ln" id="L157">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dir) = <span class="tok-kw">self</span>.dir.<span class="tok-fn">clone</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L158">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;this system has no program folder&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L159">        };</span>
-<span class="ln" id="L160">        <span class="tok-kw">let</span> hoard = Hoard::<span class="tok-fn">open</span>(&amp;dir, key);</span>
-<span class="ln" id="L161"></span>
-<span class="ln" id="L162">        <span class="tok-kw">for</span> (logical, plain) <span class="tok-kw">in</span> records::ALL {</span>
-<span class="ln" id="L163">            <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(plain);</span>
-<span class="ln" id="L164">            <span class="tok-kw">if</span> !path.<span class="tok-fn">exists</span>() {</span>
-<span class="ln" id="L165">                continue;</span>
-<span class="ln" id="L166">            }</span>
-<span class="ln" id="L167">            <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(&amp;path)</span>
-<span class="ln" id="L168">                .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not read {plain} to move it in: {e}&quot;</span>))?;</span>
-<span class="ln" id="L169">            hoard</span>
-<span class="ln" id="L170">                .<span class="tok-fn">write</span>(logical, &amp;bytes)</span>
-<span class="ln" id="L171">                .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not store {plain}: {e}&quot;</span>))?;</span>
-<span class="ln" id="L172">            <span class="tok-com">// Erased rather than deleted: a settings file that says which</span></span>
-<span class="ln" id="L173">            <span class="tok-com">// vault you use should not be recoverable from free space after</span></span>
-<span class="ln" id="L174">            <span class="tok-com">// VeilVoice has told you it is now encrypted.</span></span>
-<span class="ln" id="L175">            <span class="tok-kw">let</span> _ =</span>
-<span class="ln" id="L176">                veilvoice_crypto::shred::<span class="tok-fn">shred_file</span>(&amp;path, veilvoice_crypto::shred::Passes::Triple);</span>
-<span class="ln" id="L177">            <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;path);</span>
-<span class="ln" id="L178">        }</span>
-<span class="ln" id="L179"></span>
-<span class="ln" id="L180">        <span class="tok-com">// Kept stocked rather than sown once. A folder whose decoy count never</span></span>
-<span class="ln" id="L181">        <span class="tok-com">// changes while its record count does is a folder that leaks the</span></span>
-<span class="ln" id="L182">        <span class="tok-com">// difference over time.</span></span>
-<span class="ln" id="L183">        <span class="tok-kw">let</span> present = hoard.<span class="tok-fn">audit</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L184">        <span class="tok-kw">if</span> present.unrecognised &lt; DECOYS {</span>
-<span class="ln" id="L185">            <span class="tok-kw">let</span> _ = hoard.<span class="tok-fn">sow_decoys</span>(DECOYS - present.unrecognised);</span>
-<span class="ln" id="L186">        }</span>
-<span class="ln" id="L187"></span>
-<span class="ln" id="L188">        <span class="tok-kw">let</span> audit = hoard.<span class="tok-fn">audit</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L189">        <span class="tok-kw">self</span>.hoard = <span class="tok-fn">Some</span>(hoard);</span>
-<span class="ln" id="L190">        <span class="tok-fn">Ok</span>(audit)</span>
-<span class="ln" id="L191">    }</span>
+<span class="src-item" id="fn-vaultstore-dir">
+<span class="ln" id="L151">    <span class="tok-com">/// The program folder, if this platform has one.</span></span>
+<span class="ln" id="L152">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">dir</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;Path&gt; {</span>
+<span class="ln" id="L153">        <span class="tok-kw">self</span>.dir.<span class="tok-fn">as_deref</span>()</span>
+<span class="ln" id="L154">    }</span>
 </span>
-<span class="ln" id="L192"></span>
-<span class="src-item" id="fn-vaultstore-locked">
-<span class="ln" id="L193">    <span class="tok-com">/// Forget the key. Called when the window locks.</span></span>
-<span class="ln" id="L194">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">locked</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L195">        <span class="tok-kw">self</span>.hoard = None;</span>
-<span class="ln" id="L196">    }</span>
+<span class="ln" id="L155"></span>
+<span class="src-item" id="fn-vaultstore-is_obfuscated">
+<span class="ln" id="L156">    <span class="tok-com">/// Whether records are currently obfuscated.</span></span>
+<span class="ln" id="L157">    <span class="tok-com">///</span></span>
+<span class="ln" id="L158">    <span class="tok-com">/// False before an unlock and false when there is no lock at all, which</span></span>
+<span class="ln" id="L159">    <span class="tok-com">/// are different situations with the same answer: in neither of them is</span></span>
+<span class="ln" id="L160">    <span class="tok-com">/// anything hidden.</span></span>
+<span class="ln" id="L161">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_obfuscated</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L162">        <span class="tok-kw">self</span>.hoard.<span class="tok-fn">is_some</span>()</span>
+<span class="ln" id="L163">    }</span>
 </span>
-<span class="ln" id="L197"></span>
-<span class="src-item" id="fn-vaultstore-read">
-<span class="ln" id="L198">    <span class="tok-com">/// Read a record, from the hoard if it is open and from the plain file if</span></span>
-<span class="ln" id="L199">    <span class="tok-com">/// it is not.</span></span>
-<span class="ln" id="L200">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">read</span>(&amp;<span class="tok-kw">self</span>, logical: &amp;str) -&gt; Result&lt;Option&lt;Vec&lt;u8&gt;&gt;, String&gt; {</span>
-<span class="ln" id="L201">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(hoard) = &amp;<span class="tok-kw">self</span>.hoard {</span>
-<span class="ln" id="L202">            <span class="tok-kw">return</span> hoard.<span class="tok-fn">read</span>(logical).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L203">        }</span>
-<span class="ln" id="L204">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-kw">self</span>.<span class="tok-fn">plain_path</span>(logical) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L205">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(None);</span>
-<span class="ln" id="L206">        };</span>
-<span class="ln" id="L207">        <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read</span>(path) {</span>
-<span class="ln" id="L208">            <span class="tok-fn">Ok</span>(bytes) =&gt; <span class="tok-fn">Ok</span>(<span class="tok-fn">Some</span>(bytes)),</span>
-<span class="ln" id="L209">            <span class="tok-fn">Err</span>(e) <span class="tok-kw">if</span> e.<span class="tok-fn">kind</span>() == std::io::ErrorKind::NotFound =&gt; <span class="tok-fn">Ok</span>(None),</span>
-<span class="ln" id="L210">            <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-fn">Err</span>(e.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L211">        }</span>
-<span class="ln" id="L212">    }</span>
+<span class="ln" id="L164"></span>
+<span class="src-item" id="fn-vaultstore-start_unlocking">
+<span class="ln" id="L165">    <span class="tok-com">/// Take the key from an unlock and start opening the hoard with it.</span></span>
+<span class="ln" id="L166">    <span class="tok-com">///</span></span>
+<span class="ln" id="L167">    <span class="tok-com">/// Returns at once. The work happens on a thread and the answer is</span></span>
+<span class="ln" id="L168">    <span class="tok-com">/// collected by [`VaultStore::poll`], because the work is</span></span>
+<span class="ln" id="L169">    <span class="tok-com">/// [`open_with`]: reading every plain record, writing it back encrypted,</span></span>
+<span class="ln" id="L170">    <span class="tok-com">/// shredding the original with three passes, sowing decoys and auditing</span></span>
+<span class="ln" id="L171">    <span class="tok-com">/// the folder twice. See F-218 for what that cost inside one frame.</span></span>
+<span class="ln" id="L172">    <span class="tok-com">///</span></span>
+<span class="ln" id="L173">    <span class="tok-com">/// Starting a second unlock while one is running replaces it. That cannot</span></span>
+<span class="ln" id="L174">    <span class="tok-com">/// happen from the window, which produces a key only from an accepted</span></span>
+<span class="ln" id="L175">    <span class="tok-com">/// passphrase, and if it ever does then the newer key is the right one.</span></span>
+<span class="ln" id="L176">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">start_unlocking</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context, key: StoreKey) {</span>
+<span class="ln" id="L177">        <span class="tok-kw">let</span> dir = <span class="tok-kw">self</span>.dir.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L178">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L179">        <span class="tok-kw">self</span>.opening = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L180">        <span class="tok-kw">let</span> ctx = ctx.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L181">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L182">            <span class="tok-kw">let</span> answer = <span class="tok-kw">match</span> dir {</span>
+<span class="ln" id="L183">                <span class="tok-fn">Some</span>(dir) =&gt; <span class="tok-fn">open_with</span>(&amp;dir, key),</span>
+<span class="ln" id="L184">                None =&gt; <span class="tok-fn">Err</span>(<span class="tok-str">&quot;this system has no program folder&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L185">            };</span>
+<span class="ln" id="L186">            <span class="tok-com">// The receiver is gone if the window locked or shut while this ran,</span></span>
+<span class="ln" id="L187">            <span class="tok-com">// which is ordinary: see `locked`. The key then goes nowhere, which</span></span>
+<span class="ln" id="L188">            <span class="tok-com">// is the point.</span></span>
+<span class="ln" id="L189">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(answer);</span>
+<span class="ln" id="L190">            ctx.<span class="tok-fn">request_repaint</span>();</span>
+<span class="ln" id="L191">        });</span>
+<span class="ln" id="L192">    }</span>
 </span>
-<span class="ln" id="L213"></span>
-<span class="src-item" id="fn-vaultstore-write">
-<span class="ln" id="L214">    <span class="tok-com">/// Write a record, obfuscated if there is a key and plain if there is not.</span></span>
-<span class="ln" id="L215">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">write</span>(&amp;<span class="tok-kw">self</span>, logical: &amp;str, bytes: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L216">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(hoard) = &amp;<span class="tok-kw">self</span>.hoard {</span>
-<span class="ln" id="L217">            <span class="tok-kw">return</span> hoard.<span class="tok-fn">write</span>(logical, bytes).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L218">        }</span>
-<span class="ln" id="L219">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-kw">self</span>.<span class="tok-fn">plain_path</span>(logical) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L220">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;this system has no program folder&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L221">        };</span>
-<span class="ln" id="L222">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
-<span class="ln" id="L223">            std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L193"></span>
+<span class="src-item" id="fn-vaultstore-is_opening">
+<span class="ln" id="L194">    <span class="tok-com">/// Whether an unlock is still being carried out.</span></span>
+<span class="ln" id="L195">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_opening</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L196">        <span class="tok-kw">self</span>.opening.<span class="tok-fn">is_some</span>()</span>
+<span class="ln" id="L197">    }</span>
+</span>
+<span class="ln" id="L198"></span>
+<span class="src-item" id="fn-vaultstore-poll">
+<span class="ln" id="L199">    <span class="tok-com">/// Collect a finished unlock, installing the key. Never waits.</span></span>
+<span class="ln" id="L200">    <span class="tok-com">///</span></span>
+<span class="ln" id="L201">    <span class="tok-com">/// Returns what the audit found, so the caller can put a tamper report in</span></span>
+<span class="ln" id="L202">    <span class="tok-com">/// front of somebody who has just proved they own the machine.</span></span>
+<span class="ln" id="L203">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">poll</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Option&lt;Result&lt;Audit, String&gt;&gt; {</span>
+<span class="ln" id="L204">        <span class="tok-kw">let</span> rx = <span class="tok-kw">self</span>.opening.<span class="tok-fn">as_ref</span>()?;</span>
+<span class="ln" id="L205">        <span class="tok-kw">match</span> rx.<span class="tok-fn">try_recv</span>() {</span>
+<span class="ln" id="L206">            <span class="tok-fn">Ok</span>(<span class="tok-fn">Ok</span>((hoard, audit))) =&gt; {</span>
+<span class="ln" id="L207">                <span class="tok-kw">self</span>.opening = None;</span>
+<span class="ln" id="L208">                <span class="tok-kw">self</span>.hoard = <span class="tok-fn">Some</span>(hoard);</span>
+<span class="ln" id="L209">                <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(audit))</span>
+<span class="ln" id="L210">            }</span>
+<span class="ln" id="L211">            <span class="tok-fn">Ok</span>(<span class="tok-fn">Err</span>(why)) =&gt; {</span>
+<span class="ln" id="L212">                <span class="tok-kw">self</span>.opening = None;</span>
+<span class="ln" id="L213">                <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(why))</span>
+<span class="ln" id="L214">            }</span>
+<span class="ln" id="L215">            <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; None,</span>
+<span class="ln" id="L216">            <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; {</span>
+<span class="ln" id="L217">                <span class="tok-kw">self</span>.opening = None;</span>
+<span class="ln" id="L218">                <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(</span>
+<span class="ln" id="L219">                    <span class="tok-str">&quot;opening the program folder stopped without saying why. \</span></span>
+<span class="ln" id="L220"><span class="tok-str">                     Nothing was lost; lock and unlock again to retry.&quot;</span></span>
+<span class="ln" id="L221">                        .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L222">                ))</span>
+<span class="ln" id="L223">            }</span>
 <span class="ln" id="L224">        }</span>
-<span class="ln" id="L225">        veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(&amp;path, bytes).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L226">    }</span>
+<span class="ln" id="L225">    }</span>
 </span>
-<span class="ln" id="L227"></span>
+<span class="ln" id="L226"></span>
+<span class="src-item" id="fn-vaultstore-unlocked">
+<span class="ln" id="L227">    <span class="tok-com">/// Open the hoard here and now, for tests only.</span></span>
+<span class="ln" id="L228">    <span class="tok-com">///</span></span>
+<span class="ln" id="L229">    <span class="tok-com">/// `#[cfg(test)]`, so the window cannot call it: the compiler forbids the</span></span>
+<span class="ln" id="L230">    <span class="tok-com">/// blocking path in a shipped build, which is a stronger guarantee than a</span></span>
+<span class="ln" id="L231">    <span class="tok-com">/// guard reading the source for it. The tests below are about what the</span></span>
+<span class="ln" id="L232">    <span class="tok-com">/// hoard does with the files, not about which thread does it, and spinning</span></span>
+<span class="ln" id="L233">    <span class="tok-com">/// a worker in each of them would test the channel twenty times over.</span></span>
+<span class="ln" id="L234">    <span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L235">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">unlocked</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, key: StoreKey) -&gt; Result&lt;Audit, String&gt; {</span>
+<span class="ln" id="L236">        <span class="tok-kw">let</span> dir = <span class="tok-kw">self</span></span>
+<span class="ln" id="L237">            .dir</span>
+<span class="ln" id="L238">            .<span class="tok-fn">clone</span>()</span>
+<span class="ln" id="L239">            .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;this system has no program folder&quot;</span>.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L240">        <span class="tok-kw">let</span> (hoard, audit) = <span class="tok-fn">open_with</span>(&amp;dir, key)?;</span>
+<span class="ln" id="L241">        <span class="tok-kw">self</span>.hoard = <span class="tok-fn">Some</span>(hoard);</span>
+<span class="ln" id="L242">        <span class="tok-fn">Ok</span>(audit)</span>
+<span class="ln" id="L243">    }</span>
+</span>
+<span class="ln" id="L244"></span>
+<span class="src-item" id="fn-vaultstore-locked">
+<span class="ln" id="L245">    <span class="tok-com">/// Forget the key. Called when the window locks.</span></span>
+<span class="ln" id="L246">    <span class="tok-com">///</span></span>
+<span class="ln" id="L247">    <span class="tok-com">/// **An unlock in flight is abandoned as well.** The window locking while</span></span>
+<span class="ln" id="L248">    <span class="tok-com">/// the folder is being opened must not end with the key installed a moment</span></span>
+<span class="ln" id="L249">    <span class="tok-com">/// later, which is what dropping the receiver prevents: the worker&#x27;s send</span></span>
+<span class="ln" id="L250">    <span class="tok-com">/// fails and its `Hoard`, with the key inside it, is dropped on that</span></span>
+<span class="ln" id="L251">    <span class="tok-com">/// thread.</span></span>
+<span class="ln" id="L252">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">locked</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L253">        <span class="tok-kw">self</span>.hoard = None;</span>
+<span class="ln" id="L254">        <span class="tok-kw">self</span>.opening = None;</span>
+<span class="ln" id="L255">    }</span>
+</span>
+<span class="ln" id="L256"></span>
+<span class="src-item" id="fn-vaultstore-read">
+<span class="ln" id="L257">    <span class="tok-com">/// Read a record, from the hoard if it is open and from the plain file if</span></span>
+<span class="ln" id="L258">    <span class="tok-com">/// it is not.</span></span>
+<span class="ln" id="L259">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">read</span>(&amp;<span class="tok-kw">self</span>, logical: &amp;str) -&gt; Result&lt;Option&lt;Vec&lt;u8&gt;&gt;, String&gt; {</span>
+<span class="ln" id="L260">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(hoard) = &amp;<span class="tok-kw">self</span>.hoard {</span>
+<span class="ln" id="L261">            <span class="tok-kw">return</span> hoard.<span class="tok-fn">read</span>(logical).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L262">        }</span>
+<span class="ln" id="L263">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-kw">self</span>.<span class="tok-fn">plain_path</span>(logical) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L264">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(None);</span>
+<span class="ln" id="L265">        };</span>
+<span class="ln" id="L266">        <span class="tok-kw">match</span> std::fs::<span class="tok-fn">read</span>(path) {</span>
+<span class="ln" id="L267">            <span class="tok-fn">Ok</span>(bytes) =&gt; <span class="tok-fn">Ok</span>(<span class="tok-fn">Some</span>(bytes)),</span>
+<span class="ln" id="L268">            <span class="tok-fn">Err</span>(e) <span class="tok-kw">if</span> e.<span class="tok-fn">kind</span>() == std::io::ErrorKind::NotFound =&gt; <span class="tok-fn">Ok</span>(None),</span>
+<span class="ln" id="L269">            <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-fn">Err</span>(e.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L270">        }</span>
+<span class="ln" id="L271">    }</span>
+</span>
+<span class="ln" id="L272"></span>
+<span class="src-item" id="fn-vaultstore-write">
+<span class="ln" id="L273">    <span class="tok-com">/// Write a record, obfuscated if there is a key and plain if there is not.</span></span>
+<span class="ln" id="L274">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">write</span>(&amp;<span class="tok-kw">self</span>, logical: &amp;str, bytes: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L275">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(hoard) = &amp;<span class="tok-kw">self</span>.hoard {</span>
+<span class="ln" id="L276">            <span class="tok-kw">return</span> hoard.<span class="tok-fn">write</span>(logical, bytes).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L277">        }</span>
+<span class="ln" id="L278">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(path) = <span class="tok-kw">self</span>.<span class="tok-fn">plain_path</span>(logical) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L279">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;this system has no program folder&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L280">        };</span>
+<span class="ln" id="L281">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
+<span class="ln" id="L282">            std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L283">        }</span>
+<span class="ln" id="L284">        veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(&amp;path, bytes).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L285">    }</span>
+</span>
+<span class="ln" id="L286"></span>
 <span class="src-item" id="fn-vaultstore-plain_path">
-<span class="ln" id="L228">    <span class="tok-com">/// Where a record sits when nothing is obfuscating it.</span></span>
-<span class="ln" id="L229">    <span class="tok-kw">fn</span> <span class="tok-fn">plain_path</span>(&amp;<span class="tok-kw">self</span>, logical: &amp;str) -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L230">        <span class="tok-kw">let</span> dir = <span class="tok-kw">self</span>.dir.<span class="tok-fn">as_ref</span>()?;</span>
-<span class="ln" id="L231">        <span class="tok-kw">let</span> name = records::ALL</span>
-<span class="ln" id="L232">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L233">            .<span class="tok-fn">find</span>(|(key, _)| *key == logical)</span>
-<span class="ln" id="L234">            .<span class="tok-fn">map</span>(|(_, plain)| *plain)?;</span>
-<span class="ln" id="L235">        <span class="tok-fn">Some</span>(dir.<span class="tok-fn">join</span>(name))</span>
-<span class="ln" id="L236">    }</span>
+<span class="ln" id="L287">    <span class="tok-com">/// Where a record sits when nothing is obfuscating it.</span></span>
+<span class="ln" id="L288">    <span class="tok-kw">fn</span> <span class="tok-fn">plain_path</span>(&amp;<span class="tok-kw">self</span>, logical: &amp;str) -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L289">        <span class="tok-kw">let</span> dir = <span class="tok-kw">self</span>.dir.<span class="tok-fn">as_ref</span>()?;</span>
+<span class="ln" id="L290">        <span class="tok-kw">let</span> name = records::ALL</span>
+<span class="ln" id="L291">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L292">            .<span class="tok-fn">find</span>(|(key, _)| *key == logical)</span>
+<span class="ln" id="L293">            .<span class="tok-fn">map</span>(|(_, plain)| *plain)?;</span>
+<span class="ln" id="L294">        <span class="tok-fn">Some</span>(dir.<span class="tok-fn">join</span>(name))</span>
+<span class="ln" id="L295">    }</span>
 </span>
-<span class="ln" id="L237">}</span>
-<span class="ln" id="L238"></span>
-<span class="ln" id="L239"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L240"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L241">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L242">    <span class="tok-kw">use</span> veilvoice_crypto::amnesia::Secret;</span>
-<span class="ln" id="L243"></span>
-<span class="ln" id="L244">    <span class="tok-kw">fn</span> <span class="tok-fn">key</span>(byte: u8) -&gt; StoreKey {</span>
-<span class="ln" id="L245">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> raw = [byte; <span class="tok-num">32</span>];</span>
-<span class="ln" id="L246">        StoreKey::<span class="tok-fn">from_secret</span>(Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> raw))</span>
-<span class="ln" id="L247">    }</span>
-<span class="ln" id="L248"></span>
-<span class="ln" id="L249">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L250">    <span class="tok-kw">fn</span> <span class="tok-fn">without_a_lock_it_writes_plain_files_under_their_own_names</span>() {</span>
-<span class="ln" id="L251">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L252">        <span class="tok-kw">let</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L253">        assert!(!store.<span class="tok-fn">is_obfuscated</span>());</span>
-<span class="ln" id="L254">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L255">        assert!(</span>
-<span class="ln" id="L256">            dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;measured.dat&quot;</span>).<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L257">            <span class="tok-str">&quot;with no passphrase there is no key, so there is nothing to hide with&quot;</span></span>
-<span class="ln" id="L258">        );</span>
-<span class="ln" id="L259">        assert_eq!(</span>
-<span class="ln" id="L260">            store.<span class="tok-fn">read</span>(records::MEASURED).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L261">            b<span class="tok-str">&quot;theme=dark&quot;</span></span>
-<span class="ln" id="L262">        );</span>
-<span class="ln" id="L263">    }</span>
-<span class="ln" id="L264"></span>
-<span class="ln" id="L265">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L266">    <span class="tok-kw">fn</span> <span class="tok-fn">unlocking_moves_the_plain_files_in_and_removes_them</span>() {</span>
-<span class="ln" id="L267">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L268">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L269">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L270">        assert!(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;measured.dat&quot;</span>).<span class="tok-fn">exists</span>());</span>
-<span class="ln" id="L271"></span>
-<span class="ln" id="L272">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L273">        assert!(store.<span class="tok-fn">is_obfuscated</span>());</span>
-<span class="ln" id="L274">        assert!(</span>
-<span class="ln" id="L275">            !dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;measured.dat&quot;</span>).<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L276">            <span class="tok-str">&quot;the plain copy has to go, or the obfuscation is decoration&quot;</span></span>
-<span class="ln" id="L277">        );</span>
-<span class="ln" id="L278">        assert_eq!(</span>
-<span class="ln" id="L279">            store.<span class="tok-fn">read</span>(records::MEASURED).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L280">            b<span class="tok-str">&quot;theme=dark&quot;</span>,</span>
-<span class="ln" id="L281">            <span class="tok-str">&quot;and the contents have to survive the move&quot;</span></span>
-<span class="ln" id="L282">        );</span>
-<span class="ln" id="L283">    }</span>
-<span class="ln" id="L284"></span>
-<span class="ln" id="L285">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L286">    <span class="tok-kw">fn</span> <span class="tok-fn">once_unlocked_no_filename_says_what_it_holds</span>() {</span>
-<span class="ln" id="L287">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L288">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L289">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L290">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L291">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;4 runs&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L292"></span>
-<span class="ln" id="L293">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>() {</span>
-<span class="ln" id="L294">            <span class="tok-kw">let</span> name = entry.<span class="tok-fn">unwrap</span>().<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L295">            <span class="tok-kw">for</span> (_, plain) <span class="tok-kw">in</span> records::ALL {</span>
-<span class="ln" id="L296">                assert_ne!(&amp;name, plain, <span class="tok-str">&quot;a plain name survived the move&quot;</span>);</span>
-<span class="ln" id="L297">            }</span>
-<span class="ln" id="L298">        }</span>
-<span class="ln" id="L299">    }</span>
-<span class="ln" id="L300"></span>
-<span class="ln" id="L301">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L302">    <span class="tok-kw">fn</span> <span class="tok-fn">decoys_outnumber_the_records</span>() {</span>
-<span class="ln" id="L303">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L304">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L305">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;x&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L306">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L307">        <span class="tok-kw">let</span> files = std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L308">        assert!(</span>
-<span class="ln" id="L309">            files &gt;= DECOYS,</span>
-<span class="ln" id="L310">            <span class="tok-str">&quot;only {files} files: the real ones are not lost in a crowd&quot;</span></span>
-<span class="ln" id="L311">        );</span>
-<span class="ln" id="L312">    }</span>
-<span class="ln" id="L313"></span>
-<span class="ln" id="L314">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L315">    <span class="tok-kw">fn</span> <span class="tok-fn">a_second_unlock_does_not_keep_adding_decoys</span>() {</span>
-<span class="ln" id="L316">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L317">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L318">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L319">        <span class="tok-kw">let</span> first = std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L320">        store.<span class="tok-fn">locked</span>();</span>
-<span class="ln" id="L321">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L322">        <span class="tok-kw">let</span> second = std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L323">        assert_eq!(</span>
-<span class="ln" id="L324">            first, second,</span>
-<span class="ln" id="L325">            <span class="tok-str">&quot;a folder that grows by two dozen files per unlock is its own signal&quot;</span></span>
-<span class="ln" id="L326">        );</span>
-<span class="ln" id="L327">    }</span>
-<span class="ln" id="L328"></span>
-<span class="ln" id="L329">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L330">    <span class="tok-kw">fn</span> <span class="tok-fn">the_wrong_passphrase_finds_nothing_rather_than_erroring</span>() {</span>
-<span class="ln" id="L331">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L332">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L333">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L334">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L335"></span>
-<span class="ln" id="L336">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> other = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L337">        other.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">9</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L338">        assert_eq!(</span>
-<span class="ln" id="L339">            other.<span class="tok-fn">read</span>(records::MEASURED).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L340">            None,</span>
-<span class="ln" id="L341">            <span class="tok-str">&quot;a different key derives names nothing is stored under&quot;</span></span>
-<span class="ln" id="L342">        );</span>
-<span class="ln" id="L343">    }</span>
-<span class="ln" id="L344"></span>
-<span class="ln" id="L345">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L346">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_forgets_the_key</span>() {</span>
-<span class="ln" id="L347">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L348">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L349">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L350">        assert!(store.<span class="tok-fn">is_obfuscated</span>());</span>
-<span class="ln" id="L351">        store.<span class="tok-fn">locked</span>();</span>
-<span class="ln" id="L352">        assert!(!store.<span class="tok-fn">is_obfuscated</span>());</span>
-<span class="ln" id="L353">    }</span>
-<span class="ln" id="L354"></span>
-<span class="ln" id="L355">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L356">    <span class="tok-kw">fn</span> <span class="tok-fn">an_edited_record_is_reported_by_the_audit</span>() {</span>
-<span class="ln" id="L357">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L358">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L359">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L360">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L361"></span>
-<span class="ln" id="L362">        <span class="tok-kw">let</span> hoard = Hoard::<span class="tok-fn">open</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-fn">key</span>(<span class="tok-num">7</span>));</span>
-<span class="ln" id="L363">        <span class="tok-kw">let</span> path = hoard.<span class="tok-fn">path_for</span>(records::MEASURED).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L364">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L365">        <span class="tok-kw">let</span> last = bytes.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>;</span>
-<span class="ln" id="L366">        bytes[last] ^= 0xff;</span>
-<span class="ln" id="L367">        std::fs::<span class="tok-fn">write</span>(&amp;path, &amp;bytes).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L368"></span>
-<span class="ln" id="L369">        store.<span class="tok-fn">locked</span>();</span>
-<span class="ln" id="L370">        <span class="tok-kw">let</span> audit = store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L371">        assert!(!audit.<span class="tok-fn">is_clean</span>());</span>
-<span class="ln" id="L372">        assert!(audit.tampered.<span class="tok-fn">contains</span>(&amp;records::MEASURED.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L373">    }</span>
+<span class="ln" id="L296">}</span>
+<span class="ln" id="L297"></span>
+<span class="src-item" id="fn-open_with">
+<span class="ln" id="L298"><span class="tok-com">/// Open the hoard in `dir` with `key`, migrating and auditing.</span></span>
+<span class="ln" id="L299"><span class="tok-com">///</span></span>
+<span class="ln" id="L300"><span class="tok-com">/// A free function rather than a method, and the only place this work is</span></span>
+<span class="ln" id="L301"><span class="tok-com">/// written, so that the thread doing it holds nothing belonging to the window.</span></span>
+<span class="ln" id="L302"><span class="tok-com">/// It is the whole of an unlock:</span></span>
+<span class="ln" id="L303"><span class="tok-com">///</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// 1. every plain record read, written back as a hoard record, and the</span></span>
+<span class="ln" id="L305"><span class="tok-com">///    original **shredded** rather than deleted, because a settings file that</span></span>
+<span class="ln" id="L306"><span class="tok-com">///    says which vault you use should not be recoverable from free space after</span></span>
+<span class="ln" id="L307"><span class="tok-com">///    VeilVoice has told you it is now encrypted;</span></span>
+<span class="ln" id="L308"><span class="tok-com">/// 2. the decoys topped up, because a folder whose decoy count never changes</span></span>
+<span class="ln" id="L309"><span class="tok-com">///    while its record count does is a folder that leaks the difference over</span></span>
+<span class="ln" id="L310"><span class="tok-com">///    time;</span></span>
+<span class="ln" id="L311"><span class="tok-com">/// 3. the folder audited, so the caller can say whether anything was edited or</span></span>
+<span class="ln" id="L312"><span class="tok-com">///    removed while the window was shut.</span></span>
+<span class="ln" id="L313"><span class="tok-com">///</span></span>
+<span class="ln" id="L314"><span class="tok-com">/// Three passes of overwriting per migrated record, two full reads of the</span></span>
+<span class="ln" id="L315"><span class="tok-com">/// folder, and a write per decoy. None of it belongs in a frame. See F-218.</span></span>
+<span class="ln" id="L316"><span class="tok-kw">fn</span> <span class="tok-fn">open_with</span>(dir: &amp;Path, key: StoreKey) -&gt; Result&lt;(Hoard, Audit), String&gt; {</span>
+<span class="ln" id="L317">    <span class="tok-kw">let</span> hoard = Hoard::<span class="tok-fn">open</span>(dir, key);</span>
+<span class="ln" id="L318"></span>
+<span class="ln" id="L319">    <span class="tok-kw">for</span> (logical, plain) <span class="tok-kw">in</span> records::ALL {</span>
+<span class="ln" id="L320">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(plain);</span>
+<span class="ln" id="L321">        <span class="tok-kw">if</span> !path.<span class="tok-fn">exists</span>() {</span>
+<span class="ln" id="L322">            continue;</span>
+<span class="ln" id="L323">        }</span>
+<span class="ln" id="L324">        <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(&amp;path)</span>
+<span class="ln" id="L325">            .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not read {plain} to move it in: {e}&quot;</span>))?;</span>
+<span class="ln" id="L326">        hoard</span>
+<span class="ln" id="L327">            .<span class="tok-fn">write</span>(logical, &amp;bytes)</span>
+<span class="ln" id="L328">            .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not store {plain}: {e}&quot;</span>))?;</span>
+<span class="ln" id="L329">        <span class="tok-kw">let</span> _ = veilvoice_crypto::shred::<span class="tok-fn">shred_file</span>(&amp;path, veilvoice_crypto::shred::Passes::Triple);</span>
+<span class="ln" id="L330">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;path);</span>
+<span class="ln" id="L331">    }</span>
+<span class="ln" id="L332"></span>
+<span class="ln" id="L333">    <span class="tok-kw">let</span> present = hoard.<span class="tok-fn">audit</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L334">    <span class="tok-kw">if</span> present.unrecognised &lt; DECOYS {</span>
+<span class="ln" id="L335">        <span class="tok-kw">let</span> _ = hoard.<span class="tok-fn">sow_decoys</span>(DECOYS - present.unrecognised);</span>
+<span class="ln" id="L336">    }</span>
+<span class="ln" id="L337"></span>
+<span class="ln" id="L338">    <span class="tok-kw">let</span> audit = hoard.<span class="tok-fn">audit</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L339">    <span class="tok-fn">Ok</span>((hoard, audit))</span>
+<span class="ln" id="L340">}</span>
+</span>
+<span class="ln" id="L341"></span>
+<span class="ln" id="L342"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L343"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L344">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L345">    <span class="tok-kw">use</span> veilvoice_crypto::amnesia::Secret;</span>
+<span class="ln" id="L346"></span>
+<span class="ln" id="L347">    <span class="tok-kw">fn</span> <span class="tok-fn">key</span>(byte: u8) -&gt; StoreKey {</span>
+<span class="ln" id="L348">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> raw = [byte; <span class="tok-num">32</span>];</span>
+<span class="ln" id="L349">        StoreKey::<span class="tok-fn">from_secret</span>(Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> raw))</span>
+<span class="ln" id="L350">    }</span>
+<span class="ln" id="L351"></span>
+<span class="ln" id="L352">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L353">    <span class="tok-kw">fn</span> <span class="tok-fn">without_a_lock_it_writes_plain_files_under_their_own_names</span>() {</span>
+<span class="ln" id="L354">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L355">        <span class="tok-kw">let</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L356">        assert!(!store.<span class="tok-fn">is_obfuscated</span>());</span>
+<span class="ln" id="L357">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L358">        assert!(</span>
+<span class="ln" id="L359">            dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;measured.dat&quot;</span>).<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L360">            <span class="tok-str">&quot;with no passphrase there is no key, so there is nothing to hide with&quot;</span></span>
+<span class="ln" id="L361">        );</span>
+<span class="ln" id="L362">        assert_eq!(</span>
+<span class="ln" id="L363">            store.<span class="tok-fn">read</span>(records::MEASURED).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L364">            b<span class="tok-str">&quot;theme=dark&quot;</span></span>
+<span class="ln" id="L365">        );</span>
+<span class="ln" id="L366">    }</span>
+<span class="ln" id="L367"></span>
+<span class="ln" id="L368">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L369">    <span class="tok-kw">fn</span> <span class="tok-fn">unlocking_moves_the_plain_files_in_and_removes_them</span>() {</span>
+<span class="ln" id="L370">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L371">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L372">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L373">        assert!(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;measured.dat&quot;</span>).<span class="tok-fn">exists</span>());</span>
 <span class="ln" id="L374"></span>
-<span class="ln" id="L375">    <span class="tok-com">/// **F-142.** A record that is migrated but never read is a file destroyed.</span></span>
-<span class="ln" id="L376">    <span class="tok-com">///</span></span>
-<span class="ln" id="L377">    <span class="tok-com">/// The first version of this module listed `integrity.manifest` and</span></span>
-<span class="ln" id="L378">    <span class="tok-com">/// `last-crash.txt` beside `measured.dat`. Migration reads each plain</span></span>
-<span class="ln" id="L379">    <span class="tok-com">/// file, stores it, and shreds the original -- so on the first unlock</span></span>
-<span class="ln" id="L380">    <span class="tok-com">/// after setting an app lock, the integrity baseline `veilvoice guard`</span></span>
-<span class="ln" id="L381">    <span class="tok-com">/// compares against and the crash log the next launch offers to report</span></span>
-<span class="ln" id="L382">    <span class="tok-com">/// would both have been erased, with nothing reading them back. Neither is</span></span>
-<span class="ln" id="L383">    <span class="tok-com">/// read through this store; both are still read by their plain paths, one</span></span>
-<span class="ln" id="L384">    <span class="tok-com">/// of them from a command line that has no key at all.</span></span>
-<span class="ln" id="L385">    <span class="tok-com">///</span></span>
-<span class="ln" id="L386">    <span class="tok-com">/// The same shape as F-141 -- written through one path, read through</span></span>
-<span class="ln" id="L387">    <span class="tok-com">/// another -- found by auditing for that shape rather than by somebody</span></span>
-<span class="ln" id="L388">    <span class="tok-com">/// losing a file. So it is pinned: a name in `ALL` has to be read through</span></span>
-<span class="ln" id="L389">    <span class="tok-com">/// the store somewhere, or this fails.</span></span>
-<span class="ln" id="L390">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L391">    <span class="tok-kw">fn</span> <span class="tok-fn">every_record_is_actually_read_through_the_store</span>() {</span>
-<span class="ln" id="L392">        <span class="tok-kw">let</span> sources = [</span>
-<span class="ln" id="L393">            include_str!(<span class="tok-str">&quot;vault_store.rs&quot;</span>),</span>
-<span class="ln" id="L394">            include_str!(<span class="tok-str">&quot;app.rs&quot;</span>),</span>
-<span class="ln" id="L395">            include_str!(<span class="tok-str">&quot;settings.rs&quot;</span>),</span>
-<span class="ln" id="L396">            include_str!(<span class="tok-str">&quot;security.rs&quot;</span>),</span>
-<span class="ln" id="L397">            include_str!(<span class="tok-str">&quot;integrity.rs&quot;</span>),</span>
-<span class="ln" id="L398">            include_str!(<span class="tok-str">&quot;crashlog.rs&quot;</span>),</span>
-<span class="ln" id="L399">        ];</span>
-<span class="ln" id="L400">        <span class="tok-kw">for</span> (logical, plain) <span class="tok-kw">in</span> records::ALL {</span>
-<span class="ln" id="L401">            <span class="tok-kw">let</span> constant = logical.<span class="tok-fn">to_uppercase</span>();</span>
-<span class="ln" id="L402">            <span class="tok-kw">let</span> read = sources.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|src| {</span>
-<span class="ln" id="L403">                src.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;records::{constant}&quot;</span>))</span>
-<span class="ln" id="L404">                    &amp;&amp; (src.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;store.read&quot;</span>) || src.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Measured::load&quot;</span>))</span>
-<span class="ln" id="L405">            });</span>
-<span class="ln" id="L406">            assert!(</span>
-<span class="ln" id="L407">                read,</span>
-<span class="ln" id="L408">                <span class="tok-str">&quot;{plain:?} is migrated into the store and shredded, and nothing \</span></span>
-<span class="ln" id="L409"><span class="tok-str">                 reads it back through the store. That destroys it. Either read \</span></span>
-<span class="ln" id="L410"><span class="tok-str">                 it through `VaultStore`, or take it out of `records::ALL`.&quot;</span></span>
-<span class="ln" id="L411">            );</span>
-<span class="ln" id="L412">        }</span>
-<span class="ln" id="L413">    }</span>
-<span class="ln" id="L414"></span>
-<span class="ln" id="L415">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L416">    <span class="tok-kw">fn</span> <span class="tok-fn">every_record_has_a_plain_name_to_migrate_from</span>() {</span>
-<span class="ln" id="L417">        <span class="tok-com">// A record added to `ALL` without one would silently never migrate.</span></span>
-<span class="ln" id="L418">        <span class="tok-kw">for</span> (logical, plain) <span class="tok-kw">in</span> records::ALL {</span>
-<span class="ln" id="L419">            assert!(!logical.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L420">            assert!(!plain.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L421">            assert!(plain.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;.&#x27;</span>), <span class="tok-str">&quot;{plain} does not look like a filename&quot;</span>);</span>
-<span class="ln" id="L422">        }</span>
-<span class="ln" id="L423">    }</span>
-<span class="ln" id="L424">}</span>
-<span class="ln" id="L425"></span>
-<span class="src-item" id="fn-measured">
-<span class="ln" id="L426"><span class="tok-com">/// What the application measured about its own running, kept between sessions.</span></span>
-<span class="ln" id="L427"><span class="tok-com">///</span></span>
-<span class="ln" id="L428"><span class="tok-com">/// Small on purpose. These are the numbers the About panel shows and then</span></span>
-<span class="ln" id="L429"><span class="tok-com">/// forgets: how long a frame took, which renderer drew it, how much faster</span></span>
-<span class="ln" id="L430"><span class="tok-com">/// than real time the engine ran. Keeping them makes the panel able to say</span></span>
-<span class="ln" id="L431"><span class="tok-com">/// &quot;and it was like this last time too&quot;, which is the difference between a</span></span>
-<span class="ln" id="L432"><span class="tok-com">/// number and a measurement.</span></span>
-<span class="ln" id="L433"><span class="tok-com">///</span></span>
-<span class="ln" id="L434"><span class="tok-com">/// It is written through [`VaultStore`], so with an app lock set it is</span></span>
-<span class="ln" id="L435"><span class="tok-com">/// encrypted under a derived name like everything else there, and with no lock</span></span>
-<span class="ln" id="L436"><span class="tok-com">/// it is a plain file called `measured.dat`. Nothing about it is sent anywhere:</span></span>
-<span class="ln" id="L437"><span class="tok-com">/// VeilVoice has no networking crate in its dependency graph and this is not</span></span>
-<span class="ln" id="L438"><span class="tok-com">/// the exception.</span></span>
-<span class="ln" id="L439"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, Default, PartialEq)]</span>
-<span class="ln" id="L440"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Measured {</span>
-<span class="ln" id="L441">    <span class="tok-com">/// The best frame time seen, in milliseconds.</span></span>
-<span class="ln" id="L442">    <span class="tok-kw">pub</span> frame_ms: f32,</span>
-<span class="ln" id="L443">    <span class="tok-com">/// How many times faster than real time the engine last ran.</span></span>
-<span class="ln" id="L444">    <span class="tok-kw">pub</span> speed: f32,</span>
-<span class="ln" id="L445">    <span class="tok-com">/// How many sessions have been recorded.</span></span>
-<span class="ln" id="L446">    <span class="tok-kw">pub</span> sessions: u32,</span>
-<span class="ln" id="L447">}</span>
-</span>
-<span class="ln" id="L448"></span>
-<span class="ln" id="L449"><span class="tok-kw">impl</span> Measured {</span>
-<span class="src-item" id="fn-measured-load">
-<span class="ln" id="L450">    <span class="tok-com">/// Read it back, or the defaults if nothing has been recorded.</span></span>
-<span class="ln" id="L451">    <span class="tok-com">///</span></span>
-<span class="ln" id="L452">    <span class="tok-com">/// A record that does not parse reads as absent rather than as an error.</span></span>
-<span class="ln" id="L453">    <span class="tok-com">/// These are numbers for a panel; a corrupt one is worth losing silently,</span></span>
-<span class="ln" id="L454">    <span class="tok-com">/// and it is emphatically not worth blocking a launch over. A record that</span></span>
-<span class="ln" id="L455">    <span class="tok-com">/// fails to *authenticate* is a different matter and is reported by the</span></span>
-<span class="ln" id="L456">    <span class="tok-com">/// audit, which runs at unlock.</span></span>
-<span class="ln" id="L457">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">load</span>(store: &amp;VaultStore) -&gt; Self {</span>
-<span class="ln" id="L458">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-fn">Some</span>(bytes)) = store.<span class="tok-fn">read</span>(records::MEASURED) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L459">            <span class="tok-kw">return</span> Self::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L460">        };</span>
-<span class="ln" id="L461">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = String::<span class="tok-fn">from_utf8</span>(bytes) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L462">            <span class="tok-kw">return</span> Self::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L463">        };</span>
-<span class="ln" id="L464">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Self::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L465">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L466">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((key, value)) = line.<span class="tok-fn">split_once</span>(<span class="tok-str">&#x27;=&#x27;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L467">                continue;</span>
-<span class="ln" id="L468">            };</span>
-<span class="ln" id="L469">            <span class="tok-kw">match</span> key.<span class="tok-fn">trim</span>() {</span>
-<span class="ln" id="L470">                <span class="tok-str">&quot;frame_ms&quot;</span> =&gt; out.frame_ms = value.<span class="tok-fn">trim</span>().<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L471">                <span class="tok-str">&quot;speed&quot;</span> =&gt; out.speed = value.<span class="tok-fn">trim</span>().<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0.0</span>),</span>
-<span class="ln" id="L472">                <span class="tok-str">&quot;sessions&quot;</span> =&gt; out.sessions = value.<span class="tok-fn">trim</span>().<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>),</span>
-<span class="ln" id="L473">                _ =&gt; {}</span>
-<span class="ln" id="L474">            }</span>
-<span class="ln" id="L475">        }</span>
-<span class="ln" id="L476">        out</span>
-<span class="ln" id="L477">    }</span>
-</span>
-<span class="ln" id="L478"></span>
-<span class="src-item" id="fn-measured-save">
-<span class="ln" id="L479">    <span class="tok-com">/// Write it, obfuscated when there is a key and plain when there is not.</span></span>
-<span class="ln" id="L480">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">save</span>(&amp;<span class="tok-kw">self</span>, store: &amp;VaultStore) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L481">        <span class="tok-kw">let</span> text = format!(</span>
-<span class="ln" id="L482">            <span class="tok-str">&quot;frame_ms = {:.3}\nspeed = {:.2}\nsessions = {}\n&quot;</span>,</span>
-<span class="ln" id="L483">            <span class="tok-kw">self</span>.frame_ms, <span class="tok-kw">self</span>.speed, <span class="tok-kw">self</span>.sessions</span>
-<span class="ln" id="L484">        );</span>
-<span class="ln" id="L485">        store.<span class="tok-fn">write</span>(records::MEASURED, text.<span class="tok-fn">as_bytes</span>())</span>
-<span class="ln" id="L486">    }</span>
-</span>
-<span class="ln" id="L487"></span>
-<span class="src-item" id="fn-measured-record">
-<span class="ln" id="L488">    <span class="tok-com">/// Fold this session&#x27;s numbers in.</span></span>
-<span class="ln" id="L489">    <span class="tok-com">///</span></span>
-<span class="ln" id="L490">    <span class="tok-com">/// The frame time keeps the *best* seen rather than the last: a frame that</span></span>
-<span class="ln" id="L491">    <span class="tok-com">/// took 300 ms because the machine was swapping says nothing about what</span></span>
-<span class="ln" id="L492">    <span class="tok-com">/// VeilVoice costs, and the number people want from this panel is what it</span></span>
-<span class="ln" id="L493">    <span class="tok-com">/// can do rather than what happened once.</span></span>
-<span class="ln" id="L494">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">record</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, frame_ms: f32, speed: f32) {</span>
-<span class="ln" id="L495">        <span class="tok-kw">if</span> frame_ms &gt; <span class="tok-num">0.0</span> &amp;&amp; (<span class="tok-kw">self</span>.frame_ms &lt;= <span class="tok-num">0.0</span> || frame_ms &lt; <span class="tok-kw">self</span>.frame_ms) {</span>
-<span class="ln" id="L496">            <span class="tok-kw">self</span>.frame_ms = frame_ms;</span>
-<span class="ln" id="L497">        }</span>
-<span class="ln" id="L498">        <span class="tok-kw">if</span> speed &gt; <span class="tok-num">0.0</span> {</span>
-<span class="ln" id="L499">            <span class="tok-kw">self</span>.speed = speed;</span>
-<span class="ln" id="L500">        }</span>
-<span class="ln" id="L501">    }</span>
-</span>
-<span class="ln" id="L502">}</span>
-<span class="ln" id="L503"></span>
-<span class="src-item" id="fn-measured_tests">
-<span class="ln" id="L504"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L505"><span class="tok-kw">mod</span> measured_tests {</span>
-<span class="ln" id="L506">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L507">    <span class="tok-kw">use</span> veilvoice_crypto::amnesia::Secret;</span>
-<span class="ln" id="L508"></span>
-<span class="ln" id="L509">    <span class="tok-kw">fn</span> <span class="tok-fn">key</span>(byte: u8) -&gt; StoreKey {</span>
-<span class="ln" id="L510">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> raw = [byte; <span class="tok-num">32</span>];</span>
-<span class="ln" id="L511">        StoreKey::<span class="tok-fn">from_secret</span>(Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> raw))</span>
-<span class="ln" id="L512">    }</span>
-<span class="ln" id="L513"></span>
-<span class="ln" id="L514">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L515">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_a_plain_folder</span>() {</span>
-<span class="ln" id="L516">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L517">        <span class="tok-kw">let</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> m = Measured {</span>
-<span class="ln" id="L519">            frame_ms: <span class="tok-num">4.25</span>,</span>
-<span class="ln" id="L520">            speed: <span class="tok-num">98.5</span>,</span>
-<span class="ln" id="L521">            sessions: <span class="tok-num">3</span>,</span>
-<span class="ln" id="L522">        };</span>
-<span class="ln" id="L523">        m.<span class="tok-fn">save</span>(&amp;store).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L524">        assert_eq!(Measured::<span class="tok-fn">load</span>(&amp;store), m);</span>
-<span class="ln" id="L525">    }</span>
-<span class="ln" id="L526"></span>
-<span class="ln" id="L527">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L528">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_an_obfuscated_one</span>() {</span>
-<span class="ln" id="L529">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L530">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L531">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L532">        <span class="tok-kw">let</span> m = Measured {</span>
-<span class="ln" id="L533">            frame_ms: <span class="tok-num">4.25</span>,</span>
-<span class="ln" id="L534">            speed: <span class="tok-num">98.5</span>,</span>
-<span class="ln" id="L535">            sessions: <span class="tok-num">3</span>,</span>
-<span class="ln" id="L536">        };</span>
-<span class="ln" id="L537">        m.<span class="tok-fn">save</span>(&amp;store).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L538">        assert_eq!(Measured::<span class="tok-fn">load</span>(&amp;store), m);</span>
-<span class="ln" id="L539">    }</span>
-<span class="ln" id="L540"></span>
-<span class="ln" id="L541">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L542">    <span class="tok-kw">fn</span> <span class="tok-fn">the_numbers_do_not_appear_in_the_file_once_locked</span>() {</span>
-<span class="ln" id="L543">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L544">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L545">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L546">        Measured {</span>
-<span class="ln" id="L547">            frame_ms: <span class="tok-num">4.25</span>,</span>
-<span class="ln" id="L548">            speed: <span class="tok-num">98.5</span>,</span>
-<span class="ln" id="L549">            sessions: <span class="tok-num">3</span>,</span>
-<span class="ln" id="L550">        }</span>
-<span class="ln" id="L551">        .<span class="tok-fn">save</span>(&amp;store)</span>
-<span class="ln" id="L552">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L553"></span>
-<span class="ln" id="L554">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>() {</span>
-<span class="ln" id="L555">            <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(entry.<span class="tok-fn">unwrap</span>().<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L556">            assert!(</span>
-<span class="ln" id="L557">                !bytes.<span class="tok-fn">windows</span>(<span class="tok-num">4</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;4.25&quot;</span>),</span>
-<span class="ln" id="L558">                <span class="tok-str">&quot;a measurement is readable on disk&quot;</span></span>
-<span class="ln" id="L559">            );</span>
-<span class="ln" id="L560">        }</span>
+<span class="ln" id="L375">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L376">        assert!(store.<span class="tok-fn">is_obfuscated</span>());</span>
+<span class="ln" id="L377">        assert!(</span>
+<span class="ln" id="L378">            !dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;measured.dat&quot;</span>).<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L379">            <span class="tok-str">&quot;the plain copy has to go, or the obfuscation is decoration&quot;</span></span>
+<span class="ln" id="L380">        );</span>
+<span class="ln" id="L381">        assert_eq!(</span>
+<span class="ln" id="L382">            store.<span class="tok-fn">read</span>(records::MEASURED).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L383">            b<span class="tok-str">&quot;theme=dark&quot;</span>,</span>
+<span class="ln" id="L384">            <span class="tok-str">&quot;and the contents have to survive the move&quot;</span></span>
+<span class="ln" id="L385">        );</span>
+<span class="ln" id="L386">    }</span>
+<span class="ln" id="L387"></span>
+<span class="ln" id="L388">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L389">    <span class="tok-kw">fn</span> <span class="tok-fn">once_unlocked_no_filename_says_what_it_holds</span>() {</span>
+<span class="ln" id="L390">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L391">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L392">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L393">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L394">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;4 runs&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L395"></span>
+<span class="ln" id="L396">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>() {</span>
+<span class="ln" id="L397">            <span class="tok-kw">let</span> name = entry.<span class="tok-fn">unwrap</span>().<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L398">            <span class="tok-kw">for</span> (_, plain) <span class="tok-kw">in</span> records::ALL {</span>
+<span class="ln" id="L399">                assert_ne!(&amp;name, plain, <span class="tok-str">&quot;a plain name survived the move&quot;</span>);</span>
+<span class="ln" id="L400">            }</span>
+<span class="ln" id="L401">        }</span>
+<span class="ln" id="L402">    }</span>
+<span class="ln" id="L403"></span>
+<span class="ln" id="L404">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L405">    <span class="tok-kw">fn</span> <span class="tok-fn">decoys_outnumber_the_records</span>() {</span>
+<span class="ln" id="L406">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L407">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L408">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;x&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L409">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L410">        <span class="tok-kw">let</span> files = std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L411">        assert!(</span>
+<span class="ln" id="L412">            files &gt;= DECOYS,</span>
+<span class="ln" id="L413">            <span class="tok-str">&quot;only {files} files: the real ones are not lost in a crowd&quot;</span></span>
+<span class="ln" id="L414">        );</span>
+<span class="ln" id="L415">    }</span>
+<span class="ln" id="L416"></span>
+<span class="ln" id="L417">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L418">    <span class="tok-kw">fn</span> <span class="tok-fn">a_second_unlock_does_not_keep_adding_decoys</span>() {</span>
+<span class="ln" id="L419">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L420">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L421">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L422">        <span class="tok-kw">let</span> first = std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L423">        store.<span class="tok-fn">locked</span>();</span>
+<span class="ln" id="L424">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L425">        <span class="tok-kw">let</span> second = std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L426">        assert_eq!(</span>
+<span class="ln" id="L427">            first, second,</span>
+<span class="ln" id="L428">            <span class="tok-str">&quot;a folder that grows by two dozen files per unlock is its own signal&quot;</span></span>
+<span class="ln" id="L429">        );</span>
+<span class="ln" id="L430">    }</span>
+<span class="ln" id="L431"></span>
+<span class="ln" id="L432">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L433">    <span class="tok-kw">fn</span> <span class="tok-fn">the_wrong_passphrase_finds_nothing_rather_than_erroring</span>() {</span>
+<span class="ln" id="L434">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L435">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L436">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L437">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L438"></span>
+<span class="ln" id="L439">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> other = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L440">        other.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">9</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L441">        assert_eq!(</span>
+<span class="ln" id="L442">            other.<span class="tok-fn">read</span>(records::MEASURED).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L443">            None,</span>
+<span class="ln" id="L444">            <span class="tok-str">&quot;a different key derives names nothing is stored under&quot;</span></span>
+<span class="ln" id="L445">        );</span>
+<span class="ln" id="L446">    }</span>
+<span class="ln" id="L447"></span>
+<span class="ln" id="L448">    <span class="tok-com">/// **F-218.** The unlock happens somewhere else, and is collected without</span></span>
+<span class="ln" id="L449">    <span class="tok-com">/// waiting.</span></span>
+<span class="ln" id="L450">    <span class="tok-com">///</span></span>
+<span class="ln" id="L451">    <span class="tok-com">/// Opening the folder reads every plain record, writes each back</span></span>
+<span class="ln" id="L452">    <span class="tok-com">/// encrypted, shreds the original with three passes, sows decoys and audits</span></span>
+<span class="ln" id="L453">    <span class="tok-com">/// the folder twice. That ran on the frame the passphrase was accepted, so</span></span>
+<span class="ln" id="L454">    <span class="tok-com">/// the window stopped for all of it at the moment somebody had just proved</span></span>
+<span class="ln" id="L455">    <span class="tok-com">/// they owned the machine and was watching to see what happened.</span></span>
+<span class="ln" id="L456">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L457">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unlock_is_carried_out_off_the_calling_thread</span>() {</span>
+<span class="ln" id="L458">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L459">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L460">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L461"></span>
+<span class="ln" id="L462">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L463">        store.<span class="tok-fn">start_unlocking</span>(&amp;ctx, <span class="tok-fn">key</span>(<span class="tok-num">7</span>));</span>
+<span class="ln" id="L464">        assert!(store.<span class="tok-fn">is_opening</span>(), <span class="tok-str">&quot;nothing is being opened&quot;</span>);</span>
+<span class="ln" id="L465">        assert!(</span>
+<span class="ln" id="L466">            !store.<span class="tok-fn">is_obfuscated</span>(),</span>
+<span class="ln" id="L467">            <span class="tok-str">&quot;the key was installed by the call that started the work, so the \</span></span>
+<span class="ln" id="L468"><span class="tok-str">             work was done on this thread after all&quot;</span></span>
+<span class="ln" id="L469">        );</span>
+<span class="ln" id="L470"></span>
+<span class="ln" id="L471">        <span class="tok-com">// Polled rather than waited for, which is what the window does.</span></span>
+<span class="ln" id="L472">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">30</span>);</span>
+<span class="ln" id="L473">        <span class="tok-kw">let</span> audit = loop {</span>
+<span class="ln" id="L474">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(answer) = store.<span class="tok-fn">poll</span>() {</span>
+<span class="ln" id="L475">                break answer.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the unlock must succeed&quot;</span>);</span>
+<span class="ln" id="L476">            }</span>
+<span class="ln" id="L477">            assert!(</span>
+<span class="ln" id="L478">                std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline,</span>
+<span class="ln" id="L479">                <span class="tok-str">&quot;the unlock never came back&quot;</span></span>
+<span class="ln" id="L480">            );</span>
+<span class="ln" id="L481">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L482">        };</span>
+<span class="ln" id="L483">        assert!(audit.<span class="tok-fn">is_clean</span>(), <span class="tok-str">&quot;{audit:?}&quot;</span>);</span>
+<span class="ln" id="L484">        assert!(store.<span class="tok-fn">is_obfuscated</span>(), <span class="tok-str">&quot;the key was never installed&quot;</span>);</span>
+<span class="ln" id="L485">        assert!(!store.<span class="tok-fn">is_opening</span>());</span>
+<span class="ln" id="L486">        assert!(</span>
+<span class="ln" id="L487">            !dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;measured.dat&quot;</span>).<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L488">            <span class="tok-str">&quot;the plain copy has to go, or the obfuscation is decoration&quot;</span></span>
+<span class="ln" id="L489">        );</span>
+<span class="ln" id="L490">        assert_eq!(</span>
+<span class="ln" id="L491">            store.<span class="tok-fn">read</span>(records::MEASURED).<span class="tok-fn">unwrap</span>().<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L492">            b<span class="tok-str">&quot;theme=dark&quot;</span></span>
+<span class="ln" id="L493">        );</span>
+<span class="ln" id="L494">    }</span>
+<span class="ln" id="L495"></span>
+<span class="ln" id="L496">    <span class="tok-com">/// Locking while an unlock is in flight abandons it.</span></span>
+<span class="ln" id="L497">    <span class="tok-com">///</span></span>
+<span class="ln" id="L498">    <span class="tok-com">/// This is the one part of F-218 that is about more than a frame. Moving</span></span>
+<span class="ln" id="L499">    <span class="tok-com">/// the work to a thread introduces a window in which the passphrase has</span></span>
+<span class="ln" id="L500">    <span class="tok-com">/// been accepted, the key exists, and the person has locked the screen</span></span>
+<span class="ln" id="L501">    <span class="tok-com">/// again. The key must not arrive a moment later and let itself in. Dropping</span></span>
+<span class="ln" id="L502">    <span class="tok-com">/// the receiver is what prevents it: the worker&#x27;s send fails and the</span></span>
+<span class="ln" id="L503">    <span class="tok-com">/// `Hoard`, with the key inside it, is dropped on that thread.</span></span>
+<span class="ln" id="L504">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L505">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_during_an_unlock_abandons_it</span>() {</span>
+<span class="ln" id="L506">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L507">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L508">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L509">        store.<span class="tok-fn">start_unlocking</span>(&amp;ctx, <span class="tok-fn">key</span>(<span class="tok-num">7</span>));</span>
+<span class="ln" id="L510">        store.<span class="tok-fn">locked</span>();</span>
+<span class="ln" id="L511">        assert!(!store.<span class="tok-fn">is_opening</span>(), <span class="tok-str">&quot;the abandoned unlock is still awaited&quot;</span>);</span>
+<span class="ln" id="L512"></span>
+<span class="ln" id="L513">        <span class="tok-com">// However long the worker takes, and whether it finished before the</span></span>
+<span class="ln" id="L514">        <span class="tok-com">// lock or after it, nothing it produced may be installed.</span></span>
+<span class="ln" id="L515">        <span class="tok-kw">let</span> until = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">2</span>);</span>
+<span class="ln" id="L516">        while std::time::Instant::<span class="tok-fn">now</span>() &lt; until {</span>
+<span class="ln" id="L517">            assert!(</span>
+<span class="ln" id="L518">                store.<span class="tok-fn">poll</span>().<span class="tok-fn">is_none</span>(),</span>
+<span class="ln" id="L519">                <span class="tok-str">&quot;an abandoned unlock still reported an answer&quot;</span></span>
+<span class="ln" id="L520">            );</span>
+<span class="ln" id="L521">            assert!(</span>
+<span class="ln" id="L522">                !store.<span class="tok-fn">is_obfuscated</span>(),</span>
+<span class="ln" id="L523">                <span class="tok-str">&quot;the key was installed after the window locked&quot;</span></span>
+<span class="ln" id="L524">            );</span>
+<span class="ln" id="L525">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L526">        }</span>
+<span class="ln" id="L527">    }</span>
+<span class="ln" id="L528"></span>
+<span class="ln" id="L529">    <span class="tok-com">/// The work is not written twice, and not written where it can be called</span></span>
+<span class="ln" id="L530">    <span class="tok-com">/// from a frame.</span></span>
+<span class="ln" id="L531">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L532">    <span class="tok-kw">fn</span> <span class="tok-fn">the_unlock_is_written_once_and_only_a_test_can_do_it_inline</span>() {</span>
+<span class="ln" id="L533">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;vault_store.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L534">        <span class="tok-kw">let</span> shipped = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(&amp;source);</span>
+<span class="ln" id="L535">        assert_eq!(</span>
+<span class="ln" id="L536">            shipped.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;shred_file&quot;</span>).<span class="tok-fn">count</span>(),</span>
+<span class="ln" id="L537">            <span class="tok-num">1</span>,</span>
+<span class="ln" id="L538">            <span class="tok-str">&quot;the shredding step is written in more than one place, so the \</span></span>
+<span class="ln" id="L539"><span class="tok-str">             threaded path and whatever else does it will drift&quot;</span></span>
+<span class="ln" id="L540">        );</span>
+<span class="ln" id="L541">        <span class="tok-kw">let</span> at = shipped</span>
+<span class="ln" id="L542">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn start_unlocking&quot;</span>)</span>
+<span class="ln" id="L543">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the unlock starts somewhere&quot;</span>);</span>
+<span class="ln" id="L544">        <span class="tok-kw">let</span> starting = &amp;shipped[at..];</span>
+<span class="ln" id="L545">        <span class="tok-kw">let</span> starting = starting.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n    ///&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(starting);</span>
+<span class="ln" id="L546">        assert!(</span>
+<span class="ln" id="L547">            starting.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;std::thread::spawn&quot;</span>),</span>
+<span class="ln" id="L548">            <span class="tok-str">&quot;the unlock is carried out by whichever thread asked for it, which \</span></span>
+<span class="ln" id="L549"><span class="tok-str">             is the drawing thread every time. See F-218.&quot;</span></span>
+<span class="ln" id="L550">        );</span>
+<span class="ln" id="L551">        <span class="tok-com">// And the inline door is shut in a shipped build, by the compiler</span></span>
+<span class="ln" id="L552">        <span class="tok-com">// rather than by a check reading the source.</span></span>
+<span class="ln" id="L553">        <span class="tok-kw">let</span> door = source</span>
+<span class="ln" id="L554">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn unlocked(&quot;</span>)</span>
+<span class="ln" id="L555">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the test-only door exists&quot;</span>);</span>
+<span class="ln" id="L556">        assert!(</span>
+<span class="ln" id="L557">            source[..door].<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;#[cfg(test)]\n    &quot;</span>),</span>
+<span class="ln" id="L558">            <span class="tok-str">&quot;`unlocked` is reachable from a shipped build, so the window can \</span></span>
+<span class="ln" id="L559"><span class="tok-str">             open the folder inside a frame again&quot;</span></span>
+<span class="ln" id="L560">        );</span>
 <span class="ln" id="L561">    }</span>
 <span class="ln" id="L562"></span>
 <span class="ln" id="L563">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L564">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_recorded_reads_as_zeroes_rather_than_failing</span>() {</span>
+<span class="ln" id="L564">    <span class="tok-kw">fn</span> <span class="tok-fn">locking_forgets_the_key</span>() {</span>
 <span class="ln" id="L565">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L566">        <span class="tok-kw">let</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L567">        assert_eq!(Measured::<span class="tok-fn">load</span>(&amp;store), Measured::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L568">    }</span>
-<span class="ln" id="L569"></span>
-<span class="ln" id="L570">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L571">    <span class="tok-kw">fn</span> <span class="tok-fn">a_corrupt_record_reads_as_absent</span>() {</span>
-<span class="ln" id="L572">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L573">        <span class="tok-kw">let</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
-<span class="ln" id="L574">        store</span>
-<span class="ln" id="L575">            .<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;\xff\xfe not text&quot;</span>)</span>
-<span class="ln" id="L576">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L577">        assert_eq!(Measured::<span class="tok-fn">load</span>(&amp;store), Measured::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L578">    }</span>
+<span class="ln" id="L566">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L567">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L568">        assert!(store.<span class="tok-fn">is_obfuscated</span>());</span>
+<span class="ln" id="L569">        store.<span class="tok-fn">locked</span>();</span>
+<span class="ln" id="L570">        assert!(!store.<span class="tok-fn">is_obfuscated</span>());</span>
+<span class="ln" id="L571">    }</span>
+<span class="ln" id="L572"></span>
+<span class="ln" id="L573">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L574">    <span class="tok-kw">fn</span> <span class="tok-fn">an_edited_record_is_reported_by_the_audit</span>() {</span>
+<span class="ln" id="L575">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L576">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L577">        store.<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;theme=dark&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L578">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L579"></span>
-<span class="ln" id="L580">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L581">    <span class="tok-kw">fn</span> <span class="tok-fn">the_best_frame_time_is_kept_not_the_last</span>() {</span>
-<span class="ln" id="L582">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Measured::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L583">        m.<span class="tok-fn">record</span>(<span class="tok-num">8.0</span>, <span class="tok-num">90.0</span>);</span>
-<span class="ln" id="L584">        m.<span class="tok-fn">record</span>(<span class="tok-num">4.0</span>, <span class="tok-num">91.0</span>);</span>
-<span class="ln" id="L585">        m.<span class="tok-fn">record</span>(<span class="tok-num">300.0</span>, <span class="tok-num">92.0</span>);</span>
-<span class="ln" id="L586">        assert_eq!(m.frame_ms, <span class="tok-num">4.0</span>, <span class="tok-str">&quot;a swap storm is not a measurement&quot;</span>);</span>
-<span class="ln" id="L587">        assert_eq!(m.speed, <span class="tok-num">92.0</span>, <span class="tok-str">&quot;the speed is the latest run, and says so&quot;</span>);</span>
-<span class="ln" id="L588">    }</span>
-<span class="ln" id="L589">}</span>
+<span class="ln" id="L580">        <span class="tok-kw">let</span> hoard = Hoard::<span class="tok-fn">open</span>(dir.<span class="tok-fn">path</span>(), <span class="tok-fn">key</span>(<span class="tok-num">7</span>));</span>
+<span class="ln" id="L581">        <span class="tok-kw">let</span> path = hoard.<span class="tok-fn">path_for</span>(records::MEASURED).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L582">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L583">        <span class="tok-kw">let</span> last = bytes.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>;</span>
+<span class="ln" id="L584">        bytes[last] ^= 0xff;</span>
+<span class="ln" id="L585">        std::fs::<span class="tok-fn">write</span>(&amp;path, &amp;bytes).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L586"></span>
+<span class="ln" id="L587">        store.<span class="tok-fn">locked</span>();</span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> audit = store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L589">        assert!(!audit.<span class="tok-fn">is_clean</span>());</span>
+<span class="ln" id="L590">        assert!(audit.tampered.<span class="tok-fn">contains</span>(&amp;records::MEASURED.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L591">    }</span>
+<span class="ln" id="L592"></span>
+<span class="ln" id="L593">    <span class="tok-com">/// **F-142.** A record that is migrated but never read is a file destroyed.</span></span>
+<span class="ln" id="L594">    <span class="tok-com">///</span></span>
+<span class="ln" id="L595">    <span class="tok-com">/// The first version of this module listed `integrity.manifest` and</span></span>
+<span class="ln" id="L596">    <span class="tok-com">/// `last-crash.txt` beside `measured.dat`. Migration reads each plain</span></span>
+<span class="ln" id="L597">    <span class="tok-com">/// file, stores it, and shreds the original -- so on the first unlock</span></span>
+<span class="ln" id="L598">    <span class="tok-com">/// after setting an app lock, the integrity baseline `veilvoice guard`</span></span>
+<span class="ln" id="L599">    <span class="tok-com">/// compares against and the crash log the next launch offers to report</span></span>
+<span class="ln" id="L600">    <span class="tok-com">/// would both have been erased, with nothing reading them back. Neither is</span></span>
+<span class="ln" id="L601">    <span class="tok-com">/// read through this store; both are still read by their plain paths, one</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// of them from a command line that has no key at all.</span></span>
+<span class="ln" id="L603">    <span class="tok-com">///</span></span>
+<span class="ln" id="L604">    <span class="tok-com">/// The same shape as F-141 -- written through one path, read through</span></span>
+<span class="ln" id="L605">    <span class="tok-com">/// another -- found by auditing for that shape rather than by somebody</span></span>
+<span class="ln" id="L606">    <span class="tok-com">/// losing a file. So it is pinned: a name in `ALL` has to be read through</span></span>
+<span class="ln" id="L607">    <span class="tok-com">/// the store somewhere, or this fails.</span></span>
+<span class="ln" id="L608">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L609">    <span class="tok-kw">fn</span> <span class="tok-fn">every_record_is_actually_read_through_the_store</span>() {</span>
+<span class="ln" id="L610">        <span class="tok-kw">let</span> sources = [</span>
+<span class="ln" id="L611">            include_str!(<span class="tok-str">&quot;vault_store.rs&quot;</span>),</span>
+<span class="ln" id="L612">            include_str!(<span class="tok-str">&quot;app.rs&quot;</span>),</span>
+<span class="ln" id="L613">            include_str!(<span class="tok-str">&quot;settings.rs&quot;</span>),</span>
+<span class="ln" id="L614">            include_str!(<span class="tok-str">&quot;security.rs&quot;</span>),</span>
+<span class="ln" id="L615">            include_str!(<span class="tok-str">&quot;integrity.rs&quot;</span>),</span>
+<span class="ln" id="L616">            include_str!(<span class="tok-str">&quot;crashlog.rs&quot;</span>),</span>
+<span class="ln" id="L617">        ];</span>
+<span class="ln" id="L618">        <span class="tok-kw">for</span> (logical, plain) <span class="tok-kw">in</span> records::ALL {</span>
+<span class="ln" id="L619">            <span class="tok-kw">let</span> constant = logical.<span class="tok-fn">to_uppercase</span>();</span>
+<span class="ln" id="L620">            <span class="tok-kw">let</span> read = sources.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|src| {</span>
+<span class="ln" id="L621">                src.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;records::{constant}&quot;</span>))</span>
+<span class="ln" id="L622">                    &amp;&amp; (src.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;store.read&quot;</span>) || src.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Measured::load&quot;</span>))</span>
+<span class="ln" id="L623">            });</span>
+<span class="ln" id="L624">            assert!(</span>
+<span class="ln" id="L625">                read,</span>
+<span class="ln" id="L626">                <span class="tok-str">&quot;{plain:?} is migrated into the store and shredded, and nothing \</span></span>
+<span class="ln" id="L627"><span class="tok-str">                 reads it back through the store. That destroys it. Either read \</span></span>
+<span class="ln" id="L628"><span class="tok-str">                 it through `VaultStore`, or take it out of `records::ALL`.&quot;</span></span>
+<span class="ln" id="L629">            );</span>
+<span class="ln" id="L630">        }</span>
+<span class="ln" id="L631">    }</span>
+<span class="ln" id="L632"></span>
+<span class="ln" id="L633">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L634">    <span class="tok-kw">fn</span> <span class="tok-fn">every_record_has_a_plain_name_to_migrate_from</span>() {</span>
+<span class="ln" id="L635">        <span class="tok-com">// A record added to `ALL` without one would silently never migrate.</span></span>
+<span class="ln" id="L636">        <span class="tok-kw">for</span> (logical, plain) <span class="tok-kw">in</span> records::ALL {</span>
+<span class="ln" id="L637">            assert!(!logical.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L638">            assert!(!plain.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L639">            assert!(plain.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;.&#x27;</span>), <span class="tok-str">&quot;{plain} does not look like a filename&quot;</span>);</span>
+<span class="ln" id="L640">        }</span>
+<span class="ln" id="L641">    }</span>
+<span class="ln" id="L642">}</span>
+<span class="ln" id="L643"></span>
+<span class="src-item" id="fn-measured">
+<span class="ln" id="L644"><span class="tok-com">/// What the application measured about its own running, kept between sessions.</span></span>
+<span class="ln" id="L645"><span class="tok-com">///</span></span>
+<span class="ln" id="L646"><span class="tok-com">/// Small on purpose. These are the numbers the About panel shows and then</span></span>
+<span class="ln" id="L647"><span class="tok-com">/// forgets: how long a frame took, which renderer drew it, how much faster</span></span>
+<span class="ln" id="L648"><span class="tok-com">/// than real time the engine ran. Keeping them makes the panel able to say</span></span>
+<span class="ln" id="L649"><span class="tok-com">/// &quot;and it was like this last time too&quot;, which is the difference between a</span></span>
+<span class="ln" id="L650"><span class="tok-com">/// number and a measurement.</span></span>
+<span class="ln" id="L651"><span class="tok-com">///</span></span>
+<span class="ln" id="L652"><span class="tok-com">/// It is written through [`VaultStore`], so with an app lock set it is</span></span>
+<span class="ln" id="L653"><span class="tok-com">/// encrypted under a derived name like everything else there, and with no lock</span></span>
+<span class="ln" id="L654"><span class="tok-com">/// it is a plain file called `measured.dat`. Nothing about it is sent anywhere:</span></span>
+<span class="ln" id="L655"><span class="tok-com">/// VeilVoice has no networking crate in its dependency graph and this is not</span></span>
+<span class="ln" id="L656"><span class="tok-com">/// the exception.</span></span>
+<span class="ln" id="L657"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, Default, PartialEq)]</span>
+<span class="ln" id="L658"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Measured {</span>
+<span class="ln" id="L659">    <span class="tok-com">/// The best frame time seen, in milliseconds.</span></span>
+<span class="ln" id="L660">    <span class="tok-kw">pub</span> frame_ms: f32,</span>
+<span class="ln" id="L661">    <span class="tok-com">/// How many times faster than real time the engine last ran.</span></span>
+<span class="ln" id="L662">    <span class="tok-kw">pub</span> speed: f32,</span>
+<span class="ln" id="L663">    <span class="tok-com">/// How many sessions have been recorded.</span></span>
+<span class="ln" id="L664">    <span class="tok-kw">pub</span> sessions: u32,</span>
+<span class="ln" id="L665">}</span>
+</span>
+<span class="ln" id="L666"></span>
+<span class="ln" id="L667"><span class="tok-kw">impl</span> Measured {</span>
+<span class="src-item" id="fn-measured-load">
+<span class="ln" id="L668">    <span class="tok-com">/// Read it back, or the defaults if nothing has been recorded.</span></span>
+<span class="ln" id="L669">    <span class="tok-com">///</span></span>
+<span class="ln" id="L670">    <span class="tok-com">/// A record that does not parse reads as absent rather than as an error.</span></span>
+<span class="ln" id="L671">    <span class="tok-com">/// These are numbers for a panel; a corrupt one is worth losing silently,</span></span>
+<span class="ln" id="L672">    <span class="tok-com">/// and it is emphatically not worth blocking a launch over. A record that</span></span>
+<span class="ln" id="L673">    <span class="tok-com">/// fails to *authenticate* is a different matter and is reported by the</span></span>
+<span class="ln" id="L674">    <span class="tok-com">/// audit, which runs at unlock.</span></span>
+<span class="ln" id="L675">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">load</span>(store: &amp;VaultStore) -&gt; Self {</span>
+<span class="ln" id="L676">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-fn">Some</span>(bytes)) = store.<span class="tok-fn">read</span>(records::MEASURED) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L677">            <span class="tok-kw">return</span> Self::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L678">        };</span>
+<span class="ln" id="L679">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(text) = String::<span class="tok-fn">from_utf8</span>(bytes) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L680">            <span class="tok-kw">return</span> Self::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L681">        };</span>
+<span class="ln" id="L682">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Self::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L683">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L684">            <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((key, value)) = line.<span class="tok-fn">split_once</span>(<span class="tok-str">&#x27;=&#x27;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L685">                continue;</span>
+<span class="ln" id="L686">            };</span>
+<span class="ln" id="L687">            <span class="tok-kw">match</span> key.<span class="tok-fn">trim</span>() {</span>
+<span class="ln" id="L688">                <span class="tok-str">&quot;frame_ms&quot;</span> =&gt; out.frame_ms = value.<span class="tok-fn">trim</span>().<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L689">                <span class="tok-str">&quot;speed&quot;</span> =&gt; out.speed = value.<span class="tok-fn">trim</span>().<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0.0</span>),</span>
+<span class="ln" id="L690">                <span class="tok-str">&quot;sessions&quot;</span> =&gt; out.sessions = value.<span class="tok-fn">trim</span>().<span class="tok-fn">parse</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>),</span>
+<span class="ln" id="L691">                _ =&gt; {}</span>
+<span class="ln" id="L692">            }</span>
+<span class="ln" id="L693">        }</span>
+<span class="ln" id="L694">        out</span>
+<span class="ln" id="L695">    }</span>
+</span>
+<span class="ln" id="L696"></span>
+<span class="src-item" id="fn-measured-save">
+<span class="ln" id="L697">    <span class="tok-com">/// Write it, obfuscated when there is a key and plain when there is not.</span></span>
+<span class="ln" id="L698">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">save</span>(&amp;<span class="tok-kw">self</span>, store: &amp;VaultStore) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L699">        <span class="tok-kw">let</span> text = format!(</span>
+<span class="ln" id="L700">            <span class="tok-str">&quot;frame_ms = {:.3}\nspeed = {:.2}\nsessions = {}\n&quot;</span>,</span>
+<span class="ln" id="L701">            <span class="tok-kw">self</span>.frame_ms, <span class="tok-kw">self</span>.speed, <span class="tok-kw">self</span>.sessions</span>
+<span class="ln" id="L702">        );</span>
+<span class="ln" id="L703">        store.<span class="tok-fn">write</span>(records::MEASURED, text.<span class="tok-fn">as_bytes</span>())</span>
+<span class="ln" id="L704">    }</span>
+</span>
+<span class="ln" id="L705"></span>
+<span class="src-item" id="fn-measured-record">
+<span class="ln" id="L706">    <span class="tok-com">/// Fold this session&#x27;s numbers in.</span></span>
+<span class="ln" id="L707">    <span class="tok-com">///</span></span>
+<span class="ln" id="L708">    <span class="tok-com">/// The frame time keeps the *best* seen rather than the last: a frame that</span></span>
+<span class="ln" id="L709">    <span class="tok-com">/// took 300 ms because the machine was swapping says nothing about what</span></span>
+<span class="ln" id="L710">    <span class="tok-com">/// VeilVoice costs, and the number people want from this panel is what it</span></span>
+<span class="ln" id="L711">    <span class="tok-com">/// can do rather than what happened once.</span></span>
+<span class="ln" id="L712">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">record</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, frame_ms: f32, speed: f32) {</span>
+<span class="ln" id="L713">        <span class="tok-kw">if</span> frame_ms &gt; <span class="tok-num">0.0</span> &amp;&amp; (<span class="tok-kw">self</span>.frame_ms &lt;= <span class="tok-num">0.0</span> || frame_ms &lt; <span class="tok-kw">self</span>.frame_ms) {</span>
+<span class="ln" id="L714">            <span class="tok-kw">self</span>.frame_ms = frame_ms;</span>
+<span class="ln" id="L715">        }</span>
+<span class="ln" id="L716">        <span class="tok-kw">if</span> speed &gt; <span class="tok-num">0.0</span> {</span>
+<span class="ln" id="L717">            <span class="tok-kw">self</span>.speed = speed;</span>
+<span class="ln" id="L718">        }</span>
+<span class="ln" id="L719">    }</span>
+</span>
+<span class="ln" id="L720">}</span>
+<span class="ln" id="L721"></span>
+<span class="src-item" id="fn-measured_tests">
+<span class="ln" id="L722"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L723"><span class="tok-kw">mod</span> measured_tests {</span>
+<span class="ln" id="L724">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L725">    <span class="tok-kw">use</span> veilvoice_crypto::amnesia::Secret;</span>
+<span class="ln" id="L726"></span>
+<span class="ln" id="L727">    <span class="tok-kw">fn</span> <span class="tok-fn">key</span>(byte: u8) -&gt; StoreKey {</span>
+<span class="ln" id="L728">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> raw = [byte; <span class="tok-num">32</span>];</span>
+<span class="ln" id="L729">        StoreKey::<span class="tok-fn">from_secret</span>(Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> raw))</span>
+<span class="ln" id="L730">    }</span>
+<span class="ln" id="L731"></span>
+<span class="ln" id="L732">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L733">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_a_plain_folder</span>() {</span>
+<span class="ln" id="L734">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L735">        <span class="tok-kw">let</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L736">        <span class="tok-kw">let</span> m = Measured {</span>
+<span class="ln" id="L737">            frame_ms: <span class="tok-num">4.25</span>,</span>
+<span class="ln" id="L738">            speed: <span class="tok-num">98.5</span>,</span>
+<span class="ln" id="L739">            sessions: <span class="tok-num">3</span>,</span>
+<span class="ln" id="L740">        };</span>
+<span class="ln" id="L741">        m.<span class="tok-fn">save</span>(&amp;store).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L742">        assert_eq!(Measured::<span class="tok-fn">load</span>(&amp;store), m);</span>
+<span class="ln" id="L743">    }</span>
+<span class="ln" id="L744"></span>
+<span class="ln" id="L745">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L746">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_an_obfuscated_one</span>() {</span>
+<span class="ln" id="L747">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L748">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L749">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L750">        <span class="tok-kw">let</span> m = Measured {</span>
+<span class="ln" id="L751">            frame_ms: <span class="tok-num">4.25</span>,</span>
+<span class="ln" id="L752">            speed: <span class="tok-num">98.5</span>,</span>
+<span class="ln" id="L753">            sessions: <span class="tok-num">3</span>,</span>
+<span class="ln" id="L754">        };</span>
+<span class="ln" id="L755">        m.<span class="tok-fn">save</span>(&amp;store).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L756">        assert_eq!(Measured::<span class="tok-fn">load</span>(&amp;store), m);</span>
+<span class="ln" id="L757">    }</span>
+<span class="ln" id="L758"></span>
+<span class="ln" id="L759">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L760">    <span class="tok-kw">fn</span> <span class="tok-fn">the_numbers_do_not_appear_in_the_file_once_locked</span>() {</span>
+<span class="ln" id="L761">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L762">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L763">        store.<span class="tok-fn">unlocked</span>(<span class="tok-fn">key</span>(<span class="tok-num">7</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L764">        Measured {</span>
+<span class="ln" id="L765">            frame_ms: <span class="tok-num">4.25</span>,</span>
+<span class="ln" id="L766">            speed: <span class="tok-num">98.5</span>,</span>
+<span class="ln" id="L767">            sessions: <span class="tok-num">3</span>,</span>
+<span class="ln" id="L768">        }</span>
+<span class="ln" id="L769">        .<span class="tok-fn">save</span>(&amp;store)</span>
+<span class="ln" id="L770">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L771"></span>
+<span class="ln" id="L772">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>() {</span>
+<span class="ln" id="L773">            <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(entry.<span class="tok-fn">unwrap</span>().<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L774">            assert!(</span>
+<span class="ln" id="L775">                !bytes.<span class="tok-fn">windows</span>(<span class="tok-num">4</span>).<span class="tok-fn">any</span>(|w| w == b<span class="tok-str">&quot;4.25&quot;</span>),</span>
+<span class="ln" id="L776">                <span class="tok-str">&quot;a measurement is readable on disk&quot;</span></span>
+<span class="ln" id="L777">            );</span>
+<span class="ln" id="L778">        }</span>
+<span class="ln" id="L779">    }</span>
+<span class="ln" id="L780"></span>
+<span class="ln" id="L781">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L782">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_recorded_reads_as_zeroes_rather_than_failing</span>() {</span>
+<span class="ln" id="L783">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L784">        <span class="tok-kw">let</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L785">        assert_eq!(Measured::<span class="tok-fn">load</span>(&amp;store), Measured::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L786">    }</span>
+<span class="ln" id="L787"></span>
+<span class="ln" id="L788">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L789">    <span class="tok-kw">fn</span> <span class="tok-fn">a_corrupt_record_reads_as_absent</span>() {</span>
+<span class="ln" id="L790">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L791">        <span class="tok-kw">let</span> store = VaultStore::<span class="tok-fn">new</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()));</span>
+<span class="ln" id="L792">        store</span>
+<span class="ln" id="L793">            .<span class="tok-fn">write</span>(records::MEASURED, b<span class="tok-str">&quot;\xff\xfe not text&quot;</span>)</span>
+<span class="ln" id="L794">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L795">        assert_eq!(Measured::<span class="tok-fn">load</span>(&amp;store), Measured::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L796">    }</span>
+<span class="ln" id="L797"></span>
+<span class="ln" id="L798">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L799">    <span class="tok-kw">fn</span> <span class="tok-fn">the_best_frame_time_is_kept_not_the_last</span>() {</span>
+<span class="ln" id="L800">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Measured::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L801">        m.<span class="tok-fn">record</span>(<span class="tok-num">8.0</span>, <span class="tok-num">90.0</span>);</span>
+<span class="ln" id="L802">        m.<span class="tok-fn">record</span>(<span class="tok-num">4.0</span>, <span class="tok-num">91.0</span>);</span>
+<span class="ln" id="L803">        m.<span class="tok-fn">record</span>(<span class="tok-num">300.0</span>, <span class="tok-num">92.0</span>);</span>
+<span class="ln" id="L804">        assert_eq!(m.frame_ms, <span class="tok-num">4.0</span>, <span class="tok-str">&quot;a swap storm is not a measurement&quot;</span>);</span>
+<span class="ln" id="L805">        assert_eq!(m.speed, <span class="tok-num">92.0</span>, <span class="tok-str">&quot;the speed is the latest run, and says so&quot;</span>);</span>
+<span class="ln" id="L806">    }</span>
+<span class="ln" id="L807">}</span>
 </span>
 </code></pre>
 </main>
