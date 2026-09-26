@@ -422,6 +422,11 @@ fn first_existing(candidates: &[PathBuf]) -> Option<PathBuf> {
     candidates.iter().find(|path| path.exists()).cloned()
 }
 
+/// The path an environment variable names, with `rest` joined onto it.
+///
+/// `None` when the variable is not set, which is the ordinary case for most of
+/// the variables this is asked about: a machine with no `PROGRAMFILES` is a
+/// machine where that candidate does not apply, not a machine with a problem.
 fn env_path(name: &str, rest: &[&str]) -> Option<PathBuf> {
     let base = std::env::var_os(name)?;
     let mut path = PathBuf::from(base);
@@ -597,6 +602,13 @@ fn ffmpeg_offer() -> Offer {
     unix_package("ffmpeg", "ffmpeg")
 }
 
+/// An offer to install something through Homebrew, or the reason there is none.
+///
+/// Homebrew is not installed for the reader if it is missing, and the message
+/// says so plainly and points at where to get it. Installing a package manager
+/// on somebody's machine because they asked to check a download is far outside
+/// what was asked for, and it is the kind of helpfulness this program does not
+/// do.
 fn brew(arguments: &[&str]) -> Offer {
     if on_path("brew").is_none() {
         return Offer::NoKnownRoute(

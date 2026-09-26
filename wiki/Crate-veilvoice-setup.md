@@ -96,8 +96,8 @@ you who makes each one, and installs none of them unless you say so.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>226 lines"])
-    n_companions["companions.rs<br/>1088 lines"]
-    n_install["install.rs<br/>861 lines"]
+    n_companions["companions.rs<br/>1100 lines"]
+    n_install["install.rs<br/>867 lines"]
     n_needs["needs.rs<br/>565 lines"]
     n_space["space.rs<br/>170 lines"]
     n_update["update.rs<br/>892 lines"]
@@ -120,8 +120,8 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`companions.rs`|File-veilvoice-setup-companions]] | 1088 | Optional third-party software, detected rather than assumed. |
-| [[`install.rs`|File-veilvoice-setup-install]] | 861 | Put this program somewhere the system can find it. |
+| [[`companions.rs`|File-veilvoice-setup-companions]] | 1100 | Optional third-party software, detected rather than assumed. |
+| [[`install.rs`|File-veilvoice-setup-install]] | 867 | Put this program somewhere the system can find it. |
 | [[`lib.rs`|File-veilvoice-setup-lib]] | 226 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [[`needs.rs`|File-veilvoice-setup-needs]] | 565 | What this machine is missing, asked once and at the right moment. |
 | [[`space.rs`|File-veilvoice-setup-space]] | 170 | How much room is actually free where VeilVoice keeps things. |

@@ -116,11 +116,26 @@ use veilvoice_setup::{companions, install, needs};
 pitch, the formants, the timbre and the melody of an accent. It keeps the words clean and \
 transcribable. Nothing here reaches the network except when you ask it to by name: `veilvoice update` and `veilvoice verify release` fetch from the releases page, and no other command opens a connection for any reason."
 )]
+/// The whole command line, which is one subcommand and nothing else.
+///
+/// There are no top-level options on purpose. Every setting belongs to the thing
+/// it affects, so it is spelled beside that subcommand and appears on that
+/// subcommand's help screen, rather than in a general list a reader has to
+/// search. The `about` and `long_about` above are what `veilvoice --help` prints.
 struct Cli {
     #[command(subcommand)]
     command: Command,
 }
 
+/// Everything `veilvoice` can be asked to do.
+///
+/// One variant per subcommand, with `clap` deriving the parser, the help screens
+/// and the completions from it, so what the program accepts and what it says it
+/// accepts cannot come apart. Each variant's doc comment is the line printed in
+/// a terminal, which is why they are written for somebody reading one.
+///
+/// Two of these open a network connection and no others do, which is stated in
+/// `long_about` above and enforced by a CI job rather than believed.
 #[derive(Subcommand)]
 enum Command {
     /// De-identify an audio file and write a WAV.
@@ -844,6 +859,7 @@ enum FixCommand {
     },
 }
 
+/// What `veilvoice conversation` can be asked to do: read a plan, or render one.
 #[derive(Subcommand)]
 enum ConversationCommand {
     /// Describe a plan: who is in it, which voice each gets, and any overlaps.
@@ -1029,6 +1045,12 @@ enum AppctlCommand {
     Log,
 }
 
+/// What `veilvoice input` can be asked to do: what is watching input now, or
+/// everything this build is able to notice.
+///
+/// The second exists so an empty answer can be checked rather than trusted. A
+/// reader told nothing is watching has no way to tell that from a build that
+/// cannot see anything.
 #[derive(Subcommand, Debug)]
 enum InputCommand {
     /// What is running now that could see input. The default.
@@ -1042,6 +1064,9 @@ enum InputCommand {
     Known,
 }
 
+/// What `veilvoice capture` can be asked to do about the microphone and camera,
+/// with the same pairing as [`InputCommand`]: what is happening now, and what
+/// this build is able to notice at all.
 #[derive(Subcommand)]
 enum CaptureCommand {
     /// What is running, what is allowed, and what this cannot see.
@@ -1232,6 +1257,12 @@ enum SentryCommand {
     },
 }
 
+/// What to do with the tags in a file `veilvoice clean` is given.
+///
+/// A value taken from the command line rather than a subcommand, so `ValueEnum`
+/// rather than `Subcommand`, and the two variants are a real choice rather than
+/// a default and an option: removing every tag is itself a signal that something
+/// was removed, and replacing them leaves a file that looks untouched.
 #[derive(Clone, Copy, Debug, ValueEnum)]
 enum CleanPolicy {
     /// Remove every tag.

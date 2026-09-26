@@ -34,6 +34,13 @@ pub fn baseline_path() -> Result<PathBuf, String> {
     Ok(base.join("veilvoice").join("appctl.conf"))
 }
 
+/// The baseline at `path`, or an empty one if there is no file yet.
+///
+/// A missing file is not an error: the first run on a machine has nothing
+/// recorded, and reporting that as a failure would make the ordinary case look
+/// broken. A file that exists and will not parse is reported, because starting
+/// again from an empty baseline would silently accept whatever is on the machine
+/// now as ordinary, which is the one thing this file exists to prevent.
 fn load(path: &Path) -> Result<Baseline, String> {
     match std::fs::read_to_string(path) {
         Ok(text) => Baseline::parse(&text).map_err(|e| format!("{}: {e}", path.display())),
@@ -42,6 +49,8 @@ fn load(path: &Path) -> Result<Baseline, String> {
     }
 }
 
+/// Write `baseline` to `path`, creating the directory if it is not there, and
+/// readable by this account alone.
 fn save(path: &Path, baseline: &Baseline) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;

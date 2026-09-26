@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-setup/src/install.rs</code></h1>
-<p style="color:var(--muted)"><a href="install.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 861 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="install.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 867 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -403,578 +403,584 @@
 </span>
 <span class="ln" id="L314"></span>
 <span class="src-item" id="fn-userpath">
-<span class="ln" id="L315"><span class="tok-attr">#[cfg</span>(windows)]</span>
-<span class="ln" id="L316"><span class="tok-kw">enum</span> UserPath {</span>
-<span class="ln" id="L317">    <span class="tok-com">/// Read successfully. This is the value to append to.</span></span>
-<span class="ln" id="L318">    <span class="tok-fn">Value</span>(String),</span>
-<span class="ln" id="L319">    <span class="tok-com">/// `reg` said the value does not exist. Creating it is safe.</span></span>
-<span class="ln" id="L320">    Absent,</span>
-<span class="ln" id="L321">}</span>
+<span class="ln" id="L315"><span class="tok-com">/// What reading this user&#x27;s `PATH` out of the registry found.</span></span>
+<span class="ln" id="L316"><span class="tok-com">///</span></span>
+<span class="ln" id="L317"><span class="tok-com">/// Three outcomes rather than two, and the distinction is the point: a value</span></span>
+<span class="ln" id="L318"><span class="tok-com">/// that is there, a value the registry says is absent, and a query that failed,</span></span>
+<span class="ln" id="L319"><span class="tok-com">/// which is the error case the caller gets instead of this type. See the note on</span></span>
+<span class="ln" id="L320"><span class="tok-com">/// the function below for the defect that made it necessary.</span></span>
+<span class="ln" id="L321"><span class="tok-attr">#[cfg</span>(windows)]</span>
+<span class="ln" id="L322"><span class="tok-kw">enum</span> UserPath {</span>
+<span class="ln" id="L323">    <span class="tok-com">/// Read successfully. This is the value to append to.</span></span>
+<span class="ln" id="L324">    <span class="tok-fn">Value</span>(String),</span>
+<span class="ln" id="L325">    <span class="tok-com">/// `reg` said the value does not exist. Creating it is safe.</span></span>
+<span class="ln" id="L326">    Absent,</span>
+<span class="ln" id="L327">}</span>
 </span>
-<span class="ln" id="L322"></span>
+<span class="ln" id="L328"></span>
 <span class="src-item" id="fn-read_user_path">
-<span class="ln" id="L323"><span class="tok-com">/// Read this user&#x27;s `PATH`, distinguishing &quot;not set&quot; from &quot;could not tell&quot;.</span></span>
-<span class="ln" id="L324"><span class="tok-com">///</span></span>
-<span class="ln" id="L325"><span class="tok-com">/// The first version returned an empty string for both, and the caller treats</span></span>
-<span class="ln" id="L326"><span class="tok-com">/// empty as &quot;there is no PATH yet, write a fresh one&quot; -- so a query that failed</span></span>
-<span class="ln" id="L327"><span class="tok-com">/// for any reason would have replaced the user&#x27;s entire `PATH` with a single</span></span>
-<span class="ln" id="L328"><span class="tok-com">/// entry. The comment at the top of this file already said that was the thing</span></span>
-<span class="ln" id="L329"><span class="tok-com">/// to avoid; the code did not implement it.</span></span>
+<span class="ln" id="L329"><span class="tok-com">/// Read this user&#x27;s `PATH`, distinguishing &quot;not set&quot; from &quot;could not tell&quot;.</span></span>
 <span class="ln" id="L330"><span class="tok-com">///</span></span>
-<span class="ln" id="L331"><span class="tok-com">/// `reg query` exits non-zero for a missing value *and* for every other</span></span>
-<span class="ln" id="L332"><span class="tok-com">/// failure, so the two are told apart by what it says. Anything not</span></span>
-<span class="ln" id="L333"><span class="tok-com">/// recognisably &quot;value does not exist&quot; is an error, and an error refuses the</span></span>
-<span class="ln" id="L334"><span class="tok-com">/// write rather than guessing.</span></span>
-<span class="ln" id="L335"><span class="tok-attr">#[cfg</span>(windows)]</span>
-<span class="ln" id="L336"><span class="tok-kw">fn</span> <span class="tok-fn">read_user_path</span>() -&gt; Result&lt;UserPath, String&gt; {</span>
-<span class="ln" id="L337">    <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-fn">reg_exe</span>())</span>
-<span class="ln" id="L338">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;query&quot;</span>, <span class="tok-str">r&quot;HKCU\Environment&quot;</span>, <span class="tok-str">&quot;/v&quot;</span>, <span class="tok-str">&quot;PATH&quot;</span>])</span>
-<span class="ln" id="L339">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L340">        .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not run reg.exe: {e}&quot;</span>))?;</span>
-<span class="ln" id="L341">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L342">        <span class="tok-kw">let</span> complaint = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L343">        <span class="tok-kw">if</span> complaint.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;unable to find&quot;</span>) {</span>
-<span class="ln" id="L344">            <span class="tok-com">// Genuinely no value. Creating one is safe.</span></span>
-<span class="ln" id="L345">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(UserPath::Absent);</span>
-<span class="ln" id="L346">        }</span>
-<span class="ln" id="L347">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L348">            <span class="tok-str">&quot;could not read your PATH ({}). Refusing to change it: writing a \</span></span>
-<span class="ln" id="L349"><span class="tok-str">             PATH that could not first be read would replace whatever is there.&quot;</span>,</span>
-<span class="ln" id="L350">            String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L351">        ));</span>
-<span class="ln" id="L352">    }</span>
-<span class="ln" id="L353">    <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout);</span>
-<span class="ln" id="L354">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L355">        <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L356">        <span class="tok-kw">if</span> !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;PATH&quot;</span>) {</span>
-<span class="ln" id="L357">            continue;</span>
-<span class="ln" id="L358">        }</span>
-<span class="ln" id="L359">        <span class="tok-com">// `reg query` prints:  PATH    REG_EXPAND_SZ    &lt;value&gt;</span></span>
-<span class="ln" id="L360">        <span class="tok-com">//</span></span>
-<span class="ln" id="L361">        <span class="tok-com">// The value may itself contain spaces, so it is taken as everything</span></span>
-<span class="ln" id="L362">        <span class="tok-com">// after the type rather than by splitting on whitespace -- a PATH is</span></span>
-<span class="ln" id="L363">        <span class="tok-com">// full of `C:\Program Files\...` and splitting one on spaces is how a</span></span>
-<span class="ln" id="L364">        <span class="tok-com">// tool corrupts it.</span></span>
-<span class="ln" id="L365">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = trimmed.<span class="tok-fn">find</span>(<span class="tok-str">&quot;REG_&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L366">            continue;</span>
-<span class="ln" id="L367">        };</span>
-<span class="ln" id="L368">        <span class="tok-kw">let</span> after = &amp;trimmed[at..];</span>
-<span class="ln" id="L369">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(space) = after.<span class="tok-fn">find</span>(char::is_whitespace) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L370">            continue;</span>
-<span class="ln" id="L371">        };</span>
-<span class="ln" id="L372">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(UserPath::<span class="tok-fn">Value</span>(after[space..].<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L373">    }</span>
-<span class="ln" id="L374">    <span class="tok-com">// `reg` succeeded and printed something this cannot parse. That is not</span></span>
-<span class="ln" id="L375">    <span class="tok-com">// &quot;there is no PATH&quot; -- it is &quot;I do not understand the answer&quot;, and the</span></span>
-<span class="ln" id="L376">    <span class="tok-com">// difference is the whole point of this function.</span></span>
-<span class="ln" id="L377">    <span class="tok-fn">Err</span>(<span class="tok-str">&quot;could not parse the PATH value reg.exe printed. Refusing to change it.&quot;</span>.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L378">}</span>
+<span class="ln" id="L331"><span class="tok-com">/// The first version returned an empty string for both, and the caller treats</span></span>
+<span class="ln" id="L332"><span class="tok-com">/// empty as &quot;there is no PATH yet, write a fresh one&quot; -- so a query that failed</span></span>
+<span class="ln" id="L333"><span class="tok-com">/// for any reason would have replaced the user&#x27;s entire `PATH` with a single</span></span>
+<span class="ln" id="L334"><span class="tok-com">/// entry. The comment at the top of this file already said that was the thing</span></span>
+<span class="ln" id="L335"><span class="tok-com">/// to avoid; the code did not implement it.</span></span>
+<span class="ln" id="L336"><span class="tok-com">///</span></span>
+<span class="ln" id="L337"><span class="tok-com">/// `reg query` exits non-zero for a missing value *and* for every other</span></span>
+<span class="ln" id="L338"><span class="tok-com">/// failure, so the two are told apart by what it says. Anything not</span></span>
+<span class="ln" id="L339"><span class="tok-com">/// recognisably &quot;value does not exist&quot; is an error, and an error refuses the</span></span>
+<span class="ln" id="L340"><span class="tok-com">/// write rather than guessing.</span></span>
+<span class="ln" id="L341"><span class="tok-attr">#[cfg</span>(windows)]</span>
+<span class="ln" id="L342"><span class="tok-kw">fn</span> <span class="tok-fn">read_user_path</span>() -&gt; Result&lt;UserPath, String&gt; {</span>
+<span class="ln" id="L343">    <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-fn">reg_exe</span>())</span>
+<span class="ln" id="L344">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;query&quot;</span>, <span class="tok-str">r&quot;HKCU\Environment&quot;</span>, <span class="tok-str">&quot;/v&quot;</span>, <span class="tok-str">&quot;PATH&quot;</span>])</span>
+<span class="ln" id="L345">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L346">        .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not run reg.exe: {e}&quot;</span>))?;</span>
+<span class="ln" id="L347">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L348">        <span class="tok-kw">let</span> complaint = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L349">        <span class="tok-kw">if</span> complaint.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;unable to find&quot;</span>) {</span>
+<span class="ln" id="L350">            <span class="tok-com">// Genuinely no value. Creating one is safe.</span></span>
+<span class="ln" id="L351">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(UserPath::Absent);</span>
+<span class="ln" id="L352">        }</span>
+<span class="ln" id="L353">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L354">            <span class="tok-str">&quot;could not read your PATH ({}). Refusing to change it: writing a \</span></span>
+<span class="ln" id="L355"><span class="tok-str">             PATH that could not first be read would replace whatever is there.&quot;</span>,</span>
+<span class="ln" id="L356">            String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L357">        ));</span>
+<span class="ln" id="L358">    }</span>
+<span class="ln" id="L359">    <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout);</span>
+<span class="ln" id="L360">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L361">        <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L362">        <span class="tok-kw">if</span> !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;PATH&quot;</span>) {</span>
+<span class="ln" id="L363">            continue;</span>
+<span class="ln" id="L364">        }</span>
+<span class="ln" id="L365">        <span class="tok-com">// `reg query` prints:  PATH    REG_EXPAND_SZ    &lt;value&gt;</span></span>
+<span class="ln" id="L366">        <span class="tok-com">//</span></span>
+<span class="ln" id="L367">        <span class="tok-com">// The value may itself contain spaces, so it is taken as everything</span></span>
+<span class="ln" id="L368">        <span class="tok-com">// after the type rather than by splitting on whitespace -- a PATH is</span></span>
+<span class="ln" id="L369">        <span class="tok-com">// full of `C:\Program Files\...` and splitting one on spaces is how a</span></span>
+<span class="ln" id="L370">        <span class="tok-com">// tool corrupts it.</span></span>
+<span class="ln" id="L371">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(at) = trimmed.<span class="tok-fn">find</span>(<span class="tok-str">&quot;REG_&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L372">            continue;</span>
+<span class="ln" id="L373">        };</span>
+<span class="ln" id="L374">        <span class="tok-kw">let</span> after = &amp;trimmed[at..];</span>
+<span class="ln" id="L375">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(space) = after.<span class="tok-fn">find</span>(char::is_whitespace) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L376">            continue;</span>
+<span class="ln" id="L377">        };</span>
+<span class="ln" id="L378">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(UserPath::<span class="tok-fn">Value</span>(after[space..].<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L379">    }</span>
+<span class="ln" id="L380">    <span class="tok-com">// `reg` succeeded and printed something this cannot parse. That is not</span></span>
+<span class="ln" id="L381">    <span class="tok-com">// &quot;there is no PATH&quot; -- it is &quot;I do not understand the answer&quot;, and the</span></span>
+<span class="ln" id="L382">    <span class="tok-com">// difference is the whole point of this function.</span></span>
+<span class="ln" id="L383">    <span class="tok-fn">Err</span>(<span class="tok-str">&quot;could not parse the PATH value reg.exe printed. Refusing to change it.&quot;</span>.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L384">}</span>
 </span>
-<span class="ln" id="L379"></span>
+<span class="ln" id="L385"></span>
 <span class="src-item" id="fn-add_to_path-2">
-<span class="ln" id="L380"><span class="tok-com">/// The Unix half: report that nothing was written, because nothing was.</span></span>
-<span class="ln" id="L381"><span class="tok-com">///</span></span>
-<span class="ln" id="L382"><span class="tok-com">/// Answering `Ok(false)` rather than doing it is the decision, and the body</span></span>
-<span class="ln" id="L383"><span class="tok-com">/// says why. The caller prints the line for the person to add themselves.</span></span>
-<span class="ln" id="L384"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
-<span class="ln" id="L385"><span class="tok-kw">fn</span> <span class="tok-fn">add_to_path</span>(dir: &amp;Path) -&gt; Result&lt;bool, String&gt; {</span>
-<span class="ln" id="L386">    <span class="tok-com">// On Unix the convention is a line in a shell profile, and rewriting</span></span>
-<span class="ln" id="L387">    <span class="tok-com">// somebody&#x27;s profile without asking is not this program&#x27;s business. The</span></span>
-<span class="ln" id="L388">    <span class="tok-com">// line is printed for them to add.</span></span>
-<span class="ln" id="L389">    <span class="tok-kw">let</span> _ = dir;</span>
-<span class="ln" id="L390">    <span class="tok-fn">Ok</span>(false)</span>
-<span class="ln" id="L391">}</span>
+<span class="ln" id="L386"><span class="tok-com">/// The Unix half: report that nothing was written, because nothing was.</span></span>
+<span class="ln" id="L387"><span class="tok-com">///</span></span>
+<span class="ln" id="L388"><span class="tok-com">/// Answering `Ok(false)` rather than doing it is the decision, and the body</span></span>
+<span class="ln" id="L389"><span class="tok-com">/// says why. The caller prints the line for the person to add themselves.</span></span>
+<span class="ln" id="L390"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
+<span class="ln" id="L391"><span class="tok-kw">fn</span> <span class="tok-fn">add_to_path</span>(dir: &amp;Path) -&gt; Result&lt;bool, String&gt; {</span>
+<span class="ln" id="L392">    <span class="tok-com">// On Unix the convention is a line in a shell profile, and rewriting</span></span>
+<span class="ln" id="L393">    <span class="tok-com">// somebody&#x27;s profile without asking is not this program&#x27;s business. The</span></span>
+<span class="ln" id="L394">    <span class="tok-com">// line is printed for them to add.</span></span>
+<span class="ln" id="L395">    <span class="tok-kw">let</span> _ = dir;</span>
+<span class="ln" id="L396">    <span class="tok-fn">Ok</span>(false)</span>
+<span class="ln" id="L397">}</span>
 </span>
-<span class="ln" id="L392"></span>
+<span class="ln" id="L398"></span>
 <span class="src-item" id="fn-register_uninstall">
-<span class="ln" id="L393"><span class="tok-com">/// Register with Add/Remove Programs, so the system can list and remove it.</span></span>
-<span class="ln" id="L394"><span class="tok-attr">#[cfg</span>(windows)]</span>
-<span class="ln" id="L395"><span class="tok-kw">fn</span> <span class="tok-fn">register_uninstall</span>(prefix: &amp;Path) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L396">    <span class="tok-kw">let</span> key = format!(<span class="tok-str">r&quot;HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{NAME}&quot;</span>);</span>
-<span class="ln" id="L397">    <span class="tok-kw">let</span> exe = prefix.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(<span class="tok-str">&quot;veilvoice&quot;</span>));</span>
-<span class="ln" id="L398">    <span class="tok-kw">let</span> entries: &amp;[(&amp;str, &amp;str, String)] = &amp;[</span>
-<span class="ln" id="L399">        (<span class="tok-str">&quot;DisplayName&quot;</span>, <span class="tok-str">&quot;REG_SZ&quot;</span>, NAME.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L400">        (</span>
-<span class="ln" id="L401">            <span class="tok-str">&quot;DisplayVersion&quot;</span>,</span>
-<span class="ln" id="L402">            <span class="tok-str">&quot;REG_SZ&quot;</span>,</span>
-<span class="ln" id="L403">            env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>).<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L404">        ),</span>
-<span class="ln" id="L405">        (<span class="tok-str">&quot;Publisher&quot;</span>, <span class="tok-str">&quot;REG_SZ&quot;</span>, <span class="tok-str">&quot;tilas01&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L406">        (<span class="tok-str">&quot;InstallLocation&quot;</span>, <span class="tok-str">&quot;REG_SZ&quot;</span>, prefix.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L407">        (<span class="tok-str">&quot;DisplayIcon&quot;</span>, <span class="tok-str">&quot;REG_SZ&quot;</span>, exe.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L408">        (<span class="tok-str">&quot;NoModify&quot;</span>, <span class="tok-str">&quot;REG_DWORD&quot;</span>, <span class="tok-str">&quot;1&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L409">        (<span class="tok-str">&quot;NoRepair&quot;</span>, <span class="tok-str">&quot;REG_DWORD&quot;</span>, <span class="tok-str">&quot;1&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L410">        (</span>
-<span class="ln" id="L411">            <span class="tok-str">&quot;UninstallString&quot;</span>,</span>
-<span class="ln" id="L412">            <span class="tok-str">&quot;REG_SZ&quot;</span>,</span>
-<span class="ln" id="L413">            format!(<span class="tok-str">&quot;\&quot;{}\&quot; uninstall --yes&quot;</span>, exe.<span class="tok-fn">display</span>()),</span>
-<span class="ln" id="L414">        ),</span>
-<span class="ln" id="L415">    ];</span>
-<span class="ln" id="L416">    <span class="tok-kw">for</span> (name, kind, value) <span class="tok-kw">in</span> entries {</span>
-<span class="ln" id="L417">        <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-fn">reg_exe</span>())</span>
-<span class="ln" id="L418">            .<span class="tok-fn">args</span>([<span class="tok-str">&quot;add&quot;</span>, &amp;key, <span class="tok-str">&quot;/v&quot;</span>, name, <span class="tok-str">&quot;/t&quot;</span>, kind, <span class="tok-str">&quot;/d&quot;</span>])</span>
-<span class="ln" id="L419">            .<span class="tok-fn">arg</span>(value)</span>
-<span class="ln" id="L420">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;/f&quot;</span>)</span>
-<span class="ln" id="L421">            .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L422">            .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not run reg.exe: {e}&quot;</span>))?;</span>
-<span class="ln" id="L423">        <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L424">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L425">                <span class="tok-str">&quot;could not write the uninstall entry: {}&quot;</span>,</span>
-<span class="ln" id="L426">                String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L427">            ));</span>
-<span class="ln" id="L428">        }</span>
-<span class="ln" id="L429">    }</span>
-<span class="ln" id="L430">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L431">}</span>
+<span class="ln" id="L399"><span class="tok-com">/// Register with Add/Remove Programs, so the system can list and remove it.</span></span>
+<span class="ln" id="L400"><span class="tok-attr">#[cfg</span>(windows)]</span>
+<span class="ln" id="L401"><span class="tok-kw">fn</span> <span class="tok-fn">register_uninstall</span>(prefix: &amp;Path) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L402">    <span class="tok-kw">let</span> key = format!(<span class="tok-str">r&quot;HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{NAME}&quot;</span>);</span>
+<span class="ln" id="L403">    <span class="tok-kw">let</span> exe = prefix.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(<span class="tok-str">&quot;veilvoice&quot;</span>));</span>
+<span class="ln" id="L404">    <span class="tok-kw">let</span> entries: &amp;[(&amp;str, &amp;str, String)] = &amp;[</span>
+<span class="ln" id="L405">        (<span class="tok-str">&quot;DisplayName&quot;</span>, <span class="tok-str">&quot;REG_SZ&quot;</span>, NAME.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L406">        (</span>
+<span class="ln" id="L407">            <span class="tok-str">&quot;DisplayVersion&quot;</span>,</span>
+<span class="ln" id="L408">            <span class="tok-str">&quot;REG_SZ&quot;</span>,</span>
+<span class="ln" id="L409">            env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>).<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L410">        ),</span>
+<span class="ln" id="L411">        (<span class="tok-str">&quot;Publisher&quot;</span>, <span class="tok-str">&quot;REG_SZ&quot;</span>, <span class="tok-str">&quot;tilas01&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L412">        (<span class="tok-str">&quot;InstallLocation&quot;</span>, <span class="tok-str">&quot;REG_SZ&quot;</span>, prefix.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L413">        (<span class="tok-str">&quot;DisplayIcon&quot;</span>, <span class="tok-str">&quot;REG_SZ&quot;</span>, exe.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L414">        (<span class="tok-str">&quot;NoModify&quot;</span>, <span class="tok-str">&quot;REG_DWORD&quot;</span>, <span class="tok-str">&quot;1&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L415">        (<span class="tok-str">&quot;NoRepair&quot;</span>, <span class="tok-str">&quot;REG_DWORD&quot;</span>, <span class="tok-str">&quot;1&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L416">        (</span>
+<span class="ln" id="L417">            <span class="tok-str">&quot;UninstallString&quot;</span>,</span>
+<span class="ln" id="L418">            <span class="tok-str">&quot;REG_SZ&quot;</span>,</span>
+<span class="ln" id="L419">            format!(<span class="tok-str">&quot;\&quot;{}\&quot; uninstall --yes&quot;</span>, exe.<span class="tok-fn">display</span>()),</span>
+<span class="ln" id="L420">        ),</span>
+<span class="ln" id="L421">    ];</span>
+<span class="ln" id="L422">    <span class="tok-kw">for</span> (name, kind, value) <span class="tok-kw">in</span> entries {</span>
+<span class="ln" id="L423">        <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-fn">reg_exe</span>())</span>
+<span class="ln" id="L424">            .<span class="tok-fn">args</span>([<span class="tok-str">&quot;add&quot;</span>, &amp;key, <span class="tok-str">&quot;/v&quot;</span>, name, <span class="tok-str">&quot;/t&quot;</span>, kind, <span class="tok-str">&quot;/d&quot;</span>])</span>
+<span class="ln" id="L425">            .<span class="tok-fn">arg</span>(value)</span>
+<span class="ln" id="L426">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;/f&quot;</span>)</span>
+<span class="ln" id="L427">            .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L428">            .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not run reg.exe: {e}&quot;</span>))?;</span>
+<span class="ln" id="L429">        <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L430">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L431">                <span class="tok-str">&quot;could not write the uninstall entry: {}&quot;</span>,</span>
+<span class="ln" id="L432">                String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L433">            ));</span>
+<span class="ln" id="L434">        }</span>
+<span class="ln" id="L435">    }</span>
+<span class="ln" id="L436">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L437">}</span>
 </span>
-<span class="ln" id="L432"></span>
+<span class="ln" id="L438"></span>
 <span class="src-item" id="fn-register_uninstall-2">
-<span class="ln" id="L433"><span class="tok-com">/// The Unix half: nothing to register. There is no Add/Remove Programs here,</span></span>
-<span class="ln" id="L434"><span class="tok-com">/// and `veilvoice uninstall` is the reversal on these platforms.</span></span>
-<span class="ln" id="L435"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
-<span class="ln" id="L436"><span class="tok-kw">fn</span> <span class="tok-fn">register_uninstall</span>(_prefix: &amp;Path) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L437">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L438">}</span>
+<span class="ln" id="L439"><span class="tok-com">/// The Unix half: nothing to register. There is no Add/Remove Programs here,</span></span>
+<span class="ln" id="L440"><span class="tok-com">/// and `veilvoice uninstall` is the reversal on these platforms.</span></span>
+<span class="ln" id="L441"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
+<span class="ln" id="L442"><span class="tok-kw">fn</span> <span class="tok-fn">register_uninstall</span>(_prefix: &amp;Path) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L443">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L444">}</span>
 </span>
-<span class="ln" id="L439"></span>
+<span class="ln" id="L445"></span>
 <span class="src-item" id="fn-remove_from_path">
-<span class="ln" id="L440"><span class="tok-com">/// Take this directory back out of the user&#x27;s `PATH`, leaving the rest of it</span></span>
-<span class="ln" id="L441"><span class="tok-com">/// exactly as it was.</span></span>
-<span class="ln" id="L442"><span class="tok-com">///</span></span>
-<span class="ln" id="L443"><span class="tok-com">/// The same care as [`add_to_path`], for the same reason: the variable is read</span></span>
-<span class="ln" id="L444"><span class="tok-com">/// and rewritten rather than replaced, and a `PATH` that never had this</span></span>
-<span class="ln" id="L445"><span class="tok-com">/// directory in it is left untouched rather than rewritten to itself.</span></span>
-<span class="ln" id="L446"><span class="tok-attr">#[cfg</span>(windows)]</span>
-<span class="ln" id="L447"><span class="tok-kw">fn</span> <span class="tok-fn">remove_from_path</span>(dir: &amp;Path) -&gt; Result&lt;bool, String&gt; {</span>
-<span class="ln" id="L448">    <span class="tok-kw">let</span> current = <span class="tok-kw">match</span> <span class="tok-fn">read_user_path</span>()? {</span>
-<span class="ln" id="L449">        <span class="tok-com">// Nothing to remove from, and nothing to write.</span></span>
-<span class="ln" id="L450">        UserPath::Absent =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(false),</span>
-<span class="ln" id="L451">        UserPath::<span class="tok-fn">Value</span>(value) =&gt; value,</span>
-<span class="ln" id="L452">    };</span>
-<span class="ln" id="L453">    <span class="tok-kw">if</span> current.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L454">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(false);</span>
-<span class="ln" id="L455">    }</span>
-<span class="ln" id="L456">    <span class="tok-kw">let</span> wanted = dir.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L457">    <span class="tok-kw">let</span> kept: Vec&lt;&amp;str&gt; = current</span>
-<span class="ln" id="L458">        .<span class="tok-fn">split</span>(<span class="tok-str">&#x27;;&#x27;</span>)</span>
-<span class="ln" id="L459">        .<span class="tok-fn">filter</span>(|entry| !entry.<span class="tok-fn">trim</span>().<span class="tok-fn">eq_ignore_ascii_case</span>(&amp;wanted))</span>
-<span class="ln" id="L460">        .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L461">    <span class="tok-kw">if</span> kept.<span class="tok-fn">len</span>() == current.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;;&#x27;</span>).<span class="tok-fn">count</span>() {</span>
-<span class="ln" id="L462">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(false);</span>
-<span class="ln" id="L463">    }</span>
-<span class="ln" id="L464">    <span class="tok-com">// Only this entry is removed, and only from the value just read. An</span></span>
-<span class="ln" id="L465">    <span class="tok-com">// uninstall that rewrites PATH from a template destroys whatever else the</span></span>
-<span class="ln" id="L466">    <span class="tok-com">// user had, at the moment they are least likely to look.</span></span>
-<span class="ln" id="L467">    <span class="tok-kw">let</span> joined = kept.<span class="tok-fn">join</span>(<span class="tok-str">&quot;;&quot;</span>);</span>
-<span class="ln" id="L468">    <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-fn">reg_exe</span>())</span>
-<span class="ln" id="L469">        .<span class="tok-fn">args</span>([</span>
-<span class="ln" id="L470">            <span class="tok-str">&quot;add&quot;</span>,</span>
-<span class="ln" id="L471">            <span class="tok-str">r&quot;HKCU\Environment&quot;</span>,</span>
-<span class="ln" id="L472">            <span class="tok-str">&quot;/v&quot;</span>,</span>
-<span class="ln" id="L473">            <span class="tok-str">&quot;PATH&quot;</span>,</span>
-<span class="ln" id="L474">            <span class="tok-str">&quot;/t&quot;</span>,</span>
-<span class="ln" id="L475">            <span class="tok-str">&quot;REG_EXPAND_SZ&quot;</span>,</span>
-<span class="ln" id="L476">            <span class="tok-str">&quot;/d&quot;</span>,</span>
-<span class="ln" id="L477">        ])</span>
-<span class="ln" id="L478">        .<span class="tok-fn">arg</span>(&amp;joined)</span>
-<span class="ln" id="L479">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;/f&quot;</span>)</span>
-<span class="ln" id="L480">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L481">        .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not run reg.exe: {e}&quot;</span>))?;</span>
-<span class="ln" id="L482">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L483">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L484">            <span class="tok-str">&quot;could not update PATH: {}&quot;</span>,</span>
-<span class="ln" id="L485">            String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L486">        ));</span>
-<span class="ln" id="L487">    }</span>
-<span class="ln" id="L488">    <span class="tok-fn">Ok</span>(true)</span>
-<span class="ln" id="L489">}</span>
-</span>
-<span class="ln" id="L490"></span>
-<span class="src-item" id="fn-remove_from_path-2">
-<span class="ln" id="L491"><span class="tok-com">/// The Unix half: nothing was written to a profile, so nothing is taken out.</span></span>
-<span class="ln" id="L492"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
-<span class="ln" id="L493"><span class="tok-kw">fn</span> <span class="tok-fn">remove_from_path</span>(_dir: &amp;Path) -&gt; Result&lt;bool, String&gt; {</span>
-<span class="ln" id="L494">    <span class="tok-fn">Ok</span>(false)</span>
+<span class="ln" id="L446"><span class="tok-com">/// Take this directory back out of the user&#x27;s `PATH`, leaving the rest of it</span></span>
+<span class="ln" id="L447"><span class="tok-com">/// exactly as it was.</span></span>
+<span class="ln" id="L448"><span class="tok-com">///</span></span>
+<span class="ln" id="L449"><span class="tok-com">/// The same care as [`add_to_path`], for the same reason: the variable is read</span></span>
+<span class="ln" id="L450"><span class="tok-com">/// and rewritten rather than replaced, and a `PATH` that never had this</span></span>
+<span class="ln" id="L451"><span class="tok-com">/// directory in it is left untouched rather than rewritten to itself.</span></span>
+<span class="ln" id="L452"><span class="tok-attr">#[cfg</span>(windows)]</span>
+<span class="ln" id="L453"><span class="tok-kw">fn</span> <span class="tok-fn">remove_from_path</span>(dir: &amp;Path) -&gt; Result&lt;bool, String&gt; {</span>
+<span class="ln" id="L454">    <span class="tok-kw">let</span> current = <span class="tok-kw">match</span> <span class="tok-fn">read_user_path</span>()? {</span>
+<span class="ln" id="L455">        <span class="tok-com">// Nothing to remove from, and nothing to write.</span></span>
+<span class="ln" id="L456">        UserPath::Absent =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(false),</span>
+<span class="ln" id="L457">        UserPath::<span class="tok-fn">Value</span>(value) =&gt; value,</span>
+<span class="ln" id="L458">    };</span>
+<span class="ln" id="L459">    <span class="tok-kw">if</span> current.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L460">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(false);</span>
+<span class="ln" id="L461">    }</span>
+<span class="ln" id="L462">    <span class="tok-kw">let</span> wanted = dir.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L463">    <span class="tok-kw">let</span> kept: Vec&lt;&amp;str&gt; = current</span>
+<span class="ln" id="L464">        .<span class="tok-fn">split</span>(<span class="tok-str">&#x27;;&#x27;</span>)</span>
+<span class="ln" id="L465">        .<span class="tok-fn">filter</span>(|entry| !entry.<span class="tok-fn">trim</span>().<span class="tok-fn">eq_ignore_ascii_case</span>(&amp;wanted))</span>
+<span class="ln" id="L466">        .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L467">    <span class="tok-kw">if</span> kept.<span class="tok-fn">len</span>() == current.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;;&#x27;</span>).<span class="tok-fn">count</span>() {</span>
+<span class="ln" id="L468">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(false);</span>
+<span class="ln" id="L469">    }</span>
+<span class="ln" id="L470">    <span class="tok-com">// Only this entry is removed, and only from the value just read. An</span></span>
+<span class="ln" id="L471">    <span class="tok-com">// uninstall that rewrites PATH from a template destroys whatever else the</span></span>
+<span class="ln" id="L472">    <span class="tok-com">// user had, at the moment they are least likely to look.</span></span>
+<span class="ln" id="L473">    <span class="tok-kw">let</span> joined = kept.<span class="tok-fn">join</span>(<span class="tok-str">&quot;;&quot;</span>);</span>
+<span class="ln" id="L474">    <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-fn">reg_exe</span>())</span>
+<span class="ln" id="L475">        .<span class="tok-fn">args</span>([</span>
+<span class="ln" id="L476">            <span class="tok-str">&quot;add&quot;</span>,</span>
+<span class="ln" id="L477">            <span class="tok-str">r&quot;HKCU\Environment&quot;</span>,</span>
+<span class="ln" id="L478">            <span class="tok-str">&quot;/v&quot;</span>,</span>
+<span class="ln" id="L479">            <span class="tok-str">&quot;PATH&quot;</span>,</span>
+<span class="ln" id="L480">            <span class="tok-str">&quot;/t&quot;</span>,</span>
+<span class="ln" id="L481">            <span class="tok-str">&quot;REG_EXPAND_SZ&quot;</span>,</span>
+<span class="ln" id="L482">            <span class="tok-str">&quot;/d&quot;</span>,</span>
+<span class="ln" id="L483">        ])</span>
+<span class="ln" id="L484">        .<span class="tok-fn">arg</span>(&amp;joined)</span>
+<span class="ln" id="L485">        .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;/f&quot;</span>)</span>
+<span class="ln" id="L486">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L487">        .<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;could not run reg.exe: {e}&quot;</span>))?;</span>
+<span class="ln" id="L488">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L489">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L490">            <span class="tok-str">&quot;could not update PATH: {}&quot;</span>,</span>
+<span class="ln" id="L491">            String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L492">        ));</span>
+<span class="ln" id="L493">    }</span>
+<span class="ln" id="L494">    <span class="tok-fn">Ok</span>(true)</span>
 <span class="ln" id="L495">}</span>
 </span>
 <span class="ln" id="L496"></span>
-<span class="src-item" id="fn-unregister_uninstall">
-<span class="ln" id="L497"><span class="tok-com">/// Take the Add/Remove Programs entry away again.</span></span>
-<span class="ln" id="L498"><span class="tok-com">///</span></span>
-<span class="ln" id="L499"><span class="tok-com">/// A failure is ignored on purpose: the entry not being there is the outcome</span></span>
-<span class="ln" id="L500"><span class="tok-com">/// wanted, and refusing to finish an uninstall because the registry key was</span></span>
-<span class="ln" id="L501"><span class="tok-com">/// already gone would leave the person with a half-removed program.</span></span>
-<span class="ln" id="L502"><span class="tok-attr">#[cfg</span>(windows)]</span>
-<span class="ln" id="L503"><span class="tok-kw">fn</span> <span class="tok-fn">unregister_uninstall</span>() -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L504">    <span class="tok-kw">let</span> key = format!(<span class="tok-str">r&quot;HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{NAME}&quot;</span>);</span>
-<span class="ln" id="L505">    <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-fn">reg_exe</span>())</span>
-<span class="ln" id="L506">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;delete&quot;</span>, &amp;key, <span class="tok-str">&quot;/f&quot;</span>])</span>
-<span class="ln" id="L507">        .<span class="tok-fn">output</span>();</span>
-<span class="ln" id="L508">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L509">}</span>
+<span class="src-item" id="fn-remove_from_path-2">
+<span class="ln" id="L497"><span class="tok-com">/// The Unix half: nothing was written to a profile, so nothing is taken out.</span></span>
+<span class="ln" id="L498"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
+<span class="ln" id="L499"><span class="tok-kw">fn</span> <span class="tok-fn">remove_from_path</span>(_dir: &amp;Path) -&gt; Result&lt;bool, String&gt; {</span>
+<span class="ln" id="L500">    <span class="tok-fn">Ok</span>(false)</span>
+<span class="ln" id="L501">}</span>
 </span>
-<span class="ln" id="L510"></span>
-<span class="src-item" id="fn-unregister_uninstall-2">
-<span class="ln" id="L511"><span class="tok-com">/// The Unix half: nothing was registered, so nothing is unregistered.</span></span>
-<span class="ln" id="L512"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
-<span class="ln" id="L513"><span class="tok-kw">fn</span> <span class="tok-fn">unregister_uninstall</span>() -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L502"></span>
+<span class="src-item" id="fn-unregister_uninstall">
+<span class="ln" id="L503"><span class="tok-com">/// Take the Add/Remove Programs entry away again.</span></span>
+<span class="ln" id="L504"><span class="tok-com">///</span></span>
+<span class="ln" id="L505"><span class="tok-com">/// A failure is ignored on purpose: the entry not being there is the outcome</span></span>
+<span class="ln" id="L506"><span class="tok-com">/// wanted, and refusing to finish an uninstall because the registry key was</span></span>
+<span class="ln" id="L507"><span class="tok-com">/// already gone would leave the person with a half-removed program.</span></span>
+<span class="ln" id="L508"><span class="tok-attr">#[cfg</span>(windows)]</span>
+<span class="ln" id="L509"><span class="tok-kw">fn</span> <span class="tok-fn">unregister_uninstall</span>() -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L510">    <span class="tok-kw">let</span> key = format!(<span class="tok-str">r&quot;HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{NAME}&quot;</span>);</span>
+<span class="ln" id="L511">    <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(<span class="tok-fn">reg_exe</span>())</span>
+<span class="ln" id="L512">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;delete&quot;</span>, &amp;key, <span class="tok-str">&quot;/f&quot;</span>])</span>
+<span class="ln" id="L513">        .<span class="tok-fn">output</span>();</span>
 <span class="ln" id="L514">    <span class="tok-fn">Ok</span>(())</span>
 <span class="ln" id="L515">}</span>
 </span>
 <span class="ln" id="L516"></span>
+<span class="src-item" id="fn-unregister_uninstall-2">
+<span class="ln" id="L517"><span class="tok-com">/// The Unix half: nothing was registered, so nothing is unregistered.</span></span>
+<span class="ln" id="L518"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
+<span class="ln" id="L519"><span class="tok-kw">fn</span> <span class="tok-fn">unregister_uninstall</span>() -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L520">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L521">}</span>
+</span>
+<span class="ln" id="L522"></span>
 <span class="src-item" id="fn-install">
-<span class="ln" id="L517"><span class="tok-com">/// Install for this user. Returns the lines to report.</span></span>
-<span class="ln" id="L518"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">install</span>() -&gt; Result&lt;Vec&lt;String&gt;, String&gt; {</span>
-<span class="ln" id="L519">    <span class="tok-com">// One directory, and it is the one that goes on `PATH`. Copying into a</span></span>
-<span class="ln" id="L520">    <span class="tok-com">// second and adding this one is F-214, and it made installing a</span></span>
-<span class="ln" id="L521">    <span class="tok-com">// no-op on every platform but Windows.</span></span>
-<span class="ln" id="L522">    <span class="tok-kw">let</span> dir = <span class="tok-fn">bin_dir</span>()</span>
-<span class="ln" id="L523">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;no per-user program directory could be found on this system&quot;</span>.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L524">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> report = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L525"></span>
-<span class="ln" id="L526">    <span class="tok-kw">let</span> copied = <span class="tok-fn">copy_programs</span>(&amp;dir)?;</span>
-<span class="ln" id="L527">    report.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L528">        <span class="tok-str">&quot;copied {} into {}&quot;</span>,</span>
-<span class="ln" id="L529">        copied.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>),</span>
-<span class="ln" id="L530">        dir.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L531">    ));</span>
-<span class="ln" id="L532"></span>
-<span class="ln" id="L533">    <span class="tok-kw">match</span> <span class="tok-fn">add_to_path</span>(&amp;dir) {</span>
-<span class="ln" id="L534">        <span class="tok-fn">Ok</span>(true) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;added {} to your PATH&quot;</span>, dir.<span class="tok-fn">display</span>())),</span>
-<span class="ln" id="L535">        <span class="tok-fn">Ok</span>(false) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{} was already on your PATH&quot;</span>, dir.<span class="tok-fn">display</span>())),</span>
-<span class="ln" id="L536">        <span class="tok-fn">Err</span>(error) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;PATH was not changed: {error}&quot;</span>)),</span>
-<span class="ln" id="L537">    }</span>
+<span class="ln" id="L523"><span class="tok-com">/// Install for this user. Returns the lines to report.</span></span>
+<span class="ln" id="L524"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">install</span>() -&gt; Result&lt;Vec&lt;String&gt;, String&gt; {</span>
+<span class="ln" id="L525">    <span class="tok-com">// One directory, and it is the one that goes on `PATH`. Copying into a</span></span>
+<span class="ln" id="L526">    <span class="tok-com">// second and adding this one is F-214, and it made installing a</span></span>
+<span class="ln" id="L527">    <span class="tok-com">// no-op on every platform but Windows.</span></span>
+<span class="ln" id="L528">    <span class="tok-kw">let</span> dir = <span class="tok-fn">bin_dir</span>()</span>
+<span class="ln" id="L529">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;no per-user program directory could be found on this system&quot;</span>.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L530">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> report = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L531"></span>
+<span class="ln" id="L532">    <span class="tok-kw">let</span> copied = <span class="tok-fn">copy_programs</span>(&amp;dir)?;</span>
+<span class="ln" id="L533">    report.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L534">        <span class="tok-str">&quot;copied {} into {}&quot;</span>,</span>
+<span class="ln" id="L535">        copied.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>),</span>
+<span class="ln" id="L536">        dir.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L537">    ));</span>
 <span class="ln" id="L538"></span>
-<span class="ln" id="L539">    <span class="tok-fn">register_uninstall</span>(&amp;dir)?;</span>
-<span class="ln" id="L540">    <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L541">        report.<span class="tok-fn">push</span>(<span class="tok-str">&quot;registered in Apps &amp; features, so Windows can remove it&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L542">    }</span>
-<span class="ln" id="L543">    <span class="tok-fn">Ok</span>(report)</span>
-<span class="ln" id="L544">}</span>
+<span class="ln" id="L539">    <span class="tok-kw">match</span> <span class="tok-fn">add_to_path</span>(&amp;dir) {</span>
+<span class="ln" id="L540">        <span class="tok-fn">Ok</span>(true) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;added {} to your PATH&quot;</span>, dir.<span class="tok-fn">display</span>())),</span>
+<span class="ln" id="L541">        <span class="tok-fn">Ok</span>(false) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{} was already on your PATH&quot;</span>, dir.<span class="tok-fn">display</span>())),</span>
+<span class="ln" id="L542">        <span class="tok-fn">Err</span>(error) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;PATH was not changed: {error}&quot;</span>)),</span>
+<span class="ln" id="L543">    }</span>
+<span class="ln" id="L544"></span>
+<span class="ln" id="L545">    <span class="tok-fn">register_uninstall</span>(&amp;dir)?;</span>
+<span class="ln" id="L546">    <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L547">        report.<span class="tok-fn">push</span>(<span class="tok-str">&quot;registered in Apps &amp; features, so Windows can remove it&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L548">    }</span>
+<span class="ln" id="L549">    <span class="tok-fn">Ok</span>(report)</span>
+<span class="ln" id="L550">}</span>
 </span>
-<span class="ln" id="L545"></span>
-<span class="src-item" id="fn-uninstall">
-<span class="ln" id="L546"><span class="tok-com">/// Remove what `install` added.</span></span>
-<span class="ln" id="L547"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">uninstall</span>() -&gt; Result&lt;Vec&lt;String&gt;, String&gt; {</span>
-<span class="ln" id="L548">    <span class="tok-kw">let</span> dir = <span class="tok-fn">bin_dir</span>()</span>
-<span class="ln" id="L549">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;no per-user program directory could be found on this system&quot;</span>.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L550">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> report = Vec::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L551"></span>
-<span class="ln" id="L552">    <span class="tok-kw">match</span> <span class="tok-fn">remove_from_path</span>(&amp;dir) {</span>
-<span class="ln" id="L553">        <span class="tok-fn">Ok</span>(true) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;removed {} from your PATH&quot;</span>, dir.<span class="tok-fn">display</span>())),</span>
-<span class="ln" id="L554">        <span class="tok-fn">Ok</span>(false) =&gt; report.<span class="tok-fn">push</span>(<span class="tok-str">&quot;PATH did not mention it&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L555">        <span class="tok-fn">Err</span>(error) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;PATH was not changed: {error}&quot;</span>)),</span>
-<span class="ln" id="L556">    }</span>
+<span class="src-item" id="fn-uninstall">
+<span class="ln" id="L552"><span class="tok-com">/// Remove what `install` added.</span></span>
+<span class="ln" id="L553"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">uninstall</span>() -&gt; Result&lt;Vec&lt;String&gt;, String&gt; {</span>
+<span class="ln" id="L554">    <span class="tok-kw">let</span> dir = <span class="tok-fn">bin_dir</span>()</span>
+<span class="ln" id="L555">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;no per-user program directory could be found on this system&quot;</span>.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L556">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> report = Vec::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L557"></span>
-<span class="ln" id="L558">    <span class="tok-fn">unregister_uninstall</span>()?;</span>
-<span class="ln" id="L559"></span>
-<span class="ln" id="L560">    <span class="tok-com">// The binaries, by name. See `remove_programs` for why this is not a</span></span>
-<span class="ln" id="L561">    <span class="tok-com">// recursive delete of the directory they are in.</span></span>
-<span class="ln" id="L562">    <span class="tok-kw">let</span> running = std::env::<span class="tok-fn">current_exe</span>().<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L563">    <span class="tok-kw">let</span> (removed, in_use) = <span class="tok-fn">remove_programs</span>(&amp;dir, running.<span class="tok-fn">as_deref</span>())?;</span>
-<span class="ln" id="L564">    <span class="tok-kw">if</span> removed.<span class="tok-fn">is_empty</span>() &amp;&amp; in_use.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L565">        report.<span class="tok-fn">push</span>(<span class="tok-str">&quot;nothing was installed&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L566">    } <span class="tok-kw">else</span> <span class="tok-kw">if</span> !removed.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L567">        report.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L568">            <span class="tok-str">&quot;removed {} from {}&quot;</span>,</span>
-<span class="ln" id="L569">            removed.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>),</span>
-<span class="ln" id="L570">            dir.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L571">        ));</span>
-<span class="ln" id="L572">    }</span>
-<span class="ln" id="L573">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;in_use {</span>
-<span class="ln" id="L574">        report.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L575">            <span class="tok-str">&quot;left {} in place: this program is running from it, and a running \</span></span>
-<span class="ln" id="L576"><span class="tok-str">             program cannot delete itself. Remove that file by hand.&quot;</span>,</span>
-<span class="ln" id="L577">            path.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L578">        ));</span>
-<span class="ln" id="L579">    }</span>
-<span class="ln" id="L580"></span>
-<span class="ln" id="L581">    <span class="tok-com">// VeilVoice&#x27;s own directory, which is a different one everywhere but</span></span>
-<span class="ln" id="L582">    <span class="tok-com">// Windows, and which it created. Only this directory may go whole.</span></span>
-<span class="ln" id="L583">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(owned) = <span class="tok-fn">removable_prefix</span>() {</span>
-<span class="ln" id="L584">        <span class="tok-com">// On Windows that is the directory the binaries were just in, so a</span></span>
-<span class="ln" id="L585">        <span class="tok-com">// program still running from it has already been reported and there is</span></span>
-<span class="ln" id="L586">        <span class="tok-com">// nothing to add by failing to delete the folder around it.</span></span>
-<span class="ln" id="L587">        <span class="tok-kw">let</span> already_said = !in_use.<span class="tok-fn">is_empty</span>() &amp;&amp; owned == dir;</span>
-<span class="ln" id="L588">        <span class="tok-kw">if</span> owned.<span class="tok-fn">exists</span>() &amp;&amp; !already_said {</span>
-<span class="ln" id="L589">            <span class="tok-kw">match</span> std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;owned) {</span>
-<span class="ln" id="L590">                <span class="tok-fn">Ok</span>(()) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;removed {}&quot;</span>, owned.<span class="tok-fn">display</span>())),</span>
-<span class="ln" id="L591">                <span class="tok-com">// Not fatal. The binaries are gone, `PATH` is clean and the</span></span>
-<span class="ln" id="L592">                <span class="tok-com">// uninstall entry is gone; failing the whole operation over a</span></span>
-<span class="ln" id="L593">                <span class="tok-com">// data directory would leave somebody with a half-removed</span></span>
-<span class="ln" id="L594">                <span class="tok-com">// program and an error they cannot act on.</span></span>
-<span class="ln" id="L595">                <span class="tok-fn">Err</span>(e) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;could not remove {}: {e}&quot;</span>, owned.<span class="tok-fn">display</span>())),</span>
-<span class="ln" id="L596">            }</span>
-<span class="ln" id="L597">        }</span>
-<span class="ln" id="L598">    }</span>
-<span class="ln" id="L599"></span>
-<span class="ln" id="L600">    <span class="tok-fn">Ok</span>(report)</span>
-<span class="ln" id="L601">}</span>
+<span class="ln" id="L558">    <span class="tok-kw">match</span> <span class="tok-fn">remove_from_path</span>(&amp;dir) {</span>
+<span class="ln" id="L559">        <span class="tok-fn">Ok</span>(true) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;removed {} from your PATH&quot;</span>, dir.<span class="tok-fn">display</span>())),</span>
+<span class="ln" id="L560">        <span class="tok-fn">Ok</span>(false) =&gt; report.<span class="tok-fn">push</span>(<span class="tok-str">&quot;PATH did not mention it&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L561">        <span class="tok-fn">Err</span>(error) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;PATH was not changed: {error}&quot;</span>)),</span>
+<span class="ln" id="L562">    }</span>
+<span class="ln" id="L563"></span>
+<span class="ln" id="L564">    <span class="tok-fn">unregister_uninstall</span>()?;</span>
+<span class="ln" id="L565"></span>
+<span class="ln" id="L566">    <span class="tok-com">// The binaries, by name. See `remove_programs` for why this is not a</span></span>
+<span class="ln" id="L567">    <span class="tok-com">// recursive delete of the directory they are in.</span></span>
+<span class="ln" id="L568">    <span class="tok-kw">let</span> running = std::env::<span class="tok-fn">current_exe</span>().<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L569">    <span class="tok-kw">let</span> (removed, in_use) = <span class="tok-fn">remove_programs</span>(&amp;dir, running.<span class="tok-fn">as_deref</span>())?;</span>
+<span class="ln" id="L570">    <span class="tok-kw">if</span> removed.<span class="tok-fn">is_empty</span>() &amp;&amp; in_use.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L571">        report.<span class="tok-fn">push</span>(<span class="tok-str">&quot;nothing was installed&quot;</span>.<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L572">    } <span class="tok-kw">else</span> <span class="tok-kw">if</span> !removed.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L573">        report.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L574">            <span class="tok-str">&quot;removed {} from {}&quot;</span>,</span>
+<span class="ln" id="L575">            removed.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>),</span>
+<span class="ln" id="L576">            dir.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L577">        ));</span>
+<span class="ln" id="L578">    }</span>
+<span class="ln" id="L579">    <span class="tok-kw">for</span> path <span class="tok-kw">in</span> &amp;in_use {</span>
+<span class="ln" id="L580">        report.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L581">            <span class="tok-str">&quot;left {} in place: this program is running from it, and a running \</span></span>
+<span class="ln" id="L582"><span class="tok-str">             program cannot delete itself. Remove that file by hand.&quot;</span>,</span>
+<span class="ln" id="L583">            path.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L584">        ));</span>
+<span class="ln" id="L585">    }</span>
+<span class="ln" id="L586"></span>
+<span class="ln" id="L587">    <span class="tok-com">// VeilVoice&#x27;s own directory, which is a different one everywhere but</span></span>
+<span class="ln" id="L588">    <span class="tok-com">// Windows, and which it created. Only this directory may go whole.</span></span>
+<span class="ln" id="L589">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(owned) = <span class="tok-fn">removable_prefix</span>() {</span>
+<span class="ln" id="L590">        <span class="tok-com">// On Windows that is the directory the binaries were just in, so a</span></span>
+<span class="ln" id="L591">        <span class="tok-com">// program still running from it has already been reported and there is</span></span>
+<span class="ln" id="L592">        <span class="tok-com">// nothing to add by failing to delete the folder around it.</span></span>
+<span class="ln" id="L593">        <span class="tok-kw">let</span> already_said = !in_use.<span class="tok-fn">is_empty</span>() &amp;&amp; owned == dir;</span>
+<span class="ln" id="L594">        <span class="tok-kw">if</span> owned.<span class="tok-fn">exists</span>() &amp;&amp; !already_said {</span>
+<span class="ln" id="L595">            <span class="tok-kw">match</span> std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;owned) {</span>
+<span class="ln" id="L596">                <span class="tok-fn">Ok</span>(()) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;removed {}&quot;</span>, owned.<span class="tok-fn">display</span>())),</span>
+<span class="ln" id="L597">                <span class="tok-com">// Not fatal. The binaries are gone, `PATH` is clean and the</span></span>
+<span class="ln" id="L598">                <span class="tok-com">// uninstall entry is gone; failing the whole operation over a</span></span>
+<span class="ln" id="L599">                <span class="tok-com">// data directory would leave somebody with a half-removed</span></span>
+<span class="ln" id="L600">                <span class="tok-com">// program and an error they cannot act on.</span></span>
+<span class="ln" id="L601">                <span class="tok-fn">Err</span>(e) =&gt; report.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;could not remove {}: {e}&quot;</span>, owned.<span class="tok-fn">display</span>())),</span>
+<span class="ln" id="L602">            }</span>
+<span class="ln" id="L603">        }</span>
+<span class="ln" id="L604">    }</span>
+<span class="ln" id="L605"></span>
+<span class="ln" id="L606">    <span class="tok-fn">Ok</span>(report)</span>
+<span class="ln" id="L607">}</span>
 </span>
-<span class="ln" id="L602"></span>
+<span class="ln" id="L608"></span>
 <span class="src-item" id="fn-remove_programs">
-<span class="ln" id="L603"><span class="tok-com">/// Remove the programs `install` wrote, by name, and say which are still in</span></span>
-<span class="ln" id="L604"><span class="tok-com">/// use.</span></span>
-<span class="ln" id="L605"><span class="tok-com">///</span></span>
-<span class="ln" id="L606"><span class="tok-com">/// **By name, never as a directory.** On every platform but Windows the</span></span>
-<span class="ln" id="L607"><span class="tok-com">/// binaries live in `~/.local/bin`, which belongs to the user and holds other</span></span>
-<span class="ln" id="L608"><span class="tok-com">/// programs&#x27; binaries too. A `remove_dir_all` there would take every one of</span></span>
-<span class="ln" id="L609"><span class="tok-com">/// them, during an uninstall, which is the moment somebody is least likely to</span></span>
-<span class="ln" id="L610"><span class="tok-com">/// be watching closely. The previous version of this function did exactly that</span></span>
-<span class="ln" id="L611"><span class="tok-com">/// to [`prefix`], and it was only ever safe because `prefix` happened not to be</span></span>
-<span class="ln" id="L612"><span class="tok-com">/// a shared directory: one line moving the binaries to where they belonged</span></span>
-<span class="ln" id="L613"><span class="tok-com">/// would have turned it into a command that empties `~/.local/bin`. That is</span></span>
-<span class="ln" id="L614"><span class="tok-com">/// half of F-214, and the answer is a function that cannot do it rather</span></span>
-<span class="ln" id="L615"><span class="tok-com">/// than a comment asking the next person not to.</span></span>
-<span class="ln" id="L616"><span class="tok-com">///</span></span>
-<span class="ln" id="L617"><span class="tok-com">/// A file that is the running program is reported rather than deleted: Windows</span></span>
-<span class="ln" id="L618"><span class="tok-com">/// will not unlink a running executable, and the honest report is which file is</span></span>
-<span class="ln" id="L619"><span class="tok-com">/// still there and why.</span></span>
-<span class="ln" id="L620"><span class="tok-kw">fn</span> <span class="tok-fn">remove_programs</span>(</span>
-<span class="ln" id="L621">    dir: &amp;Path,</span>
-<span class="ln" id="L622">    running: Option&lt;&amp;Path&gt;,</span>
-<span class="ln" id="L623">) -&gt; Result&lt;(Vec&lt;String&gt;, Vec&lt;PathBuf&gt;), String&gt; {</span>
-<span class="ln" id="L624">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> removed = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L625">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> in_use = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L626">    <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> PROGRAMS {</span>
-<span class="ln" id="L627">        <span class="tok-kw">let</span> name = <span class="tok-fn">exe_name</span>(stem);</span>
-<span class="ln" id="L628">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(&amp;name);</span>
-<span class="ln" id="L629">        <span class="tok-kw">if</span> !path.<span class="tok-fn">exists</span>() {</span>
-<span class="ln" id="L630">            continue;</span>
-<span class="ln" id="L631">        }</span>
-<span class="ln" id="L632">        <span class="tok-kw">if</span> running == <span class="tok-fn">Some</span>(path.<span class="tok-fn">as_path</span>()) {</span>
-<span class="ln" id="L633">            in_use.<span class="tok-fn">push</span>(path);</span>
-<span class="ln" id="L634">            continue;</span>
-<span class="ln" id="L635">        }</span>
-<span class="ln" id="L636">        <span class="tok-kw">match</span> std::fs::<span class="tok-fn">remove_file</span>(&amp;path) {</span>
-<span class="ln" id="L637">            <span class="tok-fn">Ok</span>(()) =&gt; removed.<span class="tok-fn">push</span>(name),</span>
-<span class="ln" id="L638">            <span class="tok-com">// Anything else is a real failure and is reported as one: a</span></span>
-<span class="ln" id="L639">            <span class="tok-com">// binary left behind is a `veilvoice` that still runs after an</span></span>
-<span class="ln" id="L640">            <span class="tok-com">// uninstall said it was gone.</span></span>
-<span class="ln" id="L641">            <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;could not remove {}: {e}&quot;</span>, path.<span class="tok-fn">display</span>())),</span>
-<span class="ln" id="L642">        }</span>
-<span class="ln" id="L643">    }</span>
-<span class="ln" id="L644">    <span class="tok-fn">Ok</span>((removed, in_use))</span>
-<span class="ln" id="L645">}</span>
+<span class="ln" id="L609"><span class="tok-com">/// Remove the programs `install` wrote, by name, and say which are still in</span></span>
+<span class="ln" id="L610"><span class="tok-com">/// use.</span></span>
+<span class="ln" id="L611"><span class="tok-com">///</span></span>
+<span class="ln" id="L612"><span class="tok-com">/// **By name, never as a directory.** On every platform but Windows the</span></span>
+<span class="ln" id="L613"><span class="tok-com">/// binaries live in `~/.local/bin`, which belongs to the user and holds other</span></span>
+<span class="ln" id="L614"><span class="tok-com">/// programs&#x27; binaries too. A `remove_dir_all` there would take every one of</span></span>
+<span class="ln" id="L615"><span class="tok-com">/// them, during an uninstall, which is the moment somebody is least likely to</span></span>
+<span class="ln" id="L616"><span class="tok-com">/// be watching closely. The previous version of this function did exactly that</span></span>
+<span class="ln" id="L617"><span class="tok-com">/// to [`prefix`], and it was only ever safe because `prefix` happened not to be</span></span>
+<span class="ln" id="L618"><span class="tok-com">/// a shared directory: one line moving the binaries to where they belonged</span></span>
+<span class="ln" id="L619"><span class="tok-com">/// would have turned it into a command that empties `~/.local/bin`. That is</span></span>
+<span class="ln" id="L620"><span class="tok-com">/// half of F-214, and the answer is a function that cannot do it rather</span></span>
+<span class="ln" id="L621"><span class="tok-com">/// than a comment asking the next person not to.</span></span>
+<span class="ln" id="L622"><span class="tok-com">///</span></span>
+<span class="ln" id="L623"><span class="tok-com">/// A file that is the running program is reported rather than deleted: Windows</span></span>
+<span class="ln" id="L624"><span class="tok-com">/// will not unlink a running executable, and the honest report is which file is</span></span>
+<span class="ln" id="L625"><span class="tok-com">/// still there and why.</span></span>
+<span class="ln" id="L626"><span class="tok-kw">fn</span> <span class="tok-fn">remove_programs</span>(</span>
+<span class="ln" id="L627">    dir: &amp;Path,</span>
+<span class="ln" id="L628">    running: Option&lt;&amp;Path&gt;,</span>
+<span class="ln" id="L629">) -&gt; Result&lt;(Vec&lt;String&gt;, Vec&lt;PathBuf&gt;), String&gt; {</span>
+<span class="ln" id="L630">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> removed = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L631">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> in_use = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L632">    <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> PROGRAMS {</span>
+<span class="ln" id="L633">        <span class="tok-kw">let</span> name = <span class="tok-fn">exe_name</span>(stem);</span>
+<span class="ln" id="L634">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(&amp;name);</span>
+<span class="ln" id="L635">        <span class="tok-kw">if</span> !path.<span class="tok-fn">exists</span>() {</span>
+<span class="ln" id="L636">            continue;</span>
+<span class="ln" id="L637">        }</span>
+<span class="ln" id="L638">        <span class="tok-kw">if</span> running == <span class="tok-fn">Some</span>(path.<span class="tok-fn">as_path</span>()) {</span>
+<span class="ln" id="L639">            in_use.<span class="tok-fn">push</span>(path);</span>
+<span class="ln" id="L640">            continue;</span>
+<span class="ln" id="L641">        }</span>
+<span class="ln" id="L642">        <span class="tok-kw">match</span> std::fs::<span class="tok-fn">remove_file</span>(&amp;path) {</span>
+<span class="ln" id="L643">            <span class="tok-fn">Ok</span>(()) =&gt; removed.<span class="tok-fn">push</span>(name),</span>
+<span class="ln" id="L644">            <span class="tok-com">// Anything else is a real failure and is reported as one: a</span></span>
+<span class="ln" id="L645">            <span class="tok-com">// binary left behind is a `veilvoice` that still runs after an</span></span>
+<span class="ln" id="L646">            <span class="tok-com">// uninstall said it was gone.</span></span>
+<span class="ln" id="L647">            <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;could not remove {}: {e}&quot;</span>, path.<span class="tok-fn">display</span>())),</span>
+<span class="ln" id="L648">        }</span>
+<span class="ln" id="L649">    }</span>
+<span class="ln" id="L650">    <span class="tok-fn">Ok</span>((removed, in_use))</span>
+<span class="ln" id="L651">}</span>
 </span>
-<span class="ln" id="L646"></span>
+<span class="ln" id="L652"></span>
 <span class="src-item" id="fn-removable_prefix">
-<span class="ln" id="L647"><span class="tok-com">/// [`prefix`], but only when it is genuinely a directory VeilVoice made for</span></span>
-<span class="ln" id="L648"><span class="tok-com">/// itself.</span></span>
-<span class="ln" id="L649"><span class="tok-com">///</span></span>
-<span class="ln" id="L650"><span class="tok-com">/// The check is the point rather than paranoia. `remove_dir_all` is the one</span></span>
-<span class="ln" id="L651"><span class="tok-com">/// call in this crate that can destroy something a user cares about, and it is</span></span>
-<span class="ln" id="L652"><span class="tok-com">/// reached during an uninstall, so it is given a directory that has passed two</span></span>
-<span class="ln" id="L653"><span class="tok-com">/// tests: it is not the directory the binaries live in, and its last component</span></span>
-<span class="ln" id="L654"><span class="tok-com">/// names VeilVoice. Either one alone would have been enough to stop</span></span>
-<span class="ln" id="L655"><span class="tok-com">/// F-214 turning into a command that empties `~/.local/bin`; both are</span></span>
-<span class="ln" id="L656"><span class="tok-com">/// here because the cost of the check is nothing and the cost of being wrong</span></span>
-<span class="ln" id="L657"><span class="tok-com">/// is somebody&#x27;s machine.</span></span>
-<span class="ln" id="L658"><span class="tok-kw">fn</span> <span class="tok-fn">removable_prefix</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L659">    <span class="tok-kw">let</span> owned = <span class="tok-fn">prefix</span>()?;</span>
-<span class="ln" id="L660">    <span class="tok-kw">if</span> <span class="tok-fn">Some</span>(&amp;owned) == <span class="tok-fn">bin_dir</span>().<span class="tok-fn">as_ref</span>() &amp;&amp; !cfg!(windows) {</span>
-<span class="ln" id="L661">        <span class="tok-com">// On Windows these are deliberately the same directory, and it is</span></span>
-<span class="ln" id="L662">        <span class="tok-com">// VeilVoice&#x27;s own, so the equality is not a warning there.</span></span>
-<span class="ln" id="L663">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L664">    }</span>
-<span class="ln" id="L665">    <span class="tok-kw">let</span> last = owned.<span class="tok-fn">file_name</span>()?.<span class="tok-fn">to_str</span>()?.<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L666">    <span class="tok-kw">if</span> !last.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice&quot;</span>) {</span>
-<span class="ln" id="L667">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L668">    }</span>
-<span class="ln" id="L669">    <span class="tok-fn">Some</span>(owned)</span>
-<span class="ln" id="L670">}</span>
+<span class="ln" id="L653"><span class="tok-com">/// [`prefix`], but only when it is genuinely a directory VeilVoice made for</span></span>
+<span class="ln" id="L654"><span class="tok-com">/// itself.</span></span>
+<span class="ln" id="L655"><span class="tok-com">///</span></span>
+<span class="ln" id="L656"><span class="tok-com">/// The check is the point rather than paranoia. `remove_dir_all` is the one</span></span>
+<span class="ln" id="L657"><span class="tok-com">/// call in this crate that can destroy something a user cares about, and it is</span></span>
+<span class="ln" id="L658"><span class="tok-com">/// reached during an uninstall, so it is given a directory that has passed two</span></span>
+<span class="ln" id="L659"><span class="tok-com">/// tests: it is not the directory the binaries live in, and its last component</span></span>
+<span class="ln" id="L660"><span class="tok-com">/// names VeilVoice. Either one alone would have been enough to stop</span></span>
+<span class="ln" id="L661"><span class="tok-com">/// F-214 turning into a command that empties `~/.local/bin`; both are</span></span>
+<span class="ln" id="L662"><span class="tok-com">/// here because the cost of the check is nothing and the cost of being wrong</span></span>
+<span class="ln" id="L663"><span class="tok-com">/// is somebody&#x27;s machine.</span></span>
+<span class="ln" id="L664"><span class="tok-kw">fn</span> <span class="tok-fn">removable_prefix</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L665">    <span class="tok-kw">let</span> owned = <span class="tok-fn">prefix</span>()?;</span>
+<span class="ln" id="L666">    <span class="tok-kw">if</span> <span class="tok-fn">Some</span>(&amp;owned) == <span class="tok-fn">bin_dir</span>().<span class="tok-fn">as_ref</span>() &amp;&amp; !cfg!(windows) {</span>
+<span class="ln" id="L667">        <span class="tok-com">// On Windows these are deliberately the same directory, and it is</span></span>
+<span class="ln" id="L668">        <span class="tok-com">// VeilVoice&#x27;s own, so the equality is not a warning there.</span></span>
+<span class="ln" id="L669">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L670">    }</span>
+<span class="ln" id="L671">    <span class="tok-kw">let</span> last = owned.<span class="tok-fn">file_name</span>()?.<span class="tok-fn">to_str</span>()?.<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L672">    <span class="tok-kw">if</span> !last.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice&quot;</span>) {</span>
+<span class="ln" id="L673">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L674">    }</span>
+<span class="ln" id="L675">    <span class="tok-fn">Some</span>(owned)</span>
+<span class="ln" id="L676">}</span>
 </span>
-<span class="ln" id="L671"></span>
-<span class="ln" id="L672"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L673"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L674">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L675"></span>
-<span class="ln" id="L676">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L677">    <span class="tok-kw">fn</span> <span class="tok-fn">a_prefix_is_found_on_this_platform</span>() {</span>
-<span class="ln" id="L678">        assert!(</span>
-<span class="ln" id="L679">            <span class="tok-fn">prefix</span>().<span class="tok-fn">is_some</span>(),</span>
-<span class="ln" id="L680">            <span class="tok-str">&quot;no per-user program directory was resolved&quot;</span></span>
-<span class="ln" id="L681">        );</span>
-<span class="ln" id="L682">    }</span>
-<span class="ln" id="L683"></span>
-<span class="ln" id="L684">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L685">    <span class="tok-kw">fn</span> <span class="tok-fn">status_reads_without_changing_anything</span>() {</span>
-<span class="ln" id="L686">        <span class="tok-com">// Called twice: the second must see exactly what the first did, or</span></span>
-<span class="ln" id="L687">        <span class="tok-com">// reading the state is not free of side effects.</span></span>
-<span class="ln" id="L688">        <span class="tok-kw">let</span> first = <span class="tok-fn">status</span>();</span>
-<span class="ln" id="L689">        <span class="tok-kw">let</span> second = <span class="tok-fn">status</span>();</span>
-<span class="ln" id="L690">        assert_eq!(first.installed, second.installed);</span>
-<span class="ln" id="L691">        assert_eq!(first.on_path, second.on_path);</span>
-<span class="ln" id="L692">        assert_eq!(first.prefix, second.prefix);</span>
-<span class="ln" id="L693">    }</span>
-<span class="ln" id="L694"></span>
-<span class="ln" id="L695">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L696">    <span class="tok-kw">fn</span> <span class="tok-fn">the_executable_name_matches_the_platform</span>() {</span>
-<span class="ln" id="L697">        <span class="tok-kw">let</span> name = <span class="tok-fn">exe_name</span>(<span class="tok-str">&quot;veilvoice&quot;</span>);</span>
-<span class="ln" id="L698">        <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L699">            assert_eq!(name, <span class="tok-str">&quot;veilvoice.exe&quot;</span>);</span>
-<span class="ln" id="L700">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L701">            assert_eq!(name, <span class="tok-str">&quot;veilvoice&quot;</span>);</span>
-<span class="ln" id="L702">        }</span>
-<span class="ln" id="L703">    }</span>
-<span class="ln" id="L704"></span>
-<span class="ln" id="L705">    <span class="tok-com">/// **F-214, the half that could have damaged a machine.**</span></span>
-<span class="ln" id="L706">    <span class="tok-com">///</span></span>
-<span class="ln" id="L707">    <span class="tok-com">/// `uninstall` removes the programs it wrote **by name** and leaves</span></span>
-<span class="ln" id="L708">    <span class="tok-com">/// everything else in the directory alone. The directory the binaries live</span></span>
-<span class="ln" id="L709">    <span class="tok-com">/// in is `~/.local/bin` on every platform but Windows, and that belongs to</span></span>
-<span class="ln" id="L710">    <span class="tok-com">/// the user: it holds whatever else they have installed. The previous</span></span>
-<span class="ln" id="L711">    <span class="tok-com">/// version removed a directory recursively, and was safe only because it</span></span>
-<span class="ln" id="L712">    <span class="tok-com">/// happened to be pointed at a directory nobody else wrote to.</span></span>
-<span class="ln" id="L713">    <span class="tok-com">///</span></span>
-<span class="ln" id="L714">    <span class="tok-com">/// Written against `remove_programs` directly rather than `uninstall`,</span></span>
-<span class="ln" id="L715">    <span class="tok-com">/// because `uninstall` reads the real environment and a test that could</span></span>
-<span class="ln" id="L716">    <span class="tok-com">/// empty the developer&#x27;s own `~/.local/bin` is not a test worth having.</span></span>
-<span class="ln" id="L717">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L718">    <span class="tok-kw">fn</span> <span class="tok-fn">uninstalling_removes_its_own_files_and_nothing_else</span>() {</span>
-<span class="ln" id="L719">        <span class="tok-kw">let</span> dir = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(</span>
-<span class="ln" id="L720">            <span class="tok-str">&quot;veilvoice-uninstall-{:x}&quot;</span>,</span>
-<span class="ln" id="L721">            std::time::SystemTime::<span class="tok-fn">now</span>()</span>
-<span class="ln" id="L722">                .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
-<span class="ln" id="L723">                .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
-<span class="ln" id="L724">                .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L725">        ));</span>
-<span class="ln" id="L726">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dir).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L727"></span>
-<span class="ln" id="L728">        <span class="tok-com">// What VeilVoice put there, and what somebody else did.</span></span>
-<span class="ln" id="L729">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> PROGRAMS {</span>
-<span class="ln" id="L730">            std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(stem)), b<span class="tok-str">&quot;ours&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L731">        }</span>
-<span class="ln" id="L732">        <span class="tok-kw">let</span> theirs = [<span class="tok-str">&quot;ripgrep&quot;</span>, <span class="tok-str">&quot;fd&quot;</span>, <span class="tok-str">&quot;a-script-somebody-wrote&quot;</span>];</span>
-<span class="ln" id="L733">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> theirs {</span>
-<span class="ln" id="L734">            std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">join</span>(name), b<span class="tok-str">&quot;not ours&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L735">        }</span>
-<span class="ln" id="L736">        std::fs::<span class="tok-fn">create_dir</span>(dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;a-directory-of-their-own&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L737"></span>
-<span class="ln" id="L738">        <span class="tok-kw">let</span> (removed, in_use) = <span class="tok-fn">remove_programs</span>(&amp;dir, None).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it removes&quot;</span>);</span>
-<span class="ln" id="L739">        assert_eq!(removed.<span class="tok-fn">len</span>(), PROGRAMS.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;{removed:?}&quot;</span>);</span>
-<span class="ln" id="L740">        assert!(in_use.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L741"></span>
-<span class="ln" id="L742">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> PROGRAMS {</span>
-<span class="ln" id="L743">            assert!(!dir.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(stem)).<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;{stem} was not removed&quot;</span>);</span>
-<span class="ln" id="L744">        }</span>
-<span class="ln" id="L745">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> theirs {</span>
-<span class="ln" id="L746">            assert!(</span>
-<span class="ln" id="L747">                dir.<span class="tok-fn">join</span>(name).<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L748">                <span class="tok-str">&quot;uninstalling VeilVoice removed {name}, which is not VeilVoice&quot;</span></span>
-<span class="ln" id="L749">            );</span>
+<span class="ln" id="L677"></span>
+<span class="ln" id="L678"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L679"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L680">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L681"></span>
+<span class="ln" id="L682">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L683">    <span class="tok-kw">fn</span> <span class="tok-fn">a_prefix_is_found_on_this_platform</span>() {</span>
+<span class="ln" id="L684">        assert!(</span>
+<span class="ln" id="L685">            <span class="tok-fn">prefix</span>().<span class="tok-fn">is_some</span>(),</span>
+<span class="ln" id="L686">            <span class="tok-str">&quot;no per-user program directory was resolved&quot;</span></span>
+<span class="ln" id="L687">        );</span>
+<span class="ln" id="L688">    }</span>
+<span class="ln" id="L689"></span>
+<span class="ln" id="L690">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L691">    <span class="tok-kw">fn</span> <span class="tok-fn">status_reads_without_changing_anything</span>() {</span>
+<span class="ln" id="L692">        <span class="tok-com">// Called twice: the second must see exactly what the first did, or</span></span>
+<span class="ln" id="L693">        <span class="tok-com">// reading the state is not free of side effects.</span></span>
+<span class="ln" id="L694">        <span class="tok-kw">let</span> first = <span class="tok-fn">status</span>();</span>
+<span class="ln" id="L695">        <span class="tok-kw">let</span> second = <span class="tok-fn">status</span>();</span>
+<span class="ln" id="L696">        assert_eq!(first.installed, second.installed);</span>
+<span class="ln" id="L697">        assert_eq!(first.on_path, second.on_path);</span>
+<span class="ln" id="L698">        assert_eq!(first.prefix, second.prefix);</span>
+<span class="ln" id="L699">    }</span>
+<span class="ln" id="L700"></span>
+<span class="ln" id="L701">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L702">    <span class="tok-kw">fn</span> <span class="tok-fn">the_executable_name_matches_the_platform</span>() {</span>
+<span class="ln" id="L703">        <span class="tok-kw">let</span> name = <span class="tok-fn">exe_name</span>(<span class="tok-str">&quot;veilvoice&quot;</span>);</span>
+<span class="ln" id="L704">        <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L705">            assert_eq!(name, <span class="tok-str">&quot;veilvoice.exe&quot;</span>);</span>
+<span class="ln" id="L706">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L707">            assert_eq!(name, <span class="tok-str">&quot;veilvoice&quot;</span>);</span>
+<span class="ln" id="L708">        }</span>
+<span class="ln" id="L709">    }</span>
+<span class="ln" id="L710"></span>
+<span class="ln" id="L711">    <span class="tok-com">/// **F-214, the half that could have damaged a machine.**</span></span>
+<span class="ln" id="L712">    <span class="tok-com">///</span></span>
+<span class="ln" id="L713">    <span class="tok-com">/// `uninstall` removes the programs it wrote **by name** and leaves</span></span>
+<span class="ln" id="L714">    <span class="tok-com">/// everything else in the directory alone. The directory the binaries live</span></span>
+<span class="ln" id="L715">    <span class="tok-com">/// in is `~/.local/bin` on every platform but Windows, and that belongs to</span></span>
+<span class="ln" id="L716">    <span class="tok-com">/// the user: it holds whatever else they have installed. The previous</span></span>
+<span class="ln" id="L717">    <span class="tok-com">/// version removed a directory recursively, and was safe only because it</span></span>
+<span class="ln" id="L718">    <span class="tok-com">/// happened to be pointed at a directory nobody else wrote to.</span></span>
+<span class="ln" id="L719">    <span class="tok-com">///</span></span>
+<span class="ln" id="L720">    <span class="tok-com">/// Written against `remove_programs` directly rather than `uninstall`,</span></span>
+<span class="ln" id="L721">    <span class="tok-com">/// because `uninstall` reads the real environment and a test that could</span></span>
+<span class="ln" id="L722">    <span class="tok-com">/// empty the developer&#x27;s own `~/.local/bin` is not a test worth having.</span></span>
+<span class="ln" id="L723">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L724">    <span class="tok-kw">fn</span> <span class="tok-fn">uninstalling_removes_its_own_files_and_nothing_else</span>() {</span>
+<span class="ln" id="L725">        <span class="tok-kw">let</span> dir = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(</span>
+<span class="ln" id="L726">            <span class="tok-str">&quot;veilvoice-uninstall-{:x}&quot;</span>,</span>
+<span class="ln" id="L727">            std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L728">                .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L729">                .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
+<span class="ln" id="L730">                .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L731">        ));</span>
+<span class="ln" id="L732">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dir).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L733"></span>
+<span class="ln" id="L734">        <span class="tok-com">// What VeilVoice put there, and what somebody else did.</span></span>
+<span class="ln" id="L735">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> PROGRAMS {</span>
+<span class="ln" id="L736">            std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(stem)), b<span class="tok-str">&quot;ours&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L737">        }</span>
+<span class="ln" id="L738">        <span class="tok-kw">let</span> theirs = [<span class="tok-str">&quot;ripgrep&quot;</span>, <span class="tok-str">&quot;fd&quot;</span>, <span class="tok-str">&quot;a-script-somebody-wrote&quot;</span>];</span>
+<span class="ln" id="L739">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> theirs {</span>
+<span class="ln" id="L740">            std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">join</span>(name), b<span class="tok-str">&quot;not ours&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L741">        }</span>
+<span class="ln" id="L742">        std::fs::<span class="tok-fn">create_dir</span>(dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;a-directory-of-their-own&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L743"></span>
+<span class="ln" id="L744">        <span class="tok-kw">let</span> (removed, in_use) = <span class="tok-fn">remove_programs</span>(&amp;dir, None).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it removes&quot;</span>);</span>
+<span class="ln" id="L745">        assert_eq!(removed.<span class="tok-fn">len</span>(), PROGRAMS.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;{removed:?}&quot;</span>);</span>
+<span class="ln" id="L746">        assert!(in_use.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L747"></span>
+<span class="ln" id="L748">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> PROGRAMS {</span>
+<span class="ln" id="L749">            assert!(!dir.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(stem)).<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;{stem} was not removed&quot;</span>);</span>
 <span class="ln" id="L750">        }</span>
-<span class="ln" id="L751">        assert!(</span>
-<span class="ln" id="L752">            dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;a-directory-of-their-own&quot;</span>).<span class="tok-fn">is_dir</span>(),</span>
-<span class="ln" id="L753">            <span class="tok-str">&quot;uninstalling VeilVoice removed a directory that was not its own&quot;</span></span>
-<span class="ln" id="L754">        );</span>
-<span class="ln" id="L755">        assert!(</span>
-<span class="ln" id="L756">            dir.<span class="tok-fn">is_dir</span>(),</span>
-<span class="ln" id="L757">            <span class="tok-str">&quot;uninstalling VeilVoice removed the directory itself&quot;</span></span>
-<span class="ln" id="L758">        );</span>
-<span class="ln" id="L759"></span>
-<span class="ln" id="L760">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;dir).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L761">    }</span>
-<span class="ln" id="L762"></span>
-<span class="ln" id="L763">    <span class="tok-com">/// The running program is reported rather than deleted, and nothing else</span></span>
-<span class="ln" id="L764">    <span class="tok-com">/// is skipped because of it.</span></span>
-<span class="ln" id="L765">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L766">    <span class="tok-kw">fn</span> <span class="tok-fn">the_running_program_is_left_and_named</span>() {</span>
-<span class="ln" id="L767">        <span class="tok-kw">let</span> dir = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(</span>
-<span class="ln" id="L768">            <span class="tok-str">&quot;veilvoice-uninstall-running-{:x}&quot;</span>,</span>
-<span class="ln" id="L769">            std::time::SystemTime::<span class="tok-fn">now</span>()</span>
-<span class="ln" id="L770">                .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
-<span class="ln" id="L771">                .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
-<span class="ln" id="L772">                .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>)</span>
-<span class="ln" id="L773">        ));</span>
-<span class="ln" id="L774">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dir).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L775">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> PROGRAMS {</span>
-<span class="ln" id="L776">            std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(stem)), b<span class="tok-str">&quot;ours&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L777">        }</span>
-<span class="ln" id="L778">        <span class="tok-kw">let</span> running = dir.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(PROGRAMS[<span class="tok-num">0</span>]));</span>
-<span class="ln" id="L779"></span>
-<span class="ln" id="L780">        <span class="tok-kw">let</span> (removed, in_use) = <span class="tok-fn">remove_programs</span>(&amp;dir, <span class="tok-fn">Some</span>(&amp;running)).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it removes&quot;</span>);</span>
-<span class="ln" id="L781">        assert_eq!(in_use, vec![running.<span class="tok-fn">clone</span>()]);</span>
-<span class="ln" id="L782">        assert!(running.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the running program was deleted&quot;</span>);</span>
-<span class="ln" id="L783">        assert_eq!(</span>
-<span class="ln" id="L784">            removed.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L785">            PROGRAMS.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>,</span>
-<span class="ln" id="L786">            <span class="tok-str">&quot;the others should still go: {removed:?}&quot;</span></span>
-<span class="ln" id="L787">        );</span>
-<span class="ln" id="L788">    }</span>
-<span class="ln" id="L789"></span>
-<span class="ln" id="L790">    <span class="tok-com">/// The one recursive delete in this crate is only ever given a directory</span></span>
-<span class="ln" id="L791">    <span class="tok-com">/// VeilVoice made for itself.</span></span>
-<span class="ln" id="L792">    <span class="tok-com">///</span></span>
-<span class="ln" id="L793">    <span class="tok-com">/// The guard is what keeps F-214 from being able to come back as</span></span>
-<span class="ln" id="L794">    <span class="tok-com">/// something much worse than an install that did not work. If `prefix` is</span></span>
-<span class="ln" id="L795">    <span class="tok-com">/// ever pointed at the directory the binaries live in, on a platform where</span></span>
-<span class="ln" id="L796">    <span class="tok-com">/// that directory is shared, this returns `None` and the recursive delete</span></span>
-<span class="ln" id="L797">    <span class="tok-com">/// does not happen at all.</span></span>
-<span class="ln" id="L798">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L799">    <span class="tok-kw">fn</span> <span class="tok-fn">only_a_directory_named_for_veilvoice_may_be_removed_whole</span>() {</span>
-<span class="ln" id="L800">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(owned) = <span class="tok-fn">removable_prefix</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L801">            <span class="tok-com">// Nothing will be removed recursively on this machine, which is the</span></span>
-<span class="ln" id="L802">            <span class="tok-com">// safe answer and not a failure.</span></span>
-<span class="ln" id="L803">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L804">        };</span>
-<span class="ln" id="L805">        <span class="tok-kw">let</span> last = owned</span>
-<span class="ln" id="L806">            .<span class="tok-fn">file_name</span>()</span>
-<span class="ln" id="L807">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a final component&quot;</span>)</span>
-<span class="ln" id="L808">            .<span class="tok-fn">to_str</span>()</span>
-<span class="ln" id="L809">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable name&quot;</span>)</span>
-<span class="ln" id="L810">            .<span class="tok-fn">to_ascii_lowercase</span>();</span>
-<span class="ln" id="L811">        assert!(</span>
-<span class="ln" id="L812">            last.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice&quot;</span>),</span>
-<span class="ln" id="L813">            <span class="tok-str">&quot;{} would be removed whole and is not VeilVoice&#x27;s own directory&quot;</span>,</span>
-<span class="ln" id="L814">            owned.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L815">        );</span>
-<span class="ln" id="L816">        <span class="tok-kw">if</span> !cfg!(windows) {</span>
-<span class="ln" id="L817">            assert_ne!(</span>
-<span class="ln" id="L818">                <span class="tok-fn">Some</span>(owned.<span class="tok-fn">clone</span>()),</span>
-<span class="ln" id="L819">                <span class="tok-fn">bin_dir</span>(),</span>
-<span class="ln" id="L820">                <span class="tok-str">&quot;the directory holding other programs&#x27; binaries must never be \</span></span>
-<span class="ln" id="L821"><span class="tok-str">                 removed whole&quot;</span></span>
-<span class="ln" id="L822">            );</span>
-<span class="ln" id="L823">        }</span>
-<span class="ln" id="L824">    }</span>
-<span class="ln" id="L825"></span>
-<span class="ln" id="L826">    <span class="tok-com">/// Everything `status` reports is about one directory, and it is the one</span></span>
-<span class="ln" id="L827">    <span class="tok-com">/// the binaries actually go into.</span></span>
-<span class="ln" id="L828">    <span class="tok-com">///</span></span>
-<span class="ln" id="L829">    <span class="tok-com">/// Three facts about three different places is what F-214 was:</span></span>
-<span class="ln" id="L830">    <span class="tok-com">/// `install` copied into one, added a second to `PATH`, and `status`</span></span>
-<span class="ln" id="L831">    <span class="tok-com">/// answered about a third, so an install that worked reported itself as an</span></span>
-<span class="ln" id="L832">    <span class="tok-com">/// install that had not happened.</span></span>
-<span class="ln" id="L833">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L834">    <span class="tok-kw">fn</span> <span class="tok-fn">everything_reported_is_about_the_directory_the_binaries_go_into</span>() {</span>
-<span class="ln" id="L835">        <span class="tok-kw">let</span> state = <span class="tok-fn">status</span>();</span>
-<span class="ln" id="L836">        assert_eq!(</span>
-<span class="ln" id="L837">            state.prefix,</span>
-<span class="ln" id="L838">            <span class="tok-fn">bin_dir</span>(),</span>
-<span class="ln" id="L839">            <span class="tok-str">&quot;status reports a directory the binaries are not copied into&quot;</span></span>
-<span class="ln" id="L840">        );</span>
-<span class="ln" id="L841">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(dir), <span class="tok-fn">Some</span>(from)) = (&amp;state.prefix, &amp;state.running_from) {</span>
-<span class="ln" id="L842">            assert_eq!(</span>
-<span class="ln" id="L843">                state.running_installed,</span>
-<span class="ln" id="L844">                from.<span class="tok-fn">parent</span>() == <span class="tok-fn">Some</span>(dir.<span class="tok-fn">as_path</span>()),</span>
-<span class="ln" id="L845">                <span class="tok-str">&quot;`running_installed` is answered about a different directory&quot;</span></span>
-<span class="ln" id="L846">            );</span>
-<span class="ln" id="L847">        }</span>
-<span class="ln" id="L848">    }</span>
-<span class="ln" id="L849"></span>
-<span class="ln" id="L850">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L851">    <span class="tok-kw">fn</span> <span class="tok-fn">path_membership_is_an_exact_directory_match</span>() {</span>
-<span class="ln" id="L852">        <span class="tok-com">// A prefix match would report `C:\Program Files\VeilVoiceOther` as</span></span>
-<span class="ln" id="L853">        <span class="tok-com">// VeilVoice being installed, and a substring match is worse again.</span></span>
-<span class="ln" id="L854">        <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>);</span>
-<span class="ln" id="L855">        <span class="tok-kw">if</span> path.<span class="tok-fn">is_none</span>() {</span>
-<span class="ln" id="L856">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L857">        }</span>
-<span class="ln" id="L858">        <span class="tok-kw">let</span> nonsense = PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;this-directory-is-not-on-anybody-s-path-42&quot;</span>);</span>
-<span class="ln" id="L859">        assert!(!<span class="tok-fn">path_contains</span>(&amp;nonsense));</span>
-<span class="ln" id="L860">    }</span>
-<span class="ln" id="L861">}</span>
+<span class="ln" id="L751">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> theirs {</span>
+<span class="ln" id="L752">            assert!(</span>
+<span class="ln" id="L753">                dir.<span class="tok-fn">join</span>(name).<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L754">                <span class="tok-str">&quot;uninstalling VeilVoice removed {name}, which is not VeilVoice&quot;</span></span>
+<span class="ln" id="L755">            );</span>
+<span class="ln" id="L756">        }</span>
+<span class="ln" id="L757">        assert!(</span>
+<span class="ln" id="L758">            dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;a-directory-of-their-own&quot;</span>).<span class="tok-fn">is_dir</span>(),</span>
+<span class="ln" id="L759">            <span class="tok-str">&quot;uninstalling VeilVoice removed a directory that was not its own&quot;</span></span>
+<span class="ln" id="L760">        );</span>
+<span class="ln" id="L761">        assert!(</span>
+<span class="ln" id="L762">            dir.<span class="tok-fn">is_dir</span>(),</span>
+<span class="ln" id="L763">            <span class="tok-str">&quot;uninstalling VeilVoice removed the directory itself&quot;</span></span>
+<span class="ln" id="L764">        );</span>
+<span class="ln" id="L765"></span>
+<span class="ln" id="L766">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;dir).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L767">    }</span>
+<span class="ln" id="L768"></span>
+<span class="ln" id="L769">    <span class="tok-com">/// The running program is reported rather than deleted, and nothing else</span></span>
+<span class="ln" id="L770">    <span class="tok-com">/// is skipped because of it.</span></span>
+<span class="ln" id="L771">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L772">    <span class="tok-kw">fn</span> <span class="tok-fn">the_running_program_is_left_and_named</span>() {</span>
+<span class="ln" id="L773">        <span class="tok-kw">let</span> dir = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(</span>
+<span class="ln" id="L774">            <span class="tok-str">&quot;veilvoice-uninstall-running-{:x}&quot;</span>,</span>
+<span class="ln" id="L775">            std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L776">                .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L777">                .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
+<span class="ln" id="L778">                .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>)</span>
+<span class="ln" id="L779">        ));</span>
+<span class="ln" id="L780">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dir).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L781">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> PROGRAMS {</span>
+<span class="ln" id="L782">            std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(stem)), b<span class="tok-str">&quot;ours&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L783">        }</span>
+<span class="ln" id="L784">        <span class="tok-kw">let</span> running = dir.<span class="tok-fn">join</span>(<span class="tok-fn">exe_name</span>(PROGRAMS[<span class="tok-num">0</span>]));</span>
+<span class="ln" id="L785"></span>
+<span class="ln" id="L786">        <span class="tok-kw">let</span> (removed, in_use) = <span class="tok-fn">remove_programs</span>(&amp;dir, <span class="tok-fn">Some</span>(&amp;running)).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it removes&quot;</span>);</span>
+<span class="ln" id="L787">        assert_eq!(in_use, vec![running.<span class="tok-fn">clone</span>()]);</span>
+<span class="ln" id="L788">        assert!(running.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;the running program was deleted&quot;</span>);</span>
+<span class="ln" id="L789">        assert_eq!(</span>
+<span class="ln" id="L790">            removed.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L791">            PROGRAMS.<span class="tok-fn">len</span>() - <span class="tok-num">1</span>,</span>
+<span class="ln" id="L792">            <span class="tok-str">&quot;the others should still go: {removed:?}&quot;</span></span>
+<span class="ln" id="L793">        );</span>
+<span class="ln" id="L794">    }</span>
+<span class="ln" id="L795"></span>
+<span class="ln" id="L796">    <span class="tok-com">/// The one recursive delete in this crate is only ever given a directory</span></span>
+<span class="ln" id="L797">    <span class="tok-com">/// VeilVoice made for itself.</span></span>
+<span class="ln" id="L798">    <span class="tok-com">///</span></span>
+<span class="ln" id="L799">    <span class="tok-com">/// The guard is what keeps F-214 from being able to come back as</span></span>
+<span class="ln" id="L800">    <span class="tok-com">/// something much worse than an install that did not work. If `prefix` is</span></span>
+<span class="ln" id="L801">    <span class="tok-com">/// ever pointed at the directory the binaries live in, on a platform where</span></span>
+<span class="ln" id="L802">    <span class="tok-com">/// that directory is shared, this returns `None` and the recursive delete</span></span>
+<span class="ln" id="L803">    <span class="tok-com">/// does not happen at all.</span></span>
+<span class="ln" id="L804">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L805">    <span class="tok-kw">fn</span> <span class="tok-fn">only_a_directory_named_for_veilvoice_may_be_removed_whole</span>() {</span>
+<span class="ln" id="L806">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(owned) = <span class="tok-fn">removable_prefix</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L807">            <span class="tok-com">// Nothing will be removed recursively on this machine, which is the</span></span>
+<span class="ln" id="L808">            <span class="tok-com">// safe answer and not a failure.</span></span>
+<span class="ln" id="L809">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L810">        };</span>
+<span class="ln" id="L811">        <span class="tok-kw">let</span> last = owned</span>
+<span class="ln" id="L812">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L813">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a final component&quot;</span>)</span>
+<span class="ln" id="L814">            .<span class="tok-fn">to_str</span>()</span>
+<span class="ln" id="L815">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a readable name&quot;</span>)</span>
+<span class="ln" id="L816">            .<span class="tok-fn">to_ascii_lowercase</span>();</span>
+<span class="ln" id="L817">        assert!(</span>
+<span class="ln" id="L818">            last.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice&quot;</span>),</span>
+<span class="ln" id="L819">            <span class="tok-str">&quot;{} would be removed whole and is not VeilVoice&#x27;s own directory&quot;</span>,</span>
+<span class="ln" id="L820">            owned.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L821">        );</span>
+<span class="ln" id="L822">        <span class="tok-kw">if</span> !cfg!(windows) {</span>
+<span class="ln" id="L823">            assert_ne!(</span>
+<span class="ln" id="L824">                <span class="tok-fn">Some</span>(owned.<span class="tok-fn">clone</span>()),</span>
+<span class="ln" id="L825">                <span class="tok-fn">bin_dir</span>(),</span>
+<span class="ln" id="L826">                <span class="tok-str">&quot;the directory holding other programs&#x27; binaries must never be \</span></span>
+<span class="ln" id="L827"><span class="tok-str">                 removed whole&quot;</span></span>
+<span class="ln" id="L828">            );</span>
+<span class="ln" id="L829">        }</span>
+<span class="ln" id="L830">    }</span>
+<span class="ln" id="L831"></span>
+<span class="ln" id="L832">    <span class="tok-com">/// Everything `status` reports is about one directory, and it is the one</span></span>
+<span class="ln" id="L833">    <span class="tok-com">/// the binaries actually go into.</span></span>
+<span class="ln" id="L834">    <span class="tok-com">///</span></span>
+<span class="ln" id="L835">    <span class="tok-com">/// Three facts about three different places is what F-214 was:</span></span>
+<span class="ln" id="L836">    <span class="tok-com">/// `install` copied into one, added a second to `PATH`, and `status`</span></span>
+<span class="ln" id="L837">    <span class="tok-com">/// answered about a third, so an install that worked reported itself as an</span></span>
+<span class="ln" id="L838">    <span class="tok-com">/// install that had not happened.</span></span>
+<span class="ln" id="L839">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L840">    <span class="tok-kw">fn</span> <span class="tok-fn">everything_reported_is_about_the_directory_the_binaries_go_into</span>() {</span>
+<span class="ln" id="L841">        <span class="tok-kw">let</span> state = <span class="tok-fn">status</span>();</span>
+<span class="ln" id="L842">        assert_eq!(</span>
+<span class="ln" id="L843">            state.prefix,</span>
+<span class="ln" id="L844">            <span class="tok-fn">bin_dir</span>(),</span>
+<span class="ln" id="L845">            <span class="tok-str">&quot;status reports a directory the binaries are not copied into&quot;</span></span>
+<span class="ln" id="L846">        );</span>
+<span class="ln" id="L847">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(dir), <span class="tok-fn">Some</span>(from)) = (&amp;state.prefix, &amp;state.running_from) {</span>
+<span class="ln" id="L848">            assert_eq!(</span>
+<span class="ln" id="L849">                state.running_installed,</span>
+<span class="ln" id="L850">                from.<span class="tok-fn">parent</span>() == <span class="tok-fn">Some</span>(dir.<span class="tok-fn">as_path</span>()),</span>
+<span class="ln" id="L851">                <span class="tok-str">&quot;`running_installed` is answered about a different directory&quot;</span></span>
+<span class="ln" id="L852">            );</span>
+<span class="ln" id="L853">        }</span>
+<span class="ln" id="L854">    }</span>
+<span class="ln" id="L855"></span>
+<span class="ln" id="L856">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L857">    <span class="tok-kw">fn</span> <span class="tok-fn">path_membership_is_an_exact_directory_match</span>() {</span>
+<span class="ln" id="L858">        <span class="tok-com">// A prefix match would report `C:\Program Files\VeilVoiceOther` as</span></span>
+<span class="ln" id="L859">        <span class="tok-com">// VeilVoice being installed, and a substring match is worse again.</span></span>
+<span class="ln" id="L860">        <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>);</span>
+<span class="ln" id="L861">        <span class="tok-kw">if</span> path.<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L862">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L863">        }</span>
+<span class="ln" id="L864">        <span class="tok-kw">let</span> nonsense = PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;this-directory-is-not-on-anybody-s-path-42&quot;</span>);</span>
+<span class="ln" id="L865">        assert!(!<span class="tok-fn">path_contains</span>(&amp;nonsense));</span>
+<span class="ln" id="L866">    }</span>
+<span class="ln" id="L867">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

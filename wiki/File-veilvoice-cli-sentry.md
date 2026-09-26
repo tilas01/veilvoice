@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/sentry.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 386 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 392 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs)
 
 ## Contents
 
@@ -59,19 +59,19 @@ out quickly.
 
 ## What this file contains
 
-386 lines defining **11 functions** (7 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+392 lines defining **11 functions** (7 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `status` (line 130) -- What is planted, what is watched, and what this is worth.
+- `status` (line 136) -- What is planted, what is watched, and what this is worth.
   - reaches: `baselines`, `load_nest`, `wrap`, `state_dir`, `nest_path`
-- `plant` (line 172) -- Put a canary in dir.
+- `plant` (line 178) -- Put a canary in dir.
   - reaches: `load_nest`, `save_nest`, `nest_path`, `state_dir`
-- `pull_up` (line 196) -- Stop watching a canary, and delete it.
+- `pull_up` (line 202) -- Stop watching a canary, and delete it.
   - reaches: `load_nest`, `save_nest`, `nest_path`, `state_dir`
-- `baseline` (line 207) -- Record what dir holds now, as the thing to compare against later.
+- `baseline` (line 213) -- Record what dir holds now, as the thing to compare against later.
   - reaches: `state_dir`
-- `check` (line 243) -- Look at every canary and every baseline.
+- `check` (line 249) -- Look at every canary and every baseline.
   - reaches: `baselines`, `load_nest`, `state_dir`, `nest_path`
 
 ## What calls what
@@ -89,16 +89,16 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_state_dir["state_dir<br/>line 54"]
-    n_nest_path["nest_path<br/>line 58"]
-    n_load_nest["load_nest<br/>line 74"]
-    n_save_nest["save_nest<br/>line 87"]
-    n_baselines["baselines<br/>line 94"]
-    n_status(["status<br/>line 130"])
-    n_plant(["plant<br/>line 172"])
-    n_pull_up(["pull_up<br/>line 196"])
-    n_baseline(["baseline<br/>line 207"])
-    n_check(["check<br/>line 243"])
-    n_wrap["wrap<br/>line 321"]
+    n_nest_path["nest_path<br/>line 59"]
+    n_load_nest["load_nest<br/>line 75"]
+    n_save_nest["save_nest<br/>line 93"]
+    n_baselines["baselines<br/>line 100"]
+    n_status(["status<br/>line 136"])
+    n_plant(["plant<br/>line 178"])
+    n_pull_up(["pull_up<br/>line 202"])
+    n_baseline(["baseline<br/>line 213"])
+    n_check(["check<br/>line 249"])
+    n_wrap["wrap<br/>line 327"]
     n_baseline --> n_state_dir
     n_baselines --> n_state_dir
     n_check --> n_baselines
@@ -114,16 +114,16 @@ flowchart TD
     n_status --> n_load_nest
     n_status --> n_wrap
     click n_state_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L54" "open the source"
-    click n_nest_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L58" "open the source"
-    click n_load_nest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L74" "open the source"
-    click n_save_nest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L87" "open the source"
-    click n_baselines href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L94" "open the source"
-    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L130" "open the source"
-    click n_plant href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L172" "open the source"
-    click n_pull_up href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L196" "open the source"
-    click n_baseline href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L207" "open the source"
-    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L243" "open the source"
-    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L321" "open the source"
+    click n_nest_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L59" "open the source"
+    click n_load_nest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L75" "open the source"
+    click n_save_nest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L93" "open the source"
+    click n_baselines href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L100" "open the source"
+    click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L136" "open the source"
+    click n_plant href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L178" "open the source"
+    click n_pull_up href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L202" "open the source"
+    click n_baseline href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L213" "open the source"
+    click n_check href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L249" "open the source"
+    click n_wrap href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L327" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_plant,n_pull_up,n_baseline,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -139,13 +139,13 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `state_dir` <sub>pub fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L54) | Where the canaries and baselines are kept. |
-| `nest_path` <sub>fn</sub> | [58](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L58) |  |
-| `load_nest` <sub>fn</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L74) | Read the nest, treating "no file yet" as "nothing planted". |
-| `save_nest` <sub>fn</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L87) |  |
-| `baselines` <sub>fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L94) | Every saved baseline, with the path it came from. |
-| `status` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L130) | What is planted, what is watched, and what this is worth. |
-| `plant` <sub>pub fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L172) | Put a canary in dir. |
-| `pull_up` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L196) | Stop watching a canary, and delete it. |
-| `baseline` <sub>pub fn</sub> | [207](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L207) | Record what dir holds now, as the thing to compare against later. |
-| `check` <sub>pub fn</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L243) | Look at every canary and every baseline. |
-| `wrap` <sub>pub fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L321) | Wrap text to width columns on spaces, for the scope note. |
+| `nest_path` <sub>fn</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L59) | Where the record of canary files is kept, or why this machine cannot say. |
+| `load_nest` <sub>fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L75) | Read the nest, treating "no file yet" as "nothing planted". |
+| `save_nest` <sub>fn</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L93) | Write the nest back, naming the file if that fails. |
+| `baselines` <sub>fn</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L100) | Every saved baseline, with the path it came from. |
+| `status` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L136) | What is planted, what is watched, and what this is worth. |
+| `plant` <sub>pub fn</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L178) | Put a canary in dir. |
+| `pull_up` <sub>pub fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L202) | Stop watching a canary, and delete it. |
+| `baseline` <sub>pub fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L213) | Record what dir holds now, as the thing to compare against later. |
+| `check` <sub>pub fn</sub> | [249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L249) | Look at every canary and every baseline. |
+| `wrap` <sub>pub fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L327) | Wrap text to width columns on spaces, for the scope note. |

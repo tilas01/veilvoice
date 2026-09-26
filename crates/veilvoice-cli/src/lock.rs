@@ -26,6 +26,13 @@ use clap::Subcommand;
 use std::path::PathBuf;
 use veilvoice_crypto::{kdf, lock, LockStore};
 
+/// What `veilvoice lock` can be asked to do.
+///
+/// As with the other subcommand enums here, `clap` derives the parser and the
+/// help screen from it, and each variant's doc comment is the line a reader sees
+/// in the terminal. There is deliberately no variant that reads a lock out: the
+/// only things that can be done to one are setting it, proving it and removing
+/// it.
 #[derive(Subcommand)]
 pub enum Action {
     /// Report whether a lock is set, and where it lives.

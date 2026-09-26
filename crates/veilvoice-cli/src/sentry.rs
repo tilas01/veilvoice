@@ -55,6 +55,7 @@ pub fn state_dir() -> Option<PathBuf> {
     veilvoice_crypto::lock::default_path().map(|lock| lock.with_file_name("").join("sentry"))
 }
 
+/// Where the record of canary files is kept, or why this machine cannot say.
 fn nest_path() -> Result<PathBuf, String> {
     Ok(state_dir()
         .ok_or_else(|| {
@@ -84,6 +85,11 @@ fn load_nest() -> Result<Nest, String> {
     }
 }
 
+/// Write the nest back, naming the file if that fails.
+///
+/// Naming it matters here more than it usually would: this is the record of
+/// which files are canaries, and a write that failed without saying where leaves
+/// somebody believing a canary is being watched when it is not.
 fn save_nest(nest: &Nest) -> Result<(), String> {
     let path = nest_path()?;
     nest.save(&path)

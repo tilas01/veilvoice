@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/sentry.svg" alt="sentry.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/sentry.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 386 lines &middot; <a href="sentry.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 392 lines &middot; <a href="sentry.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#where-the-state-lives">Where the state lives</a>
@@ -94,21 +94,21 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>386 lines defining <strong>11 functions</strong> (7 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>392 lines defining <strong>11 functions</strong> (7 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>status</code> <span style="color:var(--muted)">line 130</span> &middot; What is planted, what is watched, and what this is worth.
+<li><code>status</code> <span style="color:var(--muted)">line 136</span> &middot; What is planted, what is watched, and what this is worth.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baselines</code>, <code>load_nest</code>, <code>wrap</code>, <code>state_dir</code>, <code>nest_path</code></span>
 </li>
-<li><code>plant</code> <span style="color:var(--muted)">line 172</span> &middot; Put a canary in dir.
+<li><code>plant</code> <span style="color:var(--muted)">line 178</span> &middot; Put a canary in dir.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load_nest</code>, <code>save_nest</code>, <code>nest_path</code>, <code>state_dir</code></span>
 </li>
-<li><code>pull_up</code> <span style="color:var(--muted)">line 196</span> &middot; Stop watching a canary, and delete it.
+<li><code>pull_up</code> <span style="color:var(--muted)">line 202</span> &middot; Stop watching a canary, and delete it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>load_nest</code>, <code>save_nest</code>, <code>nest_path</code>, <code>state_dir</code></span>
 </li>
-<li><code>baseline</code> <span style="color:var(--muted)">line 207</span> &middot; Record what dir holds now, as the thing to compare against later.
+<li><code>baseline</code> <span style="color:var(--muted)">line 213</span> &middot; Record what dir holds now, as the thing to compare against later.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>state_dir</code></span>
 </li>
-<li><code>check</code> <span style="color:var(--muted)">line 243</span> &middot; Look at every canary and every baseline.
+<li><code>check</code> <span style="color:var(--muted)">line 249</span> &middot; Look at every canary and every baseline.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>baselines</code>, <code>load_nest</code>, <code>state_dir</code>, <code>nest_path</code></span>
 </li>
 </ul>
@@ -148,52 +148,52 @@
 <a href="sentry.src.html#fn-nest_path">
 <rect x="201.7" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="252.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">nest_path</text>
-<text x="252.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 58</text>
+<text x="252.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
 </a>
 <a href="sentry.src.html#fn-load_nest">
 <rect x="328.2" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="378.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">load_nest</text>
-<text x="378.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 74</text>
+<text x="378.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 75</text>
 </a>
 <a href="sentry.src.html#fn-save_nest">
 <rect x="454.8" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="505.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">save_nest</text>
-<text x="505.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
+<text x="505.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 93</text>
 </a>
 <a href="sentry.src.html#fn-baselines">
 <rect x="28.0" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="78.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">baselines</text>
-<text x="78.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
+<text x="78.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 100</text>
 </a>
 <a href="sentry.src.html#fn-status">
 <rect x="154.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="200.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status</text>
-<text x="200.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
+<text x="200.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
 </a>
 <a href="sentry.src.html#fn-plant">
 <rect x="273.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="319.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">plant</text>
-<text x="319.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 172</text>
+<text x="319.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 178</text>
 </a>
 <a href="sentry.src.html#fn-pull_up">
 <rect x="391.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="437.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">pull_up</text>
-<text x="437.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 196</text>
+<text x="437.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
 </a>
 <a href="sentry.src.html#fn-baseline">
 <rect x="510.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="556.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">baseline</text>
-<text x="556.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 207</text>
+<text x="556.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 213</text>
 </a>
 <a href="sentry.src.html#fn-check">
 <rect x="269.0" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="315.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check</text>
-<text x="315.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 243</text>
+<text x="315.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 249</text>
 </a>
 <a href="sentry.src.html#fn-wrap">
 <rect x="269.0" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="315.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wrap</text>
-<text x="315.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
+<text x="315.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -213,16 +213,16 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_state_dir[&quot;state_dir&lt;br/&gt;line 54&quot;]
-    n_nest_path[&quot;nest_path&lt;br/&gt;line 58&quot;]
-    n_load_nest[&quot;load_nest&lt;br/&gt;line 74&quot;]
-    n_save_nest[&quot;save_nest&lt;br/&gt;line 87&quot;]
-    n_baselines[&quot;baselines&lt;br/&gt;line 94&quot;]
-    n_status([&quot;status&lt;br/&gt;line 130&quot;])
-    n_plant([&quot;plant&lt;br/&gt;line 172&quot;])
-    n_pull_up([&quot;pull_up&lt;br/&gt;line 196&quot;])
-    n_baseline([&quot;baseline&lt;br/&gt;line 207&quot;])
-    n_check([&quot;check&lt;br/&gt;line 243&quot;])
-    n_wrap[&quot;wrap&lt;br/&gt;line 321&quot;]
+    n_nest_path[&quot;nest_path&lt;br/&gt;line 59&quot;]
+    n_load_nest[&quot;load_nest&lt;br/&gt;line 75&quot;]
+    n_save_nest[&quot;save_nest&lt;br/&gt;line 93&quot;]
+    n_baselines[&quot;baselines&lt;br/&gt;line 100&quot;]
+    n_status([&quot;status&lt;br/&gt;line 136&quot;])
+    n_plant([&quot;plant&lt;br/&gt;line 178&quot;])
+    n_pull_up([&quot;pull_up&lt;br/&gt;line 202&quot;])
+    n_baseline([&quot;baseline&lt;br/&gt;line 213&quot;])
+    n_check([&quot;check&lt;br/&gt;line 249&quot;])
+    n_wrap[&quot;wrap&lt;br/&gt;line 327&quot;]
     n_baseline --&gt; n_state_dir
     n_baselines --&gt; n_state_dir
     n_check --&gt; n_baselines
@@ -238,16 +238,16 @@ flowchart TD
     n_status --&gt; n_load_nest
     n_status --&gt; n_wrap
     click n_state_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L54&quot; &quot;open the source&quot;
-    click n_nest_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L58&quot; &quot;open the source&quot;
-    click n_load_nest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L74&quot; &quot;open the source&quot;
-    click n_save_nest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L87&quot; &quot;open the source&quot;
-    click n_baselines href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L94&quot; &quot;open the source&quot;
-    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L130&quot; &quot;open the source&quot;
-    click n_plant href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L172&quot; &quot;open the source&quot;
-    click n_pull_up href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L196&quot; &quot;open the source&quot;
-    click n_baseline href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L207&quot; &quot;open the source&quot;
-    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L243&quot; &quot;open the source&quot;
-    click n_wrap href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L321&quot; &quot;open the source&quot;
+    click n_nest_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L59&quot; &quot;open the source&quot;
+    click n_load_nest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L75&quot; &quot;open the source&quot;
+    click n_save_nest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L93&quot; &quot;open the source&quot;
+    click n_baselines href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L100&quot; &quot;open the source&quot;
+    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L136&quot; &quot;open the source&quot;
+    click n_plant href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L178&quot; &quot;open the source&quot;
+    click n_pull_up href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L202&quot; &quot;open the source&quot;
+    click n_baseline href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L213&quot; &quot;open the source&quot;
+    click n_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L249&quot; &quot;open the source&quot;
+    click n_wrap href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs#L327&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_plant,n_pull_up,n_baseline,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -261,16 +261,16 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>state_dir</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-state_dir">54</a></td><td>Where the canaries and baselines are kept.</td></tr>
-<tr><td><code>nest_path</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-nest_path">58</a></td><td></td></tr>
-<tr><td><code>load_nest</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-load_nest">74</a></td><td>Read the nest, treating &quot;no file yet&quot; as &quot;nothing planted&quot;.</td></tr>
-<tr><td><code>save_nest</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-save_nest">87</a></td><td></td></tr>
-<tr><td><code>baselines</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-baselines">94</a></td><td>Every saved baseline, with the path it came from.</td></tr>
-<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-status">130</a></td><td>What is planted, what is watched, and what this is worth.</td></tr>
-<tr><td><code>plant</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-plant">172</a></td><td>Put a canary in dir.</td></tr>
-<tr><td><code>pull_up</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-pull_up">196</a></td><td>Stop watching a canary, and delete it.</td></tr>
-<tr><td><code>baseline</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-baseline">207</a></td><td>Record what dir holds now, as the thing to compare against later.</td></tr>
-<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-check">243</a></td><td>Look at every canary and every baseline.</td></tr>
-<tr><td><code>wrap</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-wrap">321</a></td><td>Wrap text to width columns on spaces, for the scope note.</td></tr>
+<tr><td><code>nest_path</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-nest_path">59</a></td><td>Where the record of canary files is kept, or why this machine cannot say.</td></tr>
+<tr><td><code>load_nest</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-load_nest">75</a></td><td>Read the nest, treating &quot;no file yet&quot; as &quot;nothing planted&quot;.</td></tr>
+<tr><td><code>save_nest</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-save_nest">93</a></td><td>Write the nest back, naming the file if that fails.</td></tr>
+<tr><td><code>baselines</code> <sub>fn</sub></td><td><a href="sentry.src.html#fn-baselines">100</a></td><td>Every saved baseline, with the path it came from.</td></tr>
+<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-status">136</a></td><td>What is planted, what is watched, and what this is worth.</td></tr>
+<tr><td><code>plant</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-plant">178</a></td><td>Put a canary in dir.</td></tr>
+<tr><td><code>pull_up</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-pull_up">202</a></td><td>Stop watching a canary, and delete it.</td></tr>
+<tr><td><code>baseline</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-baseline">213</a></td><td>Record what dir holds now, as the thing to compare against later.</td></tr>
+<tr><td><code>check</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-check">249</a></td><td>Look at every canary and every baseline.</td></tr>
+<tr><td><code>wrap</code> <sub>pub fn</sub></td><td><a href="sentry.src.html#fn-wrap">327</a></td><td>Wrap text to width columns on spaces, for the scope note.</td></tr>
 </tbody></table>
 </section>
 </div></div>

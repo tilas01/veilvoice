@@ -93,12 +93,12 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>2502 lines"])
+    n_lib(["lib.rs<br/>2520 lines"])
     n_builder["builder.rs<br/>1210 lines"]
     n_deps["deps.rs<br/>652 lines"]
     n_discover["discover.rs<br/>460 lines"]
     n_extracted["extracted.rs<br/>316 lines"]
-    n_fetch["fetch.rs<br/>329 lines"]
+    n_fetch["fetch.rs<br/>337 lines"]
     n_report["report.rs<br/>385 lines"]
     n_tests["tests.rs<br/>1743 lines"]
     n_update["update.rs<br/>1333 lines"]
@@ -130,8 +130,8 @@ flowchart TD
 | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 652 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 460 | Finding a release to check, without being told where it is. |
 | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 316 | What came out of the archive, and the GnuPG somebody already has. |
-| [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 329 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 2502 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 337 | Download a release, without putting an HTTP client in the dependency graph. |
+| [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 2520 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 1743 | The verifier's own tests. |
 | [`update.rs`](../../docs/files/veilvoice-verify/update.md) | 1333 | The update that does the update. |
@@ -195,8 +195,8 @@ counts blank lines and comments too. Both are produced by
 | `fn no_downloader_message` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | Say what could not be found, and what to do instead. |
 | `fn download` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | Fetch one URL into into. |
 | `fn asset_url` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The URL of one file in one release. |
-| `const SUMS` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The three files every release publishes for checking itself. |
-| `const SIGNATURE` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) |  |
+| `const SUMS` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The list of hashes every release publishes, one line per file. |
+| `const SIGNATURE` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The detached signature over that list, which is what ties it to the signing key rather than to whoever served the page. |
 | `fn valid_tag` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | A release tag, rejected unless it looks like one. |
 | `fn valid_asset` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | An asset filename, rejected unless it looks like one. |
 | `fn help_text` | [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | The verifier's own help, with its verbosity and exit-status tables. |

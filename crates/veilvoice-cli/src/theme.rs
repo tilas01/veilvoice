@@ -65,6 +65,14 @@ pub mod colour {
     pub const RESET: &str = "\x1b[0m";
 }
 
+/// Whether to colour the output, decided once and remembered.
+///
+/// Asked once per process through a `OnceLock` rather than per line, because the
+/// answer cannot change while the program runs and reading the environment for
+/// every escape sequence would be work for nothing.
+///
+/// `NO_COLOR` wins outright, whatever its value, which is what that convention
+/// asks for, and `TERM=dumb` is honoured as well.
 fn enabled() -> bool {
     static ENABLED: OnceLock<bool> = OnceLock::new();
     *ENABLED.get_or_init(|| {

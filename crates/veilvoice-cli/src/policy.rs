@@ -46,6 +46,12 @@ pub fn policy_dir() -> Option<PathBuf> {
     veilvoice_crypto::lock::default_path().map(|lock| lock.with_file_name("").join("policy"))
 }
 
+/// Where policies are kept, or why this machine cannot say.
+///
+/// [`policy_dir`] answers `None` when no environment variable names a
+/// configuration directory, which is a real state on a stripped-down machine
+/// rather than a bug. This is the wrapper that turns that into the sentence a
+/// reader gets, in one place, so every subcommand explains it the same way.
 fn dir() -> Result<PathBuf, String> {
     policy_dir().ok_or_else(|| {
         "this platform did not say where to keep configuration (no APPDATA, \

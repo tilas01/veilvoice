@@ -50,6 +50,13 @@ use clap::Subcommand;
 use std::path::{Path, PathBuf};
 use veilvoice_guard::{blame_path, manifest_files_in, Manifest, SCOPE};
 
+/// What `veilvoice guard` can be asked to do.
+///
+/// One variant per subcommand, with `clap` deriving the parser from it, so the
+/// help screen and the code that handles each case cannot come apart. The doc
+/// comment on each variant is what the help screen prints, which is why they are
+/// written for somebody reading a terminal rather than for somebody reading
+/// this file.
 #[derive(Subcommand)]
 pub enum Action {
     /// Record the current state of the watched files.

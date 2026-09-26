@@ -87,6 +87,12 @@ struct Downloader {
     style: Style,
 }
 
+/// Which downloader is being driven, since the two want different arguments for
+/// the same job.
+///
+/// A choice of tool rather than a library: this crate fetches by running the
+/// program the machine already has, so nothing here has to be trusted with a TLS
+/// stack, and a reader can see exactly what was run.
 #[derive(Clone, Copy)]
 enum Style {
     Curl,
@@ -231,8 +237,10 @@ pub fn asset_url(tag: &str, name: &str) -> String {
     format!("{HOST}/{REPO}/releases/download/{tag}/{name}")
 }
 
-/// The three files every release publishes for checking itself.
+/// The list of hashes every release publishes, one line per file.
 pub const SUMS: &str = "SHA256SUMS";
+/// The detached signature over that list, which is what ties it to the signing
+/// key rather than to whoever served the page.
 pub const SIGNATURE: &str = "SHA256SUMS.asc";
 
 /// A release tag, rejected unless it looks like one.
