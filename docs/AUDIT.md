@@ -743,6 +743,77 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-220: the guard was written at the crate, and found two more the same afternoon
+
+Roadmap item 167's guard, and what widening it turned up.
+
+**What the guard was.** `the_drawing_thread_never_waits_on_anything` lived in
+`app.rs`, read `app.rs`, and was correct about `app.rs`. It listed fourteen calls
+that wait, found none of them in the draw path, and passed for months. Meanwhile
+five calls waited on the drawing thread in four other modules: F-216's three
+per-frame machine readings, F-218's unlock, and F-219's export. Every one of them
+was found by reading the crate by hand, which is not a thing that happens twice.
+
+**What it is now.** It reads every module, with the list checked against
+`lib.rs`'s own `mod` declarations so a module added later fails rather than going
+unscanned. A function is on the drawing thread when its parameters include a
+`&mut Ui`, or when it is the `update` that `eframe` calls, and so is anything it
+calls by name **within its own module**.
+
+Same-module only, and deliberately. The first version followed calls across the
+whole crate by name and reported 495 functions of 523 as drawing, because `run`,
+`write`, `load`, `status` and `poll` are each the name of several unrelated
+things here. A guard that answers "everything" answers nothing. The limit is
+stated in its own doc comment rather than left to be discovered: a call that
+leaves the module is invisible to it, and the frame-timing test is what covers
+that.
+
+**The first run of it found two more, both in the Studio tab.**
+
+`decoy_panel` called `Shape::of(vault)`, which reads and decrypts the vault's
+index, **on every frame the panel was drawn**. The tab already holds that
+listing in `self.entries`, and the comment on that field says why: "read when the
+vault opens and after every change rather than every frame: a frame is 16
+milliseconds and this decrypts a file." The panel is five hundred lines from the
+comment. `Shape::from_entries` now takes the listing somebody already has, and
+`Shape::of` calls it, so the arithmetic exists once: a decoy whose shape is
+computed one way here and another way there can be told from the vault by
+whichever of the two is wrong.
+
+`make_decoys` wrote them inside the frame. Each decoy is a vault the size of the
+real one, so eight of them is eight times the vault written to disk, and then the
+folder was measured again, which spawns `df`. It is a worker now.
+
+**And following the same call led to a third**, which the guard reported by
+proxy: `unlock` was on that path too. Deriving the key, then `find_or_make`,
+which opens candidate folders until one answers and a properly stocked folder has
+twenty-five of them, then `list`, which decrypts the index, then the measure. All
+on the frame the button was pressed. That is F-218's defect one tab along, and it
+is now `start_unlock` and `poll_unlock`, with the passphrase buffers still
+consumed and wiped in the frame **before** anything is spawned, so a passphrase
+never waits on a thread to be cleared out of the form.
+
+**The frame-timing test, and what it honestly does.** It drives each panel
+headlessly and fails if a frame takes more than 25 milliseconds. These panels
+draw in 20 to 215 *micro*seconds when nothing in them waits, so the limit is more
+than a hundred times a clean frame and the gap is not a matter of how fast the
+machine is. It catches the gross stalls: a render waited on, an enumeration, a
+decryption, twenty-five folders opened in turn, three passes of overwriting.
+
+It does not catch a single cheap syscall, and the doc comment says so with a
+number: spawning `df` was measured at 1.5 milliseconds here, which is fifteen
+times a clean frame and still well inside the limit. Lowering the limit to catch
+it would make the test fail on a loaded build runner, which is how a timing test
+gets deleted. The name-based guard is what catches those. Two tests, two blind
+spots, neither one sufficient, and that is written down rather than assumed.
+
+**The shape, for the last time this week.** F-210, F-212, F-216, F-219 and this
+one are all the same finding: **a guard is written at the scope of the fix that
+prompted it, and the defect is somewhere else.** Four crates, one week. What
+changed here is not another fix at that scope; it is that the question is now
+asked of the whole crate, by something that fails when a module is added and
+nobody remembers to include it.
+
 ### F-219: the file picker was moved off the drawing thread and the render it leads to was not
 
 The last of the freezing half of roadmap item 167, and the one with the largest
@@ -7427,7 +7498,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1789 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1791 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9075,7 +9146,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and nineteen defects found and fixed (F-1 to F-219), across
+**Two hundred and twenty defects found and fixed (F-1 to F-220), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

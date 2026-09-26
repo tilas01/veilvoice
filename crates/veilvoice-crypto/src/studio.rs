@@ -470,10 +470,24 @@ pub struct Shape {
 
 impl Shape {
     /// Measure a real vault, to build decoys that match it.
+    ///
+    /// Reads the vault, so it is not free. A caller that already has the
+    /// listing calls [`Shape::from_entries`] instead: the desktop application
+    /// holds one and was reading the index again on every frame it drew the
+    /// decoy panel. See F-220.
     pub fn of(studio: &Studio) -> Result<Self, Error> {
-        let entries = studio.list()?;
+        Ok(Self::from_entries(&studio.list()?))
+    }
+
+    /// The same measurement, from a listing somebody already has.
+    ///
+    /// This is where the arithmetic lives and [`Shape::of`] calls it, rather
+    /// than the two being written out separately: a decoy whose shape is
+    /// computed one way here and another way there is a decoy that can be told
+    /// from the vault by whichever of the two is wrong.
+    pub fn from_entries(entries: &[Entry]) -> Self {
         let total: usize = entries.iter().map(|e| e.bytes).sum();
-        Ok(Self {
+        Self {
             recordings: entries.len(),
             // The mean, so a decoy is the same size overall. Matching every
             // individual length would copy the real vault's fingerprint into
@@ -483,8 +497,8 @@ impl Shape {
             } else {
                 total / entries.len()
             },
-            index: render_index(&entries).len(),
-        })
+            index: render_index(entries).len(),
+        }
     }
 
     /// What one vault of this shape occupies, in bytes, as files on a disk.

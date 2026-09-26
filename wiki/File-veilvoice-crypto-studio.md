@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/studio.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1508 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1522 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs)
 
 ## Contents
 
@@ -75,7 +75,7 @@ VeilVoice at the moment you type both.
 
 ## What this file contains
 
-1508 lines defining **31 functions** (16 public), **4 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1522 lines defining **32 functions** (17 public), **4 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -99,18 +99,18 @@ VeilVoice at the moment you type both.
   - reaches: `list`, `safe_id`, `write_index`, `parse_index`, `unseal`, `render_index`, `seal`, `secret_key`
 - `Studio::remove` (line 302) -- Remove one recording and its index entry.
   - reaches: `list`, `safe_id`, `write_index`, `parse_index`, `unseal`, `render_index`, `seal`, `secret_key`
-- `Shape::of` (line 473) -- Measure a real vault, to build decoys that match it.
-  - reaches: `render_index`
-- `Shape::bytes_on_disk` (line 502) -- What one vault of this shape occupies, in bytes, as files on a disk.
+- `Shape::of` (line 478) -- Measure a real vault, to build decoys that match it.
+  - reaches: `from_entries`, `render_index`
+- `Shape::bytes_on_disk` (line 516) -- What one vault of this shape occupies, in bytes, as files on a disk.
   - reaches: `index_len`, `bare_index`, `digits`
-- `find_or_make` (line 602) -- Open the one vault under parent that key unlocks, making it on a first run.
+- `find_or_make` (line 616) -- Open the one vault under parent that key unlocks, making it on a first run.
   - reaches: `migrate_flat`, `new_id`, `vault_dirs`
-- `make_decoy_in` (line 685) -- Make one decoy under parent, named the way a real vault is named.
+- `make_decoy_in` (line 699) -- Make one decoy under parent, named the way a real vault is named.
   - reaches: `make_decoy`, `new_id`, `pad_index`, `render_index`
 
 ## What calls what
 
-_22 of 31 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 32 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
@@ -138,18 +138,17 @@ flowchart TD
     n_safe_id["safe_id<br/>line 401"]
     n_render_index["render_index<br/>line 411"]
     n_parse_index["parse_index<br/>line 426"]
-    n_of(["Shape::of<br/>line 473"])
-    n_bytes_on_disk(["Shape::bytes_on_disk<br/>line 502"])
-    n_bare_index["Shape::bare_index<br/>line 516"]
-    n_index_len["Shape::index_len<br/>line 529"]
-    n_vault_dirs["vault_dirs<br/>line 559"]
-    n_find_or_make(["find_or_make<br/>line 602"])
-    n_make_decoy_in(["make_decoy_in<br/>line 685"])
-    n_make_decoy["make_decoy<br/>line 717"]
-    n_bytes_on_disk --> n_index_len
+    n_of(["Shape::of<br/>line 478"])
+    n_from_entries["Shape::from_entries<br/>line 488"]
+    n_bytes_on_disk(["Shape::bytes_on_disk<br/>line 516"])
+    n_bare_index["Shape::bare_index<br/>line 530"]
+    n_vault_dirs["vault_dirs<br/>line 573"]
+    n_find_or_make(["find_or_make<br/>line 616"])
+    n_make_decoy_in(["make_decoy_in<br/>line 699"])
+    n_make_decoy["make_decoy<br/>line 731"]
     n_find_or_make --> n_new_id
     n_find_or_make --> n_vault_dirs
-    n_index_len --> n_bare_index
+    n_from_entries --> n_render_index
     n_list --> n_parse_index
     n_list --> n_unseal
     n_load --> n_safe_id
@@ -157,7 +156,7 @@ flowchart TD
     n_make_decoy --> n_new_id
     n_make_decoy_in --> n_make_decoy
     n_make_decoy_in --> n_new_id
-    n_of --> n_render_index
+    n_of --> n_from_entries
     n_parse_index --> n_safe_id
     n_remove --> n_list
     n_remove --> n_safe_id
@@ -188,20 +187,20 @@ flowchart TD
     click n_safe_id href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L401" "open the source"
     click n_render_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L411" "open the source"
     click n_parse_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L426" "open the source"
-    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L473" "open the source"
-    click n_bytes_on_disk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L502" "open the source"
-    click n_bare_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L516" "open the source"
-    click n_index_len href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L529" "open the source"
-    click n_vault_dirs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L559" "open the source"
-    click n_find_or_make href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L602" "open the source"
-    click n_make_decoy_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L685" "open the source"
-    click n_make_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L717" "open the source"
+    click n_of href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L478" "open the source"
+    click n_from_entries href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L488" "open the source"
+    click n_bytes_on_disk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L516" "open the source"
+    click n_bare_index href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L530" "open the source"
+    click n_vault_dirs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L573" "open the source"
+    click n_find_or_make href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L616" "open the source"
+    click n_make_decoy_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L699" "open the source"
+    click n_make_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L731" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_store,n_load,n_rename,n_remove,n_of,n_bytes_on_disk,n_find_or_make,n_make_decoy_in entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_list,n_vault_dirs,n_make_decoy api
+    class n_list,n_from_entries,n_vault_dirs,n_make_decoy api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_secret_key,n_write_index,n_seal,n_unseal,n_unseal_secret,n_new_id,n_safe_id,n_render_index,n_parse_index,n_bare_index,n_index_len helper
+    class n_secret_key,n_write_index,n_seal,n_unseal,n_unseal_secret,n_new_id,n_safe_id,n_render_index,n_parse_index,n_bare_index helper
 ```
 
 </details>
@@ -239,14 +238,15 @@ flowchart TD
 | `render_index` <sub>fn</sub> | [411](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L411) | The index, as lines. |
 | `parse_index` <sub>fn</sub> | [426](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L426) | Read the index back: one entry per line, four tab-separated fields. |
 | `Shape` <sub>pub struct</sub> | [456](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L456) | What a decoy vault looks like from outside, so it looks like the real one. |
-| `Shape::of` <sub>pub fn</sub> | [473](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L473) | Measure a real vault, to build decoys that match it. |
-| `Shape::bytes_on_disk` <sub>pub fn</sub> | [502](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L502) | What one vault of this shape occupies, in bytes, as files on a disk. |
-| `Shape::bare_index` <sub>fn</sub> | [516](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L516) | The shortest index a decoy of this shape can be written with: every entry present and every name empty. |
-| `Shape::index_len` <sub>fn</sub> | [529](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L529) | The index length a decoy of this shape will actually be written with. |
-| `digits` <sub>fn</sub> | [539](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L539) | How many decimal digits n is written with. |
-| `vault_dirs` <sub>pub fn</sub> | [559](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L559) | Every directory under parent that is shaped like a vault. |
-| `find_or_make` <sub>pub fn</sub> | [602](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L602) | Open the one vault under parent that key unlocks, making it on a first run. |
-| `migrate_flat` <sub>fn</sub> | [645](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L645) | Move a vault written straight into parent down into a directory of its own. |
-| `make_decoy_in` <sub>pub fn</sub> | [685](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L685) | Make one decoy under parent, named the way a real vault is named. |
-| `make_decoy` <sub>pub fn</sub> | [717](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L717) | Fill dir with a vault that never held anything. |
-| `pad_index` <sub>fn</sub> | [770](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L770) | Grow the names until the index is exactly the length a real one was. |
+| `Shape::of` <sub>pub fn</sub> | [478](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L478) | Measure a real vault, to build decoys that match it. |
+| `Shape::from_entries` <sub>pub fn</sub> | [488](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L488) | The same measurement, from a listing somebody already has. |
+| `Shape::bytes_on_disk` <sub>pub fn</sub> | [516](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L516) | What one vault of this shape occupies, in bytes, as files on a disk. |
+| `Shape::bare_index` <sub>fn</sub> | [530](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L530) | The shortest index a decoy of this shape can be written with: every entry present and every name empty. |
+| `Shape::index_len` <sub>fn</sub> | [543](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L543) | The index length a decoy of this shape will actually be written with. |
+| `digits` <sub>fn</sub> | [553](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L553) | How many decimal digits n is written with. |
+| `vault_dirs` <sub>pub fn</sub> | [573](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L573) | Every directory under parent that is shaped like a vault. |
+| `find_or_make` <sub>pub fn</sub> | [616](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L616) | Open the one vault under parent that key unlocks, making it on a first run. |
+| `migrate_flat` <sub>fn</sub> | [659](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L659) | Move a vault written straight into parent down into a directory of its own. |
+| `make_decoy_in` <sub>pub fn</sub> | [699](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L699) | Make one decoy under parent, named the way a real vault is named. |
+| `make_decoy` <sub>pub fn</sub> | [731](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L731) | Fill dir with a vault that never held anything. |
+| `pad_index` <sub>fn</sub> | [784](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs#L784) | Grow the names until the index is exactly the length a real one was. |
