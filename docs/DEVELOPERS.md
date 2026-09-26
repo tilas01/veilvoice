@@ -220,6 +220,8 @@ And what it then checks:
 - **section pages match index.html**: `python tools/site/split.py --check`
 - **the roadmap page matches ROADMAP.md**: `python tools/site/roadmap.py --check`
 - **the demonstration matches the source**: `python tools/site/demo.py --check`
+- **the window bundle is of this window**: `python tools/site/window.py --check`
+- **the window bundle's staleness check catches its cases**: `python tools/site/window.py --self-test`
 - **the questions page matches docs/FAQ.md**: `python tools/site/faq.py --check`
 - **the releases page matches CHANGELOG.md**: `python tools/site/releases.py --check`
 - **every page says where it lives, and the sitemap lists it**: `python tools/site/seo.py --check`
