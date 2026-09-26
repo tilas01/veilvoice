@@ -371,6 +371,11 @@ CHECKS = [
      [sys.executable, "tools/shots/attrs.py", "--check"]),
     ("terminal drawings match their output",
      [sys.executable, "tools/shots/terminal.py", "--check"]),
+    # `--check` above runs the program, and will only do so from a build of
+    # this tree. This proves it can tell the difference, on a throwaway tree
+    # where a stale build can be arranged rather than waited for.
+    ("the build a capture is compared against is of this tree",
+     [sys.executable, "tools/shots/terminal.py", "--self-test"]),
     # The recorded sessions, re-run and compared. This is the check that would
     # have caught the demonstration inventing the verifier's output, and it is
     # the only one here that runs the programs rather than reading about them.

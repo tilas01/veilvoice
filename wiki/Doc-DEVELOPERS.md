@@ -210,6 +210,7 @@ And what it then checks:
 - **screenshots have rounded corners**: `python tools/shots/round.py --check`
 - **every screenshot tag matches its file**: `python tools/shots/attrs.py --check`
 - **terminal drawings match their output**: `python tools/shots/terminal.py --check`
+- **the build a capture is compared against is of this tree**: `python tools/shots/terminal.py --self-test`
 - **recorded sessions match the programs**: `python tools/shots/sessions.py --check`
 - **the window captures are of this version**: `python tools/shots/taken.py --check`
 - **documentation matches the source**: `python tools/docs/generate.py --check`

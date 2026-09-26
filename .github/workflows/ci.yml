@@ -421,7 +421,9 @@ jobs:
           python tools/shots/attrs.py --check
 
       - name: Terminal drawings must match their captured text
-        run: python tools/shots/terminal.py --check
+        run: |
+          python tools/shots/terminal.py --check
+          python tools/shots/terminal.py --self-test
 
       - name: Every copy of the version must agree with the workspace
         run: python tools/release/version.py --check

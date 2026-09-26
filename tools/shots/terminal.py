@@ -5,6 +5,7 @@
     python tools/shots/terminal.py --capture   # run the commands, save the text
     python tools/shots/terminal.py             # draw the SVGs from that text
     python tools/shots/terminal.py --check     # verify the SVGs match the text
+    python tools/shots/terminal.py --self-test # prove the build check catches it
 
 # Two steps, on purpose
 
@@ -133,22 +134,112 @@ MAX_COLUMNS = 96
 # taller picture.
 
 
-def binary():
-    """Where the built `veilvoice` is."""
-    target = os.environ.get("CARGO_TARGET_DIR") or os.path.join(ROOT, "target")
+def binary(target=None):
+    """The most recently built `veilvoice`, or `None`.
+
+    **The newest, not the release one.** This preferred `target/release` over
+    `target/debug` whenever both existed, which is the wrong rule: `cargo build`
+    without `--release` is what somebody editing a string runs, and a release
+    build from last week outranked it. Two profiles is not a preference, it is
+    two answers, and the one to take is the one that was built last.
+    """
+    target = target or os.environ.get("CARGO_TARGET_DIR") or os.path.join(ROOT, "target")
     name = "veilvoice.exe" if os.name == "nt" else "veilvoice"
-    for profile in ("release", "debug"):
-        path = os.path.join(target, profile, name)
-        if os.path.exists(path):
-            return path
-    return None
+    built = [os.path.join(target, profile, name) for profile in ("release", "debug")]
+    built = [path for path in built if os.path.exists(path)]
+    if not built:
+        return None
+    return max(built, key=os.path.getmtime)
+
+
+WORKSPACE_DEP = re.compile(r"^\s*(veilvoice-[a-z0-9-]+)\s*[.=]", re.M)
+
+
+def cli_crates(root=None):
+    """The crates a `veilvoice` binary is built from, by directory name.
+
+    Derived from the manifests rather than listed here, and it matters which:
+    `veilvoice-gui` is not among them. A list written down would have included
+    it, because it is a crate in this workspace and it is the one being edited
+    most, and every edit to the window would then have declared the command
+    line's build out of date.
+    """
+    root = root or ROOT
+    seen, queue = set(), ["veilvoice-cli"]
+    while queue:
+        name = queue.pop()
+        if name in seen:
+            continue
+        seen.add(name)
+        manifest = os.path.join(root, "crates", name, "Cargo.toml")
+        if not os.path.exists(manifest):
+            continue
+        with io.open(manifest, encoding="utf-8") as handle:
+            text = handle.read()
+        queue.extend(WORKSPACE_DEP.findall(text))
+    return sorted(seen)
+
+
+# What a build of `veilvoice` is a build *of*. A `.rs` file in any crate it is
+# built from can change a help screen; so can a manifest, because the help
+# screens are rendered by `clap` and a version bump rewrites their spacing.
+# Nothing else here is read by the compiler.
+def sources(root=None):
+    """Every file that decides what the program prints."""
+    root = root or ROOT
+    found = [os.path.join(root, "Cargo.toml"), os.path.join(root, "Cargo.lock")]
+    for name in cli_crates(root):
+        for here, dirs, names in os.walk(os.path.join(root, "crates", name)):
+            dirs[:] = [entry for entry in dirs if entry != "target"]
+            found.extend(os.path.join(here, entry) for entry in names
+                         if entry.endswith(".rs") or entry == "Cargo.toml")
+    return [path for path in found if os.path.exists(path)]
+
+
+def newest_source(root=None):
+    """The most recently changed of those, as (path, when), or (None, 0)."""
+    newest, when = None, 0.0
+    for path in sources(root):
+        try:
+            stamp = os.path.getmtime(path)
+        except OSError:
+            continue
+        if stamp > when:
+            newest, when = path, stamp
+    return (newest, when)
+
+
+def build_state(exe, root=None):
+    """Whether `exe` can answer for this tree: (state, the newest source).
+
+    `missing` when there is no build at all, `outdated` when the newest source
+    file is younger than the build, and `current` otherwise.
+    """
+    if exe is None:
+        return ("missing", None)
+    newest, when = newest_source(root)
+    try:
+        built = os.path.getmtime(exe)
+    except OSError:
+        return ("missing", None)
+    if newest is not None and when > built:
+        return ("outdated", newest)
+    return ("current", newest)
 
 
 def capture():
     """Run each command and write down what it printed."""
     exe = binary()
-    if exe is None:
+    state, newest = build_state(exe)
+    if state == "missing":
         print("  no `veilvoice` build found. Run:")
+        print("    cargo build --release -p veilvoice-cli")
+        return 1
+    if state == "outdated":
+        print("  %s is older than %s, so what it prints is not what this tree"
+              % (os.path.relpath(exe, ROOT), os.path.relpath(newest, ROOT)))
+        print("  prints. Capturing from it would write down something untrue.")
+        print("  Run:")
         print("    cargo build --release -p veilvoice-cli")
         return 1
     os.makedirs(OUT, exist_ok=True)
@@ -519,10 +610,51 @@ def check_captures_are_current():
     Skipped where there is no build, which is the state of the CI job that runs
     the other checks here. It is not skipped where it matters: `verify.py` runs
     after `cargo build`, on the machine where the strings were just edited.
+
+    # **F-217.** That last sentence was an assumption, and it was not true
+
+    Nothing made `verify.py` run after `cargo build`, and nothing made the
+    build in `target/` be a build of this tree. `binary()` took whatever was
+    there, preferring `target/release`, and a release build from two days
+    earlier outranked a debug build from a minute earlier.
+
+    Both directions of that are wrong, and the quiet one is worse. The loud
+    one is what was reported: a two-day-old build printed an old help screen,
+    this check called the committed capture wrong, and the capture was right.
+    The quiet one is that a stale build printing an old help screen **matches**
+    the old capture, so a string edited since is waved through -- which is the
+    exact failure F-103 added this check to catch, restored by the means of
+    catching it.
+
+    So the build is now asked whether it can answer for this tree, by
+    [`build_state`], and refuses rather than guessing. Refusing is a failure
+    and not a skip: a check that goes quiet when it cannot see is the thing
+    being fixed.
+
+    # Why mtimes, and what the cost is
+
+    The exact question is whether this binary was compiled from these bytes,
+    and nothing in `target/` answers it without reading `cargo`'s own
+    fingerprints, which are an internal format. The answerable question is
+    whether any source has been *written* since the binary was linked, which
+    is strictly more cautious: it can ask for a rebuild that would produce an
+    identical binary, and it cannot miss one that would not.
+
+    That happens after a rebase, which rewrites the files it carries. It is
+    less of a cost than it looks: rebasing onto somebody's Rust change means
+    the Rust in this tree changed, and the house rules already say to run
+    `cargo test --workspace` before pushing when it has. The build is one that
+    was owed anyway.
+
+    The sources are the crates a `veilvoice` binary is built from, closed over
+    the manifests by [`cli_crates`], plus the workspace manifest and the
+    lockfile, because `clap` renders these screens and a version bump moves
+    their spacing. `veilvoice-gui` is deliberately not among them.
     """
     exe = binary()
-    if exe is None:
-        return [], False
+    state, newest = build_state(exe)
+    if state != "current":
+        return ([], state)
     problems = []
     for name, argv, _ in COMMANDS:
         path = os.path.join(OUT, "cli-%s.txt" % name)
@@ -538,7 +670,107 @@ def check_captures_are_current():
                 "assets/screenshots/cli-%s.txt is not what `veilvoice %s` prints"
                 % (name, " ".join(argv))
             )
-    return problems, True
+    return (problems, "current")
+
+
+# ------------------------------------------------------- the self-test
+#
+# `build_state` decides whether the one check here that runs the program is
+# allowed to believe what it printed, and it is the kind of thing that is
+# easiest to get wrong in the direction that stays green. It is driven here on
+# a throwaway tree rather than on this one, so the cases that matter -- a
+# release build older than a debug build, a source touched after the link --
+# can be arranged exactly instead of waited for.
+
+
+def _touch(path, when):
+    """Write an empty file at `path`, with `when` as its modification time."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with io.open(path, "w", encoding="utf-8") as handle:
+        handle.write("")
+    os.utime(path, (when, when))
+
+
+def _tree(root, cli_manifest=None):
+    """A throwaway workspace with one crate the CLI is built from."""
+    _touch(os.path.join(root, "Cargo.toml"), 1000)
+    _touch(os.path.join(root, "Cargo.lock"), 1000)
+    manifest = os.path.join(root, "crates", "veilvoice-cli", "Cargo.toml")
+    _touch(manifest, 1000)
+    with io.open(manifest, "w", encoding="utf-8") as handle:
+        handle.write(cli_manifest if cli_manifest is not None
+                     else "[dependencies]\nveilvoice-core.workspace = true\n")
+    os.utime(manifest, (1000, 1000))
+    _touch(os.path.join(root, "crates", "veilvoice-cli", "src", "main.rs"), 1000)
+    _touch(os.path.join(root, "crates", "veilvoice-core", "Cargo.toml"), 1000)
+    _touch(os.path.join(root, "crates", "veilvoice-core", "src", "lib.rs"), 1000)
+    # Present, and never a reason to rebuild the command line.
+    _touch(os.path.join(root, "crates", "veilvoice-gui", "Cargo.toml"), 1000)
+    _touch(os.path.join(root, "crates", "veilvoice-gui", "src", "window.rs"), 1000)
+
+
+def self_test():
+    import shutil
+    import tempfile
+
+    name = "veilvoice.exe" if os.name == "nt" else "veilvoice"
+    failures = []
+
+    def check(what, got, want):
+        if got != want:
+            failures.append("%s: got %r, wanted %r" % (what, got, want))
+
+    root = tempfile.mkdtemp(prefix="veilvoice-shots-")
+    try:
+        _tree(root)
+        target = os.path.join(root, "target")
+
+        check("no build at all is `missing`",
+              build_state(binary(target), root)[0], "missing")
+
+        # The reported defect: release preferred over a newer debug build.
+        _touch(os.path.join(target, "release", name), 2000)
+        _touch(os.path.join(target, "debug", name), 3000)
+        check("the newest build wins, not the release one",
+              os.path.basename(os.path.dirname(binary(target))), "debug")
+
+        _touch(os.path.join(target, "release", name), 4000)
+        check("and the other way round when release is newer",
+              os.path.basename(os.path.dirname(binary(target))), "release")
+
+        check("a build newer than every source is `current`",
+              build_state(binary(target), root)[0], "current")
+
+        # The quiet failure: a source written after the binary was linked.
+        _touch(os.path.join(root, "crates", "veilvoice-core", "src", "lib.rs"), 5000)
+        state, newest = build_state(binary(target), root)
+        check("a source younger than the build is `outdated`", state, "outdated")
+        check("and it names the file", os.path.basename(newest or ""), "lib.rs")
+
+        # The window is not part of a `veilvoice` binary, and editing it must
+        # not declare the command line's build out of date.
+        _touch(os.path.join(root, "crates", "veilvoice-core", "src", "lib.rs"), 1000)
+        _touch(os.path.join(root, "crates", "veilvoice-gui", "src", "window.rs"), 9000)
+        check("the window is not one of the command line's sources",
+              build_state(binary(target), root)[0], "current")
+        check("nor is it in the crate set", "veilvoice-gui" in cli_crates(root), False)
+        check("and the crate it does depend on is",
+              "veilvoice-core" in cli_crates(root), True)
+
+        # A lockfile bump moves `clap`'s spacing, so it counts as a source.
+        _touch(os.path.join(root, "Cargo.lock"), 9000)
+        check("the lockfile counts", build_state(binary(target), root)[0], "outdated")
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+    if failures:
+        print("  %d self-test(s) failed: this guard does not catch what it "
+              "claims to" % len(failures))
+        for line in failures:
+            print("    %s" % line)
+        return 1
+    print("  the build-is-of-this-tree check catches every case it claims to")
+    return 0
 
 
 def main():
@@ -547,8 +779,12 @@ def main():
                         help="run the commands and save what they printed")
     parser.add_argument("--check", action="store_true",
                         help="verify the drawings match the captured text")
+    parser.add_argument("--self-test", action="store_true",
+                        help="prove the build-is-current check catches its cases")
     args = parser.parse_args()
 
+    if args.self_test:
+        return self_test()
     if args.capture:
         return capture()
 
@@ -559,7 +795,23 @@ def main():
         return 1
 
     if args.check:
-        stale, ran = check_captures_are_current()
+        stale, state = check_captures_are_current()
+        if state == "outdated":
+            exe = binary()
+            _, newest = build_state(exe)
+            print("  REFUSED: the build here is not a build of this tree")
+            print("    the build:  %s" % os.path.relpath(exe, ROOT))
+            print("    written since it was linked:")
+            print("      %s" % os.path.relpath(newest, ROOT))
+            print()
+            print("    A build older than its source can fail this check")
+            print("    against code nobody wrote, and pass it against code")
+            print("    somebody did. The second is the one that matters: it")
+            print("    is the silence F-103 added this check to end.")
+            print()
+            print("    Run:")
+            print("      cargo build --release -p veilvoice-cli")
+            return 1
         problems = mirror_captures(check=True) + check_declared_sizes() + stale
         for rel, text in sorted(files.items()):
             path = os.path.join(ROOT, rel.replace("/", os.sep))
@@ -585,7 +837,7 @@ def main():
         )
         print(
             "  and the captures %s"
-            % ("are what the built program prints" if ran
+            % ("are what the built program prints" if state == "current"
                else "were not compared against a build: there is none here")
         )
         return 0

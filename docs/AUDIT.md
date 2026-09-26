@@ -1073,6 +1073,92 @@ replaces the files beside the running program, which is right for a folder
 somebody unzipped as well as for an install, and portable is this project's
 default.
 
+### F-217: the check that runs the program ran whichever build happened to be lying about
+
+`tools/shots/terminal.py --check` is the one check in this repository that
+runs VeilVoice and compares what it printed against the committed captures.
+F-103 added it, for a good reason: a string had been edited in the interface,
+every check passed, and `assets/screenshots/cli-help.txt` went on showing the
+old wording on the website, in the README and in the gallery.
+
+It found the binary like this:
+
+    for profile in ("release", "debug"):
+        path = os.path.join(target, profile, name)
+        if os.path.exists(path):
+            return path
+
+Whatever was in `target/`, preferring `release`. Nothing asked whether that
+build was a build of this tree, and its docstring said, as a statement of
+fact, that `verify.py` runs after `cargo build` on the machine where the
+strings were just edited. Nothing made that true.
+
+**The loud half** is what was reported, by the thread landing roadmap item
+171: a release build two days old printed an old help screen, this check
+called `cli-help.txt` wrong, and `cli-help.txt` was right. They deleted the
+binary and moved on, which is the correct thing to do about a false alarm and
+leaves the cause in place.
+
+**The quiet half is the defect.** A build two days old printing a help screen
+two days old *matches* a capture two days old. So a string edited since is
+waved through, silently, by the check whose whole purpose is to say that it
+was not. The means of catching F-103 had been turned back into F-103.
+
+Both halves were reproduced here before anything was changed. The release
+build in this container was from two days earlier, `--check` reported
+`cli-help.txt is not what veilvoice --help prints`, and a rebuild made it pass
+against the same committed file, which is the false alarm exactly. The quiet
+half follows from the same mechanism and needs no separate demonstration: if
+the binary decides the answer and the binary is old, the answer is about the
+old tree whichever way it comes out.
+
+**Preferring `release` is wrong on its own terms.** `cargo build` without
+`--release` is what somebody editing a string runs, and it lands in
+`target/debug`. Two profiles present is not a preference, it is two answers,
+and the one to take is the one that was linked last.
+
+## What it does now
+
+`binary()` takes the most recently built of the two. `build_state()` then asks
+whether that build can answer for this tree at all, and the check refuses
+rather than guessing when it cannot. Refusing is a failure and not a skip,
+because a check that goes quiet when it cannot see is the thing being fixed.
+`--capture` refuses too, and more firmly: capturing from a stale build writes
+down something that is not true and commits it.
+
+The question that can be answered exactly, without reading `cargo`'s internal
+fingerprints, is whether any source has been *written* since the binary was
+linked. That is strictly more cautious than asking whether the bytes differ:
+it can ask for a rebuild that would produce an identical binary, and it cannot
+miss one that would not.
+
+The sources are the crates a `veilvoice` binary is built from, closed over the
+manifests rather than listed, plus the workspace manifest and the lockfile,
+because `clap` renders these screens and a version bump moves their spacing.
+Deriving the list rather than writing it down is what keeps `veilvoice-gui`
+out of it. A list would have included the window, it being a crate in this
+workspace, and every edit to the window would then have declared the command
+line's build out of date, which is the kind of false alarm that gets a check
+deleted.
+
+The cost that remains is a rebuild after a rebase, which rewrites the files it
+carries. It is smaller than it looks: rebasing onto somebody else's Rust means
+the Rust in this tree changed, and the house rules already say to run the Rust
+gates before pushing when it has, so the build was owed anyway.
+
+## What is checked
+
+`tools/shots/terminal.py --self-test`, run by `tools/verify.py` and by CI
+beside the check itself. It builds a throwaway workspace and arranges the
+cases rather than waiting for them: no build at all, a release build older
+than a debug build, a release build newer, a source written after the link, a
+touched `veilvoice-gui` that must not count, and a touched lockfile that must.
+Each was confirmed by inverting it.
+
+That last pair is the part worth having. A staleness check is easy to get
+wrong in the direction that stays green, and a self-test that only proves it
+fires proves half of it.
+
 ### F-213: the program told people it had no network code, next to a command that downloads
 
 Two sentences shipped, in the two places somebody is most likely to read one.
@@ -8874,7 +8960,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and sixteen defects found and fixed (F-1 to F-216), across
+**Two hundred and seventeen defects found and fixed (F-1 to F-217), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
