@@ -1484,6 +1484,7 @@ fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
         .map_err(|error| format!("{}: {error}", path.display()))
 }
 
+/// `path` with its last extension replaced, for putting a render beside its plan.
 fn with_extension(path: &std::path::Path, extension: &str) -> PathBuf {
     let mut out = path.to_path_buf();
     out.set_extension(extension);

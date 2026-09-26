@@ -87,6 +87,10 @@ pub struct Theme {
     pub err: Color32,
 }
 
+/// A colour written as `0xrrggbb`, which is how the palettes below are read.
+///
+/// `const` so every palette in this file is built at compile time, and so a
+/// colour can be used where a constant is needed.
 const fn rgb(hex: u32) -> Color32 {
     Color32::from_rgb(
         ((hex >> 16) & 0xff) as u8,
@@ -417,6 +421,13 @@ const JETBRAINS_MONO_PATHS: &[&str] = &[
     "/usr/share/fonts/jetbrains-mono/JetBrainsMono-Regular.ttf",
 ];
 
+/// Every place JetBrains Mono might be on this machine, most likely first.
+///
+/// The system locations from the table above, then this user's own font
+/// directory, because a font somebody installed for themselves is the one they
+/// expect to be used. Nothing is downloaded and nothing is installed: if none of
+/// these exists the window draws in the font it ships with, which is why this
+/// answers a list rather than a result.
 fn user_font_paths() -> Vec<std::path::PathBuf> {
     let mut paths: Vec<std::path::PathBuf> = JETBRAINS_MONO_PATHS
         .iter()

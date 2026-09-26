@@ -94,8 +94,11 @@ const DELAYS: [f32; 12] = [
     0.000, 0.120, 0.240, 0.080, 0.300, 0.180, 0.060, 0.420, 0.220, 0.500, 0.140, 0.360,
 ];
 
-/// Height as a fraction of the available box, matching `16%` and `82%`.
+/// The shortest a bar gets, as a fraction of the available box, matching the
+/// `16%` the website's own mark animates between.
 const MIN_FRACTION: f32 = 0.16;
+/// And the tallest, matching that mark's `82%`. Not `1.0`: a bar that reaches the
+/// top of its box reads as clipped rather than as loud.
 const MAX_FRACTION: f32 = 0.82;
 
 /// How far along its cycle a bar is, in 0..=1, eased the way CSS

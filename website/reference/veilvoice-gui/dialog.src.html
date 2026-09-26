@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/dialog.rs</code></h1>
-<p style="color:var(--muted)"><a href="dialog.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 425 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="dialog.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 430 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -465,59 +465,64 @@
 <span class="ln" id="L371">}</span>
 <span class="ln" id="L372"></span>
 <span class="src-item" id="fn-house_style">
-<span class="ln" id="L373"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L374"><span class="tok-kw">mod</span> house_style {</span>
-<span class="ln" id="L375">    <span class="tok-com">/// **No dashes in anything the application shows.**</span></span>
-<span class="ln" id="L376">    <span class="tok-com">///</span></span>
-<span class="ln" id="L377">    <span class="tok-com">/// Not the em dash, and not the doubled hyphen this project used in its</span></span>
-<span class="ln" id="L378">    <span class="tok-com">/// place. A dash is almost always a colon, a semicolon, a full stop or a</span></span>
-<span class="ln" id="L379">    <span class="tok-com">/// pair of brackets wearing a disguise, and the sentence reads better once</span></span>
-<span class="ln" id="L380">    <span class="tok-com">/// it has been made to choose.</span></span>
+<span class="ln" id="L373"><span class="tok-com">/// The house style, enforced rather than described.</span></span>
+<span class="ln" id="L374"><span class="tok-com">///</span></span>
+<span class="ln" id="L375"><span class="tok-com">/// A test module rather than a document, because a rule about what the interface</span></span>
+<span class="ln" id="L376"><span class="tok-com">/// may say is only a rule if something fails when it is broken. Each test below</span></span>
+<span class="ln" id="L377"><span class="tok-com">/// carries the reason for its rule, so the reason arrives with the failure.</span></span>
+<span class="ln" id="L378"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L379"><span class="tok-kw">mod</span> house_style {</span>
+<span class="ln" id="L380">    <span class="tok-com">/// **No dashes in anything the application shows.**</span></span>
 <span class="ln" id="L381">    <span class="tok-com">///</span></span>
-<span class="ln" id="L382">    <span class="tok-com">/// Checked across the whole crate rather than in one file, because the</span></span>
-<span class="ln" id="L383">    <span class="tok-com">/// strings a reader sees are spread through every panel. Comments are</span></span>
-<span class="ln" id="L384">    <span class="tok-com">/// exempt: this is about the interface, and a sweep of the rest of the</span></span>
-<span class="ln" id="L385">    <span class="tok-com">/// repository is a separate decision that has not been taken.</span></span>
-<span class="ln" id="L386">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L387">    <span class="tok-kw">fn</span> <span class="tok-fn">no_dashes_in_anything_the_interface_says</span>() {</span>
-<span class="ln" id="L388">        <span class="tok-kw">let</span> here = std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;src&quot;</span>);</span>
-<span class="ln" id="L389">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L390">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;here).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;src/&quot;</span>) {</span>
-<span class="ln" id="L391">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;entry&quot;</span>).<span class="tok-fn">path</span>();</span>
-<span class="ln" id="L392">            <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">and_then</span>(|e| e.<span class="tok-fn">to_str</span>()) != <span class="tok-fn">Some</span>(<span class="tok-str">&quot;rs&quot;</span>) {</span>
-<span class="ln" id="L393">                continue;</span>
-<span class="ln" id="L394">            }</span>
-<span class="ln" id="L395">            <span class="tok-kw">let</span> name = path.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L396">            <span class="tok-kw">let</span> source = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path)</span>
-<span class="ln" id="L397">                .<span class="tok-fn">unwrap_or_default</span>()</span>
-<span class="ln" id="L398">                .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L399">            <span class="tok-com">// Code only, and only outside the tests: a test may legitimately</span></span>
-<span class="ln" id="L400">            <span class="tok-com">// quote a dash in order to assert something about it, and this</span></span>
-<span class="ln" id="L401">            <span class="tok-com">// very test contains two.</span></span>
-<span class="ln" id="L402">            <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L403">            <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> body.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L404">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L405">                <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
-<span class="ln" id="L406">                    continue;</span>
-<span class="ln" id="L407">                }</span>
-<span class="ln" id="L408">                <span class="tok-com">// The escape as well as the character. One was written as a</span></span>
-<span class="ln" id="L409">                <span class="tok-com">// unicode escape inside a format string and this test walked</span></span>
-<span class="ln" id="L410">                <span class="tok-com">// straight past it: the guard fooled by the same trick twice,</span></span>
-<span class="ln" id="L411">                <span class="tok-com">// once by its own comments and once by an escape sequence.</span></span>
-<span class="ln" id="L412">                <span class="tok-kw">let</span> escaped = concat!(<span class="tok-str">&quot;\\u{&quot;</span>, <span class="tok-str">&quot;2014}&quot;</span>);</span>
-<span class="ln" id="L413">                <span class="tok-kw">if</span> line.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\u{2014}&#x27;</span>) || line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot; -- &quot;</span>) || line.<span class="tok-fn">contains</span>(escaped) {</span>
-<span class="ln" id="L414">                    offenders.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{name}:{}: {}&quot;</span>, number + <span class="tok-num">1</span>, line.<span class="tok-fn">trim</span>()));</span>
-<span class="ln" id="L415">                }</span>
-<span class="ln" id="L416">            }</span>
-<span class="ln" id="L417">        }</span>
-<span class="ln" id="L418">        assert!(</span>
-<span class="ln" id="L419">            offenders.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L420">            <span class="tok-str">&quot;these carry a dash into the interface; rewrite the sentence with a \</span></span>
-<span class="ln" id="L421"><span class="tok-str">             colon, a semicolon, a full stop or brackets:\n{}&quot;</span>,</span>
-<span class="ln" id="L422">            offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L423">        );</span>
-<span class="ln" id="L424">    }</span>
-<span class="ln" id="L425">}</span>
+<span class="ln" id="L382">    <span class="tok-com">/// Not the em dash, and not the doubled hyphen this project used in its</span></span>
+<span class="ln" id="L383">    <span class="tok-com">/// place. A dash is almost always a colon, a semicolon, a full stop or a</span></span>
+<span class="ln" id="L384">    <span class="tok-com">/// pair of brackets wearing a disguise, and the sentence reads better once</span></span>
+<span class="ln" id="L385">    <span class="tok-com">/// it has been made to choose.</span></span>
+<span class="ln" id="L386">    <span class="tok-com">///</span></span>
+<span class="ln" id="L387">    <span class="tok-com">/// Checked across the whole crate rather than in one file, because the</span></span>
+<span class="ln" id="L388">    <span class="tok-com">/// strings a reader sees are spread through every panel. Comments are</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// exempt: this is about the interface, and a sweep of the rest of the</span></span>
+<span class="ln" id="L390">    <span class="tok-com">/// repository is a separate decision that has not been taken.</span></span>
+<span class="ln" id="L391">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L392">    <span class="tok-kw">fn</span> <span class="tok-fn">no_dashes_in_anything_the_interface_says</span>() {</span>
+<span class="ln" id="L393">        <span class="tok-kw">let</span> here = std::path::Path::<span class="tok-fn">new</span>(env!(<span class="tok-str">&quot;CARGO_MANIFEST_DIR&quot;</span>)).<span class="tok-fn">join</span>(<span class="tok-str">&quot;src&quot;</span>);</span>
+<span class="ln" id="L394">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> offenders = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L395">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> std::fs::<span class="tok-fn">read_dir</span>(&amp;here).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;src/&quot;</span>) {</span>
+<span class="ln" id="L396">            <span class="tok-kw">let</span> path = entry.<span class="tok-fn">expect</span>(<span class="tok-str">&quot;entry&quot;</span>).<span class="tok-fn">path</span>();</span>
+<span class="ln" id="L397">            <span class="tok-kw">if</span> path.<span class="tok-fn">extension</span>().<span class="tok-fn">and_then</span>(|e| e.<span class="tok-fn">to_str</span>()) != <span class="tok-fn">Some</span>(<span class="tok-str">&quot;rs&quot;</span>) {</span>
+<span class="ln" id="L398">                continue;</span>
+<span class="ln" id="L399">            }</span>
+<span class="ln" id="L400">            <span class="tok-kw">let</span> name = path.<span class="tok-fn">file_name</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L401">            <span class="tok-kw">let</span> source = std::fs::<span class="tok-fn">read_to_string</span>(&amp;path)</span>
+<span class="ln" id="L402">                .<span class="tok-fn">unwrap_or_default</span>()</span>
+<span class="ln" id="L403">                .<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L404">            <span class="tok-com">// Code only, and only outside the tests: a test may legitimately</span></span>
+<span class="ln" id="L405">            <span class="tok-com">// quote a dash in order to assert something about it, and this</span></span>
+<span class="ln" id="L406">            <span class="tok-com">// very test contains two.</span></span>
+<span class="ln" id="L407">            <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L408">            <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> body.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L409">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L410">                <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) {</span>
+<span class="ln" id="L411">                    continue;</span>
+<span class="ln" id="L412">                }</span>
+<span class="ln" id="L413">                <span class="tok-com">// The escape as well as the character. One was written as a</span></span>
+<span class="ln" id="L414">                <span class="tok-com">// unicode escape inside a format string and this test walked</span></span>
+<span class="ln" id="L415">                <span class="tok-com">// straight past it: the guard fooled by the same trick twice,</span></span>
+<span class="ln" id="L416">                <span class="tok-com">// once by its own comments and once by an escape sequence.</span></span>
+<span class="ln" id="L417">                <span class="tok-kw">let</span> escaped = concat!(<span class="tok-str">&quot;\\u{&quot;</span>, <span class="tok-str">&quot;2014}&quot;</span>);</span>
+<span class="ln" id="L418">                <span class="tok-kw">if</span> line.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\u{2014}&#x27;</span>) || line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot; -- &quot;</span>) || line.<span class="tok-fn">contains</span>(escaped) {</span>
+<span class="ln" id="L419">                    offenders.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;{name}:{}: {}&quot;</span>, number + <span class="tok-num">1</span>, line.<span class="tok-fn">trim</span>()));</span>
+<span class="ln" id="L420">                }</span>
+<span class="ln" id="L421">            }</span>
+<span class="ln" id="L422">        }</span>
+<span class="ln" id="L423">        assert!(</span>
+<span class="ln" id="L424">            offenders.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L425">            <span class="tok-str">&quot;these carry a dash into the interface; rewrite the sentence with a \</span></span>
+<span class="ln" id="L426"><span class="tok-str">             colon, a semicolon, a full stop or brackets:\n{}&quot;</span>,</span>
+<span class="ln" id="L427">            offenders.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L428">        );</span>
+<span class="ln" id="L429">    }</span>
+<span class="ln" id="L430">}</span>
 </span>
 </code></pre>
 </main>

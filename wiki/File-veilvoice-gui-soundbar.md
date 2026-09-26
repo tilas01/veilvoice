@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/soundbar.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 779 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 782 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
 
 ## Contents
 
@@ -90,11 +90,11 @@ ignores it is animation that makes an application unusable for them.
 
 ## What this file contains
 
-779 lines defining **6 functions** (2 public), **0 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+782 lines defining **6 functions** (2 public), **0 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `badge` (line 196) -- Draw the mark at size, returning the response so it can carry a tooltip.
+- `badge` (line 199) -- Draw the mark at size, returning the response so it can carry a tooltip.
   - reaches: `draw`, `animation_clock`, `colour_for`, `height_fraction`, `window_is_settled`
 
 ## What calls what
@@ -111,23 +111,23 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_height_fraction["height_fraction<br/>line 103"]
-    n_window_is_settled["window_is_settled<br/>line 130"]
-    n_animation_clock["animation_clock<br/>line 168"]
-    n_badge(["badge<br/>line 196"])
-    n_draw["draw<br/>line 228"]
-    n_colour_for["colour_for<br/>line 281"]
+    n_height_fraction["height_fraction<br/>line 106"]
+    n_window_is_settled["window_is_settled<br/>line 133"]
+    n_animation_clock["animation_clock<br/>line 171"]
+    n_badge(["badge<br/>line 199"])
+    n_draw["draw<br/>line 231"]
+    n_colour_for["colour_for<br/>line 284"]
     n_badge --> n_draw
     n_draw --> n_animation_clock
     n_draw --> n_colour_for
     n_draw --> n_height_fraction
     n_draw --> n_window_is_settled
-    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L103" "open the source"
-    click n_window_is_settled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L130" "open the source"
-    click n_animation_clock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L168" "open the source"
-    click n_badge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L196" "open the source"
-    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L228" "open the source"
-    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L281" "open the source"
+    click n_height_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L106" "open the source"
+    click n_window_is_settled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L133" "open the source"
+    click n_animation_clock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L171" "open the source"
+    click n_badge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L199" "open the source"
+    click n_draw href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L231" "open the source"
+    click n_colour_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L284" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_badge entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -145,11 +145,11 @@ flowchart TD
 | `PERIOD` <sub>const</sub> | [80](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L80) | Seconds for one full rise and fall. |
 | `SETTLE` <sub>const</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L88) | How long the window must hold still before the mark starts moving again. |
 | `DELAYS` <sub>const</sub> | [93](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L93) | Per-bar phase offsets in seconds, matching the animation-delay values in website/index.html. |
-| `MIN_FRACTION` <sub>const</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L98) | Height as a fraction of the available box, matching 16% and 82%. |
-| `MAX_FRACTION` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L99) |  |
-| `height_fraction` <sub>fn</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L103) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
-| `window_is_settled` <sub>fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L130) | Whether the window is holding still enough for the mark to move. |
-| `animation_clock` <sub>fn</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L168) | The clock the bars are drawn against, which is not always the real one. |
-| `badge` <sub>pub fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L196) | Draw the mark at size, returning the response so it can carry a tooltip. |
-| `draw` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L228) | Draw the mark at size, returning the response so it can carry a tooltip. |
-| `colour_for` <sub>fn</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L281) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |
+| `MIN_FRACTION` <sub>const</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L99) | The shortest a bar gets, as a fraction of the available box, matching the 16% the website's own mark animates between. |
+| `MAX_FRACTION` <sub>const</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L102) | And the tallest, matching that mark's 82%. |
+| `height_fraction` <sub>fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L106) | How far along its cycle a bar is, in 0..=1, eased the way CSS ease-in-out eases. |
+| `window_is_settled` <sub>fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L133) | Whether the window is holding still enough for the mark to move. |
+| `animation_clock` <sub>fn</sub> | [171](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L171) | The clock the bars are drawn against, which is not always the real one. |
+| `badge` <sub>pub fn</sub> | [199](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L199) | Draw the mark at size, returning the response so it can carry a tooltip. |
+| `draw` <sub>pub fn</sub> | [231](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L231) | Draw the mark at size, returning the response so it can carry a tooltip. |
+| `colour_for` <sub>fn</sub> | [284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs#L284) | The left half in the accent colour, the right in the veiled secondary -- the same split the website and the icon use. |

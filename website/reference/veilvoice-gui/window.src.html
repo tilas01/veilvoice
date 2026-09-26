@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/window.rs</code></h1>
-<p style="color:var(--muted)"><a href="window.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 244 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="window.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 249 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -263,66 +263,71 @@
 <span class="ln" id="L183">}</span>
 <span class="ln" id="L184"></span>
 <span class="src-item" id="fn-opening">
-<span class="ln" id="L185"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L186"><span class="tok-kw">mod</span> opening {</span>
-<span class="ln" id="L187">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L188"></span>
-<span class="ln" id="L189">    <span class="tok-com">/// A big screen gets the size the application actually wants.</span></span>
-<span class="ln" id="L190">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L191">    <span class="tok-kw">fn</span> <span class="tok-fn">a_large_screen_gets_the_preferred_size</span>() {</span>
-<span class="ln" id="L192">        assert_eq!(<span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">2560.0</span>, <span class="tok-num">1440.0</span>]), None), PREFERRED);</span>
-<span class="ln" id="L193">        assert_eq!(<span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">3840.0</span>, <span class="tok-num">2160.0</span>]), None), PREFERRED);</span>
-<span class="ln" id="L194">    }</span>
-<span class="ln" id="L195"></span>
-<span class="ln" id="L196">    <span class="tok-com">/// The machine this is really about: a window taller than the screen opens</span></span>
-<span class="ln" id="L197">    <span class="tok-com">/// with its buttons off the bottom.</span></span>
-<span class="ln" id="L198">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L199">    <span class="tok-kw">fn</span> <span class="tok-fn">a_small_laptop_gets_a_window_that_fits_on_it</span>() {</span>
-<span class="ln" id="L200">        <span class="tok-kw">let</span> screen = [<span class="tok-num">1366.0</span>, <span class="tok-num">768.0</span>];</span>
-<span class="ln" id="L201">        <span class="tok-kw">let</span> size = <span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>(screen), None);</span>
-<span class="ln" id="L202">        assert!(</span>
-<span class="ln" id="L203">            size[<span class="tok-num">0</span>] &lt;= screen[<span class="tok-num">0</span>] - CHROME[<span class="tok-num">0</span>] &amp;&amp; size[<span class="tok-num">1</span>] &lt;= screen[<span class="tok-num">1</span>] - CHROME[<span class="tok-num">1</span>],</span>
-<span class="ln" id="L204">            <span class="tok-str">&quot;{size:?} does not leave room for a title bar and a task bar on a \</span></span>
-<span class="ln" id="L205"><span class="tok-str">             {screen:?} screen&quot;</span></span>
-<span class="ln" id="L206">        );</span>
-<span class="ln" id="L207">        assert!(size[<span class="tok-num">0</span>] &gt;= MINIMUM[<span class="tok-num">0</span>] &amp;&amp; size[<span class="tok-num">1</span>] &gt;= MINIMUM[<span class="tok-num">1</span>]);</span>
-<span class="ln" id="L208">    }</span>
-<span class="ln" id="L209"></span>
-<span class="ln" id="L210">    <span class="tok-com">/// 1080p is the commonest desktop screen there is, and the window should</span></span>
-<span class="ln" id="L211">    <span class="tok-com">/// open at its full preferred size on one. A proportional allowance got</span></span>
-<span class="ln" id="L212">    <span class="tok-com">/// this wrong, which is why the allowance is a number of pixels.</span></span>
-<span class="ln" id="L213">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L214">    <span class="tok-kw">fn</span> <span class="tok-fn">the_commonest_screen_of_all_gets_the_full_size</span>() {</span>
-<span class="ln" id="L215">        assert_eq!(<span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">1920.0</span>, <span class="tok-num">1080.0</span>]), None), PREFERRED);</span>
-<span class="ln" id="L216">    }</span>
-<span class="ln" id="L217"></span>
-<span class="ln" id="L218">    <span class="tok-com">/// Never below the floor, however small the screen claims to be. A window</span></span>
-<span class="ln" id="L219">    <span class="tok-com">/// narrower than this has overlapping columns, which is worse than a</span></span>
-<span class="ln" id="L220">    <span class="tok-com">/// window that does not fit.</span></span>
-<span class="ln" id="L221">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L222">    <span class="tok-kw">fn</span> <span class="tok-fn">a_tiny_screen_still_gets_a_readable_window</span>() {</span>
-<span class="ln" id="L223">        <span class="tok-kw">let</span> size = <span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">320.0</span>, <span class="tok-num">200.0</span>]), None);</span>
-<span class="ln" id="L224">        assert_eq!(size, MINIMUM);</span>
-<span class="ln" id="L225">    }</span>
-<span class="ln" id="L226"></span>
-<span class="ln" id="L227">    <span class="tok-com">/// `--size` is somebody saying what they want, including the screenshot</span></span>
-<span class="ln" id="L228">    <span class="tok-com">/// harness, which needs the exact size or the pictures are not comparable.</span></span>
-<span class="ln" id="L229">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L230">    <span class="tok-kw">fn</span> <span class="tok-fn">an_explicit_size_is_not_second_guessed</span>() {</span>
-<span class="ln" id="L231">        assert_eq!(</span>
-<span class="ln" id="L232">            <span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">1366.0</span>, <span class="tok-num">768.0</span>]), <span class="tok-fn">Some</span>([<span class="tok-num">1400.0</span>, <span class="tok-num">1900.0</span>])),</span>
-<span class="ln" id="L233">            [<span class="tok-num">1400.0</span>, <span class="tok-num">1900.0</span>]</span>
-<span class="ln" id="L234">        );</span>
-<span class="ln" id="L235">    }</span>
-<span class="ln" id="L236"></span>
-<span class="ln" id="L237">    <span class="tok-com">/// With nothing known about the screen, the preferred size is the answer:</span></span>
-<span class="ln" id="L238">    <span class="tok-com">/// opening too small is the complaint, and the first frame will report the</span></span>
-<span class="ln" id="L239">    <span class="tok-com">/// monitor if it turns out to matter.</span></span>
-<span class="ln" id="L240">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L241">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_screen_gets_the_preferred_size</span>() {</span>
-<span class="ln" id="L242">        assert_eq!(<span class="tok-fn">opening_size</span>(None, None), PREFERRED);</span>
-<span class="ln" id="L243">    }</span>
-<span class="ln" id="L244">}</span>
+<span class="ln" id="L185"><span class="tok-com">/// What size the window opens at, on screens from a phone to a workstation.</span></span>
+<span class="ln" id="L186"><span class="tok-com">///</span></span>
+<span class="ln" id="L187"><span class="tok-com">/// Its own module because the rule has several cases and each needs naming: the</span></span>
+<span class="ln" id="L188"><span class="tok-com">/// preferred size on a large screen, a shrink to fit on a small one, and an</span></span>
+<span class="ln" id="L189"><span class="tok-com">/// answer when the platform does not say how large the screen is.</span></span>
+<span class="ln" id="L190"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L191"><span class="tok-kw">mod</span> opening {</span>
+<span class="ln" id="L192">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L193"></span>
+<span class="ln" id="L194">    <span class="tok-com">/// A big screen gets the size the application actually wants.</span></span>
+<span class="ln" id="L195">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L196">    <span class="tok-kw">fn</span> <span class="tok-fn">a_large_screen_gets_the_preferred_size</span>() {</span>
+<span class="ln" id="L197">        assert_eq!(<span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">2560.0</span>, <span class="tok-num">1440.0</span>]), None), PREFERRED);</span>
+<span class="ln" id="L198">        assert_eq!(<span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">3840.0</span>, <span class="tok-num">2160.0</span>]), None), PREFERRED);</span>
+<span class="ln" id="L199">    }</span>
+<span class="ln" id="L200"></span>
+<span class="ln" id="L201">    <span class="tok-com">/// The machine this is really about: a window taller than the screen opens</span></span>
+<span class="ln" id="L202">    <span class="tok-com">/// with its buttons off the bottom.</span></span>
+<span class="ln" id="L203">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L204">    <span class="tok-kw">fn</span> <span class="tok-fn">a_small_laptop_gets_a_window_that_fits_on_it</span>() {</span>
+<span class="ln" id="L205">        <span class="tok-kw">let</span> screen = [<span class="tok-num">1366.0</span>, <span class="tok-num">768.0</span>];</span>
+<span class="ln" id="L206">        <span class="tok-kw">let</span> size = <span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>(screen), None);</span>
+<span class="ln" id="L207">        assert!(</span>
+<span class="ln" id="L208">            size[<span class="tok-num">0</span>] &lt;= screen[<span class="tok-num">0</span>] - CHROME[<span class="tok-num">0</span>] &amp;&amp; size[<span class="tok-num">1</span>] &lt;= screen[<span class="tok-num">1</span>] - CHROME[<span class="tok-num">1</span>],</span>
+<span class="ln" id="L209">            <span class="tok-str">&quot;{size:?} does not leave room for a title bar and a task bar on a \</span></span>
+<span class="ln" id="L210"><span class="tok-str">             {screen:?} screen&quot;</span></span>
+<span class="ln" id="L211">        );</span>
+<span class="ln" id="L212">        assert!(size[<span class="tok-num">0</span>] &gt;= MINIMUM[<span class="tok-num">0</span>] &amp;&amp; size[<span class="tok-num">1</span>] &gt;= MINIMUM[<span class="tok-num">1</span>]);</span>
+<span class="ln" id="L213">    }</span>
+<span class="ln" id="L214"></span>
+<span class="ln" id="L215">    <span class="tok-com">/// 1080p is the commonest desktop screen there is, and the window should</span></span>
+<span class="ln" id="L216">    <span class="tok-com">/// open at its full preferred size on one. A proportional allowance got</span></span>
+<span class="ln" id="L217">    <span class="tok-com">/// this wrong, which is why the allowance is a number of pixels.</span></span>
+<span class="ln" id="L218">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L219">    <span class="tok-kw">fn</span> <span class="tok-fn">the_commonest_screen_of_all_gets_the_full_size</span>() {</span>
+<span class="ln" id="L220">        assert_eq!(<span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">1920.0</span>, <span class="tok-num">1080.0</span>]), None), PREFERRED);</span>
+<span class="ln" id="L221">    }</span>
+<span class="ln" id="L222"></span>
+<span class="ln" id="L223">    <span class="tok-com">/// Never below the floor, however small the screen claims to be. A window</span></span>
+<span class="ln" id="L224">    <span class="tok-com">/// narrower than this has overlapping columns, which is worse than a</span></span>
+<span class="ln" id="L225">    <span class="tok-com">/// window that does not fit.</span></span>
+<span class="ln" id="L226">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L227">    <span class="tok-kw">fn</span> <span class="tok-fn">a_tiny_screen_still_gets_a_readable_window</span>() {</span>
+<span class="ln" id="L228">        <span class="tok-kw">let</span> size = <span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">320.0</span>, <span class="tok-num">200.0</span>]), None);</span>
+<span class="ln" id="L229">        assert_eq!(size, MINIMUM);</span>
+<span class="ln" id="L230">    }</span>
+<span class="ln" id="L231"></span>
+<span class="ln" id="L232">    <span class="tok-com">/// `--size` is somebody saying what they want, including the screenshot</span></span>
+<span class="ln" id="L233">    <span class="tok-com">/// harness, which needs the exact size or the pictures are not comparable.</span></span>
+<span class="ln" id="L234">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L235">    <span class="tok-kw">fn</span> <span class="tok-fn">an_explicit_size_is_not_second_guessed</span>() {</span>
+<span class="ln" id="L236">        assert_eq!(</span>
+<span class="ln" id="L237">            <span class="tok-fn">opening_size</span>(<span class="tok-fn">Some</span>([<span class="tok-num">1366.0</span>, <span class="tok-num">768.0</span>]), <span class="tok-fn">Some</span>([<span class="tok-num">1400.0</span>, <span class="tok-num">1900.0</span>])),</span>
+<span class="ln" id="L238">            [<span class="tok-num">1400.0</span>, <span class="tok-num">1900.0</span>]</span>
+<span class="ln" id="L239">        );</span>
+<span class="ln" id="L240">    }</span>
+<span class="ln" id="L241"></span>
+<span class="ln" id="L242">    <span class="tok-com">/// With nothing known about the screen, the preferred size is the answer:</span></span>
+<span class="ln" id="L243">    <span class="tok-com">/// opening too small is the complaint, and the first frame will report the</span></span>
+<span class="ln" id="L244">    <span class="tok-com">/// monitor if it turns out to matter.</span></span>
+<span class="ln" id="L245">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L246">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unknown_screen_gets_the_preferred_size</span>() {</span>
+<span class="ln" id="L247">        assert_eq!(<span class="tok-fn">opening_size</span>(None, None), PREFERRED);</span>
+<span class="ln" id="L248">    }</span>
+<span class="ln" id="L249">}</span>
 </span>
 </code></pre>
 </main>

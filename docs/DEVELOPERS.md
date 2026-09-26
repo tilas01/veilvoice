@@ -214,6 +214,7 @@ And what it then checks:
 - **per-program guides match the user guide**: `python tools/docs/guides.py --check`
 - **the wiki matches the documents, and every link in it resolves**: `python tools/docs/wiki.py --check`
 - **website source pages match their files**: `python tools/docs/sources.py --check`
+- **every published item says what it is for**: `python tools/audit/documented.py`
 - **every command is documented, and its window location exists**: `python tools/docs/commands.py --check`
 - **the developer guide matches the tree**: `python tools/docs/developers.py --check`
 - **the website's wiki matches the wiki**: `python tools/site/wiki_site.py --check`

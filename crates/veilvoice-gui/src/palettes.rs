@@ -160,6 +160,13 @@ struct Parsed {
     colours: Vec<(String, Color32)>,
 }
 
+/// A `#rrggbb` colour, or `None` if that is not what this is.
+///
+/// Six digits exactly, with the `#` optional. Shorthand is not accepted and
+/// neither is an alpha channel: a palette file is written by somebody who meant
+/// a particular colour, and guessing at `#abc` or dropping an alpha they wrote
+/// would give them a theme that is nearly what they asked for, which is harder to
+/// notice than a line that was rejected.
 fn parse_hex(text: &str) -> Option<Color32> {
     let text = text.trim().trim_start_matches('#');
     if text.len() != 6 || !text.chars().all(|c| c.is_ascii_hexdigit()) {
@@ -255,6 +262,13 @@ fn parse(text: &str, fallback_id: &str) -> Result<Parsed, Vec<String>> {
     }
 }
 
+/// A parsed palette file as a [`Theme`], with anything it left out taken from
+/// the built-in one.
+///
+/// Every token has a fallback rather than being required, so a palette naming
+/// three colours is a valid palette. The alternative is refusing the file, which
+/// would mean somebody who wanted to change the background had to write out
+/// every colour in the interface to do it.
 fn build(parsed: Parsed) -> Theme {
     let get = |token: &str| -> Color32 {
         parsed

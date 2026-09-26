@@ -284,6 +284,13 @@ fn run(password: Option<&str>) -> State {
     }
 }
 
+/// Write `bytes` to `path`, readable by this account and no other, creating the
+/// directory if it is not there.
+///
+/// A thin wrapper so every write in this module goes through one call and cannot
+/// be the one that forgot the permissions. What it writes is the record of what
+/// this installation looked like, and a record anybody on the machine can
+/// rewrite is a record that proves nothing.
 fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         if !parent.as_os_str().is_empty() {

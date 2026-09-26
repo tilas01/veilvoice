@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/avnotice.svg" alt="avnotice.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/avnotice.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 298 lines &middot; <a href="avnotice.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 305 lines &middot; <a href="avnotice.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-problem-this-is-for">The problem this is for</a>
@@ -89,7 +89,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>298 lines defining <strong>8 functions</strong> (7 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>305 lines defining <strong>8 functions</strong> (7 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Product</code> <span style="color:var(--muted)">line 51</span> &middot; An antivirus product recognised on this machine.</li>
 <li><code>struct Notice</code> <span style="color:var(--muted)">line 58</span> &middot; The notice to put in front of the user, once.</li>
@@ -165,7 +165,7 @@
 <a href="avnotice.src.html#fn-detect_windows">
 <rect x="246.0" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="316.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">detect_windows</text>
-<text x="316.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 212</text>
+<text x="316.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 219</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -191,7 +191,7 @@ flowchart TD
     n_prior_was_unclean([&quot;Session::prior_was_unclean&lt;br/&gt;line 151&quot;])
     n_end([&quot;Session::end&lt;br/&gt;line 160&quot;])
     n_detect([&quot;detect&lt;br/&gt;line 174&quot;])
-    n_detect_windows[&quot;detect_windows&lt;br/&gt;line 212&quot;]
+    n_detect_windows[&quot;detect_windows&lt;br/&gt;line 219&quot;]
     n_begin --&gt; n_marker_path
     n_detect --&gt; n_detect_windows
     click n_message href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L69&quot; &quot;open the source&quot;
@@ -201,7 +201,7 @@ flowchart TD
     click n_prior_was_unclean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L151&quot; &quot;open the source&quot;
     click n_end href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L160&quot; &quot;open the source&quot;
     click n_detect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L174&quot; &quot;open the source&quot;
-    click n_detect_windows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L212&quot; &quot;open the source&quot;
+    click n_detect_windows href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/avnotice.rs#L219&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_message,n_diagnose,n_begin,n_prior_was_unclean,n_end,n_detect entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -225,7 +225,7 @@ flowchart TD
 <tr><td><code>Session::end</code> <sub>pub fn</sub></td><td><a href="avnotice.src.html#fn-session-end">160</a></td><td>End the session cleanly, removing the marker.</td></tr>
 <tr><td><code>detect</code> <sub>pub fn</sub></td><td><a href="avnotice.src.html#fn-detect">174</a></td><td>Look for antivirus products on this machine.</td></tr>
 <tr><td><code>WINDOWS_PRODUCTS</code> <sub>const</sub></td><td><a href="avnotice.src.html#fn-windows_products">192</a></td><td>Known products, and a path whose presence is good evidence of them.</td></tr>
-<tr><td><code>detect_windows</code> <sub>fn</sub></td><td><a href="avnotice.src.html#fn-detect_windows">212</a></td><td></td></tr>
+<tr><td><code>detect_windows</code> <sub>fn</sub></td><td><a href="avnotice.src.html#fn-detect_windows">219</a></td><td>Which of the products in the table above are installed on this machine.</td></tr>
 </tbody></table>
 </section>
 </div></div>

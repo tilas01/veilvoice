@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/window.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 244 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 249 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs)
 
 ## Contents
 
@@ -43,7 +43,7 @@ program from *opening* somewhere unreadable, which is a different thing.
 
 ## What this file contains
 
-244 lines defining **3 functions** (3 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+249 lines defining **3 functions** (3 public), **0 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -90,4 +90,4 @@ flowchart TD
 | `requested_size` <sub>pub fn</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs#L64) | The size asked for by --size <W>x<H>, if one was and it parses. |
 | `size_from` <sub>pub fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs#L73) | The parsing half, separated from the environment so it can be tested. |
 | `opening_size` <sub>pub fn</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs#L100) | The size to open at on this screen, given the monitor and what was asked for on the command line. |
-| `opening` <sub>mod</sub> | [186](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs#L186) |  |
+| `opening` <sub>mod</sub> | [191](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs#L191) | What size the window opens at, on screens from a phone to a workstation. |

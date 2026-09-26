@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/firstrun.svg" alt="firstrun.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/firstrun.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 856 lines &middot; <a href="firstrun.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 863 lines &middot; <a href="firstrun.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-replaced">What this replaced</a>
@@ -95,15 +95,15 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>856 lines defining <strong>14 functions</strong> (1 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>863 lines defining <strong>14 functions</strong> (1 public), <strong>4 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Step</code> <span style="color:var(--muted)">line 51</span> &middot; Which card is showing.</li>
-<li><code>struct FirstRun</code> <span style="color:var(--muted)">line 101</span> &middot; What the setup is holding while it runs.</li>
-<li><code>enum Outcome</code> <span style="color:var(--muted)">line 123</span> &middot; What the panel wants the application to do after drawing.</li>
-<li><code>struct Reading</code> <span style="color:var(--muted)">line 582</span> &middot; What the last card of the tour reads from this computer.</li>
+<li><code>struct FirstRun</code> <span style="color:var(--muted)">line 108</span> &middot; What the setup is holding while it runs.</li>
+<li><code>enum Outcome</code> <span style="color:var(--muted)">line 130</span> &middot; What the panel wants the application to do after drawing.</li>
+<li><code>struct Reading</code> <span style="color:var(--muted)">line 589</span> &middot; What the last card of the tour reads from this computer.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>FirstRun::panel</code> <span style="color:var(--muted)">line 137</span> &middot; Draw the current card.
+<li><code>FirstRun::panel</code> <span style="color:var(--muted)">line 144</span> &middot; Draw the current card.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>app_lock</code>, <code>appearance</code>, <code>autolock</code>, <code>machine</code>, <code>recording</code>, <code>should_skip</code>, <code>buttons</code>, <code>card</code>, <code>field</code>, <code>still_reading</code></span>
 </li>
 </ul>
@@ -153,62 +153,62 @@
 <a href="firstrun.src.html#fn-firstrun-panel">
 <rect x="381.9" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="456.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">FirstRun::panel</text>
-<text x="456.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
+<text x="456.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 144</text>
 </a>
 <a href="firstrun.src.html#fn-firstrun-should_skip">
 <rect x="99.4" y="220.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="198.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">FirstRun::should_skip</text>
-<text x="198.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 200</text>
+<text x="198.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 207</text>
 </a>
 <a href="firstrun.src.html#fn-firstrun-appearance">
 <rect x="322.6" y="220.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="417.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">FirstRun::appearance</text>
-<text x="417.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
+<text x="417.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 216</text>
 </a>
 <a href="firstrun.src.html#fn-firstrun-app_lock">
 <rect x="20.0" y="320.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="106.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">FirstRun::app_lock</text>
-<text x="106.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 226</text>
+<text x="106.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 233</text>
 </a>
 <a href="firstrun.src.html#fn-firstrun-recording">
 <rect x="219.1" y="320.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="309.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">FirstRun::recording</text>
-<text x="309.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 298</text>
+<text x="309.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 305</text>
 </a>
 <a href="firstrun.src.html#fn-firstrun-machine">
 <rect x="426.2" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="508.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">FirstRun::machine</text>
-<text x="508.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 394</text>
+<text x="508.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 401</text>
 </a>
 <a href="firstrun.src.html#fn-firstrun-autolock">
 <rect x="219.1" y="420.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="305.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">FirstRun::autolock</text>
-<text x="305.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 532</text>
+<text x="305.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 539</text>
 </a>
 <a href="firstrun.src.html#fn-card">
 <rect x="61.5" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="107.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">card</text>
-<text x="107.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 556</text>
+<text x="107.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 563</text>
 </a>
 <a href="firstrun.src.html#fn-read_machine">
 <rect x="243.3" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="305.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_machine</text>
-<text x="305.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 600</text>
+<text x="305.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 607</text>
 </a>
 <a href="firstrun.src.html#fn-still_reading">
 <rect x="180.0" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="246.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">still_reading</text>
-<text x="246.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 620</text>
+<text x="246.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 627</text>
 </a>
 <a href="firstrun.src.html#fn-field">
 <rect x="338.8" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="385.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">field</text>
-<text x="385.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 631</text>
+<text x="385.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 638</text>
 </a>
 <a href="firstrun.src.html#fn-buttons">
 <rect x="457.2" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="503.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">buttons</text>
-<text x="503.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 643</text>
+<text x="503.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 650</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -227,18 +227,18 @@
 flowchart TD
     n_next[&quot;Step::next&lt;br/&gt;line 75&quot;]
     n_position[&quot;Step::position&lt;br/&gt;line 86&quot;]
-    n_panel([&quot;FirstRun::panel&lt;br/&gt;line 137&quot;])
-    n_should_skip[&quot;FirstRun::should_skip&lt;br/&gt;line 200&quot;]
-    n_appearance[&quot;FirstRun::appearance&lt;br/&gt;line 209&quot;]
-    n_app_lock[&quot;FirstRun::app_lock&lt;br/&gt;line 226&quot;]
-    n_recording[&quot;FirstRun::recording&lt;br/&gt;line 298&quot;]
-    n_machine[&quot;FirstRun::machine&lt;br/&gt;line 394&quot;]
-    n_autolock[&quot;FirstRun::autolock&lt;br/&gt;line 532&quot;]
-    n_card[&quot;card&lt;br/&gt;line 556&quot;]
-    n_read_machine[&quot;read_machine&lt;br/&gt;line 600&quot;]
-    n_still_reading[&quot;still_reading&lt;br/&gt;line 620&quot;]
-    n_field[&quot;field&lt;br/&gt;line 631&quot;]
-    n_buttons[&quot;buttons&lt;br/&gt;line 643&quot;]
+    n_panel([&quot;FirstRun::panel&lt;br/&gt;line 144&quot;])
+    n_should_skip[&quot;FirstRun::should_skip&lt;br/&gt;line 207&quot;]
+    n_appearance[&quot;FirstRun::appearance&lt;br/&gt;line 216&quot;]
+    n_app_lock[&quot;FirstRun::app_lock&lt;br/&gt;line 233&quot;]
+    n_recording[&quot;FirstRun::recording&lt;br/&gt;line 305&quot;]
+    n_machine[&quot;FirstRun::machine&lt;br/&gt;line 401&quot;]
+    n_autolock[&quot;FirstRun::autolock&lt;br/&gt;line 539&quot;]
+    n_card[&quot;card&lt;br/&gt;line 563&quot;]
+    n_read_machine[&quot;read_machine&lt;br/&gt;line 607&quot;]
+    n_still_reading[&quot;still_reading&lt;br/&gt;line 627&quot;]
+    n_field[&quot;field&lt;br/&gt;line 638&quot;]
+    n_buttons[&quot;buttons&lt;br/&gt;line 650&quot;]
     n_app_lock --&gt; n_buttons
     n_app_lock --&gt; n_card
     n_app_lock --&gt; n_field
@@ -260,18 +260,18 @@ flowchart TD
     n_recording --&gt; n_field
     click n_next href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L75&quot; &quot;open the source&quot;
     click n_position href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L86&quot; &quot;open the source&quot;
-    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L137&quot; &quot;open the source&quot;
-    click n_should_skip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L200&quot; &quot;open the source&quot;
-    click n_appearance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L209&quot; &quot;open the source&quot;
-    click n_app_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L226&quot; &quot;open the source&quot;
-    click n_recording href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L298&quot; &quot;open the source&quot;
-    click n_machine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L394&quot; &quot;open the source&quot;
-    click n_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L532&quot; &quot;open the source&quot;
-    click n_card href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L556&quot; &quot;open the source&quot;
-    click n_read_machine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L600&quot; &quot;open the source&quot;
-    click n_still_reading href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L620&quot; &quot;open the source&quot;
-    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L631&quot; &quot;open the source&quot;
-    click n_buttons href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L643&quot; &quot;open the source&quot;
+    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L144&quot; &quot;open the source&quot;
+    click n_should_skip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L207&quot; &quot;open the source&quot;
+    click n_appearance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L216&quot; &quot;open the source&quot;
+    click n_app_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L233&quot; &quot;open the source&quot;
+    click n_recording href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L305&quot; &quot;open the source&quot;
+    click n_machine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L401&quot; &quot;open the source&quot;
+    click n_autolock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L539&quot; &quot;open the source&quot;
+    click n_card href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L563&quot; &quot;open the source&quot;
+    click n_read_machine href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L607&quot; &quot;open the source&quot;
+    click n_still_reading href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L627&quot; &quot;open the source&quot;
+    click n_field href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L638&quot; &quot;open the source&quot;
+    click n_buttons href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L650&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_panel entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -285,22 +285,22 @@ flowchart TD
 <tr><td><code>Step</code> <sub>pub enum</sub></td><td><a href="firstrun.src.html#fn-step">51</a></td><td>Which card is showing.</td></tr>
 <tr><td><code>Step::next</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-step-next">75</a></td><td>The step after this one, or None at the end of the tour.</td></tr>
 <tr><td><code>Step::position</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-step-position">86</a></td><td>One-based position, for &quot;step 2 of 4&quot;.</td></tr>
-<tr><td><code>Step::COUNT</code> <sub>const</sub></td><td><a href="firstrun.src.html#fn-step-count">96</a></td><td></td></tr>
-<tr><td><code>FirstRun</code> <sub>pub struct</sub></td><td><a href="firstrun.src.html#fn-firstrun">101</a></td><td>What the setup is holding while it runs.</td></tr>
-<tr><td><code>Outcome</code> <sub>pub enum</sub></td><td><a href="firstrun.src.html#fn-outcome">123</a></td><td>What the panel wants the application to do after drawing.</td></tr>
-<tr><td><code>FirstRun::panel</code> <sub>pub fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-panel">137</a></td><td>Draw the current card.</td></tr>
-<tr><td><code>FirstRun::should_skip</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-should_skip">200</a></td><td>Whether a card has nothing left to ask.</td></tr>
-<tr><td><code>FirstRun::appearance</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-appearance">209</a></td><td>The appearance step: pick a palette and see it applied immediately.</td></tr>
-<tr><td><code>FirstRun::app_lock</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-app_lock">226</a></td><td>The app-lock step: set a passphrase for VeilVoice itself, or decline it.</td></tr>
-<tr><td><code>FirstRun::recording</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-recording">298</a></td><td>The recording step: the at-rest passphrase, and what it is separate from.</td></tr>
-<tr><td><code>FirstRun::machine</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-machine">394</a></td><td>The machine card: what this computer says, read once rather than per frame.</td></tr>
-<tr><td><code>FirstRun::autolock</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-autolock">532</a></td><td>The auto-lock step: how long idle before the window locks itself.</td></tr>
-<tr><td><code>card</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-card">556</a></td><td>A bordered card, so each step reads as one thing rather than a page of text.</td></tr>
-<tr><td><code>Reading</code> <sub>struct</sub></td><td><a href="firstrun.src.html#fn-reading">582</a></td><td>What the last card of the tour reads from this computer.</td></tr>
-<tr><td><code>read_machine</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-read_machine">600</a></td><td>Ask this computer everything the last card shows, on a worker thread.</td></tr>
-<tr><td><code>still_reading</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-still_reading">620</a></td><td>The line a card shows where an answer will go, while it is being got.</td></tr>
-<tr><td><code>field</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-field">631</a></td><td>A password field with its label, laid out like the rest of the application.</td></tr>
-<tr><td><code>buttons</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-buttons">643</a></td><td>The row that moves on.</td></tr>
+<tr><td><code>Step::COUNT</code> <sub>const</sub></td><td><a href="firstrun.src.html#fn-step-count">103</a></td><td>How many cards the tour has.</td></tr>
+<tr><td><code>FirstRun</code> <sub>pub struct</sub></td><td><a href="firstrun.src.html#fn-firstrun">108</a></td><td>What the setup is holding while it runs.</td></tr>
+<tr><td><code>Outcome</code> <sub>pub enum</sub></td><td><a href="firstrun.src.html#fn-outcome">130</a></td><td>What the panel wants the application to do after drawing.</td></tr>
+<tr><td><code>FirstRun::panel</code> <sub>pub fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-panel">144</a></td><td>Draw the current card.</td></tr>
+<tr><td><code>FirstRun::should_skip</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-should_skip">207</a></td><td>Whether a card has nothing left to ask.</td></tr>
+<tr><td><code>FirstRun::appearance</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-appearance">216</a></td><td>The appearance step: pick a palette and see it applied immediately.</td></tr>
+<tr><td><code>FirstRun::app_lock</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-app_lock">233</a></td><td>The app-lock step: set a passphrase for VeilVoice itself, or decline it.</td></tr>
+<tr><td><code>FirstRun::recording</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-recording">305</a></td><td>The recording step: the at-rest passphrase, and what it is separate from.</td></tr>
+<tr><td><code>FirstRun::machine</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-machine">401</a></td><td>The machine card: what this computer says, read once rather than per frame.</td></tr>
+<tr><td><code>FirstRun::autolock</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-firstrun-autolock">539</a></td><td>The auto-lock step: how long idle before the window locks itself.</td></tr>
+<tr><td><code>card</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-card">563</a></td><td>A bordered card, so each step reads as one thing rather than a page of text.</td></tr>
+<tr><td><code>Reading</code> <sub>struct</sub></td><td><a href="firstrun.src.html#fn-reading">589</a></td><td>What the last card of the tour reads from this computer.</td></tr>
+<tr><td><code>read_machine</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-read_machine">607</a></td><td>Ask this computer everything the last card shows, on a worker thread.</td></tr>
+<tr><td><code>still_reading</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-still_reading">627</a></td><td>The line a card shows where an answer will go, while it is being got.</td></tr>
+<tr><td><code>field</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-field">638</a></td><td>A password field with its label, laid out like the rest of the application.</td></tr>
+<tr><td><code>buttons</code> <sub>fn</sub></td><td><a href="firstrun.src.html#fn-buttons">650</a></td><td>The row that moves on.</td></tr>
 </tbody></table>
 </section>
 </div></div>

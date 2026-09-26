@@ -400,6 +400,14 @@ CHECKS = [
      [sys.executable, "tools/docs/wiki.py", "--check"]),
     ("website source pages match their files",
      [sys.executable, "tools/docs/sources.py", "--check"]),
+    # Every item on a published page has a sentence under it. This only
+    # reported for a long time, because it found eighty-one things and a guard
+    # that fails a build for eighty-one known things is one somebody turns off.
+    # The last of those sentences was written on 2026-09-26 and it became a
+    # check in the same commit, which is what its own module note said it would
+    # do.
+    ("every published item says what it is for",
+     [sys.executable, "tools/audit/documented.py"]),
     ("every command is documented, and its window location exists",
      [sys.executable, "tools/docs/commands.py", "--check"]),
     ("the developer guide matches the tree",
