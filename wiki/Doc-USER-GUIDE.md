@@ -182,10 +182,15 @@ VeilVoice bundles no HTTP client, and this is checked rather than claimed:
 nothing in the workspace links one. Two features nonetheless involve the
 network, and the way they do it is the point.
 
-**Check for updates**, in the desktop application only, asks the operating
-system's own transfer tool to fetch one small file, and reads a version number
-out of what it printed. It is a button, it is never automatic, and the command
-line has no such feature at all.
+**Looking for a newer version** asks the operating system's own transfer tool to
+fetch one small file, and reads a version number out of what it printed. It is
+the **Check for updates** button on the window's About tab, and it is
+`veilvoice update --check` at the command line. Neither is ever automatic:
+there is no timer, no check at startup and nothing in the background, and no
+setting turns either into a schedule. `veilvoice update` without `--check` goes
+on to fetch the release, check its signature against the key compiled into this
+program, and put it in place. [Updating](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-UPDATING) is the whole of what that
+does and what you see afterwards.
 
 **It looks along the stream this copy came from**, and says which. There are
 two, and they are the same program built the same way:
@@ -217,7 +222,7 @@ That distinction is not fussiness. Windows searches the current directory
 before `PATH`, so a file called `curl.exe` sitting beside VeilVoice would
 otherwise be the program that ran, and a privacy tool reaching for the network
 is the last place to accept a stranger's binary. If none of those paths holds a
-tool, the button says so and nothing is run.
+tool, the button and the command both say so, and nothing is run.
 
 **Installing a companion** does not fetch anything either. It runs the package
 manager already on the machine, which is the thing your system already trusts
@@ -225,8 +230,9 @@ to install software, and for anything needing root it prints the command
 instead of running it.
 
 The consequence worth stating: there is no code path in VeilVoice that opens a
-socket. A firewall rule that blocks it entirely costs you the update button and
-nothing else.
+socket. A firewall rule that blocks it entirely costs you the two things named at
+the top of this section, looking for a newer version and fetching a release to
+check, and nothing else.
 
 ---
 
