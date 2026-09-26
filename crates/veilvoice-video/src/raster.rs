@@ -71,6 +71,7 @@ pub fn colour(hex: &str) -> Option<Rgb> {
 }
 
 /// A picture being drawn, one byte per channel, three channels per pixel.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Canvas {
     width: usize,
     height: usize,
@@ -108,6 +109,24 @@ impl Canvas {
         }
         let at = (y * self.width + x) * 3;
         Some([self.pixels[at], self.pixels[at + 1], self.pixels[at + 2]])
+    }
+
+    /// Set the pixel at `x`, `y`, doing nothing outside the canvas.
+    pub fn set(&mut self, x: usize, y: usize, colour: Rgb) {
+        if x >= self.width || y >= self.height {
+            return;
+        }
+        let at = (y * self.width + x) * 3;
+        self.pixels[at..at + 3].copy_from_slice(&colour);
+    }
+
+    /// The pixels, row by row from the top, three bytes each.
+    ///
+    /// **Roadmap item 175.** This is what `ffmpeg` reads as `rawvideo` in
+    /// `rgb24` when an export pipes its frames rather than writing them, and
+    /// what a front end turns into a thumbnail without a PNG in between.
+    pub fn rgb(&self) -> &[u8] {
+        &self.pixels
     }
 
     /// Mix `colour` into the pixel at `x`, `y` by `alpha`, from 0.0 to 1.0.

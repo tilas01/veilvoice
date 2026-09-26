@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-video/src/raster.rs`
 
-[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 602 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs)
+[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 621 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs)
 
 ## Contents
 
@@ -72,25 +72,27 @@ program is careful not to do.
 
 ## What this file contains
 
-602 lines defining **17 functions** (12 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+621 lines defining **19 functions** (14 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Canvas` (line 74) -- A picture being drawn, one byte per channel, three channels per pixel.
-- `struct Crc` (line 349) -- The CRC-32 PNG puts on every chunk.
+- `struct Canvas` (line 75) -- A picture being drawn, one byte per channel, three channels per pixel.
+- `struct Crc` (line 368) -- The CRC-32 PNG puts on every chunk.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `colour` (line 61) -- Read #rrggbb into three bytes.
-- `Canvas::width` (line 95) -- How wide it is.
-- `Canvas::height` (line 100) -- How tall it is.
-- `Canvas::rounded_rect` (line 157) -- A rectangle with rounded ends, which is how the level bars are drawn.
+- `Canvas::width` (line 96) -- How wide it is.
+- `Canvas::height` (line 101) -- How tall it is.
+- `Canvas::set` (line 115) -- Set the pixel at x, y, doing nothing outside the canvas.
+- `Canvas::rgb` (line 128) -- The pixels, row by row from the top, three bytes each.
+- `Canvas::rounded_rect` (line 176) -- A rectangle with rounded ends, which is how the level bars are drawn.
   - reaches: `circle`, `rect`, `blend`
-- `Canvas::ring` (line 222) -- A ring, drawn as a filled disc with the middle taken back out.
+- `Canvas::ring` (line 241) -- A ring, drawn as a filled disc with the middle taken back out.
   - reaches: `at`, `blend`, `circle`
-- `Canvas::text_centred` (line 283) -- Draw text centred on centre_x, with its top at y.
+- `Canvas::text_centred` (line 302) -- Draw text centred on centre_x, with its top at y.
   - reaches: `text`, `rect`
-- `Canvas::png` (line 306) -- The picture as a PNG file.
+- `Canvas::png` (line 325) -- The picture as a PNG file.
   - reaches: `chunk`, `new`
 
 ## What calls what
@@ -114,22 +116,24 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_colour(["colour<br/>line 61"])
-    n_new["Canvas::new<br/>line 82"]
-    n_width(["Canvas::width<br/>line 95"])
-    n_height(["Canvas::height<br/>line 100"])
-    n_at["Canvas::at<br/>line 105"]
-    n_blend["Canvas::blend<br/>line 118"]
-    n_rect["Canvas::rect<br/>line 137"]
-    n_rounded_rect(["Canvas::rounded_rect<br/>line 157"])
-    n_circle["Canvas::circle<br/>line 183"]
-    n_ring(["Canvas::ring<br/>line 222"])
-    n_text["Canvas::text<br/>line 255"]
-    n_text_centred(["Canvas::text_centred<br/>line 283"])
-    n_png(["Canvas::png<br/>line 306"])
-    n_chunk["chunk<br/>line 335"]
-    n_new["Crc::new<br/>line 354"]
-    n_eat["Crc::eat<br/>line 361"]
-    n_done["Crc::done<br/>line 378"]
+    n_new["Canvas::new<br/>line 83"]
+    n_width(["Canvas::width<br/>line 96"])
+    n_height(["Canvas::height<br/>line 101"])
+    n_at["Canvas::at<br/>line 106"]
+    n_set(["Canvas::set<br/>line 115"])
+    n_rgb(["Canvas::rgb<br/>line 128"])
+    n_blend["Canvas::blend<br/>line 137"]
+    n_rect["Canvas::rect<br/>line 156"]
+    n_rounded_rect(["Canvas::rounded_rect<br/>line 176"])
+    n_circle["Canvas::circle<br/>line 202"]
+    n_ring(["Canvas::ring<br/>line 241"])
+    n_text["Canvas::text<br/>line 274"]
+    n_text_centred(["Canvas::text_centred<br/>line 302"])
+    n_png(["Canvas::png<br/>line 325"])
+    n_chunk["chunk<br/>line 354"]
+    n_new["Crc::new<br/>line 373"]
+    n_eat["Crc::eat<br/>line 380"]
+    n_done["Crc::done<br/>line 397"]
     n_chunk --> n_new
     n_circle --> n_blend
     n_png --> n_chunk
@@ -141,24 +145,26 @@ flowchart TD
     n_text --> n_rect
     n_text_centred --> n_text
     click n_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L61" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L82" "open the source"
-    click n_width href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L95" "open the source"
-    click n_height href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L100" "open the source"
-    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L105" "open the source"
-    click n_blend href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L118" "open the source"
-    click n_rect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L137" "open the source"
-    click n_rounded_rect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L157" "open the source"
-    click n_circle href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L183" "open the source"
-    click n_ring href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L222" "open the source"
-    click n_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L255" "open the source"
-    click n_text_centred href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L283" "open the source"
-    click n_png href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L306" "open the source"
-    click n_chunk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L335" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L354" "open the source"
-    click n_eat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L361" "open the source"
-    click n_done href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L378" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L83" "open the source"
+    click n_width href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L96" "open the source"
+    click n_height href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L101" "open the source"
+    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L106" "open the source"
+    click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L115" "open the source"
+    click n_rgb href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L128" "open the source"
+    click n_blend href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L137" "open the source"
+    click n_rect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L156" "open the source"
+    click n_rounded_rect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L176" "open the source"
+    click n_circle href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L202" "open the source"
+    click n_ring href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L241" "open the source"
+    click n_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L274" "open the source"
+    click n_text_centred href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L302" "open the source"
+    click n_png href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L325" "open the source"
+    click n_chunk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L354" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L373" "open the source"
+    click n_eat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L380" "open the source"
+    click n_done href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L397" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_colour,n_width,n_height,n_rounded_rect,n_ring,n_text_centred,n_png entry
+    class n_colour,n_width,n_height,n_set,n_rgb,n_rounded_rect,n_ring,n_text_centred,n_png entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_new,n_at,n_rect,n_circle,n_text api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -173,24 +179,26 @@ flowchart TD
 |---|---:|---|
 | `Rgb` <sub>pub type</sub> | [52](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L52) | A colour, as the three bytes a PNG stores. |
 | `colour` <sub>pub fn</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L61) | Read #rrggbb into three bytes. |
-| `Canvas` <sub>pub struct</sub> | [74](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L74) | A picture being drawn, one byte per channel, three channels per pixel. |
-| `Canvas::new` <sub>pub fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L82) | A canvas of width by height, filled with background. |
-| `Canvas::width` <sub>pub fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L95) | How wide it is. |
-| `Canvas::height` <sub>pub fn</sub> | [100](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L100) | How tall it is. |
-| `Canvas::at` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L105) | The colour at a point, or None outside the canvas. |
-| `Canvas::blend` <sub>fn</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L118) | Mix colour into the pixel at x, y by alpha, from 0.0 to 1.0. |
-| `Canvas::rect` <sub>pub fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L137) | A filled rectangle, clipped to the canvas. |
-| `Canvas::rounded_rect` <sub>pub fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L157) | A rectangle with rounded ends, which is how the level bars are drawn. |
-| `Canvas::circle` <sub>pub fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L183) | A filled circle with a smooth edge. |
-| `Canvas::ring` <sub>pub fn</sub> | [222](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L222) | A ring, drawn as a filled disc with the middle taken back out. |
-| `Canvas::text` <sub>pub fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L255) | Draw text with its left edge at x and its top at y. |
-| `Canvas::text_centred` <sub>pub fn</sub> | [283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L283) | Draw text centred on centre_x, with its top at y. |
-| `Canvas::png` <sub>pub fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L306) | The picture as a PNG file. |
-| `chunk` <sub>fn</sub> | [335](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L335) | Append one PNG chunk: length, type, data, and the checksum over both. |
-| `Crc` <sub>struct</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L349) | The CRC-32 PNG puts on every chunk. |
-| `Crc::new` <sub>fn</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L354) | A fresh checksum, which PNG specifies as starting from all ones rather than from zero. |
-| `Crc::eat` <sub>fn</sub> | [361](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L361) | Fold bytes in. |
-| `Crc::done` <sub>fn</sub> | [378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L378) | The value to write, which is the running state inverted. |
+| `Canvas` <sub>pub struct</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L75) | A picture being drawn, one byte per channel, three channels per pixel. |
+| `Canvas::new` <sub>pub fn</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L83) | A canvas of width by height, filled with background. |
+| `Canvas::width` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L96) | How wide it is. |
+| `Canvas::height` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L101) | How tall it is. |
+| `Canvas::at` <sub>pub fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L106) | The colour at a point, or None outside the canvas. |
+| `Canvas::set` <sub>pub fn</sub> | [115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L115) | Set the pixel at x, y, doing nothing outside the canvas. |
+| `Canvas::rgb` <sub>pub fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L128) | The pixels, row by row from the top, three bytes each. |
+| `Canvas::blend` <sub>fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L137) | Mix colour into the pixel at x, y by alpha, from 0.0 to 1.0. |
+| `Canvas::rect` <sub>pub fn</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L156) | A filled rectangle, clipped to the canvas. |
+| `Canvas::rounded_rect` <sub>pub fn</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L176) | A rectangle with rounded ends, which is how the level bars are drawn. |
+| `Canvas::circle` <sub>pub fn</sub> | [202](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L202) | A filled circle with a smooth edge. |
+| `Canvas::ring` <sub>pub fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L241) | A ring, drawn as a filled disc with the middle taken back out. |
+| `Canvas::text` <sub>pub fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L274) | Draw text with its left edge at x and its top at y. |
+| `Canvas::text_centred` <sub>pub fn</sub> | [302](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L302) | Draw text centred on centre_x, with its top at y. |
+| `Canvas::png` <sub>pub fn</sub> | [325](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L325) | The picture as a PNG file. |
+| `chunk` <sub>fn</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L354) | Append one PNG chunk: length, type, data, and the checksum over both. |
+| `Crc` <sub>struct</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L368) | The CRC-32 PNG puts on every chunk. |
+| `Crc::new` <sub>fn</sub> | [373](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L373) | A fresh checksum, which PNG specifies as starting from all ones rather than from zero. |
+| `Crc::eat` <sub>fn</sub> | [380](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L380) | Fold bytes in. |
+| `Crc::done` <sub>fn</sub> | [397](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L397) | The value to write, which is the running state inverted. |
 
 ---
 
