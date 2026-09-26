@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-verify/tests/inside_the_archive.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 430 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 498 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs)
 
 ## Contents
 
@@ -61,7 +61,7 @@ the release job, and the release workflow itself cannot be without them.
 
 ## What this file contains
 
-430 lines defining **13 functions** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+498 lines defining **14 functions** (0 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -90,12 +90,13 @@ flowchart TD
     n_stage["stage<br/>line 91"]
     n_generate["generate<br/>line 104"]
     n_agrees["agrees<br/>line 130"]
-    n_a_tarball_holds_what_the_release_job_published["a_tarball_holds_what_the_release_job_<br/>published<br/>line 179"]
-    n_a_zip_holds_what_the_release_job_published["a_zip_holds_what_the_release_job_<br/>published<br/>line 224"]
-    n_a_changed_or_added_file_inside_the_archive_is_caught["a_changed_or_added_file_inside_the_<br/>archive_is_caught<br/>line 272"]
-    n_a_file_taken_out_of_the_archive_is_reported["a_file_taken_out_of_the_archive_is_<br/>reported<br/>line 336"]
-    n_an_archive_this_cannot_read_says_so["an_archive_this_cannot_read_says_so<br/>line 388"]
-    n_rubbish_in_place_of_an_archive_is_refused["rubbish_in_place_of_an_archive_is_<br/>refused<br/>line 416"]
+    n_spelling_this_tar_knows["spelling_this_tar_knows<br/>line 192"]
+    n_a_tarball_holds_what_the_release_job_published["a_tarball_holds_what_the_release_job_<br/>published<br/>line 226"]
+    n_a_zip_holds_what_the_release_job_published["a_zip_holds_what_the_release_job_<br/>published<br/>line 292"]
+    n_a_changed_or_added_file_inside_the_archive_is_caught["a_changed_or_added_file_inside_the_<br/>archive_is_caught<br/>line 340"]
+    n_a_file_taken_out_of_the_archive_is_reported["a_file_taken_out_of_the_archive_is_<br/>reported<br/>line 404"]
+    n_an_archive_this_cannot_read_says_so["an_archive_this_cannot_read_says_so<br/>line 456"]
+    n_rubbish_in_place_of_an_archive_is_refused["rubbish_in_place_of_an_archive_is_<br/>refused<br/>line 484"]
     n_a_changed_or_added_file_inside_the_archive_is_caught --> n_generate
     n_a_changed_or_added_file_inside_the_archive_is_caught --> n_have
     n_a_changed_or_added_file_inside_the_archive_is_caught --> n_python
@@ -111,6 +112,7 @@ flowchart TD
     n_a_tarball_holds_what_the_release_job_published --> n_have
     n_a_tarball_holds_what_the_release_job_published --> n_python
     n_a_tarball_holds_what_the_release_job_published --> n_room
+    n_a_tarball_holds_what_the_release_job_published --> n_spelling_this_tar_knows
     n_a_tarball_holds_what_the_release_job_published --> n_stage
     n_a_zip_holds_what_the_release_job_published --> n_agrees
     n_a_zip_holds_what_the_release_job_published --> n_generate
@@ -127,14 +129,15 @@ flowchart TD
     click n_stage href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L91" "open the source"
     click n_generate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L104" "open the source"
     click n_agrees href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L130" "open the source"
-    click n_a_tarball_holds_what_the_release_job_published href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L179" "open the source"
-    click n_a_zip_holds_what_the_release_job_published href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L224" "open the source"
-    click n_a_changed_or_added_file_inside_the_archive_is_caught href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L272" "open the source"
-    click n_a_file_taken_out_of_the_archive_is_reported href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L336" "open the source"
-    click n_an_archive_this_cannot_read_says_so href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L388" "open the source"
-    click n_rubbish_in_place_of_an_archive_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L416" "open the source"
+    click n_spelling_this_tar_knows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L192" "open the source"
+    click n_a_tarball_holds_what_the_release_job_published href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L226" "open the source"
+    click n_a_zip_holds_what_the_release_job_published href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L292" "open the source"
+    click n_a_changed_or_added_file_inside_the_archive_is_caught href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L340" "open the source"
+    click n_a_file_taken_out_of_the_archive_is_reported href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L404" "open the source"
+    click n_an_archive_this_cannot_read_says_so href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L456" "open the source"
+    click n_rubbish_in_place_of_an_archive_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L484" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_repository,n_python,n_have,n_room,n_stage,n_generate,n_agrees,n_a_tarball_holds_what_the_release_job_published,n_a_zip_holds_what_the_release_job_published,n_a_changed_or_added_file_inside_the_archive_is_caught,n_a_file_taken_out_of_the_archive_is_reported,n_an_archive_this_cannot_read_says_so,n_rubbish_in_place_of_an_archive_is_refused helper
+    class n_repository,n_python,n_have,n_room,n_stage,n_generate,n_agrees,n_spelling_this_tar_knows,n_a_tarball_holds_what_the_release_job_published,n_a_zip_holds_what_the_release_job_published,n_a_changed_or_added_file_inside_the_archive_is_caught,n_a_file_taken_out_of_the_archive_is_reported,n_an_archive_this_cannot_read_says_so,n_rubbish_in_place_of_an_archive_is_refused helper
 ```
 
 </details>
@@ -151,12 +154,14 @@ flowchart TD
 | `stage` <sub>fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L91) | Build one release directory, the shape the release job stages. |
 | `generate` <sub>fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L104) | Run the real generator over a staging directory. |
 | `agrees` <sub>fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L130) | Assert that an archive holds exactly what the generated list says it does. |
-| `a_tarball_holds_what_the_release_job_published` <sub>fn</sub> | [179](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L179) | A gzipped tar, in each of the three ways tar spells a long name. |
-| `a_zip_holds_what_the_release_job_published` <sub>fn</sub> | [224](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L224) | A zip, deflated and stored, read from its central directory. |
-| `a_changed_or_added_file_inside_the_archive_is_caught` <sub>fn</sub> | [272](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L272) | A file changed inside the archive is named, and an added one is too. |
-| `a_file_taken_out_of_the_archive_is_reported` <sub>fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L336) | A published file missing from the archive is reported as missing. |
-| `an_archive_this_cannot_read_says_so` <sub>fn</sub> | [388](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L388) | An archive this reader cannot open says so, rather than reporting nothing. |
-| `rubbish_in_place_of_an_archive_is_refused` <sub>fn</sub> | [416](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L416) | A file that is not an archive at all is refused, not passed over. |
+| `SHAPES` <sub>const</sub> | [181](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L181) | The three ways a tar writes a long name, and what each tar calls them. |
+| `spelling_this_tar_knows` <sub>fn</sub> | [192](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L192) | Which spelling of a format this machine's tar will accept, if any. |
+| `a_tarball_holds_what_the_release_job_published` <sub>fn</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L226) | A gzipped tar, in each of the three ways tar writes a long name. |
+| `a_zip_holds_what_the_release_job_published` <sub>fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L292) | A zip, deflated and stored, read from its central directory. |
+| `a_changed_or_added_file_inside_the_archive_is_caught` <sub>fn</sub> | [340](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L340) | A file changed inside the archive is named, and an added one is too. |
+| `a_file_taken_out_of_the_archive_is_reported` <sub>fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L404) | A published file missing from the archive is reported as missing. |
+| `an_archive_this_cannot_read_says_so` <sub>fn</sub> | [456](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L456) | An archive this reader cannot open says so, rather than reporting nothing. |
+| `rubbish_in_place_of_an_archive_is_refused` <sub>fn</sub> | [484](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L484) | A file that is not an archive at all is refused, not passed over. |
 
 ---
 

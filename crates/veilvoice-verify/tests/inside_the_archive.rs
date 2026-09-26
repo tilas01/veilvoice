@@ -167,26 +167,80 @@ fn agrees(archive_path: &Path, all: &[contents::ArchiveContents]) {
     );
 }
 
-/// A gzipped tar, in each of the three ways `tar` spells a long name.
+/// The three ways a tar writes a long name, and what each `tar` calls them.
 ///
-/// `gnu` writes an `L` record, `pax` an extended header, and `ustar` splits the
-/// path across `prefix` and `name`. This project's releases are built on five
-/// machines with whichever `tar` each of them ships, so a reader that handles
-/// only one of the three would work on some platforms and refuse the release on
-/// others -- the worst shape a verifier defect can take, because it looks like
-/// a compromised download.
+/// The format is one thing and its spelling is another, which is the whole of
+/// F-225. GNU tar calls the long-name record format `gnu`; the bsdtar that
+/// macOS and Windows both ship calls that same format `gnutar` and refuses
+/// `gnu` outright, naming no alternative. `pax` and `ustar` are spelled the
+/// same by both.
+///
+/// So the spellings are tried in turn and this machine's `tar` decides, rather
+/// than this file assuming it is GNU tar. A fixed spelling is a test that
+/// passes where it was written and fails everywhere else.
+const SHAPES: &[(&str, &[&str])] = &[
+    ("a long-name record", &["gnu", "gnutar"]),
+    ("an extended header", &["pax"]),
+    ("a split path", &["ustar"]),
+];
+
+/// Which spelling of a format this machine's `tar` will accept, if any.
+///
+/// Asked by making a trivial archive rather than by reading a version string:
+/// what matters is whether this `tar` will write the format when told to, and
+/// the only way to know that is to tell it to.
+fn spelling_this_tar_knows(work: &Path, spellings: &[&str]) -> Option<String> {
+    let probe = work.join("probe");
+    std::fs::create_dir_all(&probe).expect("a directory to probe in");
+    std::fs::write(probe.join("a"), b"a").expect("a file to probe with");
+    for spelling in spellings {
+        let made = Command::new("tar")
+            .arg(format!("--format={spelling}"))
+            .arg("-C")
+            .arg(&probe)
+            .arg("-cf")
+            .arg(work.join(format!("probe-{spelling}.tar")))
+            .arg("a")
+            // A spelling this `tar` does not know prints its usage, which in
+            // a passing test run reads exactly like something going wrong.
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status()
+            .expect("tar runs");
+        if made.success() {
+            return Some((*spelling).to_string());
+        }
+    }
+    None
+}
+
+/// A gzipped tar, in each of the three ways `tar` writes a long name.
+///
+/// A long-name record, an extended header, and a path split across `ustar`'s
+/// `prefix` and `name`. This project's releases are built on five machines with
+/// whichever `tar` each of them ships, so a reader that handles only one of the
+/// three would work on some platforms and refuse the release on others -- the
+/// worst shape a verifier defect can take, because it looks like a compromised
+/// download.
 #[test]
 fn a_tarball_holds_what_the_release_job_published() {
     let Some(python) = python() else { return };
     if !have("tar") {
         return;
     }
-    for format in ["gnu", "pax", "ustar"] {
-        let work = room(&format!("inside-tar-{format}"));
+    let mut unspellable = Vec::new();
+    for (shape, spellings) in SHAPES {
+        let work = room(&format!("inside-tar-{}", spellings[0]));
         let dist = work.join("dist");
         let staging = work.join("staging");
         std::fs::create_dir_all(&dist).unwrap();
         std::fs::create_dir_all(&staging).unwrap();
+
+        let Some(format) = spelling_this_tar_knows(&work, spellings) else {
+            unspellable.push(*shape);
+            std::fs::remove_dir_all(&work).ok();
+            continue;
+        };
 
         let name = "veilvoice-v0.1.23-linux-x86_64";
         stage(&dist, name);
@@ -202,7 +256,9 @@ fn a_tarball_holds_what_the_release_job_published() {
             .expect("tar runs");
         // `ustar` cannot hold every path, and refusing one it cannot hold is
         // correct behaviour rather than a failure of this test. The other two
-        // formats exist precisely because of that limit.
+        // formats exist precisely because of that limit. The format was
+        // spelled in a way this `tar` accepted a moment ago, so a failure here
+        // is about the path and nothing else.
         if !made.success() {
             assert_eq!(format, "ustar", "{format} should have archived this");
             std::fs::remove_dir_all(&work).ok();
@@ -212,6 +268,18 @@ fn a_tarball_holds_what_the_release_job_published() {
         let all = generate(python, &staging);
         agrees(&tarball, &all);
         std::fs::remove_dir_all(&work).ok();
+    }
+    // A `tar` that can write neither of these is not a `tar` this project has
+    // ever been published by, and a run that quietly exercised nothing would
+    // report itself as coverage. The long-name record is left out of this on
+    // purpose: it is the one shape a `tar` may genuinely not offer, and the
+    // reader that handles it is the same code on every platform.
+    for shape in ["an extended header", "a split path"] {
+        assert!(
+            !unspellable.contains(&shape),
+            "this tar could spell no format that writes {shape}, so this test \
+             checked nothing about it"
+        );
     }
 }
 

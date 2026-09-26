@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/tests/inside_the_archive.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests-inside_the_archive.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 430 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests-inside_the_archive.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 498 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -251,278 +251,350 @@
 <span class="ln" id="L168">}</span>
 </span>
 <span class="ln" id="L169"></span>
-<span class="src-item" id="fn-a_tarball_holds_what_the_release_job_published">
-<span class="ln" id="L170"><span class="tok-com">/// A gzipped tar, in each of the three ways `tar` spells a long name.</span></span>
+<span class="src-item" id="fn-shapes">
+<span class="ln" id="L170"><span class="tok-com">/// The three ways a tar writes a long name, and what each `tar` calls them.</span></span>
 <span class="ln" id="L171"><span class="tok-com">///</span></span>
-<span class="ln" id="L172"><span class="tok-com">/// `gnu` writes an `L` record, `pax` an extended header, and `ustar` splits the</span></span>
-<span class="ln" id="L173"><span class="tok-com">/// path across `prefix` and `name`. This project&#x27;s releases are built on five</span></span>
-<span class="ln" id="L174"><span class="tok-com">/// machines with whichever `tar` each of them ships, so a reader that handles</span></span>
-<span class="ln" id="L175"><span class="tok-com">/// only one of the three would work on some platforms and refuse the release on</span></span>
-<span class="ln" id="L176"><span class="tok-com">/// others -- the worst shape a verifier defect can take, because it looks like</span></span>
-<span class="ln" id="L177"><span class="tok-com">/// a compromised download.</span></span>
-<span class="ln" id="L178"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L179"><span class="tok-kw">fn</span> <span class="tok-fn">a_tarball_holds_what_the_release_job_published</span>() {</span>
-<span class="ln" id="L180">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
-<span class="ln" id="L181">    <span class="tok-kw">if</span> !<span class="tok-fn">have</span>(<span class="tok-str">&quot;tar&quot;</span>) {</span>
-<span class="ln" id="L182">        <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L183">    }</span>
-<span class="ln" id="L184">    <span class="tok-kw">for</span> format <span class="tok-kw">in</span> [<span class="tok-str">&quot;gnu&quot;</span>, <span class="tok-str">&quot;pax&quot;</span>, <span class="tok-str">&quot;ustar&quot;</span>] {</span>
-<span class="ln" id="L185">        <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(&amp;format!(<span class="tok-str">&quot;inside-tar-{format}&quot;</span>));</span>
-<span class="ln" id="L186">        <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
-<span class="ln" id="L187">        <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
-<span class="ln" id="L188">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L189">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L190"></span>
-<span class="ln" id="L191">        <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64&quot;</span>;</span>
-<span class="ln" id="L192">        <span class="tok-fn">stage</span>(&amp;dist, name);</span>
-<span class="ln" id="L193">        <span class="tok-kw">let</span> tarball = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
-<span class="ln" id="L194">        <span class="tok-kw">let</span> made = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
-<span class="ln" id="L195">            .<span class="tok-fn">arg</span>(format!(<span class="tok-str">&quot;--format={format}&quot;</span>))</span>
-<span class="ln" id="L196">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
-<span class="ln" id="L197">            .<span class="tok-fn">arg</span>(&amp;dist)</span>
-<span class="ln" id="L198">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
-<span class="ln" id="L199">            .<span class="tok-fn">arg</span>(&amp;tarball)</span>
-<span class="ln" id="L200">            .<span class="tok-fn">arg</span>(name)</span>
-<span class="ln" id="L201">            .<span class="tok-fn">status</span>()</span>
-<span class="ln" id="L202">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
-<span class="ln" id="L203">        <span class="tok-com">// `ustar` cannot hold every path, and refusing one it cannot hold is</span></span>
-<span class="ln" id="L204">        <span class="tok-com">// correct behaviour rather than a failure of this test. The other two</span></span>
-<span class="ln" id="L205">        <span class="tok-com">// formats exist precisely because of that limit.</span></span>
-<span class="ln" id="L206">        <span class="tok-kw">if</span> !made.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L207">            assert_eq!(format, <span class="tok-str">&quot;ustar&quot;</span>, <span class="tok-str">&quot;{format} should have archived this&quot;</span>);</span>
-<span class="ln" id="L208">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L209">            continue;</span>
-<span class="ln" id="L210">        }</span>
-<span class="ln" id="L211"></span>
-<span class="ln" id="L212">        <span class="tok-kw">let</span> all = <span class="tok-fn">generate</span>(python, &amp;staging);</span>
-<span class="ln" id="L213">        <span class="tok-fn">agrees</span>(&amp;tarball, &amp;all);</span>
-<span class="ln" id="L214">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L215">    }</span>
-<span class="ln" id="L216">}</span>
+<span class="ln" id="L172"><span class="tok-com">/// The format is one thing and its spelling is another, which is the whole of</span></span>
+<span class="ln" id="L173"><span class="tok-com">/// F-225. GNU tar calls the long-name record format `gnu`; the bsdtar that</span></span>
+<span class="ln" id="L174"><span class="tok-com">/// macOS and Windows both ship calls that same format `gnutar` and refuses</span></span>
+<span class="ln" id="L175"><span class="tok-com">/// `gnu` outright, naming no alternative. `pax` and `ustar` are spelled the</span></span>
+<span class="ln" id="L176"><span class="tok-com">/// same by both.</span></span>
+<span class="ln" id="L177"><span class="tok-com">///</span></span>
+<span class="ln" id="L178"><span class="tok-com">/// So the spellings are tried in turn and this machine&#x27;s `tar` decides, rather</span></span>
+<span class="ln" id="L179"><span class="tok-com">/// than this file assuming it is GNU tar. A fixed spelling is a test that</span></span>
+<span class="ln" id="L180"><span class="tok-com">/// passes where it was written and fails everywhere else.</span></span>
+<span class="ln" id="L181"><span class="tok-kw">const</span> SHAPES: &amp;[(&amp;str, &amp;[&amp;str])] = &amp;[</span>
+<span class="ln" id="L182">    (<span class="tok-str">&quot;a long-name record&quot;</span>, &amp;[<span class="tok-str">&quot;gnu&quot;</span>, <span class="tok-str">&quot;gnutar&quot;</span>]),</span>
+<span class="ln" id="L183">    (<span class="tok-str">&quot;an extended header&quot;</span>, &amp;[<span class="tok-str">&quot;pax&quot;</span>]),</span>
+<span class="ln" id="L184">    (<span class="tok-str">&quot;a split path&quot;</span>, &amp;[<span class="tok-str">&quot;ustar&quot;</span>]),</span>
+<span class="ln" id="L185">];</span>
 </span>
-<span class="ln" id="L217"></span>
+<span class="ln" id="L186"></span>
+<span class="src-item" id="fn-spelling_this_tar_knows">
+<span class="ln" id="L187"><span class="tok-com">/// Which spelling of a format this machine&#x27;s `tar` will accept, if any.</span></span>
+<span class="ln" id="L188"><span class="tok-com">///</span></span>
+<span class="ln" id="L189"><span class="tok-com">/// Asked by making a trivial archive rather than by reading a version string:</span></span>
+<span class="ln" id="L190"><span class="tok-com">/// what matters is whether this `tar` will write the format when told to, and</span></span>
+<span class="ln" id="L191"><span class="tok-com">/// the only way to know that is to tell it to.</span></span>
+<span class="ln" id="L192"><span class="tok-kw">fn</span> <span class="tok-fn">spelling_this_tar_knows</span>(work: &amp;Path, spellings: &amp;[&amp;str]) -&gt; Option&lt;String&gt; {</span>
+<span class="ln" id="L193">    <span class="tok-kw">let</span> probe = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;probe&quot;</span>);</span>
+<span class="ln" id="L194">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;probe).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a directory to probe in&quot;</span>);</span>
+<span class="ln" id="L195">    std::fs::<span class="tok-fn">write</span>(probe.<span class="tok-fn">join</span>(<span class="tok-str">&quot;a&quot;</span>), b<span class="tok-str">&quot;a&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a file to probe with&quot;</span>);</span>
+<span class="ln" id="L196">    <span class="tok-kw">for</span> spelling <span class="tok-kw">in</span> spellings {</span>
+<span class="ln" id="L197">        <span class="tok-kw">let</span> made = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
+<span class="ln" id="L198">            .<span class="tok-fn">arg</span>(format!(<span class="tok-str">&quot;--format={spelling}&quot;</span>))</span>
+<span class="ln" id="L199">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
+<span class="ln" id="L200">            .<span class="tok-fn">arg</span>(&amp;probe)</span>
+<span class="ln" id="L201">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-cf&quot;</span>)</span>
+<span class="ln" id="L202">            .<span class="tok-fn">arg</span>(work.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;probe-{spelling}.tar&quot;</span>)))</span>
+<span class="ln" id="L203">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;a&quot;</span>)</span>
+<span class="ln" id="L204">            <span class="tok-com">// A spelling this `tar` does not know prints its usage, which in</span></span>
+<span class="ln" id="L205">            <span class="tok-com">// a passing test run reads exactly like something going wrong.</span></span>
+<span class="ln" id="L206">            .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L207">            .<span class="tok-fn">stderr</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L208">            .<span class="tok-fn">status</span>()</span>
+<span class="ln" id="L209">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
+<span class="ln" id="L210">        <span class="tok-kw">if</span> made.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L211">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>((*spelling).<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L212">        }</span>
+<span class="ln" id="L213">    }</span>
+<span class="ln" id="L214">    None</span>
+<span class="ln" id="L215">}</span>
+</span>
+<span class="ln" id="L216"></span>
+<span class="src-item" id="fn-a_tarball_holds_what_the_release_job_published">
+<span class="ln" id="L217"><span class="tok-com">/// A gzipped tar, in each of the three ways `tar` writes a long name.</span></span>
+<span class="ln" id="L218"><span class="tok-com">///</span></span>
+<span class="ln" id="L219"><span class="tok-com">/// A long-name record, an extended header, and a path split across `ustar`&#x27;s</span></span>
+<span class="ln" id="L220"><span class="tok-com">/// `prefix` and `name`. This project&#x27;s releases are built on five machines with</span></span>
+<span class="ln" id="L221"><span class="tok-com">/// whichever `tar` each of them ships, so a reader that handles only one of the</span></span>
+<span class="ln" id="L222"><span class="tok-com">/// three would work on some platforms and refuse the release on others -- the</span></span>
+<span class="ln" id="L223"><span class="tok-com">/// worst shape a verifier defect can take, because it looks like a compromised</span></span>
+<span class="ln" id="L224"><span class="tok-com">/// download.</span></span>
+<span class="ln" id="L225"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L226"><span class="tok-kw">fn</span> <span class="tok-fn">a_tarball_holds_what_the_release_job_published</span>() {</span>
+<span class="ln" id="L227">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
+<span class="ln" id="L228">    <span class="tok-kw">if</span> !<span class="tok-fn">have</span>(<span class="tok-str">&quot;tar&quot;</span>) {</span>
+<span class="ln" id="L229">        <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L230">    }</span>
+<span class="ln" id="L231">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> unspellable = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L232">    <span class="tok-kw">for</span> (shape, spellings) <span class="tok-kw">in</span> SHAPES {</span>
+<span class="ln" id="L233">        <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(&amp;format!(<span class="tok-str">&quot;inside-tar-{}&quot;</span>, spellings[<span class="tok-num">0</span>]));</span>
+<span class="ln" id="L234">        <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
+<span class="ln" id="L235">        <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
+<span class="ln" id="L236">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L237">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L238"></span>
+<span class="ln" id="L239">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(format) = <span class="tok-fn">spelling_this_tar_knows</span>(&amp;work, spellings) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L240">            unspellable.<span class="tok-fn">push</span>(*shape);</span>
+<span class="ln" id="L241">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L242">            continue;</span>
+<span class="ln" id="L243">        };</span>
+<span class="ln" id="L244"></span>
+<span class="ln" id="L245">        <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64&quot;</span>;</span>
+<span class="ln" id="L246">        <span class="tok-fn">stage</span>(&amp;dist, name);</span>
+<span class="ln" id="L247">        <span class="tok-kw">let</span> tarball = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
+<span class="ln" id="L248">        <span class="tok-kw">let</span> made = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
+<span class="ln" id="L249">            .<span class="tok-fn">arg</span>(format!(<span class="tok-str">&quot;--format={format}&quot;</span>))</span>
+<span class="ln" id="L250">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
+<span class="ln" id="L251">            .<span class="tok-fn">arg</span>(&amp;dist)</span>
+<span class="ln" id="L252">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
+<span class="ln" id="L253">            .<span class="tok-fn">arg</span>(&amp;tarball)</span>
+<span class="ln" id="L254">            .<span class="tok-fn">arg</span>(name)</span>
+<span class="ln" id="L255">            .<span class="tok-fn">status</span>()</span>
+<span class="ln" id="L256">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
+<span class="ln" id="L257">        <span class="tok-com">// `ustar` cannot hold every path, and refusing one it cannot hold is</span></span>
+<span class="ln" id="L258">        <span class="tok-com">// correct behaviour rather than a failure of this test. The other two</span></span>
+<span class="ln" id="L259">        <span class="tok-com">// formats exist precisely because of that limit. The format was</span></span>
+<span class="ln" id="L260">        <span class="tok-com">// spelled in a way this `tar` accepted a moment ago, so a failure here</span></span>
+<span class="ln" id="L261">        <span class="tok-com">// is about the path and nothing else.</span></span>
+<span class="ln" id="L262">        <span class="tok-kw">if</span> !made.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L263">            assert_eq!(format, <span class="tok-str">&quot;ustar&quot;</span>, <span class="tok-str">&quot;{format} should have archived this&quot;</span>);</span>
+<span class="ln" id="L264">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L265">            continue;</span>
+<span class="ln" id="L266">        }</span>
+<span class="ln" id="L267"></span>
+<span class="ln" id="L268">        <span class="tok-kw">let</span> all = <span class="tok-fn">generate</span>(python, &amp;staging);</span>
+<span class="ln" id="L269">        <span class="tok-fn">agrees</span>(&amp;tarball, &amp;all);</span>
+<span class="ln" id="L270">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L271">    }</span>
+<span class="ln" id="L272">    <span class="tok-com">// A `tar` that can write neither of these is not a `tar` this project has</span></span>
+<span class="ln" id="L273">    <span class="tok-com">// ever been published by, and a run that quietly exercised nothing would</span></span>
+<span class="ln" id="L274">    <span class="tok-com">// report itself as coverage. The long-name record is left out of this on</span></span>
+<span class="ln" id="L275">    <span class="tok-com">// purpose: it is the one shape a `tar` may genuinely not offer, and the</span></span>
+<span class="ln" id="L276">    <span class="tok-com">// reader that handles it is the same code on every platform.</span></span>
+<span class="ln" id="L277">    <span class="tok-kw">for</span> shape <span class="tok-kw">in</span> [<span class="tok-str">&quot;an extended header&quot;</span>, <span class="tok-str">&quot;a split path&quot;</span>] {</span>
+<span class="ln" id="L278">        assert!(</span>
+<span class="ln" id="L279">            !unspellable.<span class="tok-fn">contains</span>(&amp;shape),</span>
+<span class="ln" id="L280">            <span class="tok-str">&quot;this tar could spell no format that writes {shape}, so this test \</span></span>
+<span class="ln" id="L281"><span class="tok-str">             checked nothing about it&quot;</span></span>
+<span class="ln" id="L282">        );</span>
+<span class="ln" id="L283">    }</span>
+<span class="ln" id="L284">}</span>
+</span>
+<span class="ln" id="L285"></span>
 <span class="src-item" id="fn-a_zip_holds_what_the_release_job_published">
-<span class="ln" id="L218"><span class="tok-com">/// A zip, deflated and stored, read from its central directory.</span></span>
-<span class="ln" id="L219"><span class="tok-com">///</span></span>
-<span class="ln" id="L220"><span class="tok-com">/// Both compression methods, because a release zip holds both: `Compress-Archive`</span></span>
-<span class="ln" id="L221"><span class="tok-com">/// stores a member it cannot usefully compress, and a reader that handled only</span></span>
-<span class="ln" id="L222"><span class="tok-com">/// deflate would report a changed file for one that is perfectly sound.</span></span>
-<span class="ln" id="L223"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L224"><span class="tok-kw">fn</span> <span class="tok-fn">a_zip_holds_what_the_release_job_published</span>() {</span>
-<span class="ln" id="L225">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
-<span class="ln" id="L226">    <span class="tok-kw">for</span> (method, label) <span class="tok-kw">in</span> [(<span class="tok-str">&quot;ZIP_DEFLATED&quot;</span>, <span class="tok-str">&quot;deflated&quot;</span>), (<span class="tok-str">&quot;ZIP_STORED&quot;</span>, <span class="tok-str">&quot;stored&quot;</span>)] {</span>
-<span class="ln" id="L227">        <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(&amp;format!(<span class="tok-str">&quot;inside-zip-{label}&quot;</span>));</span>
-<span class="ln" id="L228">        <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
-<span class="ln" id="L229">        <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
-<span class="ln" id="L230">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L231">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L232"></span>
-<span class="ln" id="L233">        <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64&quot;</span>;</span>
-<span class="ln" id="L234">        <span class="tok-fn">stage</span>(&amp;dist, name);</span>
-<span class="ln" id="L235">        <span class="tok-kw">let</span> zip = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.zip&quot;</span>));</span>
-<span class="ln" id="L236">        <span class="tok-com">// Built with the same library that built every release zip this</span></span>
-<span class="ln" id="L237">        <span class="tok-com">// project has published, so the bytes under test are the bytes a</span></span>
-<span class="ln" id="L238">        <span class="tok-com">// reader will meet.</span></span>
-<span class="ln" id="L239">        <span class="tok-kw">let</span> script = format!(</span>
-<span class="ln" id="L240">            <span class="tok-str">&quot;import pathlib, zipfile\n\</span></span>
-<span class="ln" id="L241"><span class="tok-str">             root = pathlib.Path({dist:?})\n\</span></span>
-<span class="ln" id="L242"><span class="tok-str">             with zipfile.ZipFile({zip:?}, &#x27;w&#x27;, zipfile.{method}) as z:\n\</span></span>
-<span class="ln" id="L243"><span class="tok-str">             \x20   for path in sorted(root.rglob(&#x27;*&#x27;)):\n\</span></span>
-<span class="ln" id="L244"><span class="tok-str">             \x20       if path.is_file():\n\</span></span>
-<span class="ln" id="L245"><span class="tok-str">             \x20           z.write(path, path.relative_to(root).as_posix())\n&quot;</span>,</span>
-<span class="ln" id="L246">            dist = dist.<span class="tok-fn">to_string_lossy</span>(),</span>
-<span class="ln" id="L247">            zip = zip.<span class="tok-fn">to_string_lossy</span>(),</span>
-<span class="ln" id="L248">        );</span>
-<span class="ln" id="L249">        <span class="tok-kw">let</span> ran = Command::<span class="tok-fn">new</span>(python)</span>
-<span class="ln" id="L250">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-c&quot;</span>)</span>
-<span class="ln" id="L251">            .<span class="tok-fn">arg</span>(&amp;script)</span>
-<span class="ln" id="L252">            .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L253">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;python runs&quot;</span>);</span>
-<span class="ln" id="L254">        assert!(</span>
-<span class="ln" id="L255">            ran.status.<span class="tok-fn">success</span>(),</span>
-<span class="ln" id="L256">            <span class="tok-str">&quot;the zip could not be built: {}&quot;</span>,</span>
-<span class="ln" id="L257">            String::<span class="tok-fn">from_utf8_lossy</span>(&amp;ran.stderr)</span>
-<span class="ln" id="L258">        );</span>
-<span class="ln" id="L259"></span>
-<span class="ln" id="L260">        <span class="tok-kw">let</span> all = <span class="tok-fn">generate</span>(python, &amp;staging);</span>
-<span class="ln" id="L261">        <span class="tok-fn">agrees</span>(&amp;zip, &amp;all);</span>
-<span class="ln" id="L262">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L263">    }</span>
-<span class="ln" id="L264">}</span>
-</span>
-<span class="ln" id="L265"></span>
-<span class="src-item" id="fn-a_changed_or_added_file_inside_the_archive_is_caught">
-<span class="ln" id="L266"><span class="tok-com">/// A file changed inside the archive is named, and an added one is too.</span></span>
-<span class="ln" id="L267"><span class="tok-com">///</span></span>
-<span class="ln" id="L268"><span class="tok-com">/// Written after the clean runs above rather than instead of them: a test that</span></span>
-<span class="ln" id="L269"><span class="tok-com">/// only proves refusal cannot tell a working verifier from one that refuses</span></span>
-<span class="ln" id="L270"><span class="tok-com">/// everything.</span></span>
-<span class="ln" id="L271"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L272"><span class="tok-kw">fn</span> <span class="tok-fn">a_changed_or_added_file_inside_the_archive_is_caught</span>() {</span>
-<span class="ln" id="L273">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
-<span class="ln" id="L274">    <span class="tok-kw">if</span> !<span class="tok-fn">have</span>(<span class="tok-str">&quot;tar&quot;</span>) {</span>
-<span class="ln" id="L275">        <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L276">    }</span>
-<span class="ln" id="L277">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;inside-tampered&quot;</span>);</span>
-<span class="ln" id="L278">    <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
-<span class="ln" id="L279">    <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
-<span class="ln" id="L280">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L281">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L282"></span>
-<span class="ln" id="L283">    <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64&quot;</span>;</span>
-<span class="ln" id="L284">    <span class="tok-kw">let</span> release = <span class="tok-fn">stage</span>(&amp;dist, name);</span>
-<span class="ln" id="L285">    <span class="tok-kw">let</span> tarball = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
-<span class="ln" id="L286">    <span class="tok-kw">let</span> archive_it = |to: &amp;Path| {</span>
-<span class="ln" id="L287">        <span class="tok-kw">let</span> made = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
-<span class="ln" id="L288">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
-<span class="ln" id="L289">            .<span class="tok-fn">arg</span>(&amp;dist)</span>
-<span class="ln" id="L290">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
-<span class="ln" id="L291">            .<span class="tok-fn">arg</span>(to)</span>
-<span class="ln" id="L292">            .<span class="tok-fn">arg</span>(name)</span>
-<span class="ln" id="L293">            .<span class="tok-fn">status</span>()</span>
-<span class="ln" id="L294">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
-<span class="ln" id="L295">        assert!(made.<span class="tok-fn">success</span>());</span>
-<span class="ln" id="L296">    };</span>
-<span class="ln" id="L297">    <span class="tok-fn">archive_it</span>(&amp;tarball);</span>
-<span class="ln" id="L298"></span>
-<span class="ln" id="L299">    <span class="tok-com">// The list is written from the honest archive, and then the archive is</span></span>
-<span class="ln" id="L300">    <span class="tok-com">// rebuilt with a changed program and an extra one in it. That is the</span></span>
-<span class="ln" id="L301">    <span class="tok-com">// substitution this whole command exists to notice: the hash list and its</span></span>
-<span class="ln" id="L302">    <span class="tok-com">// signature are untouched and genuine, and the archive is not.</span></span>
-<span class="ln" id="L303">    <span class="tok-kw">let</span> all = <span class="tok-fn">generate</span>(python, &amp;staging);</span>
-<span class="ln" id="L304">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;something else entirely&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L305">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;helpfully-added&quot;</span>), b<span class="tok-str">&quot;not published\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L306">    <span class="tok-fn">archive_it</span>(&amp;tarball);</span>
-<span class="ln" id="L307"></span>
-<span class="ln" id="L308">    <span class="tok-kw">let</span> section = contents::<span class="tok-fn">for_archive</span>(&amp;all, &amp;format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L309">    <span class="tok-kw">let</span> inside = archive::<span class="tok-fn">members</span>(&amp;tarball).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the archive still reads&quot;</span>);</span>
-<span class="ln" id="L310">    <span class="tok-kw">let</span> comparison = archive::<span class="tok-fn">compare</span>(&amp;inside, section);</span>
-<span class="ln" id="L311"></span>
-<span class="ln" id="L312">    assert!(!comparison.<span class="tok-fn">is_clean</span>(), <span class="tok-str">&quot;a changed archive must not pass&quot;</span>);</span>
-<span class="ln" id="L313">    <span class="tok-kw">let</span> changed: Vec&lt;&amp;str&gt; = comparison</span>
-<span class="ln" id="L314">        .outcomes</span>
-<span class="ln" id="L315">        .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L316">        .<span class="tok-fn">filter</span>(|o| matches!(o.verdict, archive::Verdict::Differs { .. }))</span>
-<span class="ln" id="L317">        .<span class="tok-fn">map</span>(|o| o.path.<span class="tok-fn">as_str</span>())</span>
-<span class="ln" id="L318">        .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L319">    assert_eq!(</span>
-<span class="ln" id="L320">        changed,</span>
-<span class="ln" id="L321">        vec![format!(<span class="tok-str">&quot;{name}/veilvoice&quot;</span>)],</span>
-<span class="ln" id="L322">        <span class="tok-str">&quot;the changed program is named, and only it&quot;</span></span>
-<span class="ln" id="L323">    );</span>
-<span class="ln" id="L324">    assert_eq!(</span>
-<span class="ln" id="L325">        comparison.extras,</span>
-<span class="ln" id="L326">        vec![format!(<span class="tok-str">&quot;{name}/helpfully-added&quot;</span>)],</span>
-<span class="ln" id="L327">        <span class="tok-str">&quot;the file nobody published is named&quot;</span></span>
-<span class="ln" id="L328">    );</span>
-<span class="ln" id="L329">    assert_eq!(comparison.<span class="tok-fn">wrong</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;one changed and one added&quot;</span>);</span>
-<span class="ln" id="L330"></span>
-<span class="ln" id="L331">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L286"><span class="tok-com">/// A zip, deflated and stored, read from its central directory.</span></span>
+<span class="ln" id="L287"><span class="tok-com">///</span></span>
+<span class="ln" id="L288"><span class="tok-com">/// Both compression methods, because a release zip holds both: `Compress-Archive`</span></span>
+<span class="ln" id="L289"><span class="tok-com">/// stores a member it cannot usefully compress, and a reader that handled only</span></span>
+<span class="ln" id="L290"><span class="tok-com">/// deflate would report a changed file for one that is perfectly sound.</span></span>
+<span class="ln" id="L291"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L292"><span class="tok-kw">fn</span> <span class="tok-fn">a_zip_holds_what_the_release_job_published</span>() {</span>
+<span class="ln" id="L293">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
+<span class="ln" id="L294">    <span class="tok-kw">for</span> (method, label) <span class="tok-kw">in</span> [(<span class="tok-str">&quot;ZIP_DEFLATED&quot;</span>, <span class="tok-str">&quot;deflated&quot;</span>), (<span class="tok-str">&quot;ZIP_STORED&quot;</span>, <span class="tok-str">&quot;stored&quot;</span>)] {</span>
+<span class="ln" id="L295">        <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(&amp;format!(<span class="tok-str">&quot;inside-zip-{label}&quot;</span>));</span>
+<span class="ln" id="L296">        <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
+<span class="ln" id="L297">        <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
+<span class="ln" id="L298">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L299">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L300"></span>
+<span class="ln" id="L301">        <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64&quot;</span>;</span>
+<span class="ln" id="L302">        <span class="tok-fn">stage</span>(&amp;dist, name);</span>
+<span class="ln" id="L303">        <span class="tok-kw">let</span> zip = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.zip&quot;</span>));</span>
+<span class="ln" id="L304">        <span class="tok-com">// Built with the same library that built every release zip this</span></span>
+<span class="ln" id="L305">        <span class="tok-com">// project has published, so the bytes under test are the bytes a</span></span>
+<span class="ln" id="L306">        <span class="tok-com">// reader will meet.</span></span>
+<span class="ln" id="L307">        <span class="tok-kw">let</span> script = format!(</span>
+<span class="ln" id="L308">            <span class="tok-str">&quot;import pathlib, zipfile\n\</span></span>
+<span class="ln" id="L309"><span class="tok-str">             root = pathlib.Path({dist:?})\n\</span></span>
+<span class="ln" id="L310"><span class="tok-str">             with zipfile.ZipFile({zip:?}, &#x27;w&#x27;, zipfile.{method}) as z:\n\</span></span>
+<span class="ln" id="L311"><span class="tok-str">             \x20   for path in sorted(root.rglob(&#x27;*&#x27;)):\n\</span></span>
+<span class="ln" id="L312"><span class="tok-str">             \x20       if path.is_file():\n\</span></span>
+<span class="ln" id="L313"><span class="tok-str">             \x20           z.write(path, path.relative_to(root).as_posix())\n&quot;</span>,</span>
+<span class="ln" id="L314">            dist = dist.<span class="tok-fn">to_string_lossy</span>(),</span>
+<span class="ln" id="L315">            zip = zip.<span class="tok-fn">to_string_lossy</span>(),</span>
+<span class="ln" id="L316">        );</span>
+<span class="ln" id="L317">        <span class="tok-kw">let</span> ran = Command::<span class="tok-fn">new</span>(python)</span>
+<span class="ln" id="L318">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-c&quot;</span>)</span>
+<span class="ln" id="L319">            .<span class="tok-fn">arg</span>(&amp;script)</span>
+<span class="ln" id="L320">            .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L321">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;python runs&quot;</span>);</span>
+<span class="ln" id="L322">        assert!(</span>
+<span class="ln" id="L323">            ran.status.<span class="tok-fn">success</span>(),</span>
+<span class="ln" id="L324">            <span class="tok-str">&quot;the zip could not be built: {}&quot;</span>,</span>
+<span class="ln" id="L325">            String::<span class="tok-fn">from_utf8_lossy</span>(&amp;ran.stderr)</span>
+<span class="ln" id="L326">        );</span>
+<span class="ln" id="L327"></span>
+<span class="ln" id="L328">        <span class="tok-kw">let</span> all = <span class="tok-fn">generate</span>(python, &amp;staging);</span>
+<span class="ln" id="L329">        <span class="tok-fn">agrees</span>(&amp;zip, &amp;all);</span>
+<span class="ln" id="L330">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L331">    }</span>
 <span class="ln" id="L332">}</span>
 </span>
 <span class="ln" id="L333"></span>
-<span class="src-item" id="fn-a_file_taken_out_of_the_archive_is_reported">
-<span class="ln" id="L334"><span class="tok-com">/// A published file missing from the archive is reported as missing.</span></span>
-<span class="ln" id="L335"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L336"><span class="tok-kw">fn</span> <span class="tok-fn">a_file_taken_out_of_the_archive_is_reported</span>() {</span>
-<span class="ln" id="L337">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
-<span class="ln" id="L338">    <span class="tok-kw">if</span> !<span class="tok-fn">have</span>(<span class="tok-str">&quot;tar&quot;</span>) {</span>
-<span class="ln" id="L339">        <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L340">    }</span>
-<span class="ln" id="L341">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;inside-missing&quot;</span>);</span>
-<span class="ln" id="L342">    <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
-<span class="ln" id="L343">    <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
-<span class="ln" id="L344">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L345">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L346"></span>
-<span class="ln" id="L347">    <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64&quot;</span>;</span>
-<span class="ln" id="L348">    <span class="tok-kw">let</span> release = <span class="tok-fn">stage</span>(&amp;dist, name);</span>
-<span class="ln" id="L349">    <span class="tok-kw">let</span> tarball = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
-<span class="ln" id="L350">    <span class="tok-kw">let</span> archive_it = || {</span>
-<span class="ln" id="L351">        assert!(Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
-<span class="ln" id="L352">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
-<span class="ln" id="L353">            .<span class="tok-fn">arg</span>(&amp;dist)</span>
-<span class="ln" id="L354">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
-<span class="ln" id="L355">            .<span class="tok-fn">arg</span>(&amp;tarball)</span>
-<span class="ln" id="L356">            .<span class="tok-fn">arg</span>(name)</span>
-<span class="ln" id="L357">            .<span class="tok-fn">status</span>()</span>
-<span class="ln" id="L358">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>)</span>
-<span class="ln" id="L359">            .<span class="tok-fn">success</span>());</span>
-<span class="ln" id="L360">    };</span>
-<span class="ln" id="L361">    <span class="tok-fn">archive_it</span>();</span>
-<span class="ln" id="L362">    <span class="tok-kw">let</span> all = <span class="tok-fn">generate</span>(python, &amp;staging);</span>
-<span class="ln" id="L363"></span>
-<span class="ln" id="L364">    std::fs::<span class="tok-fn">remove_file</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L365">    <span class="tok-fn">archive_it</span>();</span>
+<span class="src-item" id="fn-a_changed_or_added_file_inside_the_archive_is_caught">
+<span class="ln" id="L334"><span class="tok-com">/// A file changed inside the archive is named, and an added one is too.</span></span>
+<span class="ln" id="L335"><span class="tok-com">///</span></span>
+<span class="ln" id="L336"><span class="tok-com">/// Written after the clean runs above rather than instead of them: a test that</span></span>
+<span class="ln" id="L337"><span class="tok-com">/// only proves refusal cannot tell a working verifier from one that refuses</span></span>
+<span class="ln" id="L338"><span class="tok-com">/// everything.</span></span>
+<span class="ln" id="L339"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L340"><span class="tok-kw">fn</span> <span class="tok-fn">a_changed_or_added_file_inside_the_archive_is_caught</span>() {</span>
+<span class="ln" id="L341">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
+<span class="ln" id="L342">    <span class="tok-kw">if</span> !<span class="tok-fn">have</span>(<span class="tok-str">&quot;tar&quot;</span>) {</span>
+<span class="ln" id="L343">        <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L344">    }</span>
+<span class="ln" id="L345">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;inside-tampered&quot;</span>);</span>
+<span class="ln" id="L346">    <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
+<span class="ln" id="L347">    <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
+<span class="ln" id="L348">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L349">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L350"></span>
+<span class="ln" id="L351">    <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64&quot;</span>;</span>
+<span class="ln" id="L352">    <span class="tok-kw">let</span> release = <span class="tok-fn">stage</span>(&amp;dist, name);</span>
+<span class="ln" id="L353">    <span class="tok-kw">let</span> tarball = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
+<span class="ln" id="L354">    <span class="tok-kw">let</span> archive_it = |to: &amp;Path| {</span>
+<span class="ln" id="L355">        <span class="tok-kw">let</span> made = Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
+<span class="ln" id="L356">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
+<span class="ln" id="L357">            .<span class="tok-fn">arg</span>(&amp;dist)</span>
+<span class="ln" id="L358">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
+<span class="ln" id="L359">            .<span class="tok-fn">arg</span>(to)</span>
+<span class="ln" id="L360">            .<span class="tok-fn">arg</span>(name)</span>
+<span class="ln" id="L361">            .<span class="tok-fn">status</span>()</span>
+<span class="ln" id="L362">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
+<span class="ln" id="L363">        assert!(made.<span class="tok-fn">success</span>());</span>
+<span class="ln" id="L364">    };</span>
+<span class="ln" id="L365">    <span class="tok-fn">archive_it</span>(&amp;tarball);</span>
 <span class="ln" id="L366"></span>
-<span class="ln" id="L367">    <span class="tok-kw">let</span> section = contents::<span class="tok-fn">for_archive</span>(&amp;all, &amp;format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L368">    <span class="tok-kw">let</span> inside = archive::<span class="tok-fn">members</span>(&amp;tarball).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the archive still reads&quot;</span>);</span>
-<span class="ln" id="L369">    <span class="tok-kw">let</span> comparison = archive::<span class="tok-fn">compare</span>(&amp;inside, section);</span>
-<span class="ln" id="L370">    <span class="tok-kw">let</span> missing: Vec&lt;&amp;str&gt; = comparison</span>
-<span class="ln" id="L371">        .outcomes</span>
-<span class="ln" id="L372">        .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L373">        .<span class="tok-fn">filter</span>(|o| o.verdict == archive::Verdict::Missing)</span>
-<span class="ln" id="L374">        .<span class="tok-fn">map</span>(|o| o.path.<span class="tok-fn">as_str</span>())</span>
-<span class="ln" id="L375">        .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L376">    assert_eq!(missing, vec![format!(<span class="tok-str">&quot;{name}/veilvoice-gui&quot;</span>)]);</span>
-<span class="ln" id="L377">    assert!(comparison.extras.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;nothing was added&quot;</span>);</span>
-<span class="ln" id="L378"></span>
-<span class="ln" id="L379">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L380">}</span>
-</span>
-<span class="ln" id="L381"></span>
-<span class="src-item" id="fn-an_archive_this_cannot_read_says_so">
-<span class="ln" id="L382"><span class="tok-com">/// An archive this reader cannot open says so, rather than reporting nothing.</span></span>
-<span class="ln" id="L383"><span class="tok-com">///</span></span>
-<span class="ln" id="L384"><span class="tok-com">/// `.tar.xz` is published and is not readable here. The distinction that</span></span>
-<span class="ln" id="L385"><span class="tok-com">/// matters is between &quot;there is nothing wrong with this&quot; and &quot;I did not look&quot;,</span></span>
-<span class="ln" id="L386"><span class="tok-com">/// and a verifier must never spell the second as the first.</span></span>
-<span class="ln" id="L387"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L388"><span class="tok-kw">fn</span> <span class="tok-fn">an_archive_this_cannot_read_says_so</span>() {</span>
-<span class="ln" id="L389">    assert_eq!(</span>
-<span class="ln" id="L390">        archive::<span class="tok-fn">kind_of</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>),</span>
-<span class="ln" id="L391">        archive::Kind::TarGz</span>
-<span class="ln" id="L392">    );</span>
-<span class="ln" id="L393">    assert_eq!(</span>
-<span class="ln" id="L394">        archive::<span class="tok-fn">kind_of</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64.zip&quot;</span>),</span>
-<span class="ln" id="L395">        archive::Kind::Zip</span>
+<span class="ln" id="L367">    <span class="tok-com">// The list is written from the honest archive, and then the archive is</span></span>
+<span class="ln" id="L368">    <span class="tok-com">// rebuilt with a changed program and an extra one in it. That is the</span></span>
+<span class="ln" id="L369">    <span class="tok-com">// substitution this whole command exists to notice: the hash list and its</span></span>
+<span class="ln" id="L370">    <span class="tok-com">// signature are untouched and genuine, and the archive is not.</span></span>
+<span class="ln" id="L371">    <span class="tok-kw">let</span> all = <span class="tok-fn">generate</span>(python, &amp;staging);</span>
+<span class="ln" id="L372">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;something else entirely&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L373">    std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;helpfully-added&quot;</span>), b<span class="tok-str">&quot;not published\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L374">    <span class="tok-fn">archive_it</span>(&amp;tarball);</span>
+<span class="ln" id="L375"></span>
+<span class="ln" id="L376">    <span class="tok-kw">let</span> section = contents::<span class="tok-fn">for_archive</span>(&amp;all, &amp;format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L377">    <span class="tok-kw">let</span> inside = archive::<span class="tok-fn">members</span>(&amp;tarball).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the archive still reads&quot;</span>);</span>
+<span class="ln" id="L378">    <span class="tok-kw">let</span> comparison = archive::<span class="tok-fn">compare</span>(&amp;inside, section);</span>
+<span class="ln" id="L379"></span>
+<span class="ln" id="L380">    assert!(!comparison.<span class="tok-fn">is_clean</span>(), <span class="tok-str">&quot;a changed archive must not pass&quot;</span>);</span>
+<span class="ln" id="L381">    <span class="tok-kw">let</span> changed: Vec&lt;&amp;str&gt; = comparison</span>
+<span class="ln" id="L382">        .outcomes</span>
+<span class="ln" id="L383">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L384">        .<span class="tok-fn">filter</span>(|o| matches!(o.verdict, archive::Verdict::Differs { .. }))</span>
+<span class="ln" id="L385">        .<span class="tok-fn">map</span>(|o| o.path.<span class="tok-fn">as_str</span>())</span>
+<span class="ln" id="L386">        .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L387">    assert_eq!(</span>
+<span class="ln" id="L388">        changed,</span>
+<span class="ln" id="L389">        vec![format!(<span class="tok-str">&quot;{name}/veilvoice&quot;</span>)],</span>
+<span class="ln" id="L390">        <span class="tok-str">&quot;the changed program is named, and only it&quot;</span></span>
+<span class="ln" id="L391">    );</span>
+<span class="ln" id="L392">    assert_eq!(</span>
+<span class="ln" id="L393">        comparison.extras,</span>
+<span class="ln" id="L394">        vec![format!(<span class="tok-str">&quot;{name}/helpfully-added&quot;</span>)],</span>
+<span class="ln" id="L395">        <span class="tok-str">&quot;the file nobody published is named&quot;</span></span>
 <span class="ln" id="L396">    );</span>
-<span class="ln" id="L397">    assert!(matches!(</span>
-<span class="ln" id="L398">        archive::<span class="tok-fn">kind_of</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.xz&quot;</span>),</span>
-<span class="ln" id="L399">        archive::Kind::<span class="tok-fn">Unreadable</span>(_)</span>
-<span class="ln" id="L400">    ));</span>
-<span class="ln" id="L401">    assert_eq!(archive::<span class="tok-fn">kind_of</span>(<span class="tok-str">&quot;notes.txt&quot;</span>), archive::Kind::Unknown);</span>
-<span class="ln" id="L402"></span>
-<span class="ln" id="L403">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;inside-unreadable&quot;</span>);</span>
-<span class="ln" id="L404">    <span class="tok-kw">let</span> path = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.xz&quot;</span>);</span>
-<span class="ln" id="L405">    std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;not really an xz&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L406">    <span class="tok-kw">let</span> why = archive::<span class="tok-fn">members</span>(&amp;path).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an unreadable format is an error&quot;</span>);</span>
-<span class="ln" id="L407">    assert!(</span>
-<span class="ln" id="L408">        why.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.tar.gz&quot;</span>),</span>
-<span class="ln" id="L409">        <span class="tok-str">&quot;it says which file to fetch instead: {why}&quot;</span></span>
-<span class="ln" id="L410">    );</span>
-<span class="ln" id="L411">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L412">}</span>
+<span class="ln" id="L397">    assert_eq!(comparison.<span class="tok-fn">wrong</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;one changed and one added&quot;</span>);</span>
+<span class="ln" id="L398"></span>
+<span class="ln" id="L399">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L400">}</span>
 </span>
-<span class="ln" id="L413"></span>
+<span class="ln" id="L401"></span>
+<span class="src-item" id="fn-a_file_taken_out_of_the_archive_is_reported">
+<span class="ln" id="L402"><span class="tok-com">/// A published file missing from the archive is reported as missing.</span></span>
+<span class="ln" id="L403"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L404"><span class="tok-kw">fn</span> <span class="tok-fn">a_file_taken_out_of_the_archive_is_reported</span>() {</span>
+<span class="ln" id="L405">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(python) = <span class="tok-fn">python</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
+<span class="ln" id="L406">    <span class="tok-kw">if</span> !<span class="tok-fn">have</span>(<span class="tok-str">&quot;tar&quot;</span>) {</span>
+<span class="ln" id="L407">        <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L408">    }</span>
+<span class="ln" id="L409">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;inside-missing&quot;</span>);</span>
+<span class="ln" id="L410">    <span class="tok-kw">let</span> dist = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;dist&quot;</span>);</span>
+<span class="ln" id="L411">    <span class="tok-kw">let</span> staging = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staging&quot;</span>);</span>
+<span class="ln" id="L412">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;dist).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L413">    std::fs::<span class="tok-fn">create_dir_all</span>(&amp;staging).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L414"></span>
+<span class="ln" id="L415">    <span class="tok-kw">let</span> name = <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64&quot;</span>;</span>
+<span class="ln" id="L416">    <span class="tok-kw">let</span> release = <span class="tok-fn">stage</span>(&amp;dist, name);</span>
+<span class="ln" id="L417">    <span class="tok-kw">let</span> tarball = staging.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
+<span class="ln" id="L418">    <span class="tok-kw">let</span> archive_it = || {</span>
+<span class="ln" id="L419">        assert!(Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;tar&quot;</span>)</span>
+<span class="ln" id="L420">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
+<span class="ln" id="L421">            .<span class="tok-fn">arg</span>(&amp;dist)</span>
+<span class="ln" id="L422">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
+<span class="ln" id="L423">            .<span class="tok-fn">arg</span>(&amp;tarball)</span>
+<span class="ln" id="L424">            .<span class="tok-fn">arg</span>(name)</span>
+<span class="ln" id="L425">            .<span class="tok-fn">status</span>()</span>
+<span class="ln" id="L426">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>)</span>
+<span class="ln" id="L427">            .<span class="tok-fn">success</span>());</span>
+<span class="ln" id="L428">    };</span>
+<span class="ln" id="L429">    <span class="tok-fn">archive_it</span>();</span>
+<span class="ln" id="L430">    <span class="tok-kw">let</span> all = <span class="tok-fn">generate</span>(python, &amp;staging);</span>
+<span class="ln" id="L431"></span>
+<span class="ln" id="L432">    std::fs::<span class="tok-fn">remove_file</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L433">    <span class="tok-fn">archive_it</span>();</span>
+<span class="ln" id="L434"></span>
+<span class="ln" id="L435">    <span class="tok-kw">let</span> section = contents::<span class="tok-fn">for_archive</span>(&amp;all, &amp;format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L436">    <span class="tok-kw">let</span> inside = archive::<span class="tok-fn">members</span>(&amp;tarball).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the archive still reads&quot;</span>);</span>
+<span class="ln" id="L437">    <span class="tok-kw">let</span> comparison = archive::<span class="tok-fn">compare</span>(&amp;inside, section);</span>
+<span class="ln" id="L438">    <span class="tok-kw">let</span> missing: Vec&lt;&amp;str&gt; = comparison</span>
+<span class="ln" id="L439">        .outcomes</span>
+<span class="ln" id="L440">        .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L441">        .<span class="tok-fn">filter</span>(|o| o.verdict == archive::Verdict::Missing)</span>
+<span class="ln" id="L442">        .<span class="tok-fn">map</span>(|o| o.path.<span class="tok-fn">as_str</span>())</span>
+<span class="ln" id="L443">        .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L444">    assert_eq!(missing, vec![format!(<span class="tok-str">&quot;{name}/veilvoice-gui&quot;</span>)]);</span>
+<span class="ln" id="L445">    assert!(comparison.extras.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;nothing was added&quot;</span>);</span>
+<span class="ln" id="L446"></span>
+<span class="ln" id="L447">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L448">}</span>
+</span>
+<span class="ln" id="L449"></span>
+<span class="src-item" id="fn-an_archive_this_cannot_read_says_so">
+<span class="ln" id="L450"><span class="tok-com">/// An archive this reader cannot open says so, rather than reporting nothing.</span></span>
+<span class="ln" id="L451"><span class="tok-com">///</span></span>
+<span class="ln" id="L452"><span class="tok-com">/// `.tar.xz` is published and is not readable here. The distinction that</span></span>
+<span class="ln" id="L453"><span class="tok-com">/// matters is between &quot;there is nothing wrong with this&quot; and &quot;I did not look&quot;,</span></span>
+<span class="ln" id="L454"><span class="tok-com">/// and a verifier must never spell the second as the first.</span></span>
+<span class="ln" id="L455"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L456"><span class="tok-kw">fn</span> <span class="tok-fn">an_archive_this_cannot_read_says_so</span>() {</span>
+<span class="ln" id="L457">    assert_eq!(</span>
+<span class="ln" id="L458">        archive::<span class="tok-fn">kind_of</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>),</span>
+<span class="ln" id="L459">        archive::Kind::TarGz</span>
+<span class="ln" id="L460">    );</span>
+<span class="ln" id="L461">    assert_eq!(</span>
+<span class="ln" id="L462">        archive::<span class="tok-fn">kind_of</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64.zip&quot;</span>),</span>
+<span class="ln" id="L463">        archive::Kind::Zip</span>
+<span class="ln" id="L464">    );</span>
+<span class="ln" id="L465">    assert!(matches!(</span>
+<span class="ln" id="L466">        archive::<span class="tok-fn">kind_of</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.xz&quot;</span>),</span>
+<span class="ln" id="L467">        archive::Kind::<span class="tok-fn">Unreadable</span>(_)</span>
+<span class="ln" id="L468">    ));</span>
+<span class="ln" id="L469">    assert_eq!(archive::<span class="tok-fn">kind_of</span>(<span class="tok-str">&quot;notes.txt&quot;</span>), archive::Kind::Unknown);</span>
+<span class="ln" id="L470"></span>
+<span class="ln" id="L471">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;inside-unreadable&quot;</span>);</span>
+<span class="ln" id="L472">    <span class="tok-kw">let</span> path = work.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.xz&quot;</span>);</span>
+<span class="ln" id="L473">    std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;not really an xz&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L474">    <span class="tok-kw">let</span> why = archive::<span class="tok-fn">members</span>(&amp;path).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an unreadable format is an error&quot;</span>);</span>
+<span class="ln" id="L475">    assert!(</span>
+<span class="ln" id="L476">        why.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.tar.gz&quot;</span>),</span>
+<span class="ln" id="L477">        <span class="tok-str">&quot;it says which file to fetch instead: {why}&quot;</span></span>
+<span class="ln" id="L478">    );</span>
+<span class="ln" id="L479">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L480">}</span>
+</span>
+<span class="ln" id="L481"></span>
 <span class="src-item" id="fn-rubbish_in_place_of_an_archive_is_refused">
-<span class="ln" id="L414"><span class="tok-com">/// A file that is not an archive at all is refused, not passed over.</span></span>
-<span class="ln" id="L415"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L416"><span class="tok-kw">fn</span> <span class="tok-fn">rubbish_in_place_of_an_archive_is_refused</span>() {</span>
-<span class="ln" id="L417">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;inside-rubbish&quot;</span>);</span>
-<span class="ln" id="L418">    <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L419">        <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>,</span>
-<span class="ln" id="L420">        <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64.zip&quot;</span>,</span>
-<span class="ln" id="L421">    ] {</span>
-<span class="ln" id="L422">        <span class="tok-kw">let</span> path = work.<span class="tok-fn">join</span>(name);</span>
-<span class="ln" id="L423">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;this is not an archive, it is a sentence&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L424">        assert!(</span>
-<span class="ln" id="L425">            archive::<span class="tok-fn">members</span>(&amp;path).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L426">            <span class="tok-str">&quot;{name} is not an archive and must not read as an empty one&quot;</span></span>
-<span class="ln" id="L427">        );</span>
-<span class="ln" id="L428">    }</span>
-<span class="ln" id="L429">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L430">}</span>
+<span class="ln" id="L482"><span class="tok-com">/// A file that is not an archive at all is refused, not passed over.</span></span>
+<span class="ln" id="L483"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L484"><span class="tok-kw">fn</span> <span class="tok-fn">rubbish_in_place_of_an_archive_is_refused</span>() {</span>
+<span class="ln" id="L485">    <span class="tok-kw">let</span> work = <span class="tok-fn">room</span>(<span class="tok-str">&quot;inside-rubbish&quot;</span>);</span>
+<span class="ln" id="L486">    <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L487">        <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>,</span>
+<span class="ln" id="L488">        <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64.zip&quot;</span>,</span>
+<span class="ln" id="L489">    ] {</span>
+<span class="ln" id="L490">        <span class="tok-kw">let</span> path = work.<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L491">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;this is not an archive, it is a sentence&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L492">        assert!(</span>
+<span class="ln" id="L493">            archive::<span class="tok-fn">members</span>(&amp;path).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L494">            <span class="tok-str">&quot;{name} is not an archive and must not read as an empty one&quot;</span></span>
+<span class="ln" id="L495">        );</span>
+<span class="ln" id="L496">    }</span>
+<span class="ln" id="L497">    std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;work).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L498">}</span>
 </span>
 </code></pre>
 </main>

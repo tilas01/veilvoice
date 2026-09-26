@@ -122,7 +122,7 @@ flowchart TD
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |
 | [[`tests.rs`|File-veilvoice-verify-tests]] | 1743 | The verifier's own tests. |
 | [[`update.rs`|File-veilvoice-verify-update]] | 1333 | The update that does the update. |
-| [[`inside_the_archive.rs`|File-veilvoice-verify-tests-inside_the_archive]] | 430 | Roadmap item 164. |
+| [[`inside_the_archive.rs`|File-veilvoice-verify-tests-inside_the_archive]] | 498 | Roadmap item 164. |
 | [[`release_manifest.rs`|File-veilvoice-verify-tests-release_manifest]] | 208 | Roadmap item 97. |
 
 **9,530 functional lines of Rust** in this crate. A functional line is a line
