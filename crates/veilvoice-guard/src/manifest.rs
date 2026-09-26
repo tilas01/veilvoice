@@ -170,6 +170,14 @@ fn unrecordable(path: &str) -> Option<&'static str> {
     None
 }
 
+/// SHA-256 of `bytes`, as lower-case hexadecimal.
+///
+/// A string rather than the digest itself, because every caller is either
+/// writing it into the manifest or comparing it with a line already there, and
+/// the manifest is text. The formatting lives here so there is one spelling of
+/// it: two places formatting a digest is two places that can disagree about
+/// case, and a comparison that fails on case reports a file as changed when it
+/// is not.
 fn digest_of(bytes: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(bytes);

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-video/src/raster.rs`
 
-[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 594 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs)
+[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 602 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs)
 
 ## Contents
 
@@ -72,7 +72,7 @@ program is careful not to do.
 
 ## What this file contains
 
-594 lines defining **17 functions** (12 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+602 lines defining **17 functions** (12 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -127,9 +127,9 @@ flowchart TD
     n_text_centred(["Canvas::text_centred<br/>line 283"])
     n_png(["Canvas::png<br/>line 306"])
     n_chunk["chunk<br/>line 335"]
-    n_new["Crc::new<br/>line 352"]
-    n_eat["Crc::eat<br/>line 356"]
-    n_done["Crc::done<br/>line 370"]
+    n_new["Crc::new<br/>line 354"]
+    n_eat["Crc::eat<br/>line 361"]
+    n_done["Crc::done<br/>line 378"]
     n_chunk --> n_new
     n_circle --> n_blend
     n_png --> n_chunk
@@ -154,9 +154,9 @@ flowchart TD
     click n_text_centred href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L283" "open the source"
     click n_png href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L306" "open the source"
     click n_chunk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L335" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L352" "open the source"
-    click n_eat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L356" "open the source"
-    click n_done href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L370" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L354" "open the source"
+    click n_eat href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L361" "open the source"
+    click n_done href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L378" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_colour,n_width,n_height,n_rounded_rect,n_ring,n_text_centred,n_png entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -188,9 +188,9 @@ flowchart TD
 | `Canvas::png` <sub>pub fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L306) | The picture as a PNG file. |
 | `chunk` <sub>fn</sub> | [335](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L335) | Append one PNG chunk: length, type, data, and the checksum over both. |
 | `Crc` <sub>struct</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L349) | The CRC-32 PNG puts on every chunk. |
-| `Crc::new` <sub>fn</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L352) |  |
-| `Crc::eat` <sub>fn</sub> | [356](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L356) |  |
-| `Crc::done` <sub>fn</sub> | [370](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L370) |  |
+| `Crc::new` <sub>fn</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L354) | A fresh checksum, which PNG specifies as starting from all ones rather than from zero. |
+| `Crc::eat` <sub>fn</sub> | [361](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L361) | Fold bytes in. |
+| `Crc::done` <sub>fn</sub> | [378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs#L378) | The value to write, which is the running state inverted. |
 
 ---
 

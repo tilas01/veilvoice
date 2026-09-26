@@ -66,9 +66,17 @@ const NAME_BYTES: usize = 10;
 /// point is secret would be the dishonest half of this idea.
 const INDEX_NAME: &str = "applock.index";
 
-/// Domain separators, so the two names and the mask cannot coincide.
+// Domain separators, so the two names and the mask cannot coincide. One label
+// per line with its own sentence, rather than one comment over the group: a
+// generated page lists each on its own and a shared comment reaches only the
+// first of them.
+
+/// Derives the real vault's key from the material the unlock produced.
 const LABEL_PRIMARY: &[u8] = b"veilvoice/vault/primary";
+/// Derives the decoy vault's key from the same material, so the two keys are
+/// unrelated even though one passphrase leads to both.
 const LABEL_SHADOW: &[u8] = b"veilvoice/vault/shadow";
+/// Derives the mask that hides which of the two an index entry belongs to.
 const LABEL_MASK: &[u8] = b"veilvoice/vault/mask";
 
 /// What [`Vault::load`] found when it went looking.

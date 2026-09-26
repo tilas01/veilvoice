@@ -83,6 +83,15 @@ struct Signature {
 }
 
 impl Signature {
+    /// Everything about one frame that could make it differ from its
+    /// neighbour, at `at_secs` into the plan.
+    ///
+    /// Two frames with the same signature are the same picture, which is what
+    /// lets the renderer draw one of them and reuse it. The fields are chosen
+    /// to be exactly what is drawn and nothing else: the playhead is rounded to
+    /// the pixel it lands on rather than kept as a fraction, because a
+    /// difference smaller than a pixel is a difference nobody can see and
+    /// keeping it would mean redrawing every frame.
     fn at(plan: &Conversation, envelope: &Envelope, look: &Look, at_secs: f64) -> Self {
         let layout = page::layout(look, plan.len());
         let duration = plan.duration().max(1e-9);

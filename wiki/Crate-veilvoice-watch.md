@@ -71,10 +71,10 @@ flowchart TD
     n_lib(["lib.rs<br/>423 lines"])
     n_appctl["appctl.rs<br/>798 lines"]
     n_input["input.rs<br/>605 lines"]
-    n_linux["linux.rs<br/>201 lines"]
+    n_linux["linux.rs<br/>218 lines"]
     n_privilege["privilege.rs<br/>404 lines"]
     n_proc["proc.rs<br/>274 lines"]
-    n_windows["windows.rs<br/>606 lines"]
+    n_windows["windows.rs<br/>622 lines"]
     n_input --> n_proc
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs" "open the source"
     click n_appctl href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/appctl.rs" "open the source"
@@ -94,10 +94,10 @@ flowchart TD
 | [[`appctl.rs`|File-veilvoice-watch-appctl]] | 798 | Learn what normally runs on this machine, then notice what does not. |
 | [[`input.rs`|File-veilvoice-watch-input]] | 605 | What on this machine could be watching the keyboard and the mouse. |
 | [[`lib.rs`|File-veilvoice-watch-lib]] | 423 | Find out which applications are using your microphone and camera, right now. |
-| [[`linux.rs`|File-veilvoice-watch-linux]] | 201 | Linux detection, via open file handles in /proc. |
+| [[`linux.rs`|File-veilvoice-watch-linux]] | 218 | Linux detection, via open file handles in /proc. |
 | [[`privilege.rs`|File-veilvoice-watch-privilege]] | 404 | What privilege VeilVoice is running with, and what each level can actually see. |
 | [[`proc.rs`|File-veilvoice-watch-proc]] | 274 | Which processes are running, per platform, and what that cannot tell you. |
-| [[`windows.rs`|File-veilvoice-watch-windows]] | 606 | Windows detection, via the Capability Access Manager. |
+| [[`windows.rs`|File-veilvoice-watch-windows]] | 622 | Windows detection, via the Capability Access Manager. |
 | [[`scan_once.rs`|File-veilvoice-watch-examples-scan_once]] | 30 | Print what is using the microphone and camera right now. |
 
 **3,917 functional lines of Rust** in this crate. A functional line is a line

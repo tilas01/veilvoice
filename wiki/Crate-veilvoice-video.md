@@ -81,10 +81,10 @@ flowchart TD
     n_accel["accel.rs<br/>652 lines"]
     n_ffmpeg["ffmpeg.rs<br/>718 lines"]
     n_font["font.rs<br/>418 lines"]
-    n_frames["frames.rs<br/>686 lines"]
+    n_frames["frames.rs<br/>695 lines"]
     n_page["page.rs<br/>1610 lines"]
     n_palette["palette.rs<br/>747 lines"]
-    n_raster["raster.rs<br/>594 lines"]
+    n_raster["raster.rs<br/>602 lines"]
     n_size["size.rs<br/>732 lines"]
     n_waveform["waveform.rs<br/>298 lines"]
     n_ffmpeg --> n_size
@@ -118,11 +118,11 @@ flowchart TD
 | [[`accel.rs`|File-veilvoice-video-accel]] | 652 | What hardware this machine has, and the one place VeilVoice can use it. |
 | [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 718 | The video file, which needs a codec this project does not ship. |
 | [[`font.rs`|File-veilvoice-video-font]] | 418 | A monospace face, five pixels by seven, drawn here. |
-| [[`frames.rs`|File-veilvoice-video-frames]] | 686 | The video's pictures, and how many of them there really are. |
+| [[`frames.rs`|File-veilvoice-video-frames]] | 695 | The video's pictures, and how many of them there really are. |
 | [[`lib.rs`|File-veilvoice-video-lib]] | 168 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
 | [[`page.rs`|File-veilvoice-video-page]] | 1610 | The picture: one still for a preview, and one page that plays. |
 | [[`palette.rs`|File-veilvoice-video-palette]] | 747 | Colours: the site's own tokens, and one per speaker. |
-| [[`raster.rs`|File-veilvoice-video-raster]] | 594 | Pixels, and a PNG to put them in. |
+| [[`raster.rs`|File-veilvoice-video-raster]] | 602 | Pixels, and a PNG to put them in. |
 | [[`size.rs`|File-veilvoice-video-size]] | 732 | The size and frame rate a video is rendered at. |
 | [[`waveform.rs`|File-veilvoice-video-waveform]] | 298 | The shape of the audio, reduced to something a page can draw. |
 

@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-watch/linux.svg" alt="linux.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-watch/src/linux.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 201 lines &middot; <a href="linux.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 218 lines &middot; <a href="linux.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#how-it-works">How it works</a>
@@ -91,9 +91,9 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>201 lines defining <strong>5 functions</strong> (1 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>218 lines defining <strong>5 functions</strong> (1 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>scan</code> <span style="color:var(--muted)">line 46</span>
+<li><code>scan</code> <span style="color:var(--muted)">line 58</span> &middot; Every process on this machine holding a microphone or a camera open.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>classify</code>, <code>process_name</code>, <code>started_at</code></span>
 </li>
 </ul>
@@ -117,27 +117,27 @@
 <a href="linux.src.html#fn-scan">
 <rect x="91.6" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="133.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scan</text>
-<text x="133.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 46</text>
+<text x="133.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 58</text>
 </a>
 <a href="linux.src.html#fn-classify">
 <rect x="36.4" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="82.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">classify</text>
-<text x="82.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 103</text>
+<text x="82.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 115</text>
 </a>
 <a href="linux.src.html#fn-process_name">
 <rect x="154.9" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="217.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">process_name</text>
-<text x="217.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 124</text>
+<text x="217.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 141</text>
 </a>
 <a href="linux.src.html#fn-started_at">
 <rect x="305.6" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="359.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">started_at</text>
-<text x="359.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 135</text>
+<text x="359.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 152</text>
 </a>
 <a href="linux.src.html#fn-approx_now_minus">
 <rect x="202.0" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="280.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">approx_now_minus</text>
-<text x="280.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 141</text>
+<text x="280.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 158</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -155,19 +155,19 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_scan([&quot;scan&lt;br/&gt;line 46&quot;])
-    n_classify[&quot;classify&lt;br/&gt;line 103&quot;]
-    n_process_name[&quot;process_name&lt;br/&gt;line 124&quot;]
-    n_started_at[&quot;started_at&lt;br/&gt;line 135&quot;]
-    n_approx_now_minus[&quot;approx_now_minus&lt;br/&gt;line 141&quot;]
+    n_scan([&quot;scan&lt;br/&gt;line 58&quot;])
+    n_classify[&quot;classify&lt;br/&gt;line 115&quot;]
+    n_process_name[&quot;process_name&lt;br/&gt;line 141&quot;]
+    n_started_at[&quot;started_at&lt;br/&gt;line 152&quot;]
+    n_approx_now_minus[&quot;approx_now_minus&lt;br/&gt;line 158&quot;]
     n_scan --&gt; n_classify
     n_scan --&gt; n_process_name
     n_scan --&gt; n_started_at
-    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L46&quot; &quot;open the source&quot;
-    click n_classify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L103&quot; &quot;open the source&quot;
-    click n_process_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L124&quot; &quot;open the source&quot;
-    click n_started_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L135&quot; &quot;open the source&quot;
-    click n_approx_now_minus href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L141&quot; &quot;open the source&quot;
+    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L58&quot; &quot;open the source&quot;
+    click n_classify href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L115&quot; &quot;open the source&quot;
+    click n_process_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L141&quot; &quot;open the source&quot;
+    click n_started_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L152&quot; &quot;open the source&quot;
+    click n_approx_now_minus href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/linux.rs#L158&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -178,11 +178,11 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="linux.src.html#fn-scan">46</a></td><td></td></tr>
-<tr><td><code>classify</code> <sub>fn</sub></td><td><a href="linux.src.html#fn-classify">103</a></td><td>Decide whether an open handle means capture.</td></tr>
-<tr><td><code>process_name</code> <sub>fn</sub></td><td><a href="linux.src.html#fn-process_name">124</a></td><td></td></tr>
-<tr><td><code>started_at</code> <sub>fn</sub></td><td><a href="linux.src.html#fn-started_at">135</a></td><td>When the process started, from the modification time of its /proc entry.</td></tr>
-<tr><td><code>approx_now_minus</code> <sub>fn</sub></td><td><a href="linux.src.html#fn-approx_now_minus">141</a></td><td>Unused today; kept because a future PipeWire client lookup will want it.</td></tr>
+<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="linux.src.html#fn-scan">58</a></td><td>Every process on this machine holding a microphone or a camera open.</td></tr>
+<tr><td><code>classify</code> <sub>fn</sub></td><td><a href="linux.src.html#fn-classify">115</a></td><td>Decide whether an open handle means capture.</td></tr>
+<tr><td><code>process_name</code> <sub>fn</sub></td><td><a href="linux.src.html#fn-process_name">141</a></td><td>What a process calls itself, from /proc/&lt;pid&gt;/comm.</td></tr>
+<tr><td><code>started_at</code> <sub>fn</sub></td><td><a href="linux.src.html#fn-started_at">152</a></td><td>When the process started, from the modification time of its /proc entry.</td></tr>
+<tr><td><code>approx_now_minus</code> <sub>fn</sub></td><td><a href="linux.src.html#fn-approx_now_minus">158</a></td><td>Unused today; kept because a future PipeWire client lookup will want it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-watch/windows.svg" alt="windows.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-watch/src/windows.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 606 lines &middot; <a href="windows.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 622 lines &middot; <a href="windows.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#where-the-answer-lives">Where the answer lives</a>
@@ -96,9 +96,9 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>606 lines defining <strong>10 functions</strong> (1 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>622 lines defining <strong>10 functions</strong> (1 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>scan</code> <span style="color:var(--muted)">line 136</span>
+<li><code>scan</code> <span style="color:var(--muted)">line 145</span> &middot; Every application Windows records as having used the microphone or camera, and which of them is using one now.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>collect</code>, <code>decode_path</code>, <code>filetime_to_system</code>, <code>friendly_name</code>, <code>parse_consent_dump</code>, <code>query_tree</code>, <code>hex_value</code>, <code>no_window</code>, <code>reg_exe</code></span>
 </li>
 </ul>
@@ -138,42 +138,42 @@
 <a href="windows.src.html#fn-scan">
 <rect x="321.4" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="367.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">scan</text>
-<text x="367.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
+<text x="367.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 145</text>
 </a>
 <a href="windows.src.html#fn-collect">
 <rect x="198.9" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="245.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">collect</text>
-<text x="245.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 149</text>
+<text x="245.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 158</text>
 </a>
 <a href="windows.src.html#fn-query_tree">
 <rect x="20.0" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="74.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">query_tree</text>
-<text x="74.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 177</text>
+<text x="74.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 186</text>
 </a>
 <a href="windows.src.html#fn-parse_consent_dump">
 <rect x="154.6" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="241.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse_consent_dump</text>
-<text x="241.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
+<text x="241.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 220</text>
 </a>
 <a href="windows.src.html#fn-hex_value">
 <rect x="194.9" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="245.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">hex_value</text>
-<text x="245.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 266</text>
+<text x="245.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 275</text>
 </a>
 <a href="windows.src.html#fn-decode_path">
 <rect x="353.7" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="412.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decode_path</text>
-<text x="412.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 277</text>
+<text x="412.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 286</text>
 </a>
 <a href="windows.src.html#fn-friendly_name">
 <rect x="79.2" y="320.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="145.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">friendly_name</text>
-<text x="145.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 282</text>
+<text x="145.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 291</text>
 </a>
 <a href="windows.src.html#fn-filetime_to_system">
 <rect x="238.0" y="320.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="324.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">filetime_to_system</text>
-<text x="324.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
+<text x="324.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
 </a>
 <rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -192,14 +192,14 @@
 flowchart TD
     n_no_window[&quot;no_window&lt;br/&gt;line 88&quot;]
     n_reg_exe[&quot;reg_exe&lt;br/&gt;line 120&quot;]
-    n_scan([&quot;scan&lt;br/&gt;line 136&quot;])
-    n_collect[&quot;collect&lt;br/&gt;line 149&quot;]
-    n_query_tree[&quot;query_tree&lt;br/&gt;line 177&quot;]
-    n_parse_consent_dump[&quot;parse_consent_dump&lt;br/&gt;line 211&quot;]
-    n_hex_value[&quot;hex_value&lt;br/&gt;line 266&quot;]
-    n_decode_path[&quot;decode_path&lt;br/&gt;line 277&quot;]
-    n_friendly_name[&quot;friendly_name&lt;br/&gt;line 282&quot;]
-    n_filetime_to_system[&quot;filetime_to_system&lt;br/&gt;line 292&quot;]
+    n_scan([&quot;scan&lt;br/&gt;line 145&quot;])
+    n_collect[&quot;collect&lt;br/&gt;line 158&quot;]
+    n_query_tree[&quot;query_tree&lt;br/&gt;line 186&quot;]
+    n_parse_consent_dump[&quot;parse_consent_dump&lt;br/&gt;line 220&quot;]
+    n_hex_value[&quot;hex_value&lt;br/&gt;line 275&quot;]
+    n_decode_path[&quot;decode_path&lt;br/&gt;line 286&quot;]
+    n_friendly_name[&quot;friendly_name&lt;br/&gt;line 291&quot;]
+    n_filetime_to_system[&quot;filetime_to_system&lt;br/&gt;line 308&quot;]
     n_collect --&gt; n_decode_path
     n_collect --&gt; n_filetime_to_system
     n_collect --&gt; n_friendly_name
@@ -211,14 +211,14 @@ flowchart TD
     n_scan --&gt; n_collect
     click n_no_window href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L88&quot; &quot;open the source&quot;
     click n_reg_exe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L120&quot; &quot;open the source&quot;
-    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L136&quot; &quot;open the source&quot;
-    click n_collect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L149&quot; &quot;open the source&quot;
-    click n_query_tree href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L177&quot; &quot;open the source&quot;
-    click n_parse_consent_dump href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L211&quot; &quot;open the source&quot;
-    click n_hex_value href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L266&quot; &quot;open the source&quot;
-    click n_decode_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L277&quot; &quot;open the source&quot;
-    click n_friendly_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L282&quot; &quot;open the source&quot;
-    click n_filetime_to_system href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L292&quot; &quot;open the source&quot;
+    click n_scan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L145&quot; &quot;open the source&quot;
+    click n_collect href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L158&quot; &quot;open the source&quot;
+    click n_query_tree href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L186&quot; &quot;open the source&quot;
+    click n_parse_consent_dump href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L220&quot; &quot;open the source&quot;
+    click n_hex_value href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L275&quot; &quot;open the source&quot;
+    click n_decode_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L286&quot; &quot;open the source&quot;
+    click n_friendly_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L291&quot; &quot;open the source&quot;
+    click n_filetime_to_system href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L308&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -233,14 +233,14 @@ flowchart TD
 <tr><td><code>CONSENT_STORE</code> <sub>const</sub></td><td><a href="windows.src.html#fn-consent_store">101</a></td><td>The full hive name, not the HKCU abbreviation: reg query echoes subkey paths back in long form, and the reply has to be matched against what was asked for.</td></tr>
 <tr><td><code>FILETIME_TO_UNIX_SECS</code> <sub>const</sub></td><td><a href="windows.src.html#fn-filetime_to_unix_secs">105</a></td><td>FILETIME counts 100-nanosecond intervals from 1601-01-01; Unix time starts at 1970-01-01.</td></tr>
 <tr><td><code>reg_exe</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-reg_exe">120</a></td><td>The absolute path of reg.exe, or None if it is not where it should be.</td></tr>
-<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="windows.src.html#fn-scan">136</a></td><td></td></tr>
-<tr><td><code>collect</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-collect">149</a></td><td>Walk one capability&#x27;s whole subtree, from a single reg query /s.</td></tr>
-<tr><td><code>query_tree</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-query_tree">177</a></td><td>One reg query &lt;key&gt; /s, printing the whole subtree.</td></tr>
-<tr><td><code>parse_consent_dump</code> <sub>pub(crate) fn</sub></td><td><a href="windows.src.html#fn-parse_consent_dump">211</a></td><td>Pull (key, LastUsedTimeStart, LastUsedTimeStop) out of a /s dump.</td></tr>
-<tr><td><code>hex_value</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-hex_value">266</a></td><td>Name    REG_QWORD    0x...</td></tr>
-<tr><td><code>decode_path</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-decode_path">277</a></td><td>Registry keys encode a path with # where a separator belongs.</td></tr>
-<tr><td><code>friendly_name</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-friendly_name">282</a></td><td>The executable name, or the package family name for a Store app.</td></tr>
-<tr><td><code>filetime_to_system</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-filetime_to_system">292</a></td><td></td></tr>
+<tr><td><code>scan</code> <sub>pub fn</sub></td><td><a href="windows.src.html#fn-scan">145</a></td><td>Every application Windows records as having used the microphone or camera, and which of them is using one now.</td></tr>
+<tr><td><code>collect</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-collect">158</a></td><td>Walk one capability&#x27;s whole subtree, from a single reg query /s.</td></tr>
+<tr><td><code>query_tree</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-query_tree">186</a></td><td>One reg query &lt;key&gt; /s, printing the whole subtree.</td></tr>
+<tr><td><code>parse_consent_dump</code> <sub>pub(crate) fn</sub></td><td><a href="windows.src.html#fn-parse_consent_dump">220</a></td><td>Pull (key, LastUsedTimeStart, LastUsedTimeStop) out of a /s dump.</td></tr>
+<tr><td><code>hex_value</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-hex_value">275</a></td><td>Name    REG_QWORD    0x...</td></tr>
+<tr><td><code>decode_path</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-decode_path">286</a></td><td>Registry keys encode a path with # where a separator belongs.</td></tr>
+<tr><td><code>friendly_name</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-friendly_name">291</a></td><td>The executable name, or the package family name for a Store app.</td></tr>
+<tr><td><code>filetime_to_system</code> <sub>fn</sub></td><td><a href="windows.src.html#fn-filetime_to_system">308</a></td><td>A Windows FILETIME as an ordinary SystemTime.</td></tr>
 </tbody></table>
 </section>
 </div></div>

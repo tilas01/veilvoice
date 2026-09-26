@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-meta/wav.svg" alt="wav.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-meta/src/wav.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 425 lines &middot; <a href="wav.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 432 lines &middot; <a href="wav.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-wav-gets-its-own-path">Why WAV gets its own path</a>
@@ -89,7 +89,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>425 lines defining <strong>4 functions</strong> (2 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>432 lines defining <strong>4 functions</strong> (2 public), <strong>0 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>clean_wav_bytes</code> <span style="color:var(--muted)">line 59</span> &middot; Rewrite a WAV, keeping only the chunks needed to decode it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>info_chunk</code>, <code>is_wav</code>, <code>show</code></span>
@@ -130,7 +130,7 @@
 <a href="wav.src.html#fn-show">
 <rect x="246.3" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="292.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">show</text>
-<text x="292.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 162</text>
+<text x="292.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -153,14 +153,14 @@ flowchart TD
     n_is_wav[&quot;is_wav&lt;br/&gt;line 54&quot;]
     n_clean_wav_bytes([&quot;clean_wav_bytes&lt;br/&gt;line 59&quot;])
     n_info_chunk[&quot;info_chunk&lt;br/&gt;line 143&quot;]
-    n_show[&quot;show&lt;br/&gt;line 162&quot;]
+    n_show[&quot;show&lt;br/&gt;line 169&quot;]
     n_clean_wav_bytes --&gt; n_info_chunk
     n_clean_wav_bytes --&gt; n_is_wav
     n_clean_wav_bytes --&gt; n_show
     click n_is_wav href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L54&quot; &quot;open the source&quot;
     click n_clean_wav_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L59&quot; &quot;open the source&quot;
     click n_info_chunk href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L143&quot; &quot;open the source&quot;
-    click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L162&quot; &quot;open the source&quot;
+    click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L169&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_wav_bytes entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -178,7 +178,7 @@ flowchart TD
 <tr><td><code>is_wav</code> <sub>pub fn</sub></td><td><a href="wav.src.html#fn-is_wav">54</a></td><td>Whether bytes looks like a RIFF/WAVE file.</td></tr>
 <tr><td><code>clean_wav_bytes</code> <sub>pub fn</sub></td><td><a href="wav.src.html#fn-clean_wav_bytes">59</a></td><td>Rewrite a WAV, keeping only the chunks needed to decode it.</td></tr>
 <tr><td><code>info_chunk</code> <sub>fn</sub></td><td><a href="wav.src.html#fn-info_chunk">143</a></td><td>Build a bland LIST/INFO chunk.</td></tr>
-<tr><td><code>show</code> <sub>fn</sub></td><td><a href="wav.src.html#fn-show">162</a></td><td></td></tr>
+<tr><td><code>show</code> <sub>fn</sub></td><td><a href="wav.src.html#fn-show">169</a></td><td>A four-character chunk identifier as text, for a report a person reads.</td></tr>
 </tbody></table>
 </section>
 </div></div>

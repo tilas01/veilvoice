@@ -93,7 +93,7 @@ is a rule they will trip over.
 flowchart TD
     n_lib(["lib.rs<br/>168 lines"])
     n_mandate["mandate.rs<br/>539 lines"]
-    n_policy["policy.rs<br/>984 lines"]
+    n_policy["policy.rs<br/>991 lines"]
     n_workspace["workspace.rs<br/>817 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs" "open the source"
     click n_mandate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs" "open the source"
@@ -109,7 +109,7 @@ flowchart TD
 |---|---:|---|
 | [[`lib.rs`|File-veilvoice-policy-lib]] | 168 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
 | [[`mandate.rs`|File-veilvoice-policy-mandate]] | 539 | The two things VeilVoice insists on unless you say otherwise. |
-| [[`policy.rs`|File-veilvoice-policy-policy]] | 984 | The policy itself: what can be required, and what requiring it does. |
+| [[`policy.rs`|File-veilvoice-policy-policy]] | 991 | The policy itself: what can be required, and what requiring it does. |
 | [[`workspace.rs`|File-veilvoice-policy-workspace]] | 817 | Named profiles and saved projects. |
 
 **1,689 functional lines of Rust** in this crate. A functional line is a line

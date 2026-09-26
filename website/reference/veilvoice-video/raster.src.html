@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-video/src/raster.rs</code></h1>
-<p style="color:var(--muted)"><a href="raster.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 594 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="raster.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 602 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/raster.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -452,254 +452,262 @@
 <span class="ln" id="L350"></span>
 <span class="ln" id="L351"><span class="tok-kw">impl</span> Crc {</span>
 <span class="src-item" id="fn-crc-new">
-<span class="ln" id="L352">    <span class="tok-kw">fn</span> <span class="tok-fn">new</span>() -&gt; Self {</span>
-<span class="ln" id="L353">        <span class="tok-fn">Self</span>(0xffff_ffff)</span>
-<span class="ln" id="L354">    }</span>
+<span class="ln" id="L352">    <span class="tok-com">/// A fresh checksum, which PNG specifies as starting from all ones rather</span></span>
+<span class="ln" id="L353">    <span class="tok-com">/// than from zero.</span></span>
+<span class="ln" id="L354">    <span class="tok-kw">fn</span> <span class="tok-fn">new</span>() -&gt; Self {</span>
+<span class="ln" id="L355">        <span class="tok-fn">Self</span>(0xffff_ffff)</span>
+<span class="ln" id="L356">    }</span>
 </span>
-<span class="ln" id="L355"></span>
+<span class="ln" id="L357"></span>
 <span class="src-item" id="fn-crc-eat">
-<span class="ln" id="L356">    <span class="tok-kw">fn</span> <span class="tok-fn">eat</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, bytes: &amp;[u8]) {</span>
-<span class="ln" id="L357">        <span class="tok-kw">for</span> byte <span class="tok-kw">in</span> bytes {</span>
-<span class="ln" id="L358">            <span class="tok-kw">self</span>.<span class="tok-num">0</span> ^= *byte <span class="tok-kw">as</span> u32;</span>
-<span class="ln" id="L359">            <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">8</span> {</span>
-<span class="ln" id="L360">                <span class="tok-com">// The reflected polynomial, which is what PNG specifies.</span></span>
-<span class="ln" id="L361">                <span class="tok-kw">self</span>.<span class="tok-num">0</span> = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.<span class="tok-num">0</span> &amp; <span class="tok-num">1</span> != <span class="tok-num">0</span> {</span>
-<span class="ln" id="L362">                    (<span class="tok-kw">self</span>.<span class="tok-num">0</span> &gt;&gt; <span class="tok-num">1</span>) ^ 0xedb8_8320</span>
-<span class="ln" id="L363">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L364">                    <span class="tok-kw">self</span>.<span class="tok-num">0</span> &gt;&gt; <span class="tok-num">1</span></span>
-<span class="ln" id="L365">                };</span>
-<span class="ln" id="L366">            }</span>
-<span class="ln" id="L367">        }</span>
-<span class="ln" id="L368">    }</span>
+<span class="ln" id="L358">    <span class="tok-com">/// Fold `bytes` in. Called once per part of a chunk, so a chunk&#x27;s type and</span></span>
+<span class="ln" id="L359">    <span class="tok-com">/// its data are checksummed together without being copied into one buffer</span></span>
+<span class="ln" id="L360">    <span class="tok-com">/// first.</span></span>
+<span class="ln" id="L361">    <span class="tok-kw">fn</span> <span class="tok-fn">eat</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, bytes: &amp;[u8]) {</span>
+<span class="ln" id="L362">        <span class="tok-kw">for</span> byte <span class="tok-kw">in</span> bytes {</span>
+<span class="ln" id="L363">            <span class="tok-kw">self</span>.<span class="tok-num">0</span> ^= *byte <span class="tok-kw">as</span> u32;</span>
+<span class="ln" id="L364">            <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">8</span> {</span>
+<span class="ln" id="L365">                <span class="tok-com">// The reflected polynomial, which is what PNG specifies.</span></span>
+<span class="ln" id="L366">                <span class="tok-kw">self</span>.<span class="tok-num">0</span> = <span class="tok-kw">if</span> <span class="tok-kw">self</span>.<span class="tok-num">0</span> &amp; <span class="tok-num">1</span> != <span class="tok-num">0</span> {</span>
+<span class="ln" id="L367">                    (<span class="tok-kw">self</span>.<span class="tok-num">0</span> &gt;&gt; <span class="tok-num">1</span>) ^ 0xedb8_8320</span>
+<span class="ln" id="L368">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L369">                    <span class="tok-kw">self</span>.<span class="tok-num">0</span> &gt;&gt; <span class="tok-num">1</span></span>
+<span class="ln" id="L370">                };</span>
+<span class="ln" id="L371">            }</span>
+<span class="ln" id="L372">        }</span>
+<span class="ln" id="L373">    }</span>
 </span>
-<span class="ln" id="L369"></span>
-<span class="src-item" id="fn-crc-done">
-<span class="ln" id="L370">    <span class="tok-kw">fn</span> <span class="tok-fn">done</span>(<span class="tok-kw">self</span>) -&gt; u32 {</span>
-<span class="ln" id="L371">        <span class="tok-kw">self</span>.<span class="tok-num">0</span> ^ 0xffff_ffff</span>
-<span class="ln" id="L372">    }</span>
-</span>
-<span class="ln" id="L373">}</span>
 <span class="ln" id="L374"></span>
-<span class="ln" id="L375"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L376"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L377">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L378"></span>
-<span class="ln" id="L379">    <span class="tok-kw">const</span> BLACK: Rgb = [<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>];</span>
-<span class="ln" id="L380">    <span class="tok-kw">const</span> WHITE: Rgb = [<span class="tok-num">255</span>, <span class="tok-num">255</span>, <span class="tok-num">255</span>];</span>
-<span class="ln" id="L381"></span>
-<span class="ln" id="L382">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L383">    <span class="tok-kw">fn</span> <span class="tok-fn">a_colour_is_read_or_refused</span>() {</span>
-<span class="ln" id="L384">        assert_eq!(<span class="tok-fn">colour</span>(<span class="tok-str">&quot;#1a1b26&quot;</span>), <span class="tok-fn">Some</span>([0x1a, 0x1b, 0x26]));</span>
-<span class="ln" id="L385">        assert_eq!(<span class="tok-fn">colour</span>(<span class="tok-str">&quot;#FFFFFF&quot;</span>), <span class="tok-fn">Some</span>([<span class="tok-num">255</span>, <span class="tok-num">255</span>, <span class="tok-num">255</span>]));</span>
-<span class="ln" id="L386">        <span class="tok-kw">for</span> wrong <span class="tok-kw">in</span> [<span class="tok-str">&quot;1a1b26&quot;</span>, <span class="tok-str">&quot;#1a1b2&quot;</span>, <span class="tok-str">&quot;#1a1b26f&quot;</span>, <span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;#zzzzzz&quot;</span>, <span class="tok-str">&quot;#&quot;</span>] {</span>
-<span class="ln" id="L387">            assert_eq!(<span class="tok-fn">colour</span>(wrong), None, <span class="tok-str">&quot;{wrong:?} was read as a colour&quot;</span>);</span>
-<span class="ln" id="L388">        }</span>
-<span class="ln" id="L389">    }</span>
-<span class="ln" id="L390"></span>
-<span class="ln" id="L391">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L392">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_canvas_is_its_background_everywhere</span>() {</span>
-<span class="ln" id="L393">        <span class="tok-kw">let</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">4</span>, <span class="tok-num">3</span>, [<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>]);</span>
-<span class="ln" id="L394">        <span class="tok-kw">for</span> y <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
-<span class="ln" id="L395">            <span class="tok-kw">for</span> x <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
-<span class="ln" id="L396">                assert_eq!(canvas.<span class="tok-fn">at</span>(x, y), <span class="tok-fn">Some</span>([<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>]));</span>
-<span class="ln" id="L397">            }</span>
-<span class="ln" id="L398">        }</span>
-<span class="ln" id="L399">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">4</span>, <span class="tok-num">0</span>), None, <span class="tok-str">&quot;outside is outside&quot;</span>);</span>
-<span class="ln" id="L400">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">0</span>, <span class="tok-num">3</span>), None);</span>
-<span class="ln" id="L401">    }</span>
-<span class="ln" id="L402"></span>
-<span class="ln" id="L403">    <span class="tok-com">/// Drawing off the edge clips rather than wrapping or panicking.</span></span>
-<span class="ln" id="L404">    <span class="tok-com">///</span></span>
-<span class="ln" id="L405">    <span class="tok-com">/// The layout is computed in floats and a box can legitimately start left</span></span>
-<span class="ln" id="L406">    <span class="tok-com">/// of zero. Wrapping would put a bar on the wrong side of the picture.</span></span>
-<span class="ln" id="L407">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L408">    <span class="tok-kw">fn</span> <span class="tok-fn">drawing_outside_the_canvas_is_clipped</span>() {</span>
-<span class="ln" id="L409">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">4</span>, <span class="tok-num">4</span>, BLACK);</span>
-<span class="ln" id="L410">        canvas.<span class="tok-fn">rect</span>(-<span class="tok-num">10</span>, -<span class="tok-num">10</span>, <span class="tok-num">12</span>, <span class="tok-num">12</span>, WHITE);</span>
-<span class="ln" id="L411">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">1</span>, <span class="tok-num">1</span>), <span class="tok-fn">Some</span>(WHITE), <span class="tok-str">&quot;the part that is inside&quot;</span>);</span>
-<span class="ln" id="L412">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">3</span>, <span class="tok-num">3</span>), <span class="tok-fn">Some</span>(BLACK), <span class="tok-str">&quot;the part that is outside&quot;</span>);</span>
-<span class="ln" id="L413"></span>
-<span class="ln" id="L414">        canvas.<span class="tok-fn">rect</span>(<span class="tok-num">100</span>, <span class="tok-num">100</span>, <span class="tok-num">10</span>, <span class="tok-num">10</span>, WHITE);</span>
-<span class="ln" id="L415">        canvas.<span class="tok-fn">circle</span>(-<span class="tok-num">50.0</span>, -<span class="tok-num">50.0</span>, <span class="tok-num">3.0</span>, WHITE);</span>
-<span class="ln" id="L416">        canvas.<span class="tok-fn">circle</span>(<span class="tok-num">1000.0</span>, <span class="tok-num">1000.0</span>, <span class="tok-num">3.0</span>, WHITE);</span>
-<span class="ln" id="L417">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">3</span>, <span class="tok-num">3</span>), <span class="tok-fn">Some</span>(BLACK), <span class="tok-str">&quot;nothing wrapped round&quot;</span>);</span>
-<span class="ln" id="L418">    }</span>
-<span class="ln" id="L419"></span>
-<span class="ln" id="L420">    <span class="tok-com">/// A circle is filled in the middle, empty at the corners, and soft at the</span></span>
-<span class="ln" id="L421">    <span class="tok-com">/// edge.</span></span>
-<span class="ln" id="L422">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L423">    <span class="tok-kw">fn</span> <span class="tok-fn">a_circle_is_round_and_its_edge_is_not_a_staircase</span>() {</span>
-<span class="ln" id="L424">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">41</span>, <span class="tok-num">41</span>, BLACK);</span>
-<span class="ln" id="L425">        canvas.<span class="tok-fn">circle</span>(<span class="tok-num">20.5</span>, <span class="tok-num">20.5</span>, <span class="tok-num">15.0</span>, WHITE);</span>
-<span class="ln" id="L426"></span>
-<span class="ln" id="L427">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">20</span>, <span class="tok-num">20</span>), <span class="tok-fn">Some</span>(WHITE), <span class="tok-str">&quot;the middle&quot;</span>);</span>
-<span class="ln" id="L428">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>), <span class="tok-fn">Some</span>(BLACK), <span class="tok-str">&quot;a corner&quot;</span>);</span>
-<span class="ln" id="L429"></span>
-<span class="ln" id="L430">        <span class="tok-com">// Somewhere on the rim there is a pixel that is neither, which is what</span></span>
-<span class="ln" id="L431">        <span class="tok-com">// a smooth edge means and what a hard-edged circle would not have.</span></span>
-<span class="ln" id="L432">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> partial = <span class="tok-num">0</span>;</span>
-<span class="ln" id="L433">        <span class="tok-kw">for</span> y <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">41</span> {</span>
-<span class="ln" id="L434">            <span class="tok-kw">for</span> x <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">41</span> {</span>
-<span class="ln" id="L435">                <span class="tok-kw">let</span> shade = canvas.<span class="tok-fn">at</span>(x, y).<span class="tok-fn">unwrap</span>()[<span class="tok-num">0</span>];</span>
-<span class="ln" id="L436">                <span class="tok-kw">if</span> shade &gt; <span class="tok-num">0</span> &amp;&amp; shade &lt; <span class="tok-num">255</span> {</span>
-<span class="ln" id="L437">                    partial += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L438">                }</span>
-<span class="ln" id="L439">            }</span>
-<span class="ln" id="L440">        }</span>
-<span class="ln" id="L441">        assert!(</span>
-<span class="ln" id="L442">            partial &gt; <span class="tok-num">20</span>,</span>
-<span class="ln" id="L443">            <span class="tok-str">&quot;only {partial} pixels are part-covered, so the edge is a staircase&quot;</span></span>
-<span class="ln" id="L444">        );</span>
-<span class="ln" id="L445">    }</span>
-<span class="ln" id="L446"></span>
-<span class="ln" id="L447">    <span class="tok-com">/// A ring is hollow.</span></span>
-<span class="ln" id="L448">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L449">    <span class="tok-kw">fn</span> <span class="tok-fn">a_ring_leaves_what_was_under_its_middle</span>() {</span>
-<span class="ln" id="L450">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">41</span>, <span class="tok-num">41</span>, BLACK);</span>
-<span class="ln" id="L451">        canvas.<span class="tok-fn">rect</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">41</span>, <span class="tok-num">41</span>, [<span class="tok-num">7</span>, <span class="tok-num">7</span>, <span class="tok-num">7</span>]);</span>
-<span class="ln" id="L452">        canvas.<span class="tok-fn">ring</span>(<span class="tok-num">20.5</span>, <span class="tok-num">20.5</span>, <span class="tok-num">15.0</span>, <span class="tok-num">3.0</span>, WHITE);</span>
-<span class="ln" id="L453">        assert_eq!(</span>
-<span class="ln" id="L454">            canvas.<span class="tok-fn">at</span>(<span class="tok-num">20</span>, <span class="tok-num">20</span>),</span>
-<span class="ln" id="L455">            <span class="tok-fn">Some</span>([<span class="tok-num">7</span>, <span class="tok-num">7</span>, <span class="tok-num">7</span>]),</span>
-<span class="ln" id="L456">            <span class="tok-str">&quot;the middle is untouched&quot;</span></span>
-<span class="ln" id="L457">        );</span>
-<span class="ln" id="L458">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">20</span>, <span class="tok-num">6</span>), <span class="tok-fn">Some</span>(WHITE), <span class="tok-str">&quot;the rim is drawn&quot;</span>);</span>
-<span class="ln" id="L459">    }</span>
-<span class="ln" id="L460"></span>
-<span class="ln" id="L461">    <span class="tok-com">/// Text lands where it was put and reports what it could not draw.</span></span>
-<span class="ln" id="L462">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L463">    <span class="tok-kw">fn</span> <span class="tok-fn">text_is_drawn_and_says_what_it_could_not</span>() {</span>
-<span class="ln" id="L464">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">80</span>, <span class="tok-num">20</span>, BLACK);</span>
-<span class="ln" id="L465">        <span class="tok-kw">let</span> missing = canvas.<span class="tok-fn">text</span>(<span class="tok-num">2</span>, <span class="tok-num">2</span>, <span class="tok-str">&quot;Hi&quot;</span>, <span class="tok-num">2</span>, WHITE);</span>
-<span class="ln" id="L466">        assert_eq!(missing, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L467">        <span class="tok-kw">let</span> lit = (<span class="tok-num">0</span>..<span class="tok-num">20</span>)</span>
-<span class="ln" id="L468">            .<span class="tok-fn">flat_map</span>(|y| (<span class="tok-num">0</span>..<span class="tok-num">80</span>).<span class="tok-fn">map</span>(<span class="tok-kw">move</span> |x| (x, y)))</span>
-<span class="ln" id="L469">            .<span class="tok-fn">filter</span>(|(x, y)| canvas.<span class="tok-fn">at</span>(*x, *y) == <span class="tok-fn">Some</span>(WHITE))</span>
-<span class="ln" id="L470">            .<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L471">        assert!(lit &gt; <span class="tok-num">0</span>, <span class="tok-str">&quot;nothing was drawn&quot;</span>);</span>
-<span class="ln" id="L472"></span>
-<span class="ln" id="L473">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> other = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">80</span>, <span class="tok-num">20</span>, BLACK);</span>
-<span class="ln" id="L474">        assert_eq!(other.<span class="tok-fn">text</span>(<span class="tok-num">2</span>, <span class="tok-num">2</span>, <span class="tok-str">&quot;Zo&#235;&quot;</span>, <span class="tok-num">2</span>, WHITE), <span class="tok-num">1</span>, <span class="tok-str">&quot;one box&quot;</span>);</span>
-<span class="ln" id="L475">    }</span>
-<span class="ln" id="L476"></span>
-<span class="ln" id="L477">    <span class="tok-com">/// Centred text is centred.</span></span>
-<span class="ln" id="L478">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L479">    <span class="tok-kw">fn</span> <span class="tok-fn">centred_text_sits_on_its_centre</span>() {</span>
-<span class="ln" id="L480">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">101</span>, <span class="tok-num">20</span>, BLACK);</span>
-<span class="ln" id="L481">        canvas.<span class="tok-fn">text_centred</span>(<span class="tok-num">50.0</span>, <span class="tok-num">2</span>, <span class="tok-str">&quot;ii&quot;</span>, <span class="tok-num">2</span>, WHITE);</span>
-<span class="ln" id="L482">        <span class="tok-kw">let</span> columns: Vec&lt;usize&gt; = (<span class="tok-num">0</span>..<span class="tok-num">101</span>)</span>
-<span class="ln" id="L483">            .<span class="tok-fn">filter</span>(|x| (<span class="tok-num">0</span>..<span class="tok-num">20</span>).<span class="tok-fn">any</span>(|y| canvas.<span class="tok-fn">at</span>(*x, y) == <span class="tok-fn">Some</span>(WHITE)))</span>
-<span class="ln" id="L484">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L485">        <span class="tok-kw">let</span> left = *columns.<span class="tok-fn">first</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;something was drawn&quot;</span>);</span>
-<span class="ln" id="L486">        <span class="tok-kw">let</span> right = *columns.<span class="tok-fn">last</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L487">        <span class="tok-kw">let</span> middle = (left + right) <span class="tok-kw">as</span> f32 / <span class="tok-num">2.0</span>;</span>
-<span class="ln" id="L488">        assert!(</span>
-<span class="ln" id="L489">            (middle - <span class="tok-num">50.0</span>).<span class="tok-fn">abs</span>() &lt;= <span class="tok-num">2.0</span>,</span>
-<span class="ln" id="L490">            <span class="tok-str">&quot;drawn from {left} to {right}, centred on {middle} rather than 50&quot;</span></span>
-<span class="ln" id="L491">        );</span>
-<span class="ln" id="L492">    }</span>
-<span class="ln" id="L493"></span>
-<span class="ln" id="L494">    <span class="tok-com">/// The PNG is a PNG: signature, the three chunks, and correct checksums.</span></span>
-<span class="ln" id="L495">    <span class="tok-com">///</span></span>
-<span class="ln" id="L496">    <span class="tok-com">/// Checked by reading the bytes rather than by opening the file with</span></span>
-<span class="ln" id="L497">    <span class="tok-com">/// something, because &quot;a decoder accepted it&quot; and &quot;it is what the format</span></span>
-<span class="ln" id="L498">    <span class="tok-com">/// says&quot; are different claims and this writer makes the second.</span></span>
-<span class="ln" id="L499">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L500">    <span class="tok-kw">fn</span> <span class="tok-fn">the_png_is_shaped_the_way_the_format_says</span>() {</span>
-<span class="ln" id="L501">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">7</span>, <span class="tok-num">5</span>, [<span class="tok-num">10</span>, <span class="tok-num">20</span>, <span class="tok-num">30</span>]);</span>
-<span class="ln" id="L502">        canvas.<span class="tok-fn">circle</span>(<span class="tok-num">3.5</span>, <span class="tok-num">2.5</span>, <span class="tok-num">2.0</span>, [<span class="tok-num">200</span>, <span class="tok-num">100</span>, <span class="tok-num">50</span>]);</span>
-<span class="ln" id="L503">        <span class="tok-kw">let</span> png = canvas.<span class="tok-fn">png</span>();</span>
-<span class="ln" id="L504"></span>
-<span class="ln" id="L505">        assert_eq!(</span>
-<span class="ln" id="L506">            &amp;png[..<span class="tok-num">8</span>],</span>
-<span class="ln" id="L507">            &amp;[0x89, b<span class="tok-str">&#x27;P&#x27;</span>, b<span class="tok-str">&#x27;N&#x27;</span>, b<span class="tok-str">&#x27;G&#x27;</span>, 0x0d, 0x0a, 0x1a, 0x0a],</span>
-<span class="ln" id="L508">            <span class="tok-str">&quot;signature&quot;</span></span>
-<span class="ln" id="L509">        );</span>
-<span class="ln" id="L510"></span>
-<span class="ln" id="L511">        <span class="tok-com">// Walk the chunks, checking each length and checksum as it goes.</span></span>
-<span class="ln" id="L512">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> at = <span class="tok-num">8</span>;</span>
-<span class="ln" id="L513">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L514">        while at + <span class="tok-num">12</span> &lt;= png.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L515">            <span class="tok-kw">let</span> length = u32::<span class="tok-fn">from_be_bytes</span>(png[at..at + <span class="tok-num">4</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
-<span class="ln" id="L516">            <span class="tok-kw">let</span> kind = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;png[at + <span class="tok-num">4</span>..at + <span class="tok-num">8</span>]).<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L517">            <span class="tok-kw">let</span> body = &amp;png[at + <span class="tok-num">8</span>..at + <span class="tok-num">8</span> + length];</span>
-<span class="ln" id="L518">            <span class="tok-kw">let</span> stated =</span>
-<span class="ln" id="L519">                u32::<span class="tok-fn">from_be_bytes</span>(png[at + <span class="tok-num">8</span> + length..at + <span class="tok-num">12</span> + length].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L520">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> crc = Crc::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L521">            crc.<span class="tok-fn">eat</span>(&amp;png[at + <span class="tok-num">4</span>..at + <span class="tok-num">8</span>]);</span>
-<span class="ln" id="L522">            crc.<span class="tok-fn">eat</span>(body);</span>
-<span class="ln" id="L523">            assert_eq!(crc.<span class="tok-fn">done</span>(), stated, <span class="tok-str">&quot;{kind} checksum&quot;</span>);</span>
-<span class="ln" id="L524">            <span class="tok-kw">if</span> kind == <span class="tok-str">&quot;IHDR&quot;</span> {</span>
-<span class="ln" id="L525">                assert_eq!(u32::<span class="tok-fn">from_be_bytes</span>(body[<span class="tok-num">0</span>..<span class="tok-num">4</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()), <span class="tok-num">7</span>);</span>
-<span class="ln" id="L526">                assert_eq!(u32::<span class="tok-fn">from_be_bytes</span>(body[<span class="tok-num">4</span>..<span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()), <span class="tok-num">5</span>);</span>
-<span class="ln" id="L527">                assert_eq!(</span>
-<span class="ln" id="L528">                    &amp;body[<span class="tok-num">8</span>..],</span>
-<span class="ln" id="L529">                    &amp;[<span class="tok-num">8</span>, <span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>],</span>
-<span class="ln" id="L530">                    <span class="tok-str">&quot;8-bit truecolour, no interlace&quot;</span></span>
-<span class="ln" id="L531">                );</span>
-<span class="ln" id="L532">            }</span>
-<span class="ln" id="L533">            seen.<span class="tok-fn">push</span>(kind);</span>
-<span class="ln" id="L534">            at += <span class="tok-num">12</span> + length;</span>
-<span class="ln" id="L535">        }</span>
-<span class="ln" id="L536">        assert_eq!(at, png.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;trailing bytes after the last chunk&quot;</span>);</span>
-<span class="ln" id="L537">        assert_eq!(seen, vec![<span class="tok-str">&quot;IHDR&quot;</span>, <span class="tok-str">&quot;IDAT&quot;</span>, <span class="tok-str">&quot;IEND&quot;</span>]);</span>
-<span class="ln" id="L538">    }</span>
-<span class="ln" id="L539"></span>
-<span class="ln" id="L540">    <span class="tok-com">/// The pixels survive the round trip.</span></span>
-<span class="ln" id="L541">    <span class="tok-com">///</span></span>
-<span class="ln" id="L542">    <span class="tok-com">/// Deflated and inflated again, and compared against what was drawn. A</span></span>
-<span class="ln" id="L543">    <span class="tok-com">/// writer that produced a well-formed file of the wrong pixels would pass</span></span>
-<span class="ln" id="L544">    <span class="tok-com">/// every structural check above.</span></span>
-<span class="ln" id="L545">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L546">    <span class="tok-kw">fn</span> <span class="tok-fn">the_pixels_come_back_out_as_they_went_in</span>() {</span>
-<span class="ln" id="L547">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">9</span>, <span class="tok-num">6</span>, [<span class="tok-num">10</span>, <span class="tok-num">20</span>, <span class="tok-num">30</span>]);</span>
-<span class="ln" id="L548">        canvas.<span class="tok-fn">rect</span>(<span class="tok-num">2</span>, <span class="tok-num">1</span>, <span class="tok-num">4</span>, <span class="tok-num">3</span>, [<span class="tok-num">200</span>, <span class="tok-num">100</span>, <span class="tok-num">50</span>]);</span>
-<span class="ln" id="L549">        <span class="tok-kw">let</span> png = canvas.<span class="tok-fn">png</span>();</span>
-<span class="ln" id="L550"></span>
-<span class="ln" id="L551">        <span class="tok-com">// The IDAT body, found by walking rather than by a fixed offset.</span></span>
-<span class="ln" id="L552">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> at = <span class="tok-num">8</span>;</span>
-<span class="ln" id="L553">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> squeezed = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L554">        while at + <span class="tok-num">12</span> &lt;= png.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L555">            <span class="tok-kw">let</span> length = u32::<span class="tok-fn">from_be_bytes</span>(png[at..at + <span class="tok-num">4</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
-<span class="ln" id="L556">            <span class="tok-kw">if</span> &amp;png[at + <span class="tok-num">4</span>..at + <span class="tok-num">8</span>] == b<span class="tok-str">&quot;IDAT&quot;</span> {</span>
-<span class="ln" id="L557">                squeezed = png[at + <span class="tok-num">8</span>..at + <span class="tok-num">8</span> + length].<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L558">            }</span>
-<span class="ln" id="L559">            at += <span class="tok-num">12</span> + length;</span>
-<span class="ln" id="L560">        }</span>
-<span class="ln" id="L561">        <span class="tok-kw">let</span> raw = miniz_oxide::inflate::<span class="tok-fn">decompress_to_vec_zlib</span>(&amp;squeezed)</span>
-<span class="ln" id="L562">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the deflate stream is readable&quot;</span>);</span>
-<span class="ln" id="L563"></span>
-<span class="ln" id="L564">        assert_eq!(raw.<span class="tok-fn">len</span>(), <span class="tok-num">6</span> * (<span class="tok-num">1</span> + <span class="tok-num">9</span> * <span class="tok-num">3</span>), <span class="tok-str">&quot;one filter byte per row&quot;</span>);</span>
-<span class="ln" id="L565">        <span class="tok-kw">for</span> y <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">6</span> {</span>
-<span class="ln" id="L566">            <span class="tok-kw">let</span> row = y * (<span class="tok-num">1</span> + <span class="tok-num">9</span> * <span class="tok-num">3</span>);</span>
-<span class="ln" id="L567">            assert_eq!(raw[row], <span class="tok-num">0</span>, <span class="tok-str">&quot;row {y} filter&quot;</span>);</span>
-<span class="ln" id="L568">            <span class="tok-kw">for</span> x <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">9</span> {</span>
-<span class="ln" id="L569">                <span class="tok-kw">let</span> at = row + <span class="tok-num">1</span> + x * <span class="tok-num">3</span>;</span>
-<span class="ln" id="L570">                assert_eq!(</span>
-<span class="ln" id="L571">                    [raw[at], raw[at + <span class="tok-num">1</span>], raw[at + <span class="tok-num">2</span>]],</span>
-<span class="ln" id="L572">                    canvas.<span class="tok-fn">at</span>(x, y).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L573">                    <span class="tok-str">&quot;pixel {x},{y}&quot;</span></span>
-<span class="ln" id="L574">                );</span>
-<span class="ln" id="L575">            }</span>
-<span class="ln" id="L576">        }</span>
-<span class="ln" id="L577">    }</span>
-<span class="ln" id="L578"></span>
-<span class="ln" id="L579">    <span class="tok-com">/// The same drawing gives the same bytes.</span></span>
-<span class="ln" id="L580">    <span class="tok-com">///</span></span>
-<span class="ln" id="L581">    <span class="tok-com">/// Two people rendering one recording should get one file. Nothing here may</span></span>
-<span class="ln" id="L582">    <span class="tok-com">/// depend on a hash order, a system font or a clock.</span></span>
-<span class="ln" id="L583">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L584">    <span class="tok-kw">fn</span> <span class="tok-fn">the_same_picture_encodes_to_the_same_bytes</span>() {</span>
-<span class="ln" id="L585">        <span class="tok-kw">let</span> draw = || {</span>
-<span class="ln" id="L586">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">64</span>, <span class="tok-num">40</span>, [<span class="tok-num">26</span>, <span class="tok-num">27</span>, <span class="tok-num">38</span>]);</span>
-<span class="ln" id="L587">            canvas.<span class="tok-fn">circle</span>(<span class="tok-num">20.0</span>, <span class="tok-num">20.0</span>, <span class="tok-num">11.0</span>, [<span class="tok-num">122</span>, <span class="tok-num">162</span>, <span class="tok-num">247</span>]);</span>
-<span class="ln" id="L588">            canvas.<span class="tok-fn">rounded_rect</span>(<span class="tok-num">30.0</span>, <span class="tok-num">30.0</span>, <span class="tok-num">28.0</span>, <span class="tok-num">6.0</span>, [<span class="tok-num">158</span>, <span class="tok-num">206</span>, <span class="tok-num">106</span>]);</span>
-<span class="ln" id="L589">            canvas.<span class="tok-fn">text</span>(<span class="tok-num">2</span>, <span class="tok-num">2</span>, <span class="tok-str">&quot;Alex&quot;</span>, <span class="tok-num">2</span>, [<span class="tok-num">192</span>, <span class="tok-num">202</span>, <span class="tok-num">245</span>]);</span>
-<span class="ln" id="L590">            canvas.<span class="tok-fn">png</span>()</span>
-<span class="ln" id="L591">        };</span>
-<span class="ln" id="L592">        assert_eq!(<span class="tok-fn">draw</span>(), <span class="tok-fn">draw</span>());</span>
-<span class="ln" id="L593">    }</span>
-<span class="ln" id="L594">}</span>
+<span class="src-item" id="fn-crc-done">
+<span class="ln" id="L375">    <span class="tok-com">/// The value to write, which is the running state inverted. Takes `self`</span></span>
+<span class="ln" id="L376">    <span class="tok-com">/// by value: a checksum that has been read is finished, and a further</span></span>
+<span class="ln" id="L377">    <span class="tok-com">/// `eat` after it would produce a number for nothing.</span></span>
+<span class="ln" id="L378">    <span class="tok-kw">fn</span> <span class="tok-fn">done</span>(<span class="tok-kw">self</span>) -&gt; u32 {</span>
+<span class="ln" id="L379">        <span class="tok-kw">self</span>.<span class="tok-num">0</span> ^ 0xffff_ffff</span>
+<span class="ln" id="L380">    }</span>
+</span>
+<span class="ln" id="L381">}</span>
+<span class="ln" id="L382"></span>
+<span class="ln" id="L383"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L384"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L385">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L386"></span>
+<span class="ln" id="L387">    <span class="tok-kw">const</span> BLACK: Rgb = [<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>];</span>
+<span class="ln" id="L388">    <span class="tok-kw">const</span> WHITE: Rgb = [<span class="tok-num">255</span>, <span class="tok-num">255</span>, <span class="tok-num">255</span>];</span>
+<span class="ln" id="L389"></span>
+<span class="ln" id="L390">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L391">    <span class="tok-kw">fn</span> <span class="tok-fn">a_colour_is_read_or_refused</span>() {</span>
+<span class="ln" id="L392">        assert_eq!(<span class="tok-fn">colour</span>(<span class="tok-str">&quot;#1a1b26&quot;</span>), <span class="tok-fn">Some</span>([0x1a, 0x1b, 0x26]));</span>
+<span class="ln" id="L393">        assert_eq!(<span class="tok-fn">colour</span>(<span class="tok-str">&quot;#FFFFFF&quot;</span>), <span class="tok-fn">Some</span>([<span class="tok-num">255</span>, <span class="tok-num">255</span>, <span class="tok-num">255</span>]));</span>
+<span class="ln" id="L394">        <span class="tok-kw">for</span> wrong <span class="tok-kw">in</span> [<span class="tok-str">&quot;1a1b26&quot;</span>, <span class="tok-str">&quot;#1a1b2&quot;</span>, <span class="tok-str">&quot;#1a1b26f&quot;</span>, <span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;#zzzzzz&quot;</span>, <span class="tok-str">&quot;#&quot;</span>] {</span>
+<span class="ln" id="L395">            assert_eq!(<span class="tok-fn">colour</span>(wrong), None, <span class="tok-str">&quot;{wrong:?} was read as a colour&quot;</span>);</span>
+<span class="ln" id="L396">        }</span>
+<span class="ln" id="L397">    }</span>
+<span class="ln" id="L398"></span>
+<span class="ln" id="L399">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L400">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_canvas_is_its_background_everywhere</span>() {</span>
+<span class="ln" id="L401">        <span class="tok-kw">let</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">4</span>, <span class="tok-num">3</span>, [<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>]);</span>
+<span class="ln" id="L402">        <span class="tok-kw">for</span> y <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">3</span> {</span>
+<span class="ln" id="L403">            <span class="tok-kw">for</span> x <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
+<span class="ln" id="L404">                assert_eq!(canvas.<span class="tok-fn">at</span>(x, y), <span class="tok-fn">Some</span>([<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>]));</span>
+<span class="ln" id="L405">            }</span>
+<span class="ln" id="L406">        }</span>
+<span class="ln" id="L407">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">4</span>, <span class="tok-num">0</span>), None, <span class="tok-str">&quot;outside is outside&quot;</span>);</span>
+<span class="ln" id="L408">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">0</span>, <span class="tok-num">3</span>), None);</span>
+<span class="ln" id="L409">    }</span>
+<span class="ln" id="L410"></span>
+<span class="ln" id="L411">    <span class="tok-com">/// Drawing off the edge clips rather than wrapping or panicking.</span></span>
+<span class="ln" id="L412">    <span class="tok-com">///</span></span>
+<span class="ln" id="L413">    <span class="tok-com">/// The layout is computed in floats and a box can legitimately start left</span></span>
+<span class="ln" id="L414">    <span class="tok-com">/// of zero. Wrapping would put a bar on the wrong side of the picture.</span></span>
+<span class="ln" id="L415">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L416">    <span class="tok-kw">fn</span> <span class="tok-fn">drawing_outside_the_canvas_is_clipped</span>() {</span>
+<span class="ln" id="L417">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">4</span>, <span class="tok-num">4</span>, BLACK);</span>
+<span class="ln" id="L418">        canvas.<span class="tok-fn">rect</span>(-<span class="tok-num">10</span>, -<span class="tok-num">10</span>, <span class="tok-num">12</span>, <span class="tok-num">12</span>, WHITE);</span>
+<span class="ln" id="L419">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">1</span>, <span class="tok-num">1</span>), <span class="tok-fn">Some</span>(WHITE), <span class="tok-str">&quot;the part that is inside&quot;</span>);</span>
+<span class="ln" id="L420">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">3</span>, <span class="tok-num">3</span>), <span class="tok-fn">Some</span>(BLACK), <span class="tok-str">&quot;the part that is outside&quot;</span>);</span>
+<span class="ln" id="L421"></span>
+<span class="ln" id="L422">        canvas.<span class="tok-fn">rect</span>(<span class="tok-num">100</span>, <span class="tok-num">100</span>, <span class="tok-num">10</span>, <span class="tok-num">10</span>, WHITE);</span>
+<span class="ln" id="L423">        canvas.<span class="tok-fn">circle</span>(-<span class="tok-num">50.0</span>, -<span class="tok-num">50.0</span>, <span class="tok-num">3.0</span>, WHITE);</span>
+<span class="ln" id="L424">        canvas.<span class="tok-fn">circle</span>(<span class="tok-num">1000.0</span>, <span class="tok-num">1000.0</span>, <span class="tok-num">3.0</span>, WHITE);</span>
+<span class="ln" id="L425">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">3</span>, <span class="tok-num">3</span>), <span class="tok-fn">Some</span>(BLACK), <span class="tok-str">&quot;nothing wrapped round&quot;</span>);</span>
+<span class="ln" id="L426">    }</span>
+<span class="ln" id="L427"></span>
+<span class="ln" id="L428">    <span class="tok-com">/// A circle is filled in the middle, empty at the corners, and soft at the</span></span>
+<span class="ln" id="L429">    <span class="tok-com">/// edge.</span></span>
+<span class="ln" id="L430">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L431">    <span class="tok-kw">fn</span> <span class="tok-fn">a_circle_is_round_and_its_edge_is_not_a_staircase</span>() {</span>
+<span class="ln" id="L432">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">41</span>, <span class="tok-num">41</span>, BLACK);</span>
+<span class="ln" id="L433">        canvas.<span class="tok-fn">circle</span>(<span class="tok-num">20.5</span>, <span class="tok-num">20.5</span>, <span class="tok-num">15.0</span>, WHITE);</span>
+<span class="ln" id="L434"></span>
+<span class="ln" id="L435">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">20</span>, <span class="tok-num">20</span>), <span class="tok-fn">Some</span>(WHITE), <span class="tok-str">&quot;the middle&quot;</span>);</span>
+<span class="ln" id="L436">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>), <span class="tok-fn">Some</span>(BLACK), <span class="tok-str">&quot;a corner&quot;</span>);</span>
+<span class="ln" id="L437"></span>
+<span class="ln" id="L438">        <span class="tok-com">// Somewhere on the rim there is a pixel that is neither, which is what</span></span>
+<span class="ln" id="L439">        <span class="tok-com">// a smooth edge means and what a hard-edged circle would not have.</span></span>
+<span class="ln" id="L440">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> partial = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L441">        <span class="tok-kw">for</span> y <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">41</span> {</span>
+<span class="ln" id="L442">            <span class="tok-kw">for</span> x <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">41</span> {</span>
+<span class="ln" id="L443">                <span class="tok-kw">let</span> shade = canvas.<span class="tok-fn">at</span>(x, y).<span class="tok-fn">unwrap</span>()[<span class="tok-num">0</span>];</span>
+<span class="ln" id="L444">                <span class="tok-kw">if</span> shade &gt; <span class="tok-num">0</span> &amp;&amp; shade &lt; <span class="tok-num">255</span> {</span>
+<span class="ln" id="L445">                    partial += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L446">                }</span>
+<span class="ln" id="L447">            }</span>
+<span class="ln" id="L448">        }</span>
+<span class="ln" id="L449">        assert!(</span>
+<span class="ln" id="L450">            partial &gt; <span class="tok-num">20</span>,</span>
+<span class="ln" id="L451">            <span class="tok-str">&quot;only {partial} pixels are part-covered, so the edge is a staircase&quot;</span></span>
+<span class="ln" id="L452">        );</span>
+<span class="ln" id="L453">    }</span>
+<span class="ln" id="L454"></span>
+<span class="ln" id="L455">    <span class="tok-com">/// A ring is hollow.</span></span>
+<span class="ln" id="L456">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L457">    <span class="tok-kw">fn</span> <span class="tok-fn">a_ring_leaves_what_was_under_its_middle</span>() {</span>
+<span class="ln" id="L458">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">41</span>, <span class="tok-num">41</span>, BLACK);</span>
+<span class="ln" id="L459">        canvas.<span class="tok-fn">rect</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">41</span>, <span class="tok-num">41</span>, [<span class="tok-num">7</span>, <span class="tok-num">7</span>, <span class="tok-num">7</span>]);</span>
+<span class="ln" id="L460">        canvas.<span class="tok-fn">ring</span>(<span class="tok-num">20.5</span>, <span class="tok-num">20.5</span>, <span class="tok-num">15.0</span>, <span class="tok-num">3.0</span>, WHITE);</span>
+<span class="ln" id="L461">        assert_eq!(</span>
+<span class="ln" id="L462">            canvas.<span class="tok-fn">at</span>(<span class="tok-num">20</span>, <span class="tok-num">20</span>),</span>
+<span class="ln" id="L463">            <span class="tok-fn">Some</span>([<span class="tok-num">7</span>, <span class="tok-num">7</span>, <span class="tok-num">7</span>]),</span>
+<span class="ln" id="L464">            <span class="tok-str">&quot;the middle is untouched&quot;</span></span>
+<span class="ln" id="L465">        );</span>
+<span class="ln" id="L466">        assert_eq!(canvas.<span class="tok-fn">at</span>(<span class="tok-num">20</span>, <span class="tok-num">6</span>), <span class="tok-fn">Some</span>(WHITE), <span class="tok-str">&quot;the rim is drawn&quot;</span>);</span>
+<span class="ln" id="L467">    }</span>
+<span class="ln" id="L468"></span>
+<span class="ln" id="L469">    <span class="tok-com">/// Text lands where it was put and reports what it could not draw.</span></span>
+<span class="ln" id="L470">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">text_is_drawn_and_says_what_it_could_not</span>() {</span>
+<span class="ln" id="L472">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">80</span>, <span class="tok-num">20</span>, BLACK);</span>
+<span class="ln" id="L473">        <span class="tok-kw">let</span> missing = canvas.<span class="tok-fn">text</span>(<span class="tok-num">2</span>, <span class="tok-num">2</span>, <span class="tok-str">&quot;Hi&quot;</span>, <span class="tok-num">2</span>, WHITE);</span>
+<span class="ln" id="L474">        assert_eq!(missing, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L475">        <span class="tok-kw">let</span> lit = (<span class="tok-num">0</span>..<span class="tok-num">20</span>)</span>
+<span class="ln" id="L476">            .<span class="tok-fn">flat_map</span>(|y| (<span class="tok-num">0</span>..<span class="tok-num">80</span>).<span class="tok-fn">map</span>(<span class="tok-kw">move</span> |x| (x, y)))</span>
+<span class="ln" id="L477">            .<span class="tok-fn">filter</span>(|(x, y)| canvas.<span class="tok-fn">at</span>(*x, *y) == <span class="tok-fn">Some</span>(WHITE))</span>
+<span class="ln" id="L478">            .<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L479">        assert!(lit &gt; <span class="tok-num">0</span>, <span class="tok-str">&quot;nothing was drawn&quot;</span>);</span>
+<span class="ln" id="L480"></span>
+<span class="ln" id="L481">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> other = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">80</span>, <span class="tok-num">20</span>, BLACK);</span>
+<span class="ln" id="L482">        assert_eq!(other.<span class="tok-fn">text</span>(<span class="tok-num">2</span>, <span class="tok-num">2</span>, <span class="tok-str">&quot;Zo&#235;&quot;</span>, <span class="tok-num">2</span>, WHITE), <span class="tok-num">1</span>, <span class="tok-str">&quot;one box&quot;</span>);</span>
+<span class="ln" id="L483">    }</span>
+<span class="ln" id="L484"></span>
+<span class="ln" id="L485">    <span class="tok-com">/// Centred text is centred.</span></span>
+<span class="ln" id="L486">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L487">    <span class="tok-kw">fn</span> <span class="tok-fn">centred_text_sits_on_its_centre</span>() {</span>
+<span class="ln" id="L488">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">101</span>, <span class="tok-num">20</span>, BLACK);</span>
+<span class="ln" id="L489">        canvas.<span class="tok-fn">text_centred</span>(<span class="tok-num">50.0</span>, <span class="tok-num">2</span>, <span class="tok-str">&quot;ii&quot;</span>, <span class="tok-num">2</span>, WHITE);</span>
+<span class="ln" id="L490">        <span class="tok-kw">let</span> columns: Vec&lt;usize&gt; = (<span class="tok-num">0</span>..<span class="tok-num">101</span>)</span>
+<span class="ln" id="L491">            .<span class="tok-fn">filter</span>(|x| (<span class="tok-num">0</span>..<span class="tok-num">20</span>).<span class="tok-fn">any</span>(|y| canvas.<span class="tok-fn">at</span>(*x, y) == <span class="tok-fn">Some</span>(WHITE)))</span>
+<span class="ln" id="L492">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L493">        <span class="tok-kw">let</span> left = *columns.<span class="tok-fn">first</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;something was drawn&quot;</span>);</span>
+<span class="ln" id="L494">        <span class="tok-kw">let</span> right = *columns.<span class="tok-fn">last</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L495">        <span class="tok-kw">let</span> middle = (left + right) <span class="tok-kw">as</span> f32 / <span class="tok-num">2.0</span>;</span>
+<span class="ln" id="L496">        assert!(</span>
+<span class="ln" id="L497">            (middle - <span class="tok-num">50.0</span>).<span class="tok-fn">abs</span>() &lt;= <span class="tok-num">2.0</span>,</span>
+<span class="ln" id="L498">            <span class="tok-str">&quot;drawn from {left} to {right}, centred on {middle} rather than 50&quot;</span></span>
+<span class="ln" id="L499">        );</span>
+<span class="ln" id="L500">    }</span>
+<span class="ln" id="L501"></span>
+<span class="ln" id="L502">    <span class="tok-com">/// The PNG is a PNG: signature, the three chunks, and correct checksums.</span></span>
+<span class="ln" id="L503">    <span class="tok-com">///</span></span>
+<span class="ln" id="L504">    <span class="tok-com">/// Checked by reading the bytes rather than by opening the file with</span></span>
+<span class="ln" id="L505">    <span class="tok-com">/// something, because &quot;a decoder accepted it&quot; and &quot;it is what the format</span></span>
+<span class="ln" id="L506">    <span class="tok-com">/// says&quot; are different claims and this writer makes the second.</span></span>
+<span class="ln" id="L507">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L508">    <span class="tok-kw">fn</span> <span class="tok-fn">the_png_is_shaped_the_way_the_format_says</span>() {</span>
+<span class="ln" id="L509">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">7</span>, <span class="tok-num">5</span>, [<span class="tok-num">10</span>, <span class="tok-num">20</span>, <span class="tok-num">30</span>]);</span>
+<span class="ln" id="L510">        canvas.<span class="tok-fn">circle</span>(<span class="tok-num">3.5</span>, <span class="tok-num">2.5</span>, <span class="tok-num">2.0</span>, [<span class="tok-num">200</span>, <span class="tok-num">100</span>, <span class="tok-num">50</span>]);</span>
+<span class="ln" id="L511">        <span class="tok-kw">let</span> png = canvas.<span class="tok-fn">png</span>();</span>
+<span class="ln" id="L512"></span>
+<span class="ln" id="L513">        assert_eq!(</span>
+<span class="ln" id="L514">            &amp;png[..<span class="tok-num">8</span>],</span>
+<span class="ln" id="L515">            &amp;[0x89, b<span class="tok-str">&#x27;P&#x27;</span>, b<span class="tok-str">&#x27;N&#x27;</span>, b<span class="tok-str">&#x27;G&#x27;</span>, 0x0d, 0x0a, 0x1a, 0x0a],</span>
+<span class="ln" id="L516">            <span class="tok-str">&quot;signature&quot;</span></span>
+<span class="ln" id="L517">        );</span>
+<span class="ln" id="L518"></span>
+<span class="ln" id="L519">        <span class="tok-com">// Walk the chunks, checking each length and checksum as it goes.</span></span>
+<span class="ln" id="L520">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> at = <span class="tok-num">8</span>;</span>
+<span class="ln" id="L521">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seen = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L522">        while at + <span class="tok-num">12</span> &lt;= png.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L523">            <span class="tok-kw">let</span> length = u32::<span class="tok-fn">from_be_bytes</span>(png[at..at + <span class="tok-num">4</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L524">            <span class="tok-kw">let</span> kind = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;png[at + <span class="tok-num">4</span>..at + <span class="tok-num">8</span>]).<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L525">            <span class="tok-kw">let</span> body = &amp;png[at + <span class="tok-num">8</span>..at + <span class="tok-num">8</span> + length];</span>
+<span class="ln" id="L526">            <span class="tok-kw">let</span> stated =</span>
+<span class="ln" id="L527">                u32::<span class="tok-fn">from_be_bytes</span>(png[at + <span class="tok-num">8</span> + length..at + <span class="tok-num">12</span> + length].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L528">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> crc = Crc::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L529">            crc.<span class="tok-fn">eat</span>(&amp;png[at + <span class="tok-num">4</span>..at + <span class="tok-num">8</span>]);</span>
+<span class="ln" id="L530">            crc.<span class="tok-fn">eat</span>(body);</span>
+<span class="ln" id="L531">            assert_eq!(crc.<span class="tok-fn">done</span>(), stated, <span class="tok-str">&quot;{kind} checksum&quot;</span>);</span>
+<span class="ln" id="L532">            <span class="tok-kw">if</span> kind == <span class="tok-str">&quot;IHDR&quot;</span> {</span>
+<span class="ln" id="L533">                assert_eq!(u32::<span class="tok-fn">from_be_bytes</span>(body[<span class="tok-num">0</span>..<span class="tok-num">4</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()), <span class="tok-num">7</span>);</span>
+<span class="ln" id="L534">                assert_eq!(u32::<span class="tok-fn">from_be_bytes</span>(body[<span class="tok-num">4</span>..<span class="tok-num">8</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()), <span class="tok-num">5</span>);</span>
+<span class="ln" id="L535">                assert_eq!(</span>
+<span class="ln" id="L536">                    &amp;body[<span class="tok-num">8</span>..],</span>
+<span class="ln" id="L537">                    &amp;[<span class="tok-num">8</span>, <span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>],</span>
+<span class="ln" id="L538">                    <span class="tok-str">&quot;8-bit truecolour, no interlace&quot;</span></span>
+<span class="ln" id="L539">                );</span>
+<span class="ln" id="L540">            }</span>
+<span class="ln" id="L541">            seen.<span class="tok-fn">push</span>(kind);</span>
+<span class="ln" id="L542">            at += <span class="tok-num">12</span> + length;</span>
+<span class="ln" id="L543">        }</span>
+<span class="ln" id="L544">        assert_eq!(at, png.<span class="tok-fn">len</span>(), <span class="tok-str">&quot;trailing bytes after the last chunk&quot;</span>);</span>
+<span class="ln" id="L545">        assert_eq!(seen, vec![<span class="tok-str">&quot;IHDR&quot;</span>, <span class="tok-str">&quot;IDAT&quot;</span>, <span class="tok-str">&quot;IEND&quot;</span>]);</span>
+<span class="ln" id="L546">    }</span>
+<span class="ln" id="L547"></span>
+<span class="ln" id="L548">    <span class="tok-com">/// The pixels survive the round trip.</span></span>
+<span class="ln" id="L549">    <span class="tok-com">///</span></span>
+<span class="ln" id="L550">    <span class="tok-com">/// Deflated and inflated again, and compared against what was drawn. A</span></span>
+<span class="ln" id="L551">    <span class="tok-com">/// writer that produced a well-formed file of the wrong pixels would pass</span></span>
+<span class="ln" id="L552">    <span class="tok-com">/// every structural check above.</span></span>
+<span class="ln" id="L553">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L554">    <span class="tok-kw">fn</span> <span class="tok-fn">the_pixels_come_back_out_as_they_went_in</span>() {</span>
+<span class="ln" id="L555">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">9</span>, <span class="tok-num">6</span>, [<span class="tok-num">10</span>, <span class="tok-num">20</span>, <span class="tok-num">30</span>]);</span>
+<span class="ln" id="L556">        canvas.<span class="tok-fn">rect</span>(<span class="tok-num">2</span>, <span class="tok-num">1</span>, <span class="tok-num">4</span>, <span class="tok-num">3</span>, [<span class="tok-num">200</span>, <span class="tok-num">100</span>, <span class="tok-num">50</span>]);</span>
+<span class="ln" id="L557">        <span class="tok-kw">let</span> png = canvas.<span class="tok-fn">png</span>();</span>
+<span class="ln" id="L558"></span>
+<span class="ln" id="L559">        <span class="tok-com">// The IDAT body, found by walking rather than by a fixed offset.</span></span>
+<span class="ln" id="L560">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> at = <span class="tok-num">8</span>;</span>
+<span class="ln" id="L561">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> squeezed = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L562">        while at + <span class="tok-num">12</span> &lt;= png.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L563">            <span class="tok-kw">let</span> length = u32::<span class="tok-fn">from_be_bytes</span>(png[at..at + <span class="tok-num">4</span>].<span class="tok-fn">try_into</span>().<span class="tok-fn">unwrap</span>()) <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L564">            <span class="tok-kw">if</span> &amp;png[at + <span class="tok-num">4</span>..at + <span class="tok-num">8</span>] == b<span class="tok-str">&quot;IDAT&quot;</span> {</span>
+<span class="ln" id="L565">                squeezed = png[at + <span class="tok-num">8</span>..at + <span class="tok-num">8</span> + length].<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L566">            }</span>
+<span class="ln" id="L567">            at += <span class="tok-num">12</span> + length;</span>
+<span class="ln" id="L568">        }</span>
+<span class="ln" id="L569">        <span class="tok-kw">let</span> raw = miniz_oxide::inflate::<span class="tok-fn">decompress_to_vec_zlib</span>(&amp;squeezed)</span>
+<span class="ln" id="L570">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the deflate stream is readable&quot;</span>);</span>
+<span class="ln" id="L571"></span>
+<span class="ln" id="L572">        assert_eq!(raw.<span class="tok-fn">len</span>(), <span class="tok-num">6</span> * (<span class="tok-num">1</span> + <span class="tok-num">9</span> * <span class="tok-num">3</span>), <span class="tok-str">&quot;one filter byte per row&quot;</span>);</span>
+<span class="ln" id="L573">        <span class="tok-kw">for</span> y <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">6</span> {</span>
+<span class="ln" id="L574">            <span class="tok-kw">let</span> row = y * (<span class="tok-num">1</span> + <span class="tok-num">9</span> * <span class="tok-num">3</span>);</span>
+<span class="ln" id="L575">            assert_eq!(raw[row], <span class="tok-num">0</span>, <span class="tok-str">&quot;row {y} filter&quot;</span>);</span>
+<span class="ln" id="L576">            <span class="tok-kw">for</span> x <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">9</span> {</span>
+<span class="ln" id="L577">                <span class="tok-kw">let</span> at = row + <span class="tok-num">1</span> + x * <span class="tok-num">3</span>;</span>
+<span class="ln" id="L578">                assert_eq!(</span>
+<span class="ln" id="L579">                    [raw[at], raw[at + <span class="tok-num">1</span>], raw[at + <span class="tok-num">2</span>]],</span>
+<span class="ln" id="L580">                    canvas.<span class="tok-fn">at</span>(x, y).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L581">                    <span class="tok-str">&quot;pixel {x},{y}&quot;</span></span>
+<span class="ln" id="L582">                );</span>
+<span class="ln" id="L583">            }</span>
+<span class="ln" id="L584">        }</span>
+<span class="ln" id="L585">    }</span>
+<span class="ln" id="L586"></span>
+<span class="ln" id="L587">    <span class="tok-com">/// The same drawing gives the same bytes.</span></span>
+<span class="ln" id="L588">    <span class="tok-com">///</span></span>
+<span class="ln" id="L589">    <span class="tok-com">/// Two people rendering one recording should get one file. Nothing here may</span></span>
+<span class="ln" id="L590">    <span class="tok-com">/// depend on a hash order, a system font or a clock.</span></span>
+<span class="ln" id="L591">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L592">    <span class="tok-kw">fn</span> <span class="tok-fn">the_same_picture_encodes_to_the_same_bytes</span>() {</span>
+<span class="ln" id="L593">        <span class="tok-kw">let</span> draw = || {</span>
+<span class="ln" id="L594">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> canvas = Canvas::<span class="tok-fn">new</span>(<span class="tok-num">64</span>, <span class="tok-num">40</span>, [<span class="tok-num">26</span>, <span class="tok-num">27</span>, <span class="tok-num">38</span>]);</span>
+<span class="ln" id="L595">            canvas.<span class="tok-fn">circle</span>(<span class="tok-num">20.0</span>, <span class="tok-num">20.0</span>, <span class="tok-num">11.0</span>, [<span class="tok-num">122</span>, <span class="tok-num">162</span>, <span class="tok-num">247</span>]);</span>
+<span class="ln" id="L596">            canvas.<span class="tok-fn">rounded_rect</span>(<span class="tok-num">30.0</span>, <span class="tok-num">30.0</span>, <span class="tok-num">28.0</span>, <span class="tok-num">6.0</span>, [<span class="tok-num">158</span>, <span class="tok-num">206</span>, <span class="tok-num">106</span>]);</span>
+<span class="ln" id="L597">            canvas.<span class="tok-fn">text</span>(<span class="tok-num">2</span>, <span class="tok-num">2</span>, <span class="tok-str">&quot;Alex&quot;</span>, <span class="tok-num">2</span>, [<span class="tok-num">192</span>, <span class="tok-num">202</span>, <span class="tok-num">245</span>]);</span>
+<span class="ln" id="L598">            canvas.<span class="tok-fn">png</span>()</span>
+<span class="ln" id="L599">        };</span>
+<span class="ln" id="L600">        assert_eq!(<span class="tok-fn">draw</span>(), <span class="tok-fn">draw</span>());</span>
+<span class="ln" id="L601">    }</span>
+<span class="ln" id="L602">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

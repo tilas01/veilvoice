@@ -159,6 +159,13 @@ fn info_chunk() -> Vec<u8> {
     chunk
 }
 
+/// A four-character chunk identifier as text, for a report a person reads.
+///
+/// Lossy on purpose: an identifier is four bytes and nothing guarantees they
+/// are ASCII, so a malformed file must be describable rather than able to stop
+/// the report being written. Trailing spaces go because the format pads short
+/// identifiers with them, and `LIST ` in a list of what was removed reads as a
+/// typo.
 fn show(id: &[u8; 4]) -> String {
     String::from_utf8_lossy(id).trim_end().to_string()
 }

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-meta/src/wav.rs`
 
-[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 425 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs)
+[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 432 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs)
 
 ## Contents
 
@@ -50,7 +50,7 @@ handing VeilVoice's own output to a general-purpose parser.
 
 ## What this file contains
 
-425 lines defining **4 functions** (2 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+432 lines defining **4 functions** (2 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -74,14 +74,14 @@ flowchart TD
     n_is_wav["is_wav<br/>line 54"]
     n_clean_wav_bytes(["clean_wav_bytes<br/>line 59"])
     n_info_chunk["info_chunk<br/>line 143"]
-    n_show["show<br/>line 162"]
+    n_show["show<br/>line 169"]
     n_clean_wav_bytes --> n_info_chunk
     n_clean_wav_bytes --> n_is_wav
     n_clean_wav_bytes --> n_show
     click n_is_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L54" "open the source"
     click n_clean_wav_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L59" "open the source"
     click n_info_chunk href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L143" "open the source"
-    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L162" "open the source"
+    click n_show href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L169" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_wav_bytes entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -101,4 +101,4 @@ flowchart TD
 | `is_wav` <sub>pub fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L54) | Whether bytes looks like a RIFF/WAVE file. |
 | `clean_wav_bytes` <sub>pub fn</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L59) | Rewrite a WAV, keeping only the chunks needed to decode it. |
 | `info_chunk` <sub>fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L143) | Build a bland LIST/INFO chunk. |
-| `show` <sub>fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L162) |  |
+| `show` <sub>fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs#L169) | A four-character chunk identifier as text, for a report a person reads. |

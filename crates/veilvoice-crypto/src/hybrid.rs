@@ -79,7 +79,14 @@ pub const PUBLIC_KEY_LEN: usize = X25519_PUB_LEN + MLKEM_EK_LEN;
 /// Total encoded length of an [`Encapsulation`].
 pub const ENCAPSULATION_LEN: usize = X25519_PUB_LEN + MLKEM_CT_LEN;
 
+// `ml_kem` names its key types through an associated type on the parameter
+// set, so the spelling in full is `<MlKem768 as KemCore>::DecapsulationKey`.
+// Naming them once here keeps that out of every struct field and signature
+// below, and means changing parameter set is one line rather than a search.
+
+/// ML-KEM-768's private half, which recovers the shared secret.
 type MlKemDk = <MlKem768 as KemCore>::DecapsulationKey;
+/// ML-KEM-768's public half, which a sender encapsulates to.
 type MlKemEk = <MlKem768 as KemCore>::EncapsulationKey;
 
 /// A recipient's public key: an X25519 point plus an ML-KEM-768 encapsulation

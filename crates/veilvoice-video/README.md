@@ -94,10 +94,10 @@ flowchart TD
     n_accel["accel.rs<br/>652 lines"]
     n_ffmpeg["ffmpeg.rs<br/>718 lines"]
     n_font["font.rs<br/>418 lines"]
-    n_frames["frames.rs<br/>686 lines"]
+    n_frames["frames.rs<br/>695 lines"]
     n_page["page.rs<br/>1610 lines"]
     n_palette["palette.rs<br/>747 lines"]
-    n_raster["raster.rs<br/>594 lines"]
+    n_raster["raster.rs<br/>602 lines"]
     n_size["size.rs<br/>732 lines"]
     n_waveform["waveform.rs<br/>298 lines"]
     n_ffmpeg --> n_size
@@ -131,11 +131,11 @@ flowchart TD
 | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | 652 | What hardware this machine has, and the one place VeilVoice can use it. |
 | [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 718 | The video file, which needs a codec this project does not ship. |
 | [`font.rs`](../../docs/files/veilvoice-video/font.md) | 418 | A monospace face, five pixels by seven, drawn here. |
-| [`frames.rs`](../../docs/files/veilvoice-video/frames.md) | 686 | The video's pictures, and how many of them there really are. |
+| [`frames.rs`](../../docs/files/veilvoice-video/frames.md) | 695 | The video's pictures, and how many of them there really are. |
 | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 168 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
 | [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1610 | The picture: one still for a preview, and one page that plays. |
 | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 747 | Colours: the site's own tokens, and one per speaker. |
-| [`raster.rs`](../../docs/files/veilvoice-video/raster.md) | 594 | Pixels, and a PNG to put them in. |
+| [`raster.rs`](../../docs/files/veilvoice-video/raster.md) | 602 | Pixels, and a PNG to put them in. |
 | [`size.rs`](../../docs/files/veilvoice-video/size.md) | 732 | The size and frame rate a video is rendered at. |
 | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 298 | The shape of the audio, reduced to something a page can draw. |
 

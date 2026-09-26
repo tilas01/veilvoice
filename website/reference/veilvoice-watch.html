@@ -121,7 +121,7 @@
 <a href="veilvoice-watch/linux.src.html">
 <rect x="399.6" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="449.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">linux.rs</text>
-<text x="449.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">201 lines</text>
+<text x="449.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">218 lines</text>
 </a>
 <a href="veilvoice-watch/privilege.src.html">
 <rect x="130.4" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -136,7 +136,7 @@
 <a href="veilvoice-watch/windows.src.html">
 <rect x="281.1" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="335.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">windows.rs</text>
-<text x="335.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">606 lines</text>
+<text x="335.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">622 lines</text>
 </a>
 <text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">Every arrow is a crate:: or super:: path one module actually uses,</text>
 <text x="20.0" y="328.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">read out of the source rather than drawn by hand.</text>
@@ -149,10 +149,10 @@ flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;423 lines&quot;])
     n_appctl[&quot;appctl.rs&lt;br/&gt;798 lines&quot;]
     n_input[&quot;input.rs&lt;br/&gt;605 lines&quot;]
-    n_linux[&quot;linux.rs&lt;br/&gt;201 lines&quot;]
+    n_linux[&quot;linux.rs&lt;br/&gt;218 lines&quot;]
     n_privilege[&quot;privilege.rs&lt;br/&gt;404 lines&quot;]
     n_proc[&quot;proc.rs&lt;br/&gt;274 lines&quot;]
-    n_windows[&quot;windows.rs&lt;br/&gt;606 lines&quot;]
+    n_windows[&quot;windows.rs&lt;br/&gt;622 lines&quot;]
     n_input --&gt; n_proc
     click n_lib href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs&quot; &quot;open the source&quot;
     click n_appctl href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/appctl.rs&quot; &quot;open the source&quot;
@@ -170,10 +170,10 @@ flowchart TD
 <tr><td><a href="veilvoice-watch/appctl.html"><code>appctl.rs</code></a></td><td>798</td><td>Learn what normally runs on this machine, then notice what does not.</td></tr>
 <tr><td><a href="veilvoice-watch/input.html"><code>input.rs</code></a></td><td>605</td><td>What on this machine could be watching the keyboard and the mouse.</td></tr>
 <tr><td><a href="veilvoice-watch/lib.html"><code>lib.rs</code></a></td><td>423</td><td>Find out which applications are using your microphone and camera, right now.</td></tr>
-<tr><td><a href="veilvoice-watch/linux.html"><code>linux.rs</code></a></td><td>201</td><td>Linux detection, via open file handles in /proc.</td></tr>
+<tr><td><a href="veilvoice-watch/linux.html"><code>linux.rs</code></a></td><td>218</td><td>Linux detection, via open file handles in /proc.</td></tr>
 <tr><td><a href="veilvoice-watch/privilege.html"><code>privilege.rs</code></a></td><td>404</td><td>What privilege VeilVoice is running with, and what each level can actually see.</td></tr>
 <tr><td><a href="veilvoice-watch/proc.html"><code>proc.rs</code></a></td><td>274</td><td>Which processes are running, per platform, and what that cannot tell you.</td></tr>
-<tr><td><a href="veilvoice-watch/windows.html"><code>windows.rs</code></a></td><td>606</td><td>Windows detection, via the Capability Access Manager.</td></tr>
+<tr><td><a href="veilvoice-watch/windows.html"><code>windows.rs</code></a></td><td>622</td><td>Windows detection, via the Capability Access Manager.</td></tr>
 <tr><td><a href="veilvoice-watch/examples-scan_once.html"><code>scan_once.rs</code></a></td><td>30</td><td>Print what is using the microphone and camera right now.</td></tr>
 </tbody></table>
 </section>

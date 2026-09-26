@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-watch/src/windows.rs</code></h1>
-<p style="color:var(--muted)"><a href="windows.html">what this file is for</a> &middot; <a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 606 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="windows.html">what this file is for</a> &middot; <a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 622 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -210,492 +210,508 @@
 </span>
 <span class="ln" id="L135"></span>
 <span class="src-item" id="fn-scan">
-<span class="ln" id="L136"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">scan</span>() -&gt; Result&lt;Vec&lt;DeviceUse&gt;, Error&gt; {</span>
-<span class="ln" id="L137">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L138">    <span class="tok-com">// &quot;webcam&quot; is what the registry calls it, even though the UI says camera.</span></span>
-<span class="ln" id="L139">    <span class="tok-kw">for</span> (kind, key) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L140">        (DeviceKind::Microphone, <span class="tok-str">&quot;microphone&quot;</span>),</span>
-<span class="ln" id="L141">        (DeviceKind::Camera, <span class="tok-str">&quot;webcam&quot;</span>),</span>
-<span class="ln" id="L142">    ] {</span>
-<span class="ln" id="L143">        <span class="tok-fn">collect</span>(kind, &amp;format!(<span class="tok-str">r&quot;{CONSENT_STORE}\{key}&quot;</span>), &amp;<span class="tok-kw">mut</span> found);</span>
-<span class="ln" id="L144">    }</span>
-<span class="ln" id="L145">    <span class="tok-fn">Ok</span>(found)</span>
-<span class="ln" id="L146">}</span>
+<span class="ln" id="L136"><span class="tok-com">/// Every application Windows records as having used the microphone or camera,</span></span>
+<span class="ln" id="L137"><span class="tok-com">/// and which of them is using one now.</span></span>
+<span class="ln" id="L138"><span class="tok-com">///</span></span>
+<span class="ln" id="L139"><span class="tok-com">/// Read out of the consent store in the registry, which is where Windows keeps</span></span>
+<span class="ln" id="L140"><span class="tok-com">/// what it shows in its own privacy settings. That makes this a record of what</span></span>
+<span class="ln" id="L141"><span class="tok-com">/// was permitted and last used rather than a list of open handles, which is a</span></span>
+<span class="ln" id="L142"><span class="tok-com">/// weaker claim than the Linux half makes and is the strongest available</span></span>
+<span class="ln" id="L143"><span class="tok-com">/// without a driver: an application that has stopped is told apart from one</span></span>
+<span class="ln" id="L144"><span class="tok-com">/// that has not by whether its stop time is later than its start time.</span></span>
+<span class="ln" id="L145"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">scan</span>() -&gt; Result&lt;Vec&lt;DeviceUse&gt;, Error&gt; {</span>
+<span class="ln" id="L146">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L147">    <span class="tok-com">// &quot;webcam&quot; is what the registry calls it, even though the UI says camera.</span></span>
+<span class="ln" id="L148">    <span class="tok-kw">for</span> (kind, key) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L149">        (DeviceKind::Microphone, <span class="tok-str">&quot;microphone&quot;</span>),</span>
+<span class="ln" id="L150">        (DeviceKind::Camera, <span class="tok-str">&quot;webcam&quot;</span>),</span>
+<span class="ln" id="L151">    ] {</span>
+<span class="ln" id="L152">        <span class="tok-fn">collect</span>(kind, &amp;format!(<span class="tok-str">r&quot;{CONSENT_STORE}\{key}&quot;</span>), &amp;<span class="tok-kw">mut</span> found);</span>
+<span class="ln" id="L153">    }</span>
+<span class="ln" id="L154">    <span class="tok-fn">Ok</span>(found)</span>
+<span class="ln" id="L155">}</span>
 </span>
-<span class="ln" id="L147"></span>
+<span class="ln" id="L156"></span>
 <span class="src-item" id="fn-collect">
-<span class="ln" id="L148"><span class="tok-com">/// Walk one capability&#x27;s whole subtree, from a single `reg query /s`.</span></span>
-<span class="ln" id="L149"><span class="tok-kw">fn</span> <span class="tok-fn">collect</span>(kind: DeviceKind, root: &amp;str, out: &amp;<span class="tok-kw">mut</span> Vec&lt;DeviceUse&gt;) {</span>
-<span class="ln" id="L150">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dump) = <span class="tok-fn">query_tree</span>(root) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L151">        <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L152">    };</span>
-<span class="ln" id="L153">    <span class="tok-kw">for</span> (key, start, stop) <span class="tok-kw">in</span> <span class="tok-fn">parse_consent_dump</span>(&amp;dump) {</span>
-<span class="ln" id="L154">        <span class="tok-com">// In use == started and not yet stopped. Anything else is history.</span></span>
-<span class="ln" id="L155">        <span class="tok-kw">if</span> start == <span class="tok-num">0</span> || stop != <span class="tok-num">0</span> {</span>
-<span class="ln" id="L156">            continue;</span>
-<span class="ln" id="L157">        }</span>
-<span class="ln" id="L158">        <span class="tok-kw">let</span> raw = key.<span class="tok-fn">rsplit</span>(<span class="tok-str">&#x27;\\&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(&amp;key);</span>
-<span class="ln" id="L159">        <span class="tok-kw">let</span> path = <span class="tok-fn">decode_path</span>(raw);</span>
-<span class="ln" id="L160">        <span class="tok-kw">let</span> app = <span class="tok-fn">friendly_name</span>(&amp;path);</span>
-<span class="ln" id="L161">        out.<span class="tok-fn">push</span>(DeviceUse {</span>
-<span class="ln" id="L162">            kind,</span>
-<span class="ln" id="L163">            app,</span>
-<span class="ln" id="L164">            path: <span class="tok-fn">Some</span>(path),</span>
-<span class="ln" id="L165">            <span class="tok-com">// Per-application accounting, not per-process. See the module note.</span></span>
-<span class="ln" id="L166">            pid: None,</span>
-<span class="ln" id="L167">            since: <span class="tok-fn">filetime_to_system</span>(start),</span>
-<span class="ln" id="L168">            device: None,</span>
-<span class="ln" id="L169">        });</span>
-<span class="ln" id="L170">    }</span>
-<span class="ln" id="L171">}</span>
+<span class="ln" id="L157"><span class="tok-com">/// Walk one capability&#x27;s whole subtree, from a single `reg query /s`.</span></span>
+<span class="ln" id="L158"><span class="tok-kw">fn</span> <span class="tok-fn">collect</span>(kind: DeviceKind, root: &amp;str, out: &amp;<span class="tok-kw">mut</span> Vec&lt;DeviceUse&gt;) {</span>
+<span class="ln" id="L159">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dump) = <span class="tok-fn">query_tree</span>(root) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L160">        <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L161">    };</span>
+<span class="ln" id="L162">    <span class="tok-kw">for</span> (key, start, stop) <span class="tok-kw">in</span> <span class="tok-fn">parse_consent_dump</span>(&amp;dump) {</span>
+<span class="ln" id="L163">        <span class="tok-com">// In use == started and not yet stopped. Anything else is history.</span></span>
+<span class="ln" id="L164">        <span class="tok-kw">if</span> start == <span class="tok-num">0</span> || stop != <span class="tok-num">0</span> {</span>
+<span class="ln" id="L165">            continue;</span>
+<span class="ln" id="L166">        }</span>
+<span class="ln" id="L167">        <span class="tok-kw">let</span> raw = key.<span class="tok-fn">rsplit</span>(<span class="tok-str">&#x27;\\&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(&amp;key);</span>
+<span class="ln" id="L168">        <span class="tok-kw">let</span> path = <span class="tok-fn">decode_path</span>(raw);</span>
+<span class="ln" id="L169">        <span class="tok-kw">let</span> app = <span class="tok-fn">friendly_name</span>(&amp;path);</span>
+<span class="ln" id="L170">        out.<span class="tok-fn">push</span>(DeviceUse {</span>
+<span class="ln" id="L171">            kind,</span>
+<span class="ln" id="L172">            app,</span>
+<span class="ln" id="L173">            path: <span class="tok-fn">Some</span>(path),</span>
+<span class="ln" id="L174">            <span class="tok-com">// Per-application accounting, not per-process. See the module note.</span></span>
+<span class="ln" id="L175">            pid: None,</span>
+<span class="ln" id="L176">            since: <span class="tok-fn">filetime_to_system</span>(start),</span>
+<span class="ln" id="L177">            device: None,</span>
+<span class="ln" id="L178">        });</span>
+<span class="ln" id="L179">    }</span>
+<span class="ln" id="L180">}</span>
 </span>
-<span class="ln" id="L172"></span>
+<span class="ln" id="L181"></span>
 <span class="src-item" id="fn-query_tree">
-<span class="ln" id="L173"><span class="tok-com">/// One `reg query &lt;key&gt; /s`, printing the whole subtree.</span></span>
-<span class="ln" id="L174"><span class="tok-com">///</span></span>
-<span class="ln" id="L175"><span class="tok-com">/// The single subprocess this module&#x27;s scan costs per capability. Everything</span></span>
-<span class="ln" id="L176"><span class="tok-com">/// after it is text.</span></span>
-<span class="ln" id="L177"><span class="tok-kw">fn</span> <span class="tok-fn">query_tree</span>(key: &amp;str) -&gt; Option&lt;String&gt; {</span>
-<span class="ln" id="L178">    <span class="tok-kw">let</span> reg = <span class="tok-fn">reg_exe</span>()?;</span>
-<span class="ln" id="L179">    <span class="tok-kw">let</span> output = <span class="tok-fn">no_window</span>(Command::<span class="tok-fn">new</span>(reg))</span>
-<span class="ln" id="L180">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;query&quot;</span>, key, <span class="tok-str">&quot;/s&quot;</span>])</span>
-<span class="ln" id="L181">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L182">        .<span class="tok-fn">ok</span>()?;</span>
-<span class="ln" id="L183">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L184">        <span class="tok-com">// A store that does not exist is the ordinary state on a machine where</span></span>
-<span class="ln" id="L185">        <span class="tok-com">// nothing has ever asked for a microphone, and is not an error.</span></span>
-<span class="ln" id="L186">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L187">    }</span>
-<span class="ln" id="L188">    <span class="tok-fn">Some</span>(String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout).<span class="tok-fn">into_owned</span>())</span>
-<span class="ln" id="L189">}</span>
+<span class="ln" id="L182"><span class="tok-com">/// One `reg query &lt;key&gt; /s`, printing the whole subtree.</span></span>
+<span class="ln" id="L183"><span class="tok-com">///</span></span>
+<span class="ln" id="L184"><span class="tok-com">/// The single subprocess this module&#x27;s scan costs per capability. Everything</span></span>
+<span class="ln" id="L185"><span class="tok-com">/// after it is text.</span></span>
+<span class="ln" id="L186"><span class="tok-kw">fn</span> <span class="tok-fn">query_tree</span>(key: &amp;str) -&gt; Option&lt;String&gt; {</span>
+<span class="ln" id="L187">    <span class="tok-kw">let</span> reg = <span class="tok-fn">reg_exe</span>()?;</span>
+<span class="ln" id="L188">    <span class="tok-kw">let</span> output = <span class="tok-fn">no_window</span>(Command::<span class="tok-fn">new</span>(reg))</span>
+<span class="ln" id="L189">        .<span class="tok-fn">args</span>([<span class="tok-str">&quot;query&quot;</span>, key, <span class="tok-str">&quot;/s&quot;</span>])</span>
+<span class="ln" id="L190">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L191">        .<span class="tok-fn">ok</span>()?;</span>
+<span class="ln" id="L192">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L193">        <span class="tok-com">// A store that does not exist is the ordinary state on a machine where</span></span>
+<span class="ln" id="L194">        <span class="tok-com">// nothing has ever asked for a microphone, and is not an error.</span></span>
+<span class="ln" id="L195">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L196">    }</span>
+<span class="ln" id="L197">    <span class="tok-fn">Some</span>(String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout).<span class="tok-fn">into_owned</span>())</span>
+<span class="ln" id="L198">}</span>
 </span>
-<span class="ln" id="L190"></span>
+<span class="ln" id="L199"></span>
 <span class="src-item" id="fn-parse_consent_dump">
-<span class="ln" id="L191"><span class="tok-com">/// Pull `(key, LastUsedTimeStart, LastUsedTimeStop)` out of a `/s` dump.</span></span>
-<span class="ln" id="L192"><span class="tok-com">///</span></span>
-<span class="ln" id="L193"><span class="tok-com">/// The shape `reg query /s` prints is a key path on its own unindented line,</span></span>
-<span class="ln" id="L194"><span class="tok-com">/// then that key&#x27;s values indented beneath it, then a blank line:</span></span>
-<span class="ln" id="L195"><span class="tok-com">///</span></span>
-<span class="ln" id="L196"><span class="tok-com">/// ```text</span></span>
-<span class="ln" id="L197"><span class="tok-com">/// HKEY_CURRENT_USER\...\microphone\SomeApp</span></span>
-<span class="ln" id="L198"><span class="tok-com">///     LastUsedTimeStart    REG_QWORD    0x1db5f3a1c2d4e5f</span></span>
-<span class="ln" id="L199"><span class="tok-com">///     LastUsedTimeStop    REG_QWORD    0x0</span></span>
-<span class="ln" id="L200"><span class="tok-com">/// ```</span></span>
+<span class="ln" id="L200"><span class="tok-com">/// Pull `(key, LastUsedTimeStart, LastUsedTimeStop)` out of a `/s` dump.</span></span>
 <span class="ln" id="L201"><span class="tok-com">///</span></span>
-<span class="ln" id="L202"><span class="tok-com">/// Only keys that carry a `LastUsedTimeStart` come back, which is exactly the</span></span>
-<span class="ln" id="L203"><span class="tok-com">/// set of application entries. Packaged ones sit directly under the store and</span></span>
-<span class="ln" id="L204"><span class="tok-com">/// desktop ones under `NonPackaged`, and this needs to know nothing about that</span></span>
-<span class="ln" id="L205"><span class="tok-com">/// distinction to find both.</span></span>
-<span class="ln" id="L206"><span class="tok-com">///</span></span>
-<span class="ln" id="L207"><span class="tok-com">/// A key with a start time and no stop time is reported with a stop of zero:</span></span>
-<span class="ln" id="L208"><span class="tok-com">/// Windows clears the stop value on acquisition, so *absent* and *zero* mean</span></span>
-<span class="ln" id="L209"><span class="tok-com">/// the same thing here, and treating a missing line as &quot;still running&quot; is the</span></span>
-<span class="ln" id="L210"><span class="tok-com">/// reading that errs toward telling the user something is listening.</span></span>
-<span class="ln" id="L211"><span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">parse_consent_dump</span>(text: &amp;str) -&gt; Vec&lt;(String, u64, u64)&gt; {</span>
-<span class="ln" id="L212">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found: Vec&lt;(String, u64, u64)&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L213">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> key: Option&lt;String&gt; = None;</span>
-<span class="ln" id="L214">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> start: Option&lt;u64&gt; = None;</span>
-<span class="ln" id="L215">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stop: Option&lt;u64&gt; = None;</span>
-<span class="ln" id="L216"></span>
-<span class="ln" id="L217">    <span class="tok-com">// Close off whichever key was being read.</span></span>
-<span class="ln" id="L218">    <span class="tok-kw">fn</span> <span class="tok-fn">flush</span>(</span>
-<span class="ln" id="L219">        found: &amp;<span class="tok-kw">mut</span> Vec&lt;(String, u64, u64)&gt;,</span>
-<span class="ln" id="L220">        key: &amp;<span class="tok-kw">mut</span> Option&lt;String&gt;,</span>
-<span class="ln" id="L221">        start: &amp;<span class="tok-kw">mut</span> Option&lt;u64&gt;,</span>
-<span class="ln" id="L222">        stop: &amp;<span class="tok-kw">mut</span> Option&lt;u64&gt;,</span>
-<span class="ln" id="L223">    ) {</span>
-<span class="ln" id="L224">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(name), <span class="tok-fn">Some</span>(began)) = (key.<span class="tok-fn">take</span>(), start.<span class="tok-fn">take</span>()) {</span>
-<span class="ln" id="L225">            found.<span class="tok-fn">push</span>((name, began, stop.<span class="tok-fn">take</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>)));</span>
-<span class="ln" id="L226">        }</span>
-<span class="ln" id="L227">        *start = None;</span>
-<span class="ln" id="L228">        *stop = None;</span>
-<span class="ln" id="L229">    }</span>
-<span class="ln" id="L230"></span>
-<span class="ln" id="L231">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L232">        <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L233">        <span class="tok-kw">if</span> trimmed.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L234">            continue;</span>
+<span class="ln" id="L202"><span class="tok-com">/// The shape `reg query /s` prints is a key path on its own unindented line,</span></span>
+<span class="ln" id="L203"><span class="tok-com">/// then that key&#x27;s values indented beneath it, then a blank line:</span></span>
+<span class="ln" id="L204"><span class="tok-com">///</span></span>
+<span class="ln" id="L205"><span class="tok-com">/// ```text</span></span>
+<span class="ln" id="L206"><span class="tok-com">/// HKEY_CURRENT_USER\...\microphone\SomeApp</span></span>
+<span class="ln" id="L207"><span class="tok-com">///     LastUsedTimeStart    REG_QWORD    0x1db5f3a1c2d4e5f</span></span>
+<span class="ln" id="L208"><span class="tok-com">///     LastUsedTimeStop    REG_QWORD    0x0</span></span>
+<span class="ln" id="L209"><span class="tok-com">/// ```</span></span>
+<span class="ln" id="L210"><span class="tok-com">///</span></span>
+<span class="ln" id="L211"><span class="tok-com">/// Only keys that carry a `LastUsedTimeStart` come back, which is exactly the</span></span>
+<span class="ln" id="L212"><span class="tok-com">/// set of application entries. Packaged ones sit directly under the store and</span></span>
+<span class="ln" id="L213"><span class="tok-com">/// desktop ones under `NonPackaged`, and this needs to know nothing about that</span></span>
+<span class="ln" id="L214"><span class="tok-com">/// distinction to find both.</span></span>
+<span class="ln" id="L215"><span class="tok-com">///</span></span>
+<span class="ln" id="L216"><span class="tok-com">/// A key with a start time and no stop time is reported with a stop of zero:</span></span>
+<span class="ln" id="L217"><span class="tok-com">/// Windows clears the stop value on acquisition, so *absent* and *zero* mean</span></span>
+<span class="ln" id="L218"><span class="tok-com">/// the same thing here, and treating a missing line as &quot;still running&quot; is the</span></span>
+<span class="ln" id="L219"><span class="tok-com">/// reading that errs toward telling the user something is listening.</span></span>
+<span class="ln" id="L220"><span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">parse_consent_dump</span>(text: &amp;str) -&gt; Vec&lt;(String, u64, u64)&gt; {</span>
+<span class="ln" id="L221">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found: Vec&lt;(String, u64, u64)&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L222">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> key: Option&lt;String&gt; = None;</span>
+<span class="ln" id="L223">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> start: Option&lt;u64&gt; = None;</span>
+<span class="ln" id="L224">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stop: Option&lt;u64&gt; = None;</span>
+<span class="ln" id="L225"></span>
+<span class="ln" id="L226">    <span class="tok-com">// Close off whichever key was being read.</span></span>
+<span class="ln" id="L227">    <span class="tok-kw">fn</span> <span class="tok-fn">flush</span>(</span>
+<span class="ln" id="L228">        found: &amp;<span class="tok-kw">mut</span> Vec&lt;(String, u64, u64)&gt;,</span>
+<span class="ln" id="L229">        key: &amp;<span class="tok-kw">mut</span> Option&lt;String&gt;,</span>
+<span class="ln" id="L230">        start: &amp;<span class="tok-kw">mut</span> Option&lt;u64&gt;,</span>
+<span class="ln" id="L231">        stop: &amp;<span class="tok-kw">mut</span> Option&lt;u64&gt;,</span>
+<span class="ln" id="L232">    ) {</span>
+<span class="ln" id="L233">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(name), <span class="tok-fn">Some</span>(began)) = (key.<span class="tok-fn">take</span>(), start.<span class="tok-fn">take</span>()) {</span>
+<span class="ln" id="L234">            found.<span class="tok-fn">push</span>((name, began, stop.<span class="tok-fn">take</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>)));</span>
 <span class="ln" id="L235">        }</span>
-<span class="ln" id="L236">        <span class="tok-com">// A key header is unindented; a value line is indented. `reg` echoes</span></span>
-<span class="ln" id="L237">        <span class="tok-com">// paths under the full hive name, which is why the store is asked for</span></span>
-<span class="ln" id="L238">        <span class="tok-com">// that way -- asking with `HKCU` matched nothing and the monitor</span></span>
-<span class="ln" id="L239">        <span class="tok-com">// reported an empty machine whatever was recording.</span></span>
-<span class="ln" id="L240">        <span class="tok-kw">if</span> !line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27; &#x27;</span>) &amp;&amp; !line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;\t&#x27;</span>) {</span>
-<span class="ln" id="L241">            <span class="tok-fn">flush</span>(&amp;<span class="tok-kw">mut</span> found, &amp;<span class="tok-kw">mut</span> key, &amp;<span class="tok-kw">mut</span> start, &amp;<span class="tok-kw">mut</span> stop);</span>
-<span class="ln" id="L242">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;HKEY_&quot;</span>) {</span>
-<span class="ln" id="L243">                key = <span class="tok-fn">Some</span>(trimmed.<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&#x27;\\&#x27;</span>).<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L244">            }</span>
-<span class="ln" id="L245">            continue;</span>
-<span class="ln" id="L246">        }</span>
-<span class="ln" id="L247">        <span class="tok-kw">if</span> key.<span class="tok-fn">is_none</span>() {</span>
-<span class="ln" id="L248">            continue;</span>
-<span class="ln" id="L249">        }</span>
-<span class="ln" id="L250">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(value) = <span class="tok-fn">hex_value</span>(trimmed, <span class="tok-str">&quot;LastUsedTimeStart&quot;</span>) {</span>
-<span class="ln" id="L251">            start = <span class="tok-fn">Some</span>(value);</span>
-<span class="ln" id="L252">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(value) = <span class="tok-fn">hex_value</span>(trimmed, <span class="tok-str">&quot;LastUsedTimeStop&quot;</span>) {</span>
-<span class="ln" id="L253">            stop = <span class="tok-fn">Some</span>(value);</span>
-<span class="ln" id="L254">        }</span>
-<span class="ln" id="L255">    }</span>
-<span class="ln" id="L256">    <span class="tok-fn">flush</span>(&amp;<span class="tok-kw">mut</span> found, &amp;<span class="tok-kw">mut</span> key, &amp;<span class="tok-kw">mut</span> start, &amp;<span class="tok-kw">mut</span> stop);</span>
-<span class="ln" id="L257">    found</span>
-<span class="ln" id="L258">}</span>
+<span class="ln" id="L236">        *start = None;</span>
+<span class="ln" id="L237">        *stop = None;</span>
+<span class="ln" id="L238">    }</span>
+<span class="ln" id="L239"></span>
+<span class="ln" id="L240">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> text.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L241">        <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim</span>();</span>
+<span class="ln" id="L242">        <span class="tok-kw">if</span> trimmed.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L243">            continue;</span>
+<span class="ln" id="L244">        }</span>
+<span class="ln" id="L245">        <span class="tok-com">// A key header is unindented; a value line is indented. `reg` echoes</span></span>
+<span class="ln" id="L246">        <span class="tok-com">// paths under the full hive name, which is why the store is asked for</span></span>
+<span class="ln" id="L247">        <span class="tok-com">// that way -- asking with `HKCU` matched nothing and the monitor</span></span>
+<span class="ln" id="L248">        <span class="tok-com">// reported an empty machine whatever was recording.</span></span>
+<span class="ln" id="L249">        <span class="tok-kw">if</span> !line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27; &#x27;</span>) &amp;&amp; !line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;\t&#x27;</span>) {</span>
+<span class="ln" id="L250">            <span class="tok-fn">flush</span>(&amp;<span class="tok-kw">mut</span> found, &amp;<span class="tok-kw">mut</span> key, &amp;<span class="tok-kw">mut</span> start, &amp;<span class="tok-kw">mut</span> stop);</span>
+<span class="ln" id="L251">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;HKEY_&quot;</span>) {</span>
+<span class="ln" id="L252">                key = <span class="tok-fn">Some</span>(trimmed.<span class="tok-fn">trim_end_matches</span>(<span class="tok-str">&#x27;\\&#x27;</span>).<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L253">            }</span>
+<span class="ln" id="L254">            continue;</span>
+<span class="ln" id="L255">        }</span>
+<span class="ln" id="L256">        <span class="tok-kw">if</span> key.<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L257">            continue;</span>
+<span class="ln" id="L258">        }</span>
+<span class="ln" id="L259">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(value) = <span class="tok-fn">hex_value</span>(trimmed, <span class="tok-str">&quot;LastUsedTimeStart&quot;</span>) {</span>
+<span class="ln" id="L260">            start = <span class="tok-fn">Some</span>(value);</span>
+<span class="ln" id="L261">        } <span class="tok-kw">else</span> <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(value) = <span class="tok-fn">hex_value</span>(trimmed, <span class="tok-str">&quot;LastUsedTimeStop&quot;</span>) {</span>
+<span class="ln" id="L262">            stop = <span class="tok-fn">Some</span>(value);</span>
+<span class="ln" id="L263">        }</span>
+<span class="ln" id="L264">    }</span>
+<span class="ln" id="L265">    <span class="tok-fn">flush</span>(&amp;<span class="tok-kw">mut</span> found, &amp;<span class="tok-kw">mut</span> key, &amp;<span class="tok-kw">mut</span> start, &amp;<span class="tok-kw">mut</span> stop);</span>
+<span class="ln" id="L266">    found</span>
+<span class="ln" id="L267">}</span>
 </span>
-<span class="ln" id="L259"></span>
+<span class="ln" id="L268"></span>
 <span class="src-item" id="fn-hex_value">
-<span class="ln" id="L260"><span class="tok-com">/// `Name    REG_QWORD    0x...` for one named value, as a number.</span></span>
-<span class="ln" id="L261"><span class="tok-com">///</span></span>
-<span class="ln" id="L262"><span class="tok-com">/// Matched by name and then by taking the last field, rather than by splitting</span></span>
-<span class="ln" id="L263"><span class="tok-com">/// into three: the value&#x27;s *name* is fixed here, so the only thing that can</span></span>
-<span class="ln" id="L264"><span class="tok-com">/// vary is how much whitespace `reg` used, and the last field is the datum</span></span>
-<span class="ln" id="L265"><span class="tok-com">/// whatever it did.</span></span>
-<span class="ln" id="L266"><span class="tok-kw">fn</span> <span class="tok-fn">hex_value</span>(line: &amp;str, name: &amp;str) -&gt; Option&lt;u64&gt; {</span>
-<span class="ln" id="L267">    <span class="tok-kw">let</span> rest = line.<span class="tok-fn">strip_prefix</span>(name)?;</span>
-<span class="ln" id="L268">    <span class="tok-com">// Guard against a value called `LastUsedTimeStartSomethingElse`.</span></span>
-<span class="ln" id="L269">    <span class="tok-kw">if</span> !rest.<span class="tok-fn">starts_with</span>(char::is_whitespace) {</span>
-<span class="ln" id="L270">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L271">    }</span>
-<span class="ln" id="L272">    <span class="tok-kw">let</span> raw = rest.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next_back</span>()?;</span>
-<span class="ln" id="L273">    u64::<span class="tok-fn">from_str_radix</span>(raw.<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&quot;0x&quot;</span>), <span class="tok-num">16</span>).<span class="tok-fn">ok</span>()</span>
-<span class="ln" id="L274">}</span>
+<span class="ln" id="L269"><span class="tok-com">/// `Name    REG_QWORD    0x...` for one named value, as a number.</span></span>
+<span class="ln" id="L270"><span class="tok-com">///</span></span>
+<span class="ln" id="L271"><span class="tok-com">/// Matched by name and then by taking the last field, rather than by splitting</span></span>
+<span class="ln" id="L272"><span class="tok-com">/// into three: the value&#x27;s *name* is fixed here, so the only thing that can</span></span>
+<span class="ln" id="L273"><span class="tok-com">/// vary is how much whitespace `reg` used, and the last field is the datum</span></span>
+<span class="ln" id="L274"><span class="tok-com">/// whatever it did.</span></span>
+<span class="ln" id="L275"><span class="tok-kw">fn</span> <span class="tok-fn">hex_value</span>(line: &amp;str, name: &amp;str) -&gt; Option&lt;u64&gt; {</span>
+<span class="ln" id="L276">    <span class="tok-kw">let</span> rest = line.<span class="tok-fn">strip_prefix</span>(name)?;</span>
+<span class="ln" id="L277">    <span class="tok-com">// Guard against a value called `LastUsedTimeStartSomethingElse`.</span></span>
+<span class="ln" id="L278">    <span class="tok-kw">if</span> !rest.<span class="tok-fn">starts_with</span>(char::is_whitespace) {</span>
+<span class="ln" id="L279">        <span class="tok-kw">return</span> None;</span>
+<span class="ln" id="L280">    }</span>
+<span class="ln" id="L281">    <span class="tok-kw">let</span> raw = rest.<span class="tok-fn">split_whitespace</span>().<span class="tok-fn">next_back</span>()?;</span>
+<span class="ln" id="L282">    u64::<span class="tok-fn">from_str_radix</span>(raw.<span class="tok-fn">trim_start_matches</span>(<span class="tok-str">&quot;0x&quot;</span>), <span class="tok-num">16</span>).<span class="tok-fn">ok</span>()</span>
+<span class="ln" id="L283">}</span>
 </span>
-<span class="ln" id="L275"></span>
+<span class="ln" id="L284"></span>
 <span class="src-item" id="fn-decode_path">
-<span class="ln" id="L276"><span class="tok-com">/// Registry keys encode a path with `#` where a separator belongs.</span></span>
-<span class="ln" id="L277"><span class="tok-kw">fn</span> <span class="tok-fn">decode_path</span>(raw: &amp;str) -&gt; String {</span>
-<span class="ln" id="L278">    raw.<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;#&#x27;</span>, <span class="tok-str">&quot;\\&quot;</span>)</span>
-<span class="ln" id="L279">}</span>
+<span class="ln" id="L285"><span class="tok-com">/// Registry keys encode a path with `#` where a separator belongs.</span></span>
+<span class="ln" id="L286"><span class="tok-kw">fn</span> <span class="tok-fn">decode_path</span>(raw: &amp;str) -&gt; String {</span>
+<span class="ln" id="L287">    raw.<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;#&#x27;</span>, <span class="tok-str">&quot;\\&quot;</span>)</span>
+<span class="ln" id="L288">}</span>
 </span>
-<span class="ln" id="L280"></span>
+<span class="ln" id="L289"></span>
 <span class="src-item" id="fn-friendly_name">
-<span class="ln" id="L281"><span class="tok-com">/// The executable name, or the package family name for a Store app.</span></span>
-<span class="ln" id="L282"><span class="tok-kw">fn</span> <span class="tok-fn">friendly_name</span>(path: &amp;str) -&gt; String {</span>
-<span class="ln" id="L283">    <span class="tok-kw">let</span> tail = path.<span class="tok-fn">rsplit</span>(<span class="tok-str">&#x27;\\&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(path);</span>
-<span class="ln" id="L284">    <span class="tok-kw">let</span> name = tail.<span class="tok-fn">strip_suffix</span>(<span class="tok-str">&quot;.exe&quot;</span>).<span class="tok-fn">unwrap_or</span>(tail);</span>
-<span class="ln" id="L285">    <span class="tok-kw">if</span> name.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L286">        path.<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L287">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L288">        name.<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L289">    }</span>
-<span class="ln" id="L290">}</span>
+<span class="ln" id="L290"><span class="tok-com">/// The executable name, or the package family name for a Store app.</span></span>
+<span class="ln" id="L291"><span class="tok-kw">fn</span> <span class="tok-fn">friendly_name</span>(path: &amp;str) -&gt; String {</span>
+<span class="ln" id="L292">    <span class="tok-kw">let</span> tail = path.<span class="tok-fn">rsplit</span>(<span class="tok-str">&#x27;\\&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(path);</span>
+<span class="ln" id="L293">    <span class="tok-kw">let</span> name = tail.<span class="tok-fn">strip_suffix</span>(<span class="tok-str">&quot;.exe&quot;</span>).<span class="tok-fn">unwrap_or</span>(tail);</span>
+<span class="ln" id="L294">    <span class="tok-kw">if</span> name.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L295">        path.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L296">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L297">        name.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L298">    }</span>
+<span class="ln" id="L299">}</span>
 </span>
-<span class="ln" id="L291"></span>
-<span class="src-item" id="fn-filetime_to_system">
-<span class="ln" id="L292"><span class="tok-kw">fn</span> <span class="tok-fn">filetime_to_system</span>(filetime: u64) -&gt; Option&lt;SystemTime&gt; {</span>
-<span class="ln" id="L293">    <span class="tok-kw">let</span> secs = filetime.<span class="tok-fn">checked_div</span>(<span class="tok-num">10_000_000</span>)?;</span>
-<span class="ln" id="L294">    <span class="tok-kw">let</span> unix = secs.<span class="tok-fn">checked_sub</span>(FILETIME_TO_UNIX_SECS)?;</span>
-<span class="ln" id="L295">    UNIX_EPOCH.<span class="tok-fn">checked_add</span>(Duration::<span class="tok-fn">from_secs</span>(unix))</span>
-<span class="ln" id="L296">}</span>
-</span>
-<span class="ln" id="L297"></span>
-<span class="ln" id="L298"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L299"><span class="tok-kw">mod</span> tests {</span>
 <span class="ln" id="L300"></span>
-<span class="ln" id="L301">    <span class="tok-com">/// Every subprocess in this file must be spawned through `no_window`.</span></span>
-<span class="ln" id="L302">    <span class="tok-com">///</span></span>
-<span class="ln" id="L303">    <span class="tok-com">/// This reads the file&#x27;s own source rather than exercising the behaviour,</span></span>
-<span class="ln" id="L304">    <span class="tok-com">/// because &quot;no console window appeared&quot; cannot be observed from a test --</span></span>
-<span class="ln" id="L305">    <span class="tok-com">/// which is precisely why the defect reached a release. A `Command::new`</span></span>
-<span class="ln" id="L306">    <span class="tok-com">/// added later without the wrapper fails here rather than on a desktop.</span></span>
-<span class="ln" id="L307">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L308">    <span class="tok-kw">fn</span> <span class="tok-fn">every_subprocess_is_spawned_without_a_console_window</span>() {</span>
-<span class="ln" id="L309">        <span class="tok-com">// A source-reading test, so the line endings have to be settled first.</span></span>
-<span class="ln" id="L310">        <span class="tok-com">// F-72: these searched for &quot;\n}\n&quot; and passed on every machine</span></span>
-<span class="ln" id="L311">        <span class="tok-com">// whose checkout uses LF. GitHub&#x27;s Windows runners default to</span></span>
-<span class="ln" id="L312">        <span class="tok-com">// core.autocrlf=true, so the file arrives with CRLF, the pattern</span></span>
-<span class="ln" id="L313">        <span class="tok-com">// matches nothing, and three tests failed there and nowhere else --</span></span>
-<span class="ln" id="L314">        <span class="tok-com">// including on the developer machine that had just run them.</span></span>
-<span class="ln" id="L315">        <span class="tok-com">// Normalised here as well as pinned in .gitattributes: a test that</span></span>
-<span class="ln" id="L316">        <span class="tok-com">// depends on a git setting is a test somebody will trip over.</span></span>
-<span class="ln" id="L317">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;windows.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L318">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bare = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L319">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> source.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L320">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L321">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) || trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;*&#x27;</span>) {</span>
-<span class="ln" id="L322">                continue; <span class="tok-com">// prose: this rule is discussed in the comments</span></span>
-<span class="ln" id="L323">            }</span>
-<span class="ln" id="L324">            <span class="tok-kw">if</span> !line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new&quot;</span>) || line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no_window(&quot;</span>) {</span>
-<span class="ln" id="L325">                continue;</span>
-<span class="ln" id="L326">            }</span>
-<span class="ln" id="L327">            bare.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;line {}: {}&quot;</span>, number + <span class="tok-num">1</span>, trimmed));</span>
-<span class="ln" id="L328">        }</span>
-<span class="ln" id="L329">        assert!(</span>
-<span class="ln" id="L330">            bare.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L331">            <span class="tok-str">&quot;these spawns bypass `no_window`, so each flashes a console window \</span></span>
-<span class="ln" id="L332"><span class="tok-str">             on Windows:\n{}&quot;</span>,</span>
-<span class="ln" id="L333">            bare.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L334">        );</span>
-<span class="ln" id="L335">    }</span>
-<span class="ln" id="L336">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L337"></span>
-<span class="ln" id="L338">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L339">    <span class="tok-kw">fn</span> <span class="tok-fn">registry_paths_are_decoded</span>() {</span>
-<span class="ln" id="L340">        assert_eq!(</span>
-<span class="ln" id="L341">            <span class="tok-fn">decode_path</span>(<span class="tok-str">&quot;C:#Program Files#Zoom#bin#Zoom.exe&quot;</span>),</span>
-<span class="ln" id="L342">            <span class="tok-str">r&quot;C:\Program Files\Zoom\bin\Zoom.exe&quot;</span></span>
-<span class="ln" id="L343">        );</span>
-<span class="ln" id="L344">    }</span>
-<span class="ln" id="L345"></span>
-<span class="ln" id="L346">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L347">    <span class="tok-kw">fn</span> <span class="tok-fn">names_are_readable</span>() {</span>
-<span class="ln" id="L348">        assert_eq!(<span class="tok-fn">friendly_name</span>(<span class="tok-str">r&quot;C:\Program Files\Zoom\bin\Zoom.exe&quot;</span>), <span class="tok-str">&quot;Zoom&quot;</span>);</span>
-<span class="ln" id="L349">        assert_eq!(</span>
-<span class="ln" id="L350">            <span class="tok-fn">friendly_name</span>(<span class="tok-str">&quot;Microsoft.WindowsCamera_8wekyb3d8bbwe&quot;</span>),</span>
-<span class="ln" id="L351">            <span class="tok-str">&quot;Microsoft.WindowsCamera_8wekyb3d8bbwe&quot;</span></span>
-<span class="ln" id="L352">        );</span>
-<span class="ln" id="L353">    }</span>
-<span class="ln" id="L354"></span>
-<span class="ln" id="L355">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L356">    <span class="tok-kw">fn</span> <span class="tok-fn">filetime_converts_to_a_sane_instant</span>() {</span>
-<span class="ln" id="L357">        <span class="tok-com">// 2020-01-01T00:00:00Z as a FILETIME.</span></span>
-<span class="ln" id="L358">        <span class="tok-kw">let</span> ft = (1_577_836_800u64 + FILETIME_TO_UNIX_SECS) * <span class="tok-num">10_000_000</span>;</span>
-<span class="ln" id="L359">        <span class="tok-kw">let</span> when = <span class="tok-fn">filetime_to_system</span>(ft).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;should convert&quot;</span>);</span>
-<span class="ln" id="L360">        <span class="tok-kw">let</span> unix = when.<span class="tok-fn">duration_since</span>(UNIX_EPOCH).<span class="tok-fn">unwrap</span>().<span class="tok-fn">as_secs</span>();</span>
-<span class="ln" id="L361">        assert_eq!(unix, <span class="tok-num">1_577_836_800</span>);</span>
-<span class="ln" id="L362">    }</span>
-<span class="ln" id="L363"></span>
-<span class="ln" id="L364">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L365">    <span class="tok-kw">fn</span> <span class="tok-fn">a_nonsense_filetime_does_not_panic</span>() {</span>
-<span class="ln" id="L366">        assert!(<span class="tok-fn">filetime_to_system</span>(<span class="tok-num">0</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L367">        assert!(<span class="tok-fn">filetime_to_system</span>(<span class="tok-num">1</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L368">        assert!(<span class="tok-fn">filetime_to_system</span>(u64::MAX).<span class="tok-fn">is_none</span>());</span>
+<span class="src-item" id="fn-filetime_to_system">
+<span class="ln" id="L301"><span class="tok-com">/// A Windows FILETIME as an ordinary [`SystemTime`].</span></span>
+<span class="ln" id="L302"><span class="tok-com">///</span></span>
+<span class="ln" id="L303"><span class="tok-com">/// FILETIME counts hundred-nanosecond intervals from the first of January 1601,</span></span>
+<span class="ln" id="L304"><span class="tok-com">/// so it is both a different unit and a different epoch from everything else</span></span>
+<span class="ln" id="L305"><span class="tok-com">/// here. Every step is checked rather than wrapped: the registry is not a</span></span>
+<span class="ln" id="L306"><span class="tok-com">/// trusted input, and a value that cannot be a time answers `None` instead of</span></span>
+<span class="ln" id="L307"><span class="tok-com">/// producing one.</span></span>
+<span class="ln" id="L308"><span class="tok-kw">fn</span> <span class="tok-fn">filetime_to_system</span>(filetime: u64) -&gt; Option&lt;SystemTime&gt; {</span>
+<span class="ln" id="L309">    <span class="tok-kw">let</span> secs = filetime.<span class="tok-fn">checked_div</span>(<span class="tok-num">10_000_000</span>)?;</span>
+<span class="ln" id="L310">    <span class="tok-kw">let</span> unix = secs.<span class="tok-fn">checked_sub</span>(FILETIME_TO_UNIX_SECS)?;</span>
+<span class="ln" id="L311">    UNIX_EPOCH.<span class="tok-fn">checked_add</span>(Duration::<span class="tok-fn">from_secs</span>(unix))</span>
+<span class="ln" id="L312">}</span>
+</span>
+<span class="ln" id="L313"></span>
+<span class="ln" id="L314"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L315"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L316"></span>
+<span class="ln" id="L317">    <span class="tok-com">/// Every subprocess in this file must be spawned through `no_window`.</span></span>
+<span class="ln" id="L318">    <span class="tok-com">///</span></span>
+<span class="ln" id="L319">    <span class="tok-com">/// This reads the file&#x27;s own source rather than exercising the behaviour,</span></span>
+<span class="ln" id="L320">    <span class="tok-com">/// because &quot;no console window appeared&quot; cannot be observed from a test --</span></span>
+<span class="ln" id="L321">    <span class="tok-com">/// which is precisely why the defect reached a release. A `Command::new`</span></span>
+<span class="ln" id="L322">    <span class="tok-com">/// added later without the wrapper fails here rather than on a desktop.</span></span>
+<span class="ln" id="L323">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L324">    <span class="tok-kw">fn</span> <span class="tok-fn">every_subprocess_is_spawned_without_a_console_window</span>() {</span>
+<span class="ln" id="L325">        <span class="tok-com">// A source-reading test, so the line endings have to be settled first.</span></span>
+<span class="ln" id="L326">        <span class="tok-com">// F-72: these searched for &quot;\n}\n&quot; and passed on every machine</span></span>
+<span class="ln" id="L327">        <span class="tok-com">// whose checkout uses LF. GitHub&#x27;s Windows runners default to</span></span>
+<span class="ln" id="L328">        <span class="tok-com">// core.autocrlf=true, so the file arrives with CRLF, the pattern</span></span>
+<span class="ln" id="L329">        <span class="tok-com">// matches nothing, and three tests failed there and nowhere else --</span></span>
+<span class="ln" id="L330">        <span class="tok-com">// including on the developer machine that had just run them.</span></span>
+<span class="ln" id="L331">        <span class="tok-com">// Normalised here as well as pinned in .gitattributes: a test that</span></span>
+<span class="ln" id="L332">        <span class="tok-com">// depends on a git setting is a test somebody will trip over.</span></span>
+<span class="ln" id="L333">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;windows.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L334">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bare = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L335">        <span class="tok-kw">for</span> (number, line) <span class="tok-kw">in</span> source.<span class="tok-fn">lines</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L336">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L337">            <span class="tok-kw">if</span> trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) || trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;*&#x27;</span>) {</span>
+<span class="ln" id="L338">                continue; <span class="tok-com">// prose: this rule is discussed in the comments</span></span>
+<span class="ln" id="L339">            }</span>
+<span class="ln" id="L340">            <span class="tok-kw">if</span> !line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new&quot;</span>) || line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no_window(&quot;</span>) {</span>
+<span class="ln" id="L341">                continue;</span>
+<span class="ln" id="L342">            }</span>
+<span class="ln" id="L343">            bare.<span class="tok-fn">push</span>(format!(<span class="tok-str">&quot;line {}: {}&quot;</span>, number + <span class="tok-num">1</span>, trimmed));</span>
+<span class="ln" id="L344">        }</span>
+<span class="ln" id="L345">        assert!(</span>
+<span class="ln" id="L346">            bare.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L347">            <span class="tok-str">&quot;these spawns bypass `no_window`, so each flashes a console window \</span></span>
+<span class="ln" id="L348"><span class="tok-str">             on Windows:\n{}&quot;</span>,</span>
+<span class="ln" id="L349">            bare.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L350">        );</span>
+<span class="ln" id="L351">    }</span>
+<span class="ln" id="L352">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L353"></span>
+<span class="ln" id="L354">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L355">    <span class="tok-kw">fn</span> <span class="tok-fn">registry_paths_are_decoded</span>() {</span>
+<span class="ln" id="L356">        assert_eq!(</span>
+<span class="ln" id="L357">            <span class="tok-fn">decode_path</span>(<span class="tok-str">&quot;C:#Program Files#Zoom#bin#Zoom.exe&quot;</span>),</span>
+<span class="ln" id="L358">            <span class="tok-str">r&quot;C:\Program Files\Zoom\bin\Zoom.exe&quot;</span></span>
+<span class="ln" id="L359">        );</span>
+<span class="ln" id="L360">    }</span>
+<span class="ln" id="L361"></span>
+<span class="ln" id="L362">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L363">    <span class="tok-kw">fn</span> <span class="tok-fn">names_are_readable</span>() {</span>
+<span class="ln" id="L364">        assert_eq!(<span class="tok-fn">friendly_name</span>(<span class="tok-str">r&quot;C:\Program Files\Zoom\bin\Zoom.exe&quot;</span>), <span class="tok-str">&quot;Zoom&quot;</span>);</span>
+<span class="ln" id="L365">        assert_eq!(</span>
+<span class="ln" id="L366">            <span class="tok-fn">friendly_name</span>(<span class="tok-str">&quot;Microsoft.WindowsCamera_8wekyb3d8bbwe&quot;</span>),</span>
+<span class="ln" id="L367">            <span class="tok-str">&quot;Microsoft.WindowsCamera_8wekyb3d8bbwe&quot;</span></span>
+<span class="ln" id="L368">        );</span>
 <span class="ln" id="L369">    }</span>
 <span class="ln" id="L370"></span>
-<span class="ln" id="L371">    <span class="tok-com">/// Regression: the registry tool must be an absolute path in the system</span></span>
-<span class="ln" id="L372">    <span class="tok-com">/// directory, never a bare name the OS searches for, because the Windows search</span></span>
-<span class="ln" id="L373">    <span class="tok-com">/// order includes the current working directory, so a planted `reg.exe`</span></span>
-<span class="ln" id="L374">    <span class="tok-com">/// would have been run as the user.</span></span>
-<span class="ln" id="L375">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L376">    <span class="tok-kw">fn</span> <span class="tok-fn">the_registry_tool_is_resolved_absolutely_not_searched_for</span>() {</span>
-<span class="ln" id="L377">        <span class="tok-kw">let</span> path = <span class="tok-fn">reg_exe</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;reg.exe should exist on Windows&quot;</span>);</span>
-<span class="ln" id="L378">        assert!(path.<span class="tok-fn">is_absolute</span>(), <span class="tok-str">&quot;{} is not absolute&quot;</span>, path.<span class="tok-fn">display</span>());</span>
-<span class="ln" id="L379">        assert!(path.<span class="tok-fn">is_file</span>());</span>
-<span class="ln" id="L380">        <span class="tok-kw">let</span> shown = path.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L381">        assert!(</span>
-<span class="ln" id="L382">            shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;system32&quot;</span>) || shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sysnative&quot;</span>),</span>
-<span class="ln" id="L383">            <span class="tok-str">&quot;resolved outside the system directory: {shown}&quot;</span></span>
-<span class="ln" id="L384">        );</span>
+<span class="ln" id="L371">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L372">    <span class="tok-kw">fn</span> <span class="tok-fn">filetime_converts_to_a_sane_instant</span>() {</span>
+<span class="ln" id="L373">        <span class="tok-com">// 2020-01-01T00:00:00Z as a FILETIME.</span></span>
+<span class="ln" id="L374">        <span class="tok-kw">let</span> ft = (1_577_836_800u64 + FILETIME_TO_UNIX_SECS) * <span class="tok-num">10_000_000</span>;</span>
+<span class="ln" id="L375">        <span class="tok-kw">let</span> when = <span class="tok-fn">filetime_to_system</span>(ft).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;should convert&quot;</span>);</span>
+<span class="ln" id="L376">        <span class="tok-kw">let</span> unix = when.<span class="tok-fn">duration_since</span>(UNIX_EPOCH).<span class="tok-fn">unwrap</span>().<span class="tok-fn">as_secs</span>();</span>
+<span class="ln" id="L377">        assert_eq!(unix, <span class="tok-num">1_577_836_800</span>);</span>
+<span class="ln" id="L378">    }</span>
+<span class="ln" id="L379"></span>
+<span class="ln" id="L380">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L381">    <span class="tok-kw">fn</span> <span class="tok-fn">a_nonsense_filetime_does_not_panic</span>() {</span>
+<span class="ln" id="L382">        assert!(<span class="tok-fn">filetime_to_system</span>(<span class="tok-num">0</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L383">        assert!(<span class="tok-fn">filetime_to_system</span>(<span class="tok-num">1</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L384">        assert!(<span class="tok-fn">filetime_to_system</span>(u64::MAX).<span class="tok-fn">is_none</span>());</span>
 <span class="ln" id="L385">    }</span>
 <span class="ln" id="L386"></span>
-<span class="ln" id="L387">    <span class="tok-com">/// And a decoy named `reg.exe` in the working directory must never become</span></span>
-<span class="ln" id="L388">    <span class="tok-com">/// the tool we run. Written without a temp-directory crate so this crate</span></span>
-<span class="ln" id="L389">    <span class="tok-com">/// stays dependency-free, dev-dependencies included.</span></span>
-<span class="ln" id="L390">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L391">    <span class="tok-kw">fn</span> <span class="tok-fn">a_decoy_in_the_working_directory_is_not_picked_up</span>() {</span>
-<span class="ln" id="L392">        <span class="tok-kw">let</span> scratch = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-watch-decoy-test&quot;</span>);</span>
-<span class="ln" id="L393">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;scratch).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L394">        <span class="tok-kw">let</span> decoy = scratch.<span class="tok-fn">join</span>(<span class="tok-str">&quot;reg.exe&quot;</span>);</span>
-<span class="ln" id="L395">        std::fs::<span class="tok-fn">write</span>(&amp;decoy, b<span class="tok-str">&quot;not really reg&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L396"></span>
-<span class="ln" id="L397">        <span class="tok-kw">let</span> resolved = <span class="tok-fn">reg_exe</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;reg.exe should exist on Windows&quot;</span>);</span>
-<span class="ln" id="L398">        assert_ne!(resolved, decoy, <span class="tok-str">&quot;a planted reg.exe was selected&quot;</span>);</span>
-<span class="ln" id="L399">        assert!(</span>
-<span class="ln" id="L400">            !resolved.<span class="tok-fn">starts_with</span>(&amp;scratch),</span>
-<span class="ln" id="L401">            <span class="tok-str">&quot;resolution reached a writable scratch directory: {}&quot;</span>,</span>
-<span class="ln" id="L402">            resolved.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L403">        );</span>
-<span class="ln" id="L404">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;decoy);</span>
-<span class="ln" id="L405">    }</span>
-<span class="ln" id="L406"></span>
-<span class="ln" id="L407">    <span class="tok-com">/// Real `reg query &lt;store&gt; /s` output, kept verbatim. A parser tested only</span></span>
-<span class="ln" id="L408">    <span class="tok-com">/// against strings written by the person who wrote the parser tests the</span></span>
-<span class="ln" id="L409">    <span class="tok-com">/// assumptions twice and the format never.</span></span>
-<span class="ln" id="L410">    <span class="tok-kw">const</span> DUMP: &amp;str = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L411"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone</span></span>
-<span class="ln" id="L412"><span class="tok-str">    Value    REG_SZ    Allow</span></span>
-<span class="ln" id="L413"></span>
-<span class="ln" id="L414"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\Microsoft.WindowsCamera_8wekyb3d8bbwe</span></span>
-<span class="ln" id="L415"><span class="tok-str">    Value    REG_SZ    Allow</span></span>
-<span class="ln" id="L416"><span class="tok-str">    LastUsedTimeStart    REG_QWORD    0x1db5f3a1c2d4e5f</span></span>
-<span class="ln" id="L417"><span class="tok-str">    LastUsedTimeStop    REG_QWORD    0x1db5f3a1c2d4f00</span></span>
-<span class="ln" id="L418"></span>
-<span class="ln" id="L419"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged</span></span>
-<span class="ln" id="L420"></span>
-<span class="ln" id="L421"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged\\C:#Program Files#Zoom#bin#Zoom.exe</span></span>
-<span class="ln" id="L422"><span class="tok-str">    Value    REG_SZ    Allow</span></span>
-<span class="ln" id="L423"><span class="tok-str">    LastUsedTimeStart    REG_QWORD    0x1db6000000000000</span></span>
-<span class="ln" id="L424"><span class="tok-str">    LastUsedTimeStop    REG_QWORD    0x0</span></span>
-<span class="ln" id="L425"></span>
-<span class="ln" id="L426"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged\\C:#Windows#System32#WindowsPowerShell#v1.0#powershell.exe</span></span>
-<span class="ln" id="L427"><span class="tok-str">    LastUsedTimeStart    REG_QWORD    0x1db4000000000000</span></span>
-<span class="ln" id="L428"><span class="tok-str">&quot;</span>;</span>
+<span class="ln" id="L387">    <span class="tok-com">/// Regression: the registry tool must be an absolute path in the system</span></span>
+<span class="ln" id="L388">    <span class="tok-com">/// directory, never a bare name the OS searches for, because the Windows search</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// order includes the current working directory, so a planted `reg.exe`</span></span>
+<span class="ln" id="L390">    <span class="tok-com">/// would have been run as the user.</span></span>
+<span class="ln" id="L391">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L392">    <span class="tok-kw">fn</span> <span class="tok-fn">the_registry_tool_is_resolved_absolutely_not_searched_for</span>() {</span>
+<span class="ln" id="L393">        <span class="tok-kw">let</span> path = <span class="tok-fn">reg_exe</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;reg.exe should exist on Windows&quot;</span>);</span>
+<span class="ln" id="L394">        assert!(path.<span class="tok-fn">is_absolute</span>(), <span class="tok-str">&quot;{} is not absolute&quot;</span>, path.<span class="tok-fn">display</span>());</span>
+<span class="ln" id="L395">        assert!(path.<span class="tok-fn">is_file</span>());</span>
+<span class="ln" id="L396">        <span class="tok-kw">let</span> shown = path.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L397">        assert!(</span>
+<span class="ln" id="L398">            shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;system32&quot;</span>) || shown.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sysnative&quot;</span>),</span>
+<span class="ln" id="L399">            <span class="tok-str">&quot;resolved outside the system directory: {shown}&quot;</span></span>
+<span class="ln" id="L400">        );</span>
+<span class="ln" id="L401">    }</span>
+<span class="ln" id="L402"></span>
+<span class="ln" id="L403">    <span class="tok-com">/// And a decoy named `reg.exe` in the working directory must never become</span></span>
+<span class="ln" id="L404">    <span class="tok-com">/// the tool we run. Written without a temp-directory crate so this crate</span></span>
+<span class="ln" id="L405">    <span class="tok-com">/// stays dependency-free, dev-dependencies included.</span></span>
+<span class="ln" id="L406">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L407">    <span class="tok-kw">fn</span> <span class="tok-fn">a_decoy_in_the_working_directory_is_not_picked_up</span>() {</span>
+<span class="ln" id="L408">        <span class="tok-kw">let</span> scratch = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-watch-decoy-test&quot;</span>);</span>
+<span class="ln" id="L409">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;scratch).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L410">        <span class="tok-kw">let</span> decoy = scratch.<span class="tok-fn">join</span>(<span class="tok-str">&quot;reg.exe&quot;</span>);</span>
+<span class="ln" id="L411">        std::fs::<span class="tok-fn">write</span>(&amp;decoy, b<span class="tok-str">&quot;not really reg&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L412"></span>
+<span class="ln" id="L413">        <span class="tok-kw">let</span> resolved = <span class="tok-fn">reg_exe</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;reg.exe should exist on Windows&quot;</span>);</span>
+<span class="ln" id="L414">        assert_ne!(resolved, decoy, <span class="tok-str">&quot;a planted reg.exe was selected&quot;</span>);</span>
+<span class="ln" id="L415">        assert!(</span>
+<span class="ln" id="L416">            !resolved.<span class="tok-fn">starts_with</span>(&amp;scratch),</span>
+<span class="ln" id="L417">            <span class="tok-str">&quot;resolution reached a writable scratch directory: {}&quot;</span>,</span>
+<span class="ln" id="L418">            resolved.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L419">        );</span>
+<span class="ln" id="L420">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;decoy);</span>
+<span class="ln" id="L421">    }</span>
+<span class="ln" id="L422"></span>
+<span class="ln" id="L423">    <span class="tok-com">/// Real `reg query &lt;store&gt; /s` output, kept verbatim. A parser tested only</span></span>
+<span class="ln" id="L424">    <span class="tok-com">/// against strings written by the person who wrote the parser tests the</span></span>
+<span class="ln" id="L425">    <span class="tok-com">/// assumptions twice and the format never.</span></span>
+<span class="ln" id="L426">    <span class="tok-kw">const</span> DUMP: &amp;str = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L427"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone</span></span>
+<span class="ln" id="L428"><span class="tok-str">    Value    REG_SZ    Allow</span></span>
 <span class="ln" id="L429"></span>
-<span class="ln" id="L430">    <span class="tok-com">/// The whole subtree comes out of one dump, packaged and desktop alike,</span></span>
-<span class="ln" id="L431">    <span class="tok-com">/// without the parser needing to know which is which.</span></span>
-<span class="ln" id="L432">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L433">    <span class="tok-kw">fn</span> <span class="tok-fn">one_dump_yields_every_application_entry</span>() {</span>
-<span class="ln" id="L434">        <span class="tok-kw">let</span> found = <span class="tok-fn">parse_consent_dump</span>(DUMP);</span>
-<span class="ln" id="L435">        assert_eq!(found.<span class="tok-fn">len</span>(), <span class="tok-num">3</span>, <span class="tok-str">&quot;{found:#?}&quot;</span>);</span>
-<span class="ln" id="L436">        assert!(found.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|(key, _, _)| key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;Zoom.exe&quot;</span>)));</span>
-<span class="ln" id="L437">        assert!(found</span>
-<span class="ln" id="L438">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L439">            .<span class="tok-fn">any</span>(|(key, _, _)| key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;Microsoft.WindowsCamera_8wekyb3d8bbwe&quot;</span>)));</span>
-<span class="ln" id="L440">    }</span>
+<span class="ln" id="L430"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\Microsoft.WindowsCamera_8wekyb3d8bbwe</span></span>
+<span class="ln" id="L431"><span class="tok-str">    Value    REG_SZ    Allow</span></span>
+<span class="ln" id="L432"><span class="tok-str">    LastUsedTimeStart    REG_QWORD    0x1db5f3a1c2d4e5f</span></span>
+<span class="ln" id="L433"><span class="tok-str">    LastUsedTimeStop    REG_QWORD    0x1db5f3a1c2d4f00</span></span>
+<span class="ln" id="L434"></span>
+<span class="ln" id="L435"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged</span></span>
+<span class="ln" id="L436"></span>
+<span class="ln" id="L437"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged\\C:#Program Files#Zoom#bin#Zoom.exe</span></span>
+<span class="ln" id="L438"><span class="tok-str">    Value    REG_SZ    Allow</span></span>
+<span class="ln" id="L439"><span class="tok-str">    LastUsedTimeStart    REG_QWORD    0x1db6000000000000</span></span>
+<span class="ln" id="L440"><span class="tok-str">    LastUsedTimeStop    REG_QWORD    0x0</span></span>
 <span class="ln" id="L441"></span>
-<span class="ln" id="L442">    <span class="tok-com">/// The store key itself and the `NonPackaged` container carry no</span></span>
-<span class="ln" id="L443">    <span class="tok-com">/// timestamps, so they must not become entries.</span></span>
-<span class="ln" id="L444">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L445">    <span class="tok-kw">fn</span> <span class="tok-fn">container_keys_are_not_applications</span>() {</span>
-<span class="ln" id="L446">        <span class="tok-kw">for</span> (key, _, _) <span class="tok-kw">in</span> <span class="tok-fn">parse_consent_dump</span>(DUMP) {</span>
-<span class="ln" id="L447">            assert!(!key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;NonPackaged&quot;</span>), <span class="tok-str">&quot;{key}&quot;</span>);</span>
-<span class="ln" id="L448">            assert!(!key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;microphone&quot;</span>), <span class="tok-str">&quot;{key}&quot;</span>);</span>
-<span class="ln" id="L449">        }</span>
-<span class="ln" id="L450">    }</span>
-<span class="ln" id="L451"></span>
-<span class="ln" id="L452">    <span class="tok-com">/// The rule the whole feature turns on: started and not yet stopped.</span></span>
-<span class="ln" id="L453">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L454">    <span class="tok-kw">fn</span> <span class="tok-fn">a_started_and_unstopped_entry_is_the_one_in_use</span>() {</span>
-<span class="ln" id="L455">        <span class="tok-kw">let</span> found = <span class="tok-fn">parse_consent_dump</span>(DUMP);</span>
-<span class="ln" id="L456">        <span class="tok-kw">let</span> zoom = found</span>
-<span class="ln" id="L457">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L458">            .<span class="tok-fn">find</span>(|(key, _, _)| key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;Zoom.exe&quot;</span>))</span>
-<span class="ln" id="L459">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L460">        assert_eq!(zoom.<span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-str">&quot;Zoom is still holding the microphone&quot;</span>);</span>
-<span class="ln" id="L461">        <span class="tok-kw">let</span> camera = found</span>
-<span class="ln" id="L462">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L463">            .<span class="tok-fn">find</span>(|(key, _, _)| key.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;WindowsCamera&quot;</span>))</span>
-<span class="ln" id="L464">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L465">        assert_ne!(camera.<span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-str">&quot;the camera app released it&quot;</span>);</span>
+<span class="ln" id="L442"><span class="tok-str">HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\microphone\\NonPackaged\\C:#Windows#System32#WindowsPowerShell#v1.0#powershell.exe</span></span>
+<span class="ln" id="L443"><span class="tok-str">    LastUsedTimeStart    REG_QWORD    0x1db4000000000000</span></span>
+<span class="ln" id="L444"><span class="tok-str">&quot;</span>;</span>
+<span class="ln" id="L445"></span>
+<span class="ln" id="L446">    <span class="tok-com">/// The whole subtree comes out of one dump, packaged and desktop alike,</span></span>
+<span class="ln" id="L447">    <span class="tok-com">/// without the parser needing to know which is which.</span></span>
+<span class="ln" id="L448">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L449">    <span class="tok-kw">fn</span> <span class="tok-fn">one_dump_yields_every_application_entry</span>() {</span>
+<span class="ln" id="L450">        <span class="tok-kw">let</span> found = <span class="tok-fn">parse_consent_dump</span>(DUMP);</span>
+<span class="ln" id="L451">        assert_eq!(found.<span class="tok-fn">len</span>(), <span class="tok-num">3</span>, <span class="tok-str">&quot;{found:#?}&quot;</span>);</span>
+<span class="ln" id="L452">        assert!(found.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|(key, _, _)| key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;Zoom.exe&quot;</span>)));</span>
+<span class="ln" id="L453">        assert!(found</span>
+<span class="ln" id="L454">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L455">            .<span class="tok-fn">any</span>(|(key, _, _)| key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;Microsoft.WindowsCamera_8wekyb3d8bbwe&quot;</span>)));</span>
+<span class="ln" id="L456">    }</span>
+<span class="ln" id="L457"></span>
+<span class="ln" id="L458">    <span class="tok-com">/// The store key itself and the `NonPackaged` container carry no</span></span>
+<span class="ln" id="L459">    <span class="tok-com">/// timestamps, so they must not become entries.</span></span>
+<span class="ln" id="L460">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L461">    <span class="tok-kw">fn</span> <span class="tok-fn">container_keys_are_not_applications</span>() {</span>
+<span class="ln" id="L462">        <span class="tok-kw">for</span> (key, _, _) <span class="tok-kw">in</span> <span class="tok-fn">parse_consent_dump</span>(DUMP) {</span>
+<span class="ln" id="L463">            assert!(!key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;NonPackaged&quot;</span>), <span class="tok-str">&quot;{key}&quot;</span>);</span>
+<span class="ln" id="L464">            assert!(!key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;microphone&quot;</span>), <span class="tok-str">&quot;{key}&quot;</span>);</span>
+<span class="ln" id="L465">        }</span>
 <span class="ln" id="L466">    }</span>
 <span class="ln" id="L467"></span>
-<span class="ln" id="L468">    <span class="tok-com">/// Windows clears the stop value on acquisition, so a missing stop line</span></span>
-<span class="ln" id="L469">    <span class="tok-com">/// and a zero mean the same thing -- and the reading that errs toward</span></span>
-<span class="ln" id="L470">    <span class="tok-com">/// telling somebody a microphone is live is the right one.</span></span>
-<span class="ln" id="L471">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L472">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_stop_time_reads_as_still_running</span>() {</span>
-<span class="ln" id="L473">        <span class="tok-kw">let</span> found = <span class="tok-fn">parse_consent_dump</span>(DUMP);</span>
-<span class="ln" id="L474">        <span class="tok-kw">let</span> shell = found</span>
-<span class="ln" id="L475">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L476">            .<span class="tok-fn">find</span>(|(key, _, _)| key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;powershell.exe&quot;</span>))</span>
-<span class="ln" id="L477">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;an entry with no stop line must still be found&quot;</span>);</span>
-<span class="ln" id="L478">        assert_eq!(shell.<span class="tok-num">2</span>, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L479">    }</span>
-<span class="ln" id="L480"></span>
-<span class="ln" id="L481">    <span class="tok-com">/// A value whose name merely starts with the one being looked for must not</span></span>
-<span class="ln" id="L482">    <span class="tok-com">/// be mistaken for it.</span></span>
-<span class="ln" id="L483">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L484">    <span class="tok-kw">fn</span> <span class="tok-fn">a_similarly_named_value_is_not_confused_for_the_real_one</span>() {</span>
-<span class="ln" id="L485">        <span class="tok-kw">let</span> dump = <span class="tok-str">&quot;HKEY_CURRENT_USER\\x\\App\n                        LastUsedTimeStartedElsewhere    REG_QWORD    0x99\n&quot;</span>;</span>
-<span class="ln" id="L486">        assert!(<span class="tok-fn">parse_consent_dump</span>(dump).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L487">    }</span>
-<span class="ln" id="L488"></span>
-<span class="ln" id="L489">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L490">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_and_rubbish_produce_nothing_rather_than_panicking</span>() {</span>
-<span class="ln" id="L491">        assert!(<span class="tok-fn">parse_consent_dump</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L492">        assert!(<span class="tok-fn">parse_consent_dump</span>(<span class="tok-str">&quot;\n\n   \n&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L493">        assert!(<span class="tok-fn">parse_consent_dump</span>(<span class="tok-str">&quot;not a registry dump at all&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L494">        <span class="tok-com">// A value line with no key above it must not be attributed to anything.</span></span>
-<span class="ln" id="L495">        assert!(<span class="tok-fn">parse_consent_dump</span>(<span class="tok-str">&quot;    LastUsedTimeStart    REG_QWORD    0x1&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L496">    }</span>
-<span class="ln" id="L497"></span>
-<span class="ln" id="L498">    <span class="tok-com">/// A malformed number must drop that value rather than the whole entry</span></span>
-<span class="ln" id="L499">    <span class="tok-com">/// silently becoming something else.</span></span>
-<span class="ln" id="L500">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L501">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unparseable_timestamp_is_dropped</span>() {</span>
-<span class="ln" id="L502">        <span class="tok-kw">let</span> dump = <span class="tok-str">&quot;HKEY_CURRENT_USER\\x\\App\n                        LastUsedTimeStart    REG_QWORD    notanumber\n&quot;</span>;</span>
-<span class="ln" id="L503">        assert!(<span class="tok-fn">parse_consent_dump</span>(dump).<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L504">    }</span>
-<span class="ln" id="L505"></span>
-<span class="ln" id="L506">    <span class="tok-com">/// Regression, and the important one. `reg query` echoes subkey paths back</span></span>
-<span class="ln" id="L507">    <span class="tok-com">/// under the **full** hive name, so asking with the `HKCU` abbreviation</span></span>
-<span class="ln" id="L508">    <span class="tok-com">/// matched nothing and the monitor reported an empty machine no matter what</span></span>
-<span class="ln" id="L509">    <span class="tok-com">/// was recording, which is the worst possible failure for this feature, because it</span></span>
-<span class="ln" id="L510">    <span class="tok-com">/// looks like good news.</span></span>
-<span class="ln" id="L511">    <span class="tok-com">///</span></span>
-<span class="ln" id="L512">    <span class="tok-com">/// Asked against a key every Windows installation has, rather than against</span></span>
-<span class="ln" id="L513">    <span class="tok-com">/// the consent store. The consent store is populated by *applications</span></span>
-<span class="ln" id="L514">    <span class="tok-com">/// having asked for the microphone*, and a headless CI runner with no audio</span></span>
-<span class="ln" id="L515">    <span class="tok-com">/// hardware has legitimately never had one ask, so an empty result there</span></span>
-<span class="ln" id="L516">    <span class="tok-com">/// means &quot;nothing has used the microphone on this machine&quot;, which is not the</span></span>
-<span class="ln" id="L517">    <span class="tok-com">/// same claim at all. Conflating the two made CI fail on a machine where the</span></span>
-<span class="ln" id="L518">    <span class="tok-com">/// code was working perfectly, which is its own kind of silently wrong.</span></span>
-<span class="ln" id="L519">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L520">    <span class="tok-kw">fn</span> <span class="tok-fn">the_registry_tool_answers_for_a_key_that_always_exists</span>() {</span>
-<span class="ln" id="L521">        <span class="tok-com">// Deliberately shallow: `/s` on HKLM\SOFTWARE\Microsoft would walk an</span></span>
-<span class="ln" id="L522">        <span class="tok-com">// enormous tree, and what is being checked is that the tool runs and</span></span>
-<span class="ln" id="L523">        <span class="tok-com">// echoes paths under the full hive name -- not how big that tree is.</span></span>
-<span class="ln" id="L524">        <span class="tok-kw">let</span> dump = <span class="tok-fn">query_tree</span>(<span class="tok-str">r&quot;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT&quot;</span>)</span>
-<span class="ln" id="L525">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;reg.exe should answer for a key every Windows install has&quot;</span>);</span>
-<span class="ln" id="L526">        assert!(</span>
-<span class="ln" id="L527">            dump.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;HKEY_LOCAL_MACHINE\\&quot;</span>),</span>
-<span class="ln" id="L528">            <span class="tok-str">&quot;`reg query` parsing is broken, and the monitor would report an empty \</span></span>
-<span class="ln" id="L529"><span class="tok-str">             machine whatever was recording&quot;</span></span>
-<span class="ln" id="L530">        );</span>
-<span class="ln" id="L531">    }</span>
-<span class="ln" id="L532"></span>
-<span class="ln" id="L533">    <span class="tok-com">/// The consent store itself, when this machine has one.</span></span>
-<span class="ln" id="L534">    <span class="tok-com">///</span></span>
-<span class="ln" id="L535">    <span class="tok-com">/// Asserts the *shape* of what comes back, never which applications are in</span></span>
-<span class="ln" id="L536">    <span class="tok-com">/// it. Both of those are facts about the machine rather than about the</span></span>
-<span class="ln" id="L537">    <span class="tok-com">/// code, and both have now failed CI for that reason: first the store was</span></span>
-<span class="ln" id="L538">    <span class="tok-com">/// empty on a runner where nothing had ever asked for a microphone, and</span></span>
-<span class="ln" id="L539">    <span class="tok-com">/// then, after that was allowed for, a runner had entries but no</span></span>
-<span class="ln" id="L540">    <span class="tok-com">/// `NonPackaged` subkey, which only appears once a *desktop* application</span></span>
-<span class="ln" id="L541">    <span class="tok-com">/// has asked. A test that fails depending on what software a machine has</span></span>
-<span class="ln" id="L542">    <span class="tok-com">/// happened to run is not testing this crate.</span></span>
-<span class="ln" id="L543">    <span class="tok-com">///</span></span>
-<span class="ln" id="L544">    <span class="tok-com">/// What is worth asserting is that every entry is a real subkey path under</span></span>
-<span class="ln" id="L545">    <span class="tok-com">/// the full hive name, because that is what the parser is for. Whether the</span></span>
-<span class="ln" id="L546">    <span class="tok-com">/// parser works at all is covered without any of this ambiguity by</span></span>
-<span class="ln" id="L547">    <span class="tok-com">/// `the_registry_parser_reads_a_key_that_always_exists`.</span></span>
-<span class="ln" id="L548">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L549">    <span class="tok-kw">fn</span> <span class="tok-fn">the_consent_store_is_well_formed_when_this_machine_has_one</span>() {</span>
-<span class="ln" id="L550">        <span class="tok-kw">let</span> key = format!(<span class="tok-str">r&quot;{CONSENT_STORE}\microphone&quot;</span>);</span>
-<span class="ln" id="L551">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dump) = <span class="tok-fn">query_tree</span>(&amp;key) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L552">            eprintln!(</span>
-<span class="ln" id="L553">                <span class="tok-str">&quot;no microphone consent store on this machine - nothing has ever requested \</span></span>
-<span class="ln" id="L554"><span class="tok-str">                 the microphone here, which is a fact about the machine. The parser is \</span></span>
-<span class="ln" id="L555"><span class="tok-str">                 covered by the tests over the captured dump above.&quot;</span></span>
-<span class="ln" id="L556">            );</span>
-<span class="ln" id="L557">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L558">        };</span>
-<span class="ln" id="L559">        <span class="tok-kw">for</span> (entry, _, _) <span class="tok-kw">in</span> <span class="tok-fn">parse_consent_dump</span>(&amp;dump) {</span>
-<span class="ln" id="L560">            assert!(</span>
-<span class="ln" id="L561">                entry.<span class="tok-fn">starts_with</span>(&amp;key),</span>
-<span class="ln" id="L562">                <span class="tok-str">&quot;an entry is not under the store it came from: {entry}&quot;</span></span>
-<span class="ln" id="L563">            );</span>
-<span class="ln" id="L564">            assert!(</span>
-<span class="ln" id="L565">                !entry.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;REG_&quot;</span>),</span>
-<span class="ln" id="L566">                <span class="tok-str">&quot;a value line leaked through: {entry}&quot;</span></span>
-<span class="ln" id="L567">            );</span>
-<span class="ln" id="L568">            assert!(!entry.<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;\\&#x27;</span>), <span class="tok-str">&quot;trailing separator on {entry}&quot;</span>);</span>
-<span class="ln" id="L569">        }</span>
-<span class="ln" id="L570">    }</span>
-<span class="ln" id="L571"></span>
-<span class="ln" id="L572">    <span class="tok-com">/// The whole reason this was rewritten: one spawn per capability, not one</span></span>
-<span class="ln" id="L573">    <span class="tok-com">/// per application. A scan must not take long enough to be noticed.</span></span>
-<span class="ln" id="L574">    <span class="tok-com">///</span></span>
-<span class="ln" id="L575">    <span class="tok-com">/// Measured as a minimum over several runs, because a single sample on a</span></span>
-<span class="ln" id="L576">    <span class="tok-com">/// machine that happened to be busy says nothing.</span></span>
-<span class="ln" id="L577">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L578">    <span class="tok-kw">fn</span> <span class="tok-fn">a_scan_is_fast_enough_to_run_on_a_timer</span>() {</span>
-<span class="ln" id="L579">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> best = std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">3600</span>);</span>
-<span class="ln" id="L580">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">5</span> {</span>
-<span class="ln" id="L581">            <span class="tok-kw">let</span> started = std::time::Instant::<span class="tok-fn">now</span>();</span>
-<span class="ln" id="L582">            <span class="tok-kw">let</span> _ = <span class="tok-fn">scan</span>();</span>
-<span class="ln" id="L583">            best = best.<span class="tok-fn">min</span>(started.<span class="tok-fn">elapsed</span>());</span>
-<span class="ln" id="L584">        }</span>
-<span class="ln" id="L585">        assert!(</span>
-<span class="ln" id="L586">            best &lt; std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">500</span>),</span>
-<span class="ln" id="L587">            <span class="tok-str">&quot;a scan takes {best:?}, which is what made the window freeze&quot;</span></span>
-<span class="ln" id="L588">        );</span>
-<span class="ln" id="L589">        eprintln!(<span class="tok-str">&quot;fastest scan of this machine: {best:?}&quot;</span>);</span>
-<span class="ln" id="L590">    }</span>
-<span class="ln" id="L591"></span>
-<span class="ln" id="L592">    <span class="tok-com">/// Reading the real consent store must work on any Windows machine, and</span></span>
-<span class="ln" id="L593">    <span class="tok-com">/// must not report an application that has already released the device.</span></span>
-<span class="ln" id="L594">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L595">    <span class="tok-kw">fn</span> <span class="tok-fn">scanning_the_real_consent_store_is_well_formed</span>() {</span>
-<span class="ln" id="L596">        <span class="tok-kw">let</span> entries = <span class="tok-fn">scan</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;scan should not fail on Windows&quot;</span>);</span>
-<span class="ln" id="L597">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> &amp;entries {</span>
-<span class="ln" id="L598">            assert!(!entry.app.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L599">            assert!(entry.path.<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L600">            assert!(</span>
-<span class="ln" id="L601">                matches!(entry.kind, DeviceKind::Microphone | DeviceKind::Camera),</span>
-<span class="ln" id="L602">                <span class="tok-str">&quot;unexpected device kind&quot;</span></span>
-<span class="ln" id="L603">            );</span>
-<span class="ln" id="L604">        }</span>
-<span class="ln" id="L605">    }</span>
-<span class="ln" id="L606">}</span>
+<span class="ln" id="L468">    <span class="tok-com">/// The rule the whole feature turns on: started and not yet stopped.</span></span>
+<span class="ln" id="L469">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L470">    <span class="tok-kw">fn</span> <span class="tok-fn">a_started_and_unstopped_entry_is_the_one_in_use</span>() {</span>
+<span class="ln" id="L471">        <span class="tok-kw">let</span> found = <span class="tok-fn">parse_consent_dump</span>(DUMP);</span>
+<span class="ln" id="L472">        <span class="tok-kw">let</span> zoom = found</span>
+<span class="ln" id="L473">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L474">            .<span class="tok-fn">find</span>(|(key, _, _)| key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;Zoom.exe&quot;</span>))</span>
+<span class="ln" id="L475">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L476">        assert_eq!(zoom.<span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-str">&quot;Zoom is still holding the microphone&quot;</span>);</span>
+<span class="ln" id="L477">        <span class="tok-kw">let</span> camera = found</span>
+<span class="ln" id="L478">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L479">            .<span class="tok-fn">find</span>(|(key, _, _)| key.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;WindowsCamera&quot;</span>))</span>
+<span class="ln" id="L480">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L481">        assert_ne!(camera.<span class="tok-num">2</span>, <span class="tok-num">0</span>, <span class="tok-str">&quot;the camera app released it&quot;</span>);</span>
+<span class="ln" id="L482">    }</span>
+<span class="ln" id="L483"></span>
+<span class="ln" id="L484">    <span class="tok-com">/// Windows clears the stop value on acquisition, so a missing stop line</span></span>
+<span class="ln" id="L485">    <span class="tok-com">/// and a zero mean the same thing -- and the reading that errs toward</span></span>
+<span class="ln" id="L486">    <span class="tok-com">/// telling somebody a microphone is live is the right one.</span></span>
+<span class="ln" id="L487">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L488">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_stop_time_reads_as_still_running</span>() {</span>
+<span class="ln" id="L489">        <span class="tok-kw">let</span> found = <span class="tok-fn">parse_consent_dump</span>(DUMP);</span>
+<span class="ln" id="L490">        <span class="tok-kw">let</span> shell = found</span>
+<span class="ln" id="L491">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L492">            .<span class="tok-fn">find</span>(|(key, _, _)| key.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;powershell.exe&quot;</span>))</span>
+<span class="ln" id="L493">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;an entry with no stop line must still be found&quot;</span>);</span>
+<span class="ln" id="L494">        assert_eq!(shell.<span class="tok-num">2</span>, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L495">    }</span>
+<span class="ln" id="L496"></span>
+<span class="ln" id="L497">    <span class="tok-com">/// A value whose name merely starts with the one being looked for must not</span></span>
+<span class="ln" id="L498">    <span class="tok-com">/// be mistaken for it.</span></span>
+<span class="ln" id="L499">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L500">    <span class="tok-kw">fn</span> <span class="tok-fn">a_similarly_named_value_is_not_confused_for_the_real_one</span>() {</span>
+<span class="ln" id="L501">        <span class="tok-kw">let</span> dump = <span class="tok-str">&quot;HKEY_CURRENT_USER\\x\\App\n                        LastUsedTimeStartedElsewhere    REG_QWORD    0x99\n&quot;</span>;</span>
+<span class="ln" id="L502">        assert!(<span class="tok-fn">parse_consent_dump</span>(dump).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L503">    }</span>
+<span class="ln" id="L504"></span>
+<span class="ln" id="L505">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L506">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_and_rubbish_produce_nothing_rather_than_panicking</span>() {</span>
+<span class="ln" id="L507">        assert!(<span class="tok-fn">parse_consent_dump</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L508">        assert!(<span class="tok-fn">parse_consent_dump</span>(<span class="tok-str">&quot;\n\n   \n&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L509">        assert!(<span class="tok-fn">parse_consent_dump</span>(<span class="tok-str">&quot;not a registry dump at all&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L510">        <span class="tok-com">// A value line with no key above it must not be attributed to anything.</span></span>
+<span class="ln" id="L511">        assert!(<span class="tok-fn">parse_consent_dump</span>(<span class="tok-str">&quot;    LastUsedTimeStart    REG_QWORD    0x1&quot;</span>).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L512">    }</span>
+<span class="ln" id="L513"></span>
+<span class="ln" id="L514">    <span class="tok-com">/// A malformed number must drop that value rather than the whole entry</span></span>
+<span class="ln" id="L515">    <span class="tok-com">/// silently becoming something else.</span></span>
+<span class="ln" id="L516">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L517">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unparseable_timestamp_is_dropped</span>() {</span>
+<span class="ln" id="L518">        <span class="tok-kw">let</span> dump = <span class="tok-str">&quot;HKEY_CURRENT_USER\\x\\App\n                        LastUsedTimeStart    REG_QWORD    notanumber\n&quot;</span>;</span>
+<span class="ln" id="L519">        assert!(<span class="tok-fn">parse_consent_dump</span>(dump).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L520">    }</span>
+<span class="ln" id="L521"></span>
+<span class="ln" id="L522">    <span class="tok-com">/// Regression, and the important one. `reg query` echoes subkey paths back</span></span>
+<span class="ln" id="L523">    <span class="tok-com">/// under the **full** hive name, so asking with the `HKCU` abbreviation</span></span>
+<span class="ln" id="L524">    <span class="tok-com">/// matched nothing and the monitor reported an empty machine no matter what</span></span>
+<span class="ln" id="L525">    <span class="tok-com">/// was recording, which is the worst possible failure for this feature, because it</span></span>
+<span class="ln" id="L526">    <span class="tok-com">/// looks like good news.</span></span>
+<span class="ln" id="L527">    <span class="tok-com">///</span></span>
+<span class="ln" id="L528">    <span class="tok-com">/// Asked against a key every Windows installation has, rather than against</span></span>
+<span class="ln" id="L529">    <span class="tok-com">/// the consent store. The consent store is populated by *applications</span></span>
+<span class="ln" id="L530">    <span class="tok-com">/// having asked for the microphone*, and a headless CI runner with no audio</span></span>
+<span class="ln" id="L531">    <span class="tok-com">/// hardware has legitimately never had one ask, so an empty result there</span></span>
+<span class="ln" id="L532">    <span class="tok-com">/// means &quot;nothing has used the microphone on this machine&quot;, which is not the</span></span>
+<span class="ln" id="L533">    <span class="tok-com">/// same claim at all. Conflating the two made CI fail on a machine where the</span></span>
+<span class="ln" id="L534">    <span class="tok-com">/// code was working perfectly, which is its own kind of silently wrong.</span></span>
+<span class="ln" id="L535">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L536">    <span class="tok-kw">fn</span> <span class="tok-fn">the_registry_tool_answers_for_a_key_that_always_exists</span>() {</span>
+<span class="ln" id="L537">        <span class="tok-com">// Deliberately shallow: `/s` on HKLM\SOFTWARE\Microsoft would walk an</span></span>
+<span class="ln" id="L538">        <span class="tok-com">// enormous tree, and what is being checked is that the tool runs and</span></span>
+<span class="ln" id="L539">        <span class="tok-com">// echoes paths under the full hive name -- not how big that tree is.</span></span>
+<span class="ln" id="L540">        <span class="tok-kw">let</span> dump = <span class="tok-fn">query_tree</span>(<span class="tok-str">r&quot;HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT&quot;</span>)</span>
+<span class="ln" id="L541">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;reg.exe should answer for a key every Windows install has&quot;</span>);</span>
+<span class="ln" id="L542">        assert!(</span>
+<span class="ln" id="L543">            dump.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;HKEY_LOCAL_MACHINE\\&quot;</span>),</span>
+<span class="ln" id="L544">            <span class="tok-str">&quot;`reg query` parsing is broken, and the monitor would report an empty \</span></span>
+<span class="ln" id="L545"><span class="tok-str">             machine whatever was recording&quot;</span></span>
+<span class="ln" id="L546">        );</span>
+<span class="ln" id="L547">    }</span>
+<span class="ln" id="L548"></span>
+<span class="ln" id="L549">    <span class="tok-com">/// The consent store itself, when this machine has one.</span></span>
+<span class="ln" id="L550">    <span class="tok-com">///</span></span>
+<span class="ln" id="L551">    <span class="tok-com">/// Asserts the *shape* of what comes back, never which applications are in</span></span>
+<span class="ln" id="L552">    <span class="tok-com">/// it. Both of those are facts about the machine rather than about the</span></span>
+<span class="ln" id="L553">    <span class="tok-com">/// code, and both have now failed CI for that reason: first the store was</span></span>
+<span class="ln" id="L554">    <span class="tok-com">/// empty on a runner where nothing had ever asked for a microphone, and</span></span>
+<span class="ln" id="L555">    <span class="tok-com">/// then, after that was allowed for, a runner had entries but no</span></span>
+<span class="ln" id="L556">    <span class="tok-com">/// `NonPackaged` subkey, which only appears once a *desktop* application</span></span>
+<span class="ln" id="L557">    <span class="tok-com">/// has asked. A test that fails depending on what software a machine has</span></span>
+<span class="ln" id="L558">    <span class="tok-com">/// happened to run is not testing this crate.</span></span>
+<span class="ln" id="L559">    <span class="tok-com">///</span></span>
+<span class="ln" id="L560">    <span class="tok-com">/// What is worth asserting is that every entry is a real subkey path under</span></span>
+<span class="ln" id="L561">    <span class="tok-com">/// the full hive name, because that is what the parser is for. Whether the</span></span>
+<span class="ln" id="L562">    <span class="tok-com">/// parser works at all is covered without any of this ambiguity by</span></span>
+<span class="ln" id="L563">    <span class="tok-com">/// `the_registry_parser_reads_a_key_that_always_exists`.</span></span>
+<span class="ln" id="L564">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L565">    <span class="tok-kw">fn</span> <span class="tok-fn">the_consent_store_is_well_formed_when_this_machine_has_one</span>() {</span>
+<span class="ln" id="L566">        <span class="tok-kw">let</span> key = format!(<span class="tok-str">r&quot;{CONSENT_STORE}\microphone&quot;</span>);</span>
+<span class="ln" id="L567">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dump) = <span class="tok-fn">query_tree</span>(&amp;key) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L568">            eprintln!(</span>
+<span class="ln" id="L569">                <span class="tok-str">&quot;no microphone consent store on this machine - nothing has ever requested \</span></span>
+<span class="ln" id="L570"><span class="tok-str">                 the microphone here, which is a fact about the machine. The parser is \</span></span>
+<span class="ln" id="L571"><span class="tok-str">                 covered by the tests over the captured dump above.&quot;</span></span>
+<span class="ln" id="L572">            );</span>
+<span class="ln" id="L573">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L574">        };</span>
+<span class="ln" id="L575">        <span class="tok-kw">for</span> (entry, _, _) <span class="tok-kw">in</span> <span class="tok-fn">parse_consent_dump</span>(&amp;dump) {</span>
+<span class="ln" id="L576">            assert!(</span>
+<span class="ln" id="L577">                entry.<span class="tok-fn">starts_with</span>(&amp;key),</span>
+<span class="ln" id="L578">                <span class="tok-str">&quot;an entry is not under the store it came from: {entry}&quot;</span></span>
+<span class="ln" id="L579">            );</span>
+<span class="ln" id="L580">            assert!(</span>
+<span class="ln" id="L581">                !entry.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;REG_&quot;</span>),</span>
+<span class="ln" id="L582">                <span class="tok-str">&quot;a value line leaked through: {entry}&quot;</span></span>
+<span class="ln" id="L583">            );</span>
+<span class="ln" id="L584">            assert!(!entry.<span class="tok-fn">ends_with</span>(<span class="tok-str">&#x27;\\&#x27;</span>), <span class="tok-str">&quot;trailing separator on {entry}&quot;</span>);</span>
+<span class="ln" id="L585">        }</span>
+<span class="ln" id="L586">    }</span>
+<span class="ln" id="L587"></span>
+<span class="ln" id="L588">    <span class="tok-com">/// The whole reason this was rewritten: one spawn per capability, not one</span></span>
+<span class="ln" id="L589">    <span class="tok-com">/// per application. A scan must not take long enough to be noticed.</span></span>
+<span class="ln" id="L590">    <span class="tok-com">///</span></span>
+<span class="ln" id="L591">    <span class="tok-com">/// Measured as a minimum over several runs, because a single sample on a</span></span>
+<span class="ln" id="L592">    <span class="tok-com">/// machine that happened to be busy says nothing.</span></span>
+<span class="ln" id="L593">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L594">    <span class="tok-kw">fn</span> <span class="tok-fn">a_scan_is_fast_enough_to_run_on_a_timer</span>() {</span>
+<span class="ln" id="L595">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> best = std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">3600</span>);</span>
+<span class="ln" id="L596">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">5</span> {</span>
+<span class="ln" id="L597">            <span class="tok-kw">let</span> started = std::time::Instant::<span class="tok-fn">now</span>();</span>
+<span class="ln" id="L598">            <span class="tok-kw">let</span> _ = <span class="tok-fn">scan</span>();</span>
+<span class="ln" id="L599">            best = best.<span class="tok-fn">min</span>(started.<span class="tok-fn">elapsed</span>());</span>
+<span class="ln" id="L600">        }</span>
+<span class="ln" id="L601">        assert!(</span>
+<span class="ln" id="L602">            best &lt; std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">500</span>),</span>
+<span class="ln" id="L603">            <span class="tok-str">&quot;a scan takes {best:?}, which is what made the window freeze&quot;</span></span>
+<span class="ln" id="L604">        );</span>
+<span class="ln" id="L605">        eprintln!(<span class="tok-str">&quot;fastest scan of this machine: {best:?}&quot;</span>);</span>
+<span class="ln" id="L606">    }</span>
+<span class="ln" id="L607"></span>
+<span class="ln" id="L608">    <span class="tok-com">/// Reading the real consent store must work on any Windows machine, and</span></span>
+<span class="ln" id="L609">    <span class="tok-com">/// must not report an application that has already released the device.</span></span>
+<span class="ln" id="L610">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L611">    <span class="tok-kw">fn</span> <span class="tok-fn">scanning_the_real_consent_store_is_well_formed</span>() {</span>
+<span class="ln" id="L612">        <span class="tok-kw">let</span> entries = <span class="tok-fn">scan</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;scan should not fail on Windows&quot;</span>);</span>
+<span class="ln" id="L613">        <span class="tok-kw">for</span> entry <span class="tok-kw">in</span> &amp;entries {</span>
+<span class="ln" id="L614">            assert!(!entry.app.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L615">            assert!(entry.path.<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L616">            assert!(</span>
+<span class="ln" id="L617">                matches!(entry.kind, DeviceKind::Microphone | DeviceKind::Camera),</span>
+<span class="ln" id="L618">                <span class="tok-str">&quot;unexpected device kind&quot;</span></span>
+<span class="ln" id="L619">            );</span>
+<span class="ln" id="L620">        }</span>
+<span class="ln" id="L621">    }</span>
+<span class="ln" id="L622">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

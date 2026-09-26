@@ -48,7 +48,16 @@ pub const FORMAT_VERSION: u8 = 1;
 /// Fixed header length in bytes, before any encapsulation.
 pub const HEADER_LEN: usize = 68;
 
+// The byte in the header that says how the key was arrived at. Written out
+// rather than taken from the enum's discriminant, because the enum is this
+// crate's own shape and may be reordered, while these two numbers are part of
+// a file format that other copies of VeilVoice have to read. There is no zero:
+// a header of zeroed bytes is then not a valid container rather than a
+// password-locked one.
+
+/// Locked with a passphrase, through Argon2id.
 const MODE_PASSWORD: u8 = 1;
+/// Locked with a public key, X25519 and ML-KEM-768 together.
 const MODE_HYBRID: u8 = 2;
 
 /// How a container is locked.

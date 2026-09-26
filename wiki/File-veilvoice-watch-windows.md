@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-watch/src/windows.rs`
 
-[[veilvoice-watch|Crate-veilvoice-watch]] &middot; 606 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs)
+[[veilvoice-watch|Crate-veilvoice-watch]] &middot; 622 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs)
 
 ## Contents
 
@@ -81,11 +81,11 @@ rather than papered over.
 
 ## What this file contains
 
-606 lines defining **10 functions** (1 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+622 lines defining **10 functions** (1 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `scan` (line 136)
+- `scan` (line 145) -- Every application Windows records as having used the microphone or camera, and which of them is using one now.
   - reaches: `collect`, `decode_path`, `filetime_to_system`, `friendly_name`, `parse_consent_dump`, `query_tree`, `hex_value`, `no_window`, `reg_exe`
 
 ## What calls what
@@ -104,14 +104,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 flowchart TD
     n_no_window["no_window<br/>line 88"]
     n_reg_exe["reg_exe<br/>line 120"]
-    n_scan(["scan<br/>line 136"])
-    n_collect["collect<br/>line 149"]
-    n_query_tree["query_tree<br/>line 177"]
-    n_parse_consent_dump["parse_consent_dump<br/>line 211"]
-    n_hex_value["hex_value<br/>line 266"]
-    n_decode_path["decode_path<br/>line 277"]
-    n_friendly_name["friendly_name<br/>line 282"]
-    n_filetime_to_system["filetime_to_system<br/>line 292"]
+    n_scan(["scan<br/>line 145"])
+    n_collect["collect<br/>line 158"]
+    n_query_tree["query_tree<br/>line 186"]
+    n_parse_consent_dump["parse_consent_dump<br/>line 220"]
+    n_hex_value["hex_value<br/>line 275"]
+    n_decode_path["decode_path<br/>line 286"]
+    n_friendly_name["friendly_name<br/>line 291"]
+    n_filetime_to_system["filetime_to_system<br/>line 308"]
     n_collect --> n_decode_path
     n_collect --> n_filetime_to_system
     n_collect --> n_friendly_name
@@ -123,14 +123,14 @@ flowchart TD
     n_scan --> n_collect
     click n_no_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L88" "open the source"
     click n_reg_exe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L120" "open the source"
-    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L136" "open the source"
-    click n_collect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L149" "open the source"
-    click n_query_tree href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L177" "open the source"
-    click n_parse_consent_dump href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L211" "open the source"
-    click n_hex_value href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L266" "open the source"
-    click n_decode_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L277" "open the source"
-    click n_friendly_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L282" "open the source"
-    click n_filetime_to_system href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L292" "open the source"
+    click n_scan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L145" "open the source"
+    click n_collect href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L158" "open the source"
+    click n_query_tree href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L186" "open the source"
+    click n_parse_consent_dump href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L220" "open the source"
+    click n_hex_value href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L275" "open the source"
+    click n_decode_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L286" "open the source"
+    click n_friendly_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L291" "open the source"
+    click n_filetime_to_system href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L308" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -147,11 +147,11 @@ flowchart TD
 | `CONSENT_STORE` <sub>const</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L101) | The full hive name, not the HKCU abbreviation: reg query echoes subkey paths back in long form, and the reply has to be matched against what was asked for. |
 | `FILETIME_TO_UNIX_SECS` <sub>const</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L105) | FILETIME counts 100-nanosecond intervals from 1601-01-01; Unix time starts at 1970-01-01. |
 | `reg_exe` <sub>fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L120) | The absolute path of reg.exe, or None if it is not where it should be. |
-| `scan` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L136) |  |
-| `collect` <sub>fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L149) | Walk one capability's whole subtree, from a single reg query /s. |
-| `query_tree` <sub>fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L177) | One reg query <key> /s, printing the whole subtree. |
-| `parse_consent_dump` <sub>pub(crate) fn</sub> | [211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L211) | Pull (key, LastUsedTimeStart, LastUsedTimeStop) out of a /s dump. |
-| `hex_value` <sub>fn</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L266) | Name    REG_QWORD    0x... |
-| `decode_path` <sub>fn</sub> | [277](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L277) | Registry keys encode a path with # where a separator belongs. |
-| `friendly_name` <sub>fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L282) | The executable name, or the package family name for a Store app. |
-| `filetime_to_system` <sub>fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L292) |  |
+| `scan` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L145) | Every application Windows records as having used the microphone or camera, and which of them is using one now. |
+| `collect` <sub>fn</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L158) | Walk one capability's whole subtree, from a single reg query /s. |
+| `query_tree` <sub>fn</sub> | [186](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L186) | One reg query <key> /s, printing the whole subtree. |
+| `parse_consent_dump` <sub>pub(crate) fn</sub> | [220](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L220) | Pull (key, LastUsedTimeStart, LastUsedTimeStop) out of a /s dump. |
+| `hex_value` <sub>fn</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L275) | Name    REG_QWORD    0x... |
+| `decode_path` <sub>fn</sub> | [286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L286) | Registry keys encode a path with # where a separator belongs. |
+| `friendly_name` <sub>fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L291) | The executable name, or the package family name for a Store app. |
+| `filetime_to_system` <sub>fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs#L308) | A Windows FILETIME as an ordinary SystemTime. |

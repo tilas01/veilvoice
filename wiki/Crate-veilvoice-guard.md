@@ -95,8 +95,8 @@ change the list too. What it catches is a change nobody was hiding.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>165 lines"])
-    n_blame["blame.rs<br/>421 lines"]
-    n_manifest["manifest.rs<br/>730 lines"]
+    n_blame["blame.rs<br/>433 lines"]
+    n_manifest["manifest.rs<br/>738 lines"]
     n_record["record.rs<br/>94 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" "open the source"
     click n_blame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" "open the source"
@@ -110,9 +110,9 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`blame.rs`|File-veilvoice-guard-blame]] | 421 | Best-effort attribution: which program changed a file. |
+| [[`blame.rs`|File-veilvoice-guard-blame]] | 433 | Best-effort attribution: which program changed a file. |
 | [[`lib.rs`|File-veilvoice-guard-lib]] | 165 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
-| [[`manifest.rs`|File-veilvoice-guard-manifest]] | 730 | The integrity manifest: what the files were, and what they are now. |
+| [[`manifest.rs`|File-veilvoice-guard-manifest]] | 738 | The integrity manifest: what the files were, and what they are now. |
 | [[`record.rs`|File-veilvoice-guard-record]] | 94 | Where the integrity record is kept. |
 
 **2,947 functional lines of Rust** in this crate. A functional line is a line

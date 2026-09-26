@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-guard/src/blame.rs`
 
-[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 421 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs)
+[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 433 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs)
 
 ## Contents
 
@@ -53,7 +53,7 @@ naming none, because somebody acts on it.
 
 ## What this file contains
 
-421 lines defining **6 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+433 lines defining **6 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -112,5 +112,5 @@ flowchart TD
 | `Blame::is_known` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L134) | Whether an actual name was found. |
 | `unconfigured` <sub>fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L140) | Build the "nobody configured auditing" answer for this platform. |
 | `who_touched` <sub>pub fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L159) | Try to name the program that last wrote to path. |
-| `linux` <sub>mod</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L176) |  |
-| `windows` <sub>mod</sub> | [254](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L254) |  |
+| `linux` <sub>mod</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L182) | Who changed a file, as far as Linux can be made to say. |
+| `windows` <sub>mod</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs#L266) | The same question on Windows, asked of the installer database instead. |

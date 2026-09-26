@@ -133,6 +133,15 @@ fn reg_exe() -> Option<std::path::PathBuf> {
     None
 }
 
+/// Every application Windows records as having used the microphone or camera,
+/// and which of them is using one now.
+///
+/// Read out of the consent store in the registry, which is where Windows keeps
+/// what it shows in its own privacy settings. That makes this a record of what
+/// was permitted and last used rather than a list of open handles, which is a
+/// weaker claim than the Linux half makes and is the strongest available
+/// without a driver: an application that has stopped is told apart from one
+/// that has not by whether its stop time is later than its start time.
 pub fn scan() -> Result<Vec<DeviceUse>, Error> {
     let mut found = Vec::new();
     // "webcam" is what the registry calls it, even though the UI says camera.
@@ -289,6 +298,13 @@ fn friendly_name(path: &str) -> String {
     }
 }
 
+/// A Windows FILETIME as an ordinary [`SystemTime`].
+///
+/// FILETIME counts hundred-nanosecond intervals from the first of January 1601,
+/// so it is both a different unit and a different epoch from everything else
+/// here. Every step is checked rather than wrapped: the registry is not a
+/// trusted input, and a value that cannot be a time answers `None` instead of
+/// producing one.
 fn filetime_to_system(filetime: u64) -> Option<SystemTime> {
     let secs = filetime.checked_div(10_000_000)?;
     let unix = secs.checked_sub(FILETIME_TO_UNIX_SECS)?;

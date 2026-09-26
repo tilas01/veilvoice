@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-guard/blame.svg" alt="blame.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-guard/src/blame.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-guard.html">veilvoice-guard</a> &middot; 421 lines &middot; <a href="blame.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-guard.html">veilvoice-guard</a> &middot; 433 lines &middot; <a href="blame.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#read-this-before-relying-on-it">Read this before relying on it</a>
@@ -92,7 +92,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>421 lines defining <strong>6 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>433 lines defining <strong>6 functions</strong> (3 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Blame</code> <span style="color:var(--muted)">line 102</span> &middot; What, if anything, is known about who changed a file.</li>
 </ul>
@@ -195,8 +195,8 @@ flowchart TD
 <tr><td><code>Blame::is_known</code> <sub>pub fn</sub></td><td><a href="blame.src.html#fn-blame-is_known">134</a></td><td>Whether an actual name was found.</td></tr>
 <tr><td><code>unconfigured</code> <sub>fn</sub></td><td><a href="blame.src.html#fn-unconfigured">140</a></td><td>Build the &quot;nobody configured auditing&quot; answer for this platform.</td></tr>
 <tr><td><code>who_touched</code> <sub>pub fn</sub></td><td><a href="blame.src.html#fn-who_touched">159</a></td><td>Try to name the program that last wrote to path.</td></tr>
-<tr><td><code>linux</code> <sub>mod</sub></td><td><a href="blame.src.html#fn-linux">176</a></td><td></td></tr>
-<tr><td><code>windows</code> <sub>mod</sub></td><td><a href="blame.src.html#fn-windows">254</a></td><td></td></tr>
+<tr><td><code>linux</code> <sub>mod</sub></td><td><a href="blame.src.html#fn-linux">182</a></td><td>Who changed a file, as far as Linux can be made to say.</td></tr>
+<tr><td><code>windows</code> <sub>mod</sub></td><td><a href="blame.src.html#fn-windows">266</a></td><td>The same question on Windows, asked of the installer database instead.</td></tr>
 </tbody></table>
 </section>
 </div></div>

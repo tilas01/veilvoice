@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/decoy.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 464 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 471 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs)
 
 ## Contents
 
@@ -96,23 +96,23 @@ that claimed to would be lying to you at the worst possible moment.
 
 ## What this file contains
 
-464 lines defining **9 functions** (4 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+471 lines defining **9 functions** (4 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Opened` (line 76) -- Which passphrase was given.
 - `struct Pair` (line 90) -- A pair of passphrase verifiers, checked together.
 - `struct Verifier` (line 98) -- One passphrase's stored form.
-- `enum Refused` (line 141) -- Why a pair was refused.
+- `enum Refused` (line 148) -- Why a pair was refused.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Pair::only_real` (line 198) -- A real passphrase with no decoy.
+- `Pair::only_real` (line 205) -- A real passphrase with no decoy.
   - reaches: `create`
-- `Pair::with_decoy` (line 214) -- A real passphrase and a decoy.
+- `Pair::with_decoy` (line 221) -- A real passphrase and a decoy.
   - reaches: `create`, `differences`
-- `Pair::has_decoy` (line 240) -- Whether a decoy is set at all.
-- `Pair::open` (line 251) -- Which passphrase this is.
+- `Pair::has_decoy` (line 247) -- Whether a decoy is set at all.
+- `Pair::open` (line 258) -- Which passphrase this is.
 
 ## What calls what
 
@@ -134,28 +134,28 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_create["Verifier::create<br/>line 104"]
-    n_matches["Verifier::matches<br/>line 114"]
-    n_constant_time_eq["constant_time_eq<br/>line 121"]
-    n_fmt["Refused::fmt<br/>line 158"]
-    n_differences["differences<br/>line 184"]
-    n_only_real(["Pair::only_real<br/>line 198"])
-    n_with_decoy(["Pair::with_decoy<br/>line 214"])
-    n_has_decoy(["Pair::has_decoy<br/>line 240"])
-    n_open(["Pair::open<br/>line 251"])
+    n_create["Verifier::create<br/>line 111"]
+    n_matches["Verifier::matches<br/>line 121"]
+    n_constant_time_eq["constant_time_eq<br/>line 128"]
+    n_fmt["Refused::fmt<br/>line 165"]
+    n_differences["differences<br/>line 191"]
+    n_only_real(["Pair::only_real<br/>line 205"])
+    n_with_decoy(["Pair::with_decoy<br/>line 221"])
+    n_has_decoy(["Pair::has_decoy<br/>line 247"])
+    n_open(["Pair::open<br/>line 258"])
     n_matches --> n_constant_time_eq
     n_only_real --> n_create
     n_with_decoy --> n_create
     n_with_decoy --> n_differences
-    click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L104" "open the source"
-    click n_matches href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L114" "open the source"
-    click n_constant_time_eq href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L121" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L158" "open the source"
-    click n_differences href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L184" "open the source"
-    click n_only_real href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L198" "open the source"
-    click n_with_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L214" "open the source"
-    click n_has_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L240" "open the source"
-    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L251" "open the source"
+    click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L111" "open the source"
+    click n_matches href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L121" "open the source"
+    click n_constant_time_eq href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L128" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L165" "open the source"
+    click n_differences href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L191" "open the source"
+    click n_only_real href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L205" "open the source"
+    click n_with_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L221" "open the source"
+    click n_has_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L247" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L258" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_only_real,n_with_decoy,n_has_decoy,n_open entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -171,19 +171,19 @@ flowchart TD
 | `Opened` <sub>pub enum</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L76) | Which passphrase was given. |
 | `Pair` <sub>pub struct</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L90) | A pair of passphrase verifiers, checked together. |
 | `Verifier` <sub>struct</sub> | [98](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L98) | One passphrase's stored form. |
-| `Verifier::create` <sub>fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L104) |  |
-| `Verifier::matches` <sub>fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L114) | Derive and compare. |
-| `constant_time_eq` <sub>fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L121) | Compare without letting the time taken depend on where they differ. |
-| `LEAST_DIFFERENCE` <sub>pub const</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L137) | How similar two passphrases may be before the pair is refused. |
-| `Refused` <sub>pub enum</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L141) | Why a pair was refused. |
-| `Refused::fmt` <sub>fn</sub> | [158](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L158) |  |
-| `differences` <sub>fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L184) | How many positions two passphrases differ in. |
-| `Pair::only_real` <sub>pub fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L198) | A real passphrase with no decoy. |
-| `Pair::with_decoy` <sub>pub fn</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L214) | A real passphrase and a decoy. |
-| `Pair::has_decoy` <sub>pub fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L240) | Whether a decoy is set at all. |
-| `Pair::open` <sub>pub fn</sub> | [251](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L251) | Which passphrase this is. |
-| `SCOPE` <sub>pub const</sub> | [275](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L275) | What a decoy is worth, in the words a front end must show. |
-| `WHY_NO_DESTRUCTION` <sub>pub const</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L288) | Why no passphrase destroys anything, and why that is the honest choice. |
+| `Verifier::create` <sub>fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L111) | Derive from passphrase once and keep what it produced, with the salt that produced it, so a later attempt can be compared against it. |
+| `Verifier::matches` <sub>fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L121) | Derive and compare. |
+| `constant_time_eq` <sub>fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L128) | Compare without letting the time taken depend on where they differ. |
+| `LEAST_DIFFERENCE` <sub>pub const</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L144) | How similar two passphrases may be before the pair is refused. |
+| `Refused` <sub>pub enum</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L148) | Why a pair was refused. |
+| `Refused::fmt` <sub>fn</sub> | [165](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L165) |  |
+| `differences` <sub>fn</sub> | [191](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L191) | How many positions two passphrases differ in. |
+| `Pair::only_real` <sub>pub fn</sub> | [205](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L205) | A real passphrase with no decoy. |
+| `Pair::with_decoy` <sub>pub fn</sub> | [221](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L221) | A real passphrase and a decoy. |
+| `Pair::has_decoy` <sub>pub fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L247) | Whether a decoy is set at all. |
+| `Pair::open` <sub>pub fn</sub> | [258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L258) | Which passphrase this is. |
+| `SCOPE` <sub>pub const</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L282) | What a decoy is worth, in the words a front end must show. |
+| `WHY_NO_DESTRUCTION` <sub>pub const</sub> | [295](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L295) | Why no passphrase destroys anything, and why that is the honest choice. |
 
 ---
 

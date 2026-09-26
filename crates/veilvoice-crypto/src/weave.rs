@@ -747,18 +747,51 @@ fn nibble(c: u8) -> Result<u8, Error> {
     }
 }
 
+// The alphabets, written out rather than computed. Every one of these is fixed
+// by somebody else's specification, so the table is the specification and a
+// clever way of generating it would only be a second thing to be wrong about.
+// The order of the characters is the whole of the definition: two encodings can
+// share all sixty-four characters and disagree about every byte.
+
+/// Hexadecimal, in lower case, which is what this crate writes.
 const HEX: &[u8; 16] = b"0123456789abcdef";
+/// Hexadecimal in upper case, offered for reading rather than for writing.
 const HEX_UPPER: &[u8; 16] = b"0123456789ABCDEF";
+/// RFC 4648 base32: the letters, then the digits two to seven. It leaves out
+/// `0`, `1` and `8` so nothing is confused with `O`, `I` or `B`.
 const B32: &[u8; 32] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+/// RFC 4648's extended hex base32, which sorts in the same order as the bytes
+/// it stands for, because the digits come first.
 const B32HEX: &[u8; 32] = b"0123456789ABCDEFGHIJKLMNOPQRSTUV";
+/// z-base-32, ordered so that the characters people read most reliably carry
+/// the bits that matter most, and in lower case for the same reason.
 const ZB32: &[u8; 32] = b"ybndrfg8ejkmcpqxot1uwisza345h769";
+/// Crockford's base32, which drops `I`, `L`, `O` and `U`: the first three
+/// because they are read as digits, the last so no word is spelled by accident.
 const CROCKFORD: &[u8; 32] = b"0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+/// The base45 alphabet, whose last nine characters are the punctuation a QR
+/// code can carry in its alphanumeric mode, which is what base45 exists for.
 const B45: &[u8; 45] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+/// Which of the two base85 layouts `base85_encode` and `base85_decode` are
+/// working in: Ascii85, whose characters run from `!` upwards.
 const A85: u8 = 0;
+/// The other one: Z85, which uses the alphabet below and no offset. A flag
+/// rather than two functions because the two differ only in their alphabet and
+/// in one rule about a short final chunk.
 const Z85A: u8 = 1;
+/// Which of the two six-bit layouts `sixbit_encode` and `sixbit_decode` are
+/// working in: uuencode, which adds thirty-two to each six-bit group and so
+/// starts at the space character.
 const UU: u8 = 0;
+/// The other one: xxencode, which indexes the alphabet below instead. It exists
+/// because uuencode's output begins at the space, and a space is the one
+/// character a mail system of that era felt free to alter.
 const XX: u8 = 1;
+/// xxencode's alphabet, in the order that makes its output survive a mail
+/// gateway: no space, and the two characters before the digits are `+` and `-`.
 const XX_ALPHABET: &[u8; 64] = b"+-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+/// Z85's alphabet, whose eighty-five characters are chosen to be safe inside a
+/// source-code string literal: no quote, no backslash and no comma.
 const Z85_ALPHABET: &[u8; 85] =
     b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#";
 
@@ -776,6 +809,11 @@ const SBOX: [u8; 256] = {
     table
 };
 
+/// [`SBOX`] read backwards, so decoding is a lookup rather than a search.
+///
+/// Built from `SBOX` rather than written out, which is what makes the pair
+/// inverses by construction: a table typed twice is a table that disagrees with
+/// itself once.
 const UNSBOX: [u8; 256] = {
     let mut table = [0u8; 256];
     let mut i = 0;
@@ -948,6 +986,11 @@ fn base85_decode(input: &[u8], flavour: u8, offset: u8) -> Result<Vec<u8>, Error
     Ok(out)
 }
 
+/// basE91's alphabet: every printable ASCII character except the space, the
+/// apostrophe, the hyphen and the backslash. Those four are left out so the
+/// output can sit inside a single-quoted string, or a shell word, without
+/// anything having to be escaped, which is what makes ninety-one characters
+/// rather than ninety-five the useful number.
 const B91: &[u8; 91] =
     b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~\"";
 

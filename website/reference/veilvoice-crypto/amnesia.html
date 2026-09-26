@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/amnesia.svg" alt="amnesia.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/amnesia.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 468 lines &middot; <a href="amnesia.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 472 lines &middot; <a href="amnesia.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#no-unsafe-even-here">No unsafe, even here</a>
@@ -100,26 +100,26 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>468 lines defining <strong>17 functions</strong> (9 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>472 lines defining <strong>17 functions</strong> (9 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Secret</code> <span style="color:var(--muted)">line 91</span> &middot; A byte buffer holding key material.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Secret::new</code> <span style="color:var(--muted)">line 171</span> &middot; Wrap bytes, taking ownership and wiping the caller&#x27;s copy.
+<li><code>Secret::new</code> <span style="color:var(--muted)">line 175</span> &middot; Wrap bytes, taking ownership and wiping the caller&#x27;s copy.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>zeroed</code>, <code>lock_pages</code>, <code>page_size</code></span>
 </li>
-<li><code>Secret::random</code> <span style="color:var(--muted)">line 213</span> &middot; Fill len bytes from the operating-system CSPRNG.
+<li><code>Secret::random</code> <span style="color:var(--muted)">line 217</span> &middot; Fill len bytes from the operating-system CSPRNG.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>zeroed</code>, <code>lock_pages</code>, <code>page_size</code></span>
 </li>
-<li><code>Secret::is_locked</code> <span style="color:var(--muted)">line 224</span> &middot; Whether the pages were successfully locked out of swap.
+<li><code>Secret::is_locked</code> <span style="color:var(--muted)">line 228</span> &middot; Whether the pages were successfully locked out of swap.
 </li>
-<li><code>Secret::len</code> <span style="color:var(--muted)">line 229</span> &middot; Length in bytes.
+<li><code>Secret::len</code> <span style="color:var(--muted)">line 233</span> &middot; Length in bytes.
 </li>
-<li><code>Secret::is_empty</code> <span style="color:var(--muted)">line 234</span> &middot; Whether the secret is empty.
+<li><code>Secret::is_empty</code> <span style="color:var(--muted)">line 238</span> &middot; Whether the secret is empty.
 </li>
-<li><code>Secret::expose_mut</code> <span style="color:var(--muted)">line 245</span> &middot; Borrow mutably, for filling in place.
+<li><code>Secret::expose_mut</code> <span style="color:var(--muted)">line 249</span> &middot; Borrow mutably, for filling in place.
 </li>
-<li><code>Secret::wipe</code> <span style="color:var(--muted)">line 253</span> &middot; Wipe the contents now, before the value goes out of scope.
+<li><code>Secret::wipe</code> <span style="color:var(--muted)">line 257</span> &middot; Wipe the contents now, before the value goes out of scope.
 </li>
 </ul>
 </section>
@@ -152,82 +152,82 @@
 <a href="amnesia.src.html#fn-page_size-2">
 <rect x="154.5" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="204.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">page_size</text>
-<text x="204.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 117</text>
+<text x="204.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 121</text>
 </a>
 <a href="amnesia.src.html#fn-lock_pages">
 <rect x="281.1" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="335.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lock_pages</text>
-<text x="335.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
+<text x="335.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
 </a>
 <a href="amnesia.src.html#fn-unlock_pages">
 <rect x="415.7" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="478.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unlock_pages</text>
-<text x="478.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 157</text>
+<text x="478.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
 </a>
 <a href="amnesia.src.html#fn-secret-new">
 <rect x="46.9" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="105.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::new</text>
-<text x="105.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 171</text>
+<text x="105.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 175</text>
 </a>
 <a href="amnesia.src.html#fn-secret-zeroed">
 <rect x="213.8" y="520.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="284.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::zeroed</text>
-<text x="284.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 179</text>
+<text x="284.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 183</text>
 </a>
 <a href="amnesia.src.html#fn-secret-random">
 <rect x="189.6" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="260.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::random</text>
-<text x="260.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 213</text>
+<text x="260.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 217</text>
 </a>
 <a href="amnesia.src.html#fn-secret-is_locked">
 <rect x="356.4" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="439.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::is_locked</text>
-<text x="439.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 224</text>
+<text x="439.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
 </a>
 <a href="amnesia.src.html#fn-secret-len">
 <rect x="51.0" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="109.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::len</text>
-<text x="109.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 229</text>
+<text x="109.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 233</text>
 </a>
 <a href="amnesia.src.html#fn-secret-is_empty">
 <rect x="193.6" y="220.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="272.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::is_empty</text>
-<text x="272.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 234</text>
+<text x="272.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 238</text>
 </a>
 <a href="amnesia.src.html#fn-secret-expose">
 <rect x="376.6" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="447.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::expose</text>
-<text x="447.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 240</text>
+<text x="447.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 244</text>
 </a>
 <a href="amnesia.src.html#fn-secret-expose_mut">
 <rect x="46.9" y="320.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="133.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::expose_mut</text>
-<text x="133.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 245</text>
+<text x="133.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 249</text>
 </a>
 <a href="amnesia.src.html#fn-secret-wipe">
 <rect x="246.0" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="308.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::wipe</text>
-<text x="308.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 253</text>
+<text x="308.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
 </a>
 <a href="amnesia.src.html#fn-secret-drop">
 <rect x="396.7" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="459.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::drop</text>
-<text x="459.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 259</text>
+<text x="459.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 263</text>
 </a>
 <a href="amnesia.src.html#fn-secret-clone">
 <rect x="79.2" y="420.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="145.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::clone</text>
-<text x="145.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 270</text>
+<text x="145.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 274</text>
 </a>
 <a href="amnesia.src.html#fn-secret-eq">
 <rect x="238.0" y="420.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="292.3" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::eq</text>
-<text x="292.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 280</text>
+<text x="292.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 284</text>
 </a>
 <a href="amnesia.src.html#fn-secret-fmt">
 <rect x="372.6" y="420.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="430.9" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Secret::fmt</text>
-<text x="430.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
+<text x="430.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 293</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -247,22 +247,22 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_page_size[&quot;page_size&lt;br/&gt;line 112&quot;]
-    n_page_size[&quot;page_size&lt;br/&gt;line 117&quot;]
-    n_lock_pages[&quot;lock_pages&lt;br/&gt;line 143&quot;]
-    n_unlock_pages[&quot;unlock_pages&lt;br/&gt;line 157&quot;]
-    n_new([&quot;Secret::new&lt;br/&gt;line 171&quot;])
-    n_zeroed[&quot;Secret::zeroed&lt;br/&gt;line 179&quot;]
-    n_random([&quot;Secret::random&lt;br/&gt;line 213&quot;])
-    n_is_locked([&quot;Secret::is_locked&lt;br/&gt;line 224&quot;])
-    n_len([&quot;Secret::len&lt;br/&gt;line 229&quot;])
-    n_is_empty([&quot;Secret::is_empty&lt;br/&gt;line 234&quot;])
-    n_expose[&quot;Secret::expose&lt;br/&gt;line 240&quot;]
-    n_expose_mut([&quot;Secret::expose_mut&lt;br/&gt;line 245&quot;])
-    n_wipe([&quot;Secret::wipe&lt;br/&gt;line 253&quot;])
-    n_drop[&quot;Secret::drop&lt;br/&gt;line 259&quot;]
-    n_clone[&quot;Secret::clone&lt;br/&gt;line 270&quot;]
-    n_eq[&quot;Secret::eq&lt;br/&gt;line 280&quot;]
-    n_fmt[&quot;Secret::fmt&lt;br/&gt;line 289&quot;]
+    n_page_size[&quot;page_size&lt;br/&gt;line 121&quot;]
+    n_lock_pages[&quot;lock_pages&lt;br/&gt;line 147&quot;]
+    n_unlock_pages[&quot;unlock_pages&lt;br/&gt;line 161&quot;]
+    n_new([&quot;Secret::new&lt;br/&gt;line 175&quot;])
+    n_zeroed[&quot;Secret::zeroed&lt;br/&gt;line 183&quot;]
+    n_random([&quot;Secret::random&lt;br/&gt;line 217&quot;])
+    n_is_locked([&quot;Secret::is_locked&lt;br/&gt;line 228&quot;])
+    n_len([&quot;Secret::len&lt;br/&gt;line 233&quot;])
+    n_is_empty([&quot;Secret::is_empty&lt;br/&gt;line 238&quot;])
+    n_expose[&quot;Secret::expose&lt;br/&gt;line 244&quot;]
+    n_expose_mut([&quot;Secret::expose_mut&lt;br/&gt;line 249&quot;])
+    n_wipe([&quot;Secret::wipe&lt;br/&gt;line 257&quot;])
+    n_drop[&quot;Secret::drop&lt;br/&gt;line 263&quot;]
+    n_clone[&quot;Secret::clone&lt;br/&gt;line 274&quot;]
+    n_eq[&quot;Secret::eq&lt;br/&gt;line 284&quot;]
+    n_fmt[&quot;Secret::fmt&lt;br/&gt;line 293&quot;]
     n_clone --&gt; n_expose
     n_clone --&gt; n_zeroed
     n_drop --&gt; n_unlock_pages
@@ -272,22 +272,22 @@ flowchart TD
     n_zeroed --&gt; n_lock_pages
     n_zeroed --&gt; n_page_size
     click n_page_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L112&quot; &quot;open the source&quot;
-    click n_page_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L117&quot; &quot;open the source&quot;
-    click n_lock_pages href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L143&quot; &quot;open the source&quot;
-    click n_unlock_pages href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L157&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L171&quot; &quot;open the source&quot;
-    click n_zeroed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L179&quot; &quot;open the source&quot;
-    click n_random href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L213&quot; &quot;open the source&quot;
-    click n_is_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L224&quot; &quot;open the source&quot;
-    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L229&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L234&quot; &quot;open the source&quot;
-    click n_expose href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L240&quot; &quot;open the source&quot;
-    click n_expose_mut href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L245&quot; &quot;open the source&quot;
-    click n_wipe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L253&quot; &quot;open the source&quot;
-    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L259&quot; &quot;open the source&quot;
-    click n_clone href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L270&quot; &quot;open the source&quot;
-    click n_eq href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L280&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L289&quot; &quot;open the source&quot;
+    click n_page_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L121&quot; &quot;open the source&quot;
+    click n_lock_pages href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L147&quot; &quot;open the source&quot;
+    click n_unlock_pages href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L161&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L175&quot; &quot;open the source&quot;
+    click n_zeroed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L183&quot; &quot;open the source&quot;
+    click n_random href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L217&quot; &quot;open the source&quot;
+    click n_is_locked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L228&quot; &quot;open the source&quot;
+    click n_len href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L233&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L238&quot; &quot;open the source&quot;
+    click n_expose href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L244&quot; &quot;open the source&quot;
+    click n_expose_mut href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L249&quot; &quot;open the source&quot;
+    click n_wipe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L257&quot; &quot;open the source&quot;
+    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L263&quot; &quot;open the source&quot;
+    click n_clone href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L274&quot; &quot;open the source&quot;
+    click n_eq href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L284&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/amnesia.rs#L293&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_random,n_is_locked,n_len,n_is_empty,n_expose_mut,n_wipe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -302,22 +302,22 @@ flowchart TD
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Secret</code> <sub>pub struct</sub></td><td><a href="amnesia.src.html#fn-secret">91</a></td><td>A byte buffer holding key material.</td></tr>
 <tr><td><code>page_size</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-page_size">112</a></td><td>The size of a page of memory, for aligning the span a Secret locks.</td></tr>
-<tr><td><code>page_size</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-page_size-2">117</a></td><td></td></tr>
-<tr><td><code>lock_pages</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-lock_pages">143</a></td><td>Lock span bytes at at out of swap, answering whether it happened.</td></tr>
-<tr><td><code>unlock_pages</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-unlock_pages">157</a></td><td>Release a lock taken by lock_pages.</td></tr>
-<tr><td><code>Secret::new</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-new">171</a></td><td>Wrap bytes, taking ownership and wiping the caller&#x27;s copy.</td></tr>
-<tr><td><code>Secret::zeroed</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-zeroed">179</a></td><td>Allocate len zero bytes, ready to be filled in place.</td></tr>
-<tr><td><code>Secret::random</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-random">213</a></td><td>Fill len bytes from the operating-system CSPRNG.</td></tr>
-<tr><td><code>Secret::is_locked</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-is_locked">224</a></td><td>Whether the pages were successfully locked out of swap.</td></tr>
-<tr><td><code>Secret::len</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-len">229</a></td><td>Length in bytes.</td></tr>
-<tr><td><code>Secret::is_empty</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-is_empty">234</a></td><td>Whether the secret is empty.</td></tr>
-<tr><td><code>Secret::expose</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-expose">240</a></td><td>Borrow the raw bytes.</td></tr>
-<tr><td><code>Secret::expose_mut</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-expose_mut">245</a></td><td>Borrow mutably, for filling in place.</td></tr>
-<tr><td><code>Secret::wipe</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-wipe">253</a></td><td>Wipe the contents now, before the value goes out of scope.</td></tr>
-<tr><td><code>Secret::drop</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-secret-drop">259</a></td><td></td></tr>
-<tr><td><code>Secret::clone</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-secret-clone">270</a></td><td></td></tr>
-<tr><td><code>Secret::eq</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-secret-eq">280</a></td><td></td></tr>
-<tr><td><code>Secret::fmt</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-secret-fmt">289</a></td><td></td></tr>
+<tr><td><code>page_size</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-page_size-2">121</a></td><td>The browser&#x27;s answer, which is a number rather than a question asked of the host: see the note on the other half of this pair for why 4 KiB and not WebAssembly&#x27;s own 64 KiB page.</td></tr>
+<tr><td><code>lock_pages</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-lock_pages">147</a></td><td>Lock span bytes at at out of swap, answering whether it happened.</td></tr>
+<tr><td><code>unlock_pages</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-unlock_pages">161</a></td><td>Release a lock taken by lock_pages.</td></tr>
+<tr><td><code>Secret::new</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-new">175</a></td><td>Wrap bytes, taking ownership and wiping the caller&#x27;s copy.</td></tr>
+<tr><td><code>Secret::zeroed</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-zeroed">183</a></td><td>Allocate len zero bytes, ready to be filled in place.</td></tr>
+<tr><td><code>Secret::random</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-random">217</a></td><td>Fill len bytes from the operating-system CSPRNG.</td></tr>
+<tr><td><code>Secret::is_locked</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-is_locked">228</a></td><td>Whether the pages were successfully locked out of swap.</td></tr>
+<tr><td><code>Secret::len</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-len">233</a></td><td>Length in bytes.</td></tr>
+<tr><td><code>Secret::is_empty</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-is_empty">238</a></td><td>Whether the secret is empty.</td></tr>
+<tr><td><code>Secret::expose</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-expose">244</a></td><td>Borrow the raw bytes.</td></tr>
+<tr><td><code>Secret::expose_mut</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-expose_mut">249</a></td><td>Borrow mutably, for filling in place.</td></tr>
+<tr><td><code>Secret::wipe</code> <sub>pub fn</sub></td><td><a href="amnesia.src.html#fn-secret-wipe">257</a></td><td>Wipe the contents now, before the value goes out of scope.</td></tr>
+<tr><td><code>Secret::drop</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-secret-drop">263</a></td><td></td></tr>
+<tr><td><code>Secret::clone</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-secret-clone">274</a></td><td></td></tr>
+<tr><td><code>Secret::eq</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-secret-eq">284</a></td><td></td></tr>
+<tr><td><code>Secret::fmt</code> <sub>fn</sub></td><td><a href="amnesia.src.html#fn-secret-fmt">293</a></td><td></td></tr>
 </tbody></table>
 </section>
 </div></div>
