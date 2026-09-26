@@ -35,7 +35,7 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 | `veilvoice-meta` | Strip or spoof identifying metadata: audio tags, and image EXIF/GPS. | 696 | [`crates/veilvoice-meta/README.md`](../crates/veilvoice-meta/README.md) |
 | `veilvoice-policy` | Settings that can only be tightened, sealed with the project's own post-quantum cryptography. | 1,689 | [`crates/veilvoice-policy/README.md`](../crates/veilvoice-policy/README.md) |
 | `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,793 | [`crates/veilvoice-setup/README.md`](../crates/veilvoice-setup/README.md) |
-| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 9,547 | [`crates/veilvoice-verify/README.md`](../crates/veilvoice-verify/README.md) |
+| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 9,642 | [`crates/veilvoice-verify/README.md`](../crates/veilvoice-verify/README.md) |
 | `veilvoice-video` | A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg. | 6,010 | [`crates/veilvoice-video/README.md`](../crates/veilvoice-video/README.md) |
 | `veilvoice-watch` | Detect which applications are currently using the microphone and camera, with alerts on change. | 3,917 | [`crates/veilvoice-watch/README.md`](../crates/veilvoice-watch/README.md) |
 
@@ -127,6 +127,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/documented.py`](../tools/audit/documented.py) | Every item on a generated page has something written under it |
 | [`tools/audit/features.py`](../tools/audit/features.py) | Every feature selection a release builds is built here too |
 | [`tools/audit/fixtures.py`](../tools/audit/fixtures.py) | A file the build needs is in the commit, not merely on the machine that wrote it |
+| [`tools/audit/network_claims.py`](../tools/audit/network_claims.py) | The manual names every command that reaches the network |
 | [`tools/audit/publishing.py`](../tools/audit/publishing.py) | The step that publishes a release says which commit it is publishing |
 | [`tools/audit/randomness.py`](../tools/audit/randomness.py) | Every random number this project draws comes from a cryptographic source |
 | [`tools/audit/reachable.py`](../tools/audit/reachable.py) | Every public item is named by something other than its own declaration |
@@ -215,6 +216,8 @@ And what it then checks:
 - **the wiki matches the documents, and every link in it resolves**: `python tools/docs/wiki.py --check`
 - **website source pages match their files**: `python tools/docs/sources.py --check`
 - **every published item says what it is for**: `python tools/audit/documented.py`
+- **the manual names every command that reaches the network**: `python tools/audit/network_claims.py`
+- **that guard catches what it claims to, including the case it got wrong first**: `python tools/audit/network_claims.py --self-test`
 - **every command is documented, and its window location exists**: `python tools/docs/commands.py --check`
 - **the developer guide matches the tree**: `python tools/docs/developers.py --check`
 - **the website's wiki matches the wiki**: `python tools/site/wiki_site.py --check`

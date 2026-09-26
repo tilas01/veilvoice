@@ -2259,6 +2259,62 @@ fn asked_for(text: &str) {
     print!("{text}");
 }
 
+/// A question about this program, rather than something for it to do.
+///
+/// # **F-228.** These were read at the first argument only
+///
+/// `veilvoice verify release --help` read `release` as the subcommand and
+/// `--help` as the release tag, and went to the network to fetch a release
+/// called `--help`. Opening a connection is the one thing this program promises
+/// it will not do unless it is asked to by name, and it did it in answer to a
+/// request for help. `--version`, `--explain` and `--exit-status` were the same,
+/// behind the same subcommands.
+///
+/// So these are taken from anywhere in the arguments, the way the verbosity
+/// flags already are, and answering one is the whole of that run. A file
+/// genuinely named `-h` becomes unreachable this way, which is a better thing to
+/// be wrong about than a connection nobody asked for.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Asked {
+    /// What this program is and how to use it.
+    Help,
+    /// The longer piece on what a signature proves and what it does not.
+    Explain,
+    /// Which version of the verifier this is.
+    Version,
+    /// What each exit status means, for somebody writing a script.
+    ExitStatus,
+}
+
+impl Asked {
+    /// Which of these, if any, the arguments ask for.
+    ///
+    /// Help wins over the rest, and `help` as a bare word is accepted only in
+    /// the first position, where somebody typing it means the subcommand: a
+    /// later `help` is a path or a tag.
+    fn in_args(args: &[String]) -> Option<Self> {
+        if args.first().map(String::as_str) == Some("help") {
+            return Some(Self::Help);
+        }
+        let mut found = None;
+        for arg in args {
+            let asked = match arg.as_str() {
+                "--help" | "-h" => Some(Self::Help),
+                "--explain" => Some(Self::Explain),
+                "--version" => Some(Self::Version),
+                "--exit-status" => Some(Self::ExitStatus),
+                _ => None,
+            };
+            match asked {
+                Some(Self::Help) => return Some(Self::Help),
+                Some(other) if found.is_none() => found = Some(other),
+                _ => {}
+            }
+        }
+        found
+    }
+}
+
 /// Run the verifier over `args`, which are the words after `veilvoice verify`.
 ///
 /// This was `fn main` in a binary of its own until the verifier was folded
@@ -2291,29 +2347,32 @@ pub fn run(mut args: Vec<String>) -> ExitCode {
         return command_auto(None);
     }
 
-    if args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
-        // The tables are printed from the code that defines them rather than
-        // written out again here. The quiet level is only usable because the
-        // statuses are documented, and a second copy of that documentation is
-        // a copy that goes stale.
-        asked_for(&format!(
-            "{USAGE}\n{}\n{}",
-            Loudness::table(),
-            Status::table()
-        ));
-        return ExitCode::SUCCESS;
-    }
-    if args[0] == "--explain" {
-        asked_for(EXPLAIN);
-        return ExitCode::SUCCESS;
-    }
-    if args[0] == "--version" {
-        asked_for(&format!("veilvoice verify {}\n", env!("CARGO_PKG_VERSION")));
-        return ExitCode::SUCCESS;
-    }
-    if args[0] == "--exit-status" {
-        asked_for(&Status::table());
-        return ExitCode::SUCCESS;
+    match Asked::in_args(&args) {
+        Some(Asked::Help) => {
+            // The tables are printed from the code that defines them rather
+            // than written out again here. The quiet level is only usable
+            // because the statuses are documented, and a second copy of that
+            // documentation is a copy that goes stale.
+            asked_for(&format!(
+                "{USAGE}\n{}\n{}",
+                Loudness::table(),
+                Status::table()
+            ));
+            return ExitCode::SUCCESS;
+        }
+        Some(Asked::Explain) => {
+            asked_for(EXPLAIN);
+            return ExitCode::SUCCESS;
+        }
+        Some(Asked::Version) => {
+            asked_for(&format!("veilvoice verify {}\n", env!("CARGO_PKG_VERSION")));
+            return ExitCode::SUCCESS;
+        }
+        Some(Asked::ExitStatus) => {
+            asked_for(&Status::table());
+            return ExitCode::SUCCESS;
+        }
+        None => {}
     }
 
     match args[0].as_str() {

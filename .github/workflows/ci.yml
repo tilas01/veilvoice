@@ -560,6 +560,19 @@ jobs:
       - name: Every published item must say what it is for
         run: python tools/audit/documented.py
 
+      # F-228. The program's opening paragraph names the commands that reach
+      # the network, and the manual has a section explaining them for a reader
+      # who wants to know how a program with no HTTP client reaches the network
+      # at all. F-222 was that section denying `veilvoice update` existed for a
+      # week, and F-223 was found by hand while fixing F-222. Reading the
+      # captured help text and asking whether the section names each command is
+      # a comparison of two lists, so it is this.
+      - name: The manual must name every command that reaches the network
+        run: python tools/audit/network_claims.py
+
+      - name: And that guard must catch what it claims to
+        run: python tools/audit/network_claims.py --self-test
+
       - name: Every command must be documented
         run: python tools/docs/commands.py --check
 

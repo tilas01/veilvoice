@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 2520 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 2579 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -2411,267 +2411,330 @@
 <span class="ln" id="L2260">}</span>
 </span>
 <span class="ln" id="L2261"></span>
-<span class="src-item" id="fn-run">
-<span class="ln" id="L2262"><span class="tok-com">/// Run the verifier over `args`, which are the words after `veilvoice verify`.</span></span>
+<span class="src-item" id="fn-asked">
+<span class="ln" id="L2262"><span class="tok-com">/// A question about this program, rather than something for it to do.</span></span>
 <span class="ln" id="L2263"><span class="tok-com">///</span></span>
-<span class="ln" id="L2264"><span class="tok-com">/// This was `fn main` in a binary of its own until the verifier was folded</span></span>
-<span class="ln" id="L2265"><span class="tok-com">/// into `veilvoice`. The body is unchanged: the same commands, the same</span></span>
-<span class="ln" id="L2266"><span class="tok-com">/// output, the same exit statuses. What changed is who calls it.</span></span>
-<span class="ln" id="L2267"><span class="tok-com">///</span></span>
-<span class="ln" id="L2268"><span class="tok-com">/// # The double-click that used to work</span></span>
-<span class="ln" id="L2269"><span class="tok-com">///</span></span>
-<span class="ln" id="L2270"><span class="tok-com">/// The standalone binary did the useful thing when run with no arguments --</span></span>
-<span class="ln" id="L2271"><span class="tok-com">/// looked for a release nearby, checked it, and waited so the window did not</span></span>
-<span class="ln" id="L2272"><span class="tok-com">/// vanish -- because a person who has just downloaded a zip and is nervous</span></span>
-<span class="ln" id="L2273"><span class="tok-com">/// about it will double-click the small program next to it. That flow is gone</span></span>
-<span class="ln" id="L2274"><span class="tok-com">/// with the binary, and it is worth naming rather than quietly dropping.</span></span>
-<span class="ln" id="L2275"><span class="tok-com">///</span></span>
-<span class="ln" id="L2276"><span class="tok-com">/// What replaces it is the desktop application&#x27;s verify tab, which does the</span></span>
-<span class="ln" id="L2277"><span class="tok-com">/// same check with the same code in `crate::check`, and `veilvoice verify`</span></span>
-<span class="ln" id="L2278"><span class="tok-com">/// with no arguments, which still runs `auto`. The waiting-for-Enter is not</span></span>
-<span class="ln" id="L2279"><span class="tok-com">/// kept: a subcommand of a command-line tool is being run from a shell that</span></span>
-<span class="ln" id="L2280"><span class="tok-com">/// is not about to close.</span></span>
-<span class="ln" id="L2281"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(<span class="tok-kw">mut</span> args: Vec&lt;String&gt;) -&gt; ExitCode {</span>
-<span class="ln" id="L2282">    <span class="tok-com">// Before a single line is printed, and before the arguments are read for</span></span>
-<span class="ln" id="L2283">    <span class="tok-com">// anything else: `--quiet` has to mean quiet from the first word, and the</span></span>
-<span class="ln" id="L2284">    <span class="tok-com">// verbosity flags are not positional.</span></span>
-<span class="ln" id="L2285">    report::<span class="tok-fn">set_level</span>(Loudness::<span class="tok-fn">take_from</span>(&amp;<span class="tok-kw">mut</span> args));</span>
-<span class="ln" id="L2286"></span>
-<span class="ln" id="L2287">    <span class="tok-com">// No arguments is very probably a double-click. Do the useful thing --</span></span>
-<span class="ln" id="L2288">    <span class="tok-com">// look for a release nearby and check it -- and then wait, so the window</span></span>
-<span class="ln" id="L2289">    <span class="tok-com">// does not vanish before it has been read.</span></span>
-<span class="ln" id="L2290">    <span class="tok-kw">if</span> args.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L2291">        <span class="tok-kw">return</span> <span class="tok-fn">command_auto</span>(None);</span>
-<span class="ln" id="L2292">    }</span>
-<span class="ln" id="L2293"></span>
-<span class="ln" id="L2294">    <span class="tok-kw">if</span> args[<span class="tok-num">0</span>] == <span class="tok-str">&quot;--help&quot;</span> || args[<span class="tok-num">0</span>] == <span class="tok-str">&quot;-h&quot;</span> || args[<span class="tok-num">0</span>] == <span class="tok-str">&quot;help&quot;</span> {</span>
-<span class="ln" id="L2295">        <span class="tok-com">// The tables are printed from the code that defines them rather than</span></span>
-<span class="ln" id="L2296">        <span class="tok-com">// written out again here. The quiet level is only usable because the</span></span>
-<span class="ln" id="L2297">        <span class="tok-com">// statuses are documented, and a second copy of that documentation is</span></span>
-<span class="ln" id="L2298">        <span class="tok-com">// a copy that goes stale.</span></span>
-<span class="ln" id="L2299">        <span class="tok-fn">asked_for</span>(&amp;format!(</span>
-<span class="ln" id="L2300">            <span class="tok-str">&quot;{USAGE}\n{}\n{}&quot;</span>,</span>
-<span class="ln" id="L2301">            Loudness::<span class="tok-fn">table</span>(),</span>
-<span class="ln" id="L2302">            Status::<span class="tok-fn">table</span>()</span>
-<span class="ln" id="L2303">        ));</span>
-<span class="ln" id="L2304">        <span class="tok-kw">return</span> ExitCode::SUCCESS;</span>
-<span class="ln" id="L2305">    }</span>
-<span class="ln" id="L2306">    <span class="tok-kw">if</span> args[<span class="tok-num">0</span>] == <span class="tok-str">&quot;--explain&quot;</span> {</span>
-<span class="ln" id="L2307">        <span class="tok-fn">asked_for</span>(EXPLAIN);</span>
-<span class="ln" id="L2308">        <span class="tok-kw">return</span> ExitCode::SUCCESS;</span>
-<span class="ln" id="L2309">    }</span>
-<span class="ln" id="L2310">    <span class="tok-kw">if</span> args[<span class="tok-num">0</span>] == <span class="tok-str">&quot;--version&quot;</span> {</span>
-<span class="ln" id="L2311">        <span class="tok-fn">asked_for</span>(&amp;format!(<span class="tok-str">&quot;veilvoice verify {}\n&quot;</span>, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>)));</span>
-<span class="ln" id="L2312">        <span class="tok-kw">return</span> ExitCode::SUCCESS;</span>
-<span class="ln" id="L2313">    }</span>
-<span class="ln" id="L2314">    <span class="tok-kw">if</span> args[<span class="tok-num">0</span>] == <span class="tok-str">&quot;--exit-status&quot;</span> {</span>
-<span class="ln" id="L2315">        <span class="tok-fn">asked_for</span>(&amp;Status::<span class="tok-fn">table</span>());</span>
-<span class="ln" id="L2316">        <span class="tok-kw">return</span> ExitCode::SUCCESS;</span>
-<span class="ln" id="L2317">    }</span>
-<span class="ln" id="L2318"></span>
-<span class="ln" id="L2319">    <span class="tok-kw">match</span> args[<span class="tok-num">0</span>].<span class="tok-fn">as_str</span>() {</span>
-<span class="ln" id="L2320">        <span class="tok-str">&quot;auto&quot;</span> =&gt; <span class="tok-fn">command_auto</span>(args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>).<span class="tok-fn">map</span>(Path::new)),</span>
-<span class="ln" id="L2321"></span>
-<span class="ln" id="L2322">        <span class="tok-str">&quot;machine&quot;</span> =&gt; <span class="tok-fn">command_machine</span>(),</span>
-<span class="ln" id="L2323"></span>
-<span class="ln" id="L2324">        <span class="tok-str">&quot;archive&quot;</span> =&gt; <span class="tok-kw">match</span> args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>) {</span>
-<span class="ln" id="L2325">            <span class="tok-fn">Some</span>(path) =&gt; <span class="tok-fn">command_archive</span>(Path::<span class="tok-fn">new</span>(path)),</span>
-<span class="ln" id="L2326">            None =&gt; <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2327">                <span class="tok-str">&quot;`archive` needs an archive to take apart&quot;</span>,</span>
-<span class="ln" id="L2328">                &amp;[<span class="tok-str">&quot;veilvoice verify archive veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>],</span>
-<span class="ln" id="L2329">            ),</span>
-<span class="ln" id="L2330">        },</span>
-<span class="ln" id="L2331"></span>
-<span class="ln" id="L2332">        <span class="tok-str">&quot;key&quot;</span> =&gt; <span class="tok-fn">command_key</span>(),</span>
-<span class="ln" id="L2333"></span>
-<span class="ln" id="L2334">        <span class="tok-str">&quot;gnupg&quot;</span> =&gt; <span class="tok-fn">command_gnupg</span>(args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>).<span class="tok-fn">map</span>(Path::new)),</span>
-<span class="ln" id="L2335"></span>
-<span class="ln" id="L2336">        <span class="tok-str">&quot;deps&quot;</span> =&gt; {</span>
-<span class="ln" id="L2337">            <span class="tok-kw">let</span> install = args.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--install&quot;</span>);</span>
-<span class="ln" id="L2338">            <span class="tok-kw">let</span> yes = args.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--yes&quot;</span>);</span>
-<span class="ln" id="L2339">            <span class="tok-fn">command_deps</span>(install || yes, yes)</span>
-<span class="ln" id="L2340">        }</span>
-<span class="ln" id="L2341"></span>
-<span class="ln" id="L2342">        <span class="tok-str">&quot;build&quot;</span> =&gt; {</span>
-<span class="ln" id="L2343">            <span class="tok-kw">let</span> root = args</span>
-<span class="ln" id="L2344">                .<span class="tok-fn">get</span>(<span class="tok-num">1</span>)</span>
-<span class="ln" id="L2345">                .<span class="tok-fn">filter</span>(|a| !a.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>))</span>
-<span class="ln" id="L2346">                .<span class="tok-fn">map</span>(PathBuf::from)</span>
-<span class="ln" id="L2347">                .<span class="tok-fn">unwrap_or_else</span>(|| PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;.&quot;</span>));</span>
-<span class="ln" id="L2348">            <span class="tok-fn">command_build</span>(&amp;root, None)</span>
-<span class="ln" id="L2349">        }</span>
-<span class="ln" id="L2350"></span>
-<span class="ln" id="L2351">        <span class="tok-str">&quot;reproduce&quot;</span> =&gt; {</span>
-<span class="ln" id="L2352">            <span class="tok-kw">let</span> root = args</span>
-<span class="ln" id="L2353">                .<span class="tok-fn">get</span>(<span class="tok-num">1</span>)</span>
-<span class="ln" id="L2354">                .<span class="tok-fn">filter</span>(|a| !a.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>))</span>
-<span class="ln" id="L2355">                .<span class="tok-fn">map</span>(PathBuf::from)</span>
-<span class="ln" id="L2356">                .<span class="tok-fn">unwrap_or_else</span>(|| PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;.&quot;</span>));</span>
-<span class="ln" id="L2357">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sums = None;</span>
-<span class="ln" id="L2358">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sig = None;</span>
-<span class="ln" id="L2359">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> index = <span class="tok-num">1</span>;</span>
-<span class="ln" id="L2360">            while index &lt; args.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L2361">                <span class="tok-kw">let</span> result = <span class="tok-kw">match</span> args[index].<span class="tok-fn">as_str</span>() {</span>
-<span class="ln" id="L2362">                    <span class="tok-str">&quot;--sums&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sums&quot;</span>).<span class="tok-fn">map</span>(|v| sums = <span class="tok-fn">Some</span>(v)),</span>
-<span class="ln" id="L2363">                    <span class="tok-str">&quot;--sig&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sig&quot;</span>).<span class="tok-fn">map</span>(|v| sig = <span class="tok-fn">Some</span>(v)),</span>
-<span class="ln" id="L2364">                    other <span class="tok-kw">if</span> other.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>) =&gt; <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;unknown option: {other}&quot;</span>)),</span>
-<span class="ln" id="L2365">                    _ =&gt; <span class="tok-fn">Ok</span>(()),</span>
-<span class="ln" id="L2366">                };</span>
-<span class="ln" id="L2367">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(why) = result {</span>
-<span class="ln" id="L2368">                    <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(&amp;why, &amp;[<span class="tok-str">&quot;veilvoice verify --help&quot;</span>]);</span>
-<span class="ln" id="L2369">                }</span>
-<span class="ln" id="L2370">                index += <span class="tok-kw">if</span> args[index].<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>) { <span class="tok-num">2</span> } <span class="tok-kw">else</span> { <span class="tok-num">1</span> };</span>
-<span class="ln" id="L2371">            }</span>
-<span class="ln" id="L2372">            <span class="tok-kw">match</span> (sums, sig) {</span>
-<span class="ln" id="L2373">                (<span class="tok-fn">Some</span>(sums), <span class="tok-fn">Some</span>(sig)) =&gt; {</span>
-<span class="ln" id="L2374">                    <span class="tok-fn">command_reproduce</span>(&amp;root, Path::<span class="tok-fn">new</span>(&amp;sums), Path::<span class="tok-fn">new</span>(&amp;sig), None)</span>
-<span class="ln" id="L2375">                }</span>
-<span class="ln" id="L2376">                _ =&gt; <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2377">                    <span class="tok-str">&quot;`reproduce` needs the published hash list and its signature&quot;</span>,</span>
-<span class="ln" id="L2378">                    &amp;[</span>
-<span class="ln" id="L2379">                        <span class="tok-str">&quot;veilvoice verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc&quot;</span>,</span>
-<span class="ln" id="L2380">                        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L2381">                        <span class="tok-str">&quot;Both are on the release page. Without the signature there is&quot;</span>,</span>
-<span class="ln" id="L2382">                        <span class="tok-str">&quot;nothing to check the list against, and an unverified list is a&quot;</span>,</span>
-<span class="ln" id="L2383">                        <span class="tok-str">&quot;list of numbers somebody sent you.&quot;</span>,</span>
-<span class="ln" id="L2384">                    ],</span>
-<span class="ln" id="L2385">                ),</span>
-<span class="ln" id="L2386">            }</span>
-<span class="ln" id="L2387">        }</span>
-<span class="ln" id="L2388"></span>
-<span class="ln" id="L2389">        <span class="tok-str">&quot;install&quot;</span> =&gt; {</span>
-<span class="ln" id="L2390">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> from = None;</span>
-<span class="ln" id="L2391">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> index = <span class="tok-num">1</span>;</span>
-<span class="ln" id="L2392">            while index &lt; args.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L2393">                <span class="tok-kw">let</span> result = <span class="tok-kw">match</span> args[index].<span class="tok-fn">as_str</span>() {</span>
-<span class="ln" id="L2394">                    <span class="tok-str">&quot;--from&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--from&quot;</span>).<span class="tok-fn">map</span>(|v| from = <span class="tok-fn">Some</span>(v)),</span>
-<span class="ln" id="L2395">                    <span class="tok-str">&quot;--cli&quot;</span> | <span class="tok-str">&quot;--gui&quot;</span> =&gt; <span class="tok-fn">Ok</span>(()),</span>
-<span class="ln" id="L2396">                    other =&gt; <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;unknown option: {other}&quot;</span>)),</span>
-<span class="ln" id="L2397">                };</span>
-<span class="ln" id="L2398">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(why) = result {</span>
-<span class="ln" id="L2399">                    <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(&amp;why, &amp;[<span class="tok-str">&quot;veilvoice verify --help&quot;</span>]);</span>
-<span class="ln" id="L2400">                }</span>
-<span class="ln" id="L2401">                index += <span class="tok-kw">if</span> args[index] == <span class="tok-str">&quot;--from&quot;</span> { <span class="tok-num">2</span> } <span class="tok-kw">else</span> { <span class="tok-num">1</span> };</span>
-<span class="ln" id="L2402">            }</span>
-<span class="ln" id="L2403">            <span class="tok-kw">let</span> cli = args.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--cli&quot;</span>);</span>
-<span class="ln" id="L2404">            <span class="tok-kw">let</span> gui = args.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--gui&quot;</span>);</span>
-<span class="ln" id="L2405">            <span class="tok-kw">match</span> from {</span>
-<span class="ln" id="L2406">                <span class="tok-fn">Some</span>(dir) =&gt; <span class="tok-fn">command_install</span>(Path::<span class="tok-fn">new</span>(&amp;dir), cli, gui),</span>
-<span class="ln" id="L2407">                None =&gt; <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2408">                    <span class="tok-str">&quot;`install` needs a directory to install from&quot;</span>,</span>
-<span class="ln" id="L2409">                    &amp;[</span>
-<span class="ln" id="L2410">                        <span class="tok-str">&quot;veilvoice verify install --from target/release --cli --gui&quot;</span>,</span>
-<span class="ln" id="L2411">                        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L2412">                        <span class="tok-str">&quot;Check that directory first, with `file` or `reproduce`.&quot;</span>,</span>
-<span class="ln" id="L2413">                        <span class="tok-str">&quot;This command copies; it does not verify.&quot;</span>,</span>
-<span class="ln" id="L2414">                    ],</span>
-<span class="ln" id="L2415">                ),</span>
-<span class="ln" id="L2416">            }</span>
-<span class="ln" id="L2417">        }</span>
-<span class="ln" id="L2418"></span>
-<span class="ln" id="L2419">        <span class="tok-str">&quot;release&quot;</span> =&gt; <span class="tok-kw">match</span> args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>) {</span>
-<span class="ln" id="L2420">            <span class="tok-fn">Some</span>(tag) =&gt; <span class="tok-fn">command_release</span>(tag, args.<span class="tok-fn">get</span>(<span class="tok-num">2</span>).<span class="tok-fn">map</span>(String::as_str)),</span>
-<span class="ln" id="L2421">            None =&gt; <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2422">                <span class="tok-str">&quot;`release` needs a tag&quot;</span>,</span>
-<span class="ln" id="L2423">                &amp;[<span class="tok-str">&quot;veilvoice verify release v0.1.11&quot;</span>],</span>
-<span class="ln" id="L2424">            ),</span>
-<span class="ln" id="L2425">        },</span>
-<span class="ln" id="L2426"></span>
-<span class="ln" id="L2427">        <span class="tok-str">&quot;hash&quot;</span> =&gt; <span class="tok-kw">match</span> args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>) {</span>
-<span class="ln" id="L2428">            <span class="tok-fn">Some</span>(path) =&gt; <span class="tok-fn">command_hash</span>(Path::<span class="tok-fn">new</span>(path)),</span>
-<span class="ln" id="L2429">            None =&gt; <span class="tok-fn">usage</span>(<span class="tok-str">&quot;`hash` needs a file&quot;</span>, &amp;[<span class="tok-str">&quot;veilvoice verify hash &lt;FILE&gt;&quot;</span>]),</span>
-<span class="ln" id="L2430">        },</span>
-<span class="ln" id="L2431"></span>
-<span class="ln" id="L2432">        <span class="tok-str">&quot;sums&quot;</span> =&gt; {</span>
-<span class="ln" id="L2433">            <span class="tok-kw">if</span> args.<span class="tok-fn">len</span>() &lt; <span class="tok-num">3</span> {</span>
-<span class="ln" id="L2434">                <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2435">                    <span class="tok-str">&quot;`sums` needs a hash list and a signature&quot;</span>,</span>
-<span class="ln" id="L2436">                    &amp;[<span class="tok-str">&quot;veilvoice verify sums &lt;SHA256SUMS&gt; &lt;SHA256SUMS.asc&gt;&quot;</span>],</span>
-<span class="ln" id="L2437">                );</span>
-<span class="ln" id="L2438">            }</span>
-<span class="ln" id="L2439">            <span class="tok-fn">command_sums</span>(Path::<span class="tok-fn">new</span>(&amp;args[<span class="tok-num">1</span>]), Path::<span class="tok-fn">new</span>(&amp;args[<span class="tok-num">2</span>]))</span>
-<span class="ln" id="L2440">        }</span>
-<span class="ln" id="L2441"></span>
-<span class="ln" id="L2442">        <span class="tok-str">&quot;file&quot;</span> =&gt; {</span>
-<span class="ln" id="L2443">            <span class="tok-kw">let</span> file = <span class="tok-kw">match</span> args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>).<span class="tok-fn">map</span>(PathBuf::from) {</span>
-<span class="ln" id="L2444">                <span class="tok-fn">Some</span>(path) =&gt; path,</span>
-<span class="ln" id="L2445">                None =&gt; {</span>
-<span class="ln" id="L2446">                    <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2447">                        <span class="tok-str">&quot;`file` needs a file to check&quot;</span>,</span>
-<span class="ln" id="L2448">                        &amp;[<span class="tok-str">&quot;veilvoice verify file &lt;FILE&gt; --sums &lt;SHA256SUMS&gt; --sig &lt;SIG&gt;&quot;</span>],</span>
-<span class="ln" id="L2449">                    )</span>
-<span class="ln" id="L2450">                }</span>
-<span class="ln" id="L2451">            };</span>
-<span class="ln" id="L2452"></span>
-<span class="ln" id="L2453">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sums = None;</span>
-<span class="ln" id="L2454">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sig = None;</span>
-<span class="ln" id="L2455">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sha256 = None;</span>
-<span class="ln" id="L2456">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> index = <span class="tok-num">2</span>;</span>
-<span class="ln" id="L2457">            while index &lt; args.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L2458">                <span class="tok-kw">let</span> result = <span class="tok-kw">match</span> args[index].<span class="tok-fn">as_str</span>() {</span>
-<span class="ln" id="L2459">                    <span class="tok-str">&quot;--sums&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sums&quot;</span>).<span class="tok-fn">map</span>(|v| sums = <span class="tok-fn">Some</span>(v)),</span>
-<span class="ln" id="L2460">                    <span class="tok-str">&quot;--sig&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sig&quot;</span>).<span class="tok-fn">map</span>(|v| sig = <span class="tok-fn">Some</span>(v)),</span>
-<span class="ln" id="L2461">                    <span class="tok-str">&quot;--sha256&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sha256&quot;</span>).<span class="tok-fn">map</span>(|v| sha256 = <span class="tok-fn">Some</span>(v)),</span>
-<span class="ln" id="L2462">                    other =&gt; <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;unknown option: {other}&quot;</span>)),</span>
-<span class="ln" id="L2463">                };</span>
-<span class="ln" id="L2464">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(why) = result {</span>
-<span class="ln" id="L2465">                    <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(&amp;why, &amp;[<span class="tok-str">&quot;veilvoice verify --help&quot;</span>]);</span>
-<span class="ln" id="L2466">                }</span>
-<span class="ln" id="L2467">                index += <span class="tok-num">2</span>;</span>
-<span class="ln" id="L2468">            }</span>
-<span class="ln" id="L2469"></span>
-<span class="ln" id="L2470">            <span class="tok-kw">match</span> (sha256, sums, sig) {</span>
-<span class="ln" id="L2471">                (<span class="tok-fn">Some</span>(_), <span class="tok-fn">Some</span>(_), _) | (<span class="tok-fn">Some</span>(_), _, <span class="tok-fn">Some</span>(_)) =&gt; <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2472">                    <span class="tok-str">&quot;--sha256 and --sums are two different checks&quot;</span>,</span>
-<span class="ln" id="L2473">                    &amp;[</span>
-<span class="ln" id="L2474">                        <span class="tok-str">&quot;They prove different things, so this tool will not run both&quot;</span>,</span>
-<span class="ln" id="L2475">                        <span class="tok-str">&quot;at once and report one answer. Pick one:&quot;</span>,</span>
-<span class="ln" id="L2476">                        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L2477">                        <span class="tok-str">&quot;  --sums/--sig  proves the download is INTACT&quot;</span>,</span>
-<span class="ln" id="L2478">                        <span class="tok-str">&quot;  --sha256      can prove it is REPRODUCIBLE&quot;</span>,</span>
-<span class="ln" id="L2479">                        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L2480">                        <span class="tok-str">&quot;veilvoice verify --explain&quot;</span>,</span>
-<span class="ln" id="L2481">                    ],</span>
-<span class="ln" id="L2482">                ),</span>
-<span class="ln" id="L2483">                (<span class="tok-fn">Some</span>(hash), None, None) =&gt; <span class="tok-fn">command_file_against_hash</span>(&amp;file, &amp;hash),</span>
-<span class="ln" id="L2484">                (None, <span class="tok-fn">Some</span>(sums), <span class="tok-fn">Some</span>(sig)) =&gt; {</span>
-<span class="ln" id="L2485">                    <span class="tok-fn">command_file_against_sums</span>(&amp;file, Path::<span class="tok-fn">new</span>(&amp;sums), Path::<span class="tok-fn">new</span>(&amp;sig))</span>
-<span class="ln" id="L2486">                }</span>
-<span class="ln" id="L2487">                (None, <span class="tok-fn">Some</span>(_), None) =&gt; <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2488">                    <span class="tok-str">&quot;--sums without --sig&quot;</span>,</span>
-<span class="ln" id="L2489">                    &amp;[</span>
-<span class="ln" id="L2490">                        <span class="tok-str">&quot;An unsigned hash list proves nothing: whoever could replace the&quot;</span>,</span>
-<span class="ln" id="L2491">                        <span class="tok-str">&quot;download could replace the list beside it. Pass the signature&quot;</span>,</span>
-<span class="ln" id="L2492">                        <span class="tok-str">&quot;as well, or use --sha256 with a hash you obtained some other way.&quot;</span>,</span>
-<span class="ln" id="L2493">                    ],</span>
-<span class="ln" id="L2494">                ),</span>
-<span class="ln" id="L2495">                (None, None, <span class="tok-fn">Some</span>(_)) =&gt; <span class="tok-fn">usage</span>(<span class="tok-str">&quot;--sig without --sums&quot;</span>, &amp;[<span class="tok-str">&quot;Pass both.&quot;</span>]),</span>
-<span class="ln" id="L2496">                (None, None, None) =&gt; <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2497">                    <span class="tok-str">&quot;nothing to check the file against&quot;</span>,</span>
-<span class="ln" id="L2498">                    &amp;[</span>
-<span class="ln" id="L2499">                        <span class="tok-str">&quot;This binary carries the signing key, but it cannot carry the&quot;</span>,</span>
-<span class="ln" id="L2500">                        <span class="tok-str">&quot;expected hash of your file -- a file cannot contain its own&quot;</span>,</span>
-<span class="ln" id="L2501">                        <span class="tok-str">&quot;digest. Give it one:&quot;</span>,</span>
-<span class="ln" id="L2502">                        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L2503">                        <span class="tok-str">&quot;  --sums SHA256SUMS --sig SHA256SUMS.asc&quot;</span>,</span>
-<span class="ln" id="L2504">                        <span class="tok-str">&quot;  --sha256 &lt;64 hex characters&gt;&quot;</span>,</span>
-<span class="ln" id="L2505">                        <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L2506">                        <span class="tok-str">&quot;veilvoice verify --explain&quot;</span>,</span>
-<span class="ln" id="L2507">                    ],</span>
-<span class="ln" id="L2508">                ),</span>
-<span class="ln" id="L2509">            }</span>
-<span class="ln" id="L2510">        }</span>
-<span class="ln" id="L2511"></span>
-<span class="ln" id="L2512">        other =&gt; <span class="tok-fn">usage</span>(</span>
-<span class="ln" id="L2513">            &amp;format!(<span class="tok-str">&quot;unknown command: {other}&quot;</span>),</span>
-<span class="ln" id="L2514">            &amp;[<span class="tok-str">&quot;veilvoice verify --help&quot;</span>],</span>
-<span class="ln" id="L2515">        ),</span>
-<span class="ln" id="L2516">    }</span>
-<span class="ln" id="L2517">}</span>
+<span class="ln" id="L2264"><span class="tok-com">/// # **F-228.** These were read at the first argument only</span></span>
+<span class="ln" id="L2265"><span class="tok-com">///</span></span>
+<span class="ln" id="L2266"><span class="tok-com">/// `veilvoice verify release --help` read `release` as the subcommand and</span></span>
+<span class="ln" id="L2267"><span class="tok-com">/// `--help` as the release tag, and went to the network to fetch a release</span></span>
+<span class="ln" id="L2268"><span class="tok-com">/// called `--help`. Opening a connection is the one thing this program promises</span></span>
+<span class="ln" id="L2269"><span class="tok-com">/// it will not do unless it is asked to by name, and it did it in answer to a</span></span>
+<span class="ln" id="L2270"><span class="tok-com">/// request for help. `--version`, `--explain` and `--exit-status` were the same,</span></span>
+<span class="ln" id="L2271"><span class="tok-com">/// behind the same subcommands.</span></span>
+<span class="ln" id="L2272"><span class="tok-com">///</span></span>
+<span class="ln" id="L2273"><span class="tok-com">/// So these are taken from anywhere in the arguments, the way the verbosity</span></span>
+<span class="ln" id="L2274"><span class="tok-com">/// flags already are, and answering one is the whole of that run. A file</span></span>
+<span class="ln" id="L2275"><span class="tok-com">/// genuinely named `-h` becomes unreachable this way, which is a better thing to</span></span>
+<span class="ln" id="L2276"><span class="tok-com">/// be wrong about than a connection nobody asked for.</span></span>
+<span class="ln" id="L2277"><span class="tok-attr">#[derive</span>(Debug, Clone, Copy, PartialEq, Eq)]</span>
+<span class="ln" id="L2278"><span class="tok-kw">enum</span> Asked {</span>
+<span class="ln" id="L2279">    <span class="tok-com">/// What this program is and how to use it.</span></span>
+<span class="ln" id="L2280">    Help,</span>
+<span class="ln" id="L2281">    <span class="tok-com">/// The longer piece on what a signature proves and what it does not.</span></span>
+<span class="ln" id="L2282">    Explain,</span>
+<span class="ln" id="L2283">    <span class="tok-com">/// Which version of the verifier this is.</span></span>
+<span class="ln" id="L2284">    Version,</span>
+<span class="ln" id="L2285">    <span class="tok-com">/// What each exit status means, for somebody writing a script.</span></span>
+<span class="ln" id="L2286">    ExitStatus,</span>
+<span class="ln" id="L2287">}</span>
 </span>
-<span class="ln" id="L2518"></span>
-<span class="ln" id="L2519"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L2520"><span class="tok-kw">mod</span> tests;</span>
+<span class="ln" id="L2288"></span>
+<span class="ln" id="L2289"><span class="tok-kw">impl</span> Asked {</span>
+<span class="src-item" id="fn-asked-in_args">
+<span class="ln" id="L2290">    <span class="tok-com">/// Which of these, if any, the arguments ask for.</span></span>
+<span class="ln" id="L2291">    <span class="tok-com">///</span></span>
+<span class="ln" id="L2292">    <span class="tok-com">/// Help wins over the rest, and `help` as a bare word is accepted only in</span></span>
+<span class="ln" id="L2293">    <span class="tok-com">/// the first position, where somebody typing it means the subcommand: a</span></span>
+<span class="ln" id="L2294">    <span class="tok-com">/// later `help` is a path or a tag.</span></span>
+<span class="ln" id="L2295">    <span class="tok-kw">fn</span> <span class="tok-fn">in_args</span>(args: &amp;[String]) -&gt; Option&lt;Self&gt; {</span>
+<span class="ln" id="L2296">        <span class="tok-kw">if</span> args.<span class="tok-fn">first</span>().<span class="tok-fn">map</span>(String::as_str) == <span class="tok-fn">Some</span>(<span class="tok-str">&quot;help&quot;</span>) {</span>
+<span class="ln" id="L2297">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Self::Help);</span>
+<span class="ln" id="L2298">        }</span>
+<span class="ln" id="L2299">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> found = None;</span>
+<span class="ln" id="L2300">        <span class="tok-kw">for</span> arg <span class="tok-kw">in</span> args {</span>
+<span class="ln" id="L2301">            <span class="tok-kw">let</span> asked = <span class="tok-kw">match</span> arg.<span class="tok-fn">as_str</span>() {</span>
+<span class="ln" id="L2302">                <span class="tok-str">&quot;--help&quot;</span> | <span class="tok-str">&quot;-h&quot;</span> =&gt; <span class="tok-fn">Some</span>(Self::Help),</span>
+<span class="ln" id="L2303">                <span class="tok-str">&quot;--explain&quot;</span> =&gt; <span class="tok-fn">Some</span>(Self::Explain),</span>
+<span class="ln" id="L2304">                <span class="tok-str">&quot;--version&quot;</span> =&gt; <span class="tok-fn">Some</span>(Self::Version),</span>
+<span class="ln" id="L2305">                <span class="tok-str">&quot;--exit-status&quot;</span> =&gt; <span class="tok-fn">Some</span>(Self::ExitStatus),</span>
+<span class="ln" id="L2306">                _ =&gt; None,</span>
+<span class="ln" id="L2307">            };</span>
+<span class="ln" id="L2308">            <span class="tok-kw">match</span> asked {</span>
+<span class="ln" id="L2309">                <span class="tok-fn">Some</span>(Self::Help) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Self::Help),</span>
+<span class="ln" id="L2310">                <span class="tok-fn">Some</span>(other) <span class="tok-kw">if</span> found.<span class="tok-fn">is_none</span>() =&gt; found = <span class="tok-fn">Some</span>(other),</span>
+<span class="ln" id="L2311">                _ =&gt; {}</span>
+<span class="ln" id="L2312">            }</span>
+<span class="ln" id="L2313">        }</span>
+<span class="ln" id="L2314">        found</span>
+<span class="ln" id="L2315">    }</span>
+</span>
+<span class="ln" id="L2316">}</span>
+<span class="ln" id="L2317"></span>
+<span class="src-item" id="fn-run">
+<span class="ln" id="L2318"><span class="tok-com">/// Run the verifier over `args`, which are the words after `veilvoice verify`.</span></span>
+<span class="ln" id="L2319"><span class="tok-com">///</span></span>
+<span class="ln" id="L2320"><span class="tok-com">/// This was `fn main` in a binary of its own until the verifier was folded</span></span>
+<span class="ln" id="L2321"><span class="tok-com">/// into `veilvoice`. The body is unchanged: the same commands, the same</span></span>
+<span class="ln" id="L2322"><span class="tok-com">/// output, the same exit statuses. What changed is who calls it.</span></span>
+<span class="ln" id="L2323"><span class="tok-com">///</span></span>
+<span class="ln" id="L2324"><span class="tok-com">/// # The double-click that used to work</span></span>
+<span class="ln" id="L2325"><span class="tok-com">///</span></span>
+<span class="ln" id="L2326"><span class="tok-com">/// The standalone binary did the useful thing when run with no arguments --</span></span>
+<span class="ln" id="L2327"><span class="tok-com">/// looked for a release nearby, checked it, and waited so the window did not</span></span>
+<span class="ln" id="L2328"><span class="tok-com">/// vanish -- because a person who has just downloaded a zip and is nervous</span></span>
+<span class="ln" id="L2329"><span class="tok-com">/// about it will double-click the small program next to it. That flow is gone</span></span>
+<span class="ln" id="L2330"><span class="tok-com">/// with the binary, and it is worth naming rather than quietly dropping.</span></span>
+<span class="ln" id="L2331"><span class="tok-com">///</span></span>
+<span class="ln" id="L2332"><span class="tok-com">/// What replaces it is the desktop application&#x27;s verify tab, which does the</span></span>
+<span class="ln" id="L2333"><span class="tok-com">/// same check with the same code in `crate::check`, and `veilvoice verify`</span></span>
+<span class="ln" id="L2334"><span class="tok-com">/// with no arguments, which still runs `auto`. The waiting-for-Enter is not</span></span>
+<span class="ln" id="L2335"><span class="tok-com">/// kept: a subcommand of a command-line tool is being run from a shell that</span></span>
+<span class="ln" id="L2336"><span class="tok-com">/// is not about to close.</span></span>
+<span class="ln" id="L2337"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(<span class="tok-kw">mut</span> args: Vec&lt;String&gt;) -&gt; ExitCode {</span>
+<span class="ln" id="L2338">    <span class="tok-com">// Before a single line is printed, and before the arguments are read for</span></span>
+<span class="ln" id="L2339">    <span class="tok-com">// anything else: `--quiet` has to mean quiet from the first word, and the</span></span>
+<span class="ln" id="L2340">    <span class="tok-com">// verbosity flags are not positional.</span></span>
+<span class="ln" id="L2341">    report::<span class="tok-fn">set_level</span>(Loudness::<span class="tok-fn">take_from</span>(&amp;<span class="tok-kw">mut</span> args));</span>
+<span class="ln" id="L2342"></span>
+<span class="ln" id="L2343">    <span class="tok-com">// No arguments is very probably a double-click. Do the useful thing --</span></span>
+<span class="ln" id="L2344">    <span class="tok-com">// look for a release nearby and check it -- and then wait, so the window</span></span>
+<span class="ln" id="L2345">    <span class="tok-com">// does not vanish before it has been read.</span></span>
+<span class="ln" id="L2346">    <span class="tok-kw">if</span> args.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L2347">        <span class="tok-kw">return</span> <span class="tok-fn">command_auto</span>(None);</span>
+<span class="ln" id="L2348">    }</span>
+<span class="ln" id="L2349"></span>
+<span class="ln" id="L2350">    <span class="tok-kw">match</span> Asked::<span class="tok-fn">in_args</span>(&amp;args) {</span>
+<span class="ln" id="L2351">        <span class="tok-fn">Some</span>(Asked::Help) =&gt; {</span>
+<span class="ln" id="L2352">            <span class="tok-com">// The tables are printed from the code that defines them rather</span></span>
+<span class="ln" id="L2353">            <span class="tok-com">// than written out again here. The quiet level is only usable</span></span>
+<span class="ln" id="L2354">            <span class="tok-com">// because the statuses are documented, and a second copy of that</span></span>
+<span class="ln" id="L2355">            <span class="tok-com">// documentation is a copy that goes stale.</span></span>
+<span class="ln" id="L2356">            <span class="tok-fn">asked_for</span>(&amp;format!(</span>
+<span class="ln" id="L2357">                <span class="tok-str">&quot;{USAGE}\n{}\n{}&quot;</span>,</span>
+<span class="ln" id="L2358">                Loudness::<span class="tok-fn">table</span>(),</span>
+<span class="ln" id="L2359">                Status::<span class="tok-fn">table</span>()</span>
+<span class="ln" id="L2360">            ));</span>
+<span class="ln" id="L2361">            <span class="tok-kw">return</span> ExitCode::SUCCESS;</span>
+<span class="ln" id="L2362">        }</span>
+<span class="ln" id="L2363">        <span class="tok-fn">Some</span>(Asked::Explain) =&gt; {</span>
+<span class="ln" id="L2364">            <span class="tok-fn">asked_for</span>(EXPLAIN);</span>
+<span class="ln" id="L2365">            <span class="tok-kw">return</span> ExitCode::SUCCESS;</span>
+<span class="ln" id="L2366">        }</span>
+<span class="ln" id="L2367">        <span class="tok-fn">Some</span>(Asked::Version) =&gt; {</span>
+<span class="ln" id="L2368">            <span class="tok-fn">asked_for</span>(&amp;format!(<span class="tok-str">&quot;veilvoice verify {}\n&quot;</span>, env!(<span class="tok-str">&quot;CARGO_PKG_VERSION&quot;</span>)));</span>
+<span class="ln" id="L2369">            <span class="tok-kw">return</span> ExitCode::SUCCESS;</span>
+<span class="ln" id="L2370">        }</span>
+<span class="ln" id="L2371">        <span class="tok-fn">Some</span>(Asked::ExitStatus) =&gt; {</span>
+<span class="ln" id="L2372">            <span class="tok-fn">asked_for</span>(&amp;Status::<span class="tok-fn">table</span>());</span>
+<span class="ln" id="L2373">            <span class="tok-kw">return</span> ExitCode::SUCCESS;</span>
+<span class="ln" id="L2374">        }</span>
+<span class="ln" id="L2375">        None =&gt; {}</span>
+<span class="ln" id="L2376">    }</span>
+<span class="ln" id="L2377"></span>
+<span class="ln" id="L2378">    <span class="tok-kw">match</span> args[<span class="tok-num">0</span>].<span class="tok-fn">as_str</span>() {</span>
+<span class="ln" id="L2379">        <span class="tok-str">&quot;auto&quot;</span> =&gt; <span class="tok-fn">command_auto</span>(args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>).<span class="tok-fn">map</span>(Path::new)),</span>
+<span class="ln" id="L2380"></span>
+<span class="ln" id="L2381">        <span class="tok-str">&quot;machine&quot;</span> =&gt; <span class="tok-fn">command_machine</span>(),</span>
+<span class="ln" id="L2382"></span>
+<span class="ln" id="L2383">        <span class="tok-str">&quot;archive&quot;</span> =&gt; <span class="tok-kw">match</span> args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>) {</span>
+<span class="ln" id="L2384">            <span class="tok-fn">Some</span>(path) =&gt; <span class="tok-fn">command_archive</span>(Path::<span class="tok-fn">new</span>(path)),</span>
+<span class="ln" id="L2385">            None =&gt; <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2386">                <span class="tok-str">&quot;`archive` needs an archive to take apart&quot;</span>,</span>
+<span class="ln" id="L2387">                &amp;[<span class="tok-str">&quot;veilvoice verify archive veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>],</span>
+<span class="ln" id="L2388">            ),</span>
+<span class="ln" id="L2389">        },</span>
+<span class="ln" id="L2390"></span>
+<span class="ln" id="L2391">        <span class="tok-str">&quot;key&quot;</span> =&gt; <span class="tok-fn">command_key</span>(),</span>
+<span class="ln" id="L2392"></span>
+<span class="ln" id="L2393">        <span class="tok-str">&quot;gnupg&quot;</span> =&gt; <span class="tok-fn">command_gnupg</span>(args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>).<span class="tok-fn">map</span>(Path::new)),</span>
+<span class="ln" id="L2394"></span>
+<span class="ln" id="L2395">        <span class="tok-str">&quot;deps&quot;</span> =&gt; {</span>
+<span class="ln" id="L2396">            <span class="tok-kw">let</span> install = args.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--install&quot;</span>);</span>
+<span class="ln" id="L2397">            <span class="tok-kw">let</span> yes = args.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--yes&quot;</span>);</span>
+<span class="ln" id="L2398">            <span class="tok-fn">command_deps</span>(install || yes, yes)</span>
+<span class="ln" id="L2399">        }</span>
+<span class="ln" id="L2400"></span>
+<span class="ln" id="L2401">        <span class="tok-str">&quot;build&quot;</span> =&gt; {</span>
+<span class="ln" id="L2402">            <span class="tok-kw">let</span> root = args</span>
+<span class="ln" id="L2403">                .<span class="tok-fn">get</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L2404">                .<span class="tok-fn">filter</span>(|a| !a.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>))</span>
+<span class="ln" id="L2405">                .<span class="tok-fn">map</span>(PathBuf::from)</span>
+<span class="ln" id="L2406">                .<span class="tok-fn">unwrap_or_else</span>(|| PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;.&quot;</span>));</span>
+<span class="ln" id="L2407">            <span class="tok-fn">command_build</span>(&amp;root, None)</span>
+<span class="ln" id="L2408">        }</span>
+<span class="ln" id="L2409"></span>
+<span class="ln" id="L2410">        <span class="tok-str">&quot;reproduce&quot;</span> =&gt; {</span>
+<span class="ln" id="L2411">            <span class="tok-kw">let</span> root = args</span>
+<span class="ln" id="L2412">                .<span class="tok-fn">get</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L2413">                .<span class="tok-fn">filter</span>(|a| !a.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>))</span>
+<span class="ln" id="L2414">                .<span class="tok-fn">map</span>(PathBuf::from)</span>
+<span class="ln" id="L2415">                .<span class="tok-fn">unwrap_or_else</span>(|| PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;.&quot;</span>));</span>
+<span class="ln" id="L2416">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sums = None;</span>
+<span class="ln" id="L2417">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sig = None;</span>
+<span class="ln" id="L2418">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> index = <span class="tok-num">1</span>;</span>
+<span class="ln" id="L2419">            while index &lt; args.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L2420">                <span class="tok-kw">let</span> result = <span class="tok-kw">match</span> args[index].<span class="tok-fn">as_str</span>() {</span>
+<span class="ln" id="L2421">                    <span class="tok-str">&quot;--sums&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sums&quot;</span>).<span class="tok-fn">map</span>(|v| sums = <span class="tok-fn">Some</span>(v)),</span>
+<span class="ln" id="L2422">                    <span class="tok-str">&quot;--sig&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sig&quot;</span>).<span class="tok-fn">map</span>(|v| sig = <span class="tok-fn">Some</span>(v)),</span>
+<span class="ln" id="L2423">                    other <span class="tok-kw">if</span> other.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>) =&gt; <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;unknown option: {other}&quot;</span>)),</span>
+<span class="ln" id="L2424">                    _ =&gt; <span class="tok-fn">Ok</span>(()),</span>
+<span class="ln" id="L2425">                };</span>
+<span class="ln" id="L2426">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(why) = result {</span>
+<span class="ln" id="L2427">                    <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(&amp;why, &amp;[<span class="tok-str">&quot;veilvoice verify --help&quot;</span>]);</span>
+<span class="ln" id="L2428">                }</span>
+<span class="ln" id="L2429">                index += <span class="tok-kw">if</span> args[index].<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;--&quot;</span>) { <span class="tok-num">2</span> } <span class="tok-kw">else</span> { <span class="tok-num">1</span> };</span>
+<span class="ln" id="L2430">            }</span>
+<span class="ln" id="L2431">            <span class="tok-kw">match</span> (sums, sig) {</span>
+<span class="ln" id="L2432">                (<span class="tok-fn">Some</span>(sums), <span class="tok-fn">Some</span>(sig)) =&gt; {</span>
+<span class="ln" id="L2433">                    <span class="tok-fn">command_reproduce</span>(&amp;root, Path::<span class="tok-fn">new</span>(&amp;sums), Path::<span class="tok-fn">new</span>(&amp;sig), None)</span>
+<span class="ln" id="L2434">                }</span>
+<span class="ln" id="L2435">                _ =&gt; <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2436">                    <span class="tok-str">&quot;`reproduce` needs the published hash list and its signature&quot;</span>,</span>
+<span class="ln" id="L2437">                    &amp;[</span>
+<span class="ln" id="L2438">                        <span class="tok-str">&quot;veilvoice verify reproduce . --sums SHA256SUMS --sig SHA256SUMS.asc&quot;</span>,</span>
+<span class="ln" id="L2439">                        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L2440">                        <span class="tok-str">&quot;Both are on the release page. Without the signature there is&quot;</span>,</span>
+<span class="ln" id="L2441">                        <span class="tok-str">&quot;nothing to check the list against, and an unverified list is a&quot;</span>,</span>
+<span class="ln" id="L2442">                        <span class="tok-str">&quot;list of numbers somebody sent you.&quot;</span>,</span>
+<span class="ln" id="L2443">                    ],</span>
+<span class="ln" id="L2444">                ),</span>
+<span class="ln" id="L2445">            }</span>
+<span class="ln" id="L2446">        }</span>
+<span class="ln" id="L2447"></span>
+<span class="ln" id="L2448">        <span class="tok-str">&quot;install&quot;</span> =&gt; {</span>
+<span class="ln" id="L2449">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> from = None;</span>
+<span class="ln" id="L2450">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> index = <span class="tok-num">1</span>;</span>
+<span class="ln" id="L2451">            while index &lt; args.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L2452">                <span class="tok-kw">let</span> result = <span class="tok-kw">match</span> args[index].<span class="tok-fn">as_str</span>() {</span>
+<span class="ln" id="L2453">                    <span class="tok-str">&quot;--from&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--from&quot;</span>).<span class="tok-fn">map</span>(|v| from = <span class="tok-fn">Some</span>(v)),</span>
+<span class="ln" id="L2454">                    <span class="tok-str">&quot;--cli&quot;</span> | <span class="tok-str">&quot;--gui&quot;</span> =&gt; <span class="tok-fn">Ok</span>(()),</span>
+<span class="ln" id="L2455">                    other =&gt; <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;unknown option: {other}&quot;</span>)),</span>
+<span class="ln" id="L2456">                };</span>
+<span class="ln" id="L2457">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(why) = result {</span>
+<span class="ln" id="L2458">                    <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(&amp;why, &amp;[<span class="tok-str">&quot;veilvoice verify --help&quot;</span>]);</span>
+<span class="ln" id="L2459">                }</span>
+<span class="ln" id="L2460">                index += <span class="tok-kw">if</span> args[index] == <span class="tok-str">&quot;--from&quot;</span> { <span class="tok-num">2</span> } <span class="tok-kw">else</span> { <span class="tok-num">1</span> };</span>
+<span class="ln" id="L2461">            }</span>
+<span class="ln" id="L2462">            <span class="tok-kw">let</span> cli = args.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--cli&quot;</span>);</span>
+<span class="ln" id="L2463">            <span class="tok-kw">let</span> gui = args.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--gui&quot;</span>);</span>
+<span class="ln" id="L2464">            <span class="tok-kw">match</span> from {</span>
+<span class="ln" id="L2465">                <span class="tok-fn">Some</span>(dir) =&gt; <span class="tok-fn">command_install</span>(Path::<span class="tok-fn">new</span>(&amp;dir), cli, gui),</span>
+<span class="ln" id="L2466">                None =&gt; <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2467">                    <span class="tok-str">&quot;`install` needs a directory to install from&quot;</span>,</span>
+<span class="ln" id="L2468">                    &amp;[</span>
+<span class="ln" id="L2469">                        <span class="tok-str">&quot;veilvoice verify install --from target/release --cli --gui&quot;</span>,</span>
+<span class="ln" id="L2470">                        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L2471">                        <span class="tok-str">&quot;Check that directory first, with `file` or `reproduce`.&quot;</span>,</span>
+<span class="ln" id="L2472">                        <span class="tok-str">&quot;This command copies; it does not verify.&quot;</span>,</span>
+<span class="ln" id="L2473">                    ],</span>
+<span class="ln" id="L2474">                ),</span>
+<span class="ln" id="L2475">            }</span>
+<span class="ln" id="L2476">        }</span>
+<span class="ln" id="L2477"></span>
+<span class="ln" id="L2478">        <span class="tok-str">&quot;release&quot;</span> =&gt; <span class="tok-kw">match</span> args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>) {</span>
+<span class="ln" id="L2479">            <span class="tok-fn">Some</span>(tag) =&gt; <span class="tok-fn">command_release</span>(tag, args.<span class="tok-fn">get</span>(<span class="tok-num">2</span>).<span class="tok-fn">map</span>(String::as_str)),</span>
+<span class="ln" id="L2480">            None =&gt; <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2481">                <span class="tok-str">&quot;`release` needs a tag&quot;</span>,</span>
+<span class="ln" id="L2482">                &amp;[<span class="tok-str">&quot;veilvoice verify release v0.1.11&quot;</span>],</span>
+<span class="ln" id="L2483">            ),</span>
+<span class="ln" id="L2484">        },</span>
+<span class="ln" id="L2485"></span>
+<span class="ln" id="L2486">        <span class="tok-str">&quot;hash&quot;</span> =&gt; <span class="tok-kw">match</span> args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>) {</span>
+<span class="ln" id="L2487">            <span class="tok-fn">Some</span>(path) =&gt; <span class="tok-fn">command_hash</span>(Path::<span class="tok-fn">new</span>(path)),</span>
+<span class="ln" id="L2488">            None =&gt; <span class="tok-fn">usage</span>(<span class="tok-str">&quot;`hash` needs a file&quot;</span>, &amp;[<span class="tok-str">&quot;veilvoice verify hash &lt;FILE&gt;&quot;</span>]),</span>
+<span class="ln" id="L2489">        },</span>
+<span class="ln" id="L2490"></span>
+<span class="ln" id="L2491">        <span class="tok-str">&quot;sums&quot;</span> =&gt; {</span>
+<span class="ln" id="L2492">            <span class="tok-kw">if</span> args.<span class="tok-fn">len</span>() &lt; <span class="tok-num">3</span> {</span>
+<span class="ln" id="L2493">                <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2494">                    <span class="tok-str">&quot;`sums` needs a hash list and a signature&quot;</span>,</span>
+<span class="ln" id="L2495">                    &amp;[<span class="tok-str">&quot;veilvoice verify sums &lt;SHA256SUMS&gt; &lt;SHA256SUMS.asc&gt;&quot;</span>],</span>
+<span class="ln" id="L2496">                );</span>
+<span class="ln" id="L2497">            }</span>
+<span class="ln" id="L2498">            <span class="tok-fn">command_sums</span>(Path::<span class="tok-fn">new</span>(&amp;args[<span class="tok-num">1</span>]), Path::<span class="tok-fn">new</span>(&amp;args[<span class="tok-num">2</span>]))</span>
+<span class="ln" id="L2499">        }</span>
+<span class="ln" id="L2500"></span>
+<span class="ln" id="L2501">        <span class="tok-str">&quot;file&quot;</span> =&gt; {</span>
+<span class="ln" id="L2502">            <span class="tok-kw">let</span> file = <span class="tok-kw">match</span> args.<span class="tok-fn">get</span>(<span class="tok-num">1</span>).<span class="tok-fn">map</span>(PathBuf::from) {</span>
+<span class="ln" id="L2503">                <span class="tok-fn">Some</span>(path) =&gt; path,</span>
+<span class="ln" id="L2504">                None =&gt; {</span>
+<span class="ln" id="L2505">                    <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2506">                        <span class="tok-str">&quot;`file` needs a file to check&quot;</span>,</span>
+<span class="ln" id="L2507">                        &amp;[<span class="tok-str">&quot;veilvoice verify file &lt;FILE&gt; --sums &lt;SHA256SUMS&gt; --sig &lt;SIG&gt;&quot;</span>],</span>
+<span class="ln" id="L2508">                    )</span>
+<span class="ln" id="L2509">                }</span>
+<span class="ln" id="L2510">            };</span>
+<span class="ln" id="L2511"></span>
+<span class="ln" id="L2512">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sums = None;</span>
+<span class="ln" id="L2513">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sig = None;</span>
+<span class="ln" id="L2514">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> sha256 = None;</span>
+<span class="ln" id="L2515">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> index = <span class="tok-num">2</span>;</span>
+<span class="ln" id="L2516">            while index &lt; args.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L2517">                <span class="tok-kw">let</span> result = <span class="tok-kw">match</span> args[index].<span class="tok-fn">as_str</span>() {</span>
+<span class="ln" id="L2518">                    <span class="tok-str">&quot;--sums&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sums&quot;</span>).<span class="tok-fn">map</span>(|v| sums = <span class="tok-fn">Some</span>(v)),</span>
+<span class="ln" id="L2519">                    <span class="tok-str">&quot;--sig&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sig&quot;</span>).<span class="tok-fn">map</span>(|v| sig = <span class="tok-fn">Some</span>(v)),</span>
+<span class="ln" id="L2520">                    <span class="tok-str">&quot;--sha256&quot;</span> =&gt; <span class="tok-fn">take_value</span>(&amp;args, index, <span class="tok-str">&quot;--sha256&quot;</span>).<span class="tok-fn">map</span>(|v| sha256 = <span class="tok-fn">Some</span>(v)),</span>
+<span class="ln" id="L2521">                    other =&gt; <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;unknown option: {other}&quot;</span>)),</span>
+<span class="ln" id="L2522">                };</span>
+<span class="ln" id="L2523">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(why) = result {</span>
+<span class="ln" id="L2524">                    <span class="tok-kw">return</span> <span class="tok-fn">usage</span>(&amp;why, &amp;[<span class="tok-str">&quot;veilvoice verify --help&quot;</span>]);</span>
+<span class="ln" id="L2525">                }</span>
+<span class="ln" id="L2526">                index += <span class="tok-num">2</span>;</span>
+<span class="ln" id="L2527">            }</span>
+<span class="ln" id="L2528"></span>
+<span class="ln" id="L2529">            <span class="tok-kw">match</span> (sha256, sums, sig) {</span>
+<span class="ln" id="L2530">                (<span class="tok-fn">Some</span>(_), <span class="tok-fn">Some</span>(_), _) | (<span class="tok-fn">Some</span>(_), _, <span class="tok-fn">Some</span>(_)) =&gt; <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2531">                    <span class="tok-str">&quot;--sha256 and --sums are two different checks&quot;</span>,</span>
+<span class="ln" id="L2532">                    &amp;[</span>
+<span class="ln" id="L2533">                        <span class="tok-str">&quot;They prove different things, so this tool will not run both&quot;</span>,</span>
+<span class="ln" id="L2534">                        <span class="tok-str">&quot;at once and report one answer. Pick one:&quot;</span>,</span>
+<span class="ln" id="L2535">                        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L2536">                        <span class="tok-str">&quot;  --sums/--sig  proves the download is INTACT&quot;</span>,</span>
+<span class="ln" id="L2537">                        <span class="tok-str">&quot;  --sha256      can prove it is REPRODUCIBLE&quot;</span>,</span>
+<span class="ln" id="L2538">                        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L2539">                        <span class="tok-str">&quot;veilvoice verify --explain&quot;</span>,</span>
+<span class="ln" id="L2540">                    ],</span>
+<span class="ln" id="L2541">                ),</span>
+<span class="ln" id="L2542">                (<span class="tok-fn">Some</span>(hash), None, None) =&gt; <span class="tok-fn">command_file_against_hash</span>(&amp;file, &amp;hash),</span>
+<span class="ln" id="L2543">                (None, <span class="tok-fn">Some</span>(sums), <span class="tok-fn">Some</span>(sig)) =&gt; {</span>
+<span class="ln" id="L2544">                    <span class="tok-fn">command_file_against_sums</span>(&amp;file, Path::<span class="tok-fn">new</span>(&amp;sums), Path::<span class="tok-fn">new</span>(&amp;sig))</span>
+<span class="ln" id="L2545">                }</span>
+<span class="ln" id="L2546">                (None, <span class="tok-fn">Some</span>(_), None) =&gt; <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2547">                    <span class="tok-str">&quot;--sums without --sig&quot;</span>,</span>
+<span class="ln" id="L2548">                    &amp;[</span>
+<span class="ln" id="L2549">                        <span class="tok-str">&quot;An unsigned hash list proves nothing: whoever could replace the&quot;</span>,</span>
+<span class="ln" id="L2550">                        <span class="tok-str">&quot;download could replace the list beside it. Pass the signature&quot;</span>,</span>
+<span class="ln" id="L2551">                        <span class="tok-str">&quot;as well, or use --sha256 with a hash you obtained some other way.&quot;</span>,</span>
+<span class="ln" id="L2552">                    ],</span>
+<span class="ln" id="L2553">                ),</span>
+<span class="ln" id="L2554">                (None, None, <span class="tok-fn">Some</span>(_)) =&gt; <span class="tok-fn">usage</span>(<span class="tok-str">&quot;--sig without --sums&quot;</span>, &amp;[<span class="tok-str">&quot;Pass both.&quot;</span>]),</span>
+<span class="ln" id="L2555">                (None, None, None) =&gt; <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2556">                    <span class="tok-str">&quot;nothing to check the file against&quot;</span>,</span>
+<span class="ln" id="L2557">                    &amp;[</span>
+<span class="ln" id="L2558">                        <span class="tok-str">&quot;This binary carries the signing key, but it cannot carry the&quot;</span>,</span>
+<span class="ln" id="L2559">                        <span class="tok-str">&quot;expected hash of your file -- a file cannot contain its own&quot;</span>,</span>
+<span class="ln" id="L2560">                        <span class="tok-str">&quot;digest. Give it one:&quot;</span>,</span>
+<span class="ln" id="L2561">                        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L2562">                        <span class="tok-str">&quot;  --sums SHA256SUMS --sig SHA256SUMS.asc&quot;</span>,</span>
+<span class="ln" id="L2563">                        <span class="tok-str">&quot;  --sha256 &lt;64 hex characters&gt;&quot;</span>,</span>
+<span class="ln" id="L2564">                        <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L2565">                        <span class="tok-str">&quot;veilvoice verify --explain&quot;</span>,</span>
+<span class="ln" id="L2566">                    ],</span>
+<span class="ln" id="L2567">                ),</span>
+<span class="ln" id="L2568">            }</span>
+<span class="ln" id="L2569">        }</span>
+<span class="ln" id="L2570"></span>
+<span class="ln" id="L2571">        other =&gt; <span class="tok-fn">usage</span>(</span>
+<span class="ln" id="L2572">            &amp;format!(<span class="tok-str">&quot;unknown command: {other}&quot;</span>),</span>
+<span class="ln" id="L2573">            &amp;[<span class="tok-str">&quot;veilvoice verify --help&quot;</span>],</span>
+<span class="ln" id="L2574">        ),</span>
+<span class="ln" id="L2575">    }</span>
+<span class="ln" id="L2576">}</span>
+</span>
+<span class="ln" id="L2577"></span>
+<span class="ln" id="L2578"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L2579"><span class="tok-kw">mod</span> tests;</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

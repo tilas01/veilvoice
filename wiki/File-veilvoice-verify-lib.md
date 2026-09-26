@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/lib.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 2520 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 2579 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs)
 
 ## Contents
 
@@ -68,21 +68,22 @@ Give it arguments and it does exactly what you asked.
 
 ## What this file contains
 
-2520 lines defining **40 functions** (2 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+2579 lines defining **41 functions** (2 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Manifest` (line 1089) -- What the release said is inside its archives, if anything usable.
+- `enum Asked` (line 2278) -- A question about this program, rather than something for it to do.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `help_text` (line 167) -- The verifier's own help, with its verbosity and exit-status tables.
-- `run` (line 2281) -- Run the verifier over args, which are the words after veilvoice verify.
+- `run` (line 2337) -- Run the verifier over args, which are the words after veilvoice verify.
   - reaches: `asked_for`, `command_archive`, `command_auto`, `command_build`, `command_deps`, `command_file_against_hash`, `command_file_against_sums`, `command_gnupg`, `command_hash`, `command_install`, `command_key`, `command_machine`
 
 ## What calls what
 
-_22 of 40 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 41 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **helper** -- private to this file._
 
@@ -117,7 +118,7 @@ flowchart TD
     n_report_extracted["report_extracted<br/>line 1025"]
     n_manifest["manifest<br/>line 1105"]
     n_report_against_manifest["report_against_manifest<br/>line 1136"]
-    n_run(["run<br/>line 2281"])
+    n_run(["run<br/>line 2337"])
     n_command_auto --> n_command_file_against_sums
     n_command_auto --> n_incomplete_deny
     n_command_auto --> n_manifest
@@ -182,7 +183,7 @@ flowchart TD
     click n_report_extracted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1025" "open the source"
     click n_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1105" "open the source"
     click n_report_against_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1136" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2281" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2337" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -237,4 +238,6 @@ flowchart TD
 | `command_reproduce` <sub>fn</sub> | [2060](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2060) | Build here, and compare against the published hashes for this platform. |
 | `command_install` <sub>fn</sub> | [2169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2169) | Put binaries where a shell will find them. |
 | `asked_for` <sub>fn</sub> | [2258](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2258) | Print something the reader asked for by name, at any level. |
-| `run` <sub>pub fn</sub> | [2281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2281) | Run the verifier over args, which are the words after veilvoice verify. |
+| `Asked` <sub>enum</sub> | [2278](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2278) | A question about this program, rather than something for it to do. |
+| `Asked::in_args` <sub>fn</sub> | [2295](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2295) | Which of these, if any, the arguments ask for. |
+| `run` <sub>pub fn</sub> | [2337](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2337) | Run the verifier over args, which are the words after veilvoice verify. |

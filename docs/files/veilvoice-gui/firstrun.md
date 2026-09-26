@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/firstrun.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 866 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 871 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs)
 
 ## Contents
 
@@ -68,18 +68,18 @@ walk away. You can skip any of them and set them later.
 
 ## What this file contains
 
-866 lines defining **14 functions** (1 public), **4 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+871 lines defining **14 functions** (1 public), **4 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Step` (line 51) -- Which card is showing.
-- `struct FirstRun` (line 108) -- What the setup is holding while it runs.
-- `enum Outcome` (line 130) -- What the panel wants the application to do after drawing.
-- `struct Reading` (line 591) -- What the last card of the tour reads from this computer.
+- `struct FirstRun` (line 113) -- What the setup is holding while it runs.
+- `enum Outcome` (line 135) -- What the panel wants the application to do after drawing.
+- `struct Reading` (line 596) -- What the last card of the tour reads from this computer.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `FirstRun::panel` (line 144) -- Draw the current card.
+- `FirstRun::panel` (line 149) -- Draw the current card.
   - reaches: `app_lock`, `appearance`, `autolock`, `machine`, `recording`, `should_skip`, `buttons`, `card`, `field`, `still_reading`
 
 ## What calls what
@@ -103,19 +103,19 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_next["Step::next<br/>line 75"]
-    n_position["Step::position<br/>line 86"]
-    n_panel(["FirstRun::panel<br/>line 144"])
-    n_should_skip["FirstRun::should_skip<br/>line 208"]
-    n_appearance["FirstRun::appearance<br/>line 217"]
-    n_app_lock["FirstRun::app_lock<br/>line 234"]
-    n_recording["FirstRun::recording<br/>line 306"]
-    n_machine["FirstRun::machine<br/>line 402"]
-    n_autolock["FirstRun::autolock<br/>line 541"]
-    n_card["card<br/>line 565"]
-    n_read_machine["read_machine<br/>line 609"]
-    n_still_reading["still_reading<br/>line 629"]
-    n_field["field<br/>line 641"]
-    n_buttons["buttons<br/>line 653"]
+    n_position["Step::position<br/>line 91"]
+    n_panel(["FirstRun::panel<br/>line 149"])
+    n_should_skip["FirstRun::should_skip<br/>line 213"]
+    n_appearance["FirstRun::appearance<br/>line 222"]
+    n_app_lock["FirstRun::app_lock<br/>line 239"]
+    n_recording["FirstRun::recording<br/>line 311"]
+    n_machine["FirstRun::machine<br/>line 407"]
+    n_autolock["FirstRun::autolock<br/>line 546"]
+    n_card["card<br/>line 570"]
+    n_read_machine["read_machine<br/>line 614"]
+    n_still_reading["still_reading<br/>line 634"]
+    n_field["field<br/>line 646"]
+    n_buttons["buttons<br/>line 658"]
     n_app_lock --> n_buttons
     n_app_lock --> n_card
     n_app_lock --> n_field
@@ -136,19 +136,19 @@ flowchart TD
     n_recording --> n_card
     n_recording --> n_field
     click n_next href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L75" "open the source"
-    click n_position href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L86" "open the source"
-    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L144" "open the source"
-    click n_should_skip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L208" "open the source"
-    click n_appearance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L217" "open the source"
-    click n_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L234" "open the source"
-    click n_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L306" "open the source"
-    click n_machine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L402" "open the source"
-    click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L541" "open the source"
-    click n_card href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L565" "open the source"
-    click n_read_machine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L609" "open the source"
-    click n_still_reading href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L629" "open the source"
-    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L641" "open the source"
-    click n_buttons href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L653" "open the source"
+    click n_position href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L91" "open the source"
+    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L149" "open the source"
+    click n_should_skip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L213" "open the source"
+    click n_appearance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L222" "open the source"
+    click n_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L239" "open the source"
+    click n_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L311" "open the source"
+    click n_machine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L407" "open the source"
+    click n_autolock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L546" "open the source"
+    click n_card href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L570" "open the source"
+    click n_read_machine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L614" "open the source"
+    click n_still_reading href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L634" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L646" "open the source"
+    click n_buttons href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L658" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_panel entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -163,23 +163,23 @@ flowchart TD
 |---|---:|---|
 | `Step` <sub>pub enum</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L51) | Which card is showing. |
 | `Step::next` <sub>fn</sub> | [75](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L75) | The step after this one, or None at the end of the tour. |
-| `Step::position` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L86) | One-based position, for "step 2 of 4". |
-| `Step::COUNT` <sub>const</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L103) | How many cards the tour has. |
-| `FirstRun` <sub>pub struct</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L108) | What the setup is holding while it runs. |
-| `Outcome` <sub>pub enum</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L130) | What the panel wants the application to do after drawing. |
-| `FirstRun::panel` <sub>pub fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L144) | Draw the current card. |
-| `FirstRun::should_skip` <sub>fn</sub> | [208](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L208) | Whether a card has nothing left to ask. |
-| `FirstRun::appearance` <sub>fn</sub> | [217](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L217) | The appearance step: pick a palette and see it applied immediately. |
-| `FirstRun::app_lock` <sub>fn</sub> | [234](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L234) | The app-lock step: set a passphrase for VeilVoice itself, or decline it. |
-| `FirstRun::recording` <sub>fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L306) | The recording step: the at-rest passphrase, and what it is separate from. |
-| `FirstRun::machine` <sub>fn</sub> | [402](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L402) | The machine card: what this computer says, read once rather than per frame. |
-| `FirstRun::autolock` <sub>fn</sub> | [541](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L541) | The auto-lock step: how long idle before the window locks itself. |
-| `card` <sub>fn</sub> | [565](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L565) | A bordered card, so each step reads as one thing rather than a page of text. |
-| `Reading` <sub>struct</sub> | [591](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L591) | What the last card of the tour reads from this computer. |
-| `read_machine` <sub>fn</sub> | [609](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L609) | Ask this computer everything the last card shows, on a worker thread. |
-| `still_reading` <sub>fn</sub> | [629](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L629) | The line a card shows where an answer will go, while it is being got. |
-| `field` <sub>fn</sub> | [641](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L641) | A password field with its label, laid out like the rest of the application. |
-| `buttons` <sub>fn</sub> | [653](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L653) | The row that moves on. |
+| `Step::position` <sub>fn</sub> | [91](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L91) | One-based position, for the "step 2 of 5" line the card shows. |
+| `Step::COUNT` <sub>const</sub> | [108](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L108) | How many cards the tour has. |
+| `FirstRun` <sub>pub struct</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L113) | What the setup is holding while it runs. |
+| `Outcome` <sub>pub enum</sub> | [135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L135) | What the panel wants the application to do after drawing. |
+| `FirstRun::panel` <sub>pub fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L149) | Draw the current card. |
+| `FirstRun::should_skip` <sub>fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L213) | Whether a card has nothing left to ask. |
+| `FirstRun::appearance` <sub>fn</sub> | [222](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L222) | The appearance step: pick a palette and see it applied immediately. |
+| `FirstRun::app_lock` <sub>fn</sub> | [239](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L239) | The app-lock step: set a passphrase for VeilVoice itself, or decline it. |
+| `FirstRun::recording` <sub>fn</sub> | [311](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L311) | The recording step: the at-rest passphrase, and what it is separate from. |
+| `FirstRun::machine` <sub>fn</sub> | [407](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L407) | The machine card: what this computer says, read once rather than per frame. |
+| `FirstRun::autolock` <sub>fn</sub> | [546](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L546) | The auto-lock step: how long idle before the window locks itself. |
+| `card` <sub>fn</sub> | [570](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L570) | A bordered card, so each step reads as one thing rather than a page of text. |
+| `Reading` <sub>struct</sub> | [596](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L596) | What the last card of the tour reads from this computer. |
+| `read_machine` <sub>fn</sub> | [614](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L614) | Ask this computer everything the last card shows, on a worker thread. |
+| `still_reading` <sub>fn</sub> | [634](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L634) | The line a card shows where an answer will go, while it is being got. |
+| `field` <sub>fn</sub> | [646](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L646) | A password field with its label, laid out like the rest of the application. |
+| `buttons` <sub>fn</sub> | [658](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs#L658) | The row that moves on. |
 
 ---
 

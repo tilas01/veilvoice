@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/tests.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1743 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1820 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
 
 ## Contents
 
@@ -38,11 +38,11 @@ whether it says no.
 
 ## What this file contains
 
-1743 lines defining **41 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1820 lines defining **42 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
-_22 of 41 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 42 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **helper** -- private to this file._
 
@@ -153,3 +153,4 @@ flowchart TD
 | `tar_on_this_machine` <sub>fn</sub> | [1664](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1664) | A tar to run, if this machine has one. |
 | `the_machine_pass_never_runs_a_program_it_finds` <sub>fn</sub> | [1685](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1685) | Roadmap item 164. |
 | `the_remembered_record_says_in_itself_that_it_is_not_evidence` <sub>fn</sub> | [1726](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1726) | Roadmap item 164. |
+| `a_question_about_the_program_is_answered_wherever_it_is_asked` <sub>fn</sub> | [1752](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1752) | F-228. |

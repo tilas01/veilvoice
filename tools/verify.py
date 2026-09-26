@@ -408,6 +408,18 @@ CHECKS = [
     # do.
     ("every published item says what it is for",
      [sys.executable, "tools/audit/documented.py"]),
+    # F-228. `veilvoice --help` names the commands that reach the network, and
+    # the manual has a section explaining them. Two places naming one set is two
+    # places to be wrong, and both were: F-222 was the manual denying that
+    # `update` existed, and F-223 was found by hand while fixing F-222, because
+    # the manual never named `veilvoice verify release` and running it to find
+    # out what to write is what showed that asking it for help opened a
+    # connection. The program's list is the authority and this only reads one
+    # way, since the section legitimately mentions commands that reach nothing.
+    ("the manual names every command that reaches the network",
+     [sys.executable, "tools/audit/network_claims.py"]),
+    ("that guard catches what it claims to, including the case it got wrong first",
+     [sys.executable, "tools/audit/network_claims.py", "--self-test"]),
     ("every command is documented, and its window location exists",
      [sys.executable, "tools/docs/commands.py", "--check"]),
     ("the developer guide matches the tree",

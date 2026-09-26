@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1743 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1820 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1890,6 +1890,85 @@
 <span class="ln" id="L1741">        <span class="tok-str">&quot;and say why:\n{preamble}&quot;</span></span>
 <span class="ln" id="L1742">    );</span>
 <span class="ln" id="L1743">}</span>
+</span>
+<span class="ln" id="L1744"></span>
+<span class="src-item" id="fn-a_question_about_the_program_is_answered_wherever_it_is_asked">
+<span class="ln" id="L1745"><span class="tok-com">/// **F-228.** A request for help must be answered, wherever it is written.</span></span>
+<span class="ln" id="L1746"><span class="tok-com">///</span></span>
+<span class="ln" id="L1747"><span class="tok-com">/// `veilvoice verify release --help` read `release` as the subcommand and</span></span>
+<span class="ln" id="L1748"><span class="tok-com">/// `--help` as the tag to fetch, so asking for help opened a connection. Every</span></span>
+<span class="ln" id="L1749"><span class="tok-com">/// case below was confirmed against the old rule, which read only the first</span></span>
+<span class="ln" id="L1750"><span class="tok-com">/// argument: each of the &quot;behind a subcommand&quot; ones failed.</span></span>
+<span class="ln" id="L1751"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1752"><span class="tok-kw">fn</span> <span class="tok-fn">a_question_about_the_program_is_answered_wherever_it_is_asked</span>() {</span>
+<span class="ln" id="L1753">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::Asked;</span>
+<span class="ln" id="L1754"></span>
+<span class="ln" id="L1755">    <span class="tok-kw">fn</span> <span class="tok-fn">args</span>(words: &amp;[&amp;str]) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L1756">        words.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|w| w.<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L1757">    }</span>
+<span class="ln" id="L1758"></span>
+<span class="ln" id="L1759">    <span class="tok-kw">for</span> words <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1760">        vec![<span class="tok-str">&quot;--help&quot;</span>],</span>
+<span class="ln" id="L1761">        vec![<span class="tok-str">&quot;-h&quot;</span>],</span>
+<span class="ln" id="L1762">        vec![<span class="tok-str">&quot;help&quot;</span>],</span>
+<span class="ln" id="L1763">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>],</span>
+<span class="ln" id="L1764">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;-h&quot;</span>],</span>
+<span class="ln" id="L1765">        vec![<span class="tok-str">&quot;archive&quot;</span>, <span class="tok-str">&quot;some.tar.gz&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>],</span>
+<span class="ln" id="L1766">        vec![<span class="tok-str">&quot;reproduce&quot;</span>, <span class="tok-str">&quot;.&quot;</span>, <span class="tok-str">&quot;--sums&quot;</span>, <span class="tok-str">&quot;SHA256SUMS&quot;</span>, <span class="tok-str">&quot;-h&quot;</span>],</span>
+<span class="ln" id="L1767">    ] {</span>
+<span class="ln" id="L1768">        assert_eq!(</span>
+<span class="ln" id="L1769">            Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;words)),</span>
+<span class="ln" id="L1770">            <span class="tok-fn">Some</span>(Asked::Help),</span>
+<span class="ln" id="L1771">            <span class="tok-str">&quot;help asked for as {words:?} must be answered before anything runs&quot;</span></span>
+<span class="ln" id="L1772">        );</span>
+<span class="ln" id="L1773">    }</span>
+<span class="ln" id="L1774"></span>
+<span class="ln" id="L1775">    assert_eq!(</span>
+<span class="ln" id="L1776">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--version&quot;</span>])),</span>
+<span class="ln" id="L1777">        <span class="tok-fn">Some</span>(Asked::Version)</span>
+<span class="ln" id="L1778">    );</span>
+<span class="ln" id="L1779">    assert_eq!(</span>
+<span class="ln" id="L1780">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--explain&quot;</span>])),</span>
+<span class="ln" id="L1781">        <span class="tok-fn">Some</span>(Asked::Explain)</span>
+<span class="ln" id="L1782">    );</span>
+<span class="ln" id="L1783">    assert_eq!(</span>
+<span class="ln" id="L1784">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--exit-status&quot;</span>])),</span>
+<span class="ln" id="L1785">        <span class="tok-fn">Some</span>(Asked::ExitStatus)</span>
+<span class="ln" id="L1786">    );</span>
+<span class="ln" id="L1787"></span>
+<span class="ln" id="L1788">    <span class="tok-com">// Help wins, whichever order they are written in.</span></span>
+<span class="ln" id="L1789">    assert_eq!(</span>
+<span class="ln" id="L1790">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;--version&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>])),</span>
+<span class="ln" id="L1791">        <span class="tok-fn">Some</span>(Asked::Help)</span>
+<span class="ln" id="L1792">    );</span>
+<span class="ln" id="L1793">    assert_eq!(</span>
+<span class="ln" id="L1794">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;--help&quot;</span>, <span class="tok-str">&quot;--version&quot;</span>])),</span>
+<span class="ln" id="L1795">        <span class="tok-fn">Some</span>(Asked::Help)</span>
+<span class="ln" id="L1796">    );</span>
+<span class="ln" id="L1797"></span>
+<span class="ln" id="L1798">    <span class="tok-com">// And a real invocation asks nothing about the program, so nothing here</span></span>
+<span class="ln" id="L1799">    <span class="tok-com">// may catch it. `help` after the first word is a path or a tag.</span></span>
+<span class="ln" id="L1800">    <span class="tok-kw">for</span> words <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1801">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;v0.1.23&quot;</span>],</span>
+<span class="ln" id="L1802">        vec![<span class="tok-str">&quot;auto&quot;</span>],</span>
+<span class="ln" id="L1803">        vec![<span class="tok-str">&quot;archive&quot;</span>, <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>],</span>
+<span class="ln" id="L1804">        vec![<span class="tok-str">&quot;gnupg&quot;</span>, <span class="tok-str">&quot;help&quot;</span>],</span>
+<span class="ln" id="L1805">        vec![</span>
+<span class="ln" id="L1806">            <span class="tok-str">&quot;reproduce&quot;</span>,</span>
+<span class="ln" id="L1807">            <span class="tok-str">&quot;.&quot;</span>,</span>
+<span class="ln" id="L1808">            <span class="tok-str">&quot;--sums&quot;</span>,</span>
+<span class="ln" id="L1809">            <span class="tok-str">&quot;SHA256SUMS&quot;</span>,</span>
+<span class="ln" id="L1810">            <span class="tok-str">&quot;--sig&quot;</span>,</span>
+<span class="ln" id="L1811">            <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>,</span>
+<span class="ln" id="L1812">        ],</span>
+<span class="ln" id="L1813">    ] {</span>
+<span class="ln" id="L1814">        assert_eq!(</span>
+<span class="ln" id="L1815">            Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;words)),</span>
+<span class="ln" id="L1816">            None,</span>
+<span class="ln" id="L1817">            <span class="tok-str">&quot;{words:?} is work to do, not a question about the program&quot;</span></span>
+<span class="ln" id="L1818">        );</span>
+<span class="ln" id="L1819">    }</span>
+<span class="ln" id="L1820">}</span>
 </span>
 </code></pre>
 </main>

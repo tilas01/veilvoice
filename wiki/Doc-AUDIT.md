@@ -938,6 +938,111 @@ system for no movement, and the twelve older spinners are still twelve. Both are
 roadmap item 169, which is the next item and is now a sweep rather than an
 invention. Said here, and in the module's own doc comment, rather than left for a
 reader to notice the gap and wonder whether anybody had.
+
+### F-228: asking for help opened a connection
+
+Found while fixing F-222, by doing the thing F-222 is about. The manual's
+network section named one of the two commands that reach the network and not the
+other, so I ran `veilvoice verify release --help` to read what the missing one
+does. It did not print help. It went to the network:
+
+```
+  fetching into veilvoice---help
+  SHA256SUMS ... failed
+FAILED: could not complete the check.
+  download failed: .../releases/download/--help/SHA256SUMS
+```
+
+`veilvoice verify` hands its arguments to `veilvoice_verify::run`, which parses
+them itself rather than through `clap`, because the verifier was a program of its
+own before it was folded in. It read `--help` at `args[0]` only. With `release`
+in front of it, `--help` was simply the next positional, which for that
+subcommand is the release tag.
+
+**The promise this breaks is the one in its own first paragraph.** `veilvoice
+--help` opens with "Nothing here reaches the network except when you ask it to by
+name". Asking for help is the clearest possible case of not asking for that, and
+it is the request somebody makes when they do not yet know what the command does
+and are being careful. `-h` did the same. So did `--version`, `--explain` and
+`--exit-status`, behind any subcommand that takes a positional.
+
+Nothing of the reader's leaves in that request and nothing is written, so the
+cost is one pointless request to a public page and a confusing failure. It is
+recorded as a real defect anyway, because what was broken is a stated guarantee
+rather than an outcome: a program that says it will not open a connection unless
+asked has to mean it in every case, and "the request was harmless" is the
+argument that makes the guarantee worth nothing.
+
+## What it does now
+
+`Asked::in_args` reads these four from anywhere in the arguments, the way
+`Loudness::take_from` already read the verbosity flags, and answering one is the
+whole of that run. Help wins over the other three whatever order they are
+written in. `help` as a bare word is still accepted only first, because a later
+`help` is a path or a tag.
+
+One thing becomes unreachable: a file genuinely named `-h`. That is a better
+thing to be wrong about than a connection nobody asked for, and it is written
+down here rather than left for somebody to discover.
+
+## What is checked
+
+One regression test over `Asked::in_args`, which is a pure function of the
+arguments so the test drives the real decision rather than a copy of it. Seven
+ways of asking for help, including behind three different subcommands, the other
+three flags behind a subcommand, both orders of `--help` and `--version`, and
+five real invocations that must not be caught, among them `gnupg help`, where
+`help` is a path.
+
+Confirmed by putting the old rule back, as one line restricting the scan to the
+first argument: the test fails naming `["release", "--help"]`.
+
+#### Two things this says about F-222
+
+The first is that the sweep was worth doing. The manual's missing sentence was
+the whole of F-222, and writing the sentence meant running the command, and
+running the command found this. A stale document is not only wrong about the
+program; it is a place nobody has looked.
+
+The second is a correction to F-222's own write-up, which said no new check was
+possible. That is true of the general claim and it is not true of this one.
+Every command the program says reaches the network can be read out of the
+captured help text, and whether the manual's network section names each of them
+is a comparison of two lists. Had that check existed, it would have failed on the
+missing `veilvoice verify release` and somebody would have run the command a week
+ago.
+
+So it is written, in the same commit as the fix, rather than left as an
+observation: `tools/audit/network_claims.py`, registered in `tools/verify.py`
+and in `ci.yml`. It reads the commands out of `assets/screenshots/cli-help.txt`,
+which is the program's own output at one remove because `tools/shots/terminal.py`
+compares that file against the built program on every run, and asks whether the
+manual's section about reaching the network names each of them. It reads one way
+only. The section legitimately mentions `veilvoice info`, which explains which
+release stream a copy belongs to and opens nothing, so a check insisting the two
+lists were equal would fail on correct prose, and a check that fails on correct
+prose is one somebody deletes.
+
+#### The guard's own self-test failed first, which is the argument for having one
+
+The first draft of that file reported that the program makes no claim about the
+network at all, and would therefore have passed forever while saying nothing. It
+split the description into sentences on full stops **and colons**, and the claim
+is written with a colon in the middle of it: "except when you ask it to by name:
+`veilvoice update` and `veilvoice verify release` fetch from the releases page".
+The colon ended the sentence one word before the only part of it the check was
+looking for. Two further cases were wrong the same way: the manual writes
+invocations rather than bare names, so `` `veilvoice update --check` `` did not
+count as naming `veilvoice update`, and a command wrapped across a line break
+was not seen at all.
+
+None of that was found by reading the file. It was found because the
+`--self-test` convention meant the guard had to demonstrate the F-222 shape
+failing before it was allowed to be a build step, and it demonstrated the
+opposite. A drift check that cannot see is worse than no drift check, because it
+is counted. All three cases are now expectations in that self-test, including
+the colon, named as the case this file got wrong first.
+
 ### F-222: the manual said the command line could not update, in the week it learned to
 
 `docs/USER_GUIDE.md` is the manual, and `tools/docs/guides.py` cuts three
@@ -7893,7 +7998,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1848 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1849 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9541,7 +9646,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twenty-seven defects found and fixed (F-1 to F-227), across
+**Two hundred and twenty-eight defects found and fixed (F-1 to F-228), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
