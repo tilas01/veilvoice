@@ -419,6 +419,17 @@ pub struct Studio {
     playing: Option<(String, veilvoice_audio::playback::Playing)>,
     /// The folder picker, while it is open.
     picker: crate::dialog::Pending,
+    /// An unlock being carried out, on a thread.
+    ///
+    /// **F-220.** See [`Studio::start_unlock`] for what was happening inside
+    /// one frame.
+    unlocking: Option<mpsc::Receiver<Result<Opened, String>>>,
+    /// A round of decoys being made, on a thread.
+    ///
+    /// **F-220.** Each decoy is a vault the size of the real one, so eight of
+    /// them is eight times the vault written to disk. That happened inside the
+    /// frame the button was pressed on.
+    decoys: Option<mpsc::Receiver<DecoyRound>>,
     /// An export being carried out, on a thread.
     ///
     /// **F-219.** This work used to happen on the frame the picker's answer
@@ -800,9 +811,26 @@ impl Studio {
         self.rest_entry.zeroize();
     }
 
-    /// Derive the key from both entries and open the vault.
-    fn unlock(&mut self) {
-        let Some(dir) = default_dir() else {
+    /// Start deriving the key from both entries and opening the vault.
+    ///
+    /// **F-220.** All of this used to happen on the frame the button was
+    /// pressed. `find_or_make` opens candidate folders until one of them
+    /// answers, and a folder kept properly stocked with decoys has
+    /// twenty-five; `list` then reads and decrypts the index; and the folder
+    /// was measured afterwards, which spawns `df`. The window stopped for all
+    /// of it, which is the same defect as F-218 one tab along.
+    ///
+    /// The entries are consumed and wiped here whatever happens next, before
+    /// anything is spawned, so a passphrase never waits on a thread to be
+    /// cleared out of the form.
+    fn start_unlock(&mut self, ctx: &egui::Context) {
+        if self.unlocking.is_some() {
+            return;
+        }
+        let dir = default_dir();
+        let app = into_secret(&mut self.app_entry);
+        let rest = into_secret(&mut self.rest_entry);
+        let Some(dir) = dir else {
             self.message = Some((
                 "This system does not say where an application should keep its \
                  files, so there is nowhere to put a vault."
@@ -812,114 +840,120 @@ impl Studio {
             return;
         };
 
-        // Both buffers are consumed and wiped here whatever happens next,
-        // including the failure paths below.
-        let app = into_secret(&mut self.app_entry);
-        let rest = into_secret(&mut self.rest_entry);
+        let (tx, rx) = mpsc::channel();
+        self.unlocking = Some(rx);
+        let ctx = ctx.clone();
+        std::thread::spawn(move || {
+            let _ = tx.send(open_vault(&dir, app, rest));
+            ctx.request_repaint();
+        });
+    }
 
-        let key = match StudioKey::derive(&app, &rest) {
-            Ok(key) => key,
-            Err(error) => {
-                self.message = Some((error.to_string(), p::red()));
+    /// Collect a finished unlock. Never waits.
+    fn poll_unlock(&mut self) {
+        let Some(rx) = &self.unlocking else { return };
+        let answer = match rx.try_recv() {
+            Ok(answer) => answer,
+            Err(mpsc::TryRecvError::Empty) => return,
+            Err(mpsc::TryRecvError::Disconnected) => {
+                self.unlocking = None;
+                self.message = Some((
+                    "opening the vault stopped without saying why. Nothing was \
+                     changed; try again."
+                        .to_string(),
+                    p::red(),
+                ));
                 return;
             }
         };
-
-        match veilvoice_crypto::studio::find_or_make(&dir, key) {
-            Ok(vault) => match vault.list() {
-                Ok(entries) => {
-                    let count = entries.len();
-                    self.entries = entries;
-                    self.vault = Some(std::sync::Arc::new(vault));
-                    self.measure(&dir);
-                    self.message = Some((
-                        match count {
-                            0 => "Vault open. Nothing in it yet.".to_string(),
-                            1 => "Vault open. One recording.".to_string(),
-                            n => format!("Vault open. {n} recordings."),
-                        },
-                        p::green(),
-                    ));
-                }
-                // The index would not open. Almost always the wrong pair of
-                // passphrases, and said that way round rather than as a
-                // cryptographic verdict, because that is what it usually means.
-                Err(_) => {
-                    self.message = Some((
-                        "That pair did not open this vault. Both passphrases have \
-                         to be the ones it was made with, and either one being \
-                         wrong looks exactly like this."
-                            .into(),
-                        p::red(),
-                    ));
-                }
-            },
-            Err(error) => self.message = Some((error.to_string(), p::red())),
+        self.unlocking = None;
+        match answer {
+            Ok(opened) => {
+                let count = opened.entries.len();
+                self.entries = opened.entries;
+                self.vault = Some(std::sync::Arc::new(opened.vault));
+                self.free = opened.free;
+                self.vaults = opened.vaults;
+                self.message = Some((
+                    match count {
+                        0 => "Vault open. Nothing in it yet.".to_string(),
+                        1 => "Vault open. One recording.".to_string(),
+                        n => format!("Vault open. {n} recordings."),
+                    },
+                    p::green(),
+                ));
+            }
+            Err(why) => self.message = Some((why, p::red())),
         }
     }
 
-    /// Read the folder the vaults are in: how much room is free, and how many
-    /// vaults are already there.
-    ///
-    /// Both start a little work, so this is called when something changes
-    /// rather than while drawing. Neither is an error worth reporting: a folder
-    /// that will not list and a system that will not say how much is free both
-    /// mean the panel offers a starting point instead of a measurement, and it
-    /// says which.
-    fn measure(&mut self, dir: &std::path::Path) {
-        self.free = veilvoice_setup::space::free_bytes(dir);
-        self.vaults = veilvoice_crypto::studio::vault_dirs(dir)
-            .map(|v| v.len())
-            .unwrap_or(0);
-    }
-
-    /// Make `count` decoys beside the open vault.
+    /// Start making `count` decoys beside the open vault, on a thread.
     ///
     /// Sized from the vault that is open, so they cannot be told from it by
     /// size, and named the way it is named, so they cannot be told from it by
     /// name. The key each is filled under is made and dropped inside
     /// `make_decoy_in`; nothing here ever holds it.
-    fn make_decoys(&mut self, count: usize) {
+    fn start_decoys(&mut self, ctx: &egui::Context, count: usize, shape: DecoyShape) {
+        if self.decoys.is_some() {
+            return;
+        }
         let Some(vault) = &self.vault else { return };
         let Some(parent) = vault.dir().parent().map(std::path::Path::to_path_buf) else {
             return;
         };
 
-        let shape = match veilvoice_crypto::studio::Shape::of(vault) {
-            Ok(shape) => shape,
-            Err(error) => {
-                self.message = Some((error.to_string(), p::red()));
+        let (tx, rx) = mpsc::channel();
+        self.decoys = Some(rx);
+        let ctx = ctx.clone();
+        std::thread::spawn(move || {
+            let _ = tx.send(make_decoys_now(&parent, count, shape));
+            ctx.request_repaint();
+        });
+    }
+
+    /// Collect a finished round of decoys. Never waits.
+    fn poll_decoys(&mut self) {
+        let Some(rx) = &self.decoys else { return };
+        let outcome = match rx.try_recv() {
+            Ok(outcome) => outcome,
+            Err(mpsc::TryRecvError::Empty) => return,
+            Err(mpsc::TryRecvError::Disconnected) => {
+                self.decoys = None;
+                self.message = Some((
+                    "making decoys stopped without saying how far it got. The \
+                     count above is read from the folder."
+                        .to_string(),
+                    p::red(),
+                ));
                 return;
             }
         };
-
-        for made in 0..count {
-            if let Err(error) = veilvoice_crypto::studio::make_decoy_in(&parent, shape) {
-                // Said with the number that did get made. Stopping quietly
-                // after three of eight would leave somebody believing they had
-                // eight, which is worse than the failure itself.
-                self.message = Some((
-                    format!(
-                        "{made} of {count} were made, and then this stopped: {error}. \
-                         The ones already made are decoys and are staying."
-                    ),
-                    p::red(),
-                ));
-                self.measure(&parent);
-                return;
-            }
-        }
-
-        self.measure(&parent);
-        self.message = Some((
-            format!(
-                "{} made. This folder now holds {} and only the pair of passphrases says \
-                 which one is yours.",
-                counted_decoys(count),
-                self.vaults
+        self.decoys = None;
+        self.free = outcome.free;
+        self.vaults = outcome.vaults;
+        self.message = Some(match outcome.error {
+            // Said with the number that did get made. Stopping quietly after
+            // three of eight would leave somebody believing they had eight,
+            // which is worse than the failure itself.
+            Some(error) => (
+                format!(
+                    "{} of {count} were made, and then this stopped: {error}. \
+                     The ones already made are decoys and are staying.",
+                    outcome.made,
+                    count = outcome.asked
+                ),
+                p::red(),
             ),
-            p::green(),
-        ));
+            None => (
+                format!(
+                    "{} made. This folder now holds {} and only the pair of passphrases says \
+                     which one is yours.",
+                    counted_decoys(outcome.made),
+                    outcome.vaults
+                ),
+                p::green(),
+            ),
+        });
     }
 
     /// Start recording into the vault's holding area.
@@ -1510,6 +1544,12 @@ impl Studio {
         input: Option<&str>,
         output: Option<&str>,
     ) {
+        // The workers' answers, before anything is drawn from them. Both are
+        // drained here and in `browser`, because the shut panel and the decoy
+        // panel are each drawn from more than one tab and an answer left in a
+        // channel is an answer nobody sees.
+        self.poll_unlock();
+        self.poll_decoys();
         ui.add_space(4.0);
 
         match self.phase() {
@@ -1635,6 +1675,8 @@ impl Studio {
 
     /// The Recording Browser tab.
     pub fn browser(&mut self, ui: &mut Ui) {
+        self.poll_unlock();
+        self.poll_decoys();
         ui.add_space(4.0);
 
         // A take that has reached its end releases its samples here rather
@@ -1902,20 +1944,33 @@ impl Studio {
     /// vault is in rather than about making a recording, and this is the tab
     /// that already shows what is on the disk.
     fn decoy_panel(&mut self, ui: &mut Ui) {
-        let Some(vault) = &self.vault else { return };
-        let shape = match veilvoice_crypto::studio::Shape::of(vault) {
-            Ok(shape) => shape,
-            // The listing above would already have failed, so there is nothing
-            // to add and no second red line worth printing.
-            Err(_) => return,
-        };
+        if self.vault.is_none() {
+            return;
+        }
+        // **F-220.** From the listing this tab already holds, not from the
+        // vault. `Shape::of` reads and decrypts the index, and this ran on
+        // every frame the panel was drawn: the same work the `entries` field
+        // exists to avoid, five hundred lines from the comment that says so.
+        let shape = veilvoice_crypto::studio::Shape::from_entries(&self.entries);
 
         ui.add_space(10.0);
         let mut wanted = self.decoys_wanted;
         let asked = crate::decoys::panel(ui, shape, self.free, self.vaults, &mut wanted);
         self.decoys_wanted = wanted;
         if let Some(count) = asked {
-            self.make_decoys(count);
+            self.start_decoys(ui.ctx(), count, shape);
+        }
+        if self.decoys.is_some() {
+            ui.horizontal(|ui| {
+                ui.spinner();
+                ui.label(
+                    RichText::new("making them, each the size of the real one")
+                        .small()
+                        .color(p::muted()),
+                );
+            });
+            ui.ctx()
+                .request_repaint_after(std::time::Duration::from_millis(200));
         }
     }
 
@@ -1959,7 +2014,10 @@ impl Studio {
         });
 
         ui.add_space(8.0);
-        let ready = !self.app_entry.is_empty() && !self.rest_entry.is_empty();
+        // Not while one is already running: two unlocks is two answers arriving
+        // for one question, and the second would overwrite the first.
+        let ready =
+            !self.app_entry.is_empty() && !self.rest_entry.is_empty() && self.unlocking.is_none();
         if ui
             .add_enabled(
                 ready,
@@ -1968,9 +2026,19 @@ impl Studio {
             .clicked()
             || (go && ready)
         {
-            self.unlock();
+            self.start_unlock(ui.ctx());
         }
-        if !ready {
+        if self.unlocking.is_some() {
+            // Said, because opening a folder with twenty-five candidates in it
+            // is not instant and a button that goes quiet reads as a dead one.
+            ui.horizontal(|ui| {
+                ui.spinner();
+                ui.label(RichText::new("trying the folder").color(p::muted()).small());
+            });
+            ui.ctx()
+                .request_repaint_after(std::time::Duration::from_millis(200));
+        }
+        if !ready && self.unlocking.is_none() {
             ui.label(
                 RichText::new("Both are needed. One on its own is refused rather than tried.")
                     .color(p::muted())
@@ -2382,6 +2450,96 @@ fn safe_stem(name: &str) -> String {
 }
 
 /// Run `ffmpeg` to put the audio in a video with a black picture.
+/// An opened vault, with everything the panel needs to draw it.
+struct Opened {
+    vault: Vault,
+    entries: Vec<Entry>,
+    free: Option<u64>,
+    vaults: usize,
+}
+
+/// Derive the key and open the vault, on a worker.
+///
+/// Both secrets are consumed here, so the only copies of the passphrase
+/// material are on this thread and are wiped when it ends.
+fn open_vault(dir: &Path, app: Secret, rest: Secret) -> Result<Opened, String> {
+    let key = StudioKey::derive(&app, &rest).map_err(|e| e.to_string())?;
+    let vault = veilvoice_crypto::studio::find_or_make(dir, key).map_err(|e| e.to_string())?;
+    // The index would not open. Almost always the wrong pair of passphrases,
+    // and said that way round rather than as a cryptographic verdict, because
+    // that is what it usually means.
+    let entries = vault.list().map_err(|_| {
+        "That pair did not open this vault. Both passphrases have to be the ones \
+         it was made with, and either one being wrong looks exactly like this."
+            .to_string()
+    })?;
+    let (free, vaults) = measure_folder(dir);
+    Ok(Opened {
+        vault,
+        entries,
+        free,
+        vaults,
+    })
+}
+
+/// What one round of decoy making came back with.
+struct DecoyRound {
+    /// How many were asked for, so the failure can say "three of eight".
+    asked: usize,
+    /// How many were actually made.
+    made: usize,
+    /// Why it stopped, if it stopped early.
+    error: Option<String>,
+    /// The folder re-read afterwards, since both numbers changed.
+    free: Option<u64>,
+    vaults: usize,
+}
+
+/// The shape a decoy is built to, named here so the signatures read.
+type DecoyShape = veilvoice_crypto::studio::Shape;
+
+/// Make `count` decoys in `parent`, then read the folder again. On a worker.
+///
+/// Sized from the vault that is open, so they cannot be told from it by size,
+/// and named the way it is named, so they cannot be told from it by name. The
+/// key each is filled under is made and dropped inside `make_decoy_in`; nothing
+/// here ever holds one, which is why this job needs no vault and no key.
+fn make_decoys_now(parent: &Path, count: usize, shape: DecoyShape) -> DecoyRound {
+    let mut made = 0;
+    let mut error = None;
+    for _ in 0..count {
+        if let Err(why) = veilvoice_crypto::studio::make_decoy_in(parent, shape) {
+            error = Some(why.to_string());
+            break;
+        }
+        made += 1;
+    }
+    let (free, vaults) = measure_folder(parent);
+    DecoyRound {
+        asked: count,
+        made,
+        error,
+        free,
+        vaults,
+    }
+}
+
+/// How much room is free where the vaults are, and how many are there.
+///
+/// Both start a little work: the first spawns `df` on Unix and `fsutil.exe` on
+/// Windows, and the second lists the folder. Neither is an error worth
+/// reporting: a folder that will not list and a system that will not say how
+/// much is free both mean the panel offers a starting point instead of a
+/// measurement, and it says which.
+fn measure_folder(dir: &Path) -> (Option<u64>, usize) {
+    (
+        veilvoice_setup::space::free_bytes(dir),
+        veilvoice_crypto::studio::vault_dirs(dir)
+            .map(|v| v.len())
+            .unwrap_or(0),
+    )
+}
+
 /// How a message about an export reads, without saying in what colour.
 ///
 /// The colour is chosen where the message is drawn, not where it is written.

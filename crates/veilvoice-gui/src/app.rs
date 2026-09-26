@@ -2996,78 +2996,12 @@ mod header_layout_tests {
 mod tests {
     use super::*;
 
-    /// **Roadmap item 79.** Nothing that waits happens on the thread that draws.
-    ///
-    /// A window stutters for one of two reasons: it is asked to draw too
-    /// rarely, or it is doing something slow between frames. The second is the
-    /// one that cannot be tuned away, and it is invisible in a screenshot: the
-    /// window simply stops for as long as the call takes.
-    ///
-    /// So the draw path is read for the calls that wait. Everything this
-    /// application does that can block already runs on its own thread and
-    /// reports back through a channel: the file dialogs after seven of them
-    /// froze the window, the update check, the verifier, the group render, the
-    /// key derivation. This keeps that true rather than assuming it.
-    ///
-    /// Comments are stripped first, for the reason the lock screen's guard
-    /// gives: the first version of a test like this flags its own explanation.
-    #[test]
-    fn the_drawing_thread_never_waits_on_anything() {
-        let source = include_str!("app.rs").replace("\r\n", "\n");
-        let body: String = source
-            .split("#[cfg(test)]")
-            .next()
-            .unwrap()
-            .lines()
-            .filter(|line| !line.trim_start().starts_with("//"))
-            .collect::<Vec<_>>()
-            .join("\n");
-
-        // The draw path is `update` and everything it reaches. Device
-        // enumeration is the one filesystem-shaped call in this file and it
-        // lives in `Default`, which runs once before the window opens.
-        let update_at = body.find("fn ui(&mut self").expect("update exists");
-        let drawing = &body[update_at..];
-
-        for waits in [
-            "Command::new",
-            "std::fs::read",
-            "std::fs::write",
-            "read_to_string",
-            "join()",
-            "thread::sleep",
-            "devices::list",
-            // Each of these is a stat syscall, which is cheap on a warm local
-            // disk and is not cheap on a network share or a sleeping drive.
-            // One per frame at 60 Hz is sixty of them a second for an answer
-            // that changed when a file was dropped, which is where the check
-            // that needs them lives. Added after reading the draw path for
-            // roadmap item 79 and finding none, so this keeps it that way rather
-            // than fixing something.
-            ".exists()",
-            ".is_file()",
-            ".is_dir()",
-            "fs::metadata",
-            "read_dir(",
-            "canonicalize(",
-        ] {
-            assert!(
-                !drawing.contains(waits),
-                "the draw path calls {waits:?}, which waits. Move it to a thread \
-                 and report back through a channel, as everything else here does."
-            );
-        }
-
-        // The channels are drained without blocking. Counted rather than
-        // searched for, because `try_recv()` contains `recv()` and the first
-        // version of this reported the correct call as the fault.
-        let blocking = drawing.matches("recv()").count() - drawing.matches("try_recv()").count();
-        assert_eq!(
-            blocking, 0,
-            "a channel on the draw path is read with a blocking recv; use try_recv"
-        );
-    }
-
+    // **Roadmap item 79's guard moved, and grew.** It used to be here: it read
+    // `app.rs`, it was correct about `app.rs`, and it could not see the five
+    // calls that waited on the drawing thread in four other modules. It now
+    // lives in `crate::draw_path_tests`, reads every module, and follows what a
+    // drawing function calls within its own module. See F-216, F-218, F-219 and
+    // F-220 for what it found the first time it was run that way.
     /// An untouched window draws nothing.
     ///
     /// # The measurement this is here to keep
