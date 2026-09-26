@@ -820,6 +820,62 @@ system for no movement, and the twelve older spinners are still twelve. Both are
 roadmap item 169, which is the next item and is now a sweep rather than an
 invention. Said here, and in the module's own doc comment, rather than left for a
 reader to notice the gap and wonder whether anybody had.
+### F-222: the manual said the command line could not update, in the week it learned to
+
+`docs/USER_GUIDE.md` is the manual, and `tools/docs/guides.py` cuts three
+per-program guides out of it, so a sentence written there is published four
+times over, plus the wiki and the website. One of those sentences read:
+
+> **Check for updates**, in the desktop application only, asks the operating
+> system's own transfer tool to fetch one small file, and reads a version number
+> out of what it printed. It is a button, it is never automatic, and the command
+> line has no such feature at all.
+
+Roadmap item 179 landed `veilvoice update` on 2026-09-22. It checks, fetches,
+verifies the signature against the key compiled into the program, and replaces
+the copy being run. So the last clause of that paragraph became false, and
+`veilvoice --help` says the opposite of it on the line above the subcommand
+list.
+
+**Two published pages disagreed with each other, not just with the code.**
+`docs/UPDATING.md` was written for the updater and says plainly that two things
+reach the network and names both the button and the command. The manual, three
+guides derived from it, the wiki copy and the website copy said the command did
+not exist. A reader who found the manual first was told a feature they have is
+not there.
+
+Two smaller claims in the same section were stale for the same reason: that a
+firewall blocking VeilVoice "costs you the update button and nothing else", and
+that when no transfer tool can be found "the button says so".
+
+## Why the derived pages are the good news here
+
+The three guides, the wiki page and the website page were all wrong, and all
+five were fixed by editing one paragraph. That is the architecture working: the
+count of wrong copies was five rather than one, and the count of edits was one
+rather than six. A repository where each of those pages had been written by hand
+would have had five separate corrections to remember, and four of them would
+still be wrong now.
+
+What it does not do is notice. Every check over these pages asks whether the
+derived copies match their source, and they did: the source was wrong, so the
+copies were faithfully wrong. There is no check that compares a sentence in the
+manual against the program it describes, and there cannot be a general one.
+
+## What is checked
+
+Nothing new, and that is a deliberate answer rather than an omission. The
+checkable part of this claim already is checked: `tools/audit/documented.py` and
+`tools/docs/generate.py` keep the command reference in step with the parser, and
+the `offline` CI job is what makes the surrounding claim about sockets true
+rather than asserted. What was wrong here is a sentence of prose about which
+program has a feature, and a guard that could read that would have to understand
+the sentence.
+
+What this argues for instead is the rule that already exists and was not
+followed: everything describing a change moves in the commit that makes the
+change. The updater's own commit added `docs/UPDATING.md` and did not look for
+the paragraph in the manual that the new command contradicted.
 
 ### F-220: the guard was written at the crate, and found two more the same afternoon
 
@@ -9224,7 +9280,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twenty-one defects found and fixed (F-1 to F-221), across
+**Two hundred and twenty-two defects found and fixed (F-1 to F-222), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
