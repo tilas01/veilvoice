@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-setup/src/lib.rs`
 
-[`veilvoice-setup`](../../../crates/veilvoice-setup/README.md) &middot; 224 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs)
+[`veilvoice-setup`](../../../crates/veilvoice-setup/README.md) &middot; 226 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs)
 
 ## Contents
 
@@ -92,7 +92,7 @@ you who makes each one, and installs none of them unless you say so.
 
 ## What this file contains
 
-224 lines defining **3 functions** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+226 lines defining **3 functions** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -114,13 +114,13 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_command["command<br/>line 95"]
-    n_hide_console["hide_console<br/>line 109"]
-    n_hide_console["hide_console<br/>line 119"]
+    n_command["command<br/>line 96"]
+    n_hide_console["hide_console<br/>line 110"]
+    n_hide_console["hide_console<br/>line 120"]
     n_command --> n_hide_console
-    click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L95" "open the source"
-    click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L109" "open the source"
-    click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L119" "open the source"
+    click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L96" "open the source"
+    click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L110" "open the source"
+    click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L120" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_command,n_hide_console,n_hide_console helper
 ```
@@ -131,10 +131,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L83) | Crate version string, surfaced in the About panel. |
-| `command` <sub>pub(crate) fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L95) | Spawn without a console window. |
-| `hide_console` <sub>fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L109) | The Windows half of command. |
-| `hide_console` <sub>fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L119) | The everywhere-else half of command: nothing to hide, and no console is created by spawning a process in the first place. |
+| `VERSION` <sub>pub const</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L84) | Crate version string, surfaced in the About panel. |
+| `command` <sub>pub(crate) fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L96) | Spawn without a console window. |
+| `hide_console` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L110) | The Windows half of command. |
+| `hide_console` <sub>fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L120) | The everywhere-else half of command: nothing to hide, and no console is created by spawning a process in the first place. |
 
 ---
 

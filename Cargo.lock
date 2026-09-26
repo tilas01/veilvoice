@@ -4814,6 +4814,9 @@ dependencies = [
 [[package]]
 name = "veilvoice-setup"
 version = "0.1.22"
+dependencies = [
+ "veilvoice-crypto",
+]
 
 [[package]]
 name = "veilvoice-verify"

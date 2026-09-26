@@ -60,6 +60,8 @@ pub enum Item {
     SessionMarker,
     /// The screen-recorder allowlist.
     Captures,
+    /// Which optional companions somebody has said not to offer again.
+    Companions,
     /// The canaries and the rate limits.
     Sentry,
     /// The app lock, and everything that opens with it.
@@ -166,6 +168,16 @@ pub const ALL: &[Entry] = &[
         irreplaceable: false,
     },
     Entry {
+        item: Item::Companions,
+        name: "companions-declined.txt",
+        folder: false,
+        label: "companions you have declined",
+        note: "which optional software you have said not to offer again at \
+               launch, one name per line, with a heading that says so",
+        keys: false,
+        irreplaceable: false,
+    },
+    Entry {
         item: Item::Sentry,
         name: "sentry",
         folder: true,
@@ -250,13 +262,14 @@ mod tests {
             Item::CrashReport,
             Item::SessionMarker,
             Item::Captures,
+            Item::Companions,
             Item::Sentry,
             Item::AppLock,
         ] {
             let found = ALL.iter().filter(|entry| entry.item == item).count();
             assert_eq!(found, 1, "{item:?} is listed {found} times");
         }
-        assert_eq!(ALL.len(), 11, "something is listed that no item names");
+        assert_eq!(ALL.len(), 12, "something is listed that no item names");
     }
 
     #[test]

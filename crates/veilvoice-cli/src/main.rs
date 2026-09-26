@@ -105,7 +105,7 @@ use veilvoice_crypto::{container, hybrid, kdf};
 use veilvoice_guard::sentry::rate::{Limits, Threshold};
 use veilvoice_meta::Policy;
 use veilvoice_policy::Requirement;
-use veilvoice_setup::{companions, install};
+use veilvoice_setup::{companions, install, needs};
 
 #[derive(Parser)]
 #[command(
@@ -618,6 +618,16 @@ enum Command {
         /// Install one, by name. Without this, nothing is installed.
         #[arg(long, value_name = "NAME")]
         install: Option<String>,
+        /// Stop offering this one at launch. It is still listed here.
+        ///
+        /// **Roadmap item 163.** A question asked at every launch is a question
+        /// people learn to dismiss without reading. The answer is remembered in
+        /// a small text file you can open and delete.
+        #[arg(long, value_name = "NAME")]
+        no: Option<String>,
+        /// Be offered this one again. With no name, all of them.
+        #[arg(long, value_name = "NAME", num_args = 0..=1, default_missing_value = "")]
+        ask_again: Option<String>,
     },
     /// Check a download, and what does the checking
     ///
@@ -1450,24 +1460,31 @@ fn run(command: Command) -> Result<(), String> {
             reseed_secs,
             reseed_range,
             no_monitor,
-        } => record::run(
-            input,
-            output,
-            seconds,
-            to,
-            !no_monitor,
-            record::Sealing {
-                public_key: to_public_key,
-                plaintext,
-                yes,
-            },
-            Tuning {
-                intensity,
-                keep_accent,
-                reseed_secs,
-                reseed_range: reseed_range_from(reseed_range.as_deref())?,
-            },
-        ),
+        } => {
+            // **Roadmap item 163.** Before the recording, not after it. Turning a
+            // take into a video needs ffmpeg, and finding that out at the end
+            // of an hour's recording is the one moment the answer is least
+            // useful.
+            say_what_a_video_will_need();
+            record::run(
+                input,
+                output,
+                seconds,
+                to,
+                !no_monitor,
+                record::Sealing {
+                    public_key: to_public_key,
+                    plaintext,
+                    yes,
+                },
+                Tuning {
+                    intensity,
+                    keep_accent,
+                    reseed_secs,
+                    reseed_range: reseed_range_from(reseed_range.as_deref())?,
+                },
+            )
+        }
         #[cfg(feature = "live")]
         Command::Devices => list_devices(),
         Command::Clean { file, policy } => clean(file, policy.into()),
@@ -1897,13 +1914,38 @@ fn run(command: Command) -> Result<(), String> {
             Ok(())
         }
 
-        Command::Companions { install: wanted } => match wanted {
-            None => {
-                list_companions();
-                Ok(())
+        Command::Companions {
+            install: wanted,
+            no,
+            ask_again,
+        } => {
+            // The three are separate acts and are done in the order given, so
+            // `--no x --ask-again x` is the same nonsense it looks like rather
+            // than something with a hidden precedence.
+            if let Some(name) = no {
+                needs::decline(&name)?;
+                println!("{}", ok(&format!("{name} will not be offered at launch")));
+                if let Some(path) = needs::path() {
+                    println!("      remembered in {}", path.display());
+                }
             }
-            Some(name) => install_companion(&name),
-        },
+            if let Some(name) = ask_again {
+                if name.is_empty() {
+                    needs::ask_again_about_everything()?;
+                    println!("{}", ok("everything will be offered again"));
+                } else {
+                    needs::ask_again(&name)?;
+                    println!("{}", ok(&format!("{name} will be offered again")));
+                }
+            }
+            match wanted {
+                None => {
+                    list_companions();
+                    Ok(())
+                }
+                Some(name) => install_companion(&name),
+            }
+        }
         Command::Volumes => {
             list_volumes();
             Ok(())
@@ -2113,6 +2155,91 @@ fn list_companions() {
         println!();
     }
     println!("  Install one with: veilvoice companions --install <key>");
+    println!();
+    print_launch_check();
+}
+
+/// **Roadmap item 163.** What this machine is missing, in one place.
+///
+/// The same answer `veilvoice_setup::needs::look` gives the window, printed
+/// here. Three commands need `ffmpeg` and each of them used to find out at the
+/// moment it was used, which means somebody learns their recording cannot be
+/// turned into a video after they have finished making it.
+///
+/// Nothing is offered twice. A decline is remembered, and a declined companion
+/// is still listed above, because somebody who typed `veilvoice companions` is
+/// asking.
+fn print_launch_check() {
+    let check = needs::look();
+    println!("{}", heading("On this machine"));
+    println!("{}", field("this copy", &check.running.describe()));
+
+    if check.absent.is_empty() && check.declined.is_empty() {
+        println!("{}", ok("everything VeilVoice looks for at launch is here"));
+        return;
+    }
+
+    for absent in &check.absent {
+        println!(
+            "{}",
+            warn(&format!(
+                "{} is not here. {}",
+                absent.companion.name,
+                offer_line(&absent.offer)
+            ))
+        );
+    }
+    for put_off in &check.declined {
+        println!(
+            "{}",
+            field(
+                &format!("{} (you said no)", put_off.companion.name),
+                "not offered at launch. `veilvoice companions --ask-again <key>` undoes that."
+            )
+        );
+    }
+    if !check.absent.is_empty() {
+        println!();
+        println!("  Not asked again: veilvoice companions --no <key>");
+    }
+}
+
+// Its one caller is the `record` arm, which only exists in a build that can
+// reach a microphone. A build that cannot record has no recording to turn into
+// a video, so there is nothing to say early about.
+#[cfg(feature = "live")]
+/// **Roadmap item 163.** Say now what the last step will need, if it is not here.
+///
+/// Called before a recording rather than after one. The refusal at the point of
+/// use was always right and always too late: a person who has just spent an
+/// hour on a take, and is told at the end of it that turning that take into a
+/// video needs something they have not got, has been given a correct answer at
+/// the worst possible moment.
+///
+/// Silent when `ffmpeg` is here, and silent when the reader has said they do
+/// not want to be told, because a line printed before every recording is a line
+/// people stop reading. The audio, the subtitles and the player page are
+/// written without `ffmpeg` either way, so this is a caveat rather than a
+/// refusal and it says so.
+fn say_what_a_video_will_need() {
+    if veilvoice_video::ffmpeg::found().is_some() {
+        return;
+    }
+    if needs::declined().contains("ffmpeg") {
+        return;
+    }
+    println!(
+        "{}",
+        warn(
+            "ffmpeg is not on this machine. The recording itself needs nothing \
+             installed, and neither do the subtitles or the page that plays it. \
+             Only turning it into a video file does, and that will be waiting for \
+             you afterwards rather than working."
+        )
+    );
+    println!("      veilvoice companions          what to install, and how");
+    println!("      veilvoice companions --no ffmpeg    stop saying this");
+    println!();
 }
 
 /// One line describing what VeilVoice can do about a missing companion.

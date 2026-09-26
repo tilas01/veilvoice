@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/layout.svg" alt="layout.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/layout.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 318 lines &middot; <a href="layout.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 331 lines &middot; <a href="layout.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-here-and-not-in-each-module">Why this is here and not in each module</a>
@@ -88,13 +88,13 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>318 lines defining <strong>3 functions</strong> (3 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>331 lines defining <strong>3 functions</strong> (3 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Item</code> <span style="color:var(--muted)">line 44</span> &middot; One thing VeilVoice keeps between runs.</li>
-<li><code>struct Entry</code> <span style="color:var(--muted)">line 70</span> &middot; One entry: what it is called, what it is, and what losing it costs.</li>
+<li><code>struct Entry</code> <span style="color:var(--muted)">line 72</span> &middot; One entry: what it is called, what it is, and what losing it costs.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>path</code> <span style="color:var(--muted)">line 228</span> &middot; Where one thing is, if this platform says where anything is.
+<li><code>path</code> <span style="color:var(--muted)">line 240</span> &middot; Where one thing is, if this platform says where anything is.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>dir</code>, <code>entry</code></span>
 </li>
 </ul>
@@ -117,17 +117,17 @@
 <a href="layout.src.html#fn-dir">
 <rect x="60.6" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="106.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">dir</text>
-<text x="106.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 213</text>
+<text x="106.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 225</text>
 </a>
 <a href="layout.src.html#fn-entry-2">
 <rect x="179.0" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="225.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">entry</text>
-<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 218</text>
+<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 230</text>
 </a>
 <a href="layout.src.html#fn-path">
 <rect x="297.5" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="343.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">path</text>
-<text x="343.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
+<text x="343.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 240</text>
 </a>
 <rect x="20.0" y="104.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -145,14 +145,14 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_dir[&quot;dir&lt;br/&gt;line 213&quot;]
-    n_entry[&quot;entry&lt;br/&gt;line 218&quot;]
-    n_path([&quot;path&lt;br/&gt;line 228&quot;])
+    n_dir[&quot;dir&lt;br/&gt;line 225&quot;]
+    n_entry[&quot;entry&lt;br/&gt;line 230&quot;]
+    n_path([&quot;path&lt;br/&gt;line 240&quot;])
     n_path --&gt; n_dir
     n_path --&gt; n_entry
-    click n_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L213&quot; &quot;open the source&quot;
-    click n_entry href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L218&quot; &quot;open the source&quot;
-    click n_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L228&quot; &quot;open the source&quot;
+    click n_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L225&quot; &quot;open the source&quot;
+    click n_entry href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L230&quot; &quot;open the source&quot;
+    click n_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs#L240&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_path entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -164,11 +164,11 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Item</code> <sub>pub enum</sub></td><td><a href="layout.src.html#fn-item">44</a></td><td>One thing VeilVoice keeps between runs.</td></tr>
-<tr><td><code>Entry</code> <sub>pub struct</sub></td><td><a href="layout.src.html#fn-entry">70</a></td><td>One entry: what it is called, what it is, and what losing it costs.</td></tr>
-<tr><td><code>ALL</code> <sub>pub const</sub></td><td><a href="layout.src.html#fn-all">101</a></td><td>Every named thing, in the order a person meets it.</td></tr>
-<tr><td><code>dir</code> <sub>pub fn</sub></td><td><a href="layout.src.html#fn-dir">213</a></td><td>The folder all of this is in, if this platform says where one is.</td></tr>
-<tr><td><code>entry</code> <sub>pub fn</sub></td><td><a href="layout.src.html#fn-entry-2">218</a></td><td>The entry for one thing.</td></tr>
-<tr><td><code>path</code> <sub>pub fn</sub></td><td><a href="layout.src.html#fn-path">228</a></td><td>Where one thing is, if this platform says where anything is.</td></tr>
+<tr><td><code>Entry</code> <sub>pub struct</sub></td><td><a href="layout.src.html#fn-entry">72</a></td><td>One entry: what it is called, what it is, and what losing it costs.</td></tr>
+<tr><td><code>ALL</code> <sub>pub const</sub></td><td><a href="layout.src.html#fn-all">103</a></td><td>Every named thing, in the order a person meets it.</td></tr>
+<tr><td><code>dir</code> <sub>pub fn</sub></td><td><a href="layout.src.html#fn-dir">225</a></td><td>The folder all of this is in, if this platform says where one is.</td></tr>
+<tr><td><code>entry</code> <sub>pub fn</sub></td><td><a href="layout.src.html#fn-entry-2">230</a></td><td>The entry for one thing.</td></tr>
+<tr><td><code>path</code> <sub>pub fn</sub></td><td><a href="layout.src.html#fn-path">240</a></td><td>Where one thing is, if this platform says where anything is.</td></tr>
 </tbody></table>
 </section>
 </div></div>

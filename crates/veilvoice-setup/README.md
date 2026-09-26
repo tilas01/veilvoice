@@ -108,16 +108,20 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>224 lines"])
+    n_lib(["lib.rs<br/>226 lines"])
     n_companions["companions.rs<br/>1088 lines"]
     n_install["install.rs<br/>861 lines"]
+    n_needs["needs.rs<br/>565 lines"]
     n_space["space.rs<br/>170 lines"]
     n_update["update.rs<br/>892 lines"]
     n_volumes["volumes.rs<br/>580 lines"]
+    n_needs --> n_companions
+    n_needs --> n_install
     n_volumes --> n_companions
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs" "open the source"
     click n_companions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/companions.rs" "open the source"
     click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" "open the source"
+    click n_needs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/needs.rs" "open the source"
     click n_space href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs" "open the source"
     click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs" "open the source"
     click n_volumes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs" "open the source"
@@ -131,12 +135,13 @@ flowchart TD
 |---|---:|---|
 | [`companions.rs`](../../docs/files/veilvoice-setup/companions.md) | 1088 | Optional third-party software, detected rather than assumed. |
 | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 861 | Put this program somewhere the system can find it. |
-| [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 224 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 226 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | 565 | What this machine is missing, asked once and at the right moment. |
 | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | 170 | How much room is actually free where VeilVoice keeps things. |
 | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | 892 | Ask, only when told to, whether a newer VeilVoice release exists. |
 | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**2,440 functional lines of Rust** in this crate. A functional line is a line
+**2,793 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -163,6 +168,18 @@ counts blank lines and comments too. Both are produced by
 | `fn install` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | Install for this user. |
 | `fn uninstall` | [`install.rs`](../../docs/files/veilvoice-setup/install.md) | Remove what install added. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | Crate version string, surfaced in the About panel. |
+| `fn declined_file` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | The file a decline is remembered in. |
+| `const PREAMBLE` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | What is written at the top of that file, so it explains itself. |
+| `enum Running` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | Whether this copy is installed, and whether it is the one running. |
+| `struct Absent` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | One thing this machine has not got, and what could be done about it. |
+| `struct Check` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | What one look at this machine found. |
+| `const WANTED` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | The companions a launch asks about, by key. |
+| `fn look` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | Look at this machine. |
+| `fn path` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | Where the declines are remembered, or None on a platform that names nowhere. |
+| `fn declined` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | The companions a decline has been recorded for. |
+| `fn decline` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | Remember that this one is not wanted. |
+| `fn ask_again` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | Ask about this one again. |
+| `fn ask_again_about_everything` | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | Ask about everything again, by removing the file rather than emptying it. |
 | `fn free_bytes` | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | Free space at path, in bytes, or None if the platform would not say. |
 | `fn parse_df` | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | The available column of a df -Pk report. |
 | `fn parse_fsutil` | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | The free-bytes figure from fsutil volume diskfree. |
