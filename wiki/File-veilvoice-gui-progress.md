@@ -3,14 +3,14 @@
 
 # `crates/veilvoice-gui/src/progress.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 345 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 539 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs)
 
 ## Contents
 
 - [Why a bar is a claim](#why-a-bar-is-a-claim)
 - [Why atomics rather than a channel](#why-atomics-rather-than-a-channel)
 - [Where the repaint request lives](#where-the-repaint-request-lives)
-- [What is deliberately left to roadmap item 169](#what-is-deliberately-left-to-roadmap-item-169)
+- [One indicator, and the reduce-motion setting](#one-indicator-and-the-reduce-motion-setting)
 - [In plain words](#in-plain-words)
   - [What calls what](#what-calls-what)
   - [Items](#items)
@@ -58,14 +58,19 @@ moved the mouse, which is precisely what a frozen window looks like. Left to
 the caller that would be one line to forget per panel, and a fix written at
 the wrong scope is how F-210, F-216, F-219 and F-220 each happened.
 
-# What is deliberately left to roadmap item 169
+# One indicator, and the reduce-motion setting
 
-`strip` does not yet consult the reduce-motion setting, so the
-no-estimate case spins for somebody who has asked their system for no
-movement. That is roadmap item 169's subject, which is one indicator used
-everywhere and a static statement in place of a moving one, and it will be
-added here rather than beside it. The twelve other places that draw a bare
-`ui.spinner()` are 169's sweep for the same reason.
+Roadmap item 169. `strip` is the only thing in this crate that draws "work
+is happening", and a test refuses a bar or a spinner anywhere else. It takes
+the resolved `Motion` rather than reading the preference itself, because
+the preference is resolved once per frame against the system setting and the
+environment override, and a second reader of it is a second answer.
+
+Under reduced motion the indeterminate case becomes a still bar rather than a
+travelling one. A spinner cannot honour that setting at all, which is why
+there is no spinner here: `ui.spinner()` animates unconditionally, so twelve
+panels drawing one were twelve panels ignoring somebody who had said movement
+hurts.
 
 # In plain words
 
@@ -77,26 +82,27 @@ that would be making it up.
 
 ## What this file contains
 
-345 lines defining **9 functions** (9 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+539 lines defining **10 functions** (9 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Reach` (line 73) -- How far through one job is.
+- `struct Reach` (line 90) -- How far through one job is.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Reach::counting` (line 92) -- A job of total countable units.
-- `Reach::unmeasurable` (line 105) -- A job whose length cannot be known, and the reason, which is shown.
-- `Reach::advance` (line 114) -- Count by more units finished.
-- `Reach::set_total` (line 121) -- Say what the total really is, for a job that could only count it once it had started.
-- `Reach::fraction` (line 143) -- How far through, in 0, 1, or None where that cannot be said.
+- `Reach::counting` (line 109) -- A job of total countable units.
+- `Reach::unmeasurable` (line 122) -- A job whose length cannot be known, and the reason, which is shown.
+- `Reach::advance` (line 131) -- Count by more units finished.
+- `Reach::set_total` (line 138) -- Say what the total really is, for a job that could only count it once it had started.
+- `Reach::fraction` (line 160) -- How far through, in 0, 1, or None where that cannot be said.
   - reaches: `done`, `total`
-- `Reach::because` (line 152) -- The reason no estimate is given, for a job that cannot give one.
-- `strip` (line 170) -- The indicator, beside the control that started the work.
+- `Reach::because` (line 169) -- The reason no estimate is given, for a job that cannot give one.
+- `strip` (line 190) -- The indicator, beside the control that started the work.
+  - reaches: `bar`
 
 ## What calls what
 
-_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file._
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-gui/progress.svg" alt="what calls what in progress.rs" width="640">
@@ -108,30 +114,35 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_counting(["Reach::counting<br/>line 92"])
-    n_unmeasurable(["Reach::unmeasurable<br/>line 105"])
-    n_advance(["Reach::advance<br/>line 114"])
-    n_set_total(["Reach::set_total<br/>line 121"])
-    n_done["Reach::done<br/>line 128"]
-    n_total["Reach::total<br/>line 133"]
-    n_fraction(["Reach::fraction<br/>line 143"])
-    n_because(["Reach::because<br/>line 152"])
-    n_strip(["strip<br/>line 170"])
+    n_counting(["Reach::counting<br/>line 109"])
+    n_unmeasurable(["Reach::unmeasurable<br/>line 122"])
+    n_advance(["Reach::advance<br/>line 131"])
+    n_set_total(["Reach::set_total<br/>line 138"])
+    n_done["Reach::done<br/>line 145"]
+    n_total["Reach::total<br/>line 150"]
+    n_fraction(["Reach::fraction<br/>line 160"])
+    n_because(["Reach::because<br/>line 169"])
+    n_strip(["strip<br/>line 190"])
+    n_bar["bar<br/>line 244"]
     n_fraction --> n_done
     n_fraction --> n_total
-    click n_counting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L92" "open the source"
-    click n_unmeasurable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L105" "open the source"
-    click n_advance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L114" "open the source"
-    click n_set_total href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L121" "open the source"
-    click n_done href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L128" "open the source"
-    click n_total href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L133" "open the source"
-    click n_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L143" "open the source"
-    click n_because href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L152" "open the source"
-    click n_strip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L170" "open the source"
+    n_strip --> n_bar
+    click n_counting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L109" "open the source"
+    click n_unmeasurable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L122" "open the source"
+    click n_advance href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L131" "open the source"
+    click n_set_total href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L138" "open the source"
+    click n_done href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L145" "open the source"
+    click n_total href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L150" "open the source"
+    click n_fraction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L160" "open the source"
+    click n_because href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L169" "open the source"
+    click n_strip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L190" "open the source"
+    click n_bar href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L244" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_counting,n_unmeasurable,n_advance,n_set_total,n_fraction,n_because,n_strip entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_done,n_total api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_bar helper
 ```
 
 </details>
@@ -140,13 +151,16 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Reach` <sub>pub struct</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L73) | How far through one job is. |
-| `Reach::counting` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L92) | A job of total countable units. |
-| `Reach::unmeasurable` <sub>pub fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L105) | A job whose length cannot be known, and the reason, which is shown. |
-| `Reach::advance` <sub>pub fn</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L114) | Count by more units finished. |
-| `Reach::set_total` <sub>pub fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L121) | Say what the total really is, for a job that could only count it once it had started. |
-| `Reach::done` <sub>pub fn</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L128) | Units finished so far. |
-| `Reach::total` <sub>pub fn</sub> | [133](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L133) | The whole job, or zero where there is no honest total. |
-| `Reach::fraction` <sub>pub fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L143) | How far through, in 0, 1, or None where that cannot be said. |
-| `Reach::because` <sub>pub fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L152) | The reason no estimate is given, for a job that cannot give one. |
-| `strip` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L170) | The indicator, beside the control that started the work. |
+| `KEY_DERIVATION` <sub>pub const</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L82) | Why a key derivation cannot say how far through it is. |
+| `Reach` <sub>pub struct</sub> | [90](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L90) | How far through one job is. |
+| `Reach::counting` <sub>pub fn</sub> | [109](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L109) | A job of total countable units. |
+| `Reach::unmeasurable` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L122) | A job whose length cannot be known, and the reason, which is shown. |
+| `Reach::advance` <sub>pub fn</sub> | [131](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L131) | Count by more units finished. |
+| `Reach::set_total` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L138) | Say what the total really is, for a job that could only count it once it had started. |
+| `Reach::done` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L145) | Units finished so far. |
+| `Reach::total` <sub>pub fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L150) | The whole job, or zero where there is no honest total. |
+| `Reach::fraction` <sub>pub fn</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L160) | How far through, in 0, 1, or None where that cannot be said. |
+| `Reach::because` <sub>pub fn</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L169) | The reason no estimate is given, for a job that cannot give one. |
+| `strip` <sub>pub fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L190) | The indicator, beside the control that started the work. |
+| `BAR` <sub>const</sub> | [221](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L221) | How wide the bar is drawn, and how tall. |
+| `bar` <sub>fn</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L244) | The bar itself: filled to a fraction, travelling, or still. |

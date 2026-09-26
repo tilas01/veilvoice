@@ -67,10 +67,36 @@ import sys
 # They exist so that a file nobody expected -- a vendored blob, a generated
 # table, a lock file that grew -- cannot silently turn the index into something
 # a phone has to download.
+#
+# What bounds a document's weight in the index is MAX_SECTIONS_PER_DOC, not
+# MAX_FILE_BYTES: four hundred sections of at most MAX_EXCERPT characters is
+# about 96 KB however long the file is. MAX_FILE_BYTES is a refusal to *read*
+# something absurd, and it is deliberately far above the largest document here
+# rather than just above it, because the largest document is `docs/AUDIT.md` and
+# it grows by a write-up every time this project fixes anything. At 512 KB it
+# caught up with the audit and the audit silently left the index: see F-224, and
+# the failure below, which is what "silently" cost.
 MAX_EXCERPT = 240        # characters shown in one result
 MAX_SECTIONS_PER_DOC = 400
-MAX_FILE_BYTES = 512 * 1024
+MAX_FILE_BYTES = 2 * 1024 * 1024
 MAX_HEADING = 120
+
+
+class TooBig(Exception):
+    """A tracked document is past [`MAX_FILE_BYTES`] and was not indexed.
+
+    Raised rather than skipped. A document that has outgrown the limit is a
+    decision somebody has to take, most likely splitting it, and the one thing
+    it cannot be is a file that quietly stops being searchable: that is what
+    happened to `docs/AUDIT.md`, and what surfaced two commits later was the
+    website suite failing on "the audit is indexed", which names neither the
+    file nor the limit.
+    """
+
+    def __init__(self, rel, size):
+        super().__init__(rel)
+        self.rel = rel
+        self.size = size
 
 # This script's own output is tracked, lives under `website/`, and would
 # otherwise be walked like any other file -- which does not merely bloat the
@@ -490,7 +516,7 @@ def build(root):
         except OSError:
             continue
         if size > MAX_FILE_BYTES:
-            continue
+            raise TooBig(rel, size)
         try:
             with open(full, "r", encoding="utf-8") as handle:
                 text = handle.read()
@@ -795,9 +821,22 @@ def check(root):
 
 def main():
     root = repo_root()
-    if "--check" in sys.argv:
-        return check(root)
-    return write(root)
+    try:
+        if "--check" in sys.argv:
+            return check(root)
+        return write(root)
+    except TooBig as too_big:
+        print("  REFUSED: %s is %d KB, past the %d KB this indexes"
+              % (too_big.rel, too_big.size // 1024, MAX_FILE_BYTES // 1024))
+        print()
+        print("  It is not in the index, and nothing else here would have said")
+        print("  so: the check that notices is a website suite asserting that")
+        print("  one particular document is searchable, and it names neither")
+        print("  the file nor the reason. See F-224.")
+        print()
+        print("  Split the document, or raise MAX_FILE_BYTES in this file and")
+        print("  say in its comment what the new number is for.")
+        return 1
 
 
 if __name__ == "__main__":

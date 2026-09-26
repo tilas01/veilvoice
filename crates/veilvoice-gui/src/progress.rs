@@ -42,14 +42,19 @@
 //! the caller that would be one line to forget per panel, and a fix written at
 //! the wrong scope is how F-210, F-216, F-219 and F-220 each happened.
 //!
-//! # What is deliberately left to roadmap item 169
+//! # One indicator, and the reduce-motion setting
 //!
-//! [`strip`] does not yet consult the reduce-motion setting, so the
-//! no-estimate case spins for somebody who has asked their system for no
-//! movement. That is roadmap item 169's subject, which is one indicator used
-//! everywhere and a static statement in place of a moving one, and it will be
-//! added here rather than beside it. The twelve other places that draw a bare
-//! `ui.spinner()` are 169's sweep for the same reason.
+//! Roadmap item 169. [`strip`] is the only thing in this crate that draws "work
+//! is happening", and a test refuses a bar or a spinner anywhere else. It takes
+//! the resolved [`Motion`] rather than reading the preference itself, because
+//! the preference is resolved once per frame against the system setting and the
+//! environment override, and a second reader of it is a second answer.
+//!
+//! Under reduced motion the indeterminate case becomes a still bar rather than a
+//! travelling one. A spinner cannot honour that setting at all, which is why
+//! there is no spinner here: `ui.spinner()` animates unconditionally, so twelve
+//! panels drawing one were twelve panels ignoring somebody who had said movement
+//! hurts.
 //!
 //! # In plain words
 //!
@@ -64,7 +69,19 @@ use std::time::Duration;
 
 use egui::{RichText, Ui};
 
+use crate::prefs::Motion;
 use crate::theme::palette as p;
+
+/// Why a key derivation cannot say how far through it is.
+///
+/// Named here because two panels derive a key, the app lock and the vault, and
+/// it is the same fact about the same operation: written out in both it would be
+/// two sentences to keep in step, which this project's house rule forbids for
+/// exactly the reason that they would not be kept. It is also the roadmap's own
+/// example of the case where no honest estimate exists.
+pub const KEY_DERIVATION: &str = "deriving a key is one long computation with no \
+     countable middle, which is the same property that makes a passphrase \
+     expensive to guess";
 
 /// How far through one job is.
 ///
@@ -162,31 +179,28 @@ impl Reach {
 ///
 /// `saying` is what is happening, in words, in the present tense and lower
 /// case, the way the rest of this interface says things: "hashing the
-/// download", not "Hashing...".
+/// download", not "Hashing...". Where a fraction can honestly be given it is
+/// added to those words as a percentage, so the number is readable as well as
+/// drawn.
 ///
-/// One function rather than a shape each panel draws for itself, because five
-/// spellings of the same indicator is what roadmap item 169 is for fixing and
-/// adding a sixth here would be writing the thing it has to undo.
-pub fn strip(ui: &mut Ui, saying: &str, reach: &Reach) {
+/// One function rather than a shape each panel draws for itself. Roadmap item
+/// 169 asked for that in as many words, and the window had earned the ask: a
+/// spinner in some places, a travelling bar in Setup, a changed label in others
+/// and nothing at all in most.
+pub fn strip(ui: &mut Ui, saying: &str, reach: &Reach, motion: Motion) {
     // Ten frames a second while a job runs, asked for here for the reason in
     // the module note: a window with nothing else happening in it has stopped
     // drawing, and an indicator nobody sees advance is not an indicator.
     ui.ctx().request_repaint_after(Duration::from_millis(100));
 
+    let fraction = reach.fraction();
     ui.horizontal(|ui| {
-        match reach.fraction() {
-            Some(fraction) => {
-                ui.add(
-                    egui::ProgressBar::new(fraction)
-                        .desired_width(120.0)
-                        .show_percentage(),
-                );
-            }
-            None => {
-                ui.spinner();
-            }
-        }
-        ui.label(RichText::new(saying).small().color(p::muted()));
+        bar(ui, fraction, motion);
+        let words = match fraction {
+            Some(fraction) => format!("{saying}, {}%", (fraction * 100.0).round() as u32),
+            None => saying.to_string(),
+        };
+        ui.label(RichText::new(words).small().color(p::muted()));
     });
     if let Some(because) = reach.because() {
         ui.label(
@@ -199,11 +213,84 @@ pub fn strip(ui: &mut Ui, saying: &str, reach: &Reach) {
     }
 }
 
+/// How wide the bar is drawn, and how tall.
+///
+/// Narrow enough that the sentence saying what is happening fits beside it on a
+/// window this application can be resized to, which is what "beside the control
+/// that started it" needs to mean in a panel rather than a dialog.
+const BAR: (f32, f32) = (120.0, 8.0);
+
+/// The bar itself: filled to a fraction, travelling, or still.
+///
+/// Three cases and each is a different claim.
+///
+/// **A fraction** fills to it. This keeps moving under reduced motion, and
+/// deliberately: the setting is about decoration, and a bar that stops
+/// reporting the thing it is for would be answering a request not to animate by
+/// withholding information. What changes is that nothing moves except the
+/// measurement.
+///
+/// **No fraction, motion allowed** is a quarter-width highlight travelling left
+/// to right. It says the window is alive without claiming to know a percentage,
+/// which it does not: `reg.exe` and a package manager report nothing as they go,
+/// and a bar that fills to nine tenths and waits is a lie with a shape.
+///
+/// **No fraction, motion reduced** is a third of the bar, still. Still but not
+/// empty, because an empty bar reads as stuck, and somebody who has asked their
+/// system for no movement has asked for this rather than for a spinner they
+/// cannot stop. That is the whole of roadmap item 169's second half: the
+/// setting is somebody saying movement hurts, and there is no reading of that
+/// which permits one exception per panel.
+fn bar(ui: &mut Ui, fraction: Option<f32>, motion: Motion) {
+    let (rect, _) = ui.allocate_exact_size(
+        egui::vec2(ui.available_width().min(BAR.0), BAR.1),
+        egui::Sense::hover(),
+    );
+    let painter = ui.painter();
+    painter.rect_filled(rect, 3.0, p::bg_dark());
+    painter.rect_stroke(
+        rect,
+        3.0,
+        egui::Stroke::new(1.0, p::border()),
+        egui::StrokeKind::Inside,
+    );
+
+    match fraction {
+        Some(fraction) => {
+            let mut lit = rect;
+            lit.set_width(rect.width() * fraction);
+            if lit.width() > 0.0 {
+                painter.rect_filled(lit, 3.0, p::blue());
+            }
+        }
+        None if motion.enabled => {
+            // Read from the frame's own clock rather than a stored instant, so
+            // two indicators on screen travel together instead of each keeping
+            // time from whenever its panel was first drawn.
+            let time = ui.input(|i| i.time) as f32;
+            let width = rect.width() * 0.25;
+            let travel = rect.width() + width;
+            let position = (time * 0.45).fract() * travel - width;
+            let mut lit = rect;
+            lit.min.x = rect.min.x + position.max(0.0);
+            lit.max.x = (rect.min.x + position + width).min(rect.max.x);
+            if lit.max.x > lit.min.x {
+                painter.rect_filled(lit, 3.0, p::blue());
+            }
+        }
+        None => {
+            let mut lit = rect;
+            lit.set_width(rect.width() * 0.35);
+            painter.rect_filled(lit, 3.0, p::blend(p::blue(), p::bg_dark(), 0.45));
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    /// Nowhere else in this crate draws a bar.
+    /// Nothing in this crate draws an egui progress bar.
     ///
     /// The type makes an honest indicator easy and [`strip`] makes it the
     /// default, but neither stops a panel from adding a bar of its own with a
@@ -213,20 +300,19 @@ mod tests {
     /// The rule is not that bars are bad. It is that a bar is a claim about how
     /// much longer, and the only code here that knows whether such a claim can
     /// be made is the code that was told a total. A panel that genuinely has one
-    /// passes it to [`Reach::counting`] and gets the same bar.
+    /// passes it to [`Reach::counting`] and gets a bar drawn by [`bar`], which is
+    /// why this module needs no exception from its own rule: the drawing here is
+    /// a painted rectangle, and `egui::ProgressBar` is used nowhere at all.
     ///
     /// Written the way the spawn guards are written, for the reason F-210 and
     /// F-220 both gave: a rule enforced over the file that prompted it is a rule
     /// the next file does not have.
     #[test]
-    fn only_this_module_may_draw_a_progress_bar() {
+    fn nothing_in_this_crate_draws_a_progress_bar() {
         // Split so this test's own source is not what it finds.
         const NEEDLE: &str = concat!("ProgressBar", "::new");
         let mut bars = Vec::new();
         for (module, source) in crate::sources() {
-            if module == "progress.rs" {
-                continue;
-            }
             // Cut at the test marker: a test that searches for a name contains
             // that name, and a guard that trips over its own reasoning is one
             // somebody deletes.
@@ -246,6 +332,114 @@ mod tests {
              there is an honest total behind it. Hold a `Reach` and call \
              `progress::strip`:\n{}",
             bars.join("\n")
+        );
+    }
+
+    /// Nowhere else in this crate draws a spinner.
+    ///
+    /// **Roadmap item 169.** Twelve panels drew `ui.spinner()`, which animates
+    /// whatever the system has been asked for: egui's spinner takes no setting
+    /// and reads none, so every one of them was a panel that ignored somebody
+    /// who had said movement hurts. There is no spinner in this module either.
+    /// The indeterminate case is a bar, travelling or still, because a bar can
+    /// hold still and a spinner cannot.
+    ///
+    /// The whole crate is read, not the files that had one, which is the lesson
+    /// of F-210 and F-220 applied before rather than after.
+    #[test]
+    fn nothing_in_this_crate_draws_a_spinner() {
+        // Split so this test's own source is not what it finds.
+        const NEEDLE: &str = concat!("ui.spinner", "()");
+        let mut spinners = Vec::new();
+        for (module, source) in crate::sources() {
+            let shipped = match source.find("#[cfg(test)]") {
+                Some(at) => &source[..at],
+                None => source.as_str(),
+            };
+            for (number, line) in shipped.lines().enumerate() {
+                let trimmed = line.trim_start();
+                // Prose: the reason there is no spinner is discussed in several
+                // of these files, and a guard that trips over its own
+                // explanation is one somebody deletes.
+                if trimmed.starts_with("//") || trimmed.starts_with('*') {
+                    continue;
+                }
+                if line.contains(NEEDLE) {
+                    spinners.push(format!("{module}:{}: {}", number + 1, trimmed));
+                }
+            }
+        }
+        assert!(
+            spinners.is_empty(),
+            "a spinner is drawn here, and a spinner cannot honour the \
+             reduce-motion setting. Call `progress::strip` with a `Reach`, \
+             which holds still when movement is not wanted:\n{}",
+            spinners.join("\n")
+        );
+    }
+
+    /// Under reduced motion the indeterminate indicator does not move.
+    ///
+    /// Driven rather than read, because this is the one property of roadmap item
+    /// 169 that a reader of the source can be wrong about: the branch is there
+    /// and what it paints is the question. Two frames a second apart, and the
+    /// rectangles that came out of them are compared.
+    ///
+    /// With motion allowed they differ, which is asserted in the same test.
+    /// Without that half, a version that painted nothing at all in either case
+    /// would pass.
+    #[test]
+    fn a_reduced_motion_indicator_holds_still() {
+        fn rectangles(motion: Motion, time: f64) -> Vec<u32> {
+            let ctx = egui::Context::default();
+            crate::theme::install(&ctx);
+            let input = egui::RawInput {
+                time: Some(time),
+                ..Default::default()
+            };
+            let output = crate::headless_frame(&ctx, input, |ui| {
+                egui::CentralPanel::default().show(ui, |ui| {
+                    strip(
+                        ui,
+                        "doing something that cannot be counted",
+                        &Reach::unmeasurable("this is a test"),
+                        motion,
+                    );
+                });
+            });
+            let mut edges = Vec::new();
+            for clipped in output.shapes {
+                if let egui::Shape::Rect(rect) = &clipped.shape {
+                    // Quantised, so floating-point noise does not make two
+                    // identical frames look different. Borrowed from the
+                    // soundbar's tests, which needed it for the same reason.
+                    edges.push((rect.rect.min.x * 100.0) as u32);
+                    edges.push((rect.rect.max.x * 100.0) as u32);
+                }
+            }
+            assert!(!edges.is_empty(), "the indicator painted nothing at all");
+            edges
+        }
+
+        let still = crate::no_motion();
+        assert_eq!(
+            rectangles(still, 0.0),
+            rectangles(still, 1.0),
+            "the indicator moved between two frames although the system asked \
+             for no movement"
+        );
+
+        let moving = Motion {
+            enabled: true,
+            icon: true,
+            system_reduced: false,
+        };
+        assert_ne!(
+            rectangles(moving, 0.0),
+            rectangles(moving, 1.0),
+            "the indicator is identical in two frames a second apart with \
+             motion allowed, so the travelling half draws nothing and the test \
+             above proves nothing"
         );
     }
 
@@ -303,7 +497,7 @@ mod tests {
 
     /// A total that is only known once the work has started still gets a bar.
     #[test]
-    fn a_total_learned_late_turns_the_spinner_into_a_bar() {
+    fn a_total_learned_late_turns_a_still_bar_into_a_filling_one() {
         let reach = Reach::counting(0);
         assert_eq!(
             reach.fraction(),

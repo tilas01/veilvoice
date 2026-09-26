@@ -202,6 +202,20 @@ pub(crate) fn headless_frame(
     output
 }
 
+/// Motion resolved to "nothing moves", for tests that drive a panel.
+///
+/// Every panel that draws takes the resolved setting since roadmap item 169, so
+/// the tests need one. Written once: five copies of the same three fields is
+/// five places for the default to disagree with itself.
+#[cfg(test)]
+pub(crate) fn no_motion() -> crate::prefs::Motion {
+    crate::prefs::Motion {
+        enabled: false,
+        icon: false,
+        system_reduced: true,
+    }
+}
+
 /// Every module's source, for the guards that read the crate rather than run it.
 ///
 /// One list, because there are two guards that need it and a second copy would
@@ -933,11 +947,7 @@ mod draw_path_tests {
                 "the setup tab",
                 Box::new(|ctx: &egui::Context| {
                     let mut setup = crate::setup::Setup::new();
-                    let motion = crate::prefs::Motion {
-                        enabled: false,
-                        icon: false,
-                        system_reduced: true,
-                    };
+                    let motion = crate::no_motion();
                     let _ = crate::headless_frame(ctx, Default::default(), |ui| {
                         egui::CentralPanel::default().show(ui, |ui| setup.tab(ui, motion));
                     });
@@ -953,7 +963,7 @@ mod draw_path_tests {
                     let mut security = crate::security::Security::default();
                     let _ = crate::headless_frame(ctx, Default::default(), |ui| {
                         egui::CentralPanel::default().show(ui, |ui| {
-                            run.panel(ui, &mut prefs, &mut security, (0, 0));
+                            run.panel(ui, &mut prefs, &mut security, (0, 0), crate::no_motion());
                         });
                     });
                 }),
@@ -963,7 +973,8 @@ mod draw_path_tests {
                 Box::new(|ctx: &egui::Context| {
                     let mut verify = crate::verify::Verify::default();
                     let _ = crate::headless_frame(ctx, Default::default(), |ui| {
-                        egui::CentralPanel::default().show(ui, |ui| verify.tab(ui));
+                        egui::CentralPanel::default()
+                            .show(ui, |ui| verify.tab(ui, crate::no_motion()));
                     });
                 }),
             ),
@@ -973,7 +984,7 @@ mod draw_path_tests {
                     let mut studio = crate::studio::Studio::default();
                     let _ = crate::headless_frame(ctx, Default::default(), |ui| {
                         egui::CentralPanel::default().show(ui, |ui| {
-                            studio.tab(ui, Default::default(), None, None);
+                            studio.tab(ui, Default::default(), None, None, crate::no_motion());
                         });
                     });
                 }),
@@ -983,7 +994,8 @@ mod draw_path_tests {
                 Box::new(|ctx: &egui::Context| {
                     let mut studio = crate::studio::Studio::default();
                     let _ = crate::headless_frame(ctx, Default::default(), |ui| {
-                        egui::CentralPanel::default().show(ui, |ui| studio.browser(ui));
+                        egui::CentralPanel::default()
+                            .show(ui, |ui| studio.browser(ui, crate::no_motion()));
                     });
                 }),
             ),

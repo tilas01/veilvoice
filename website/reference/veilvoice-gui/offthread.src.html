@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/offthread.rs</code></h1>
-<p style="color:var(--muted)"><a href="offthread.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 265 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="offthread.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 267 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -91,262 +91,264 @@
 <span class="ln" id="L23"><span class="tok-com">//! self.machine.ask_once(ui.ctx(), measure);   // spawns, returns at once</span></span>
 <span class="ln" id="L24"><span class="tok-com">//! match self.machine.get() {</span></span>
 <span class="ln" id="L25"><span class="tok-com">//!     Some(machine) =&gt; draw(ui, machine),</span></span>
-<span class="ln" id="L26"><span class="tok-com">//!     None =&gt; ui.spinner(),                   // still being read</span></span>
-<span class="ln" id="L27"><span class="tok-com">//! }</span></span>
-<span class="ln" id="L28"><span class="tok-com">//! ```</span></span>
-<span class="ln" id="L29"><span class="tok-com">//!</span></span>
-<span class="ln" id="L30"><span class="tok-com">//! The thread with the news asks for the repaint, because it is the only thing</span></span>
-<span class="ln" id="L31"><span class="tok-com">//! that knows there is any. That rule is why an untouched window draws nothing</span></span>
-<span class="ln" id="L32"><span class="tok-com">//! at all, and a poller here would have quietly undone it.</span></span>
-<span class="ln" id="L33"><span class="tok-com">//!</span></span>
-<span class="ln" id="L34"><span class="tok-com">//! # What it deliberately does not do</span></span>
+<span class="ln" id="L26"><span class="tok-com">//!     // Still being read. One indicator, from `crate::progress`, which says</span></span>
+<span class="ln" id="L27"><span class="tok-com">//!     // what is happening and honours the reduce-motion setting.</span></span>
+<span class="ln" id="L28"><span class="tok-com">//!     None =&gt; crate::progress::strip(ui, &quot;reading this machine&quot;, &amp;reach, motion),</span></span>
+<span class="ln" id="L29"><span class="tok-com">//! }</span></span>
+<span class="ln" id="L30"><span class="tok-com">//! ```</span></span>
+<span class="ln" id="L31"><span class="tok-com">//!</span></span>
+<span class="ln" id="L32"><span class="tok-com">//! The thread with the news asks for the repaint, because it is the only thing</span></span>
+<span class="ln" id="L33"><span class="tok-com">//! that knows there is any. That rule is why an untouched window draws nothing</span></span>
+<span class="ln" id="L34"><span class="tok-com">//! at all, and a poller here would have quietly undone it.</span></span>
 <span class="ln" id="L35"><span class="tok-com">//!</span></span>
-<span class="ln" id="L36"><span class="tok-com">//! **It does not re-ask.** An answer is read once and kept, because the</span></span>
-<span class="ln" id="L37"><span class="tok-com">//! questions it is for have answers that change rarely and are not worth a</span></span>
-<span class="ln" id="L38"><span class="tok-com">//! process per frame to notice. Something that genuinely changes underfoot</span></span>
-<span class="ln" id="L39"><span class="tok-com">//! asks again explicitly, by calling [`Answer::ask`].</span></span>
-<span class="ln" id="L40"><span class="tok-com">//!</span></span>
-<span class="ln" id="L41"><span class="tok-com">//! **It does not report the worker&#x27;s death as an error.** A worker that</span></span>
-<span class="ln" id="L42"><span class="tok-com">//! panicked drops its sender, and this then reads as &quot;not waiting any more,</span></span>
-<span class="ln" id="L43"><span class="tok-com">//! and the last answer still stands&quot;. A panel that showed a number goes on</span></span>
-<span class="ln" id="L44"><span class="tok-com">//! showing the last true one rather than replacing it with a zero, which is</span></span>
-<span class="ln" id="L45"><span class="tok-com">//! what `setup`&#x27;s companion probe already decided for itself and for the same</span></span>
-<span class="ln" id="L46"><span class="tok-com">//! reason: an empty list reads as &quot;you have none of these&quot;.</span></span>
-<span class="ln" id="L47"><span class="tok-com">//!</span></span>
-<span class="ln" id="L48"><span class="tok-com">//! # Why this is not [`crate::dialog::Pending`]</span></span>
+<span class="ln" id="L36"><span class="tok-com">//! # What it deliberately does not do</span></span>
+<span class="ln" id="L37"><span class="tok-com">//!</span></span>
+<span class="ln" id="L38"><span class="tok-com">//! **It does not re-ask.** An answer is read once and kept, because the</span></span>
+<span class="ln" id="L39"><span class="tok-com">//! questions it is for have answers that change rarely and are not worth a</span></span>
+<span class="ln" id="L40"><span class="tok-com">//! process per frame to notice. Something that genuinely changes underfoot</span></span>
+<span class="ln" id="L41"><span class="tok-com">//! asks again explicitly, by calling [`Answer::ask`].</span></span>
+<span class="ln" id="L42"><span class="tok-com">//!</span></span>
+<span class="ln" id="L43"><span class="tok-com">//! **It does not report the worker&#x27;s death as an error.** A worker that</span></span>
+<span class="ln" id="L44"><span class="tok-com">//! panicked drops its sender, and this then reads as &quot;not waiting any more,</span></span>
+<span class="ln" id="L45"><span class="tok-com">//! and the last answer still stands&quot;. A panel that showed a number goes on</span></span>
+<span class="ln" id="L46"><span class="tok-com">//! showing the last true one rather than replacing it with a zero, which is</span></span>
+<span class="ln" id="L47"><span class="tok-com">//! what `setup`&#x27;s companion probe already decided for itself and for the same</span></span>
+<span class="ln" id="L48"><span class="tok-com">//! reason: an empty list reads as &quot;you have none of these&quot;.</span></span>
 <span class="ln" id="L49"><span class="tok-com">//!</span></span>
-<span class="ln" id="L50"><span class="tok-com">//! `Pending` is the same shape for file dialogs and it stays separate, because</span></span>
-<span class="ln" id="L51"><span class="tok-com">//! on macOS it must run its work **on** the drawing thread: `NSOpenPanel` can</span></span>
-<span class="ln" id="L52"><span class="tok-com">//! be driven from nowhere else. A type whose whole promise is &quot;not on the</span></span>
-<span class="ln" id="L53"><span class="tok-com">//! drawing thread&quot; cannot have a platform where that is false. The duplication</span></span>
-<span class="ln" id="L54"><span class="tok-com">//! is fifteen lines and the alternative is a promise with an exception in it.</span></span>
-<span class="ln" id="L55"></span>
-<span class="ln" id="L56"><span class="tok-kw">use</span> std::sync::mpsc;</span>
+<span class="ln" id="L50"><span class="tok-com">//! # Why this is not [`crate::dialog::Pending`]</span></span>
+<span class="ln" id="L51"><span class="tok-com">//!</span></span>
+<span class="ln" id="L52"><span class="tok-com">//! `Pending` is the same shape for file dialogs and it stays separate, because</span></span>
+<span class="ln" id="L53"><span class="tok-com">//! on macOS it must run its work **on** the drawing thread: `NSOpenPanel` can</span></span>
+<span class="ln" id="L54"><span class="tok-com">//! be driven from nowhere else. A type whose whole promise is &quot;not on the</span></span>
+<span class="ln" id="L55"><span class="tok-com">//! drawing thread&quot; cannot have a platform where that is false. The duplication</span></span>
+<span class="ln" id="L56"><span class="tok-com">//! is fifteen lines and the alternative is a promise with an exception in it.</span></span>
 <span class="ln" id="L57"></span>
+<span class="ln" id="L58"><span class="tok-kw">use</span> std::sync::mpsc;</span>
+<span class="ln" id="L59"></span>
 <span class="src-item" id="fn-answer">
-<span class="ln" id="L58"><span class="tok-com">/// One value, worked out off the drawing thread.</span></span>
-<span class="ln" id="L59"><span class="tok-com">///</span></span>
-<span class="ln" id="L60"><span class="tok-com">/// `new` asks nothing. The first [`ask_once`](Answer::ask_once) starts the</span></span>
-<span class="ln" id="L61"><span class="tok-com">/// work; [`get`](Answer::get) collects it when it arrives and never waits.</span></span>
-<span class="ln" id="L62"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Answer&lt;T&gt; {</span>
-<span class="ln" id="L63">    waiting: Option&lt;mpsc::Receiver&lt;T&gt;&gt;,</span>
-<span class="ln" id="L64">    answer: Option&lt;T&gt;,</span>
-<span class="ln" id="L65">    asked: bool,</span>
-<span class="ln" id="L66">}</span>
+<span class="ln" id="L60"><span class="tok-com">/// One value, worked out off the drawing thread.</span></span>
+<span class="ln" id="L61"><span class="tok-com">///</span></span>
+<span class="ln" id="L62"><span class="tok-com">/// `new` asks nothing. The first [`ask_once`](Answer::ask_once) starts the</span></span>
+<span class="ln" id="L63"><span class="tok-com">/// work; [`get`](Answer::get) collects it when it arrives and never waits.</span></span>
+<span class="ln" id="L64"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Answer&lt;T&gt; {</span>
+<span class="ln" id="L65">    waiting: Option&lt;mpsc::Receiver&lt;T&gt;&gt;,</span>
+<span class="ln" id="L66">    answer: Option&lt;T&gt;,</span>
+<span class="ln" id="L67">    asked: bool,</span>
+<span class="ln" id="L68">}</span>
 </span>
-<span class="ln" id="L67"></span>
-<span class="ln" id="L68"><span class="tok-com">// Written out rather than derived: `derive(Default)` would demand `T: Default`,</span></span>
-<span class="ln" id="L69"><span class="tok-com">// and the whole point is that the value does not exist yet.</span></span>
-<span class="ln" id="L70"><span class="tok-kw">impl</span>&lt;T&gt; Default <span class="tok-kw">for</span> Answer&lt;T&gt; {</span>
+<span class="ln" id="L69"></span>
+<span class="ln" id="L70"><span class="tok-com">// Written out rather than derived: `derive(Default)` would demand `T: Default`,</span></span>
+<span class="ln" id="L71"><span class="tok-com">// and the whole point is that the value does not exist yet.</span></span>
+<span class="ln" id="L72"><span class="tok-kw">impl</span>&lt;T&gt; Default <span class="tok-kw">for</span> Answer&lt;T&gt; {</span>
 <span class="src-item" id="fn-answer-t-default">
-<span class="ln" id="L71">    <span class="tok-kw">fn</span> <span class="tok-fn">default</span>() -&gt; Self {</span>
-<span class="ln" id="L72">        Self {</span>
-<span class="ln" id="L73">            waiting: None,</span>
-<span class="ln" id="L74">            answer: None,</span>
-<span class="ln" id="L75">            asked: false,</span>
-<span class="ln" id="L76">        }</span>
-<span class="ln" id="L77">    }</span>
+<span class="ln" id="L73">    <span class="tok-kw">fn</span> <span class="tok-fn">default</span>() -&gt; Self {</span>
+<span class="ln" id="L74">        Self {</span>
+<span class="ln" id="L75">            waiting: None,</span>
+<span class="ln" id="L76">            answer: None,</span>
+<span class="ln" id="L77">            asked: false,</span>
+<span class="ln" id="L78">        }</span>
+<span class="ln" id="L79">    }</span>
 </span>
-<span class="ln" id="L78">}</span>
-<span class="ln" id="L79"></span>
-<span class="ln" id="L80"><span class="tok-kw">impl</span>&lt;T: Send + &#x27;<span class="tok-kw">static</span>&gt; Answer&lt;T&gt; {</span>
+<span class="ln" id="L80">}</span>
+<span class="ln" id="L81"></span>
+<span class="ln" id="L82"><span class="tok-kw">impl</span>&lt;T: Send + &#x27;<span class="tok-kw">static</span>&gt; Answer&lt;T&gt; {</span>
 <span class="src-item" id="fn-answer-t-new">
-<span class="ln" id="L81">    <span class="tok-com">/// Nothing asked yet.</span></span>
-<span class="ln" id="L82">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>() -&gt; Self {</span>
-<span class="ln" id="L83">        Self::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L84">    }</span>
+<span class="ln" id="L83">    <span class="tok-com">/// Nothing asked yet.</span></span>
+<span class="ln" id="L84">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>() -&gt; Self {</span>
+<span class="ln" id="L85">        Self::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L86">    }</span>
 </span>
-<span class="ln" id="L85"></span>
+<span class="ln" id="L87"></span>
 <span class="src-item" id="fn-answer-t-ask">
-<span class="ln" id="L86">    <span class="tok-com">/// Start the work, replacing anything already in flight.</span></span>
-<span class="ln" id="L87">    <span class="tok-com">///</span></span>
-<span class="ln" id="L88">    <span class="tok-com">/// The context is cloned into the worker so that it can ask for a repaint</span></span>
-<span class="ln" id="L89">    <span class="tok-com">/// when it has something to show. Without that the answer would sit in the</span></span>
-<span class="ln" id="L90">    <span class="tok-com">/// channel until somebody moved the mouse, because a window with nothing</span></span>
-<span class="ln" id="L91">    <span class="tok-com">/// happening in it is a window that has stopped drawing.</span></span>
-<span class="ln" id="L92">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ask</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context, work: <span class="tok-kw">impl</span> <span class="tok-fn">FnOnce</span>() -&gt; T + Send + &#x27;<span class="tok-kw">static</span>) {</span>
-<span class="ln" id="L93">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L94">        <span class="tok-kw">self</span>.waiting = <span class="tok-fn">Some</span>(rx);</span>
-<span class="ln" id="L95">        <span class="tok-kw">self</span>.asked = true;</span>
-<span class="ln" id="L96">        <span class="tok-kw">let</span> ctx = ctx.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L97">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L98">            <span class="tok-com">// Sent before the repaint is asked for, so the frame that wakes up</span></span>
-<span class="ln" id="L99">            <span class="tok-com">// finds the answer already in the channel rather than one frame</span></span>
-<span class="ln" id="L100">            <span class="tok-com">// later. The send fails only if the panel that asked has gone,</span></span>
-<span class="ln" id="L101">            <span class="tok-com">// which is ordinary and not worth reporting to nobody.</span></span>
-<span class="ln" id="L102">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(<span class="tok-fn">work</span>());</span>
-<span class="ln" id="L103">            ctx.<span class="tok-fn">request_repaint</span>();</span>
-<span class="ln" id="L104">        });</span>
-<span class="ln" id="L105">    }</span>
+<span class="ln" id="L88">    <span class="tok-com">/// Start the work, replacing anything already in flight.</span></span>
+<span class="ln" id="L89">    <span class="tok-com">///</span></span>
+<span class="ln" id="L90">    <span class="tok-com">/// The context is cloned into the worker so that it can ask for a repaint</span></span>
+<span class="ln" id="L91">    <span class="tok-com">/// when it has something to show. Without that the answer would sit in the</span></span>
+<span class="ln" id="L92">    <span class="tok-com">/// channel until somebody moved the mouse, because a window with nothing</span></span>
+<span class="ln" id="L93">    <span class="tok-com">/// happening in it is a window that has stopped drawing.</span></span>
+<span class="ln" id="L94">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ask</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context, work: <span class="tok-kw">impl</span> <span class="tok-fn">FnOnce</span>() -&gt; T + Send + &#x27;<span class="tok-kw">static</span>) {</span>
+<span class="ln" id="L95">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L96">        <span class="tok-kw">self</span>.waiting = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L97">        <span class="tok-kw">self</span>.asked = true;</span>
+<span class="ln" id="L98">        <span class="tok-kw">let</span> ctx = ctx.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L99">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L100">            <span class="tok-com">// Sent before the repaint is asked for, so the frame that wakes up</span></span>
+<span class="ln" id="L101">            <span class="tok-com">// finds the answer already in the channel rather than one frame</span></span>
+<span class="ln" id="L102">            <span class="tok-com">// later. The send fails only if the panel that asked has gone,</span></span>
+<span class="ln" id="L103">            <span class="tok-com">// which is ordinary and not worth reporting to nobody.</span></span>
+<span class="ln" id="L104">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(<span class="tok-fn">work</span>());</span>
+<span class="ln" id="L105">            ctx.<span class="tok-fn">request_repaint</span>();</span>
+<span class="ln" id="L106">        });</span>
+<span class="ln" id="L107">    }</span>
 </span>
-<span class="ln" id="L106"></span>
+<span class="ln" id="L108"></span>
 <span class="src-item" id="fn-answer-t-ask_once">
-<span class="ln" id="L107">    <span class="tok-com">/// Start the work, unless it has been started before.</span></span>
-<span class="ln" id="L108">    <span class="tok-com">///</span></span>
-<span class="ln" id="L109">    <span class="tok-com">/// This is what a drawing function calls: it runs every frame and must</span></span>
-<span class="ln" id="L110">    <span class="tok-com">/// start one worker, not sixty a second.</span></span>
-<span class="ln" id="L111">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ask_once</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context, work: <span class="tok-kw">impl</span> <span class="tok-fn">FnOnce</span>() -&gt; T + Send + &#x27;<span class="tok-kw">static</span>) {</span>
-<span class="ln" id="L112">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.asked {</span>
-<span class="ln" id="L113">            <span class="tok-kw">self</span>.<span class="tok-fn">ask</span>(ctx, work);</span>
-<span class="ln" id="L114">        }</span>
-<span class="ln" id="L115">    }</span>
+<span class="ln" id="L109">    <span class="tok-com">/// Start the work, unless it has been started before.</span></span>
+<span class="ln" id="L110">    <span class="tok-com">///</span></span>
+<span class="ln" id="L111">    <span class="tok-com">/// This is what a drawing function calls: it runs every frame and must</span></span>
+<span class="ln" id="L112">    <span class="tok-com">/// start one worker, not sixty a second.</span></span>
+<span class="ln" id="L113">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ask_once</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context, work: <span class="tok-kw">impl</span> <span class="tok-fn">FnOnce</span>() -&gt; T + Send + &#x27;<span class="tok-kw">static</span>) {</span>
+<span class="ln" id="L114">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.asked {</span>
+<span class="ln" id="L115">            <span class="tok-kw">self</span>.<span class="tok-fn">ask</span>(ctx, work);</span>
+<span class="ln" id="L116">        }</span>
+<span class="ln" id="L117">    }</span>
 </span>
-<span class="ln" id="L116"></span>
+<span class="ln" id="L118"></span>
 <span class="src-item" id="fn-answer-t-get">
-<span class="ln" id="L117">    <span class="tok-com">/// The answer, if there is one. Never waits.</span></span>
-<span class="ln" id="L118">    <span class="tok-com">///</span></span>
-<span class="ln" id="L119">    <span class="tok-com">/// Takes `&amp;mut self` because collecting is what reading is: the value is</span></span>
-<span class="ln" id="L120">    <span class="tok-com">/// pulled out of the channel here, on whichever frame happens to be first</span></span>
-<span class="ln" id="L121">    <span class="tok-com">/// after it arrives.</span></span>
-<span class="ln" id="L122">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">get</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Option&lt;&amp;T&gt; {</span>
-<span class="ln" id="L123">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rx) = &amp;<span class="tok-kw">self</span>.waiting {</span>
-<span class="ln" id="L124">            <span class="tok-kw">match</span> rx.<span class="tok-fn">try_recv</span>() {</span>
-<span class="ln" id="L125">                <span class="tok-fn">Ok</span>(value) =&gt; {</span>
-<span class="ln" id="L126">                    <span class="tok-kw">self</span>.answer = <span class="tok-fn">Some</span>(value);</span>
-<span class="ln" id="L127">                    <span class="tok-kw">self</span>.waiting = None;</span>
-<span class="ln" id="L128">                }</span>
-<span class="ln" id="L129">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; {}</span>
-<span class="ln" id="L130">                <span class="tok-com">// The worker is gone without sending. See the module note: the</span></span>
-<span class="ln" id="L131">                <span class="tok-com">// last answer stands rather than being replaced by nothing.</span></span>
-<span class="ln" id="L132">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; <span class="tok-kw">self</span>.waiting = None,</span>
-<span class="ln" id="L133">            }</span>
-<span class="ln" id="L134">        }</span>
-<span class="ln" id="L135">        <span class="tok-kw">self</span>.answer.<span class="tok-fn">as_ref</span>()</span>
-<span class="ln" id="L136">    }</span>
+<span class="ln" id="L119">    <span class="tok-com">/// The answer, if there is one. Never waits.</span></span>
+<span class="ln" id="L120">    <span class="tok-com">///</span></span>
+<span class="ln" id="L121">    <span class="tok-com">/// Takes `&amp;mut self` because collecting is what reading is: the value is</span></span>
+<span class="ln" id="L122">    <span class="tok-com">/// pulled out of the channel here, on whichever frame happens to be first</span></span>
+<span class="ln" id="L123">    <span class="tok-com">/// after it arrives.</span></span>
+<span class="ln" id="L124">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">get</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Option&lt;&amp;T&gt; {</span>
+<span class="ln" id="L125">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rx) = &amp;<span class="tok-kw">self</span>.waiting {</span>
+<span class="ln" id="L126">            <span class="tok-kw">match</span> rx.<span class="tok-fn">try_recv</span>() {</span>
+<span class="ln" id="L127">                <span class="tok-fn">Ok</span>(value) =&gt; {</span>
+<span class="ln" id="L128">                    <span class="tok-kw">self</span>.answer = <span class="tok-fn">Some</span>(value);</span>
+<span class="ln" id="L129">                    <span class="tok-kw">self</span>.waiting = None;</span>
+<span class="ln" id="L130">                }</span>
+<span class="ln" id="L131">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; {}</span>
+<span class="ln" id="L132">                <span class="tok-com">// The worker is gone without sending. See the module note: the</span></span>
+<span class="ln" id="L133">                <span class="tok-com">// last answer stands rather than being replaced by nothing.</span></span>
+<span class="ln" id="L134">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; <span class="tok-kw">self</span>.waiting = None,</span>
+<span class="ln" id="L135">            }</span>
+<span class="ln" id="L136">        }</span>
+<span class="ln" id="L137">        <span class="tok-kw">self</span>.answer.<span class="tok-fn">as_ref</span>()</span>
+<span class="ln" id="L138">    }</span>
 </span>
-<span class="ln" id="L137"></span>
+<span class="ln" id="L139"></span>
 <span class="src-item" id="fn-answer-t-is_waiting">
-<span class="ln" id="L138">    <span class="tok-com">/// Whether the work is still running.</span></span>
-<span class="ln" id="L139">    <span class="tok-com">///</span></span>
-<span class="ln" id="L140">    <span class="tok-com">/// For the panel that wants to say so. A button that has just been pressed</span></span>
-<span class="ln" id="L141">    <span class="tok-com">/// going quiet is what reads as a freeze, and saying &quot;still looking&quot; is as</span></span>
-<span class="ln" id="L142">    <span class="tok-com">/// much of the fix as the worker is.</span></span>
-<span class="ln" id="L143">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_waiting</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
-<span class="ln" id="L144">        <span class="tok-kw">self</span>.waiting.<span class="tok-fn">is_some</span>()</span>
-<span class="ln" id="L145">    }</span>
+<span class="ln" id="L140">    <span class="tok-com">/// Whether the work is still running.</span></span>
+<span class="ln" id="L141">    <span class="tok-com">///</span></span>
+<span class="ln" id="L142">    <span class="tok-com">/// For the panel that wants to say so. A button that has just been pressed</span></span>
+<span class="ln" id="L143">    <span class="tok-com">/// going quiet is what reads as a freeze, and saying &quot;still looking&quot; is as</span></span>
+<span class="ln" id="L144">    <span class="tok-com">/// much of the fix as the worker is.</span></span>
+<span class="ln" id="L145">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_waiting</span>(&amp;<span class="tok-kw">self</span>) -&gt; bool {</span>
+<span class="ln" id="L146">        <span class="tok-kw">self</span>.waiting.<span class="tok-fn">is_some</span>()</span>
+<span class="ln" id="L147">    }</span>
 </span>
-<span class="ln" id="L146"></span>
+<span class="ln" id="L148"></span>
 <span class="src-item" id="fn-answer-t-forget">
-<span class="ln" id="L147">    <span class="tok-com">/// Throw the answer away, so the next [`ask_once`](Answer::ask_once) asks</span></span>
-<span class="ln" id="L148">    <span class="tok-com">/// again. For a panel that knows the machine has changed under it.</span></span>
-<span class="ln" id="L149">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">forget</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L150">        <span class="tok-kw">self</span>.waiting = None;</span>
-<span class="ln" id="L151">        <span class="tok-kw">self</span>.answer = None;</span>
-<span class="ln" id="L152">        <span class="tok-kw">self</span>.asked = false;</span>
-<span class="ln" id="L153">    }</span>
+<span class="ln" id="L149">    <span class="tok-com">/// Throw the answer away, so the next [`ask_once`](Answer::ask_once) asks</span></span>
+<span class="ln" id="L150">    <span class="tok-com">/// again. For a panel that knows the machine has changed under it.</span></span>
+<span class="ln" id="L151">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">forget</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L152">        <span class="tok-kw">self</span>.waiting = None;</span>
+<span class="ln" id="L153">        <span class="tok-kw">self</span>.answer = None;</span>
+<span class="ln" id="L154">        <span class="tok-kw">self</span>.asked = false;</span>
+<span class="ln" id="L155">    }</span>
 </span>
-<span class="ln" id="L154">}</span>
-<span class="ln" id="L155"></span>
-<span class="ln" id="L156"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L157"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L158">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L159"></span>
-<span class="ln" id="L160">    <span class="tok-com">/// A context that is never shown. `request_repaint` on one of these is a</span></span>
-<span class="ln" id="L161">    <span class="tok-com">/// no-op, which is all these tests need it to be.</span></span>
-<span class="ln" id="L162">    <span class="tok-kw">fn</span> <span class="tok-fn">ctx</span>() -&gt; egui::Context {</span>
-<span class="ln" id="L163">        egui::Context::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L164">    }</span>
-<span class="ln" id="L165"></span>
-<span class="ln" id="L166">    <span class="tok-com">/// The answer arrives, and is kept once it has.</span></span>
-<span class="ln" id="L167">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L168">    <span class="tok-kw">fn</span> <span class="tok-fn">the_answer_comes_back_and_stays</span>() {</span>
-<span class="ln" id="L169">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;u32&gt; = Answer::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L170">        assert!(</span>
-<span class="ln" id="L171">            answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>(),</span>
-<span class="ln" id="L172">            <span class="tok-str">&quot;nothing was asked, so nothing is known&quot;</span></span>
-<span class="ln" id="L173">        );</span>
-<span class="ln" id="L174">        answer.<span class="tok-fn">ask</span>(&amp;<span class="tok-fn">ctx</span>(), || <span class="tok-num">7</span>);</span>
-<span class="ln" id="L175">        <span class="tok-com">// Polled rather than waited for, which is the whole point, so this</span></span>
-<span class="ln" id="L176">        <span class="tok-com">// spins the way a window would rather than blocking on the channel.</span></span>
-<span class="ln" id="L177">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
-<span class="ln" id="L178">        while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
-<span class="ln" id="L179">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
-<span class="ln" id="L180">        }</span>
-<span class="ln" id="L181">        assert_eq!(answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">7</span>));</span>
-<span class="ln" id="L182">        assert!(!answer.<span class="tok-fn">is_waiting</span>(), <span class="tok-str">&quot;the channel was drained&quot;</span>);</span>
-<span class="ln" id="L183">        <span class="tok-com">// And again, from the kept value rather than the channel.</span></span>
-<span class="ln" id="L184">        assert_eq!(answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">7</span>));</span>
-<span class="ln" id="L185">    }</span>
-<span class="ln" id="L186"></span>
-<span class="ln" id="L187">    <span class="tok-com">/// Asking once is asking once, however many frames go past.</span></span>
-<span class="ln" id="L188">    <span class="tok-com">///</span></span>
-<span class="ln" id="L189">    <span class="tok-com">/// This is the defect the type exists to prevent, so it is checked rather</span></span>
-<span class="ln" id="L190">    <span class="tok-com">/// than left to the name: the work counts its own calls.</span></span>
-<span class="ln" id="L191">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L192">    <span class="tok-kw">fn</span> <span class="tok-fn">a_thousand_frames_ask_one_worker</span>() {</span>
-<span class="ln" id="L193">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicUsize, Ordering};</span>
-<span class="ln" id="L194">        <span class="tok-kw">use</span> std::sync::Arc;</span>
-<span class="ln" id="L195">        <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">new</span>(AtomicUsize::<span class="tok-fn">new</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L196">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;()&gt; = Answer::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L197">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
-<span class="ln" id="L198">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">1_000</span> {</span>
-<span class="ln" id="L199">            <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">clone</span>(&amp;runs);</span>
-<span class="ln" id="L200">            answer.<span class="tok-fn">ask_once</span>(&amp;ctx, <span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L201">                runs.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::SeqCst);</span>
-<span class="ln" id="L202">            });</span>
-<span class="ln" id="L203">            <span class="tok-kw">let</span> _ = answer.<span class="tok-fn">get</span>();</span>
-<span class="ln" id="L204">        }</span>
-<span class="ln" id="L205">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
-<span class="ln" id="L206">        while runs.<span class="tok-fn">load</span>(Ordering::SeqCst) == <span class="tok-num">0</span> &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
-<span class="ln" id="L207">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
-<span class="ln" id="L208">        }</span>
-<span class="ln" id="L209">        assert_eq!(</span>
-<span class="ln" id="L210">            runs.<span class="tok-fn">load</span>(Ordering::SeqCst),</span>
-<span class="ln" id="L211">            <span class="tok-num">1</span>,</span>
-<span class="ln" id="L212">            <span class="tok-str">&quot;the work ran more than once, which is the per-frame defect this \</span></span>
-<span class="ln" id="L213"><span class="tok-str">             type exists to stop&quot;</span></span>
-<span class="ln" id="L214">        );</span>
-<span class="ln" id="L215">    }</span>
-<span class="ln" id="L216"></span>
-<span class="ln" id="L217">    <span class="tok-com">/// A worker that dies leaves what was already on screen.</span></span>
-<span class="ln" id="L218">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L219">    <span class="tok-kw">fn</span> <span class="tok-fn">a_dead_worker_leaves_the_last_answer</span>() {</span>
-<span class="ln" id="L220">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;u32&gt; = Answer::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L221">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
-<span class="ln" id="L222">        answer.<span class="tok-fn">ask</span>(&amp;ctx, || <span class="tok-num">3</span>);</span>
-<span class="ln" id="L223">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
-<span class="ln" id="L224">        while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
-<span class="ln" id="L225">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
-<span class="ln" id="L226">        }</span>
-<span class="ln" id="L227">        assert_eq!(answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">3</span>));</span>
-<span class="ln" id="L228"></span>
-<span class="ln" id="L229">        <span class="tok-com">// A worker that panics drops its sender without sending.</span></span>
-<span class="ln" id="L230">        answer.<span class="tok-fn">ask</span>(&amp;ctx, || panic!(<span class="tok-str">&quot;the worker died&quot;</span>));</span>
-<span class="ln" id="L231">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
-<span class="ln" id="L232">        while answer.<span class="tok-fn">is_waiting</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
-<span class="ln" id="L233">            <span class="tok-kw">let</span> _ = answer.<span class="tok-fn">get</span>();</span>
-<span class="ln" id="L234">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
-<span class="ln" id="L235">        }</span>
-<span class="ln" id="L236">        assert!(!answer.<span class="tok-fn">is_waiting</span>(), <span class="tok-str">&quot;the dead worker is not still awaited&quot;</span>);</span>
-<span class="ln" id="L237">        assert_eq!(</span>
-<span class="ln" id="L238">            answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(),</span>
-<span class="ln" id="L239">            <span class="tok-fn">Some</span>(<span class="tok-num">3</span>),</span>
-<span class="ln" id="L240">            <span class="tok-str">&quot;the panel would have replaced a true answer with nothing&quot;</span></span>
-<span class="ln" id="L241">        );</span>
-<span class="ln" id="L242">    }</span>
-<span class="ln" id="L243"></span>
-<span class="ln" id="L244">    <span class="tok-com">/// Forgetting asks again.</span></span>
-<span class="ln" id="L245">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L246">    <span class="tok-kw">fn</span> <span class="tok-fn">forgetting_asks_again</span>() {</span>
-<span class="ln" id="L247">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicUsize, Ordering};</span>
-<span class="ln" id="L248">        <span class="tok-kw">use</span> std::sync::Arc;</span>
-<span class="ln" id="L249">        <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">new</span>(AtomicUsize::<span class="tok-fn">new</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L250">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;usize&gt; = Answer::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L251">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
-<span class="ln" id="L252">        <span class="tok-kw">for</span> round <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L253">            <span class="tok-kw">if</span> round == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L254">                answer.<span class="tok-fn">forget</span>();</span>
-<span class="ln" id="L255">            }</span>
-<span class="ln" id="L256">            <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">clone</span>(&amp;runs);</span>
-<span class="ln" id="L257">            answer.<span class="tok-fn">ask_once</span>(&amp;ctx, <span class="tok-kw">move</span> || runs.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::SeqCst) + <span class="tok-num">1</span>);</span>
-<span class="ln" id="L258">            <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
-<span class="ln" id="L259">            while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
-<span class="ln" id="L260">                std::hint::<span class="tok-fn">spin_loop</span>();</span>
-<span class="ln" id="L261">            }</span>
-<span class="ln" id="L262">        }</span>
-<span class="ln" id="L263">        assert_eq!(runs.<span class="tok-fn">load</span>(Ordering::SeqCst), <span class="tok-num">2</span>, <span class="tok-str">&quot;the second ask never ran&quot;</span>);</span>
-<span class="ln" id="L264">    }</span>
-<span class="ln" id="L265">}</span>
+<span class="ln" id="L156">}</span>
+<span class="ln" id="L157"></span>
+<span class="ln" id="L158"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L159"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L160">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L161"></span>
+<span class="ln" id="L162">    <span class="tok-com">/// A context that is never shown. `request_repaint` on one of these is a</span></span>
+<span class="ln" id="L163">    <span class="tok-com">/// no-op, which is all these tests need it to be.</span></span>
+<span class="ln" id="L164">    <span class="tok-kw">fn</span> <span class="tok-fn">ctx</span>() -&gt; egui::Context {</span>
+<span class="ln" id="L165">        egui::Context::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L166">    }</span>
+<span class="ln" id="L167"></span>
+<span class="ln" id="L168">    <span class="tok-com">/// The answer arrives, and is kept once it has.</span></span>
+<span class="ln" id="L169">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L170">    <span class="tok-kw">fn</span> <span class="tok-fn">the_answer_comes_back_and_stays</span>() {</span>
+<span class="ln" id="L171">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;u32&gt; = Answer::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L172">        assert!(</span>
+<span class="ln" id="L173">            answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>(),</span>
+<span class="ln" id="L174">            <span class="tok-str">&quot;nothing was asked, so nothing is known&quot;</span></span>
+<span class="ln" id="L175">        );</span>
+<span class="ln" id="L176">        answer.<span class="tok-fn">ask</span>(&amp;<span class="tok-fn">ctx</span>(), || <span class="tok-num">7</span>);</span>
+<span class="ln" id="L177">        <span class="tok-com">// Polled rather than waited for, which is the whole point, so this</span></span>
+<span class="ln" id="L178">        <span class="tok-com">// spins the way a window would rather than blocking on the channel.</span></span>
+<span class="ln" id="L179">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
+<span class="ln" id="L180">        while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
+<span class="ln" id="L181">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L182">        }</span>
+<span class="ln" id="L183">        assert_eq!(answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">7</span>));</span>
+<span class="ln" id="L184">        assert!(!answer.<span class="tok-fn">is_waiting</span>(), <span class="tok-str">&quot;the channel was drained&quot;</span>);</span>
+<span class="ln" id="L185">        <span class="tok-com">// And again, from the kept value rather than the channel.</span></span>
+<span class="ln" id="L186">        assert_eq!(answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">7</span>));</span>
+<span class="ln" id="L187">    }</span>
+<span class="ln" id="L188"></span>
+<span class="ln" id="L189">    <span class="tok-com">/// Asking once is asking once, however many frames go past.</span></span>
+<span class="ln" id="L190">    <span class="tok-com">///</span></span>
+<span class="ln" id="L191">    <span class="tok-com">/// This is the defect the type exists to prevent, so it is checked rather</span></span>
+<span class="ln" id="L192">    <span class="tok-com">/// than left to the name: the work counts its own calls.</span></span>
+<span class="ln" id="L193">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L194">    <span class="tok-kw">fn</span> <span class="tok-fn">a_thousand_frames_ask_one_worker</span>() {</span>
+<span class="ln" id="L195">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicUsize, Ordering};</span>
+<span class="ln" id="L196">        <span class="tok-kw">use</span> std::sync::Arc;</span>
+<span class="ln" id="L197">        <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">new</span>(AtomicUsize::<span class="tok-fn">new</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L198">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;()&gt; = Answer::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L199">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
+<span class="ln" id="L200">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">1_000</span> {</span>
+<span class="ln" id="L201">            <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">clone</span>(&amp;runs);</span>
+<span class="ln" id="L202">            answer.<span class="tok-fn">ask_once</span>(&amp;ctx, <span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L203">                runs.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::SeqCst);</span>
+<span class="ln" id="L204">            });</span>
+<span class="ln" id="L205">            <span class="tok-kw">let</span> _ = answer.<span class="tok-fn">get</span>();</span>
+<span class="ln" id="L206">        }</span>
+<span class="ln" id="L207">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
+<span class="ln" id="L208">        while runs.<span class="tok-fn">load</span>(Ordering::SeqCst) == <span class="tok-num">0</span> &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
+<span class="ln" id="L209">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L210">        }</span>
+<span class="ln" id="L211">        assert_eq!(</span>
+<span class="ln" id="L212">            runs.<span class="tok-fn">load</span>(Ordering::SeqCst),</span>
+<span class="ln" id="L213">            <span class="tok-num">1</span>,</span>
+<span class="ln" id="L214">            <span class="tok-str">&quot;the work ran more than once, which is the per-frame defect this \</span></span>
+<span class="ln" id="L215"><span class="tok-str">             type exists to stop&quot;</span></span>
+<span class="ln" id="L216">        );</span>
+<span class="ln" id="L217">    }</span>
+<span class="ln" id="L218"></span>
+<span class="ln" id="L219">    <span class="tok-com">/// A worker that dies leaves what was already on screen.</span></span>
+<span class="ln" id="L220">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L221">    <span class="tok-kw">fn</span> <span class="tok-fn">a_dead_worker_leaves_the_last_answer</span>() {</span>
+<span class="ln" id="L222">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;u32&gt; = Answer::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L223">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
+<span class="ln" id="L224">        answer.<span class="tok-fn">ask</span>(&amp;ctx, || <span class="tok-num">3</span>);</span>
+<span class="ln" id="L225">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
+<span class="ln" id="L226">        while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
+<span class="ln" id="L227">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L228">        }</span>
+<span class="ln" id="L229">        assert_eq!(answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">3</span>));</span>
+<span class="ln" id="L230"></span>
+<span class="ln" id="L231">        <span class="tok-com">// A worker that panics drops its sender without sending.</span></span>
+<span class="ln" id="L232">        answer.<span class="tok-fn">ask</span>(&amp;ctx, || panic!(<span class="tok-str">&quot;the worker died&quot;</span>));</span>
+<span class="ln" id="L233">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
+<span class="ln" id="L234">        while answer.<span class="tok-fn">is_waiting</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
+<span class="ln" id="L235">            <span class="tok-kw">let</span> _ = answer.<span class="tok-fn">get</span>();</span>
+<span class="ln" id="L236">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L237">        }</span>
+<span class="ln" id="L238">        assert!(!answer.<span class="tok-fn">is_waiting</span>(), <span class="tok-str">&quot;the dead worker is not still awaited&quot;</span>);</span>
+<span class="ln" id="L239">        assert_eq!(</span>
+<span class="ln" id="L240">            answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(),</span>
+<span class="ln" id="L241">            <span class="tok-fn">Some</span>(<span class="tok-num">3</span>),</span>
+<span class="ln" id="L242">            <span class="tok-str">&quot;the panel would have replaced a true answer with nothing&quot;</span></span>
+<span class="ln" id="L243">        );</span>
+<span class="ln" id="L244">    }</span>
+<span class="ln" id="L245"></span>
+<span class="ln" id="L246">    <span class="tok-com">/// Forgetting asks again.</span></span>
+<span class="ln" id="L247">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L248">    <span class="tok-kw">fn</span> <span class="tok-fn">forgetting_asks_again</span>() {</span>
+<span class="ln" id="L249">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicUsize, Ordering};</span>
+<span class="ln" id="L250">        <span class="tok-kw">use</span> std::sync::Arc;</span>
+<span class="ln" id="L251">        <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">new</span>(AtomicUsize::<span class="tok-fn">new</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L252">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;usize&gt; = Answer::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L253">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
+<span class="ln" id="L254">        <span class="tok-kw">for</span> round <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
+<span class="ln" id="L255">            <span class="tok-kw">if</span> round == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L256">                answer.<span class="tok-fn">forget</span>();</span>
+<span class="ln" id="L257">            }</span>
+<span class="ln" id="L258">            <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">clone</span>(&amp;runs);</span>
+<span class="ln" id="L259">            answer.<span class="tok-fn">ask_once</span>(&amp;ctx, <span class="tok-kw">move</span> || runs.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::SeqCst) + <span class="tok-num">1</span>);</span>
+<span class="ln" id="L260">            <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
+<span class="ln" id="L261">            while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
+<span class="ln" id="L262">                std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L263">            }</span>
+<span class="ln" id="L264">        }</span>
+<span class="ln" id="L265">        assert_eq!(runs.<span class="tok-fn">load</span>(Ordering::SeqCst), <span class="tok-num">2</span>, <span class="tok-str">&quot;the second ask never ran&quot;</span>);</span>
+<span class="ln" id="L266">    }</span>
+<span class="ln" id="L267">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

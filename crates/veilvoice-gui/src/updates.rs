@@ -2,7 +2,7 @@
 //! The manual update check, as the window shows it.
 //!
 //! [`veilvoice_setup::update`] does the asking and states what the answer is worth.
-//! This is the button, the spinner and the result, and the rule that the
+//! This is the button, the indicator and the result, and the rule that the
 //! button is the only thing that ever starts it.
 //!
 //! # It runs on a thread, and the window never waits for it
@@ -55,8 +55,9 @@ impl Updates {
     /// Take the worker's answer if it has one. Called once a frame; never waits.
     ///
     /// `Disconnected` is handled as well as a message: a worker that died
-    /// without sending would otherwise leave the panel saying "checking"
-    /// forever, which is the failure mode a spinner is worst at showing.
+    /// without sending would otherwise leave the panel saying "asking"
+    /// forever, which is the failure mode an indeterminate indicator is worst at
+    /// showing: it looks the same whether the work is running or gone.
     pub fn drain(&mut self) {
         let Some(rx) = &self.job else { return };
         match rx.try_recv() {
@@ -92,7 +93,7 @@ impl Updates {
     }
 
     /// The whole section, as it appears under "about".
-    pub fn section(&mut self, ui: &mut Ui, current: &str) {
+    pub fn section(&mut self, ui: &mut Ui, current: &str, motion: crate::prefs::Motion) {
         ui.label(RichText::new("Updates").color(p::blue()).small());
         ui.add_space(4.0);
 
@@ -106,8 +107,15 @@ impl Updates {
                 self.start(current);
             }
             if busy {
-                ui.spinner();
-                ui.label(RichText::new("asking…").color(p::muted()).small());
+                crate::progress::strip(
+                    ui,
+                    "asking",
+                    &crate::progress::Reach::unmeasurable(
+                        "it is one request to one server, which either answers or \
+                         does not",
+                    ),
+                    motion,
+                );
             }
         });
 

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/updates.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 268 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 276 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs)
 
 ## Contents
 
@@ -25,7 +25,7 @@
 The manual update check, as the window shows it.
 
 `veilvoice_setup::update` does the asking and states what the answer is worth.
-This is the button, the spinner and the result, and the rule that the
+This is the button, the indicator and the result, and the rule that the
 button is the only thing that ever starts it.
 
 # It runs on a thread, and the window never waits for it
@@ -57,7 +57,7 @@ release page says.
 
 ## What this file contains
 
-268 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+276 lines defining **5 functions** (3 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -65,8 +65,8 @@ release page says.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Updates::drain` (line 60) -- Take the worker's answer if it has one.
-- `Updates::section` (line 95) -- The whole section, as it appears under "about".
+- `Updates::drain` (line 61) -- Take the worker's answer if it has one.
+- `Updates::section` (line 96) -- The whole section, as it appears under "about".
   - reaches: `is_busy`, `start`, `verdict`
 
 ## What calls what
@@ -90,18 +90,18 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_is_busy["Updates::is_busy<br/>line 51"]
-    n_drain(["Updates::drain<br/>line 60"])
-    n_start["Updates::start<br/>line 78"]
-    n_section(["Updates::section<br/>line 95"])
-    n_verdict["Updates::verdict<br/>line 151"]
+    n_drain(["Updates::drain<br/>line 61"])
+    n_start["Updates::start<br/>line 79"]
+    n_section(["Updates::section<br/>line 96"])
+    n_verdict["Updates::verdict<br/>line 159"]
     n_section --> n_is_busy
     n_section --> n_start
     n_section --> n_verdict
     click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L51" "open the source"
-    click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L60" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L78" "open the source"
-    click n_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L95" "open the source"
-    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L151" "open the source"
+    click n_drain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L61" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L79" "open the source"
+    click n_section href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L96" "open the source"
+    click n_verdict href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L159" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_drain,n_section entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -118,10 +118,10 @@ flowchart TD
 |---|---:|---|
 | `Updates` <sub>pub struct</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L42) | The panel's state. |
 | `Updates::is_busy` <sub>pub fn</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L51) | Whether a check is running, so the app knows to keep repainting. |
-| `Updates::drain` <sub>pub fn</sub> | [60](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L60) | Take the worker's answer if it has one. |
-| `Updates::start` <sub>fn</sub> | [78](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L78) | Start a check. |
-| `Updates::section` <sub>pub fn</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L95) | The whole section, as it appears under "about". |
-| `Updates::verdict` <sub>fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L151) | The answer itself, in the colour it deserves. |
+| `Updates::drain` <sub>pub fn</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L61) | Take the worker's answer if it has one. |
+| `Updates::start` <sub>fn</sub> | [79](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L79) | Start a check. |
+| `Updates::section` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L96) | The whole section, as it appears under "about". |
+| `Updates::verdict` <sub>fn</sub> | [159](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs#L159) | The answer itself, in the colour it deserves. |
 
 ---
 

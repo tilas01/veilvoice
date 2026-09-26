@@ -63,14 +63,14 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/updates.rs</code></h1>
-<p style="color:var(--muted)"><a href="updates.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 268 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="updates.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 276 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/updates.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
 <span class="ln" id="L2"><span class="tok-com">//! The manual update check, as the window shows it.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
 <span class="ln" id="L4"><span class="tok-com">//! [`veilvoice_setup::update`] does the asking and states what the answer is worth.</span></span>
-<span class="ln" id="L5"><span class="tok-com">//! This is the button, the spinner and the result, and the rule that the</span></span>
+<span class="ln" id="L5"><span class="tok-com">//! This is the button, the indicator and the result, and the rule that the</span></span>
 <span class="ln" id="L6"><span class="tok-com">//! button is the only thing that ever starts it.</span></span>
 <span class="ln" id="L7"><span class="tok-com">//!</span></span>
 <span class="ln" id="L8"><span class="tok-com">//! # It runs on a thread, and the window never waits for it</span></span>
@@ -128,224 +128,232 @@
 <span class="ln" id="L55">    <span class="tok-com">/// Take the worker&#x27;s answer if it has one. Called once a frame; never waits.</span></span>
 <span class="ln" id="L56">    <span class="tok-com">///</span></span>
 <span class="ln" id="L57">    <span class="tok-com">/// `Disconnected` is handled as well as a message: a worker that died</span></span>
-<span class="ln" id="L58">    <span class="tok-com">/// without sending would otherwise leave the panel saying &quot;checking&quot;</span></span>
-<span class="ln" id="L59">    <span class="tok-com">/// forever, which is the failure mode a spinner is worst at showing.</span></span>
-<span class="ln" id="L60">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">drain</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L61">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rx) = &amp;<span class="tok-kw">self</span>.job <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
-<span class="ln" id="L62">        <span class="tok-kw">match</span> rx.<span class="tok-fn">try_recv</span>() {</span>
-<span class="ln" id="L63">            <span class="tok-fn">Ok</span>(answer) =&gt; {</span>
-<span class="ln" id="L64">                <span class="tok-kw">self</span>.answer = <span class="tok-fn">Some</span>(answer);</span>
-<span class="ln" id="L65">                <span class="tok-kw">self</span>.job = None;</span>
-<span class="ln" id="L66">            }</span>
-<span class="ln" id="L67">            <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; {}</span>
-<span class="ln" id="L68">            <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; {</span>
-<span class="ln" id="L69">                <span class="tok-kw">self</span>.answer = <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(Error::<span class="tok-fn">Failed</span>(</span>
-<span class="ln" id="L70">                    <span class="tok-str">&quot;the check stopped without answering&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L71">                )));</span>
-<span class="ln" id="L72">                <span class="tok-kw">self</span>.job = None;</span>
-<span class="ln" id="L73">            }</span>
-<span class="ln" id="L74">        }</span>
-<span class="ln" id="L75">    }</span>
+<span class="ln" id="L58">    <span class="tok-com">/// without sending would otherwise leave the panel saying &quot;asking&quot;</span></span>
+<span class="ln" id="L59">    <span class="tok-com">/// forever, which is the failure mode an indeterminate indicator is worst at</span></span>
+<span class="ln" id="L60">    <span class="tok-com">/// showing: it looks the same whether the work is running or gone.</span></span>
+<span class="ln" id="L61">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">drain</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L62">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rx) = &amp;<span class="tok-kw">self</span>.job <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
+<span class="ln" id="L63">        <span class="tok-kw">match</span> rx.<span class="tok-fn">try_recv</span>() {</span>
+<span class="ln" id="L64">            <span class="tok-fn">Ok</span>(answer) =&gt; {</span>
+<span class="ln" id="L65">                <span class="tok-kw">self</span>.answer = <span class="tok-fn">Some</span>(answer);</span>
+<span class="ln" id="L66">                <span class="tok-kw">self</span>.job = None;</span>
+<span class="ln" id="L67">            }</span>
+<span class="ln" id="L68">            <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; {}</span>
+<span class="ln" id="L69">            <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; {</span>
+<span class="ln" id="L70">                <span class="tok-kw">self</span>.answer = <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(Error::<span class="tok-fn">Failed</span>(</span>
+<span class="ln" id="L71">                    <span class="tok-str">&quot;the check stopped without answering&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L72">                )));</span>
+<span class="ln" id="L73">                <span class="tok-kw">self</span>.job = None;</span>
+<span class="ln" id="L74">            }</span>
+<span class="ln" id="L75">        }</span>
+<span class="ln" id="L76">    }</span>
 </span>
-<span class="ln" id="L76"></span>
+<span class="ln" id="L77"></span>
 <span class="src-item" id="fn-updates-start">
-<span class="ln" id="L77">    <span class="tok-com">/// Start a check. The only path to the network in this application.</span></span>
-<span class="ln" id="L78">    <span class="tok-kw">fn</span> <span class="tok-fn">start</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, current: &amp;str) {</span>
-<span class="ln" id="L79">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.job.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L80">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L81">        }</span>
-<span class="ln" id="L82">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L83">        <span class="tok-kw">let</span> current = current.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L84">        <span class="tok-com">// Detached on purpose. Nothing joins it: the window must not wait, and</span></span>
-<span class="ln" id="L85">        <span class="tok-com">// a check whose answer arrives after the panel was closed is simply</span></span>
-<span class="ln" id="L86">        <span class="tok-com">// dropped by the channel.</span></span>
-<span class="ln" id="L87">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L88">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(veilvoice_setup::update::<span class="tok-fn">check</span>(&amp;current));</span>
-<span class="ln" id="L89">        });</span>
-<span class="ln" id="L90">        <span class="tok-kw">self</span>.job = <span class="tok-fn">Some</span>(rx);</span>
-<span class="ln" id="L91">        <span class="tok-kw">self</span>.answer = None;</span>
-<span class="ln" id="L92">    }</span>
+<span class="ln" id="L78">    <span class="tok-com">/// Start a check. The only path to the network in this application.</span></span>
+<span class="ln" id="L79">    <span class="tok-kw">fn</span> <span class="tok-fn">start</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, current: &amp;str) {</span>
+<span class="ln" id="L80">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.job.<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L81">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L82">        }</span>
+<span class="ln" id="L83">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L84">        <span class="tok-kw">let</span> current = current.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L85">        <span class="tok-com">// Detached on purpose. Nothing joins it: the window must not wait, and</span></span>
+<span class="ln" id="L86">        <span class="tok-com">// a check whose answer arrives after the panel was closed is simply</span></span>
+<span class="ln" id="L87">        <span class="tok-com">// dropped by the channel.</span></span>
+<span class="ln" id="L88">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L89">            <span class="tok-kw">let</span> _ = tx.<span class="tok-fn">send</span>(veilvoice_setup::update::<span class="tok-fn">check</span>(&amp;current));</span>
+<span class="ln" id="L90">        });</span>
+<span class="ln" id="L91">        <span class="tok-kw">self</span>.job = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L92">        <span class="tok-kw">self</span>.answer = None;</span>
+<span class="ln" id="L93">    }</span>
 </span>
-<span class="ln" id="L93"></span>
+<span class="ln" id="L94"></span>
 <span class="src-item" id="fn-updates-section">
-<span class="ln" id="L94">    <span class="tok-com">/// The whole section, as it appears under &quot;about&quot;.</span></span>
-<span class="ln" id="L95">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">section</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, current: &amp;str) {</span>
-<span class="ln" id="L96">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Updates&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L97">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L98"></span>
-<span class="ln" id="L99">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L100">            <span class="tok-kw">let</span> busy = <span class="tok-kw">self</span>.<span class="tok-fn">is_busy</span>();</span>
-<span class="ln" id="L101">            <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L102">                .<span class="tok-fn">add_enabled</span>(!busy, egui::Button::<span class="tok-fn">new</span>(<span class="tok-str">&quot;check for updates&quot;</span>))</span>
-<span class="ln" id="L103">                .<span class="tok-fn">on_hover_text</span>(<span class="tok-str">&quot;Runs now, once, because you pressed it&quot;</span>)</span>
-<span class="ln" id="L104">                .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L105">            {</span>
-<span class="ln" id="L106">                <span class="tok-kw">self</span>.<span class="tok-fn">start</span>(current);</span>
-<span class="ln" id="L107">            }</span>
-<span class="ln" id="L108">            <span class="tok-kw">if</span> busy {</span>
-<span class="ln" id="L109">                ui.<span class="tok-fn">spinner</span>();</span>
-<span class="ln" id="L110">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;asking&#8230;&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L111">            }</span>
-<span class="ln" id="L112">        });</span>
-<span class="ln" id="L113"></span>
-<span class="ln" id="L114">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L115">        <span class="tok-kw">match</span> &amp;<span class="tok-kw">self</span>.answer {</span>
-<span class="ln" id="L116">            None =&gt; {</span>
-<span class="ln" id="L117">                ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L118">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Not checked. Nothing has been asked of any server.&quot;</span>)</span>
-<span class="ln" id="L119">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L120">                        .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L121">                );</span>
-<span class="ln" id="L122">            }</span>
-<span class="ln" id="L123">            <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(report)) =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">verdict</span>(ui, report),</span>
-<span class="ln" id="L124">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(error)) =&gt; {</span>
-<span class="ln" id="L125">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(error.<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L126">            }</span>
-<span class="ln" id="L127">        }</span>
-<span class="ln" id="L128"></span>
-<span class="ln" id="L129">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
-<span class="ln" id="L130">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L131">            RichText::<span class="tok-fn">new</span>(veilvoice_setup::update::SCOPE)</span>
-<span class="ln" id="L132">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L133">                .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L134">        );</span>
-<span class="ln" id="L135">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L136">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L137">            RichText::<span class="tok-fn">new</span>(veilvoice_setup::update::RELEASES_URL)</span>
-<span class="ln" id="L138">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L139">                .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L140">        );</span>
-<span class="ln" id="L141">    }</span>
+<span class="ln" id="L95">    <span class="tok-com">/// The whole section, as it appears under &quot;about&quot;.</span></span>
+<span class="ln" id="L96">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">section</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, current: &amp;str, motion: <span class="tok-kw">crate</span>::prefs::Motion) {</span>
+<span class="ln" id="L97">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Updates&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">blue</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L98">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L99"></span>
+<span class="ln" id="L100">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L101">            <span class="tok-kw">let</span> busy = <span class="tok-kw">self</span>.<span class="tok-fn">is_busy</span>();</span>
+<span class="ln" id="L102">            <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L103">                .<span class="tok-fn">add_enabled</span>(!busy, egui::Button::<span class="tok-fn">new</span>(<span class="tok-str">&quot;check for updates&quot;</span>))</span>
+<span class="ln" id="L104">                .<span class="tok-fn">on_hover_text</span>(<span class="tok-str">&quot;Runs now, once, because you pressed it&quot;</span>)</span>
+<span class="ln" id="L105">                .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L106">            {</span>
+<span class="ln" id="L107">                <span class="tok-kw">self</span>.<span class="tok-fn">start</span>(current);</span>
+<span class="ln" id="L108">            }</span>
+<span class="ln" id="L109">            <span class="tok-kw">if</span> busy {</span>
+<span class="ln" id="L110">                <span class="tok-kw">crate</span>::progress::<span class="tok-fn">strip</span>(</span>
+<span class="ln" id="L111">                    ui,</span>
+<span class="ln" id="L112">                    <span class="tok-str">&quot;asking&quot;</span>,</span>
+<span class="ln" id="L113">                    &amp;<span class="tok-kw">crate</span>::progress::Reach::<span class="tok-fn">unmeasurable</span>(</span>
+<span class="ln" id="L114">                        <span class="tok-str">&quot;it is one request to one server, which either answers or \</span></span>
+<span class="ln" id="L115"><span class="tok-str">                         does not&quot;</span>,</span>
+<span class="ln" id="L116">                    ),</span>
+<span class="ln" id="L117">                    motion,</span>
+<span class="ln" id="L118">                );</span>
+<span class="ln" id="L119">            }</span>
+<span class="ln" id="L120">        });</span>
+<span class="ln" id="L121"></span>
+<span class="ln" id="L122">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L123">        <span class="tok-kw">match</span> &amp;<span class="tok-kw">self</span>.answer {</span>
+<span class="ln" id="L124">            None =&gt; {</span>
+<span class="ln" id="L125">                ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L126">                    RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;Not checked. Nothing has been asked of any server.&quot;</span>)</span>
+<span class="ln" id="L127">                        .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L128">                        .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L129">                );</span>
+<span class="ln" id="L130">            }</span>
+<span class="ln" id="L131">            <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(report)) =&gt; <span class="tok-kw">self</span>.<span class="tok-fn">verdict</span>(ui, report),</span>
+<span class="ln" id="L132">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(error)) =&gt; {</span>
+<span class="ln" id="L133">                ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(error.<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">yellow</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L134">            }</span>
+<span class="ln" id="L135">        }</span>
+<span class="ln" id="L136"></span>
+<span class="ln" id="L137">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">10.0</span>);</span>
+<span class="ln" id="L138">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L139">            RichText::<span class="tok-fn">new</span>(veilvoice_setup::update::SCOPE)</span>
+<span class="ln" id="L140">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L141">                .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L142">        );</span>
+<span class="ln" id="L143">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L144">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L145">            RichText::<span class="tok-fn">new</span>(veilvoice_setup::update::RELEASES_URL)</span>
+<span class="ln" id="L146">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L147">                .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L148">        );</span>
+<span class="ln" id="L149">    }</span>
 </span>
-<span class="ln" id="L142"></span>
+<span class="ln" id="L150"></span>
 <span class="src-item" id="fn-updates-verdict">
-<span class="ln" id="L143">    <span class="tok-com">/// The answer itself, in the colour it deserves.</span></span>
-<span class="ln" id="L144">    <span class="tok-com">///</span></span>
-<span class="ln" id="L145">    <span class="tok-com">/// **Roadmap item 165.** A check looks along the stream this build came from and</span></span>
-<span class="ln" id="L146">    <span class="tok-com">/// says which, because the two answer different questions: a stable copy</span></span>
-<span class="ln" id="L147">    <span class="tok-com">/// is never told about a prerelease, and an early copy compared only</span></span>
-<span class="ln" id="L148">    <span class="tok-com">/// against stable releases would be told it is ahead of everything for</span></span>
-<span class="ln" id="L149">    <span class="tok-com">/// ever. Which stream is read off this build&#x27;s own version rather than</span></span>
-<span class="ln" id="L150">    <span class="tok-com">/// baked in, so the binary stays a pure function of its source.</span></span>
-<span class="ln" id="L151">    <span class="tok-kw">fn</span> <span class="tok-fn">verdict</span>(&amp;<span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, report: &amp;Report) {</span>
-<span class="ln" id="L152">        <span class="tok-kw">let</span> (text, colour) = <span class="tok-kw">match</span> &amp;report.verdict {</span>
-<span class="ln" id="L153">            Verdict::UpToDate =&gt; (</span>
-<span class="ln" id="L154">                format!(<span class="tok-str">&quot;{} is the newest published release.&quot;</span>, report.current),</span>
-<span class="ln" id="L155">                p::<span class="tok-fn">green</span>(),</span>
-<span class="ln" id="L156">            ),</span>
-<span class="ln" id="L157">            Verdict::<span class="tok-fn">Newer</span>(latest) =&gt; (</span>
-<span class="ln" id="L158">                format!(</span>
-<span class="ln" id="L159">                    <span class="tok-str">&quot;{latest} has been published. You are running {}.&quot;</span>,</span>
-<span class="ln" id="L160">                    report.current</span>
-<span class="ln" id="L161">                ),</span>
-<span class="ln" id="L162">                p::<span class="tok-fn">yellow</span>(),</span>
-<span class="ln" id="L163">            ),</span>
-<span class="ln" id="L164">            <span class="tok-com">// Told plainly rather than called &quot;up to date&quot;. Somebody running an</span></span>
-<span class="ln" id="L165">            <span class="tok-com">// unreleased build should know that is what they are running.</span></span>
-<span class="ln" id="L166">            Verdict::<span class="tok-fn">Ahead</span>(latest) =&gt; (</span>
-<span class="ln" id="L167">                format!(</span>
-<span class="ln" id="L168">                    <span class="tok-str">&quot;You are running {}, which is ahead of the newest release ({latest}).&quot;</span>,</span>
-<span class="ln" id="L169">                    report.current</span>
-<span class="ln" id="L170">                ),</span>
-<span class="ln" id="L171">                p::<span class="tok-fn">cyan</span>(),</span>
-<span class="ln" id="L172">            ),</span>
-<span class="ln" id="L173">            Verdict::<span class="tok-fn">Unreadable</span>(latest) =&gt; (</span>
-<span class="ln" id="L174">                format!(</span>
-<span class="ln" id="L175">                    <span class="tok-str">&quot;The newest release is named {latest:?}, which this build cannot \</span></span>
-<span class="ln" id="L176"><span class="tok-str">                     compare with {}. Look at the releases page.&quot;</span>,</span>
+<span class="ln" id="L151">    <span class="tok-com">/// The answer itself, in the colour it deserves.</span></span>
+<span class="ln" id="L152">    <span class="tok-com">///</span></span>
+<span class="ln" id="L153">    <span class="tok-com">/// **Roadmap item 165.** A check looks along the stream this build came from and</span></span>
+<span class="ln" id="L154">    <span class="tok-com">/// says which, because the two answer different questions: a stable copy</span></span>
+<span class="ln" id="L155">    <span class="tok-com">/// is never told about a prerelease, and an early copy compared only</span></span>
+<span class="ln" id="L156">    <span class="tok-com">/// against stable releases would be told it is ahead of everything for</span></span>
+<span class="ln" id="L157">    <span class="tok-com">/// ever. Which stream is read off this build&#x27;s own version rather than</span></span>
+<span class="ln" id="L158">    <span class="tok-com">/// baked in, so the binary stays a pure function of its source.</span></span>
+<span class="ln" id="L159">    <span class="tok-kw">fn</span> <span class="tok-fn">verdict</span>(&amp;<span class="tok-kw">self</span>, ui: &amp;<span class="tok-kw">mut</span> Ui, report: &amp;Report) {</span>
+<span class="ln" id="L160">        <span class="tok-kw">let</span> (text, colour) = <span class="tok-kw">match</span> &amp;report.verdict {</span>
+<span class="ln" id="L161">            Verdict::UpToDate =&gt; (</span>
+<span class="ln" id="L162">                format!(<span class="tok-str">&quot;{} is the newest published release.&quot;</span>, report.current),</span>
+<span class="ln" id="L163">                p::<span class="tok-fn">green</span>(),</span>
+<span class="ln" id="L164">            ),</span>
+<span class="ln" id="L165">            Verdict::<span class="tok-fn">Newer</span>(latest) =&gt; (</span>
+<span class="ln" id="L166">                format!(</span>
+<span class="ln" id="L167">                    <span class="tok-str">&quot;{latest} has been published. You are running {}.&quot;</span>,</span>
+<span class="ln" id="L168">                    report.current</span>
+<span class="ln" id="L169">                ),</span>
+<span class="ln" id="L170">                p::<span class="tok-fn">yellow</span>(),</span>
+<span class="ln" id="L171">            ),</span>
+<span class="ln" id="L172">            <span class="tok-com">// Told plainly rather than called &quot;up to date&quot;. Somebody running an</span></span>
+<span class="ln" id="L173">            <span class="tok-com">// unreleased build should know that is what they are running.</span></span>
+<span class="ln" id="L174">            Verdict::<span class="tok-fn">Ahead</span>(latest) =&gt; (</span>
+<span class="ln" id="L175">                format!(</span>
+<span class="ln" id="L176">                    <span class="tok-str">&quot;You are running {}, which is ahead of the newest release ({latest}).&quot;</span>,</span>
 <span class="ln" id="L177">                    report.current</span>
 <span class="ln" id="L178">                ),</span>
-<span class="ln" id="L179">                p::<span class="tok-fn">yellow</span>(),</span>
+<span class="ln" id="L179">                p::<span class="tok-fn">cyan</span>(),</span>
 <span class="ln" id="L180">            ),</span>
-<span class="ln" id="L181">        };</span>
-<span class="ln" id="L182">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(colour));</span>
-<span class="ln" id="L183">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L184">            RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> report.channel {</span>
-<span class="ln" id="L185">                Channel::Stable =&gt; {</span>
-<span class="ln" id="L186">                    <span class="tok-str">&quot;Along the stable channel, which is what the \</span></span>
-<span class="ln" id="L187"><span class="tok-str">                                    download page offers.&quot;</span></span>
-<span class="ln" id="L188">                }</span>
-<span class="ln" id="L189">                Channel::Early =&gt; {</span>
-<span class="ln" id="L190">                    <span class="tok-str">&quot;Along the early channel: builds from dev, \</span></span>
-<span class="ln" id="L191"><span class="tok-str">                                   marked prereleases, signed and checkable the \</span></span>
-<span class="ln" id="L192"><span class="tok-str">                                   same way.&quot;</span></span>
-<span class="ln" id="L193">                }</span>
-<span class="ln" id="L194">            })</span>
-<span class="ln" id="L195">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L196">            .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L197">        );</span>
-<span class="ln" id="L198">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L199">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(report.<span class="tok-fn">caveat</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L200">    }</span>
+<span class="ln" id="L181">            Verdict::<span class="tok-fn">Unreadable</span>(latest) =&gt; (</span>
+<span class="ln" id="L182">                format!(</span>
+<span class="ln" id="L183">                    <span class="tok-str">&quot;The newest release is named {latest:?}, which this build cannot \</span></span>
+<span class="ln" id="L184"><span class="tok-str">                     compare with {}. Look at the releases page.&quot;</span>,</span>
+<span class="ln" id="L185">                    report.current</span>
+<span class="ln" id="L186">                ),</span>
+<span class="ln" id="L187">                p::<span class="tok-fn">yellow</span>(),</span>
+<span class="ln" id="L188">            ),</span>
+<span class="ln" id="L189">        };</span>
+<span class="ln" id="L190">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(colour));</span>
+<span class="ln" id="L191">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L192">            RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> report.channel {</span>
+<span class="ln" id="L193">                Channel::Stable =&gt; {</span>
+<span class="ln" id="L194">                    <span class="tok-str">&quot;Along the stable channel, which is what the \</span></span>
+<span class="ln" id="L195"><span class="tok-str">                                    download page offers.&quot;</span></span>
+<span class="ln" id="L196">                }</span>
+<span class="ln" id="L197">                Channel::Early =&gt; {</span>
+<span class="ln" id="L198">                    <span class="tok-str">&quot;Along the early channel: builds from dev, \</span></span>
+<span class="ln" id="L199"><span class="tok-str">                                   marked prereleases, signed and checkable the \</span></span>
+<span class="ln" id="L200"><span class="tok-str">                                   same way.&quot;</span></span>
+<span class="ln" id="L201">                }</span>
+<span class="ln" id="L202">            })</span>
+<span class="ln" id="L203">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L204">            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L205">        );</span>
+<span class="ln" id="L206">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L207">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(report.<span class="tok-fn">caveat</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L208">    }</span>
 </span>
-<span class="ln" id="L201">}</span>
-<span class="ln" id="L202"></span>
-<span class="ln" id="L203"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L204"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L205">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L206"></span>
-<span class="ln" id="L207">    <span class="tok-com">/// A freshly built panel has asked nothing and is asking nothing. This is</span></span>
-<span class="ln" id="L208">    <span class="tok-com">/// the test that fails if a check at startup is ever added.</span></span>
-<span class="ln" id="L209">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L210">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_panel_has_asked_nothing</span>() {</span>
-<span class="ln" id="L211">        <span class="tok-kw">let</span> updates = Updates::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L212">        assert!(!updates.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;nothing may run before a click&quot;</span>);</span>
-<span class="ln" id="L213">        assert!(</span>
-<span class="ln" id="L214">            updates.answer.<span class="tok-fn">is_none</span>(),</span>
-<span class="ln" id="L215">            <span class="tok-str">&quot;nothing may be shown before a click&quot;</span></span>
-<span class="ln" id="L216">        );</span>
-<span class="ln" id="L217">    }</span>
-<span class="ln" id="L218"></span>
-<span class="ln" id="L219">    <span class="tok-com">/// Draining with no worker is a no-op, and drains nothing into the answer.</span></span>
-<span class="ln" id="L220">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L221">    <span class="tok-kw">fn</span> <span class="tok-fn">draining_without_a_check_running_does_nothing</span>() {</span>
-<span class="ln" id="L222">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = Updates::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L223">        updates.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L224">        assert!(updates.answer.<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L225">        assert!(!updates.<span class="tok-fn">is_busy</span>());</span>
-<span class="ln" id="L226">    }</span>
-<span class="ln" id="L227"></span>
-<span class="ln" id="L228">    <span class="tok-com">/// A worker that dies without sending must not leave the panel saying</span></span>
-<span class="ln" id="L229">    <span class="tok-com">/// &quot;checking&quot; forever.</span></span>
-<span class="ln" id="L230">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L231">    <span class="tok-kw">fn</span> <span class="tok-fn">a_worker_that_dies_without_answering_is_reported_rather_than_awaited</span>() {</span>
-<span class="ln" id="L232">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L233">        <span class="tok-fn">drop</span>(tx);</span>
-<span class="ln" id="L234">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = Updates {</span>
-<span class="ln" id="L235">            job: <span class="tok-fn">Some</span>(rx),</span>
-<span class="ln" id="L236">            answer: None,</span>
-<span class="ln" id="L237">        };</span>
-<span class="ln" id="L238">        updates.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L239">        assert!(!updates.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;the panel must stop waiting&quot;</span>);</span>
-<span class="ln" id="L240">        <span class="tok-kw">match</span> updates.answer {</span>
-<span class="ln" id="L241">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(Error::<span class="tok-fn">Failed</span>(<span class="tok-kw">ref</span> why))) =&gt; {</span>
-<span class="ln" id="L242">                assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;without answering&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>)</span>
-<span class="ln" id="L243">            }</span>
-<span class="ln" id="L244">            other =&gt; panic!(<span class="tok-str">&quot;expected a reported failure, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L245">        }</span>
-<span class="ln" id="L246">    }</span>
-<span class="ln" id="L247"></span>
-<span class="ln" id="L248">    <span class="tok-com">/// An answer is kept until another is asked for, so the result does not</span></span>
-<span class="ln" id="L249">    <span class="tok-com">/// vanish on the next frame.</span></span>
-<span class="ln" id="L250">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L251">    <span class="tok-kw">fn</span> <span class="tok-fn">an_answer_survives_being_drained_once</span>() {</span>
-<span class="ln" id="L252">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L253">        tx.<span class="tok-fn">send</span>(<span class="tok-fn">Ok</span>(veilvoice_setup::update::<span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>)))</span>
-<span class="ln" id="L254">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L255">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = Updates {</span>
-<span class="ln" id="L256">            job: <span class="tok-fn">Some</span>(rx),</span>
-<span class="ln" id="L257">            answer: None,</span>
-<span class="ln" id="L258">        };</span>
-<span class="ln" id="L259">        updates.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L260">        updates.<span class="tok-fn">drain</span>();</span>
-<span class="ln" id="L261">        <span class="tok-kw">match</span> updates.answer {</span>
-<span class="ln" id="L262">            <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(<span class="tok-kw">ref</span> report)) =&gt; {</span>
-<span class="ln" id="L263">                assert_eq!(report.verdict, Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.2.0&quot;</span>.<span class="tok-fn">into</span>()))</span>
-<span class="ln" id="L264">            }</span>
-<span class="ln" id="L265">            other =&gt; panic!(<span class="tok-str">&quot;expected the report to be kept, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L266">        }</span>
-<span class="ln" id="L267">    }</span>
-<span class="ln" id="L268">}</span>
+<span class="ln" id="L209">}</span>
+<span class="ln" id="L210"></span>
+<span class="ln" id="L211"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L212"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L213">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L214"></span>
+<span class="ln" id="L215">    <span class="tok-com">/// A freshly built panel has asked nothing and is asking nothing. This is</span></span>
+<span class="ln" id="L216">    <span class="tok-com">/// the test that fails if a check at startup is ever added.</span></span>
+<span class="ln" id="L217">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L218">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_panel_has_asked_nothing</span>() {</span>
+<span class="ln" id="L219">        <span class="tok-kw">let</span> updates = Updates::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L220">        assert!(!updates.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;nothing may run before a click&quot;</span>);</span>
+<span class="ln" id="L221">        assert!(</span>
+<span class="ln" id="L222">            updates.answer.<span class="tok-fn">is_none</span>(),</span>
+<span class="ln" id="L223">            <span class="tok-str">&quot;nothing may be shown before a click&quot;</span></span>
+<span class="ln" id="L224">        );</span>
+<span class="ln" id="L225">    }</span>
+<span class="ln" id="L226"></span>
+<span class="ln" id="L227">    <span class="tok-com">/// Draining with no worker is a no-op, and drains nothing into the answer.</span></span>
+<span class="ln" id="L228">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L229">    <span class="tok-kw">fn</span> <span class="tok-fn">draining_without_a_check_running_does_nothing</span>() {</span>
+<span class="ln" id="L230">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = Updates::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L231">        updates.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L232">        assert!(updates.answer.<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L233">        assert!(!updates.<span class="tok-fn">is_busy</span>());</span>
+<span class="ln" id="L234">    }</span>
+<span class="ln" id="L235"></span>
+<span class="ln" id="L236">    <span class="tok-com">/// A worker that dies without sending must not leave the panel saying</span></span>
+<span class="ln" id="L237">    <span class="tok-com">/// &quot;checking&quot; forever.</span></span>
+<span class="ln" id="L238">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L239">    <span class="tok-kw">fn</span> <span class="tok-fn">a_worker_that_dies_without_answering_is_reported_rather_than_awaited</span>() {</span>
+<span class="ln" id="L240">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L241">        <span class="tok-fn">drop</span>(tx);</span>
+<span class="ln" id="L242">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = Updates {</span>
+<span class="ln" id="L243">            job: <span class="tok-fn">Some</span>(rx),</span>
+<span class="ln" id="L244">            answer: None,</span>
+<span class="ln" id="L245">        };</span>
+<span class="ln" id="L246">        updates.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L247">        assert!(!updates.<span class="tok-fn">is_busy</span>(), <span class="tok-str">&quot;the panel must stop waiting&quot;</span>);</span>
+<span class="ln" id="L248">        <span class="tok-kw">match</span> updates.answer {</span>
+<span class="ln" id="L249">            <span class="tok-fn">Some</span>(<span class="tok-fn">Err</span>(Error::<span class="tok-fn">Failed</span>(<span class="tok-kw">ref</span> why))) =&gt; {</span>
+<span class="ln" id="L250">                assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;without answering&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>)</span>
+<span class="ln" id="L251">            }</span>
+<span class="ln" id="L252">            other =&gt; panic!(<span class="tok-str">&quot;expected a reported failure, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L253">        }</span>
+<span class="ln" id="L254">    }</span>
+<span class="ln" id="L255"></span>
+<span class="ln" id="L256">    <span class="tok-com">/// An answer is kept until another is asked for, so the result does not</span></span>
+<span class="ln" id="L257">    <span class="tok-com">/// vanish on the next frame.</span></span>
+<span class="ln" id="L258">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L259">    <span class="tok-kw">fn</span> <span class="tok-fn">an_answer_survives_being_drained_once</span>() {</span>
+<span class="ln" id="L260">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L261">        tx.<span class="tok-fn">send</span>(<span class="tok-fn">Ok</span>(veilvoice_setup::update::<span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>)))</span>
+<span class="ln" id="L262">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L263">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = Updates {</span>
+<span class="ln" id="L264">            job: <span class="tok-fn">Some</span>(rx),</span>
+<span class="ln" id="L265">            answer: None,</span>
+<span class="ln" id="L266">        };</span>
+<span class="ln" id="L267">        updates.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L268">        updates.<span class="tok-fn">drain</span>();</span>
+<span class="ln" id="L269">        <span class="tok-kw">match</span> updates.answer {</span>
+<span class="ln" id="L270">            <span class="tok-fn">Some</span>(<span class="tok-fn">Ok</span>(<span class="tok-kw">ref</span> report)) =&gt; {</span>
+<span class="ln" id="L271">                assert_eq!(report.verdict, Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.2.0&quot;</span>.<span class="tok-fn">into</span>()))</span>
+<span class="ln" id="L272">            }</span>
+<span class="ln" id="L273">            other =&gt; panic!(<span class="tok-str">&quot;expected the report to be kept, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L274">        }</span>
+<span class="ln" id="L275">    }</span>
+<span class="ln" id="L276">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

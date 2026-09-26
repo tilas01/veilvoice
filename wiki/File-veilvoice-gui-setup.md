@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/setup.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1165 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1144 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs)
 
 ## Contents
 
@@ -69,7 +69,7 @@ exact command is shown before the question.
 
 ## What this file contains
 
-1165 lines defining **18 functions** (5 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1144 lines defining **18 functions** (5 public), **3 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -110,12 +110,12 @@ flowchart TD
     n_install_controls["Setup::install_controls<br/>line 342"]
     n_carry_question["Setup::carry_question<br/>line 477"]
     n_start["Setup::start<br/>line 523"]
-    n_progress["Setup::progress<br/>line 547"]
-    n_companion_rows["Setup::companion_rows<br/>line 593"]
-    n_detect_all["detect_all<br/>line 768"]
-    n_can_install["can_install<br/>line 792"]
-    n_install_changes["install_changes<br/>line 802"]
-    n_field["field<br/>line 815"]
+    n_progress["Setup::progress<br/>line 553"]
+    n_companion_rows["Setup::companion_rows<br/>line 569"]
+    n_detect_all["detect_all<br/>line 745"]
+    n_can_install["can_install<br/>line 769"]
+    n_install_changes["install_changes<br/>line 779"]
+    n_field["field<br/>line 792"]
     n_companion_rows --> n_start
     n_companion_rows --> n_start_probe
     n_default --> n_new
@@ -145,12 +145,12 @@ flowchart TD
     click n_install_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L342" "open the source"
     click n_carry_question href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L477" "open the source"
     click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L523" "open the source"
-    click n_progress href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L547" "open the source"
-    click n_companion_rows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L593" "open the source"
-    click n_detect_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L768" "open the source"
-    click n_can_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L792" "open the source"
-    click n_install_changes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L802" "open the source"
-    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L815" "open the source"
+    click n_progress href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L553" "open the source"
+    click n_companion_rows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L569" "open the source"
+    click n_detect_all href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L745" "open the source"
+    click n_can_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L769" "open the source"
+    click n_install_changes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L779" "open the source"
+    click n_field href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L792" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_running_installed,n_is_busy,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -180,11 +180,11 @@ flowchart TD
 | `Setup::install_controls` <sub>fn</sub> | [342](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L342) | The install and uninstall buttons, and what each will do before it is pressed. |
 | `Setup::carry_question` <sub>fn</sub> | [477](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L477) | Ask whether an install should take the settings with it. |
 | `Setup::start` <sub>fn</sub> | [523](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L523) | Start a worker, and remember what it is doing so the strip can say. |
-| `Setup::progress` <sub>fn</sub> | [547](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L547) | The progress strip: a travelling highlight, or a plain bar when motion is off. |
-| `Setup::companion_rows` <sub>fn</sub> | [593](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L593) | One row per companion: whether it is here, and how to get it if not. |
-| `detect_all` <sub>fn</sub> | [768](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L768) | Probe for every companion that applies to this platform. |
-| `can_install` <sub>fn</sub> | [792](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L792) | Exactly what an install changes, in the order it changes it. |
-| `install_changes` <sub>fn</sub> | [802](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L802) | Everything installing alters, listed so the button is never a surprise. |
-| `field` <sub>fn</sub> | [815](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L815) | One labelled read-only value, in the shape this tab uses throughout. |
-| `companion_tests` <sub>mod</sub> | [992](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L992) |  |
-| `typeface_tests` <sub>mod</sub> | [1123](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L1123) |  |
+| `Setup::progress` <sub>fn</sub> | [553](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L553) | The progress strip, from crate::progress. |
+| `Setup::companion_rows` <sub>fn</sub> | [569](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L569) | One row per companion: whether it is here, and how to get it if not. |
+| `detect_all` <sub>fn</sub> | [745](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L745) | Probe for every companion that applies to this platform. |
+| `can_install` <sub>fn</sub> | [769](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L769) | Exactly what an install changes, in the order it changes it. |
+| `install_changes` <sub>fn</sub> | [779](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L779) | Everything installing alters, listed so the button is never a surprise. |
+| `field` <sub>fn</sub> | [792](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L792) | One labelled read-only value, in the shape this tab uses throughout. |
+| `companion_tests` <sub>mod</sub> | [969](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L969) |  |
+| `typeface_tests` <sub>mod</sub> | [1102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs#L1102) |  |

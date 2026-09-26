@@ -358,7 +358,12 @@ impl Group {
     /// only thing on this panel that outlives the run, and it belongs beside
     /// the toggle it modifies rather than on a settings page three clicks away.
     /// The two controls only make sense read together.
-    pub fn tab(&mut self, ui: &mut Ui, settings: &mut crate::settings::Settings) {
+    pub fn tab(
+        &mut self,
+        ui: &mut Ui,
+        settings: &mut crate::settings::Settings,
+        motion: crate::prefs::Motion,
+    ) {
         // The panel is taller than the window the moment the colour picker is
         // open -- 108 swatches in nine named groups -- and without a scroller
         // the picker simply is not reachable. Found by opening it in the
@@ -366,7 +371,7 @@ impl Group {
         // turned out to be five lines of wrapped text at 96 pixels wide.
         // The application scrolls every tab in one place; a second scroller
         // here would trap the wheel in whichever the pointer was over.
-        self.body(ui, settings);
+        self.body(ui, settings, motion);
     }
 
     /// Collect whatever the open pickers have answered.
@@ -403,7 +408,12 @@ impl Group {
     }
 
     /// Everything inside the scroller.
-    fn body(&mut self, ui: &mut Ui, settings: &mut crate::settings::Settings) {
+    fn body(
+        &mut self,
+        ui: &mut Ui,
+        settings: &mut crate::settings::Settings,
+        motion: crate::prefs::Motion,
+    ) {
         self.collect_dialogs();
         ui.heading(RichText::new("Group mode").color(p::blue()));
         ui.add_space(4.0);
@@ -445,7 +455,7 @@ impl Group {
         ui.add_space(12.0);
         self.files_and_theme(ui);
         ui.add_space(12.0);
-        self.render_controls(ui);
+        self.render_controls(ui, motion);
 
         if let Some(notice) = &self.notice {
             ui.add_space(8.0);
@@ -1115,7 +1125,7 @@ impl Group {
     }
 
     /// The button, and what came of pressing it.
-    fn render_controls(&mut self, ui: &mut Ui) {
+    fn render_controls(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         let ready = self.input.is_some() && self.plan.is_some() && self.outputs.any();
         ui.horizontal(|ui| {
             let busy = self.is_busy();
@@ -1126,8 +1136,15 @@ impl Group {
                 self.start();
             }
             if busy {
-                ui.spinner();
-                ui.label(RichText::new("rendering…").color(p::muted()).small());
+                crate::progress::strip(
+                    ui,
+                    "rendering",
+                    &crate::progress::Reach::unmeasurable(
+                        "the engine reports each speaker's turns separately rather \
+                         than the room as one number",
+                    ),
+                    motion,
+                );
             } else if !ready {
                 ui.label(
                     RichText::new(if !self.outputs.any() {

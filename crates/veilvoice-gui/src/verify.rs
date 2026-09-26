@@ -386,10 +386,10 @@ impl Verify {
     }
 
     /// The whole tab.
-    pub fn tab(&mut self, ui: &mut Ui) {
+    pub fn tab(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         // The application scrolls every tab in one place; a second scroller
         // here would trap the wheel in whichever the pointer was over.
-        self.body(ui);
+        self.body(ui, motion);
     }
 
     /// The tab itself, drawn under whatever heading the caller has already put
@@ -398,7 +398,7 @@ impl Verify {
     /// Split from the function above so the tab can be drawn inside the window
     /// and inside a test's own frame, from the same code: a test that rebuilt the
     /// layout it was measuring would be measuring the test.
-    fn body(&mut self, ui: &mut Ui) {
+    fn body(&mut self, ui: &mut Ui, motion: crate::prefs::Motion) {
         ui.heading(RichText::new("Verify a download").color(p::blue()));
         ui.add_space(4.0);
         ui.label(
@@ -483,9 +483,11 @@ impl Verify {
                     // bar is bytes of a known length: the roadmap's own example
                     // of an estimate that can honestly be given.
                     Some(reach) if reach.total() == 0 => {
-                        crate::progress::strip(ui, "checking the signature", reach)
+                        crate::progress::strip(ui, "checking the signature", reach, motion)
                     }
-                    Some(reach) => crate::progress::strip(ui, "hashing the download", reach),
+                    Some(reach) => {
+                        crate::progress::strip(ui, "hashing the download", reach, motion)
+                    }
                     None => {}
                 }
             } else if !ready {

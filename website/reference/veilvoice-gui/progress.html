@@ -64,13 +64,13 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/progress.svg" alt="progress.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/progress.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 345 lines &middot; <a href="progress.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 539 lines &middot; <a href="progress.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-a-bar-is-a-claim">Why a bar is a claim</a>
   <a href="#why-atomics-rather-than-a-channel">Why atomics rather than a channel</a>
   <a href="#where-the-repaint-request-lives">Where the repaint request lives</a>
-  <a href="#what-is-deliberately-left-to-roadmap-item-169">What is deliberately left to roadmap item 169</a>
+  <a href="#one-indicator-and-the-reduce-motion-setting">One indicator, and the reduce-motion setting</a>
   <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
@@ -87,40 +87,42 @@
 <p><code>Relaxed</code> is enough for all of it. Nothing here is ordered against anything else: the worst a stale read can produce is a bar one frame behind, and a bar one frame behind is what every bar is.</p>
 <h2 id="where-the-repaint-request-lives">Where the repaint request lives</h2>
 <p>In <code>strip</code>, not at the call sites. A window with nothing happening in it stops drawing, so a counter that advanced would not be seen until somebody moved the mouse, which is precisely what a frozen window looks like. Left to the caller that would be one line to forget per panel, and a fix written at the wrong scope is how F-210, F-216, F-219 and F-220 each happened.</p>
-<h2 id="what-is-deliberately-left-to-roadmap-item-169">What is deliberately left to roadmap item 169</h2>
-<p><code>strip</code> does not yet consult the reduce-motion setting, so the no-estimate case spins for somebody who has asked their system for no movement. That is roadmap item 169&#x27;s subject, which is one indicator used everywhere and a static statement in place of a moving one, and it will be added here rather than beside it. The twelve other places that draw a bare <code>ui.spinner()</code> are 169&#x27;s sweep for the same reason.</p>
+<h2 id="one-indicator-and-the-reduce-motion-setting">One indicator, and the reduce-motion setting</h2>
+<p>Roadmap item 169. <code>strip</code> is the only thing in this crate that draws &quot;work is happening&quot;, and a test refuses a bar or a spinner anywhere else. It takes the resolved <code>Motion</code> rather than reading the preference itself, because the preference is resolved once per frame against the system setting and the environment override, and a second reader of it is a second answer.</p>
+<p>Under reduced motion the indeterminate case becomes a still bar rather than a travelling one. A spinner cannot honour that setting at all, which is why there is no spinner here: <code>ui.spinner()</code> animates unconditionally, so twelve panels drawing one were twelve panels ignoring somebody who had said movement hurts.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>This is the little indicator that says something is happening.</p>
 <p>Where the program knows how much work there is, it shows how far through it is. Where it does not know, it says so in a sentence instead of drawing a bar that would be making it up.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>345 lines defining <strong>9 functions</strong> (9 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>539 lines defining <strong>10 functions</strong> (9 public), <strong>1 type</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Reach</code> <span style="color:var(--muted)">line 73</span> &middot; How far through one job is.</li>
+<li><code>struct Reach</code> <span style="color:var(--muted)">line 90</span> &middot; How far through one job is.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Reach::counting</code> <span style="color:var(--muted)">line 92</span> &middot; A job of total countable units.
+<li><code>Reach::counting</code> <span style="color:var(--muted)">line 109</span> &middot; A job of total countable units.
 </li>
-<li><code>Reach::unmeasurable</code> <span style="color:var(--muted)">line 105</span> &middot; A job whose length cannot be known, and the reason, which is shown.
+<li><code>Reach::unmeasurable</code> <span style="color:var(--muted)">line 122</span> &middot; A job whose length cannot be known, and the reason, which is shown.
 </li>
-<li><code>Reach::advance</code> <span style="color:var(--muted)">line 114</span> &middot; Count by more units finished.
+<li><code>Reach::advance</code> <span style="color:var(--muted)">line 131</span> &middot; Count by more units finished.
 </li>
-<li><code>Reach::set_total</code> <span style="color:var(--muted)">line 121</span> &middot; Say what the total really is, for a job that could only count it once it had started.
+<li><code>Reach::set_total</code> <span style="color:var(--muted)">line 138</span> &middot; Say what the total really is, for a job that could only count it once it had started.
 </li>
-<li><code>Reach::fraction</code> <span style="color:var(--muted)">line 143</span> &middot; How far through, in 0, 1, or None where that cannot be said.
+<li><code>Reach::fraction</code> <span style="color:var(--muted)">line 160</span> &middot; How far through, in 0, 1, or None where that cannot be said.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>done</code>, <code>total</code></span>
 </li>
-<li><code>Reach::because</code> <span style="color:var(--muted)">line 152</span> &middot; The reason no estimate is given, for a job that cannot give one.
+<li><code>Reach::because</code> <span style="color:var(--muted)">line 169</span> &middot; The reason no estimate is given, for a job that cannot give one.
 </li>
-<li><code>strip</code> <span style="color:var(--muted)">line 170</span> &middot; The indicator, beside the control that started the work.
+<li><code>strip</code> <span style="color:var(--muted)">line 190</span> &middot; The indicator, beside the control that started the work.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>bar</code></span>
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 563 415" width="563" height="415" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 563 531" width="563" height="531" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -129,109 +131,125 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="563" height="415" fill="var(--bg-inset, #16161e)" rx="8"/>
+<rect x="0" y="0" width="563" height="531" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M213.2 247.0 C 377.9 247.0, 377.9 147.0, 358.9 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M213.2 247.0 C 528.6 247.0, 528.6 147.0, 509.6 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M452.3 274.0 C 452.3 294.0, 281.4 300.0, 281.4 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="progress.src.html#fn-reach-counting">
 <rect x="20.0" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="94.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reach::counting</text>
-<text x="94.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 92</text>
+<text x="94.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 109</text>
 </a>
 <a href="progress.src.html#fn-reach-unmeasurable">
 <rect x="194.9" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="285.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reach::unmeasurable</text>
-<text x="285.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 105</text>
+<text x="285.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
 </a>
 <a href="progress.src.html#fn-reach-advance">
 <rect x="402.0" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="472.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reach::advance</text>
-<text x="472.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 114</text>
+<text x="472.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
 </a>
 <a href="progress.src.html#fn-reach-set_total">
 <rect x="56.3" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="134.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reach::set_total</text>
-<text x="134.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 121</text>
+<text x="134.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 138</text>
 </a>
 <a href="progress.src.html#fn-reach-done">
 <rect x="239.2" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="297.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reach::done</text>
-<text x="297.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 128</text>
+<text x="297.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 145</text>
 </a>
 <a href="progress.src.html#fn-reach-total">
 <rect x="381.9" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="444.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reach::total</text>
-<text x="444.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 133</text>
+<text x="444.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
 </a>
 <a href="progress.src.html#fn-reach-fraction">
 <rect x="64.3" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="138.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reach::fraction</text>
-<text x="138.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
+<text x="138.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 160</text>
 </a>
 <a href="progress.src.html#fn-reach-because">
 <rect x="239.2" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="309.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reach::because</text>
-<text x="309.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 152</text>
+<text x="309.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
 </a>
 <a href="progress.src.html#fn-strip">
 <rect x="406.1" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="452.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">strip</text>
-<text x="452.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 170</text>
+<text x="452.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 190</text>
 </a>
-<rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="320.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
-<text x="35.0" y="329.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
-<path d="M20.0 340.5 L29.0 340.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="345.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="367.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
-<text x="20.0" y="382.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
-<text x="20.0" y="397.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
+<a href="progress.src.html#fn-bar-2">
+<rect x="235.2" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="281.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">bar</text>
+<text x="281.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 244</text>
+</a>
+<rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="420.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="429.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="436.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="445.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 456.5 L29.0 456.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="461.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="483.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
+<text x="20.0" y="498.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
+<text x="20.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_counting([&quot;Reach::counting&lt;br/&gt;line 92&quot;])
-    n_unmeasurable([&quot;Reach::unmeasurable&lt;br/&gt;line 105&quot;])
-    n_advance([&quot;Reach::advance&lt;br/&gt;line 114&quot;])
-    n_set_total([&quot;Reach::set_total&lt;br/&gt;line 121&quot;])
-    n_done[&quot;Reach::done&lt;br/&gt;line 128&quot;]
-    n_total[&quot;Reach::total&lt;br/&gt;line 133&quot;]
-    n_fraction([&quot;Reach::fraction&lt;br/&gt;line 143&quot;])
-    n_because([&quot;Reach::because&lt;br/&gt;line 152&quot;])
-    n_strip([&quot;strip&lt;br/&gt;line 170&quot;])
+    n_counting([&quot;Reach::counting&lt;br/&gt;line 109&quot;])
+    n_unmeasurable([&quot;Reach::unmeasurable&lt;br/&gt;line 122&quot;])
+    n_advance([&quot;Reach::advance&lt;br/&gt;line 131&quot;])
+    n_set_total([&quot;Reach::set_total&lt;br/&gt;line 138&quot;])
+    n_done[&quot;Reach::done&lt;br/&gt;line 145&quot;]
+    n_total[&quot;Reach::total&lt;br/&gt;line 150&quot;]
+    n_fraction([&quot;Reach::fraction&lt;br/&gt;line 160&quot;])
+    n_because([&quot;Reach::because&lt;br/&gt;line 169&quot;])
+    n_strip([&quot;strip&lt;br/&gt;line 190&quot;])
+    n_bar[&quot;bar&lt;br/&gt;line 244&quot;]
     n_fraction --&gt; n_done
     n_fraction --&gt; n_total
-    click n_counting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L92&quot; &quot;open the source&quot;
-    click n_unmeasurable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L105&quot; &quot;open the source&quot;
-    click n_advance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L114&quot; &quot;open the source&quot;
-    click n_set_total href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L121&quot; &quot;open the source&quot;
-    click n_done href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L128&quot; &quot;open the source&quot;
-    click n_total href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L133&quot; &quot;open the source&quot;
-    click n_fraction href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L143&quot; &quot;open the source&quot;
-    click n_because href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L152&quot; &quot;open the source&quot;
-    click n_strip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L170&quot; &quot;open the source&quot;
+    n_strip --&gt; n_bar
+    click n_counting href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L109&quot; &quot;open the source&quot;
+    click n_unmeasurable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L122&quot; &quot;open the source&quot;
+    click n_advance href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L131&quot; &quot;open the source&quot;
+    click n_set_total href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L138&quot; &quot;open the source&quot;
+    click n_done href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L145&quot; &quot;open the source&quot;
+    click n_total href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L150&quot; &quot;open the source&quot;
+    click n_fraction href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L160&quot; &quot;open the source&quot;
+    click n_because href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L169&quot; &quot;open the source&quot;
+    click n_strip href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L190&quot; &quot;open the source&quot;
+    click n_bar href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs#L244&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_counting,n_unmeasurable,n_advance,n_set_total,n_fraction,n_because,n_strip entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_done,n_total api</code></pre>
+    class n_done,n_total api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_bar helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Reach</code> <sub>pub struct</sub></td><td><a href="progress.src.html#fn-reach">73</a></td><td>How far through one job is.</td></tr>
-<tr><td><code>Reach::counting</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-counting">92</a></td><td>A job of total countable units.</td></tr>
-<tr><td><code>Reach::unmeasurable</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-unmeasurable">105</a></td><td>A job whose length cannot be known, and the reason, which is shown.</td></tr>
-<tr><td><code>Reach::advance</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-advance">114</a></td><td>Count by more units finished.</td></tr>
-<tr><td><code>Reach::set_total</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-set_total">121</a></td><td>Say what the total really is, for a job that could only count it once it had started.</td></tr>
-<tr><td><code>Reach::done</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-done">128</a></td><td>Units finished so far.</td></tr>
-<tr><td><code>Reach::total</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-total">133</a></td><td>The whole job, or zero where there is no honest total.</td></tr>
-<tr><td><code>Reach::fraction</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-fraction">143</a></td><td>How far through, in 0, 1, or None where that cannot be said.</td></tr>
-<tr><td><code>Reach::because</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-because">152</a></td><td>The reason no estimate is given, for a job that cannot give one.</td></tr>
-<tr><td><code>strip</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-strip">170</a></td><td>The indicator, beside the control that started the work.</td></tr>
+<tr><td><code>KEY_DERIVATION</code> <sub>pub const</sub></td><td><a href="progress.src.html#fn-key_derivation">82</a></td><td>Why a key derivation cannot say how far through it is.</td></tr>
+<tr><td><code>Reach</code> <sub>pub struct</sub></td><td><a href="progress.src.html#fn-reach">90</a></td><td>How far through one job is.</td></tr>
+<tr><td><code>Reach::counting</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-counting">109</a></td><td>A job of total countable units.</td></tr>
+<tr><td><code>Reach::unmeasurable</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-unmeasurable">122</a></td><td>A job whose length cannot be known, and the reason, which is shown.</td></tr>
+<tr><td><code>Reach::advance</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-advance">131</a></td><td>Count by more units finished.</td></tr>
+<tr><td><code>Reach::set_total</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-set_total">138</a></td><td>Say what the total really is, for a job that could only count it once it had started.</td></tr>
+<tr><td><code>Reach::done</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-done">145</a></td><td>Units finished so far.</td></tr>
+<tr><td><code>Reach::total</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-total">150</a></td><td>The whole job, or zero where there is no honest total.</td></tr>
+<tr><td><code>Reach::fraction</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-fraction">160</a></td><td>How far through, in 0, 1, or None where that cannot be said.</td></tr>
+<tr><td><code>Reach::because</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-reach-because">169</a></td><td>The reason no estimate is given, for a job that cannot give one.</td></tr>
+<tr><td><code>strip</code> <sub>pub fn</sub></td><td><a href="progress.src.html#fn-strip">190</a></td><td>The indicator, beside the control that started the work.</td></tr>
+<tr><td><code>BAR</code> <sub>const</sub></td><td><a href="progress.src.html#fn-bar">221</a></td><td>How wide the bar is drawn, and how tall.</td></tr>
+<tr><td><code>bar</code> <sub>fn</sub></td><td><a href="progress.src.html#fn-bar-2">244</a></td><td>The bar itself: filled to a fraction, travelling, or still.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/offthread.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 265 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 267 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs)
 
 ## Contents
 
@@ -38,7 +38,9 @@ function asks for it once, draws whatever has arrived, and never waits:
 self.machine.ask_once(ui.ctx(), measure);   // spawns, returns at once
 match self.machine.get() {
 Some(machine) => draw(ui, machine),
-None => ui.spinner(),                   // still being read
+// Still being read. One indicator, from `crate::progress`, which says
+// what is happening and honours the reduce-motion setting.
+None => crate::progress::strip(ui, "reading this machine", &reach, motion),
 }
 ```
 
@@ -70,21 +72,21 @@ is fifteen lines and the alternative is a promise with an exception in it.
 
 ## What this file contains
 
-265 lines defining **7 functions** (6 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+267 lines defining **7 functions** (6 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Answer` (line 62) -- One value, worked out off the drawing thread.
+- `struct Answer` (line 64) -- One value, worked out off the drawing thread.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Answer<T>::new` (line 82) -- Nothing asked yet.
+- `Answer<T>::new` (line 84) -- Nothing asked yet.
   - reaches: `default`
-- `Answer<T>::ask_once` (line 111) -- Start the work, unless it has been started before.
+- `Answer<T>::ask_once` (line 113) -- Start the work, unless it has been started before.
   - reaches: `ask`
-- `Answer<T>::get` (line 122) -- The answer, if there is one.
-- `Answer<T>::is_waiting` (line 143) -- Whether the work is still running.
-- `Answer<T>::forget` (line 149) -- Throw the answer away, so the next ask_once asks again.
+- `Answer<T>::get` (line 124) -- The answer, if there is one.
+- `Answer<T>::is_waiting` (line 145) -- Whether the work is still running.
+- `Answer<T>::forget` (line 151) -- Throw the answer away, so the next ask_once asks again.
 
 ## What calls what
 
@@ -100,22 +102,22 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_default["Answer<T>::default<br/>line 71"]
-    n_new(["Answer<T>::new<br/>line 82"])
-    n_ask["Answer<T>::ask<br/>line 92"]
-    n_ask_once(["Answer<T>::ask_once<br/>line 111"])
-    n_get(["Answer<T>::get<br/>line 122"])
-    n_is_waiting(["Answer<T>::is_waiting<br/>line 143"])
-    n_forget(["Answer<T>::forget<br/>line 149"])
+    n_default["Answer<T>::default<br/>line 73"]
+    n_new(["Answer<T>::new<br/>line 84"])
+    n_ask["Answer<T>::ask<br/>line 94"]
+    n_ask_once(["Answer<T>::ask_once<br/>line 113"])
+    n_get(["Answer<T>::get<br/>line 124"])
+    n_is_waiting(["Answer<T>::is_waiting<br/>line 145"])
+    n_forget(["Answer<T>::forget<br/>line 151"])
     n_ask_once --> n_ask
     n_new --> n_default
-    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L71" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L82" "open the source"
-    click n_ask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L92" "open the source"
-    click n_ask_once href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L111" "open the source"
-    click n_get href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L122" "open the source"
-    click n_is_waiting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L143" "open the source"
-    click n_forget href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L149" "open the source"
+    click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L73" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L84" "open the source"
+    click n_ask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L94" "open the source"
+    click n_ask_once href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L113" "open the source"
+    click n_get href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L124" "open the source"
+    click n_is_waiting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L145" "open the source"
+    click n_forget href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L151" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_ask_once,n_get,n_is_waiting,n_forget entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -130,11 +132,11 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Answer` <sub>pub struct</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L62) | One value, worked out off the drawing thread. |
-| `Answer<T>::default` <sub>fn</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L71) |  |
-| `Answer<T>::new` <sub>pub fn</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L82) | Nothing asked yet. |
-| `Answer<T>::ask` <sub>pub fn</sub> | [92](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L92) | Start the work, replacing anything already in flight. |
-| `Answer<T>::ask_once` <sub>pub fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L111) | Start the work, unless it has been started before. |
-| `Answer<T>::get` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L122) | The answer, if there is one. |
-| `Answer<T>::is_waiting` <sub>pub fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L143) | Whether the work is still running. |
-| `Answer<T>::forget` <sub>pub fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L149) | Throw the answer away, so the next ask_once asks again. |
+| `Answer` <sub>pub struct</sub> | [64](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L64) | One value, worked out off the drawing thread. |
+| `Answer<T>::default` <sub>fn</sub> | [73](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L73) |  |
+| `Answer<T>::new` <sub>pub fn</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L84) | Nothing asked yet. |
+| `Answer<T>::ask` <sub>pub fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L94) | Start the work, replacing anything already in flight. |
+| `Answer<T>::ask_once` <sub>pub fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L113) | Start the work, unless it has been started before. |
+| `Answer<T>::get` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L124) | The answer, if there is one. |
+| `Answer<T>::is_waiting` <sub>pub fn</sub> | [145](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L145) | Whether the work is still running. |
+| `Answer<T>::forget` <sub>pub fn</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs#L151) | Throw the answer away, so the next ask_once asks again. |

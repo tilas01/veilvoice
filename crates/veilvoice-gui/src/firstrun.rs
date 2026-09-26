@@ -147,6 +147,7 @@ impl FirstRun {
         prefs: &mut crate::settings::Settings,
         security: &mut crate::security::Security,
         devices: (usize, usize),
+        motion: crate::prefs::Motion,
     ) -> Outcome {
         ui.add_space(18.0);
         ui.vertical_centered(|ui| {
@@ -174,7 +175,7 @@ impl FirstRun {
             Step::AppLock => self.app_lock(ui, security),
             Step::Recording => self.recording(ui, security),
             Step::Autolock => self.autolock(ui, prefs),
-            Step::Machine => self.machine(ui, prefs, devices),
+            Step::Machine => self.machine(ui, prefs, devices, motion),
         };
 
         if advance {
@@ -403,6 +404,7 @@ impl FirstRun {
         ui: &mut Ui,
         prefs: &mut crate::settings::Settings,
         devices: (usize, usize),
+        motion: crate::prefs::Motion,
     ) -> bool {
         self.reading.ask_once(ui.ctx(), read_machine);
         let reading = self.reading.get();
@@ -423,7 +425,7 @@ impl FirstRun {
             // whose recording did not save.
             ui.label(RichText::new("Where recordings will go").color(p::blue()));
             match reading {
-                None => still_reading(ui),
+                None => still_reading(ui, motion),
                 Some(Reading { dir: None, .. }) => {
                     ui.label(
                         RichText::new(
@@ -506,7 +508,7 @@ impl FirstRun {
             // this was the one section on it that did not say anything about
             // the machine.
             match reading {
-                None => still_reading(ui),
+                None => still_reading(ui, motion),
                 Some(machine) => {
                     ui.label(
                         RichText::new(machine.acceleration_reason.as_str())
@@ -622,17 +624,18 @@ fn read_machine() -> Reading {
 /// The line a card shows where an answer will go, while it is being got.
 ///
 /// Said rather than left blank. A section that is empty for a moment and then
-/// is not reads as the window having glitched, and the spinner is the
+/// is not reads as the window having glitched, and the indicator is the
 /// difference between "being read" and "this machine has none".
-fn still_reading(ui: &mut Ui) {
-    ui.horizontal(|ui| {
-        ui.spinner();
-        ui.label(
-            RichText::new("reading this machine")
-                .small()
-                .color(p::muted()),
-        );
-    });
+fn still_reading(ui: &mut Ui, motion: crate::prefs::Motion) {
+    crate::progress::strip(
+        ui,
+        "reading this machine",
+        &crate::progress::Reach::unmeasurable(
+            "the answers come from three different places and none of them says \
+             how long it will be",
+        ),
+        motion,
+    );
 }
 /// A password field with its label, laid out like the rest of the application.
 fn field(ui: &mut Ui, label: &str, value: &mut String) {
