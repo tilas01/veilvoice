@@ -746,6 +746,68 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-219: the file picker was moved off the drawing thread and the render it leads to was not
+
+The last of the freezing half of roadmap item 167, and the one with the largest
+number attached to it.
+
+Exporting a take from the Studio tab writes a player page, a video, or both.
+That means: reading and decrypting the recording, writing the audio, writing the
+page with its subtitles and its waveform drawing, and then running `ffmpeg` with
+`output()`, **which waits for the whole render**. A minute of audio is seconds of
+encoding; an hour is not.
+
+All of it ran on the frame the folder picker's answer arrived.
+
+**The comment directly above it says why the picker itself is not allowed to
+do that.** "Polled rather than waited for, so the window keeps running while it
+is open." That fix is F-63's, one of seven blocking file dialogs that froze the
+window for as long as somebody browsed. It is correct and it is still there. The
+work the dialog *leads to* was never looked at, and it costs minutes where the
+dialog cost seconds.
+
+This is the same shape as F-210, F-212 and F-216, and it is the fourth time it
+has been written up this week, so it is worth stating in its most general form.
+**A fix is scoped to the thing that was reported, and the thing next to it
+keeps the defect.** The report said the dialog froze the window. The dialog was
+fixed. Nobody asked what happened after the dialog closed, because the report
+did not.
+
+**The fix.** `Studio::start_export` builds an `ExportJob` and spawns;
+`export_now` does the work and sends back a sentence and a tone; `browser`
+collects it without waiting and shows a spinner and a line while it runs,
+because a button that goes quiet for the length of a video render reads as a
+window that has died.
+
+**Three details that were not free.**
+
+`StudioKey` has no `Clone`, on purpose, so the vault could not simply be copied
+into the worker. It is shared instead, through an `Arc`: one key, in one place,
+wiped when the last holder drops it, and what crosses to the worker is the right
+to read through it rather than a second copy. **And the worker drops it as soon
+as the recording is out of it**, before any writing, because a video render is
+minutes and holding the vault for all of it would mean that shutting the vault
+did not wipe the key until `ffmpeg` had finished. That is not what "shut" is
+understood to mean. A test reads the worker and fails if the drop moves after
+the writing.
+
+The colour of the message could not go with it. `theme::palette` answers from
+the palette that is **active now**, which the drawing thread changes, so a
+colour captured on a worker at the start of a render would be the colour of
+whatever theme was on five minutes ago. The worker returns a `Tone`; the colour
+is chosen where the message is drawn.
+
+`write_page` lost its `&self`, which it never read. Dropped rather than left in
+place and ignored: a receiver nothing uses is a promise that the next person
+will find a use for it, and here it would be a promise to put the drawing
+thread's state back inside a worker.
+
+**And the inline door is shut by the compiler.** The tests here are about what
+an export writes and where, not about which thread writes it, so a synchronous
+`export` remains for them, marked `#[cfg(test)]`. A shipped build cannot call
+it, which is a stronger statement than a guard reading the source, and a test
+asserts the attribute is still there.
+
 ### F-218: the window stopped while it opened its own folder, and it stopped at the worst moment to stop
 
 The second part of the freezing half of roadmap item 167.
@@ -7368,7 +7430,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1786 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1789 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9016,7 +9078,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and eighteen defects found and fixed (F-1 to F-218), across
+**Two hundred and nineteen defects found and fixed (F-1 to F-219), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

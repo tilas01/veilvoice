@@ -290,7 +290,7 @@ fn studio_with_a_take(name: &str) -> (tempfile::TempDir, Studio, String) {
     let id = entry.id.clone();
     let studio = Studio {
         entries: vault.list().unwrap(),
-        vault: Some(vault),
+        vault: Some(std::sync::Arc::new(vault)),
         ..Default::default()
     };
     (dir, studio, id)
@@ -340,6 +340,129 @@ fn a_preview_writes_the_audio_the_page_and_the_captions() {
          this said: {said}"
     );
     assert!(said.contains("interview-one.wav"), "{said}");
+}
+
+/// **F-219.** An export happens somewhere else, and is collected without
+/// waiting.
+///
+/// This used to run on the frame the folder picker's answer arrived: read and
+/// decrypt the recording, write the audio, write the page and its subtitles and
+/// its drawing, then run `ffmpeg` and wait for the video. The picker had been
+/// moved off the drawing thread, with a comment saying why; the work the picker
+/// leads to had not, and it is the part that takes minutes.
+#[test]
+fn an_export_is_carried_out_off_the_calling_thread() {
+    let (dir, mut studio, id) = studio_with_a_take("interview one");
+    let into = dir.path().join("out");
+    std::fs::create_dir_all(&into).unwrap();
+
+    let ctx = egui::Context::default();
+    studio.start_export(&ctx, &id, Render::Preview, &into);
+    assert!(studio.exporting.is_some(), "nothing is being exported");
+    assert!(
+        studio.message.is_none(),
+        "the call that started the work also finished it, so it was done on \
+         this thread after all"
+    );
+
+    // Polled rather than waited for, which is what the window does.
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+    let (said, tone) = loop {
+        match studio
+            .exporting
+            .as_ref()
+            .expect("the channel is still held")
+            .try_recv()
+        {
+            Ok(answer) => break answer,
+            Err(std::sync::mpsc::TryRecvError::Empty) => {}
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                panic!("the export worker died")
+            }
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the export never came back"
+        );
+        std::hint::spin_loop();
+    };
+    assert_eq!(tone, Tone::Good, "{said}");
+    assert!(said.contains("None of it is sealed"), "{said}");
+    assert!(into.join("interview-one.wav").is_file());
+    assert!(into.join("interview-one.html").is_file());
+
+    // And the worker has let the vault go, so the key is not held open by
+    // whatever the export was still doing.
+    assert_eq!(
+        std::sync::Arc::strong_count(studio.vault.as_ref().unwrap()),
+        1,
+        "the export is still holding the vault, and with it the key"
+    );
+}
+
+/// The vault is let go of as soon as the recording is out of it.
+///
+/// A video render is minutes. Holding the vault for the whole of one would mean
+/// that shutting the vault did not wipe the key until `ffmpeg` had finished,
+/// which is not what "shut" is understood to mean. The test above shows the
+/// vault is eventually released; this shows it is released before the writing,
+/// which is the part that takes the time and is not observable from outside.
+#[test]
+fn the_export_holds_the_key_only_for_the_load() {
+    let source = include_str!("../studio.rs").replace("\r\n", "\n");
+    let at = source.find("fn export_now(").expect("the worker exists");
+    let body = &source[at..];
+    let body = body.split("\n/// ").next().unwrap_or(body);
+
+    let dropped = body.find("drop(vault);").expect(
+        "the worker never drops the vault, so the key lives as long as the \
+         export does. See F-219.",
+    );
+    let writes = body
+        .find("write_owner_only")
+        .expect("the worker writes the audio");
+    assert!(
+        dropped < writes,
+        "the vault is dropped after the writing rather than before it, so a \
+         video render holds the key open for its whole length"
+    );
+}
+
+/// The frame starts an export and never carries one out.
+#[test]
+fn the_browser_does_not_export_while_drawing() {
+    let source = include_str!("../studio.rs").replace("\r\n", "\n");
+    let shipped = source.split("\n#[cfg(test)]").next().unwrap_or(&source);
+    let at = shipped.find("pub fn browser(").expect("the browser exists");
+    let body = &shipped[at..];
+    let body: String = body
+        .split("\n    fn ")
+        .next()
+        .unwrap_or(body)
+        .lines()
+        .filter(|line| !line.trim_start().starts_with("//"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert!(
+        body.contains("self.start_export("),
+        "the browser no longer starts the export, so something else does"
+    );
+    assert!(
+        !body.contains("export_now("),
+        "the browser carries the export out inside the frame, `ffmpeg` and \
+         all. See F-219."
+    );
+
+    // And the inline door is shut in a shipped build, by the compiler rather
+    // than by a check reading the source.
+    let door = source
+        .find("fn export(&mut self, id: &str")
+        .expect("the test-only door exists");
+    assert!(
+        source[..door].ends_with("#[cfg(test)]\n    "),
+        "`export` is reachable from a shipped build, so the window can render \
+         a video inside a frame again"
+    );
 }
 
 #[test]
