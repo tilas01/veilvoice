@@ -256,6 +256,18 @@ NOTES = {
                    "Windows the platform's own entry is where people look"),
         "example": "veilvoice uninstall",
     },
+    "reset": {
+        "use": "Puts this machine back to a new install: settings, policies, "
+               "the mandate, the vaults and the app lock. What would go is "
+               "printed first, a line per thing with the size of it, and "
+               "where any of it cannot be put back the word RESET has to be "
+               "typed. It is here as well as in the window because a policy "
+               "set from the command line has to be removable there, and "
+               "because a machine with no display has no window to open.",
+        "window": ("settings", "**Settings**, under Storage, which shows the "
+                   "same list and asks for the same word"),
+        "example": "veilvoice reset --keep-keys --dry-run",
+    },
     "policy": {
         "use": "Settings fixed so the interface cannot turn them off, for a "
                "machine somebody else is responsible for. Every setting a "

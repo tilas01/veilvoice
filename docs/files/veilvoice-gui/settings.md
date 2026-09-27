@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/settings.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1664 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1678 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs)
 
 ## Contents
 
@@ -61,7 +61,7 @@ choice applies as you make it and is remembered.
 
 ## What this file contains
 
-1664 lines defining **46 functions** (35 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1678 lines defining **46 functions** (35 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -233,8 +233,8 @@ flowchart TD
 | `Settings::motion_page` <sub>fn</sub> | [981](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L981) | The motion page, including honouring the system's reduced-motion setting. |
 | `Settings::security_page` <sub>fn</sub> | [1118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1118) | Roadmap item 92. |
 | `Settings::storage_page` <sub>fn</sub> | [1218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1218) | The storage page: where files go, and the portable or installed choice. |
-| `section` <sub>fn</sub> | [1279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1279) | A titled group with a one-line explanation under it. |
-| `swatches` <sub>fn</sub> | [1287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1287) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |
+| `section` <sub>fn</sub> | [1289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1289) | A titled group with a one-line explanation under it. |
+| `swatches` <sub>fn</sub> | [1297](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs#L1297) | The active palette, as a row of swatches, so the choice can be seen rather than only read. |
 
 ---
 

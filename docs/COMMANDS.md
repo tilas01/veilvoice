@@ -35,6 +35,7 @@ This page is the whole of the command line, in the program's own order, with wha
 | [`veilvoice install`](#veilvoice-install) | Copy VeilVoice somewhere the system can find it, and add it to PATH | **Install** tab |
 | [`veilvoice update`](#veilvoice-update) | Fetch the newest release, check it, and put it in place | **About** tab |
 | [`veilvoice uninstall`](#veilvoice-uninstall) | Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy | command line only |
+| [`veilvoice reset`](#veilvoice-reset) | Put this machine back to a new install: settings, policies, the mandate, the vaults and the app lock | **Settings** tab |
 | [`veilvoice policy`](#veilvoice-policy) | Settings fixed so the interface cannot turn them off | command line only |
 | [`veilvoice mandate`](#veilvoice-mandate) | The two things VeilVoice insists on, unless you say otherwise | command line only |
 | [`veilvoice conversation`](#veilvoice-conversation) | A recording with several people in it: a voice each, and subtitles | **Group** tab |
@@ -267,6 +268,18 @@ Undoes exactly what `install` did: the copy, the PATH entry and the uninstall en
 
 ```bash
 veilvoice uninstall
+```
+
+## `veilvoice reset`
+
+> Put this machine back to a new install: settings, policies, the mandate, the vaults and the app lock
+
+Puts this machine back to a new install: settings, policies, the mandate, the vaults and the app lock. What would go is printed first, a line per thing with the size of it, and where any of it cannot be put back the word RESET has to be typed. It is here as well as in the window because a policy set from the command line has to be removable there, and because a machine with no display has no window to open.
+
+**In the window:** **Settings**, under Storage, which shows the same list and asks for the same word.
+
+```bash
+veilvoice reset --keep-keys --dry-run
 ```
 
 ## `veilvoice policy`

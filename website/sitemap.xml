@@ -91,6 +91,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/priv_mode.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/record.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/record.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/reset.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/reset.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/sentry.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/sentry.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/theme.html</loc></url>
@@ -162,6 +164,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/lock.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/privatefile.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/privatefile.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/reset.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/reset.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/shred.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/shred.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/studio.html</loc></url>
@@ -236,6 +240,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/progress.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/reduced_motion.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/reduced_motion.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/reset.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/reset.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/security.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/security.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-gui/settings.html</loc></url>

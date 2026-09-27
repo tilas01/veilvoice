@@ -277,6 +277,8 @@ pub struct VeilVoiceApp {
     notice: Option<crate::notify::Notice>,
     /// The walkthrough, on a first run and after an upgrade that adds a stop.
     tour: crate::tour::Tour,
+    /// Starting again: what is in the settings folder, and removing it.
+    full_reset: crate::reset::Reset,
     /// Set once the tour has been considered for this launch, so the decision
     /// is taken from the saved version once rather than on every frame.
     tour_considered: bool,
@@ -531,6 +533,7 @@ impl VeilVoiceApp {
             av_session: None,
             av_notice: None,
             tour: crate::tour::Tour::default(),
+            full_reset: crate::reset::Reset::default(),
             tour_considered: false,
             choosing_input: crate::dialog::Pending::new(),
             failsafe: veilvoice_guard::failsafe::Guard::new(),
@@ -1050,6 +1053,12 @@ impl eframe::App for VeilVoiceApp {
         if self.integrity.poll() {
             ctx.request_repaint();
         }
+        // **Roadmap item 172.** A worker counting a folder or removing one. Both
+        // walk the disk, which is why neither happens on this thread, and the
+        // answer arriving is what the Storage page draws next.
+        if self.full_reset.poll() {
+            ctx.request_repaint();
+        }
         if let Some(passphrase) = self.security.take_unlock_passphrase() {
             self.integrity.start(Some(passphrase));
         }
@@ -1483,7 +1492,7 @@ impl eframe::App for VeilVoiceApp {
                             }
                         }
                         Tab::Verify => self.verify.tab(ui, motion),
-                        Tab::Preferences => self.preferences.tab(ui, ctx),
+                        Tab::Preferences => self.preferences.tab(ui, ctx, &mut self.full_reset),
                         Tab::Setup => self.setup.tab(ui, motion),
                         Tab::About => self.about_tab(ui, motion),
                     });
@@ -1573,6 +1582,7 @@ impl eframe::App for VeilVoiceApp {
             || self.job.is_some()
             || self.security.is_busy()
             || self.integrity.is_busy()
+            || self.full_reset.is_busy()
             || self.setup.is_busy()
         {
             // The one indicator, at the same rate as everything else that moves.

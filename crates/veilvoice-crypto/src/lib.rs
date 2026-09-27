@@ -80,6 +80,7 @@ pub mod kdf;
 pub mod layout;
 pub mod lock;
 pub mod privatefile;
+pub mod reset;
 pub mod shred;
 pub mod studio;
 pub mod tape;

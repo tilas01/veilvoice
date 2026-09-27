@@ -97,7 +97,7 @@ thousand times.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>3711 lines"])
+    n_main(["main.rs<br/>3749 lines"])
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>295 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
@@ -114,6 +114,7 @@ flowchart TD
     n_policy["policy.rs<br/>249 lines"]
     n_priv_mode["priv_mode.rs<br/>46 lines"]
     n_record["record.rs<br/>406 lines"]
+    n_reset["reset.rs<br/>405 lines"]
     n_sentry["sentry.rs<br/>392 lines"]
     n_theme["theme.rs<br/>152 lines"]
     n_update["update.rs<br/>246 lines"]
@@ -152,6 +153,10 @@ flowchart TD
     n_record --> n_atrest
     n_record --> n_meter
     n_record --> n_theme
+    n_reset --> n_capture
+    n_reset --> n_policy
+    n_reset --> n_sentry
+    n_reset --> n_theme
     n_sentry --> n_theme
     n_update --> n_atrest
     n_update --> n_theme
@@ -172,6 +177,7 @@ flowchart TD
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" "open the source"
     click n_priv_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/priv_mode.rs" "open the source"
     click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs" "open the source"
+    click n_reset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs" "open the source"
     click n_sentry href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" "open the source"
     click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/update.rs" "open the source"
@@ -194,17 +200,18 @@ flowchart TD
 | [[`gui.rs`|File-veilvoice-cli-gui]] | 247 | veilvoice gui opens the desktop application from the command line. |
 | [[`input.rs`|File-veilvoice-cli-input]] | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
 | [[`lock.rs`|File-veilvoice-cli-lock]] | 354 | veilvoice lock manages the application lock from the command line. |
-| [[`main.rs`|File-veilvoice-cli-main]] | 3711 | veilvoice, the command-line interface. |
+| [[`main.rs`|File-veilvoice-cli-main]] | 3749 | veilvoice, the command-line interface. |
 | [[`mandate.rs`|File-veilvoice-cli-mandate]] | 339 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
 | [[`meter.rs`|File-veilvoice-cli-meter]] | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [[`policy.rs`|File-veilvoice-cli-policy]] | 249 | veilvoice policy -- settings that can only be tightened. |
 | [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |
 | [[`record.rs`|File-veilvoice-cli-record]] | 406 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
+| [[`reset.rs`|File-veilvoice-cli-reset]] | 405 | veilvoice reset: putting this machine back to a new install. |
 | [[`sentry.rs`|File-veilvoice-cli-sentry]] | 392 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 152 | Tokyo Night colouring for the terminal. |
 | [[`update.rs`|File-veilvoice-cli-update]] | 246 | veilvoice update: fetch the new release, check it, and put it in place. |
 
-**6,384 functional lines of Rust** in this crate. A functional line is a line
+**6,689 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

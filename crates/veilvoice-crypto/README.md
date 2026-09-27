@@ -108,7 +108,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>242 lines"])
+    n_lib(["lib.rs<br/>243 lines"])
     n_aead["aead.rs<br/>280 lines"]
     n_amnesia["amnesia.rs<br/>472 lines"]
     n_container["container.rs<br/>627 lines"]
@@ -119,10 +119,11 @@ flowchart TD
     n_layout["layout.rs<br/>331 lines"]
     n_lock["lock.rs<br/>2264 lines"]
     n_privatefile["privatefile.rs<br/>313 lines"]
+    n_reset["reset.rs<br/>612 lines"]
     n_shred["shred.rs<br/>417 lines"]
     n_studio["studio.rs<br/>1522 lines"]
     n_tape["tape.rs<br/>391 lines"]
-    n_vault["vault.rs<br/>696 lines"]
+    n_vault["vault.rs<br/>714 lines"]
     n_weave["weave.rs<br/>1770 lines"]
     n_hoard --> n_amnesia
     n_hoard --> n_privatefile
@@ -148,6 +149,7 @@ flowchart TD
     click n_layout href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/layout.rs" "open the source"
     click n_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lock.rs" "open the source"
     click n_privatefile href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" "open the source"
+    click n_reset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs" "open the source"
     click n_shred href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/shred.rs" "open the source"
     click n_studio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/studio.rs" "open the source"
     click n_tape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/tape.rs" "open the source"
@@ -169,19 +171,20 @@ flowchart TD
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 531 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 633 | Password-based key derivation with Argon2id. |
 | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | 331 | Everything VeilVoice keeps between runs, in one list. |
-| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 242 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 243 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2264 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 313 | Writing a file that only its owner can read. |
+| [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | 612 | Putting this machine back to a new install. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 417 | Secure erasure, the self-destruct. |
 | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1522 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | 391 | A recording held in locked, zeroizing memory while it is still being made. |
-| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 696 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 714 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1770 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**7,461 functional lines of Rust** in this crate. A functional line is a line
+**7,853 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -264,6 +267,13 @@ counts blank lines and comments too. Both are produced by
 | `fn write_owner_only_new` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | As write_owner_only, but fail if anything is already at path. |
 | `fn replace_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Replace path with bytes in one step, or leave what was there. |
 | `fn tighten` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Make an existing file readable only by its owner. |
+| `enum Keep` | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | What a reset leaves behind. |
+| `struct Doomed` | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | One thing a reset would remove, in the words somebody can read. |
+| `struct Plan` | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | What a reset would do, before it does any of it. |
+| `struct Report` | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | What a reset did. |
+| `fn plan` | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | What this reset would do to the folder this copy is using. |
+| `fn plan_in` | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | The same, for a folder named outright. |
+| `fn carry_out` | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | Remove what the plan named. |
 | `enum Passes` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | How thoroughly to overwrite before unlinking. |
 | `struct ShredReport` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | What actually happened, so the caller can tell the user the truth. |
 | `fn shred_file` | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | Overwrite a file's contents, then delete it. |
@@ -280,6 +290,7 @@ counts blank lines and comments too. Both are produced by
 | `struct Tape` | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | An append-only buffer of locked, zeroizing chunks. |
 | `enum Found` | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | What Vault::load found when it went looking. |
 | `struct Vault` | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | The two files a lock lives in, and the index that names them. |
+| `fn admin_dir_present` | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | That same directory, but only when it is already there. |
 | `fn admin_dir` | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | A directory only an administrator can write to, if this process can make one there. |
 | `enum Weave` | [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | Every encoding, by name. |
 | `const LENGTH_PRESERVING` | [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | Every encoding that leaves the byte count alone. |

@@ -83,6 +83,7 @@ mod mandate;
 mod priv_mode;
 #[cfg(feature = "live")]
 mod record;
+mod reset;
 // Only the live path draws a meter, and the crate builds without that path on
 // the BSDs, where `cpal` has no backend.
 #[cfg(feature = "live")]
@@ -445,6 +446,36 @@ enum Command {
         /// Do not ask for confirmation.
         #[arg(long)]
         yes: bool,
+    },
+
+    /// Put this machine back to a new install: settings, policies, the mandate,
+    /// the vaults and the app lock.
+    ///
+    /// **What will be lost is printed before anything happens**, a line per
+    /// thing with the size of it. Where any of it is something nothing can put
+    /// back -- recordings, colour schemes you wrote -- the word RESET has to be
+    /// typed, and `--yes` is deliberately not accepted in its place.
+    ///
+    /// This is the same reset the window offers, and it is here because a policy
+    /// or a mandate set from the command line has to be removable from the
+    /// command line, and a machine with no display has no window to open.
+    ///
+    /// It touches one folder, the one it prints. Recordings you have saved
+    /// anywhere else, and this program itself, are not its business:
+    /// `veilvoice uninstall` is what removes the program.
+    Reset {
+        /// Leave the app lock, and the key to anything sealed with it, alone.
+        #[arg(long)]
+        keep_keys: bool,
+        /// Print what would go and stop.
+        #[arg(long)]
+        dry_run: bool,
+        /// Do not ask, where nothing in the plan is irreplaceable.
+        #[arg(long)]
+        yes: bool,
+        /// The word the prompt would ask for, for a machine with no terminal.
+        #[arg(long, value_name = "RESET")]
+        confirm: Option<String>,
     },
 
     /// Settings fixed so the interface cannot turn them off.
@@ -1651,6 +1682,13 @@ fn run(command: Command) -> Result<(), String> {
                 }
             }
         }
+
+        Command::Reset {
+            keep_keys,
+            dry_run,
+            yes,
+            confirm,
+        } => reset::run(keep_keys, dry_run, yes, confirm.as_deref()),
 
         Command::Conversation { what } => match what {
             ConversationCommand::Inspect { plan } => conversation::inspect(&plan),

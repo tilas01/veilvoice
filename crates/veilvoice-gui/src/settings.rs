@@ -779,7 +779,7 @@ impl Settings {
     }
 
     /// The settings tab.
-    pub fn tab(&mut self, ui: &mut Ui, ctx: &egui::Context) {
+    pub fn tab(&mut self, ui: &mut Ui, ctx: &egui::Context, reset: &mut crate::reset::Reset) {
         ui.add_space(6.0);
         ui.label(RichText::new("Settings").size(16.0).color(p::fg()).strong());
         ui.add_space(2.0);
@@ -811,7 +811,7 @@ impl Settings {
             Page::Motion => self.motion_page(ui, ctx),
             Page::Interface => self.interface_page(ui),
             Page::Security => self.security_page(ui),
-            Page::Storage => self.storage_page(ui),
+            Page::Storage => self.storage_page(ui, reset),
         }
 
         if let Some(error) = &self.save_error {
@@ -1215,7 +1215,7 @@ impl Settings {
     }
 
     /// The storage page: where files go, and the portable or installed choice.
-    fn storage_page(&mut self, ui: &mut Ui) {
+    fn storage_page(&mut self, ui: &mut Ui, reset: &mut crate::reset::Reset) {
         section(
             ui,
             "Where this is kept",
@@ -1267,11 +1267,21 @@ impl Settings {
         ui.label(
             RichText::new(
                 "  Colour scheme and animation only. This does not touch the app lock, \
-                 your passphrase, or any recording.",
+                 your passphrase, or any recording. The reset below is the one that \
+                 does.",
             )
             .small()
             .color(p::muted()),
         );
+
+        // **Roadmap item 172.** Here rather than on its own page because this is
+        // the page a person looking for it opens: it is titled for where things
+        // are kept and how to reset them, and until now it only offered the
+        // half of that which resets the palette.
+        ui.add_space(20.0);
+        ui.separator();
+        ui.add_space(14.0);
+        reset.panel(ui);
     }
 }
 
@@ -1364,10 +1374,14 @@ mod tests {
     /// Drive the settings tab once, with no window.
     fn render(settings: &mut Settings) {
         let ctx = egui::Context::default();
+        // A reset of its own per frame, in its resting state. The Storage page
+        // draws it and nothing here presses anything, so it looks and does
+        // nothing; `crate::reset`'s own tests are what drive its states.
+        let mut reset = crate::reset::Reset::default();
         let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
             egui::CentralPanel::default().show(ui, |ui| {
                 let ctx = ui.ctx().clone();
-                settings.tab(ui, &ctx)
+                settings.tab(ui, &ctx, &mut reset)
             });
         });
     }

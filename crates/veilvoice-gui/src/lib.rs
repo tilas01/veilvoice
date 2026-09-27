@@ -162,6 +162,7 @@ pub mod prefs;
 pub mod probe;
 pub mod progress;
 pub mod reduced_motion;
+pub mod reset;
 pub mod security;
 pub mod settings;
 pub mod setup;
@@ -290,6 +291,7 @@ pub(crate) fn sources() -> Vec<(&'static str, String)> {
             "reduced_motion.rs",
             include_str!("reduced_motion.rs").replace("\r\n", "\n"),
         ),
+        ("reset.rs", include_str!("reset.rs").replace("\r\n", "\n")),
         (
             "security.rs",
             include_str!("security.rs").replace("\r\n", "\n"),

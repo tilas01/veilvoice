@@ -21,6 +21,7 @@ Commands:
   install       Copy VeilVoice somewhere the system can find it, and add it to PATH
   update        Fetch the newest release, check it, and put it in place
   uninstall     Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy
+  reset         Put this machine back to a new install: settings, policies, the mandate, the vaults and the app lock
   policy        Settings fixed so the interface cannot turn them off
   mandate       The two things VeilVoice insists on, unless you say otherwise
   conversation  A recording with several people in it: a voice each, and subtitles
