@@ -326,6 +326,24 @@ fn mask(site: &[u8; SITE_LEN], bytes: &mut [u8]) {
     }
 }
 
+/// Where an administrator's copy of the lock goes, on a platform that has one.
+///
+/// Named rather than written twice, because [`admin_dir`] creates it and
+/// [`admin_dir_present`] must not.
+const ADMIN_DIR: &str = "/etc/veilvoice";
+
+/// That same directory, but only when it is already there.
+///
+/// [`admin_dir`] answers "can a privileged copy be written", and it answers by
+/// creating the directory, which is the honest test and a side effect. A caller
+/// that is only *looking* -- a reset listing what it is about to remove, an
+/// About panel -- must not leave a directory behind under `/etc` on a machine
+/// that never had one. This is that caller's question.
+pub fn admin_dir_present() -> Option<PathBuf> {
+    let dir = PathBuf::from(ADMIN_DIR);
+    dir.is_dir().then_some(dir)
+}
+
 /// A directory only an administrator can write to, if this process can make
 /// one there.
 ///
@@ -345,7 +363,7 @@ pub fn admin_dir() -> Option<PathBuf> {
     if cfg!(windows) {
         return None;
     }
-    let dir = PathBuf::from("/etc/veilvoice");
+    let dir = PathBuf::from(ADMIN_DIR);
     std::fs::create_dir_all(&dir).ok()?;
     #[cfg(unix)]
     {

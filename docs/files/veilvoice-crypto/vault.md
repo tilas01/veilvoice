@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/vault.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 696 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 714 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ cannot touch, and that part is not a speed bump.
 
 ## What this file contains
 
-696 lines defining **12 functions** (8 public), **2 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+714 lines defining **13 functions** (9 public), **2 types** and **7 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -97,7 +97,8 @@ cannot touch, and that part is not a speed bump.
 - `Vault::store` (line 241) -- Write both copies, and say whether the spare is now current.
   - reaches: `write_one`, `mask`
 - `Vault::clear` (line 248) -- Remove both copies, and the index with them.
-- `admin_dir` (line 344) -- A directory only an administrator can write to, if this process can make one there.
+- `admin_dir_present` (line 342) -- That same directory, but only when it is already there.
+- `admin_dir` (line 362) -- A directory only an administrator can write to, if this process can make one there.
 
 ## What calls what
 
@@ -130,7 +131,8 @@ flowchart TD
     n_read_masked["Vault::read_masked<br/>line 287"]
     n_name_for["name_for<br/>line 295"]
     n_mask["mask<br/>line 314"]
-    n_admin_dir(["admin_dir<br/>line 344"])
+    n_admin_dir_present(["admin_dir_present<br/>line 342"])
+    n_admin_dir(["admin_dir<br/>line 362"])
     n_at --> n_name_for
     n_load --> n_read_masked
     n_load --> n_write_one
@@ -148,9 +150,10 @@ flowchart TD
     click n_read_masked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L287" "open the source"
     click n_name_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L295" "open the source"
     click n_mask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L314" "open the source"
-    click n_admin_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L344" "open the source"
+    click n_admin_dir_present href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L342" "open the source"
+    click n_admin_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L362" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_at,n_primary,n_shadow,n_index,n_load,n_store,n_clear,n_admin_dir entry
+    class n_at,n_primary,n_shadow,n_index,n_load,n_store,n_clear,n_admin_dir_present,n_admin_dir entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_write_one,n_read_masked,n_name_for,n_mask helper
 ```
@@ -180,7 +183,9 @@ flowchart TD
 | `Vault::read_masked` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L287) | Read one file back and unmask it, or None if it is not a lock. |
 | `name_for` <sub>fn</sub> | [295](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L295) | The file name derived from site under label. |
 | `mask` <sub>fn</sub> | [314](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L314) | Exclusive-or bytes with a keystream derived from site. |
-| `admin_dir` <sub>pub fn</sub> | [344](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L344) | A directory only an administrator can write to, if this process can make one there. |
+| `ADMIN_DIR` <sub>const</sub> | [333](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L333) | Where an administrator's copy of the lock goes, on a platform that has one. |
+| `admin_dir_present` <sub>pub fn</sub> | [342](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L342) | That same directory, but only when it is already there. |
+| `admin_dir` <sub>pub fn</sub> | [362](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L362) | A directory only an administrator can write to, if this process can make one there. |
 
 ---
 

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1064 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1066 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ another thread, so the window keeps answering while it is busy.
 
 ## What this file contains
 
-1064 lines defining **10 functions** (3 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+1066 lines defining **10 functions** (3 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -112,10 +112,10 @@ flowchart TD
     n_hide_console["hide_console<br/>line 122"]
     n_hide_console["hide_console<br/>line 132"]
     n_jetbrains_mono_path(["jetbrains_mono_path<br/>line 140"])
-    n_headless_frame["headless_frame<br/>line 195"]
-    n_no_motion["no_motion<br/>line 211"]
-    n_sources["sources<br/>line 229"]
-    n_declared_modules["declared_modules<br/>line 335"]
+    n_headless_frame["headless_frame<br/>line 196"]
+    n_no_motion["no_motion<br/>line 212"]
+    n_sources["sources<br/>line 230"]
+    n_declared_modules["declared_modules<br/>line 337"]
     n_command --> n_hide_console
     click n_tabs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L68" "open the source"
     click n_settings_pages href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L84" "open the source"
@@ -123,10 +123,10 @@ flowchart TD
     click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L122" "open the source"
     click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L132" "open the source"
     click n_jetbrains_mono_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L140" "open the source"
-    click n_headless_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L195" "open the source"
-    click n_no_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L211" "open the source"
-    click n_sources href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L229" "open the source"
-    click n_declared_modules href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L335" "open the source"
+    click n_headless_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L196" "open the source"
+    click n_no_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L212" "open the source"
+    click n_sources href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L230" "open the source"
+    click n_declared_modules href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L337" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_tabs,n_settings_pages,n_jetbrains_mono_path entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -145,13 +145,13 @@ flowchart TD
 | `hide_console` <sub>fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L122) | The Windows half of command. |
 | `hide_console` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L132) | The everywhere-else half of command: no console is created by spawning a process in the first place, so there is nothing to suppress. |
 | `jetbrains_mono_path` <sub>pub fn</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L140) | Where JetBrains Mono is on this machine, if it is anywhere. |
-| `VERSION` <sub>pub const</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L182) | Crate version string, surfaced in the About panel. |
-| `headless_frame` <sub>pub(crate) fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L195) | Draw one frame with no window, and discard what a real backend would have uploaded. |
-| `no_motion` <sub>pub(crate) fn</sub> | [211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L211) | Motion resolved to "nothing moves", for tests that drive a panel. |
-| `sources` <sub>pub(crate) fn</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L229) | Every module's source, for the guards that read the crate rather than run it. |
-| `declared_modules` <sub>pub(crate) fn</sub> | [335](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L335) | The modules lib.rs declares, as filenames. |
-| `spawn_tests` <sub>mod</sub> | [350](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L350) |  |
-| `draw_path_tests` <sub>mod</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L432) |  |
+| `VERSION` <sub>pub const</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L183) | Crate version string, surfaced in the About panel. |
+| `headless_frame` <sub>pub(crate) fn</sub> | [196](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L196) | Draw one frame with no window, and discard what a real backend would have uploaded. |
+| `no_motion` <sub>pub(crate) fn</sub> | [212](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L212) | Motion resolved to "nothing moves", for tests that drive a panel. |
+| `sources` <sub>pub(crate) fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L230) | Every module's source, for the guards that read the crate rather than run it. |
+| `declared_modules` <sub>pub(crate) fn</sub> | [337](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L337) | The modules lib.rs declares, as filenames. |
+| `spawn_tests` <sub>mod</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L352) |  |
+| `draw_path_tests` <sub>mod</sub> | [434](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L434) |  |
 
 ---
 

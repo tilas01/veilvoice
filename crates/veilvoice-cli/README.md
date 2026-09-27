@@ -110,7 +110,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>3711 lines"])
+    n_main(["main.rs<br/>3749 lines"])
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>295 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
@@ -127,6 +127,7 @@ flowchart TD
     n_policy["policy.rs<br/>249 lines"]
     n_priv_mode["priv_mode.rs<br/>46 lines"]
     n_record["record.rs<br/>406 lines"]
+    n_reset["reset.rs<br/>405 lines"]
     n_sentry["sentry.rs<br/>392 lines"]
     n_theme["theme.rs<br/>152 lines"]
     n_update["update.rs<br/>246 lines"]
@@ -165,6 +166,10 @@ flowchart TD
     n_record --> n_atrest
     n_record --> n_meter
     n_record --> n_theme
+    n_reset --> n_capture
+    n_reset --> n_policy
+    n_reset --> n_sentry
+    n_reset --> n_theme
     n_sentry --> n_theme
     n_update --> n_atrest
     n_update --> n_theme
@@ -185,6 +190,7 @@ flowchart TD
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" "open the source"
     click n_priv_mode href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/priv_mode.rs" "open the source"
     click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/record.rs" "open the source"
+    click n_reset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs" "open the source"
     click n_sentry href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/sentry.rs" "open the source"
     click n_theme href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/theme.rs" "open the source"
     click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/update.rs" "open the source"
@@ -207,17 +213,18 @@ flowchart TD
 | [`gui.rs`](../../docs/files/veilvoice-cli/gui.md) | 247 | veilvoice gui opens the desktop application from the command line. |
 | [`input.rs`](../../docs/files/veilvoice-cli/input.md) | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
 | [`lock.rs`](../../docs/files/veilvoice-cli/lock.md) | 354 | veilvoice lock manages the application lock from the command line. |
-| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 3711 | veilvoice, the command-line interface. |
+| [`main.rs`](../../docs/files/veilvoice-cli/main.md) | 3749 | veilvoice, the command-line interface. |
 | [`mandate.rs`](../../docs/files/veilvoice-cli/mandate.md) | 339 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
 | [`meter.rs`](../../docs/files/veilvoice-cli/meter.md) | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [`policy.rs`](../../docs/files/veilvoice-cli/policy.md) | 249 | veilvoice policy -- settings that can only be tightened. |
 | [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |
 | [`record.rs`](../../docs/files/veilvoice-cli/record.md) | 406 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
+| [`reset.rs`](../../docs/files/veilvoice-cli/reset.md) | 405 | veilvoice reset: putting this machine back to a new install. |
 | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | 392 | veilvoice sentry -- canaries, baselines, and what changed since. |
 | [`theme.rs`](../../docs/files/veilvoice-cli/theme.md) | 152 | Tokyo Night colouring for the terminal. |
 | [`update.rs`](../../docs/files/veilvoice-cli/update.md) | 246 | veilvoice update: fetch the new release, check it, and put it in place. |
 
-**6,384 functional lines of Rust** in this crate. A functional line is a line
+**6,689 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -283,6 +290,8 @@ counts blank lines and comments too. Both are produced by
 | `fn show` | [`priv_mode.rs`](../../docs/files/veilvoice-cli/priv_mode.md) | Report the privilege level and what it means. |
 | `struct Sealing` | [`record.rs`](../../docs/files/veilvoice-cli/record.md) | How the recording is to be protected once it is made. |
 | `fn run` | [`record.rs`](../../docs/files/veilvoice-cli/record.md) | Run a recording session and seal what it captured. |
+| `const TYPED` | [`reset.rs`](../../docs/files/veilvoice-cli/reset.md) | The word somebody types where the plan cannot be undone. |
+| `fn run` | [`reset.rs`](../../docs/files/veilvoice-cli/reset.md) | Run the reset. |
 | `fn state_dir` | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | Where the canaries and baselines are kept. |
 | `fn status` | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | What is planted, what is watched, and what this is worth. |
 | `fn plant` | [`sentry.rs`](../../docs/files/veilvoice-cli/sentry.md) | Put a canary in dir. |

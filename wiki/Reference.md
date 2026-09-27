@@ -47,6 +47,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`policy.rs`|File-veilvoice-cli-policy]] &middot; veilvoice policy -- settings that can only be tightened.
 - [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] &middot; veilvoice privilege shows what VeilVoice runs with, and what it can see.
 - [[`record.rs`|File-veilvoice-cli-record]] &middot; veilvoice record -- capture the veiled voice straight into an encrypted file.
+- [[`reset.rs`|File-veilvoice-cli-reset]] &middot; veilvoice reset: putting this machine back to a new install.
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &middot; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &middot; Tokyo Night colouring for the terminal.
 - [[`update.rs`|File-veilvoice-cli-update]] &middot; veilvoice update: fetch the new release, check it, and put it in place.
@@ -95,6 +96,7 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`lib.rs`|File-veilvoice-crypto-lib]] &middot; Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.
 - [[`lock.rs`|File-veilvoice-crypto-lock]] &middot; The application lock: an Argon2id password verifier with a rate limit.
 - [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] &middot; Writing a file that only its owner can read.
+- [[`reset.rs`|File-veilvoice-crypto-reset]] &middot; Putting this machine back to a new install.
 - [[`shred.rs`|File-veilvoice-crypto-shred]] &middot; Secure erasure, the self-destruct.
 - [[`studio.rs`|File-veilvoice-crypto-studio]] &middot; The studio vault: a key that exists only when both locks have been opened.
 - [[`tape.rs`|File-veilvoice-crypto-tape]] &middot; A recording held in locked, zeroizing memory while it is still being made.
@@ -142,6 +144,7 @@ egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 - [[`probe.rs`|File-veilvoice-gui-probe]] &middot; What this machine answers, so the settings it starts on were measured here.
 - [[`progress.rs`|File-veilvoice-gui-progress]] &middot; How far through a job is, in the two cases that exist: the ones that can honestly say, and the ones that cannot.
 - [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] &middot; Whether the operating system has been asked to reduce motion.
+- [[`reset.rs`|File-veilvoice-gui-reset]] &middot; Starting again from the window: what would go, then going.
 - [[`security.rs`|File-veilvoice-gui-security]] &middot; The application lock, and the at-rest encryption of what VeilVoice writes.
 - [[`settings.rs`|File-veilvoice-gui-settings]] &middot; The settings panel: a menu of pages, each a titled group of choices.
 - [[`setup.rs`|File-veilvoice-gui-setup]] &middot; The setup tab: install this copy, undo that, and the optional companions.

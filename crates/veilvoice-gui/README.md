@@ -94,9 +94,9 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>1064 lines"])
+    n_lib(["lib.rs<br/>1066 lines"])
     n_main(["main.rs<br/>269 lines"])
-    n_app["app.rs<br/>3664 lines"]
+    n_app["app.rs<br/>3674 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>305 lines"]
     n_crashlog["crashlog.rs<br/>448 lines"]
@@ -119,8 +119,9 @@ flowchart TD
     n_probe["probe.rs<br/>426 lines"]
     n_progress["progress.rs<br/>539 lines"]
     n_reduced_motion["reduced_motion.rs<br/>285 lines"]
+    n_reset["reset.rs<br/>576 lines"]
     n_security["security.rs<br/>2556 lines"]
-    n_settings["settings.rs<br/>1664 lines"]
+    n_settings["settings.rs<br/>1678 lines"]
     n_setup["setup.rs<br/>1144 lines"]
     n_soundbar["soundbar.rs<br/>782 lines"]
     n_storage["storage.rs<br/>659 lines"]
@@ -149,6 +150,7 @@ flowchart TD
     n_app --> n_policy
     n_app --> n_prefs
     n_app --> n_progress
+    n_app --> n_reset
     n_app --> n_security
     n_app --> n_settings
     n_app --> n_setup
@@ -210,6 +212,7 @@ flowchart TD
     n_prefs --> n_theme
     n_progress --> n_prefs
     n_progress --> n_theme
+    n_reset --> n_theme
     n_security --> n_dialog
     n_security --> n_layout
     n_security --> n_prefs
@@ -224,6 +227,7 @@ flowchart TD
     n_settings --> n_palettes
     n_settings --> n_prefs
     n_settings --> n_reduced_motion
+    n_settings --> n_reset
     n_settings --> n_soundbar
     n_settings --> n_storage
     n_settings --> n_theme
@@ -281,6 +285,7 @@ flowchart TD
     click n_probe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/probe.rs" "open the source"
     click n_progress href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/progress.rs" "open the source"
     click n_reduced_motion href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reduced_motion.rs" "open the source"
+    click n_reset href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs" "open the source"
     click n_security href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" "open the source"
     click n_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" "open the source"
     click n_setup href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/setup.rs" "open the source"
@@ -302,7 +307,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3664 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3674 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 305 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 448 | Make a failure that produces no output produce some. |
@@ -314,7 +319,7 @@ flowchart TD
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 2128 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 397 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 473 | Centring a row of widgets, which egui does not do by nesting. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 1064 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 1066 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 269 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 579 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
@@ -327,8 +332,9 @@ flowchart TD
 | [`probe.rs`](../../docs/files/veilvoice-gui/probe.md) | 426 | What this machine answers, so the settings it starts on were measured here. |
 | [`progress.rs`](../../docs/files/veilvoice-gui/progress.md) | 539 | How far through a job is, in the two cases that exist: the ones that can honestly say, and the ones that cannot. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 285 | Whether the operating system has been asked to reduce motion. |
+| [`reset.rs`](../../docs/files/veilvoice-gui/reset.md) | 576 | Starting again from the window: what would go, then going. |
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 2556 | The application lock, and the at-rest encryption of what VeilVoice writes. |
-| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1664 | The settings panel: a menu of pages, each a titled group of choices. |
+| [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1678 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 782 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 659 | Where veiled recordings are written, and the encrypted volume that may hold them. |
@@ -341,7 +347,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 249 | How big the window opens, and why it is not a constant. |
 
-**21,736 functional lines of Rust** in this crate. A functional line is a line
+**22,187 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -452,6 +458,8 @@ counts blank lines and comments too. Both are produced by
 | `fn strip` | [`progress.rs`](../../docs/files/veilvoice-gui/progress.md) | The indicator, beside the control that started the work. |
 | `enum Query` | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | What the platform said. |
 | `fn query` | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | Ask the operating system. |
+| `const TYPED` | [`reset.rs`](../../docs/files/veilvoice-gui/reset.md) | The word somebody types where the plan cannot be undone. |
+| `struct Reset` | [`reset.rs`](../../docs/files/veilvoice-gui/reset.md) | The reset, as the window holds it. |
 | `enum Sealing` | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | How the recording that comes out of a job is protected. |
 | `struct Security` | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | Everything about locking the app and sealing its output. |
 | `const DISABLE_WARNING` | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | What the user is told before recordings stop being encrypted. |
