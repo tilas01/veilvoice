@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/fetch.rs</code></h1>
-<p style="color:var(--muted)"><a href="fetch.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 337 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="fetch.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 382 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -131,7 +131,7 @@
 <span class="ln" id="L63"><span class="tok-kw">use</span> std::process::Command;</span>
 <span class="ln" id="L64"></span>
 <span class="src-item" id="fn-host">
-<span class="ln" id="L65"><span class="tok-com">/// The only host this will ever talk to.</span></span>
+<span class="ln" id="L65"><span class="tok-com">/// Where a VeilVoice release is fetched from.</span></span>
 <span class="ln" id="L66"><span class="tok-com">///</span></span>
 <span class="ln" id="L67"><span class="tok-com">/// Compiled in rather than accepted as an argument. A verifier that can be</span></span>
 <span class="ln" id="L68"><span class="tok-com">/// pointed anywhere is a download tool wearing a verifier&#x27;s name, and the</span></span>
@@ -140,295 +140,344 @@
 <span class="ln" id="L71"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> HOST: &amp;str = <span class="tok-str">&quot;https://github.com&quot;</span>;</span>
 </span>
 <span class="ln" id="L72"></span>
+<span class="src-item" id="fn-origins">
+<span class="ln" id="L73"><span class="tok-com">/// Every origin this program will ever fetch from.</span></span>
+<span class="ln" id="L74"><span class="tok-com">///</span></span>
+<span class="ln" id="L75"><span class="tok-com">/// The invariant is not &quot;one host&quot;. It is that **no URL comes from outside</span></span>
+<span class="ln" id="L76"><span class="tok-com">/// this binary**: every address fetched is assembled from constants compiled</span></span>
+<span class="ln" id="L77"><span class="tok-com">/// in here, so what the program can reach is a property of the build a reader</span></span>
+<span class="ln" id="L78"><span class="tok-com">/// can check rather than of a configuration file, an argument or a redirect</span></span>
+<span class="ln" id="L79"><span class="tok-com">/// somebody else controls.</span></span>
+<span class="ln" id="L80"><span class="tok-com">///</span></span>
+<span class="ln" id="L81"><span class="tok-com">/// One entry today. Roadmap item 163 adds the origins that named companion</span></span>
+<span class="ln" id="L82"><span class="tok-com">/// builds are published from, and the rule each has to satisfy is the same:</span></span>
+<span class="ln" id="L83"><span class="tok-com">/// named in the source, with a hash beside it.</span></span>
+<span class="ln" id="L84"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> ORIGINS: &amp;[&amp;str] = &amp;[HOST];</span>
+</span>
+<span class="ln" id="L85"></span>
+<span class="src-item" id="fn-at_a_known_origin">
+<span class="ln" id="L86"><span class="tok-com">/// Whether a URL is at one of the origins above.</span></span>
+<span class="ln" id="L87"><span class="tok-com">///</span></span>
+<span class="ln" id="L88"><span class="tok-com">/// Matched as an origin followed by `/`, never as a string prefix. That</span></span>
+<span class="ln" id="L89"><span class="tok-com">/// distinction is the whole of this function: `https://github.com` is a prefix</span></span>
+<span class="ln" id="L90"><span class="tok-com">/// of `https://github.com.example.invalid/x`, so a plain `starts_with` accepts</span></span>
+<span class="ln" id="L91"><span class="tok-com">/// a host somebody else owns whose name merely begins with ours. Nothing</span></span>
+<span class="ln" id="L92"><span class="tok-com">/// reaches this with an attacker&#x27;s string today, because every caller builds</span></span>
+<span class="ln" id="L93"><span class="tok-com">/// its URL from constants, but a check that is only sound because of what its</span></span>
+<span class="ln" id="L94"><span class="tok-com">/// callers happen to do is one a later caller silently breaks. F-226.</span></span>
+<span class="ln" id="L95"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">at_a_known_origin</span>(url: &amp;str) -&gt; bool {</span>
+<span class="ln" id="L96">    ORIGINS.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|origin| {</span>
+<span class="ln" id="L97">        url.<span class="tok-fn">len</span>() &gt; origin.<span class="tok-fn">len</span>() &amp;&amp; url.<span class="tok-fn">starts_with</span>(origin) &amp;&amp; url[origin.<span class="tok-fn">len</span>()..].<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;/&#x27;</span>)</span>
+<span class="ln" id="L98">    })</span>
+<span class="ln" id="L99">}</span>
+</span>
+<span class="ln" id="L100"></span>
 <span class="src-item" id="fn-repo">
-<span class="ln" id="L73"><span class="tok-com">/// The repository releases are fetched from.</span></span>
-<span class="ln" id="L74"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> REPO: &amp;str = <span class="tok-str">&quot;tilas01/veilvoice&quot;</span>;</span>
+<span class="ln" id="L101"><span class="tok-com">/// The repository releases are fetched from.</span></span>
+<span class="ln" id="L102"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> REPO: &amp;str = <span class="tok-str">&quot;tilas01/veilvoice&quot;</span>;</span>
 </span>
-<span class="ln" id="L75"></span>
+<span class="ln" id="L103"></span>
 <span class="src-item" id="fn-max_bytes">
-<span class="ln" id="L76"><span class="tok-com">/// The largest file this will accept.</span></span>
-<span class="ln" id="L77"><span class="tok-com">///</span></span>
-<span class="ln" id="L78"><span class="tok-com">/// A release archive is tens of megabytes. This bounds what a redirected or</span></span>
-<span class="ln" id="L79"><span class="tok-com">/// substituted response can make the tool write to disk, and it is checked</span></span>
-<span class="ln" id="L80"><span class="tok-com">/// after the download rather than trusted from a header, because a header is</span></span>
-<span class="ln" id="L81"><span class="tok-com">/// something the other end chose.</span></span>
-<span class="ln" id="L82"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_BYTES: u64 = <span class="tok-num">512</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>;</span>
+<span class="ln" id="L104"><span class="tok-com">/// The largest file this will accept.</span></span>
+<span class="ln" id="L105"><span class="tok-com">///</span></span>
+<span class="ln" id="L106"><span class="tok-com">/// A release archive is tens of megabytes. This bounds what a redirected or</span></span>
+<span class="ln" id="L107"><span class="tok-com">/// substituted response can make the tool write to disk, and it is checked</span></span>
+<span class="ln" id="L108"><span class="tok-com">/// after the download rather than trusted from a header, because a header is</span></span>
+<span class="ln" id="L109"><span class="tok-com">/// something the other end chose.</span></span>
+<span class="ln" id="L110"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_BYTES: u64 = <span class="tok-num">512</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>;</span>
 </span>
-<span class="ln" id="L83"></span>
+<span class="ln" id="L111"></span>
 <span class="src-item" id="fn-downloader">
-<span class="ln" id="L84"><span class="tok-com">/// Where a downloader was found, and what to call it.</span></span>
-<span class="ln" id="L85"><span class="tok-kw">struct</span> Downloader {</span>
-<span class="ln" id="L86">    program: PathBuf,</span>
-<span class="ln" id="L87">    style: Style,</span>
-<span class="ln" id="L88">}</span>
+<span class="ln" id="L112"><span class="tok-com">/// Where a downloader was found, and what to call it.</span></span>
+<span class="ln" id="L113"><span class="tok-kw">struct</span> Downloader {</span>
+<span class="ln" id="L114">    program: PathBuf,</span>
+<span class="ln" id="L115">    style: Style,</span>
+<span class="ln" id="L116">}</span>
 </span>
-<span class="ln" id="L89"></span>
+<span class="ln" id="L117"></span>
 <span class="src-item" id="fn-style">
-<span class="ln" id="L90"><span class="tok-com">/// Which downloader is being driven, since the two want different arguments for</span></span>
-<span class="ln" id="L91"><span class="tok-com">/// the same job.</span></span>
-<span class="ln" id="L92"><span class="tok-com">///</span></span>
-<span class="ln" id="L93"><span class="tok-com">/// A choice of tool rather than a library: this crate fetches by running the</span></span>
-<span class="ln" id="L94"><span class="tok-com">/// program the machine already has, so nothing here has to be trusted with a TLS</span></span>
-<span class="ln" id="L95"><span class="tok-com">/// stack, and a reader can see exactly what was run.</span></span>
-<span class="ln" id="L96"><span class="tok-attr">#[derive</span>(Clone, Copy)]</span>
-<span class="ln" id="L97"><span class="tok-kw">enum</span> Style {</span>
-<span class="ln" id="L98">    Curl,</span>
-<span class="ln" id="L99">    <span class="tok-com">// Only reachable on the platforms whose lookup below considers it. Windows</span></span>
-<span class="ln" id="L100">    <span class="tok-com">// ships curl and nothing else worth preferring, so on that target this</span></span>
-<span class="ln" id="L101">    <span class="tok-com">// variant is genuinely dead -- and `-D warnings` is right to say so.</span></span>
-<span class="ln" id="L102">    <span class="tok-attr">#[cfg_attr</span>(windows, <span class="tok-fn">allow</span>(dead_code))]</span>
-<span class="ln" id="L103">    Wget,</span>
-<span class="ln" id="L104">}</span>
+<span class="ln" id="L118"><span class="tok-com">/// Which downloader is being driven, since the two want different arguments for</span></span>
+<span class="ln" id="L119"><span class="tok-com">/// the same job.</span></span>
+<span class="ln" id="L120"><span class="tok-com">///</span></span>
+<span class="ln" id="L121"><span class="tok-com">/// A choice of tool rather than a library: this crate fetches by running the</span></span>
+<span class="ln" id="L122"><span class="tok-com">/// program the machine already has, so nothing here has to be trusted with a TLS</span></span>
+<span class="ln" id="L123"><span class="tok-com">/// stack, and a reader can see exactly what was run.</span></span>
+<span class="ln" id="L124"><span class="tok-attr">#[derive</span>(Clone, Copy)]</span>
+<span class="ln" id="L125"><span class="tok-kw">enum</span> Style {</span>
+<span class="ln" id="L126">    Curl,</span>
+<span class="ln" id="L127">    <span class="tok-com">// Only reachable on the platforms whose lookup below considers it. Windows</span></span>
+<span class="ln" id="L128">    <span class="tok-com">// ships curl and nothing else worth preferring, so on that target this</span></span>
+<span class="ln" id="L129">    <span class="tok-com">// variant is genuinely dead -- and `-D warnings` is right to say so.</span></span>
+<span class="ln" id="L130">    <span class="tok-attr">#[cfg_attr</span>(windows, <span class="tok-fn">allow</span>(dead_code))]</span>
+<span class="ln" id="L131">    Wget,</span>
+<span class="ln" id="L132">}</span>
 </span>
-<span class="ln" id="L105"></span>
+<span class="ln" id="L133"></span>
 <span class="src-item" id="fn-find_downloader">
-<span class="ln" id="L106"><span class="tok-com">/// Absolute paths first, and a bare name only where that is safe.</span></span>
-<span class="ln" id="L107"><span class="tok-com">///</span></span>
-<span class="ln" id="L108"><span class="tok-com">/// Resolving a program by bare name on Windows searches the **current</span></span>
-<span class="ln" id="L109"><span class="tok-com">/// directory** before most of `PATH`, so a file called `curl.exe` sitting</span></span>
-<span class="ln" id="L110"><span class="tok-com">/// beside a downloaded archive would be run instead of the system one. That is</span></span>
-<span class="ln" id="L111"><span class="tok-com">/// finding F-13, and this is the program where it would matter most.</span></span>
-<span class="ln" id="L112"><span class="tok-kw">fn</span> <span class="tok-fn">find_downloader</span>() -&gt; Option&lt;Downloader&gt; {</span>
-<span class="ln" id="L113">    <span class="tok-attr">#[cfg</span>(windows)]</span>
-<span class="ln" id="L114">    {</span>
-<span class="ln" id="L115">        <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">r&quot;C:\Windows&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L116">        <span class="tok-kw">let</span> curl = PathBuf::<span class="tok-fn">from</span>(format!(<span class="tok-str">r&quot;{root}\System32\curl.exe&quot;</span>));</span>
-<span class="ln" id="L117">        <span class="tok-kw">if</span> curl.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L118">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Downloader {</span>
-<span class="ln" id="L119">                program: curl,</span>
-<span class="ln" id="L120">                style: Style::Curl,</span>
-<span class="ln" id="L121">            });</span>
-<span class="ln" id="L122">        }</span>
-<span class="ln" id="L123">        None</span>
-<span class="ln" id="L124">    }</span>
-<span class="ln" id="L125">    <span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
-<span class="ln" id="L126">    {</span>
-<span class="ln" id="L127">        <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> [<span class="tok-str">&quot;/usr/bin/curl&quot;</span>, <span class="tok-str">&quot;/bin/curl&quot;</span>, <span class="tok-str">&quot;/usr/local/bin/curl&quot;</span>] {</span>
-<span class="ln" id="L128">            <span class="tok-kw">let</span> path = PathBuf::<span class="tok-fn">from</span>(candidate);</span>
-<span class="ln" id="L129">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L130">                <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Downloader {</span>
-<span class="ln" id="L131">                    program: path,</span>
-<span class="ln" id="L132">                    style: Style::Curl,</span>
-<span class="ln" id="L133">                });</span>
-<span class="ln" id="L134">            }</span>
-<span class="ln" id="L135">        }</span>
-<span class="ln" id="L136">        <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> [<span class="tok-str">&quot;/usr/bin/wget&quot;</span>, <span class="tok-str">&quot;/bin/wget&quot;</span>, <span class="tok-str">&quot;/usr/local/bin/wget&quot;</span>] {</span>
-<span class="ln" id="L137">            <span class="tok-kw">let</span> path = PathBuf::<span class="tok-fn">from</span>(candidate);</span>
-<span class="ln" id="L138">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_file</span>() {</span>
-<span class="ln" id="L139">                <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Downloader {</span>
-<span class="ln" id="L140">                    program: path,</span>
-<span class="ln" id="L141">                    style: Style::Wget,</span>
-<span class="ln" id="L142">                });</span>
-<span class="ln" id="L143">            }</span>
-<span class="ln" id="L144">        }</span>
-<span class="ln" id="L145">        None</span>
-<span class="ln" id="L146">    }</span>
-<span class="ln" id="L147">}</span>
+<span class="ln" id="L134"><span class="tok-com">/// Absolute paths first, and a bare name only where that is safe.</span></span>
+<span class="ln" id="L135"><span class="tok-com">///</span></span>
+<span class="ln" id="L136"><span class="tok-com">/// Resolving a program by bare name on Windows searches the **current</span></span>
+<span class="ln" id="L137"><span class="tok-com">/// directory** before most of `PATH`, so a file called `curl.exe` sitting</span></span>
+<span class="ln" id="L138"><span class="tok-com">/// beside a downloaded archive would be run instead of the system one. That is</span></span>
+<span class="ln" id="L139"><span class="tok-com">/// finding F-13, and this is the program where it would matter most.</span></span>
+<span class="ln" id="L140"><span class="tok-kw">fn</span> <span class="tok-fn">find_downloader</span>() -&gt; Option&lt;Downloader&gt; {</span>
+<span class="ln" id="L141">    <span class="tok-attr">#[cfg</span>(windows)]</span>
+<span class="ln" id="L142">    {</span>
+<span class="ln" id="L143">        <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">r&quot;C:\Windows&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L144">        <span class="tok-kw">let</span> curl = PathBuf::<span class="tok-fn">from</span>(format!(<span class="tok-str">r&quot;{root}\System32\curl.exe&quot;</span>));</span>
+<span class="ln" id="L145">        <span class="tok-kw">if</span> curl.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L146">            <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Downloader {</span>
+<span class="ln" id="L147">                program: curl,</span>
+<span class="ln" id="L148">                style: Style::Curl,</span>
+<span class="ln" id="L149">            });</span>
+<span class="ln" id="L150">        }</span>
+<span class="ln" id="L151">        None</span>
+<span class="ln" id="L152">    }</span>
+<span class="ln" id="L153">    <span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(windows))]</span>
+<span class="ln" id="L154">    {</span>
+<span class="ln" id="L155">        <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> [<span class="tok-str">&quot;/usr/bin/curl&quot;</span>, <span class="tok-str">&quot;/bin/curl&quot;</span>, <span class="tok-str">&quot;/usr/local/bin/curl&quot;</span>] {</span>
+<span class="ln" id="L156">            <span class="tok-kw">let</span> path = PathBuf::<span class="tok-fn">from</span>(candidate);</span>
+<span class="ln" id="L157">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L158">                <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Downloader {</span>
+<span class="ln" id="L159">                    program: path,</span>
+<span class="ln" id="L160">                    style: Style::Curl,</span>
+<span class="ln" id="L161">                });</span>
+<span class="ln" id="L162">            }</span>
+<span class="ln" id="L163">        }</span>
+<span class="ln" id="L164">        <span class="tok-kw">for</span> candidate <span class="tok-kw">in</span> [<span class="tok-str">&quot;/usr/bin/wget&quot;</span>, <span class="tok-str">&quot;/bin/wget&quot;</span>, <span class="tok-str">&quot;/usr/local/bin/wget&quot;</span>] {</span>
+<span class="ln" id="L165">            <span class="tok-kw">let</span> path = PathBuf::<span class="tok-fn">from</span>(candidate);</span>
+<span class="ln" id="L166">            <span class="tok-kw">if</span> path.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L167">                <span class="tok-kw">return</span> <span class="tok-fn">Some</span>(Downloader {</span>
+<span class="ln" id="L168">                    program: path,</span>
+<span class="ln" id="L169">                    style: Style::Wget,</span>
+<span class="ln" id="L170">                });</span>
+<span class="ln" id="L171">            }</span>
+<span class="ln" id="L172">        }</span>
+<span class="ln" id="L173">        None</span>
+<span class="ln" id="L174">    }</span>
+<span class="ln" id="L175">}</span>
 </span>
-<span class="ln" id="L148"></span>
+<span class="ln" id="L176"></span>
 <span class="src-item" id="fn-no_downloader_message">
-<span class="ln" id="L149"><span class="tok-com">/// Say what could not be found, and what to do instead.</span></span>
-<span class="ln" id="L150"><span class="tok-com">///</span></span>
-<span class="ln" id="L151"><span class="tok-com">/// A tool that cannot download should explain how to proceed without it, not</span></span>
-<span class="ln" id="L152"><span class="tok-com">/// merely report an absence. Everything this fetches can be fetched by hand.</span></span>
-<span class="ln" id="L153"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">no_downloader_message</span>() -&gt; String {</span>
-<span class="ln" id="L154">    format!(</span>
-<span class="ln" id="L155">        <span class="tok-str">&quot;no downloader was found on this system.\n\n\</span></span>
-<span class="ln" id="L156"><span class="tok-str">         This tool does not contain an HTTP client -- VeilVoice has no network \</span></span>
-<span class="ln" id="L157"><span class="tok-str">         code in its dependency graph at all, which is a property you can check \</span></span>
-<span class="ln" id="L158"><span class="tok-str">         with `cargo tree`. It borrows the one your operating system already \</span></span>
-<span class="ln" id="L159"><span class="tok-str">         ships, and could not find it.\n\n\</span></span>
-<span class="ln" id="L160"><span class="tok-str">         Download the files yourself from\n  {HOST}/{REPO}/releases\n\</span></span>
-<span class="ln" id="L161"><span class="tok-str">         and pass them in:\n\n  \</span></span>
-<span class="ln" id="L162"><span class="tok-str">         veilvoice verify file &lt;ARCHIVE&gt; --sums SHA256SUMS --sig SHA256SUMS.asc\n&quot;</span></span>
-<span class="ln" id="L163">    )</span>
-<span class="ln" id="L164">}</span>
+<span class="ln" id="L177"><span class="tok-com">/// Say what could not be found, and what to do instead.</span></span>
+<span class="ln" id="L178"><span class="tok-com">///</span></span>
+<span class="ln" id="L179"><span class="tok-com">/// A tool that cannot download should explain how to proceed without it, not</span></span>
+<span class="ln" id="L180"><span class="tok-com">/// merely report an absence. Everything this fetches can be fetched by hand.</span></span>
+<span class="ln" id="L181"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">no_downloader_message</span>() -&gt; String {</span>
+<span class="ln" id="L182">    format!(</span>
+<span class="ln" id="L183">        <span class="tok-str">&quot;no downloader was found on this system.\n\n\</span></span>
+<span class="ln" id="L184"><span class="tok-str">         This tool does not contain an HTTP client -- VeilVoice has no network \</span></span>
+<span class="ln" id="L185"><span class="tok-str">         code in its dependency graph at all, which is a property you can check \</span></span>
+<span class="ln" id="L186"><span class="tok-str">         with `cargo tree`. It borrows the one your operating system already \</span></span>
+<span class="ln" id="L187"><span class="tok-str">         ships, and could not find it.\n\n\</span></span>
+<span class="ln" id="L188"><span class="tok-str">         Download the files yourself from\n  {HOST}/{REPO}/releases\n\</span></span>
+<span class="ln" id="L189"><span class="tok-str">         and pass them in:\n\n  \</span></span>
+<span class="ln" id="L190"><span class="tok-str">         veilvoice verify file &lt;ARCHIVE&gt; --sums SHA256SUMS --sig SHA256SUMS.asc\n&quot;</span></span>
+<span class="ln" id="L191">    )</span>
+<span class="ln" id="L192">}</span>
 </span>
-<span class="ln" id="L165"></span>
+<span class="ln" id="L193"></span>
 <span class="src-item" id="fn-download">
-<span class="ln" id="L166"><span class="tok-com">/// Fetch one URL into `into`. Returns the path written.</span></span>
-<span class="ln" id="L167"><span class="tok-com">///</span></span>
-<span class="ln" id="L168"><span class="tok-com">/// Every failure is reported rather than retried. A verifier that quietly</span></span>
-<span class="ln" id="L169"><span class="tok-com">/// tries again is a verifier whose output does not say what actually happened.</span></span>
-<span class="ln" id="L170"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">download</span>(url: &amp;str, into: &amp;Path) -&gt; Result&lt;PathBuf, String&gt; {</span>
-<span class="ln" id="L171">    <span class="tok-kw">if</span> !url.<span class="tok-fn">starts_with</span>(HOST) {</span>
-<span class="ln" id="L172">        <span class="tok-com">// Unreachable through the public API, which builds every URL from the</span></span>
-<span class="ln" id="L173">        <span class="tok-com">// constants above -- but this is the check that keeps that true if</span></span>
-<span class="ln" id="L174">        <span class="tok-com">// somebody adds a caller later.</span></span>
-<span class="ln" id="L175">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;refusing to fetch from outside {HOST}: {url}&quot;</span>));</span>
-<span class="ln" id="L176">    }</span>
-<span class="ln" id="L177">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(downloader) = <span class="tok-fn">find_downloader</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L178">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-fn">no_downloader_message</span>());</span>
-<span class="ln" id="L179">    };</span>
-<span class="ln" id="L180"></span>
-<span class="ln" id="L181">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = Command::<span class="tok-fn">new</span>(&amp;downloader.program);</span>
-<span class="ln" id="L182">    <span class="tok-kw">match</span> downloader.style {</span>
-<span class="ln" id="L183">        Style::Curl =&gt; {</span>
-<span class="ln" id="L184">            command.<span class="tok-fn">args</span>([</span>
-<span class="ln" id="L185">                <span class="tok-str">&quot;--fail&quot;</span>,     <span class="tok-com">// an HTTP error is a failure, not a saved error page</span></span>
-<span class="ln" id="L186">                <span class="tok-str">&quot;--location&quot;</span>, <span class="tok-com">// GitHub redirects release assets to its CDN</span></span>
-<span class="ln" id="L187">                <span class="tok-str">&quot;--silent&quot;</span>,</span>
-<span class="ln" id="L188">                <span class="tok-str">&quot;--show-error&quot;</span>,</span>
-<span class="ln" id="L189">                <span class="tok-str">&quot;--proto&quot;</span>,</span>
-<span class="ln" id="L190">                <span class="tok-str">&quot;=https&quot;</span>, <span class="tok-com">// never downgrade, never another scheme</span></span>
-<span class="ln" id="L191">                <span class="tok-str">&quot;--max-time&quot;</span>,</span>
-<span class="ln" id="L192">                <span class="tok-str">&quot;600&quot;</span>,</span>
-<span class="ln" id="L193">                <span class="tok-str">&quot;--output&quot;</span>,</span>
-<span class="ln" id="L194">            ]);</span>
-<span class="ln" id="L195">            command.<span class="tok-fn">arg</span>(into);</span>
-<span class="ln" id="L196">            command.<span class="tok-fn">arg</span>(url);</span>
-<span class="ln" id="L197">        }</span>
-<span class="ln" id="L198">        Style::Wget =&gt; {</span>
-<span class="ln" id="L199">            command.<span class="tok-fn">args</span>([<span class="tok-str">&quot;--quiet&quot;</span>, <span class="tok-str">&quot;--https-only&quot;</span>, <span class="tok-str">&quot;--timeout=600&quot;</span>, <span class="tok-str">&quot;-O&quot;</span>]);</span>
-<span class="ln" id="L200">            command.<span class="tok-fn">arg</span>(into);</span>
-<span class="ln" id="L201">            command.<span class="tok-fn">arg</span>(url);</span>
-<span class="ln" id="L202">        }</span>
-<span class="ln" id="L203">    }</span>
-<span class="ln" id="L204"></span>
-<span class="ln" id="L205">    <span class="tok-kw">let</span> output = command</span>
-<span class="ln" id="L206">        .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L207">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not run {}: {error}&quot;</span>, downloader.program.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L208"></span>
-<span class="ln" id="L209">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L210">        <span class="tok-kw">let</span> detail = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L211">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(into);</span>
-<span class="ln" id="L212">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-kw">if</span> detail.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L213">            format!(<span class="tok-str">&quot;download failed: {url}&quot;</span>)</span>
-<span class="ln" id="L214">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L215">            format!(<span class="tok-str">&quot;download failed: {url}\n  {detail}&quot;</span>)</span>
-<span class="ln" id="L216">        });</span>
-<span class="ln" id="L217">    }</span>
-<span class="ln" id="L218"></span>
-<span class="ln" id="L219">    <span class="tok-kw">let</span> size = std::fs::<span class="tok-fn">metadata</span>(into)</span>
-<span class="ln" id="L220">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;downloaded file is unreadable: {error}&quot;</span>))?</span>
-<span class="ln" id="L221">        .<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L222">    <span class="tok-kw">if</span> size == <span class="tok-num">0</span> {</span>
-<span class="ln" id="L223">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(into);</span>
-<span class="ln" id="L224">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;download produced an empty file: {url}&quot;</span>));</span>
-<span class="ln" id="L225">    }</span>
-<span class="ln" id="L226">    <span class="tok-kw">if</span> size &gt; MAX_BYTES {</span>
-<span class="ln" id="L227">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(into);</span>
-<span class="ln" id="L228">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L229">            <span class="tok-str">&quot;downloaded file is {size} bytes, over the {MAX_BYTES} limit; refusing it&quot;</span></span>
-<span class="ln" id="L230">        ));</span>
-<span class="ln" id="L231">    }</span>
-<span class="ln" id="L232">    <span class="tok-fn">Ok</span>(into.<span class="tok-fn">to_path_buf</span>())</span>
-<span class="ln" id="L233">}</span>
-</span>
+<span class="ln" id="L194"><span class="tok-com">/// Fetch one URL into `into`. Returns the path written.</span></span>
+<span class="ln" id="L195"><span class="tok-com">///</span></span>
+<span class="ln" id="L196"><span class="tok-com">/// Every failure is reported rather than retried. A verifier that quietly</span></span>
+<span class="ln" id="L197"><span class="tok-com">/// tries again is a verifier whose output does not say what actually happened.</span></span>
+<span class="ln" id="L198"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">download</span>(url: &amp;str, into: &amp;Path) -&gt; Result&lt;PathBuf, String&gt; {</span>
+<span class="ln" id="L199">    <span class="tok-kw">if</span> !<span class="tok-fn">at_a_known_origin</span>(url) {</span>
+<span class="ln" id="L200">        <span class="tok-com">// Unreachable through the public API, which builds every URL from the</span></span>
+<span class="ln" id="L201">        <span class="tok-com">// constants above -- but this is the check that keeps that true if</span></span>
+<span class="ln" id="L202">        <span class="tok-com">// somebody adds a caller later.</span></span>
+<span class="ln" id="L203">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L204">            <span class="tok-str">&quot;refusing to fetch from outside the compiled-in origins {ORIGINS:?}: {url}&quot;</span></span>
+<span class="ln" id="L205">        ));</span>
+<span class="ln" id="L206">    }</span>
+<span class="ln" id="L207">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(downloader) = <span class="tok-fn">find_downloader</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L208">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-fn">no_downloader_message</span>());</span>
+<span class="ln" id="L209">    };</span>
+<span class="ln" id="L210"></span>
+<span class="ln" id="L211">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = Command::<span class="tok-fn">new</span>(&amp;downloader.program);</span>
+<span class="ln" id="L212">    <span class="tok-kw">match</span> downloader.style {</span>
+<span class="ln" id="L213">        Style::Curl =&gt; {</span>
+<span class="ln" id="L214">            command.<span class="tok-fn">args</span>([</span>
+<span class="ln" id="L215">                <span class="tok-str">&quot;--fail&quot;</span>,     <span class="tok-com">// an HTTP error is a failure, not a saved error page</span></span>
+<span class="ln" id="L216">                <span class="tok-str">&quot;--location&quot;</span>, <span class="tok-com">// GitHub redirects release assets to its CDN</span></span>
+<span class="ln" id="L217">                <span class="tok-str">&quot;--silent&quot;</span>,</span>
+<span class="ln" id="L218">                <span class="tok-str">&quot;--show-error&quot;</span>,</span>
+<span class="ln" id="L219">                <span class="tok-str">&quot;--proto&quot;</span>,</span>
+<span class="ln" id="L220">                <span class="tok-str">&quot;=https&quot;</span>, <span class="tok-com">// never downgrade, never another scheme</span></span>
+<span class="ln" id="L221">                <span class="tok-str">&quot;--max-time&quot;</span>,</span>
+<span class="ln" id="L222">                <span class="tok-str">&quot;600&quot;</span>,</span>
+<span class="ln" id="L223">                <span class="tok-str">&quot;--output&quot;</span>,</span>
+<span class="ln" id="L224">            ]);</span>
+<span class="ln" id="L225">            command.<span class="tok-fn">arg</span>(into);</span>
+<span class="ln" id="L226">            command.<span class="tok-fn">arg</span>(url);</span>
+<span class="ln" id="L227">        }</span>
+<span class="ln" id="L228">        Style::Wget =&gt; {</span>
+<span class="ln" id="L229">            command.<span class="tok-fn">args</span>([<span class="tok-str">&quot;--quiet&quot;</span>, <span class="tok-str">&quot;--https-only&quot;</span>, <span class="tok-str">&quot;--timeout=600&quot;</span>, <span class="tok-str">&quot;-O&quot;</span>]);</span>
+<span class="ln" id="L230">            command.<span class="tok-fn">arg</span>(into);</span>
+<span class="ln" id="L231">            command.<span class="tok-fn">arg</span>(url);</span>
+<span class="ln" id="L232">        }</span>
+<span class="ln" id="L233">    }</span>
 <span class="ln" id="L234"></span>
-<span class="src-item" id="fn-asset_url">
-<span class="ln" id="L235"><span class="tok-com">/// The URL of one file in one release.</span></span>
-<span class="ln" id="L236"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">asset_url</span>(tag: &amp;str, name: &amp;str) -&gt; String {</span>
-<span class="ln" id="L237">    format!(<span class="tok-str">&quot;{HOST}/{REPO}/releases/download/{tag}/{name}&quot;</span>)</span>
-<span class="ln" id="L238">}</span>
+<span class="ln" id="L235">    <span class="tok-kw">let</span> output = command</span>
+<span class="ln" id="L236">        .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L237">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not run {}: {error}&quot;</span>, downloader.program.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L238"></span>
+<span class="ln" id="L239">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L240">        <span class="tok-kw">let</span> detail = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L241">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(into);</span>
+<span class="ln" id="L242">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-kw">if</span> detail.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L243">            format!(<span class="tok-str">&quot;download failed: {url}&quot;</span>)</span>
+<span class="ln" id="L244">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L245">            format!(<span class="tok-str">&quot;download failed: {url}\n  {detail}&quot;</span>)</span>
+<span class="ln" id="L246">        });</span>
+<span class="ln" id="L247">    }</span>
+<span class="ln" id="L248"></span>
+<span class="ln" id="L249">    <span class="tok-kw">let</span> size = std::fs::<span class="tok-fn">metadata</span>(into)</span>
+<span class="ln" id="L250">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;downloaded file is unreadable: {error}&quot;</span>))?</span>
+<span class="ln" id="L251">        .<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L252">    <span class="tok-kw">if</span> size == <span class="tok-num">0</span> {</span>
+<span class="ln" id="L253">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(into);</span>
+<span class="ln" id="L254">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;download produced an empty file: {url}&quot;</span>));</span>
+<span class="ln" id="L255">    }</span>
+<span class="ln" id="L256">    <span class="tok-kw">if</span> size &gt; MAX_BYTES {</span>
+<span class="ln" id="L257">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(into);</span>
+<span class="ln" id="L258">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L259">            <span class="tok-str">&quot;downloaded file is {size} bytes, over the {MAX_BYTES} limit; refusing it&quot;</span></span>
+<span class="ln" id="L260">        ));</span>
+<span class="ln" id="L261">    }</span>
+<span class="ln" id="L262">    <span class="tok-fn">Ok</span>(into.<span class="tok-fn">to_path_buf</span>())</span>
+<span class="ln" id="L263">}</span>
 </span>
-<span class="ln" id="L239"></span>
+<span class="ln" id="L264"></span>
+<span class="src-item" id="fn-asset_url">
+<span class="ln" id="L265"><span class="tok-com">/// The URL of one file in one release.</span></span>
+<span class="ln" id="L266"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">asset_url</span>(tag: &amp;str, name: &amp;str) -&gt; String {</span>
+<span class="ln" id="L267">    format!(<span class="tok-str">&quot;{HOST}/{REPO}/releases/download/{tag}/{name}&quot;</span>)</span>
+<span class="ln" id="L268">}</span>
+</span>
+<span class="ln" id="L269"></span>
 <span class="src-item" id="fn-sums">
-<span class="ln" id="L240"><span class="tok-com">/// The list of hashes every release publishes, one line per file.</span></span>
-<span class="ln" id="L241"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SUMS: &amp;str = <span class="tok-str">&quot;SHA256SUMS&quot;</span>;</span>
+<span class="ln" id="L270"><span class="tok-com">/// The list of hashes every release publishes, one line per file.</span></span>
+<span class="ln" id="L271"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SUMS: &amp;str = <span class="tok-str">&quot;SHA256SUMS&quot;</span>;</span>
 </span>
 <span class="src-item" id="fn-signature">
-<span class="ln" id="L242"><span class="tok-com">/// The detached signature over that list, which is what ties it to the signing</span></span>
-<span class="ln" id="L243"><span class="tok-com">/// key rather than to whoever served the page.</span></span>
-<span class="ln" id="L244"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SIGNATURE: &amp;str = <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>;</span>
+<span class="ln" id="L272"><span class="tok-com">/// The detached signature over that list, which is what ties it to the signing</span></span>
+<span class="ln" id="L273"><span class="tok-com">/// key rather than to whoever served the page.</span></span>
+<span class="ln" id="L274"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SIGNATURE: &amp;str = <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>;</span>
 </span>
-<span class="ln" id="L245"></span>
+<span class="ln" id="L275"></span>
 <span class="src-item" id="fn-valid_tag">
-<span class="ln" id="L246"><span class="tok-com">/// A release tag, rejected unless it looks like one.</span></span>
-<span class="ln" id="L247"><span class="tok-com">///</span></span>
-<span class="ln" id="L248"><span class="tok-com">/// The tag becomes part of a URL and part of a filename, so it is validated</span></span>
-<span class="ln" id="L249"><span class="tok-com">/// rather than trusted: without this, a tag containing `../` would write</span></span>
-<span class="ln" id="L250"><span class="tok-com">/// outside the download directory, and one containing a shell metacharacter</span></span>
-<span class="ln" id="L251"><span class="tok-com">/// would be passed to a subprocess. The argument is passed as a separate</span></span>
-<span class="ln" id="L252"><span class="tok-com">/// argv entry rather than through a shell, so the second is already handled --</span></span>
-<span class="ln" id="L253"><span class="tok-com">/// but a check that only holds because of how the caller happens to invoke</span></span>
-<span class="ln" id="L254"><span class="tok-com">/// things is not a check.</span></span>
-<span class="ln" id="L255"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">valid_tag</span>(tag: &amp;str) -&gt; bool {</span>
-<span class="ln" id="L256">    !tag.<span class="tok-fn">is_empty</span>()</span>
-<span class="ln" id="L257">        &amp;&amp; tag.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">40</span></span>
-<span class="ln" id="L258">        &amp;&amp; tag</span>
-<span class="ln" id="L259">            .<span class="tok-fn">chars</span>()</span>
-<span class="ln" id="L260">            .<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_alphanumeric</span>() || c == <span class="tok-str">&#x27;.&#x27;</span> || c == <span class="tok-str">&#x27;-&#x27;</span> || c == <span class="tok-str">&#x27;_&#x27;</span>)</span>
-<span class="ln" id="L261">}</span>
+<span class="ln" id="L276"><span class="tok-com">/// A release tag, rejected unless it looks like one.</span></span>
+<span class="ln" id="L277"><span class="tok-com">///</span></span>
+<span class="ln" id="L278"><span class="tok-com">/// The tag becomes part of a URL and part of a filename, so it is validated</span></span>
+<span class="ln" id="L279"><span class="tok-com">/// rather than trusted: without this, a tag containing `../` would write</span></span>
+<span class="ln" id="L280"><span class="tok-com">/// outside the download directory, and one containing a shell metacharacter</span></span>
+<span class="ln" id="L281"><span class="tok-com">/// would be passed to a subprocess. The argument is passed as a separate</span></span>
+<span class="ln" id="L282"><span class="tok-com">/// argv entry rather than through a shell, so the second is already handled --</span></span>
+<span class="ln" id="L283"><span class="tok-com">/// but a check that only holds because of how the caller happens to invoke</span></span>
+<span class="ln" id="L284"><span class="tok-com">/// things is not a check.</span></span>
+<span class="ln" id="L285"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">valid_tag</span>(tag: &amp;str) -&gt; bool {</span>
+<span class="ln" id="L286">    !tag.<span class="tok-fn">is_empty</span>()</span>
+<span class="ln" id="L287">        &amp;&amp; tag.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">40</span></span>
+<span class="ln" id="L288">        &amp;&amp; tag</span>
+<span class="ln" id="L289">            .<span class="tok-fn">chars</span>()</span>
+<span class="ln" id="L290">            .<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_alphanumeric</span>() || c == <span class="tok-str">&#x27;.&#x27;</span> || c == <span class="tok-str">&#x27;-&#x27;</span> || c == <span class="tok-str">&#x27;_&#x27;</span>)</span>
+<span class="ln" id="L291">}</span>
 </span>
-<span class="ln" id="L262"></span>
+<span class="ln" id="L292"></span>
 <span class="src-item" id="fn-valid_asset">
-<span class="ln" id="L263"><span class="tok-com">/// An asset filename, rejected unless it looks like one.</span></span>
-<span class="ln" id="L264"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">valid_asset</span>(name: &amp;str) -&gt; bool {</span>
-<span class="ln" id="L265">    !name.<span class="tok-fn">is_empty</span>()</span>
-<span class="ln" id="L266">        &amp;&amp; name.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">128</span></span>
-<span class="ln" id="L267">        &amp;&amp; !name.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;..&quot;</span>)</span>
-<span class="ln" id="L268">        &amp;&amp; name</span>
-<span class="ln" id="L269">            .<span class="tok-fn">chars</span>()</span>
-<span class="ln" id="L270">            .<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_alphanumeric</span>() || c == <span class="tok-str">&#x27;.&#x27;</span> || c == <span class="tok-str">&#x27;-&#x27;</span> || c == <span class="tok-str">&#x27;_&#x27;</span>)</span>
-<span class="ln" id="L271">}</span>
+<span class="ln" id="L293"><span class="tok-com">/// An asset filename, rejected unless it looks like one.</span></span>
+<span class="ln" id="L294"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">valid_asset</span>(name: &amp;str) -&gt; bool {</span>
+<span class="ln" id="L295">    !name.<span class="tok-fn">is_empty</span>()</span>
+<span class="ln" id="L296">        &amp;&amp; name.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">128</span></span>
+<span class="ln" id="L297">        &amp;&amp; !name.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;..&quot;</span>)</span>
+<span class="ln" id="L298">        &amp;&amp; name</span>
+<span class="ln" id="L299">            .<span class="tok-fn">chars</span>()</span>
+<span class="ln" id="L300">            .<span class="tok-fn">all</span>(|c| c.<span class="tok-fn">is_ascii_alphanumeric</span>() || c == <span class="tok-str">&#x27;.&#x27;</span> || c == <span class="tok-str">&#x27;-&#x27;</span> || c == <span class="tok-str">&#x27;_&#x27;</span>)</span>
+<span class="ln" id="L301">}</span>
 </span>
-<span class="ln" id="L272"></span>
-<span class="ln" id="L273"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L274"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L275">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L276"></span>
-<span class="ln" id="L277">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L278">    <span class="tok-kw">fn</span> <span class="tok-fn">a_url_outside_the_compiled_in_host_is_refused</span>() {</span>
-<span class="ln" id="L279">        <span class="tok-kw">let</span> target = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-fetch-test-never-written&quot;</span>);</span>
-<span class="ln" id="L280">        <span class="tok-kw">let</span> error = <span class="tok-fn">download</span>(<span class="tok-str">&quot;https://example.invalid/thing&quot;</span>, &amp;target)</span>
-<span class="ln" id="L281">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an arbitrary host must be refused&quot;</span>);</span>
-<span class="ln" id="L282">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;refusing to fetch&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L283">        assert!(!target.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;a refused download still wrote a file&quot;</span>);</span>
-<span class="ln" id="L284">    }</span>
-<span class="ln" id="L285"></span>
-<span class="ln" id="L286">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L287">    <span class="tok-kw">fn</span> <span class="tok-fn">a_tag_that_would_escape_the_directory_is_refused</span>() {</span>
-<span class="ln" id="L288">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L289">            <span class="tok-str">&quot;../../etc&quot;</span>,</span>
-<span class="ln" id="L290">            <span class="tok-str">&quot;a/b&quot;</span>,</span>
-<span class="ln" id="L291">            <span class="tok-str">&quot;tag with spaces&quot;</span>,</span>
-<span class="ln" id="L292">            <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L293">            <span class="tok-str">&quot;a;rm -rf /&quot;</span>,</span>
-<span class="ln" id="L294">            <span class="tok-str">&quot;v1$(x)&quot;</span>,</span>
-<span class="ln" id="L295">        ] {</span>
-<span class="ln" id="L296">            assert!(!<span class="tok-fn">valid_tag</span>(bad), <span class="tok-str">&quot;the tag {bad:?} was accepted&quot;</span>);</span>
-<span class="ln" id="L297">        }</span>
-<span class="ln" id="L298">        <span class="tok-kw">for</span> good <span class="tok-kw">in</span> [<span class="tok-str">&quot;v0.1.11&quot;</span>, <span class="tok-str">&quot;v1.0.0-rc1&quot;</span>, <span class="tok-str">&quot;nightly_2026&quot;</span>] {</span>
-<span class="ln" id="L299">            assert!(<span class="tok-fn">valid_tag</span>(good), <span class="tok-str">&quot;the tag {good:?} was refused&quot;</span>);</span>
-<span class="ln" id="L300">        }</span>
-<span class="ln" id="L301">    }</span>
 <span class="ln" id="L302"></span>
-<span class="ln" id="L303">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L304">    <span class="tok-kw">fn</span> <span class="tok-fn">an_asset_name_that_would_escape_the_directory_is_refused</span>() {</span>
-<span class="ln" id="L305">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&quot;../SHA256SUMS&quot;</span>, <span class="tok-str">&quot;a/b.tar.gz&quot;</span>, <span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;x y.zip&quot;</span>] {</span>
-<span class="ln" id="L306">            assert!(!<span class="tok-fn">valid_asset</span>(bad), <span class="tok-str">&quot;the name {bad:?} was accepted&quot;</span>);</span>
-<span class="ln" id="L307">        }</span>
-<span class="ln" id="L308">        <span class="tok-kw">for</span> good <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L309">            <span class="tok-str">&quot;SHA256SUMS&quot;</span>,</span>
-<span class="ln" id="L310">            <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>,</span>
-<span class="ln" id="L311">            <span class="tok-str">&quot;veilvoice-v0.1.11-linux-x86_64.tar.gz&quot;</span>,</span>
-<span class="ln" id="L312">        ] {</span>
-<span class="ln" id="L313">            assert!(<span class="tok-fn">valid_asset</span>(good), <span class="tok-str">&quot;the name {good:?} was refused&quot;</span>);</span>
-<span class="ln" id="L314">        }</span>
-<span class="ln" id="L315">    }</span>
-<span class="ln" id="L316"></span>
-<span class="ln" id="L317">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L318">    <span class="tok-kw">fn</span> <span class="tok-fn">an_asset_url_is_built_from_the_compiled_in_host_and_repository</span>() {</span>
-<span class="ln" id="L319">        <span class="tok-kw">let</span> url = <span class="tok-fn">asset_url</span>(<span class="tok-str">&quot;v0.1.11&quot;</span>, <span class="tok-str">&quot;SHA256SUMS&quot;</span>);</span>
-<span class="ln" id="L320">        assert!(url.<span class="tok-fn">starts_with</span>(HOST), <span class="tok-str">&quot;{url}&quot;</span>);</span>
-<span class="ln" id="L321">        assert!(url.<span class="tok-fn">contains</span>(REPO), <span class="tok-str">&quot;{url}&quot;</span>);</span>
-<span class="ln" id="L322">        assert!(url.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;/v0.1.11/SHA256SUMS&quot;</span>), <span class="tok-str">&quot;{url}&quot;</span>);</span>
-<span class="ln" id="L323">    }</span>
-<span class="ln" id="L324"></span>
-<span class="ln" id="L325">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L326">    <span class="tok-kw">fn</span> <span class="tok-fn">the_absent_downloader_message_says_how_to_proceed_without_one</span>() {</span>
-<span class="ln" id="L327">        <span class="tok-com">// A tool that cannot download must explain the manual route rather</span></span>
-<span class="ln" id="L328">        <span class="tok-com">// than merely reporting that it cannot.</span></span>
-<span class="ln" id="L329">        <span class="tok-kw">let</span> text = <span class="tok-fn">no_downloader_message</span>();</span>
-<span class="ln" id="L330">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;releases&quot;</span>), <span class="tok-str">&quot;no link to the releases: {text}&quot;</span>);</span>
-<span class="ln" id="L331">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--sums&quot;</span>), <span class="tok-str">&quot;no manual command shown: {text}&quot;</span>);</span>
-<span class="ln" id="L332">        assert!(</span>
-<span class="ln" id="L333">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no network code&quot;</span>),</span>
-<span class="ln" id="L334">            <span class="tok-str">&quot;the reason there is no built-in client should be stated: {text}&quot;</span></span>
-<span class="ln" id="L335">        );</span>
-<span class="ln" id="L336">    }</span>
-<span class="ln" id="L337">}</span>
+<span class="ln" id="L303"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L304"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L305">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L306"></span>
+<span class="ln" id="L307">    <span class="tok-com">/// A host whose name merely begins with ours is a different host.</span></span>
+<span class="ln" id="L308">    <span class="tok-com">///</span></span>
+<span class="ln" id="L309">    <span class="tok-com">/// The case this exists for: `https://github.com.example.invalid/x` is a</span></span>
+<span class="ln" id="L310">    <span class="tok-com">/// prefix match on `https://github.com` and is somebody else&#x27;s machine.</span></span>
+<span class="ln" id="L311">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L312">    <span class="tok-kw">fn</span> <span class="tok-fn">an_origin_is_matched_as_an_origin_rather_than_as_a_prefix</span>() {</span>
+<span class="ln" id="L313">        assert!(<span class="tok-fn">at_a_known_origin</span>(<span class="tok-str">&quot;https://github.com/tilas01/veilvoice&quot;</span>));</span>
+<span class="ln" id="L314">        assert!(!<span class="tok-fn">at_a_known_origin</span>(<span class="tok-str">&quot;https://github.com.example.invalid/x&quot;</span>));</span>
+<span class="ln" id="L315">        assert!(!<span class="tok-fn">at_a_known_origin</span>(<span class="tok-str">&quot;https://github.community/x&quot;</span>));</span>
+<span class="ln" id="L316">        <span class="tok-com">// The bare origin addresses no file, so there is nothing to fetch.</span></span>
+<span class="ln" id="L317">        assert!(!<span class="tok-fn">at_a_known_origin</span>(<span class="tok-str">&quot;https://github.com&quot;</span>));</span>
+<span class="ln" id="L318">        assert!(!<span class="tok-fn">at_a_known_origin</span>(<span class="tok-str">&quot;http://github.com/x&quot;</span>));</span>
+<span class="ln" id="L319">        assert!(!<span class="tok-fn">at_a_known_origin</span>(<span class="tok-str">&quot;https://example.invalid/x&quot;</span>));</span>
+<span class="ln" id="L320">    }</span>
+<span class="ln" id="L321"></span>
+<span class="ln" id="L322">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L323">    <span class="tok-kw">fn</span> <span class="tok-fn">a_url_outside_the_compiled_in_host_is_refused</span>() {</span>
+<span class="ln" id="L324">        <span class="tok-kw">let</span> target = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-fetch-test-never-written&quot;</span>);</span>
+<span class="ln" id="L325">        <span class="tok-kw">let</span> error = <span class="tok-fn">download</span>(<span class="tok-str">&quot;https://example.invalid/thing&quot;</span>, &amp;target)</span>
+<span class="ln" id="L326">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;an arbitrary host must be refused&quot;</span>);</span>
+<span class="ln" id="L327">        assert!(error.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;refusing to fetch&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L328">        assert!(!target.<span class="tok-fn">exists</span>(), <span class="tok-str">&quot;a refused download still wrote a file&quot;</span>);</span>
+<span class="ln" id="L329">    }</span>
+<span class="ln" id="L330"></span>
+<span class="ln" id="L331">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L332">    <span class="tok-kw">fn</span> <span class="tok-fn">a_tag_that_would_escape_the_directory_is_refused</span>() {</span>
+<span class="ln" id="L333">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L334">            <span class="tok-str">&quot;../../etc&quot;</span>,</span>
+<span class="ln" id="L335">            <span class="tok-str">&quot;a/b&quot;</span>,</span>
+<span class="ln" id="L336">            <span class="tok-str">&quot;tag with spaces&quot;</span>,</span>
+<span class="ln" id="L337">            <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L338">            <span class="tok-str">&quot;a;rm -rf /&quot;</span>,</span>
+<span class="ln" id="L339">            <span class="tok-str">&quot;v1$(x)&quot;</span>,</span>
+<span class="ln" id="L340">        ] {</span>
+<span class="ln" id="L341">            assert!(!<span class="tok-fn">valid_tag</span>(bad), <span class="tok-str">&quot;the tag {bad:?} was accepted&quot;</span>);</span>
+<span class="ln" id="L342">        }</span>
+<span class="ln" id="L343">        <span class="tok-kw">for</span> good <span class="tok-kw">in</span> [<span class="tok-str">&quot;v0.1.11&quot;</span>, <span class="tok-str">&quot;v1.0.0-rc1&quot;</span>, <span class="tok-str">&quot;nightly_2026&quot;</span>] {</span>
+<span class="ln" id="L344">            assert!(<span class="tok-fn">valid_tag</span>(good), <span class="tok-str">&quot;the tag {good:?} was refused&quot;</span>);</span>
+<span class="ln" id="L345">        }</span>
+<span class="ln" id="L346">    }</span>
+<span class="ln" id="L347"></span>
+<span class="ln" id="L348">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L349">    <span class="tok-kw">fn</span> <span class="tok-fn">an_asset_name_that_would_escape_the_directory_is_refused</span>() {</span>
+<span class="ln" id="L350">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&quot;../SHA256SUMS&quot;</span>, <span class="tok-str">&quot;a/b.tar.gz&quot;</span>, <span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;x y.zip&quot;</span>] {</span>
+<span class="ln" id="L351">            assert!(!<span class="tok-fn">valid_asset</span>(bad), <span class="tok-str">&quot;the name {bad:?} was accepted&quot;</span>);</span>
+<span class="ln" id="L352">        }</span>
+<span class="ln" id="L353">        <span class="tok-kw">for</span> good <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L354">            <span class="tok-str">&quot;SHA256SUMS&quot;</span>,</span>
+<span class="ln" id="L355">            <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>,</span>
+<span class="ln" id="L356">            <span class="tok-str">&quot;veilvoice-v0.1.11-linux-x86_64.tar.gz&quot;</span>,</span>
+<span class="ln" id="L357">        ] {</span>
+<span class="ln" id="L358">            assert!(<span class="tok-fn">valid_asset</span>(good), <span class="tok-str">&quot;the name {good:?} was refused&quot;</span>);</span>
+<span class="ln" id="L359">        }</span>
+<span class="ln" id="L360">    }</span>
+<span class="ln" id="L361"></span>
+<span class="ln" id="L362">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L363">    <span class="tok-kw">fn</span> <span class="tok-fn">an_asset_url_is_built_from_the_compiled_in_host_and_repository</span>() {</span>
+<span class="ln" id="L364">        <span class="tok-kw">let</span> url = <span class="tok-fn">asset_url</span>(<span class="tok-str">&quot;v0.1.11&quot;</span>, <span class="tok-str">&quot;SHA256SUMS&quot;</span>);</span>
+<span class="ln" id="L365">        assert!(url.<span class="tok-fn">starts_with</span>(HOST), <span class="tok-str">&quot;{url}&quot;</span>);</span>
+<span class="ln" id="L366">        assert!(url.<span class="tok-fn">contains</span>(REPO), <span class="tok-str">&quot;{url}&quot;</span>);</span>
+<span class="ln" id="L367">        assert!(url.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;/v0.1.11/SHA256SUMS&quot;</span>), <span class="tok-str">&quot;{url}&quot;</span>);</span>
+<span class="ln" id="L368">    }</span>
+<span class="ln" id="L369"></span>
+<span class="ln" id="L370">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L371">    <span class="tok-kw">fn</span> <span class="tok-fn">the_absent_downloader_message_says_how_to_proceed_without_one</span>() {</span>
+<span class="ln" id="L372">        <span class="tok-com">// A tool that cannot download must explain the manual route rather</span></span>
+<span class="ln" id="L373">        <span class="tok-com">// than merely reporting that it cannot.</span></span>
+<span class="ln" id="L374">        <span class="tok-kw">let</span> text = <span class="tok-fn">no_downloader_message</span>();</span>
+<span class="ln" id="L375">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;releases&quot;</span>), <span class="tok-str">&quot;no link to the releases: {text}&quot;</span>);</span>
+<span class="ln" id="L376">        assert!(text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;--sums&quot;</span>), <span class="tok-str">&quot;no manual command shown: {text}&quot;</span>);</span>
+<span class="ln" id="L377">        assert!(</span>
+<span class="ln" id="L378">            text.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no network code&quot;</span>),</span>
+<span class="ln" id="L379">            <span class="tok-str">&quot;the reason there is no built-in client should be stated: {text}&quot;</span></span>
+<span class="ln" id="L380">        );</span>
+<span class="ln" id="L381">    }</span>
+<span class="ln" id="L382">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
