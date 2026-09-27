@@ -98,7 +98,7 @@ flowchart TD
     n_deps["deps.rs<br/>652 lines"]
     n_discover["discover.rs<br/>460 lines"]
     n_extracted["extracted.rs<br/>316 lines"]
-    n_fetch["fetch.rs<br/>337 lines"]
+    n_fetch["fetch.rs<br/>382 lines"]
     n_report["report.rs<br/>385 lines"]
     n_tests["tests.rs<br/>1743 lines"]
     n_update["update.rs<br/>1333 lines"]
@@ -130,7 +130,7 @@ flowchart TD
 | [`deps.rs`](../../docs/files/veilvoice-verify/deps.md) | 652 | What this machine needs before it can build VeilVoice, and who ships it. |
 | [`discover.rs`](../../docs/files/veilvoice-verify/discover.md) | 460 | Finding a release to check, without being told where it is. |
 | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | 316 | What came out of the archive, and the GnuPG somebody already has. |
-| [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 337 | Download a release, without putting an HTTP client in the dependency graph. |
+| [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | 382 | Download a release, without putting an HTTP client in the dependency graph. |
 | [`lib.rs`](../../docs/files/veilvoice-verify/lib.md) | 2520 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](../../docs/files/veilvoice-verify/report.md) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](../../docs/files/veilvoice-verify/tests.md) | 1743 | The verifier's own tests. |
@@ -138,7 +138,7 @@ flowchart TD
 | [`inside_the_archive.rs`](../../docs/files/veilvoice-verify/tests-inside_the_archive.md) | 498 | Roadmap item 164. |
 | [`release_manifest.rs`](../../docs/files/veilvoice-verify/tests-release_manifest.md) | 208 | Roadmap item 97. |
 
-**9,530 functional lines of Rust** in this crate. A functional line is a line
+**9,547 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -189,7 +189,9 @@ counts blank lines and comments too. Both are produced by
 | `struct Extracted` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | What an extracted directory turned out to hold. |
 | `fn directory_for` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | The directory an archive would extract into, by this project's naming. |
 | `fn look_in` | [`extracted.rs`](../../docs/files/veilvoice-verify/extracted.md) | Look in directory for the programs a release carries. |
-| `const HOST` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The only host this will ever talk to. |
+| `const HOST` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | Where a VeilVoice release is fetched from. |
+| `const ORIGINS` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | Every origin this program will ever fetch from. |
+| `fn at_a_known_origin` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | Whether a URL is at one of the origins above. |
 | `const REPO` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The repository releases are fetched from. |
 | `const MAX_BYTES` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | The largest file this will accept. |
 | `fn no_downloader_message` | [`fetch.rs`](../../docs/files/veilvoice-verify/fetch.md) | Say what could not be found, and what to do instead. |

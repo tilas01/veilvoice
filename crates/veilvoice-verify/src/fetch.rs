@@ -62,13 +62,41 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-/// The only host this will ever talk to.
+/// Where a VeilVoice release is fetched from.
 ///
 /// Compiled in rather than accepted as an argument. A verifier that can be
 /// pointed anywhere is a download tool wearing a verifier's name, and the
 /// fingerprint check below is only meaningful against artefacts from the
 /// project it was built for.
 pub const HOST: &str = "https://github.com";
+
+/// Every origin this program will ever fetch from.
+///
+/// The invariant is not "one host". It is that **no URL comes from outside
+/// this binary**: every address fetched is assembled from constants compiled
+/// in here, so what the program can reach is a property of the build a reader
+/// can check rather than of a configuration file, an argument or a redirect
+/// somebody else controls.
+///
+/// One entry today. Roadmap item 163 adds the origins that named companion
+/// builds are published from, and the rule each has to satisfy is the same:
+/// named in the source, with a hash beside it.
+pub const ORIGINS: &[&str] = &[HOST];
+
+/// Whether a URL is at one of the origins above.
+///
+/// Matched as an origin followed by `/`, never as a string prefix. That
+/// distinction is the whole of this function: `https://github.com` is a prefix
+/// of `https://github.com.example.invalid/x`, so a plain `starts_with` accepts
+/// a host somebody else owns whose name merely begins with ours. Nothing
+/// reaches this with an attacker's string today, because every caller builds
+/// its URL from constants, but a check that is only sound because of what its
+/// callers happen to do is one a later caller silently breaks. F-226.
+pub fn at_a_known_origin(url: &str) -> bool {
+    ORIGINS.iter().any(|origin| {
+        url.len() > origin.len() && url.starts_with(origin) && url[origin.len()..].starts_with('/')
+    })
+}
 
 /// The repository releases are fetched from.
 pub const REPO: &str = "tilas01/veilvoice";
@@ -168,11 +196,13 @@ pub fn no_downloader_message() -> String {
 /// Every failure is reported rather than retried. A verifier that quietly
 /// tries again is a verifier whose output does not say what actually happened.
 pub fn download(url: &str, into: &Path) -> Result<PathBuf, String> {
-    if !url.starts_with(HOST) {
+    if !at_a_known_origin(url) {
         // Unreachable through the public API, which builds every URL from the
         // constants above -- but this is the check that keeps that true if
         // somebody adds a caller later.
-        return Err(format!("refusing to fetch from outside {HOST}: {url}"));
+        return Err(format!(
+            "refusing to fetch from outside the compiled-in origins {ORIGINS:?}: {url}"
+        ));
     }
     let Some(downloader) = find_downloader() else {
         return Err(no_downloader_message());
@@ -273,6 +303,21 @@ pub fn valid_asset(name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A host whose name merely begins with ours is a different host.
+    ///
+    /// The case this exists for: `https://github.com.example.invalid/x` is a
+    /// prefix match on `https://github.com` and is somebody else's machine.
+    #[test]
+    fn an_origin_is_matched_as_an_origin_rather_than_as_a_prefix() {
+        assert!(at_a_known_origin("https://github.com/tilas01/veilvoice"));
+        assert!(!at_a_known_origin("https://github.com.example.invalid/x"));
+        assert!(!at_a_known_origin("https://github.community/x"));
+        // The bare origin addresses no file, so there is nothing to fetch.
+        assert!(!at_a_known_origin("https://github.com"));
+        assert!(!at_a_known_origin("http://github.com/x"));
+        assert!(!at_a_known_origin("https://example.invalid/x"));
+    }
 
     #[test]
     fn a_url_outside_the_compiled_in_host_is_refused() {

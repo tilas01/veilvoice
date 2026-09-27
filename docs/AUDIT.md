@@ -1513,6 +1513,42 @@ reproduced the failure character for character, including the two values in the
 assertion. The same run passes with the fix, and so does the run with GNU tar.
 
 
+### F-226: the one-host rule was a string prefix, and a prefix is not a host
+
+Found while widening that rule for roadmap item 163, rather than by anything
+failing.
+
+`fetch::download` refused any URL that did not begin with the compiled-in
+host, written as `url.starts_with(HOST)` with `HOST` being
+`https://github.com`. A host is not a prefix. `https://github.com` is a prefix
+of `https://github.com.example.invalid/x`, which is a machine somebody else
+owns and which that check accepted.
+
+**It was not reachable and is still worth fixing.** Every caller builds its URL
+from the constants beside the check, and `valid_tag` and `valid_asset` refuse
+anything with a slash or a `..` in it, so no string a user or a server supplies
+has ever reached that comparison. The comment above it said as much. But a
+guard that is sound only because of what its callers happen to do today is a
+guard the next caller breaks in silence, and roadmap item 163 is that next
+caller: it adds the origins that named companion builds are fetched from, which
+multiplies the number of prefixes a lookalike host could be built against.
+
+The check is now `at_a_known_origin`, which requires the origin to be followed
+by `/` rather than by anything at all, and it is asked against a list rather
+than a single constant. The regression test names the lookalike case directly:
+`https://github.com.example.invalid/x` and `https://github.community/x` are
+both refused, `https://github.com/tilas01/veilvoice` is accepted, and the bare
+origin with no path is refused because it addresses no file.
+
+**The rule is also now stated as what it actually is.** It was written as "the
+only host this will ever talk to", which roadmap item 163 makes false. What the
+project promises is narrower and stronger: no URL comes from outside the
+binary. Every address fetched is assembled from constants compiled in, so what
+the program can reach is a property of the build a reader can check, rather
+than of a configuration file, an argument, or a redirect somebody else
+controls. That sentence is now in the source where the list lives.
+
+
 ## The half that could have damaged a machine
 
 `uninstall()` ended with `std::fs::remove_dir_all(prefix)`.
@@ -7797,7 +7833,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1826 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1827 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9445,7 +9481,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twenty-five defects found and fixed (F-1 to F-225), across
+**Two hundred and twenty-six defects found and fixed (F-1 to F-226), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
