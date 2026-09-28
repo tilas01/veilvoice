@@ -63,19 +63,19 @@ crates/veilvoice-crypto/src/weave.rs:631:63: replace | with ^ in Weave::undo
 # `u8` already reduces modulo 256, so the `%` is redundant and `+ 256` before a
 # truncating cast changes nothing. Kept in the source because it states the
 # intent; unkillable because the cast does the work either way.
-crates/veilvoice-crypto/src/weave.rs:770:43: replace % with +
+crates/veilvoice-crypto/src/weave.rs:806:43: replace % with +
 
 # The six-bit encoders pack three bytes into one number, each into its own eight
 # bits of a twenty-four bit window. No two of the three share a bit, so `|` and
 # `^` produce the same number.
-crates/veilvoice-crypto/src/weave.rs:994:41: replace | with ^ in sixbit_encode
-crates/veilvoice-crypto/src/weave.rs:994:66: replace | with ^ in sixbit_encode
+crates/veilvoice-crypto/src/weave.rs:1063:41: replace | with ^ in sixbit_encode
+crates/veilvoice-crypto/src/weave.rs:1063:66: replace | with ^ in sixbit_encode
 
 # The base-91 decoder shifts each new value above whatever is still in the
 # queue, and the queue never holds more than `bits` significant bits: it starts
 # empty, and the loop below shifts eight out at a time until fewer than eight
 # remain. So the two operands are disjoint here as well.
-crates/veilvoice-crypto/src/weave.rs:984:26: replace | with ^ in base91_decode
+crates/veilvoice-crypto/src/weave.rs:1051:26: replace | with ^ in base91_decode
 
 # Argon2's ceiling on the number of lanes, which can never be the only test in
 # `checked` that fires. The same function enforces Argon2's eight KiB per lane,
@@ -105,29 +105,29 @@ crates/veilvoice-crypto/src/lock.rs:182:19: delete - in unix_now
 # spare could not be written, which needs a vault whose spare lives somewhere
 # this process cannot write. Creating that state means either running the test
 # as two users or writing under /etc, and neither belongs in a unit test.
-crates/veilvoice-crypto/src/lock.rs:857:9: replace LockStore::every_copy_current -> bool with true
+crates/veilvoice-crypto/src/lock.rs:871:9: replace LockStore::every_copy_current -> bool with true
 
 # `open_default` reads the real per-user lock location. Distinguishing these
 # means writing a lock into the account's own configuration directory, which is
 # a test with a side effect on the machine that runs it.
-crates/veilvoice-crypto/src/lock.rs:874:5: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, true))
-crates/veilvoice-crypto/src/lock.rs:874:5: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, false))
+crates/veilvoice-crypto/src/lock.rs:888:5: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, true))
+crates/veilvoice-crypto/src/lock.rs:888:5: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, false))
 
 # `portable_dir` and `is_portable` answer from a folder beside the running
 # executable. Under `cargo test` that is the test binary in the build
 # directory, so making these answer anything but the default means planting a
 # folder inside `target/`, which a later build removes and which F-185 has just
 # finished arguing should never be written into by hand.
-crates/veilvoice-crypto/src/lock.rs:1058:5: replace portable_dir -> Option<PathBuf> with None
-crates/veilvoice-crypto/src/lock.rs:1113:5: replace is_portable -> bool with true
-crates/veilvoice-crypto/src/lock.rs:1113:5: replace is_portable -> bool with false
+crates/veilvoice-crypto/src/lock.rs:1072:5: replace portable_dir -> Option<PathBuf> with None
+crates/veilvoice-crypto/src/lock.rs:1127:5: replace is_portable -> bool with true
+crates/veilvoice-crypto/src/lock.rs:1127:5: replace is_portable -> bool with false
 
 # `admin_dir` tries to create /etc/veilvoice and answers None when it cannot.
 # On a machine where it can, calling it from a test changes that machine; on
 # one where it cannot, the mutant answering None is what the original already
 # does. Either way there is nothing to observe that is worth the side effect.
-crates/veilvoice-crypto/src/vault.rs:329:5: replace admin_dir -> Option<PathBuf> with None
-crates/veilvoice-crypto/src/vault.rs:329:5: replace admin_dir -> Option<PathBuf> with Some(Default::default())
+crates/veilvoice-crypto/src/vault.rs:363:5: replace admin_dir -> Option<PathBuf> with None
+crates/veilvoice-crypto/src/vault.rs:363:5: replace admin_dir -> Option<PathBuf> with Some(Default::default())
 
 # `fully_locked` asks whether every chunk was locked out of swap. Where the
 # operating system grants every lock, as it does on the machines this runs on,
@@ -146,4 +146,4 @@ crates/veilvoice-crypto/src/tape.rs:157:9: replace Tape::fully_locked -> bool wi
 # the mutant return the same error and nothing observes the difference. The
 # guard stays because the reasoning it encodes is right, and because a
 # filesystem that did behave that way is exactly what it protects against.
-crates/veilvoice-crypto/src/vault.rs:139:23: replace match guard e.kind() == std::io::ErrorKind::NotFound with true in Vault::at
+crates/veilvoice-crypto/src/vault.rs:147:23: replace match guard e.kind() == std::io::ErrorKind::NotFound with true in Vault::at

@@ -124,7 +124,7 @@ flowchart TD
     n_studio["studio.rs<br/>1522 lines"]
     n_tape["tape.rs<br/>391 lines"]
     n_vault["vault.rs<br/>769 lines"]
-    n_weave["weave.rs<br/>1770 lines"]
+    n_weave["weave.rs<br/>1811 lines"]
     n_decoy --> n_lock
     n_decoy --> n_vault
     n_hoard --> n_amnesia
@@ -182,12 +182,12 @@ flowchart TD
 | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1522 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | 391 | A recording held in locked, zeroizing memory while it is still being made. |
 | [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 769 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
-| [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1770 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
+| [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1811 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**8,133 functional lines of Rust** in this crate. A functional line is a line
+**8,151 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

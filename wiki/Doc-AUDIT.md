@@ -1834,14 +1834,58 @@ lines that are correct, which is the failure that gets ignored after the second
 week.
 
 **What the campaign over the whole set found, since it had to be run to say any
-of this.** Ten files, 21 survivors: the two above, and nineteen already argued
-for. The AEAD, the container header, the hybrid combiner and both metadata
-readers have none at all. One survivor in the encodings is genuinely new, a
-comparison in the base-91 encoder, and it is held for the round that can measure
-it against a tree that is not moving underneath it: fourteen commits landed on
-`dev` during the ninety minutes the campaign took, three of them in the very
-files being measured, which is also why the line numbers in the list are left for
-that round rather than corrected against a tree that has already moved on.
+of this.** Ten files, 21 survivors. The AEAD, the container header, the hybrid
+combiner and both metadata readers have none at all. Two are the pair above.
+Eighteen were already argued for, though thirteen of those were recorded at line
+numbers the code had since moved out from under: `weave.rs` alone gained
+sixty-nine lines above one of them. They are corrected here, read off
+`cargo mutants --list`, which enumerates without testing and so answers in
+seconds rather than in the ninety minutes a campaign takes. The twenty-first is
+F-232 below.
+
+**Fourteen commits landed on `dev` while the campaign ran**, three of them in the
+files being measured, which is what made the line numbers in the list stale a
+second time before the first correction could be written. A list keyed on
+absolute line numbers cannot hold still in a repository several people are
+pushing to hourly, and `--lint` cannot tell a stale number from a right one
+because it only asks whether the line exists. Keying each entry on the mutation
+rather than on where it sits would remove the whole class, and is not done here
+because it changes what `check.py` compares and belongs in a round of its own.
+
+### F-232: the base-91 encoder's last character was written by a decision nothing tested
+
+`base91_encode` flushes whatever is left in its queue when the input runs out. It
+writes one character always, and a second only when the leftover will not fit in
+one, which it tests as `bits > 7 || queue > 90`. Changing that second `>` to a
+`>=` survived the whole suite.
+
+**The reason it survived is the reason it matters.** The mutated encoder and the
+original both round trip. Where seven bits are left reading exactly 90, the
+original writes one trailing character and the mutant writes two, and the decoder
+rebuilds the same input from either: one trailing character is completed from
+`pending`, two are read as an ordinary pair, and both paths land on the same
+byte. So every round-trip test agrees with both, and the two forms differ only in
+the bytes on disk. This is F-186's finding in a place F-186 did not reach: a
+round trip tests the pair and not the encoder, and F-186 said so about this very
+file while leaving this one line of it resting on exactly that.
+
+**Nothing in the corpus reaches the state.** The pattern, the counter walking
+every byte value, the all-ones run at every length to sixty-four, and both of the
+inputs already searched out for base-91's thirteen-or-fourteen bit decision all
+leave the queue somewhere else. The two searched inputs are the near miss worth
+naming: they were found for the bit-width test in the middle of the encoder, one
+reaching it on the way in and one on the way out, and neither touches the tail.
+
+A third input was searched for, on the tail state directly, and one turned up
+within a few thousand tries: twenty-two bytes that leave exactly seven bits
+reading exactly 90. It is pinned on the encoded bytes rather than round-tripped,
+because a round trip is the thing that cannot see this, and the test says so
+where it stands. It also decodes the pinned form back to the input, so the vector
+cannot quietly become a fixed string that nothing produces.
+
+**Measured after.** All 41 mutants of `base91_encode` are now caught, where the
+campaign had reported one surviving.
+
 
 ## The half that could have damaged a machine
 
@@ -8127,7 +8171,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1855 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1856 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9775,7 +9819,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and thirty-one defects found and fixed (F-1 to F-231), across
+**Two hundred and thirty-two defects found and fixed (F-1 to F-232), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
