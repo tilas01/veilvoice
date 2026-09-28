@@ -17,8 +17,10 @@ Every crate and every source file, generated from the doc comments in the code b
 
 Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.
 
+- [[`absent.rs`|File-veilvoice-audio-absent]] &middot; The live modules, in a build that has no live capture.
 - [[`devices.rs`|File-veilvoice-audio-devices]] &middot; Enumerating audio devices, and guessing which of them are virtual cables.
 - [[`io.rs`|File-veilvoice-audio-io]] &middot; Reading and writing audio files.
+- [[`kinds.rs`|File-veilvoice-audio-kinds]] &middot; What the live path reports, kept apart from the live path itself.
 - [[`lib.rs`|File-veilvoice-audio-lib]] &middot; Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path.
 - [[`live.rs`|File-veilvoice-audio-live]] &middot; Live microphone scrambling.
 - [[`meter.rs`|File-veilvoice-audio-meter]] &middot; The scale a level meter is drawn on.

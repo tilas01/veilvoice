@@ -46,6 +46,7 @@
 #[cfg(feature = "live")]
 pub mod devices;
 pub mod io;
+pub mod kinds;
 #[cfg(feature = "live")]
 pub mod live;
 #[cfg(feature = "live")]
@@ -69,14 +70,27 @@ pub mod room;
 // a second copy of it in whichever crate still wanted one.
 pub mod meter;
 
-#[cfg(feature = "live")]
+// Roadmap item 162. With `live` off, the same five modules exist and refuse to
+// start anything, so the window builds on the BSDs without a `cfg` on every
+// line of the tabs that would have used them. See `absent`.
+#[cfg(not(feature = "live"))]
+pub mod absent;
+#[cfg(not(feature = "live"))]
+pub use absent::{devices, live, playback, record, room};
+
+/// Whether this build can capture and play sound.
+///
+/// **Roadmap item 162.** A front end asks this to say, before anybody presses
+/// a button, that this platform cannot capture, rather than letting the
+/// refusal be the first they hear of it.
+pub const CAN_CAPTURE: bool = cfg!(feature = "live");
+
 pub use devices::{DeviceInfo, Direction};
 pub use io::Audio;
-#[cfg(feature = "live")]
 pub use live::{Interference, Keeping, Kept, LiveSession, LiveStats, Side};
+pub use record::Recorder;
 #[cfg(feature = "live")]
-pub use record::{Recorder, Sink};
-#[cfg(feature = "live")]
+pub use record::Sink;
 pub use room::{Guest, GuestStats, KeptRoom, RoomSession, RoomStats, MAX_GUESTS};
 
 /// Crate version string, surfaced in the About panel.
@@ -103,6 +117,11 @@ pub enum Error {
     /// Protected memory for a recording could not be prepared or filled.
     #[cfg(feature = "live")]
     Crypto(veilvoice_crypto::Error),
+    /// This build has no live audio at all. **Roadmap item 162.**
+    ///
+    /// Not behind the feature, because it is the one error a build without it
+    /// has to be able to give; the words are `absent::REASON`, which only that build has.
+    NoLiveAudio(&'static str),
     /// The recording is longer than a WAV file can describe. The payload is
     /// how many bytes of audio it holds.
     #[cfg(feature = "live")]
@@ -132,6 +151,7 @@ impl std::fmt::Display for Error {
             #[cfg(feature = "live")]
             Self::Stream(m) => write!(f, "audio stream error: {m}"),
             Self::Engine(m) => write!(f, "de-identification engine error: {m}"),
+            Self::NoLiveAudio(why) => write!(f, "{why}"),
             #[cfg(feature = "live")]
             Self::Crypto(e) => write!(f, "protected memory for the recording: {e}"),
             #[cfg(feature = "live")]

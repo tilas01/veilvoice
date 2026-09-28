@@ -12,13 +12,21 @@ description = "egui/eframe front-end for VeilVoice: Tokyo Night, monospace, thre
 name = "veilvoice-gui"
 path = "src/main.rs"
 
+[features]
+default = ["live"]
+# Live capture: the Studio's recorder, the rooms, the Monitor's level meter and
+# the device lists. **Roadmap item 162.** Off on the BSDs, where `cpal` has no
+# backend; the window still builds there, and the tabs that need a microphone
+# say that this platform cannot capture rather than being quietly missing.
+live = ["veilvoice-audio/live"]
+
 [dependencies]
 # The engine's version and the configuration every tab that runs it is set
 # from.
 veilvoice-core = { path = "../veilvoice-core" }
 # Device enumeration, decoding, playback, and the live session the Studio
 # starts.
-veilvoice-audio = { path = "../veilvoice-audio" }
+veilvoice-audio = { path = "../veilvoice-audio", default-features = false }
 # The app lock, the containers, the recording vault and the page-locked memory
 # a decrypted take lives in.
 veilvoice-crypto = { path = "../veilvoice-crypto" }

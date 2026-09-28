@@ -63,6 +63,7 @@
 //! deadline, so the screen shows how much of that deadline is being used. If it
 //! reaches the top, the computer cannot keep up and the sound will break.
 
+pub use crate::kinds::{GuestStats, RoomStats, MAX_GUESTS};
 use crate::live::{Keeping, Kept};
 use crate::Error;
 use cpal::traits::{DeviceTrait, StreamTrait};
@@ -71,14 +72,6 @@ use ringbuf::HeapRb;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use veilvoice_core::{DeidConfig, Deidentifier};
-
-/// The most microphones one room will open at once.
-///
-/// A bound on the arithmetic rather than a claim about any machine: what a
-/// machine can actually carry is [`RoomStats::load`], measured while it runs.
-/// Eight is past the number of people who can hold one conversation, and every
-/// guest costs a device, a ring, an engine and a place in the mix.
-pub const MAX_GUESTS: usize = 8;
 
 /// One guest: the microphone they speak into and the voice they become.
 pub struct Guest<'a> {
@@ -96,48 +89,6 @@ pub struct Guest<'a> {
     /// What to keep of this guest, if anything. Roadmap item 131's warning about the
     /// unveiled side applies once per guest.
     pub keeping: Keeping,
-}
-
-/// What one guest's half of a running room is doing.
-#[derive(Clone, Copy, Debug, Default)]
-pub struct GuestStats {
-    /// Peak of what arrived from their microphone, since the last read.
-    pub input_peak: f32,
-    /// Peak of what their engine produced, since the last read.
-    pub output_peak: f32,
-    /// Samples dropped because their ring overflowed. Their device is running
-    /// faster than the output, or the output callback is late.
-    pub dropped: u64,
-}
-
-/// What a running room is doing, safe to read from the interface.
-///
-/// Not `Copy`: it holds one entry per guest. Read once a frame, as
-/// [`crate::LiveStats`] is.
-#[derive(Clone, Debug, Default)]
-pub struct RoomStats {
-    /// One per guest, in the order they were given.
-    pub guests: Vec<GuestStats>,
-    /// Peak of the mix **before** it was clipped, since the last read.
-    ///
-    /// Above 1.0 means the guests together went past full scale and the excess
-    /// was cut off. It is reported unclipped on purpose: a meter that showed
-    /// the clipped value would sit at exactly 1.0 and look correct.
-    pub mix_peak: f32,
-    /// Output blocks in which the mix went past full scale.
-    pub clipped: u64,
-    /// Times the output callback found a guest's ring empty and padded with
-    /// silence.
-    pub starved: u64,
-    /// How many times the platform has reported trouble on any of the streams.
-    /// **Roadmap item 132**, the same counter the single-microphone path carries.
-    pub interfered: u64,
-    /// What every engine together costs against the deadline they share.
-    ///
-    /// The sum of each guest's realtime factor. Below 1.0 the machine keeps up;
-    /// at 1.0 the engines have used the whole block, and past it the audio
-    /// breaks. This is the honest account roadmap item 147 asked for.
-    pub load: f32,
 }
 
 /// The recorders a room was asked for.

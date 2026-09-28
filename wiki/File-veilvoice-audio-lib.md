@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/lib.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 258 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs)
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 278 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs)
 
 ## Contents
 
@@ -55,15 +55,15 @@ program are drawing.
 
 ## What this file contains
 
-258 lines defining **5 functions** (1 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+278 lines defining **5 functions** (1 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Error` (line 88) -- Everything that can go wrong in this crate.
+- `enum Error` (line 102) -- Everything that can go wrong in this crate.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `deidentify` (line 164) -- De-identify a whole buffer of audio in one call.
+- `deidentify` (line 184) -- De-identify a whole buffer of audio in one call.
 
 ## What calls what
 
@@ -79,16 +79,16 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_from["Error::from<br/>line 113"]
-    n_from["Error::from<br/>line 119"]
-    n_fmt["Error::fmt<br/>line 125"]
-    n_source["Error::source<br/>line 150"]
-    n_deidentify(["deidentify<br/>line 164"])
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L113" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L119" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L125" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L150" "open the source"
-    click n_deidentify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L164" "open the source"
+    n_from["Error::from<br/>line 132"]
+    n_from["Error::from<br/>line 138"]
+    n_fmt["Error::fmt<br/>line 144"]
+    n_source["Error::source<br/>line 170"]
+    n_deidentify(["deidentify<br/>line 184"])
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L132" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L138" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L144" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L170" "open the source"
+    click n_deidentify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L184" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_deidentify entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -101,10 +101,11 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `VERSION` <sub>pub const</sub> | [83](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L83) | Crate version string, surfaced in the About panel. |
-| `Error` <sub>pub enum</sub> | [88](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L88) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L113) |  |
-| `Error::from` <sub>fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L119) |  |
-| `Error::fmt` <sub>fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L125) |  |
-| `Error::source` <sub>fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L150) |  |
-| `deidentify` <sub>pub fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L164) | De-identify a whole buffer of audio in one call. |
+| `CAN_CAPTURE` <sub>pub const</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L86) | Whether this build can capture and play sound. |
+| `VERSION` <sub>pub const</sub> | [97](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L97) | Crate version string, surfaced in the About panel. |
+| `Error` <sub>pub enum</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L102) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L132) |  |
+| `Error::from` <sub>fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L138) |  |
+| `Error::fmt` <sub>fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L144) |  |
+| `Error::source` <sub>fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L170) |  |
+| `deidentify` <sub>pub fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs#L184) | De-identify a whole buffer of audio in one call. |

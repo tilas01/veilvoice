@@ -56,28 +56,9 @@
 //! guess being right: it decides which device is *suggested*, never which ones you
 //! are allowed to choose.
 
+pub use crate::kinds::{DeviceInfo, Direction};
 use crate::Error;
 use cpal::traits::{DeviceTrait, HostTrait};
-
-/// Which direction a device carries audio.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Direction {
-    /// A capture device (microphone, loopback).
-    Input,
-    /// A playback device (speakers, virtual cable).
-    Output,
-}
-
-/// A device the user can choose.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct DeviceInfo {
-    /// Human-readable device name, as the OS reports it.
-    pub name: String,
-    /// Whether this is the host's default device for its direction.
-    pub is_default: bool,
-    /// Whether the name matches a known virtual audio cable.
-    pub is_virtual_cable: bool,
-}
 
 /// Name fragments used by the common virtual audio cables.
 ///
