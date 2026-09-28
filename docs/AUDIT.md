@@ -743,6 +743,63 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-235: fifteen commits named an assistant, and twenty-five of tilas01's read Unverified
+
+Found by tilas01, looking at GitHub's commit view of `dev` and at who it
+listed as having written two of them.
+
+This repository has one author. `docs/CONTRIBUTING.md` said so, and said that no
+assistant is named in a commit, and nothing checked either. Between 21 and 26
+September fifteen commits reached `dev` naming an assistant: eleven as author and
+committer, four as committer alone. The four were the ones people missed, because
+a log shows the author and a reader checking authorship checks the author. The
+committer is the field GitHub checks a signature against.
+
+**Why a plain commit was wrong.** The cloud containers the work is done in set
+their own identity for git in a config file, and some of them in four
+`GIT_AUTHOR_*` and `GIT_COMMITTER_*` environment variables as well. The variables
+beat every config file, so the fix that looked right, `git config user.name`,
+changed nothing where they were set: `git var GIT_AUTHOR_IDENT` went on
+answering with the container's identity. A commit made there was wrong by
+default and looked, from inside the session, like every other commit.
+
+**Why the correct ones read Unverified.** The same containers sign every commit,
+with a key registered to a different GitHub account. GitHub verifies a signature
+against the committer's account, so a commit signed that way in tilas01's name
+answers `unknown_key`: four of them were read back from GitHub's own API to
+confirm it, and twenty-five commits carrying his name correctly show Unverified
+for exactly that reason. A signature GitHub cannot connect to the committer reads
+worse than no signature, and the commits that did verify were the fifteen in the
+other account's name. Correcting the name alone would have swapped one for the
+other.
+
+Neither `main` nor any release was touched. `main` had not moved since 17
+September, the contributors GitHub lists for the repository were tilas01 alone,
+and every published release tag points at a commit outside both branches.
+
+**What stops it returning.** `tools/audit/authorship.py`, in `tools/verify.py`
+and in CI. It asks git what the *next* commit would say, before it is made,
+because `verify.py` runs before a commit rather than after it; then reads every
+commit about to be pushed, in both fields, and every message for a co-author or
+session trailer, a generated-with footer, or an assistant, its maker or a model
+named anywhere. CI reads every commit a push carried the same way, including a
+force push, which has no meaningful before and is checked against `main`
+instead, and asks GitHub whether it shows each one Verified. Its self-test builds
+a commit for every case, including the committer-only one, and three sound
+commits that must pass, one of them made by GitHub itself on his behalf.
+
+Signatures are read from the signature itself, by the key it names, so the guard
+needs neither GnuPG nor a copy of the public key, and it names the container's
+key when that is what it finds. It reports a missing or foreign signature rather
+than failing on it, for now: `SIGNATURES_REQUIRED` turns on in the commit that
+gives every place a commit is made from a key GitHub verifies as his, and not
+before, because a guard that fails every commit anybody can make is a guard
+somebody switches off.
+
+The history itself is `tools/repo/rewrite.py`: a rewrite of `dev` that makes
+every commit tilas01's, drops the names from the messages, keeps every date and
+every tree byte for byte, and refuses to push anything the guard would refuse.
+
 ### F-231: every unlock kept an empty passphrase, and sealed with it
 
 Found by reading the unlock path in `crates/veilvoice-gui/src/security.rs`
@@ -10018,7 +10075,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and thirty-four defects found and fixed (F-1 to F-234), across
+**Two hundred and thirty-five defects found and fixed (F-1 to F-235), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

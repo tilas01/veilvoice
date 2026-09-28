@@ -345,6 +345,15 @@ CHECKS = [
      [sys.executable, "tools/audit/fixtures.py"]),
     ("that guard catches what it claims to",
      [sys.executable, "tools/audit/fixtures.py", "--self-test"]),
+    # F-235. The other git-reading check. Fifteen commits reached `dev` naming
+    # an assistant as author or committer, because a cloud container presets
+    # its own identity and some set it in variables that beat every config
+    # file. This runs before the commit it protects is made, so it asks git
+    # what the next commit would say as well as reading the unpushed ones.
+    ("every commit to push is tilas01's, and so is the next one",
+     [sys.executable, "tools/audit/authorship.py"]),
+    ("the authorship guard catches what it claims to",
+     [sys.executable, "tools/audit/authorship.py", "--self-test"]),
     # Roadmap item 179. The updater builds a download URL from a platform label,
     # and the labels live in the release workflow as well as in Rust. Drift
     # either way is silent: a platform nothing is offered for, or a build asking

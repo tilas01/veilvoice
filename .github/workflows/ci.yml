@@ -974,3 +974,24 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Fail if any crate reaching pgp gains a private-key code path
         run: python tools/audit/rsa_usage.py
+
+  # F-235. Fifteen commits reached `dev` naming an assistant as author or
+  # committer, and twenty-five in tilas01's name showed Unverified because a
+  # cloud container signed them with a key registered to another account.
+  # `tools/verify.py` stops the next one before it is made; this reads what a
+  # push actually carried, in both fields, and asks GitHub whether it shows
+  # each commit Verified. A force push has no meaningful `before`, so it checks
+  # everything the branch has that `main` lacks.
+  authorship:
+    name: every commit is tilas01's and signed
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Read every pushed commit, and GitHub's verdict on its signature
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BEFORE: ${{ github.event.before }}
+        run: python tools/audit/authorship.py --pushed "$BEFORE" "$GITHUB_SHA" --github
