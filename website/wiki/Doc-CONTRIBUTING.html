@@ -84,12 +84,12 @@
 <h2 id="before-anything-else">Before anything else</h2>
 <p><strong>A security problem does not go here.</strong> Report it privately, the way <a href="https://github.com/tilas01/veilvoice/blob/main/docs/Doc-SECURITY" rel="noopener noreferrer"><code>docs/SECURITY.md</code></a> describes. The ordinary issue tracker is right for everything else, including a bug that is merely embarrassing.</p>
 <h2 id="getting-it-building">Getting it building</h2>
-<p>VeilVoice is a Rust workspace of thirteen crates producing two programs. It needs a recent stable toolchain, and on Linux the audio and windowing headers.</p>
+<p>VeilVoice is a Rust workspace of thirteen crates producing two programs. It needs the toolchain <code>rust-toolchain.toml</code> pins, 1.96.0, which rustup fetches for you on the first build, and on Linux the ALSA headers and <code>pkg-config</code>. Running the desktop application on Linux also needs <code>libxkbcommon-x11-0</code>, which is loaded at startup rather than linked against; <a href="https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL" rel="noopener noreferrer">INSTALL.md</a> has the whole from-source walkthrough, including the package names on Fedora and Arch.</p>
 <pre><code><span class="tok-kw">git</span> clone https://github.com/tilas01/veilvoice
 <span class="tok-kw">cd</span> veilvoice
 
-<span class="tok-com"># Linux only: the headers cpal and the window need.</span>
-<span class="tok-kw">sudo</span> apt-get install -y libasound2-dev libgtk-<span class="tok-num">3</span>-dev libxdo-dev
+<span class="tok-com"># Linux only: the audio headers, and how the build finds them.</span>
+<span class="tok-kw">sudo</span> apt-get install -y libasound2-dev pkg-config
 
 <span class="tok-kw">cargo</span> build --workspace
 <span class="tok-kw">cargo</span> test --workspace</code></pre>

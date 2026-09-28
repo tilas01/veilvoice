@@ -121,6 +121,7 @@ Each of these is a script that fails a build and names the line. They are listed
 |---|---|
 | [`tools/audit/actions.py`](../tools/audit/actions.py) | Every GitHub Action a workflow runs is pinned to a commit, not to a tag |
 | [`tools/audit/build_output.py`](../tools/audit/build_output.py) | No build output lives inside this repository except where it is expected |
+| [`tools/audit/build_prerequisites.py`](../tools/audit/build_prerequisites.py) | What a fresh machine needs before it can build this, said once |
 | [`tools/audit/crate_tables.py`](../tools/audit/crate_tables.py) | Every crate in the workspace appears in every table that lists the crates |
 | [`tools/audit/dependabot.py`](../tools/audit/dependabot.py) | Every manifest in this tree is covered by a Dependabot entry, aimed at `dev` |
 | [`tools/audit/dependencies.py`](../tools/audit/dependencies.py) | Every dependency says what it is for, where it is declared |
@@ -216,6 +217,8 @@ And what it then checks:
 - **the wiki matches the documents, and every link in it resolves**: `python tools/docs/wiki.py --check`
 - **website source pages match their files**: `python tools/docs/sources.py --check`
 - **every published item says what it is for**: `python tools/audit/documented.py`
+- **the build prerequisites are said the same way everywhere**: `python tools/audit/build_prerequisites.py`
+- **that guard catches what it claims to as well**: `python tools/audit/build_prerequisites.py --self-test`
 - **the manual names every command that reaches the network**: `python tools/audit/network_claims.py`
 - **that guard catches what it claims to, including the case it got wrong first**: `python tools/audit/network_claims.py --self-test`
 - **every command is documented, and its window location exists**: `python tools/docs/commands.py --check`

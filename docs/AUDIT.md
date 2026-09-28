@@ -1162,6 +1162,111 @@ roadmap item 169, which is the next item and is now a sweep rather than an
 invention. Said here, and in the module's own doc comment, rather than left for a
 reader to notice the gap and wonder whether anybody had.
 
+### F-234: the page that tells you to build it yourself did not work on a fresh machine
+
+Building VeilVoice from source is the strongest check a person can make on it,
+because it requires trusting no download at all. Section 3 of
+`docs/INSTALL.md` is where a reader is sent to do that, and it said this:
+
+> ```bash
+> git clone https://github.com/tilas01/veilvoice
+> cd veilvoice
+> cargo build --release --workspace
+> ```
+
+On a fresh Linux machine that does not work. `cpal` links against the ALSA
+headers, and without them the build stops partway through somebody else's
+dependency tree with an error about a missing `alsa.pc`. That is not a sentence
+a reader can act on, and the page offered nothing to act on instead. It named no
+packages, and no minimum Rust version either, while `rust-toolchain.toml` pins
+1.96.0 and `eframe` does not compile on anything older. Both of those are
+questions a reader can only answer by failing first.
+
+`docs/CONTRIBUTING.md` did have an `apt-get` line, and it was wrong in the other
+direction:
+
+> ```bash
+> sudo apt-get install -y libasound2-dev libgtk-3-dev libxdo-dev
+> ```
+
+Nothing in this tree has ever depended on libxdo. There is no crate in
+`Cargo.lock` that binds it and there never has been. It omitted `pkg-config`,
+which is how the ALSA headers are found at all, so the line was one package
+short of working and one package longer than necessary at the same time.
+
+#### What the packages actually are, measured rather than argued about
+
+The three workflows install seven packages before building on Linux. The
+temptation was to copy that list into the documentation and call the two
+consistent. It was measured instead, and four of the seven are not needed:
+
+* `libgtk-3-dev`. `crates/veilvoice-gui/Cargo.toml` declares `rfd` with
+  `default-features = false` and the `xdg-portal` feature, which is the desktop
+  portal and deliberately not the GTK backend. What gets built is `ashpd`.
+* `libxkbcommon-dev` and `libwayland-dev`. `eframe` is declared with
+  `default-features = false` and the `wayland` and `x11` features, which reach
+  those libraries through Rust crates and by loading them at run time rather
+  than by linking against headers.
+* `libudev-dev`. No crate in `Cargo.lock` binds udev at all.
+
+On a machine with only `libasound2-dev` and `pkg-config` installed,
+`cargo build --release --workspace` completes and links both binaries. That is
+the measurement, not an inference from the manifests.
+
+A workflow installing four packages it does not need costs a runner a few
+seconds. A document doing it costs the reader something else: they cannot tell
+which of the names in the line is the one somebody guessed, and one of them was.
+So the guide names the two, and names `libxkbcommon-x11-0` separately as the
+thing the window loads at startup and exits without, because that is needed to
+run the application and not to build it, and conflating the two is how a reader
+ends up installing headers to fix a runtime error.
+
+**Narrowing the workflows is not part of this.** It would have to be proven on a
+GitHub runner rather than in a container, and being wrong about it turns every
+branch red. It is worth doing and it is not worth guessing at.
+
+#### What is checked
+
+`tools/audit/build_prerequisites.py`, in `tools/verify.py` and in `ci.yml`. It
+reads the package list out of the step that installs it, by that step's name,
+and holds five things together:
+
+* the three workflows install the same set as each other, since a release built
+  with fewer packages than CI tested with is a release built differently from
+  the thing that was tested;
+* every guide names the same set as every other guide, because two pages that
+  disagree mean one is wrong and a reader cannot tell which;
+* that documented set is contained in what the workflows install, which is the
+  check `libxdo-dev` would have failed for as long as it existed;
+* it contains what the build needs, which is the check the empty page would
+  have failed;
+* and both guides name the pinned toolchain, so the version moves in one place.
+
+The fourth of those is a judgement rather than a measurement, so the guard does
+not simply trust it. It re-reads the window's manifest and fails if the two
+declarations that make GTK unnecessary have changed, naming the package that
+would come back. Turning the GTK file panel on again cannot quietly leave the
+documentation one package short; it stops the build and says why.
+
+Nothing here checks macOS or Windows. That is deliberate: CI builds and tests on
+both with no package installation step at all, so "the toolchain and nothing
+else" is a claim a green build makes several times a day rather than one that
+needs a guard.
+
+#### The shape this shares with F-222 and F-228
+
+Three findings in a row now have been a document describing a program that had
+moved. F-222 was the manual denying that `veilvoice update` existed. F-228 was
+found by running a command the manual had never named. This one was a page whose
+instructions had never been followed on a machine that did not already have the
+packages, which is every machine except the ones the instructions were written
+on.
+
+The pattern is that prose about how to use the program is checked by people
+using the program, and the people reading these pages are the ones who have not
+used it yet. So the check cannot be a reader noticing. Each of the three is now
+a comparison a build makes.
+
 ### F-228: asking for help opened a connection
 
 Found while fixing F-222, by doing the thing F-222 is about. The manual's
@@ -9913,7 +10018,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and thirty-three defects found and fixed (F-1 to F-233), across
+**Two hundred and thirty-four defects found and fixed (F-1 to F-234), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

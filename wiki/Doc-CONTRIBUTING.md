@@ -13,14 +13,19 @@ right for everything else, including a bug that is merely embarrassing.
 ## Getting it building
 
 VeilVoice is a Rust workspace of thirteen crates producing two programs. It
-needs a recent stable toolchain, and on Linux the audio and windowing headers.
+needs the toolchain `rust-toolchain.toml` pins, 1.96.0, which rustup fetches
+for you on the first build, and on Linux the ALSA headers and `pkg-config`.
+Running the desktop application on Linux also needs `libxkbcommon-x11-0`, which
+is loaded at startup rather than linked against;
+[INSTALL.md](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL) has the whole from-source walkthrough, including the
+package names on Fedora and Arch.
 
 ```bash
 git clone https://github.com/tilas01/veilvoice
 cd veilvoice
 
-# Linux only: the headers cpal and the window need.
-sudo apt-get install -y libasound2-dev libgtk-3-dev libxdo-dev
+# Linux only: the audio headers, and how the build finds them.
+sudo apt-get install -y libasound2-dev pkg-config
 
 cargo build --workspace
 cargo test --workspace

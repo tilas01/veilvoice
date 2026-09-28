@@ -567,6 +567,16 @@ jobs:
       # week, and F-223 was found by hand while fixing F-222. Reading the
       # captured help text and asking whether the section names each command is
       # a comparison of two lists, so it is this.
+      # The page a user is sent to in order to build this themselves named no
+      # Linux packages at all, and the contributing page named one nothing
+      # here has ever depended on. Four files say this and they must say it
+      # the same way.
+      - name: The build prerequisites must be said the same way everywhere
+        run: python tools/audit/build_prerequisites.py
+
+      - name: And that guard must catch what it claims to
+        run: python tools/audit/build_prerequisites.py --self-test
+
       - name: The manual must name every command that reaches the network
         run: python tools/audit/network_claims.py
 

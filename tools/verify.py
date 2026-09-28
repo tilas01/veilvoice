@@ -416,6 +416,15 @@ CHECKS = [
     # out what to write is what showed that asking it for help opened a
     # connection. The program's list is the authority and this only reads one
     # way, since the section legitimately mentions commands that reach nothing.
+    # What a fresh machine needs, which four files have said and three of them
+    # said differently. docs/INSTALL.md is the page a user is sent to and it
+    # named no packages at all, so on Linux the build stopped with a linker
+    # error about `alsa.pc`. docs/CONTRIBUTING.md named `libxdo-dev`, which
+    # nothing in this tree has ever depended on.
+    ("the build prerequisites are said the same way everywhere",
+     [sys.executable, "tools/audit/build_prerequisites.py"]),
+    ("that guard catches what it claims to as well",
+     [sys.executable, "tools/audit/build_prerequisites.py", "--self-test"]),
     ("the manual names every command that reaches the network",
      [sys.executable, "tools/audit/network_claims.py"]),
     ("that guard catches what it claims to, including the case it got wrong first",

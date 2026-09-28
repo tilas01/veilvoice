@@ -189,12 +189,31 @@ veilvoice verify --explain     <span class="tok-com"># the difference, at length
 <p>One consequence is recorded honestly rather than buried: that library brings in the <code>rsa</code> crate, which carries <a href="https://rustsec.org/advisories/RUSTSEC-2023-0071" rel="noopener noreferrer">RUSTSEC-2023-0071</a> (the Marvin attack) with no fixed version available. The advisory concerns RSA <strong>private key</strong> operations. This tool only ever verifies a signature against a public key compiled into it -- there is no private key anywhere in this repository, and no secret for a timing side channel to leak. That reasoning is written out in <code>.cargo/audit.toml</code>, and because it is an argument about <em>usage</em> rather than about the crate, CI fails the build if a secret-key or decryption API ever appears in the verifier.</p>
 <hr>
 <h2 id="3-from-source">3. From source</h2>
-<p>A fresh clone needs no secrets and no configuration.</p>
+<p>Building it yourself is the strongest version of checking it: you are not trusting a download at all, only the source you can read. A fresh clone needs no secrets, no keys and no configuration, and nothing in the build reaches the network except cargo fetching the dependencies named in <code>Cargo.lock</code>.</p>
+<h3 id="what-you-need-first">What you need first</h3>
+<p><strong>Rust 1.96.0 or newer.</strong> The repository pins that version in <code>rust-toolchain.toml</code>, so if you install Rust through <a href="https://rustup.rs" rel="noopener noreferrer">rustup</a> the right compiler is fetched for you the first time you build, whatever else you have. If your Rust came from a distribution package it may be older, and the desktop application will not compile on it. <code>rustc --version</code> tells you which one you have.</p>
+<p><strong>Git</strong>, to clone. Or download the source archive from the releases page and skip the clone.</p>
+<p><strong>On Linux, two system packages.</strong> Everything else the build needs is a Rust crate that cargo fetches. On Debian and Ubuntu:</p>
+<pre><code><span class="tok-kw">sudo</span> apt-get install -y libasound2-dev pkg-config</code></pre>
+<p>On Fedora: <code>sudo dnf install alsa-lib-devel pkgconf-pkg-config</code>. On Arch: <code>sudo pacman -S alsa-lib pkgconf</code>. The ALSA headers are what the audio layer links against, and <code>pkg-config</code> is how the build finds them. Without them the build stops with an error about a missing <code>alsa.pc</code>, which is not an obvious way of saying &quot;install the audio headers&quot;, so it is worth doing first.</p>
+<p><strong>On macOS and Windows, nothing beyond the toolchain.</strong> Every release is built and tested on both without installing anything else, so if <code>cargo</code> runs, you have what you need. On Windows that means the MSVC toolchain rustup already asks you to install.</p>
+<h3 id="building-it">Building it</h3>
 <pre><code><span class="tok-kw">git</span> clone https://github.com/tilas01/veilvoice
 <span class="tok-kw">cd</span> veilvoice
 <span class="tok-kw">cargo</span> build --release --workspace</code></pre>
-<p>The binaries land in <code>target/release/</code>. <code>cargo run -p veilvoice-cli -- info</code> reports what the build supports.</p>
-<p>If you want a binary you can compare against the published one, see <a href="https://github.com/tilas01/veilvoice/blob/main/docs/Doc-REPRODUCIBLE-BUILDS" rel="noopener noreferrer">REPRODUCIBLE_BUILDS.md</a>.</p>
+<p>The first build fetches and compiles every dependency and takes a while, on the order of ten minutes on a laptop. Later builds are much faster.</p>
+<h3 id="what-a-finished-build-looks-like">What a finished build looks like</h3>
+<p>The last line cargo prints is:</p>
+<pre><code>    Finished `release` profile [optimized] target(s) in 6m 52s</code></pre>
+<p>and two programs are in <code>target/release/</code>: <code>veilvoice</code>, the command line, and <code>veilvoice-gui</code>, the desktop application. Nothing is installed anywhere else, and nothing outside the folder you cloned into has been written to.</p>
+<p>Check the build by asking it about itself:</p>
+<pre><code>./target/release/veilvoice info</code></pre>
+<p>That prints the version, the release channel and which optional features this build has, and it is also the quickest way to confirm the binary runs at all. It touches no network and reads no configuration.</p>
+<p><strong>One more package to run the desktop application on Linux.</strong> The window loads <code>libxkbcommon-x11</code> at startup and exits without it, in a way that looks like a crash rather than a missing package. Most desktop systems already have it; a server or a container often does not. On Debian and Ubuntu the package is <code>libxkbcommon-x11-0</code>. The command line does not need it.</p>
+<h3 id="if-you-want-to-compare-your-build-against-the-published-one">If you want to compare your build against the published one</h3>
+<p>A build from the same source is not automatically byte-for-byte identical to the release, and <a href="https://github.com/tilas01/veilvoice/blob/main/docs/Doc-REPRODUCIBLE-BUILDS" rel="noopener noreferrer">REPRODUCIBLE_BUILDS.md</a> explains what has to match for it to be and how to check.</p>
+<h3 id="if-you-want-to-work-on-it">If you want to work on it</h3>
+<p><a href="https://github.com/tilas01/veilvoice/blob/main/docs/Doc-CONTRIBUTING" rel="noopener noreferrer">CONTRIBUTING.md</a> covers the test suite, the checks that run before a push, and the house rules. The build above is the same one, so nothing here has to be undone first.</p>
 <hr>
 <h2 id="4-after-you-have-it-portable-or-installed">4. After you have it: portable, or installed</h2>
 <p>Once VeilVoice is unpacked it runs. Nothing has to be installed, nothing is written outside the folder, and deleting the folder removes it. <strong>Portable is the normal case</strong>, not a lesser one.</p>
