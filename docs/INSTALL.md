@@ -343,7 +343,42 @@ appears in the verifier.
 
 ## 3. From source
 
-A fresh clone needs no secrets and no configuration.
+Building it yourself is the strongest version of checking it: you are not
+trusting a download at all, only the source you can read. A fresh clone needs
+no secrets, no keys and no configuration, and nothing in the build reaches the
+network except cargo fetching the dependencies named in `Cargo.lock`.
+
+### What you need first
+
+**Rust 1.96.0 or newer.** The repository pins that version in
+`rust-toolchain.toml`, so if you install Rust through
+[rustup](https://rustup.rs) the right compiler is fetched for you the first
+time you build, whatever else you have. If your Rust came from a distribution
+package it may be older, and the desktop application will not compile on it.
+`rustc --version` tells you which one you have.
+
+**Git**, to clone. Or download the source archive from the releases page and
+skip the clone.
+
+**On Linux, two system packages.** Everything else the build needs is a Rust
+crate that cargo fetches. On Debian and Ubuntu:
+
+```bash
+sudo apt-get install -y libasound2-dev pkg-config
+```
+
+On Fedora: `sudo dnf install alsa-lib-devel pkgconf-pkg-config`. On Arch:
+`sudo pacman -S alsa-lib pkgconf`. The ALSA headers are what the audio layer
+links against, and `pkg-config` is how the build finds them. Without them the
+build stops with an error about a missing `alsa.pc`, which is not an obvious
+way of saying "install the audio headers", so it is worth doing first.
+
+**On macOS and Windows, nothing beyond the toolchain.** Every release is built
+and tested on both without installing anything else, so if `cargo` runs, you
+have what you need. On Windows that means the MSVC toolchain rustup already
+asks you to install.
+
+### Building it
 
 ```bash
 git clone https://github.com/tilas01/veilvoice
@@ -351,11 +386,48 @@ cd veilvoice
 cargo build --release --workspace
 ```
 
-The binaries land in `target/release/`. `cargo run -p veilvoice-cli -- info`
-reports what the build supports.
+The first build fetches and compiles every dependency and takes a while, on the
+order of ten minutes on a laptop. Later builds are much faster.
 
-If you want a binary you can compare against the published one, see
-[REPRODUCIBLE_BUILDS.md](REPRODUCIBLE_BUILDS.md).
+### What a finished build looks like
+
+The last line cargo prints is:
+
+```
+    Finished `release` profile [optimized] target(s) in 6m 52s
+```
+
+and two programs are in `target/release/`: `veilvoice`, the command line, and
+`veilvoice-gui`, the desktop application. Nothing is installed anywhere else,
+and nothing outside the folder you cloned into has been written to.
+
+Check the build by asking it about itself:
+
+```bash
+./target/release/veilvoice info
+```
+
+That prints the version, the release channel and which optional features this
+build has, and it is also the quickest way to confirm the binary runs at all.
+It touches no network and reads no configuration.
+
+**One more package to run the desktop application on Linux.** The window loads
+`libxkbcommon-x11` at startup and exits without it, in a way that looks like a
+crash rather than a missing package. Most desktop systems already have it; a
+server or a container often does not. On Debian and Ubuntu the package is
+`libxkbcommon-x11-0`. The command line does not need it.
+
+### If you want to compare your build against the published one
+
+A build from the same source is not automatically byte-for-byte identical to
+the release, and [REPRODUCIBLE_BUILDS.md](REPRODUCIBLE_BUILDS.md) explains what
+has to match for it to be and how to check.
+
+### If you want to work on it
+
+[CONTRIBUTING.md](CONTRIBUTING.md) covers the test suite, the checks that run
+before a push, and the house rules. The build above is the same one, so nothing
+here has to be undone first.
 
 ---
 

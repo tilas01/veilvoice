@@ -67,7 +67,13 @@ const ALLOWED_LINK_HOSTS = [
   // refuses outright whatever is in this list.
   "crates.io", "pipewire.org", "jackaudio.org", "sndio.org",
   "gitlab.freedesktop.org", "man.netbsd.org",
-  "vac.muzychenko.net", "existential.audio", "rogueamoeba.com"
+  "vac.muzychenko.net", "existential.audio", "rogueamoeba.com",
+  // Where the from-source guide sends a reader to get the pinned compiler.
+  // Same category as crates.io above: the official installer for the language
+  // this is written in, followed on purpose, never loaded by a page. Telling
+  // somebody to "install Rust through rustup" without saying where is an
+  // instruction that ends in a search engine.
+  "rustup.rs"
 ];
 
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input",
