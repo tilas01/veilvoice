@@ -67,6 +67,17 @@ def selections():
         arguments = match.group(1).strip()
         if arguments not in found:
             found.append(arguments)
+    # The BSD jobs build inside a VM and write their `cargo build` lines out
+    # rather than through CARGO_ARGS. Roadmap item 162 added the window to the
+    # FreeBSD one, without live capture, and that selection is built nowhere
+    # else: read here, it is compiled on Linux on every push, which is the
+    # closest this repository can get to a FreeBSD build without the VM.
+    for match in re.finditer(
+        r"cargo build --release --locked (-p [\w-]+ --no-default-features)", body
+    ):
+        arguments = match.group(1).strip()
+        if arguments not in found:
+            found.append(arguments)
     return found
 
 

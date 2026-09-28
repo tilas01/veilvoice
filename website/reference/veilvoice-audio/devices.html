@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/devices.svg" alt="devices.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/devices.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 257 lines &middot; <a href="devices.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 238 lines &middot; <a href="devices.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -98,19 +98,15 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>257 lines defining <strong>6 functions</strong> (4 public), <strong>2 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
-<p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Direction</code> <span style="color:var(--muted)">line 64</span> &middot; Which direction a device carries audio.</li>
-<li><code>struct DeviceInfo</code> <span style="color:var(--muted)">line 73</span> &middot; A device the user can choose.</li>
-</ul>
+<p>238 lines defining <strong>6 functions</strong> (4 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>find_virtual_cable</code> <span style="color:var(--muted)">line 154</span> &middot; Find the first output device that looks like a virtual audio cable.
+<li><code>find_virtual_cable</code> <span style="color:var(--muted)">line 135</span> &middot; Find the first output device that looks like a virtual audio cable.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>list</code>, <code>looks_virtual</code>, <code>name_of_opt</code></span>
 </li>
-<li><code>name_of</code> <span style="color:var(--muted)">line 164</span> &middot; The name of an opened device, or a placeholder when the OS will not say.
+<li><code>name_of</code> <span style="color:var(--muted)">line 145</span> &middot; The name of an opened device, or a placeholder when the OS will not say.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>name_of_opt</code></span>
 </li>
-<li><code>open</code> <span style="color:var(--muted)">line 169</span> &middot; Look up a device by exact name, or the host default when name is None.
+<li><code>open</code> <span style="color:var(--muted)">line 150</span> &middot; Look up a device by exact name, or the host default when name is None.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>name_of_opt</code></span>
 </li>
 </ul>
@@ -136,32 +132,32 @@
 <a href="devices.src.html#fn-looks_virtual">
 <rect x="28.0" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="94.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">looks_virtual</text>
-<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 106</text>
+<text x="94.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 87</text>
 </a>
 <a href="devices.src.html#fn-name_of_opt">
 <rect x="186.8" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="245.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">name_of_opt</text>
-<text x="245.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 116</text>
+<text x="245.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 97</text>
 </a>
 <a href="devices.src.html#fn-list">
 <rect x="329.4" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="375.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list</text>
-<text x="375.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 121</text>
+<text x="375.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 102</text>
 </a>
 <a href="devices.src.html#fn-find_virtual_cable">
 <rect x="447.9" y="20.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="534.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">find_virtual_cable</text>
-<text x="534.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 154</text>
+<text x="534.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 135</text>
 </a>
 <a href="devices.src.html#fn-name_of">
 <rect x="219.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="265.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">name_of</text>
-<text x="265.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 164</text>
+<text x="265.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 145</text>
 </a>
 <a href="devices.src.html#fn-open">
 <rect x="337.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="383.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open</text>
-<text x="383.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 169</text>
+<text x="383.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -180,23 +176,23 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_looks_virtual[&quot;looks_virtual&lt;br/&gt;line 106&quot;]
-    n_name_of_opt[&quot;name_of_opt&lt;br/&gt;line 116&quot;]
-    n_list[&quot;list&lt;br/&gt;line 121&quot;]
-    n_find_virtual_cable([&quot;find_virtual_cable&lt;br/&gt;line 154&quot;])
-    n_name_of([&quot;name_of&lt;br/&gt;line 164&quot;])
-    n_open([&quot;open&lt;br/&gt;line 169&quot;])
+    n_looks_virtual[&quot;looks_virtual&lt;br/&gt;line 87&quot;]
+    n_name_of_opt[&quot;name_of_opt&lt;br/&gt;line 97&quot;]
+    n_list[&quot;list&lt;br/&gt;line 102&quot;]
+    n_find_virtual_cable([&quot;find_virtual_cable&lt;br/&gt;line 135&quot;])
+    n_name_of([&quot;name_of&lt;br/&gt;line 145&quot;])
+    n_open([&quot;open&lt;br/&gt;line 150&quot;])
     n_find_virtual_cable --&gt; n_list
     n_list --&gt; n_looks_virtual
     n_list --&gt; n_name_of_opt
     n_name_of --&gt; n_name_of_opt
     n_open --&gt; n_name_of_opt
-    click n_looks_virtual href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L106&quot; &quot;open the source&quot;
-    click n_name_of_opt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L116&quot; &quot;open the source&quot;
-    click n_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L121&quot; &quot;open the source&quot;
-    click n_find_virtual_cable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L154&quot; &quot;open the source&quot;
-    click n_name_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L164&quot; &quot;open the source&quot;
-    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L169&quot; &quot;open the source&quot;
+    click n_looks_virtual href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L87&quot; &quot;open the source&quot;
+    click n_name_of_opt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L97&quot; &quot;open the source&quot;
+    click n_list href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L102&quot; &quot;open the source&quot;
+    click n_find_virtual_cable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L135&quot; &quot;open the source&quot;
+    click n_name_of href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L145&quot; &quot;open the source&quot;
+    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs#L150&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_find_virtual_cable,n_name_of,n_open entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -209,15 +205,13 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Direction</code> <sub>pub enum</sub></td><td><a href="devices.src.html#fn-direction">64</a></td><td>Which direction a device carries audio.</td></tr>
-<tr><td><code>DeviceInfo</code> <sub>pub struct</sub></td><td><a href="devices.src.html#fn-deviceinfo">73</a></td><td>A device the user can choose.</td></tr>
-<tr><td><code>VIRTUAL_CABLE_HINTS</code> <sub>const</sub></td><td><a href="devices.src.html#fn-virtual_cable_hints">89</a></td><td>Name fragments used by the common virtual audio cables.</td></tr>
-<tr><td><code>looks_virtual</code> <sub>fn</sub></td><td><a href="devices.src.html#fn-looks_virtual">106</a></td><td>Whether a device&#x27;s name suggests it is a virtual cable rather than real hardware.</td></tr>
-<tr><td><code>name_of_opt</code> <sub>fn</sub></td><td><a href="devices.src.html#fn-name_of_opt">116</a></td><td>A device&#x27;s name as the platform reports it, or None when it will not say.</td></tr>
-<tr><td><code>list</code> <sub>pub fn</sub></td><td><a href="devices.src.html#fn-list">121</a></td><td>List the devices available in one direction.</td></tr>
-<tr><td><code>find_virtual_cable</code> <sub>pub fn</sub></td><td><a href="devices.src.html#fn-find_virtual_cable">154</a></td><td>Find the first output device that looks like a virtual audio cable.</td></tr>
-<tr><td><code>name_of</code> <sub>pub fn</sub></td><td><a href="devices.src.html#fn-name_of">164</a></td><td>The name of an opened device, or a placeholder when the OS will not say.</td></tr>
-<tr><td><code>open</code> <sub>pub fn</sub></td><td><a href="devices.src.html#fn-open">169</a></td><td>Look up a device by exact name, or the host default when name is None.</td></tr>
+<tr><td><code>VIRTUAL_CABLE_HINTS</code> <sub>const</sub></td><td><a href="devices.src.html#fn-virtual_cable_hints">70</a></td><td>Name fragments used by the common virtual audio cables.</td></tr>
+<tr><td><code>looks_virtual</code> <sub>fn</sub></td><td><a href="devices.src.html#fn-looks_virtual">87</a></td><td>Whether a device&#x27;s name suggests it is a virtual cable rather than real hardware.</td></tr>
+<tr><td><code>name_of_opt</code> <sub>fn</sub></td><td><a href="devices.src.html#fn-name_of_opt">97</a></td><td>A device&#x27;s name as the platform reports it, or None when it will not say.</td></tr>
+<tr><td><code>list</code> <sub>pub fn</sub></td><td><a href="devices.src.html#fn-list">102</a></td><td>List the devices available in one direction.</td></tr>
+<tr><td><code>find_virtual_cable</code> <sub>pub fn</sub></td><td><a href="devices.src.html#fn-find_virtual_cable">135</a></td><td>Find the first output device that looks like a virtual audio cable.</td></tr>
+<tr><td><code>name_of</code> <sub>pub fn</sub></td><td><a href="devices.src.html#fn-name_of">145</a></td><td>The name of an opened device, or a placeholder when the OS will not say.</td></tr>
+<tr><td><code>open</code> <sub>pub fn</sub></td><td><a href="devices.src.html#fn-open">150</a></td><td>Look up a device by exact name, or the host default when name is None.</td></tr>
 </tbody></table>
 </section>
 </div></div>

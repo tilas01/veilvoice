@@ -346,11 +346,15 @@ jobs:
       # exists, and read inside the VM.
       - name: Pin the build timestamp for the VM
         run: git log -1 --pretty=%ct > .source-date-epoch
-      - name: Build the CLI in a FreeBSD VM
+      - name: Build the CLI and the window in a FreeBSD VM
         uses: vmactions/freebsd-vm@4469451fe39bee80be4066836c5170362e9349f3 # v1
         with:
           usesh: true
-          prepare: pkg install -y rust
+          # The window's libraries as well as the compiler: roadmap item 162
+          # builds `veilvoice-gui` here too. X11 and Wayland are loaded when
+          # the window opens rather than linked, so these are what it finds
+          # at run time on a desktop, and what the build's pkg-config asks for.
+          prepare: pkg install -y rust pkgconf libxkbcommon libX11 libXcursor libXrandr libXi wayland mesa-libs
           run: |
             set -e
             # The same three things the other ten platforms do to make a build
@@ -364,6 +368,15 @@ jobs:
             cargo build --release --locked -p veilvoice-cli --no-default-features
             ./target/release/veilvoice info
             cp target/release/veilvoice "$HOME/vv-first"
+            # Roadmap item 162: the window, without live capture. Its own
+            # step inside the VM, and allowed to fail on its own: a window
+            # that does not build must not cost FreeBSD its command line,
+            # which is the half people already rely on.
+            if cargo build --release --locked -p veilvoice-gui --no-default-features; then
+              cp target/release/veilvoice-gui "$HOME/vvg-first"
+            else
+              echo "::warning::veilvoice-gui did not build on FreeBSD; the archive carries the command line only"
+            fi
 
             # Build again from a copy at a different path. This is the whole
             # check: if the two differ, something in the build depends on where
@@ -376,8 +389,18 @@ jobs:
             src_b="$(pwd -P)"
             export RUSTFLAGS="--remap-path-prefix=$src_b=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
             cargo build --release --locked -p veilvoice-cli --no-default-features
+            if [ -f "$HOME/vvg-first" ]; then
+              cargo build --release --locked -p veilvoice-gui --no-default-features
+            fi
 
-            if cmp -s "$HOME/vv-first" target/release/veilvoice; then
+            # Both programs are compared when both were built: a reproducible
+            # command line beside a window nobody checked would be half a
+            # claim, printed as the whole of one.
+            window_same=yes
+            if [ -f "$HOME/vvg-first" ] && ! cmp -s "$HOME/vvg-first" target/release/veilvoice-gui; then
+              window_same=no
+            fi
+            if cmp -s "$HOME/vv-first" target/release/veilvoice && [ "$window_same" = yes ]; then
               echo reproducible > "$src_a/.repro-verdict"
             else
               # Said in as many words rather than dropped: a platform that stops
@@ -392,6 +415,9 @@ jobs:
           out="veilvoice-${{ env.VERSION_TAG }}-freebsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
+          if [ -f target/release/veilvoice-gui ]; then
+            cp target/release/veilvoice-gui "dist/$out/"
+          fi
           cp README.md LICENSE "dist/$out/"
           cp -r docs "dist/$out/docs"
           # The per-file documentation references a generated SVG banner for
@@ -404,9 +430,12 @@ jobs:
           # conventions as Linux, so they get the same icon set.
           cp -r assets/linux "dist/$out/desktop"
           {
-            echo "This FreeBSD build has no live microphone scrambling: cpal, the"
-            echo "audio device library, has no BSD backend. Everything else works:"
-            echo "anonymise, clean, encrypt, decrypt, keygen."
+            echo "This FreeBSD build has no live audio: cpal, the audio device"
+            echo "library, has no BSD backend. So there is no live microphone"
+            echo "scrambling, and the window's Studio cannot record or play back."
+            echo "Everything else works: anonymise, clean, encrypt, decrypt, keygen,"
+            echo "and, where veilvoice-gui is in this archive, the window itself,"
+            echo "which says in its Studio that this platform cannot capture."
             echo
             echo "Run 'veilvoice info' to confirm what this binary supports."
           } > "dist/$out/FREEBSD-NOTES.txt"
