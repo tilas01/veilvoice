@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/layout.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 473 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 569 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs)
 
 ## Contents
 
@@ -64,7 +64,7 @@ like permanently.
 
 ## What this file contains
 
-473 lines defining **4 functions** (4 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+569 lines defining **6 functions** (6 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -72,10 +72,12 @@ like permanently.
 - `column` (line 138) -- A fixed-width column inside a row, so what follows it starts at one x.
 - `button_height` (line 174) -- The height this style gives a button: its own text, plus its own padding.
 - `lock_button` (line 184) -- A button that locks or unlocks: one width, and the height of its neighbour.
+- `chip_value` (line 228) -- chip, for the common case of choosing one value out of several.
+  - reaches: `chip`
 
 ## What calls what
 
-_Colour key: **entry** -- a way in: public, and nothing in this file calls it._
+_Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file._
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/diagrams/veilvoice-gui/layout.svg" alt="what calls what in layout.rs" width="640">
@@ -91,12 +93,19 @@ flowchart TD
     n_column(["column<br/>line 138"])
     n_button_height(["button_height<br/>line 174"])
     n_lock_button(["lock_button<br/>line 184"])
+    n_chip["chip<br/>line 218"]
+    n_chip_value(["chip_value<br/>line 228"])
+    n_chip_value --> n_chip
     click n_centred_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L60" "open the source"
     click n_column href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L138" "open the source"
     click n_button_height href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L174" "open the source"
     click n_lock_button href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L184" "open the source"
+    click n_chip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L218" "open the source"
+    click n_chip_value href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L228" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_centred_row,n_column,n_button_height,n_lock_button entry
+    class n_centred_row,n_column,n_button_height,n_lock_button,n_chip_value entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_chip api
 ```
 
 </details>
@@ -110,3 +119,5 @@ flowchart TD
 | `LOCK_WIDTH` <sub>pub const</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L162) | The width of every control that locks or unlocks the application. |
 | `button_height` <sub>pub fn</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L174) | The height this style gives a button: its own text, plus its own padding. |
 | `lock_button` <sub>pub fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L184) | A button that locks or unlocks: one width, and the height of its neighbour. |
+| `chip` <sub>pub fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L218) | One of a row of options, sized the same whether it is hovered or not. |
+| `chip_value` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L228) | chip, for the common case of choosing one value out of several. |

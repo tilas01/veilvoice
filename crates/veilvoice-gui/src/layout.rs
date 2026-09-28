@@ -185,6 +185,60 @@ pub fn lock_button<'a>(text: egui::RichText, height: f32) -> egui::Button<'a> {
     egui::Button::new(text).min_size(egui::vec2(LOCK_WIDTH, height))
 }
 
+/// One of a row of options, sized the same whether it is hovered or not.
+///
+/// # What this is for
+///
+/// **Roadmap item 168, F-233.** `ui.selectable_label` is
+/// `egui::Button::selectable`, which sets `frame_when_inactive(false)`: an
+/// unselected option is laid out *without* its frame, and the frame carries a
+/// one-point stroke. So the moment the pointer arrives the option is allocated
+/// two points wider and two points taller, its own text moves a point down and
+/// to the right, and every control after it in the row shifts along.
+///
+/// That is the pixel roadmap item 168 opens with, and it was in every row of
+/// options in the window: the three checker choices in Verify, the sealing
+/// choices in Security, the device lists, the keep-this-many choice in the
+/// Studio, the hidden-volume choices in Storage, the voice modes in Group and
+/// ten rows of Settings.
+///
+/// # Why the frame is always allocated rather than the stroke made invisible
+///
+/// The alternatives were to drop the hover stroke, which is the affordance that
+/// says a thing can be pressed, or to make the inactive stroke transparent,
+/// which does not help: egui drops the whole frame when inactive rather than
+/// drawing it in a different colour, so there is nothing for a transparent
+/// stroke to hold open.
+///
+/// Allocating the frame in every state costs an outline around an option at
+/// rest, which reads as a control rather than as a word, and gives the row one
+/// height: the same 27 points a button has, because it is the same frame. Hover
+/// then changes the fill and the stroke's colour and nothing about the shape,
+/// which is exactly the rule roadmap item 168 asks for.
+pub fn chip<'a>(selected: bool, text: impl egui::IntoAtoms<'a>) -> egui::Button<'a> {
+    egui::Button::selectable(selected, text).frame_when_inactive(true)
+}
+
+/// [`chip`], for the common case of choosing one value out of several.
+///
+/// The body is `egui::Ui::selectable_value`'s, including `mark_changed`, which a
+/// caller that watches the response for a change depends on. It is written out
+/// here rather than left to that method because that method is the one with the
+/// defect: see [`chip`].
+pub fn chip_value<'a, Value: PartialEq>(
+    ui: &mut Ui,
+    current: &mut Value,
+    value: Value,
+    text: impl egui::IntoAtoms<'a>,
+) -> egui::Response {
+    let mut response = ui.add(chip(*current == value, text));
+    if response.clicked() && *current != value {
+        *current = value;
+        response.mark_changed();
+    }
+    response
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -222,6 +276,48 @@ mod tests {
             });
         }
         (lefts[0], lefts[1], available)
+    }
+
+    /// **Roadmap item 168.** Selecting an option does not change its size.
+    ///
+    /// The hover half of that rule is guarded over whole panels in
+    /// `crate::row_tests`; this is the selection half, asserted where the helper
+    /// is, because it is a property of [`chip`] rather than of any panel. Both
+    /// come from the same mechanism: `egui::Button::selectable` lays out the
+    /// frame only in the states it draws it in, so a chip that was not framed at
+    /// rest grew when it became selected too, and a row of options shuffled
+    /// sideways as the choice moved along it.
+    #[test]
+    fn a_chip_is_the_same_size_selected_or_not() {
+        fn size(selected: bool) -> egui::Vec2 {
+            let ctx = egui::Context::default();
+            crate::theme::install(&ctx);
+            let mut measured = egui::Vec2::ZERO;
+            for _ in 0..2 {
+                let _ = crate::headless_frame(&ctx, input(400.0), |ui| {
+                    egui::CentralPanel::default().show(ui, |ui| {
+                        measured = ui.add(chip(selected, "an option")).rect.size();
+                    });
+                });
+            }
+            measured
+        }
+
+        let (at_rest, chosen) = (size(false), size(true));
+        assert!(
+            (at_rest - chosen).length() < 0.5,
+            "an option is {at_rest:?} unselected and {chosen:?} selected, so the \
+             row it is in moves when the choice moves"
+        );
+        // And it is the height of a button, since it is drawn with a button's
+        // frame: that is what puts a row of options and the button beside them
+        // on one line rather than two heights one point apart.
+        assert!(
+            at_rest.y > 20.0,
+            "an option is only {:.1} high, so it is not carrying a frame and the \
+             row it sits in will not match a button",
+            at_rest.y
+        );
     }
 
     /// The row lands in the middle once its width is known.

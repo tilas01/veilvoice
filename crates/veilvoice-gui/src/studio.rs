@@ -1791,7 +1791,10 @@ impl Studio {
                     let chosen = self.selected.as_deref() == Some(entry.id.as_str());
                     ui.horizontal(|ui| {
                         if ui
-                            .selectable_label(chosen, RichText::new(&entry.name).strong())
+                            .add(crate::layout::chip(
+                                chosen,
+                                RichText::new(&entry.name).strong(),
+                            ))
                             .clicked()
                         {
                             act = Some(Act::Select(entry.id.clone()));
@@ -2092,7 +2095,7 @@ impl Studio {
         ui.label(RichText::new("what to keep").color(p::blue()).small());
         ui.horizontal(|ui| {
             for choice in [Keep::Veiled, Keep::Both, Keep::Plain] {
-                ui.selectable_value(&mut self.keep, choice, choice.label());
+                crate::layout::chip_value(ui, &mut self.keep, choice, choice.label());
             }
         });
         ui.label(

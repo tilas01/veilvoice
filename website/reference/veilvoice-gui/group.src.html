@@ -608,7 +608,7 @@
 <span class="ln" id="L495">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
 <span class="ln" id="L496">            <span class="tok-kw">for</span> one <span class="tok-kw">in</span> veilvoice_policy::workspace::BUILT_IN {</span>
 <span class="ln" id="L497">                <span class="tok-kw">let</span> chosen = <span class="tok-kw">self</span>.profile == one.id;</span>
-<span class="ln" id="L498">                <span class="tok-kw">if</span> ui.<span class="tok-fn">selectable_label</span>(chosen, one.name).<span class="tok-fn">clicked</span>() &amp;&amp; !chosen {</span>
+<span class="ln" id="L498">                <span class="tok-kw">if</span> ui.<span class="tok-fn">add</span>(<span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip</span>(chosen, one.name)).<span class="tok-fn">clicked</span>() &amp;&amp; !chosen {</span>
 <span class="ln" id="L499">                    <span class="tok-kw">self</span>.<span class="tok-fn">apply_profile</span>(one);</span>
 <span class="ln" id="L500">                }</span>
 <span class="ln" id="L501">            }</span>
@@ -758,7 +758,7 @@
 <span class="ln" id="L639">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
 <span class="ln" id="L640">            <span class="tok-kw">for</span> mode <span class="tok-kw">in</span> [VoiceMode::Distinct, VoiceMode::Uniform] {</span>
 <span class="ln" id="L641">                <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L642">                    .<span class="tok-fn">selectable_label</span>(<span class="tok-kw">self</span>.voices == mode, mode.<span class="tok-fn">label</span>())</span>
+<span class="ln" id="L642">                    .<span class="tok-fn">add</span>(<span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip</span>(<span class="tok-kw">self</span>.voices == mode, mode.<span class="tok-fn">label</span>()))</span>
 <span class="ln" id="L643">                    .<span class="tok-fn">clicked</span>()</span>
 <span class="ln" id="L644">                    &amp;&amp; <span class="tok-kw">self</span>.voices != mode</span>
 <span class="ln" id="L645">                {</span>
@@ -1252,7 +1252,7 @@
 <span class="ln" id="L1113">                .<span class="tok-fn">selected_text</span>(<span class="tok-kw">self</span>.theme.name)</span>
 <span class="ln" id="L1114">                .<span class="tok-fn">show_ui</span>(ui, |ui| {</span>
 <span class="ln" id="L1115">                    <span class="tok-kw">for</span> palette <span class="tok-kw">in</span> veilvoice_video::palette::PALETTES {</span>
-<span class="ln" id="L1116">                        ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.theme, palette, palette.name);</span>
+<span class="ln" id="L1116">                        <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.theme, palette, palette.name);</span>
 <span class="ln" id="L1117">                    }</span>
 <span class="ln" id="L1118">                });</span>
 <span class="ln" id="L1119">            ui.<span class="tok-fn">label</span>(</span>

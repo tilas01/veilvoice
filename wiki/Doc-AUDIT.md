@@ -875,6 +875,103 @@ deleted for failing on a busy runner, which is how F-220 says timing tests
 usually end. After the change, four consecutive runs with `RUST_BACKTRACE=1`
 passed.
 
+### F-233: an option was laid out without its border until the pointer arrived
+
+Roadmap item 168, and the guard was written first on purpose.
+
+The item opens with "hovering a label shifts it by a pixel, because the hover
+state changes a weight or a padding rather than only a colour". That is a
+description of a symptom somebody noticed, and the obvious way to work it is to
+read the interface looking for the place that changes a weight. There is no such
+place in this crate: every hover colour comes from one theme, and nothing here
+reads a hover state at all.
+
+So it was measured instead.
+
+**How the measuring works.** egui knows where every control ended up, in
+`WidgetRects`, for its own hit testing, and that is `pub(crate)`. From outside
+egui the honest record of where a control was put is what was painted, so the
+guard reads the paint list of a headless frame. Every interactive control in this
+interface paints a background, because the theme gives the four interactive
+states a fill, a stroke and a corner radius; a label paints none, which is
+exactly the set this item is about. Rectangles are then gathered into rows by
+vertical overlap, so no list of rows has to be kept up to date, and three kinds
+are dropped with a reason each: the panel fill and the cards are scenery and fall
+outside a control's height band, a checkbox's tick box is *inside* its own widget
+rectangle and is a part rather than a neighbour, and a hairline is under six
+points.
+
+It failed on its first run, in the Verify tab, and said exactly what was wrong:
+a row holding controls 25 and 27 points high, with their centres a point apart,
+and with the pointer over the first of them a control at [8, 476] measuring
+182.4x25.0 became 184.4x27.0.
+
+**The cause, which is one line of egui.** `ui.selectable_label` is
+`egui::Button::selectable`, which sets `frame_when_inactive(false)`. Inside
+`Button::ui`:
+
+    layout = if has_frame_margin && (state != Inactive || frame_when_inactive) {
+        layout.frame(frame)
+    } else {
+        layout.frame(Frame::new().inner_margin(frame.inner_margin))
+    };
+
+An unselected option is laid out with the frame's *margin* and without the frame,
+and the frame carries a one-point stroke that counts towards its size. So the
+moment the pointer arrives the option is allocated two points wider and two
+points taller, its own text moves a point down and to the right, and every
+control after it in the row shifts along. Selecting one did the same thing, which
+is why a row of options shuffled sideways as the choice moved along it.
+
+It was not one label. It was every row of options in the window: the three
+checker choices in Verify, the sealing choices in Security, the two device lists,
+the keep-this-many choice in the Studio, the hidden-volume choices in Storage,
+the voice modes and palette list in Group, the carry-across choice in Setup and
+ten rows of Settings. Thirty controls, one cause, which is what measuring buys
+over reading.
+
+**The fix.** `layout::chip` and `layout::chip_value`, which are
+`Button::selectable` with `frame_when_inactive(true)`, and every one of the
+thirty call sites goes through them. The frame is allocated in every state, so
+hover and selection change the fill and the border's colour and nothing about the
+shape. It costs an outline around an option at rest, which reads as a control
+rather than as a word, and it gives a row of options the height a button has,
+because it is the same frame: 27 points, which is why the Verify row now agrees
+with the button beside it.
+
+The alternatives were worse and are worth naming. Dropping the hover stroke
+removes the affordance that says a thing can be pressed. Making the inactive
+stroke transparent does nothing, because egui drops the whole frame when
+inactive rather than drawing it in another colour, so there is nothing for a
+transparent stroke to hold open.
+
+**Width is measured and deliberately not compared across a row.** The item names
+four measurements and three are guarded: height, vertical centre and left edge.
+A width rule across a row would be false, and it is worth having the numbers
+rather than the intuition: the Settings tab has a row of five options 67, 74.8,
+82.6, 90.4 and 98.3 points wide, because they are labelled with words of
+different lengths, and every panel has controls of different widths starting at
+the left margin, because a button and a row of options have no reason to be the
+same size. Both are right. Width matters where two controls are two halves of
+one idea, which is `layout::LOCK_WIDTH` and roadmap item 160, and that is
+guarded where the number lives. A guard here would have needed six exceptions on
+its first run, and a guard with six exceptions is one nobody trusts.
+
+**The left edge is guarded for near misses only**, for the same kind of reason.
+Two rows starting at the same x read as a column; two rows forty points apart
+read as a heading and an indented list. Two rows three points apart read as a
+mistake, because nobody indents by three points on purpose. The guard says so in
+its own doc comment rather than implying it checks alignment in general, which
+from a paint list it cannot: whether two rows belong to one column is a question
+about the panel's structure and the answer is not in the shapes.
+
+**Both guards were proved in both directions**, by putting the defect back one
+call site at a time and reading the failure, and both carry a count they assert
+is not tiny. Every rectangle here is found by a filter, and a filter one line
+from finding nothing is how a guard comes to pass while drawing no conclusions:
+the first version of this counted a checkbox's tick box as a control beside its
+own label.
+
 ### F-224: the audit outgrew the search index, and the index said nothing
 
 Found by pushing the audit past 512 KB while writing F-223 up.
@@ -8171,7 +8268,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1856 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1860 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9819,7 +9916,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and thirty-two defects found and fixed (F-1 to F-232), across
+**Two hundred and thirty-three defects found and fixed (F-1 to F-233), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

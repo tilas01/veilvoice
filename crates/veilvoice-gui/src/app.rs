@@ -1281,7 +1281,7 @@ impl eframe::App for VeilVoiceApp {
                             } else {
                                 p::muted()
                             });
-                            if ui.selectable_label(selected, text).clicked() {
+                            if ui.add(crate::layout::chip(selected, text)).clicked() {
                                 self.tab = tab;
                             }
                             // A real gap between tabs, not just the default padding.
@@ -2012,9 +2012,10 @@ impl VeilVoiceApp {
                     .width(300.0)
                     .selected_text(RichText::new(current).color(p::cyan()))
                     .show_ui(ui, |ui| {
-                        ui.selectable_value(chosen, None, "system default");
+                        crate::layout::chip_value(ui, chosen, None, "system default");
                         for device in &self.inputs {
-                            ui.selectable_value(
+                            crate::layout::chip_value(
+                                ui,
                                 chosen,
                                 Some(device.name.clone()),
                                 device.name.clone(),
@@ -2922,13 +2923,13 @@ fn device_picker(
             .width(360.0)
             .selected_text(RichText::new(current).color(p::cyan()))
             .show_ui(ui, |ui| {
-                ui.selectable_value(chosen, None, "system default");
+                crate::layout::chip_value(ui, chosen, None, "system default");
                 for device in devices {
                     let mut text = device.name.clone();
                     if device.is_virtual_cable {
                         text.push_str("  ·  virtual cable");
                     }
-                    ui.selectable_value(chosen, Some(device.name.clone()), text);
+                    crate::layout::chip_value(ui, chosen, Some(device.name.clone()), text);
                 }
             });
     });

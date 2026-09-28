@@ -465,7 +465,7 @@ impl Settings {
         ui.horizontal(|ui| {
             for posture in veilvoice_guard::failsafe::Posture::ALL {
                 if ui
-                    .selectable_label(current == *posture, posture.label())
+                    .add(crate::layout::chip(current == *posture, posture.label()))
                     .clicked()
                     && current != *posture
                 {
@@ -503,7 +503,10 @@ impl Settings {
         ui.horizontal(|ui| {
             for style in crate::monitor::Style::ALL {
                 if ui
-                    .selectable_label(current_monitor == *style, style.label())
+                    .add(crate::layout::chip(
+                        current_monitor == *style,
+                        style.label(),
+                    ))
                     .clicked()
                     && current_monitor != *style
                 {
@@ -540,7 +543,7 @@ impl Settings {
         ui.horizontal(|ui| {
             for style in crate::notify::Style::ALL {
                 if ui
-                    .selectable_label(current == *style, style.label())
+                    .add(crate::layout::chip(current == *style, style.label()))
                     .clicked()
                     && current != *style
                 {
@@ -755,13 +758,13 @@ impl Settings {
                     .selected_text(crate::autolock::describe_secs(self.prefs.autolock_after))
                     .show_ui(ui, |ui| {
                         for choice in crate::autolock::CHOICES {
-                            changed |= ui
-                                .selectable_value(
-                                    &mut self.prefs.autolock_after,
-                                    *choice,
-                                    crate::autolock::describe_secs(*choice),
-                                )
-                                .changed();
+                            changed |= crate::layout::chip_value(
+                                ui,
+                                &mut self.prefs.autolock_after,
+                                *choice,
+                                crate::autolock::describe_secs(*choice),
+                            )
+                            .changed();
                         }
                     });
             });
@@ -797,7 +800,7 @@ impl Settings {
                 let selected = self.page == *page;
                 let text =
                     RichText::new(*heading).color(if selected { p::blue() } else { p::muted() });
-                if ui.selectable_label(selected, text).clicked() {
+                if ui.add(crate::layout::chip(selected, text)).clicked() {
                     self.page = *page;
                 }
             }
@@ -922,7 +925,7 @@ impl Settings {
             .show_ui(ui, |ui| {
                 for theme in themes() {
                     if ui
-                        .selectable_label(theme.id == current.id, theme.name)
+                        .add(crate::layout::chip(theme.id == current.id, theme.name))
                         .clicked()
                     {
                         chosen = Some(theme.id);
@@ -955,7 +958,7 @@ impl Settings {
             .show_ui(ui, |ui| {
                 for theme in themes() {
                     if ui
-                        .selectable_label(theme.id == current.id, theme.name)
+                        .add(crate::layout::chip(theme.id == current.id, theme.name))
                         .clicked()
                     {
                         chosen = Some(theme.id);
@@ -1036,10 +1039,10 @@ impl Settings {
             .width(200.0)
             .show_ui(ui, |ui| {
                 if ui
-                    .selectable_label(
+                    .add(crate::layout::chip(
                         target == crate::pace::Target::Display,
                         crate::pace::Target::Display.label(),
-                    )
+                    ))
                     .clicked()
                 {
                     target = crate::pace::Target::Display;
@@ -1047,7 +1050,7 @@ impl Settings {
                 for hz in crate::pace::TARGETS {
                     let choice = crate::pace::Target::Fixed(*hz);
                     if ui
-                        .selectable_label(target == choice, choice.label())
+                        .add(crate::layout::chip(target == choice, choice.label()))
                         .clicked()
                     {
                         target = choice;
@@ -1148,7 +1151,12 @@ impl Settings {
                         if *choice < auto.floor_secs || *choice > auto.ceiling_secs {
                             continue;
                         }
-                        ui.selectable_value(&mut auto.after_secs, *choice, describe_secs(*choice));
+                        crate::layout::chip_value(
+                            ui,
+                            &mut auto.after_secs,
+                            *choice,
+                            describe_secs(*choice),
+                        );
                     }
                 });
             changed |= auto.after_secs != current;

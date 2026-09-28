@@ -585,8 +585,8 @@
 <span class="ln" id="L490">        );</span>
 <span class="ln" id="L491">        ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
 <span class="ln" id="L492">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L493">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.carry, <span class="tok-fn">Some</span>(true), <span class="tok-str">&quot;carry them across&quot;</span>);</span>
-<span class="ln" id="L494">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.carry, <span class="tok-fn">Some</span>(false), <span class="tok-str">&quot;leave them here&quot;</span>);</span>
+<span class="ln" id="L493">            <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.carry, <span class="tok-fn">Some</span>(true), <span class="tok-str">&quot;carry them across&quot;</span>);</span>
+<span class="ln" id="L494">            <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.carry, <span class="tok-fn">Some</span>(false), <span class="tok-str">&quot;leave them here&quot;</span>);</span>
 <span class="ln" id="L495">        });</span>
 <span class="ln" id="L496">        ui.<span class="tok-fn">label</span>(</span>
 <span class="ln" id="L497">            RichText::<span class="tok-fn">new</span>(<span class="tok-kw">match</span> <span class="tok-kw">self</span>.carry {</span>

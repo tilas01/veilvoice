@@ -1367,13 +1367,13 @@
 <span class="ln" id="L1216">        }</span>
 <span class="ln" id="L1217"></span>
 <span class="ln" id="L1218">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L1219">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.sealing, Sealing::Password, <span class="tok-str">&quot;passphrase&quot;</span>);</span>
-<span class="ln" id="L1220">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.sealing, Sealing::PublicKey, <span class="tok-str">&quot;public key&quot;</span>);</span>
+<span class="ln" id="L1219">            <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.sealing, Sealing::Password, <span class="tok-str">&quot;passphrase&quot;</span>);</span>
+<span class="ln" id="L1220">            <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.sealing, Sealing::PublicKey, <span class="tok-str">&quot;public key&quot;</span>);</span>
 <span class="ln" id="L1221">            <span class="tok-com">// Offered only where there is a lock to seal with. Showing a mode</span></span>
 <span class="ln" id="L1222">            <span class="tok-com">// that cannot work, greyed out, invites the reading that VeilVoice</span></span>
 <span class="ln" id="L1223">            <span class="tok-com">// is withholding something.</span></span>
 <span class="ln" id="L1224">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.store.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L1225">                ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.sealing, Sealing::AppLock, <span class="tok-str">&quot;app lock&quot;</span>);</span>
+<span class="ln" id="L1225">                <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>.sealing, Sealing::AppLock, <span class="tok-str">&quot;app lock&quot;</span>);</span>
 <span class="ln" id="L1226">            }</span>
 <span class="ln" id="L1227">        });</span>
 <span class="ln" id="L1228"></span>

@@ -384,13 +384,15 @@ pub fn panel(storage: &mut Storage, ui: &mut egui::Ui) -> bool {
             .unwrap_or(Hidden::Unanswered);
         let mut choice = current;
         ui.horizontal_wrapped(|ui| {
-            ui.selectable_value(&mut choice, Hidden::NoHiddenVolume, "no hidden volume");
-            ui.selectable_value(
+            crate::layout::chip_value(ui, &mut choice, Hidden::NoHiddenVolume, "no hidden volume");
+            crate::layout::chip_value(
+                ui,
                 &mut choice,
                 Hidden::IsTheHiddenVolume,
                 "this is the hidden one",
             );
-            ui.selectable_value(
+            crate::layout::chip_value(
+                ui,
                 &mut choice,
                 Hidden::OuterVolumeOfAHiddenPair,
                 "this is the outer one",
