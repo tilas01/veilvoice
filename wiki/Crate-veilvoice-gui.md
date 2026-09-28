@@ -97,7 +97,7 @@ flowchart TD
     n_layout["layout.rs<br/>473 lines"]
     n_monitor["monitor.rs<br/>579 lines"]
     n_notify["notify.rs<br/>460 lines"]
-    n_offthread["offthread.rs<br/>267 lines"]
+    n_offthread["offthread.rs<br/>280 lines"]
     n_pace["pace.rs<br/>509 lines"]
     n_palettes["palettes.rs<br/>714 lines"]
     n_paths["paths.rs<br/>248 lines"]
@@ -107,7 +107,7 @@ flowchart TD
     n_progress["progress.rs<br/>539 lines"]
     n_reduced_motion["reduced_motion.rs<br/>285 lines"]
     n_reset["reset.rs<br/>576 lines"]
-    n_security["security.rs<br/>2556 lines"]
+    n_security["security.rs<br/>2622 lines"]
     n_settings["settings.rs<br/>1678 lines"]
     n_setup["setup.rs<br/>1144 lines"]
     n_soundbar["soundbar.rs<br/>782 lines"]
@@ -310,7 +310,7 @@ flowchart TD
 | [[`main.rs`|File-veilvoice-gui-main]] | 269 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [[`monitor.rs`|File-veilvoice-gui-monitor]] | 579 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [[`notify.rs`|File-veilvoice-gui-notify]] | 460 | How the application tells you something, and the three ways to be told. |
-| [[`offthread.rs`|File-veilvoice-gui-offthread]] | 267 | One answer, worked out somewhere that is not the thread drawing the window. |
+| [[`offthread.rs`|File-veilvoice-gui-offthread]] | 280 | One answer, worked out somewhere that is not the thread drawing the window. |
 | [[`pace.rs`|File-veilvoice-gui-pace]] | 509 | How often the window draws while something in it is moving, and what that actually came to. |
 | [[`palettes.rs`|File-veilvoice-gui-palettes]] | 714 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [[`paths.rs`|File-veilvoice-gui-paths]] | 248 | Exactly where this copy of VeilVoice is keeping things. |
@@ -320,7 +320,7 @@ flowchart TD
 | [[`progress.rs`|File-veilvoice-gui-progress]] | 539 | How far through a job is, in the two cases that exist: the ones that can honestly say, and the ones that cannot. |
 | [[`reduced_motion.rs`|File-veilvoice-gui-reduced_motion]] | 285 | Whether the operating system has been asked to reduce motion. |
 | [[`reset.rs`|File-veilvoice-gui-reset]] | 576 | Starting again from the window: what would go, then going. |
-| [[`security.rs`|File-veilvoice-gui-security]] | 2556 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [[`security.rs`|File-veilvoice-gui-security]] | 2622 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [[`settings.rs`|File-veilvoice-gui-settings]] | 1678 | The settings panel: a menu of pages, each a titled group of choices. |
 | [[`setup.rs`|File-veilvoice-gui-setup]] | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
 | [[`soundbar.rs`|File-veilvoice-gui-soundbar]] | 782 | The animated mark: a row of bars that rise and fall. |
@@ -334,7 +334,7 @@ flowchart TD
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 412 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 249 | How big the window opens, and why it is not a constant. |
 
-**22,187 functional lines of Rust** in this crate. A functional line is a line
+**22,230 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

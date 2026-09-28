@@ -176,7 +176,7 @@ mod tests {
         answer.ask(&ctx(), || 7);
         // Polled rather than waited for, which is the whole point, so this
         // spins the way a window would rather than blocking on the channel.
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
         while answer.get().is_none() && std::time::Instant::now() < deadline {
             std::hint::spin_loop();
         }
@@ -204,7 +204,7 @@ mod tests {
             });
             let _ = answer.get();
         }
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
         while runs.load(Ordering::SeqCst) == 0 && std::time::Instant::now() < deadline {
             std::hint::spin_loop();
         }
@@ -222,15 +222,28 @@ mod tests {
         let mut answer: Answer<u32> = Answer::new();
         let ctx = ctx();
         answer.ask(&ctx, || 3);
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
         while answer.get().is_none() && std::time::Instant::now() < deadline {
             std::hint::spin_loop();
         }
         assert_eq!(answer.get().copied(), Some(3));
 
         // A worker that panics drops its sender without sending.
-        answer.ask(&ctx, || panic!("the worker died"));
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        //
+        // `resume_unwind` rather than `panic!`, and a deadline far above what
+        // a pass takes. Both are about what the wait below used to measure,
+        // which was mostly the panic hook: with RUST_BACKTRACE=1 it walks and
+        // symbolises the worker's stack before the unwind that drops the
+        // sender begins, and in a full workspace run on four busy cores that
+        // took longer than the five seconds this allowed, so the test failed
+        // with the worker still dying. `resume_unwind` unwinds the same way
+        // and drops the same sender, without the hook. The loop leaves the
+        // moment the worker is seen to be gone, so the minute costs a passing
+        // run nothing. F-229.
+        answer.ask(&ctx, || {
+            std::panic::resume_unwind(Box::new("the worker died"))
+        });
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
         while answer.is_waiting() && std::time::Instant::now() < deadline {
             let _ = answer.get();
             std::hint::spin_loop();
@@ -257,7 +270,7 @@ mod tests {
             }
             let runs = Arc::clone(&runs);
             answer.ask_once(&ctx, move || runs.fetch_add(1, Ordering::SeqCst) + 1);
-            let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+            let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
             while answer.get().is_none() && std::time::Instant::now() < deadline {
                 std::hint::spin_loop();
             }

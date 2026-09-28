@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/offthread.rs</code></h1>
-<p style="color:var(--muted)"><a href="offthread.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 267 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="offthread.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 280 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -260,7 +260,7 @@
 <span class="ln" id="L176">        answer.<span class="tok-fn">ask</span>(&amp;<span class="tok-fn">ctx</span>(), || <span class="tok-num">7</span>);</span>
 <span class="ln" id="L177">        <span class="tok-com">// Polled rather than waited for, which is the whole point, so this</span></span>
 <span class="ln" id="L178">        <span class="tok-com">// spins the way a window would rather than blocking on the channel.</span></span>
-<span class="ln" id="L179">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
+<span class="ln" id="L179">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">60</span>);</span>
 <span class="ln" id="L180">        while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
 <span class="ln" id="L181">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
 <span class="ln" id="L182">        }</span>
@@ -288,7 +288,7 @@
 <span class="ln" id="L204">            });</span>
 <span class="ln" id="L205">            <span class="tok-kw">let</span> _ = answer.<span class="tok-fn">get</span>();</span>
 <span class="ln" id="L206">        }</span>
-<span class="ln" id="L207">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
+<span class="ln" id="L207">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">60</span>);</span>
 <span class="ln" id="L208">        while runs.<span class="tok-fn">load</span>(Ordering::SeqCst) == <span class="tok-num">0</span> &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
 <span class="ln" id="L209">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
 <span class="ln" id="L210">        }</span>
@@ -306,49 +306,62 @@
 <span class="ln" id="L222">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;u32&gt; = Answer::<span class="tok-fn">new</span>();</span>
 <span class="ln" id="L223">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
 <span class="ln" id="L224">        answer.<span class="tok-fn">ask</span>(&amp;ctx, || <span class="tok-num">3</span>);</span>
-<span class="ln" id="L225">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
+<span class="ln" id="L225">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">60</span>);</span>
 <span class="ln" id="L226">        while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
 <span class="ln" id="L227">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
 <span class="ln" id="L228">        }</span>
 <span class="ln" id="L229">        assert_eq!(answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(), <span class="tok-fn">Some</span>(<span class="tok-num">3</span>));</span>
 <span class="ln" id="L230"></span>
 <span class="ln" id="L231">        <span class="tok-com">// A worker that panics drops its sender without sending.</span></span>
-<span class="ln" id="L232">        answer.<span class="tok-fn">ask</span>(&amp;ctx, || panic!(<span class="tok-str">&quot;the worker died&quot;</span>));</span>
-<span class="ln" id="L233">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
-<span class="ln" id="L234">        while answer.<span class="tok-fn">is_waiting</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
-<span class="ln" id="L235">            <span class="tok-kw">let</span> _ = answer.<span class="tok-fn">get</span>();</span>
-<span class="ln" id="L236">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
-<span class="ln" id="L237">        }</span>
-<span class="ln" id="L238">        assert!(!answer.<span class="tok-fn">is_waiting</span>(), <span class="tok-str">&quot;the dead worker is not still awaited&quot;</span>);</span>
-<span class="ln" id="L239">        assert_eq!(</span>
-<span class="ln" id="L240">            answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(),</span>
-<span class="ln" id="L241">            <span class="tok-fn">Some</span>(<span class="tok-num">3</span>),</span>
-<span class="ln" id="L242">            <span class="tok-str">&quot;the panel would have replaced a true answer with nothing&quot;</span></span>
-<span class="ln" id="L243">        );</span>
-<span class="ln" id="L244">    }</span>
-<span class="ln" id="L245"></span>
-<span class="ln" id="L246">    <span class="tok-com">/// Forgetting asks again.</span></span>
-<span class="ln" id="L247">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L248">    <span class="tok-kw">fn</span> <span class="tok-fn">forgetting_asks_again</span>() {</span>
-<span class="ln" id="L249">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicUsize, Ordering};</span>
-<span class="ln" id="L250">        <span class="tok-kw">use</span> std::sync::Arc;</span>
-<span class="ln" id="L251">        <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">new</span>(AtomicUsize::<span class="tok-fn">new</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L252">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;usize&gt; = Answer::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L253">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
-<span class="ln" id="L254">        <span class="tok-kw">for</span> round <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L255">            <span class="tok-kw">if</span> round == <span class="tok-num">1</span> {</span>
-<span class="ln" id="L256">                answer.<span class="tok-fn">forget</span>();</span>
-<span class="ln" id="L257">            }</span>
-<span class="ln" id="L258">            <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">clone</span>(&amp;runs);</span>
-<span class="ln" id="L259">            answer.<span class="tok-fn">ask_once</span>(&amp;ctx, <span class="tok-kw">move</span> || runs.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::SeqCst) + <span class="tok-num">1</span>);</span>
-<span class="ln" id="L260">            <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">5</span>);</span>
-<span class="ln" id="L261">            while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
-<span class="ln" id="L262">                std::hint::<span class="tok-fn">spin_loop</span>();</span>
-<span class="ln" id="L263">            }</span>
-<span class="ln" id="L264">        }</span>
-<span class="ln" id="L265">        assert_eq!(runs.<span class="tok-fn">load</span>(Ordering::SeqCst), <span class="tok-num">2</span>, <span class="tok-str">&quot;the second ask never ran&quot;</span>);</span>
-<span class="ln" id="L266">    }</span>
-<span class="ln" id="L267">}</span>
+<span class="ln" id="L232">        <span class="tok-com">//</span></span>
+<span class="ln" id="L233">        <span class="tok-com">// `resume_unwind` rather than `panic!`, and a deadline far above what</span></span>
+<span class="ln" id="L234">        <span class="tok-com">// a pass takes. Both are about what the wait below used to measure,</span></span>
+<span class="ln" id="L235">        <span class="tok-com">// which was mostly the panic hook: with RUST_BACKTRACE=1 it walks and</span></span>
+<span class="ln" id="L236">        <span class="tok-com">// symbolises the worker&#x27;s stack before the unwind that drops the</span></span>
+<span class="ln" id="L237">        <span class="tok-com">// sender begins, and in a full workspace run on four busy cores that</span></span>
+<span class="ln" id="L238">        <span class="tok-com">// took longer than the five seconds this allowed, so the test failed</span></span>
+<span class="ln" id="L239">        <span class="tok-com">// with the worker still dying. `resume_unwind` unwinds the same way</span></span>
+<span class="ln" id="L240">        <span class="tok-com">// and drops the same sender, without the hook. The loop leaves the</span></span>
+<span class="ln" id="L241">        <span class="tok-com">// moment the worker is seen to be gone, so the minute costs a passing</span></span>
+<span class="ln" id="L242">        <span class="tok-com">// run nothing. F-229.</span></span>
+<span class="ln" id="L243">        answer.<span class="tok-fn">ask</span>(&amp;ctx, || {</span>
+<span class="ln" id="L244">            std::panic::<span class="tok-fn">resume_unwind</span>(Box::<span class="tok-fn">new</span>(<span class="tok-str">&quot;the worker died&quot;</span>))</span>
+<span class="ln" id="L245">        });</span>
+<span class="ln" id="L246">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">60</span>);</span>
+<span class="ln" id="L247">        while answer.<span class="tok-fn">is_waiting</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
+<span class="ln" id="L248">            <span class="tok-kw">let</span> _ = answer.<span class="tok-fn">get</span>();</span>
+<span class="ln" id="L249">            std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L250">        }</span>
+<span class="ln" id="L251">        assert!(!answer.<span class="tok-fn">is_waiting</span>(), <span class="tok-str">&quot;the dead worker is not still awaited&quot;</span>);</span>
+<span class="ln" id="L252">        assert_eq!(</span>
+<span class="ln" id="L253">            answer.<span class="tok-fn">get</span>().<span class="tok-fn">copied</span>(),</span>
+<span class="ln" id="L254">            <span class="tok-fn">Some</span>(<span class="tok-num">3</span>),</span>
+<span class="ln" id="L255">            <span class="tok-str">&quot;the panel would have replaced a true answer with nothing&quot;</span></span>
+<span class="ln" id="L256">        );</span>
+<span class="ln" id="L257">    }</span>
+<span class="ln" id="L258"></span>
+<span class="ln" id="L259">    <span class="tok-com">/// Forgetting asks again.</span></span>
+<span class="ln" id="L260">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L261">    <span class="tok-kw">fn</span> <span class="tok-fn">forgetting_asks_again</span>() {</span>
+<span class="ln" id="L262">        <span class="tok-kw">use</span> std::sync::atomic::{AtomicUsize, Ordering};</span>
+<span class="ln" id="L263">        <span class="tok-kw">use</span> std::sync::Arc;</span>
+<span class="ln" id="L264">        <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">new</span>(AtomicUsize::<span class="tok-fn">new</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L265">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> answer: Answer&lt;usize&gt; = Answer::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L266">        <span class="tok-kw">let</span> ctx = <span class="tok-fn">ctx</span>();</span>
+<span class="ln" id="L267">        <span class="tok-kw">for</span> round <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
+<span class="ln" id="L268">            <span class="tok-kw">if</span> round == <span class="tok-num">1</span> {</span>
+<span class="ln" id="L269">                answer.<span class="tok-fn">forget</span>();</span>
+<span class="ln" id="L270">            }</span>
+<span class="ln" id="L271">            <span class="tok-kw">let</span> runs = Arc::<span class="tok-fn">clone</span>(&amp;runs);</span>
+<span class="ln" id="L272">            answer.<span class="tok-fn">ask_once</span>(&amp;ctx, <span class="tok-kw">move</span> || runs.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::SeqCst) + <span class="tok-num">1</span>);</span>
+<span class="ln" id="L273">            <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">60</span>);</span>
+<span class="ln" id="L274">            while answer.<span class="tok-fn">get</span>().<span class="tok-fn">is_none</span>() &amp;&amp; std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline {</span>
+<span class="ln" id="L275">                std::hint::<span class="tok-fn">spin_loop</span>();</span>
+<span class="ln" id="L276">            }</span>
+<span class="ln" id="L277">        }</span>
+<span class="ln" id="L278">        assert_eq!(runs.<span class="tok-fn">load</span>(Ordering::SeqCst), <span class="tok-num">2</span>, <span class="tok-str">&quot;the second ask never ran&quot;</span>);</span>
+<span class="ln" id="L279">    }</span>
+<span class="ln" id="L280">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

@@ -166,9 +166,12 @@ nothing hand-copies them anywhere.
 **That list is a workflow now rather than a habit.** Run `promote` from the
 Actions tab, give it the version, and leave *Move main* off the first time: it
 reports what stands between `dev` and that release and changes nothing. Run it
-again with *Move main* on and it merges `dev` into `main`, pushes it, and
+again with *Move main* on and it merges into `main` the exact commit it
+checked, not whatever `dev` has become while the checks ran, pushes it, and
 starts the release build, which creates the tag at the commit it built and
-redeploys the website when it finishes. No tag is pushed by hand at any point.
+redeploys the website when it finishes. It dispatches the `wiki` workflow as
+well, because a push made by a workflow starts no other workflow. No tag is
+pushed by hand at any point.
 
 **It cannot run until it is on `main`, which is once.** GitHub registers a
 `workflow_dispatch` workflow only from the repository's default branch, so a

@@ -583,6 +583,21 @@ impl Security {
         });
     }
 
+    /// Check what was typed into the unlock field, on a worker.
+    ///
+    /// **F-231.** The worker gets a copy and the field keeps the original until
+    /// [`poll`](Self::poll) collects the answer. It was moved out here, which
+    /// left the field empty, and `poll` then took the passphrase for the
+    /// session *from the field*: every unlock kept an empty passphrase, so
+    /// app-lock sealing sealed each recording under nothing at all, and the
+    /// integrity record was opened and re-sealed under nothing too. The field
+    /// cannot be edited while the worker runs (`unlock_row` is disabled while
+    /// busy), a failed unlock wipes it, and a successful one moves it on, so
+    /// this holds the passphrase no longer than the worker does.
+    fn begin_unlock(&mut self) {
+        self.spawn(Op::Unlock, self.entry.clone(), String::new());
+    }
+
     /// Collect a finished lock operation. Returns true if anything changed.
     fn poll(&mut self) -> bool {
         let Some(rx) = &self.pending else {
@@ -803,8 +818,7 @@ impl Security {
             let submitted = field.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter));
             let clicked = button.clicked();
             if (submitted || clicked) && !self.entry.is_empty() && cooldown.is_none() && !busy {
-                let entry = std::mem::take(&mut self.entry);
-                self.spawn(Op::Unlock, entry, String::new());
+                self.begin_unlock();
             }
         });
 
@@ -1886,6 +1900,58 @@ mod tests {
         assert!(
             source[wipe..wipe + end].contains("self.app_secret = None"),
             "the session copy of the app-lock passphrase outlives a lock"
+        );
+    }
+
+    /// F-231. An unlock keeps the passphrase it was given, and not an empty one.
+    ///
+    /// Driven through the real path rather than read out of the source: a lock
+    /// file, the unlock started the way the button starts it, the worker's
+    /// answer collected the way a frame collects it, and then the two things
+    /// the passphrase is kept for. The source-reading tests above all passed
+    /// while the field was emptied before the worker started and read again
+    /// after it finished, so every recording sealed with the app lock was
+    /// sealed under an empty passphrase and the integrity record with it.
+    #[test]
+    fn an_unlock_keeps_the_passphrase_it_was_typed_with() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = LockStore::create(
+            &dir.path().join("applock.bin"),
+            b"correct horse",
+            veilvoice_crypto::kdf::KdfParams::weak_for_tests(),
+        )
+        .unwrap();
+
+        let mut security = Security::default();
+        security.store = Some(store);
+        security.locked = true;
+        security.encrypt_recordings = true;
+        security.sealing = Sealing::AppLock;
+        security.entry = "correct horse".to_string();
+
+        security.begin_unlock();
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+        while !security.poll() && std::time::Instant::now() < deadline {
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+
+        assert!(!security.locked, "the right passphrase did not unlock");
+        let Plan::Password(secret) = security.plan() else {
+            panic!("app-lock sealing produced no password plan after an unlock");
+        };
+        assert_eq!(
+            secret.expose(),
+            b"correct horse",
+            "recordings would be sealed under something other than the passphrase typed"
+        );
+        assert_eq!(
+            security.take_unlock_passphrase().as_deref(),
+            Some("correct horse"),
+            "the integrity record would be opened and sealed with something else"
+        );
+        assert!(
+            security.entry.is_empty(),
+            "the passphrase is still sitting in the unlock field"
         );
     }
 
