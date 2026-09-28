@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/lib.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1066 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 1513 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs)
 
 ## Contents
 
@@ -69,7 +69,7 @@ another thread, so the window keeps answering while it is busy.
 
 ## What this file contains
 
-1066 lines defining **10 functions** (3 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+1513 lines defining **10 functions** (3 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -137,3 +137,4 @@ flowchart TD
 | `declared_modules` <sub>pub(crate) fn</sub> | [337](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L337) | The modules lib.rs declares, as filenames. |
 | `spawn_tests` <sub>mod</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L352) |  |
 | `draw_path_tests` <sub>mod</sub> | [434](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L434) |  |
+| `row_tests` <sub>mod</sub> | [1069](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs#L1069) |  |

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/storage.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 659 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 661 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs)
 
 ## Contents
 
@@ -64,7 +64,7 @@ wrong half of one of those can destroy what is hidden inside.
 
 ## What this file contains
 
-659 lines defining **21 functions** (18 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+661 lines defining **21 functions** (18 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

@@ -975,7 +975,7 @@
 <span class="ln" id="L856">                    Checker::Wsl =&gt; <span class="tok-str">&quot;GnuPG inside WSL&quot;</span>,</span>
 <span class="ln" id="L857">                };</span>
 <span class="ln" id="L858">                <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L859">                    .<span class="tok-fn">add_enabled</span>(usable, egui::Button::<span class="tok-fn">selectable</span>(chosen, label))</span>
+<span class="ln" id="L859">                    .<span class="tok-fn">add_enabled</span>(usable, <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip</span>(chosen, label))</span>
 <span class="ln" id="L860">                    .<span class="tok-fn">clicked</span>()</span>
 <span class="ln" id="L861">                {</span>
 <span class="ln" id="L862">                    <span class="tok-kw">self</span>.checker = <span class="tok-fn">Some</span>(*choice);</span>

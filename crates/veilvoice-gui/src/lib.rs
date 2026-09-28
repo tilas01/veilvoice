@@ -1064,3 +1064,450 @@ mod draw_path_tests {
         );
     }
 }
+
+#[cfg(test)]
+mod row_tests {
+    //! **Roadmap item 168.** Measuring the interface rather than reading it.
+    //!
+    //! # Why this measures the paint list
+    //!
+    //! egui knows every widget's rectangle: it keeps them in `WidgetRects` for
+    //! its own hit testing. That is `pub(crate)`, so from outside the crate the
+    //! only honest record of where a control ended up is what was painted.
+    //!
+    //! Every interactive control in this interface paints a background: the
+    //! theme gives `inactive`, `hovered`, `active` and `open` a fill, a stroke
+    //! and a corner radius, so a button, a text field, a dropdown and a
+    //! selectable label each contribute a rectangle. A label does not, which is
+    //! exactly the set this item is about. Reading the paint list therefore
+    //! finds the controls and nothing else, without a list of them to keep up to
+    //! date.
+    //!
+    //! # What a row is, without naming any
+    //!
+    //! Two controls are in the same row when their vertical extents overlap.
+    //! That is the definition a reader uses, it needs no list of rows, and it
+    //! keeps working when a panel is rearranged. A row of one is not a row and is
+    //! ignored.
+    //!
+    //! Written this way for the reason F-210, F-212, F-216, F-220 and F-224 each
+    //! gave from a different direction: a rule enforced over an enumerated list
+    //! is a rule that stops holding the moment somebody adds to the interface
+    //! without adding to the list.
+    //!
+    //! # Width is measured and deliberately not compared across a row
+    //!
+    //! Roadmap item 168 names four measurements, and three of them are checked
+    //! here: height, vertical centre and left edge. Width is not, because the
+    //! rule would be false. Measured: the Settings tab has a row of five options
+    //! 67, 74.8, 82.6, 90.4 and 98.3 points wide, because they are labelled with
+    //! words of different lengths, and every panel has controls of different
+    //! widths starting at the left margin, because a button and a row of options
+    //! have no reason to be the same size. Both are right.
+    //!
+    //! Width matters where two controls are two halves of one idea, which is
+    //! `layout::LOCK_WIDTH` and roadmap item 160, and that is guarded where the
+    //! number lives. A guard here would have to be suppressed in six panels on
+    //! its first run, and a guard with six exceptions is a guard nobody trusts.
+
+    use egui::Rect;
+
+    /// How much two rectangles may differ and still be called equal, in points.
+    ///
+    /// Not zero, because a real interface has controls that are genuinely
+    /// different shapes on purpose, and not generous either: half a point is
+    /// below what anybody can see and far below the pixel this item is about.
+    const SLACK: f32 = 0.5;
+
+    /// Vertical overlap needed before two controls are in one row, in points.
+    ///
+    /// A few points rather than any overlap at all: two rows eight points apart
+    /// with a one-point stroke leaking into each other must not read as one row.
+    const OVERLAP: f32 = 4.0;
+
+    /// A window this size, so a panel has somewhere to lay a row out.
+    ///
+    /// The default test context offers nearly ten thousand points of width,
+    /// which is not a window anybody has and makes centring meaningless. The
+    /// same reasoning as `layout`'s own tests, and the same number.
+    fn input() -> egui::RawInput {
+        egui::RawInput {
+            screen_rect: Some(Rect::from_min_size(
+                egui::pos2(0.0, 0.0),
+                egui::vec2(900.0, 700.0),
+            )),
+            ..Default::default()
+        }
+    }
+
+    /// The same window, with the pointer at `at`.
+    fn input_pointing(at: egui::Pos2) -> egui::RawInput {
+        let mut raw = input();
+        raw.events.push(egui::Event::PointerMoved(at));
+        raw
+    }
+
+    /// The tallest a control is, in points, and the shortest.
+    ///
+    /// A card, a group frame and the panel's own fill are all painted
+    /// rectangles too, and none of them is a control anybody expects to line up
+    /// with its neighbour: the first-run tour's cards are 213 points tall. The
+    /// band is what separates a control from the scenery it sits in, and it is
+    /// generous at both ends: the smallest control here is a 14-point tick box
+    /// and the largest a 27-point button.
+    const CONTROL_HEIGHT: std::ops::RangeInclusive<f32> = 6.0..=40.0;
+
+    /// Every control background one frame painted.
+    ///
+    /// Three kinds of rectangle are dropped, and each for its own reason.
+    ///
+    /// **The scenery**: the panel's own fill covers the window, and a card is
+    /// taller than any control. [`CONTROL_HEIGHT`] and a width limit take both.
+    ///
+    /// **The parts of a control**: a checkbox paints its 14-point tick box
+    /// *inside* its 96-point widget rectangle, and the two are one control, not
+    /// two controls in a row. A rectangle wholly inside another is a part of it.
+    /// Two controls side by side never contain one another, so nothing this rule
+    /// drops is a thing this test is about.
+    ///
+    /// **The hairlines**: separators and strokes, which are under six points.
+    fn controls(raw: egui::RawInput, draw: impl FnMut(&mut egui::Ui)) -> Vec<Rect> {
+        let ctx = egui::Context::default();
+        crate::theme::install(&ctx);
+        // Twice: the first frame of anything that remembers a width has nothing
+        // remembered, which `layout`'s tests document at length. The second is
+        // the frame a reader sees.
+        let mut painted = Vec::new();
+        let mut draw = draw;
+        for _ in 0..2 {
+            let output = crate::headless_frame(&ctx, raw.clone(), &mut draw);
+            painted.clear();
+            for clipped in output.shapes {
+                if let egui::Shape::Rect(rect) = &clipped.shape {
+                    let rect = rect.rect;
+                    if rect.width() > 800.0
+                        || rect.width() < 6.0
+                        || !CONTROL_HEIGHT.contains(&rect.height())
+                    {
+                        continue;
+                    }
+                    painted.push(rect);
+                }
+            }
+        }
+        // A part of a control rather than a control: see the note above. Done
+        // after the loop because it is a question about the whole frame.
+        let whole = painted.clone();
+        painted.retain(|rect| {
+            !whole.iter().any(|other| {
+                other != rect && other.contains_rect(*rect) && other.area() > rect.area()
+            })
+        });
+        painted
+    }
+
+    /// The painted controls gathered into rows, top to bottom.
+    fn rows(mut painted: Vec<Rect>) -> Vec<Vec<Rect>> {
+        painted.sort_by(|a, b| a.top().total_cmp(&b.top()));
+        let mut rows: Vec<Vec<Rect>> = Vec::new();
+        for rect in painted {
+            match rows.last_mut() {
+                // Compared against the row's first member rather than its last,
+                // so a run of slightly taller controls cannot walk a row down
+                // the panel one comparison at a time.
+                Some(row)
+                    if (row[0].bottom() - rect.top()).min(rect.bottom() - row[0].top())
+                        > OVERLAP =>
+                {
+                    row.push(rect)
+                }
+                _ => rows.push(vec![rect]),
+            }
+        }
+        for row in &mut rows {
+            row.sort_by(|a, b| a.left().total_cmp(&b.left()));
+        }
+        rows
+    }
+
+    /// The panels this drives, named for the failure message.
+    type Panel = (&'static str, Box<dyn Fn(&mut egui::Ui)>);
+
+    fn panels() -> Vec<Panel> {
+        vec![
+            (
+                "the verify tab",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut verify = crate::verify::Verify::default();
+                    verify.tab(ui, crate::no_motion());
+                }),
+            ),
+            (
+                "the setup tab",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut setup = crate::setup::Setup::new();
+                    setup.tab(ui, crate::no_motion());
+                }),
+            ),
+            (
+                "the security tab",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut security = crate::security::Security::default();
+                    security.tab(ui, crate::no_motion());
+                }),
+            ),
+            (
+                "the lock screen",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut security = crate::security::Security::default();
+                    security.unlock_screen(ui, crate::no_motion());
+                }),
+            ),
+            (
+                "the recordings browser",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut studio = crate::studio::Studio::default();
+                    studio.browser(ui, crate::no_motion());
+                }),
+            ),
+            (
+                "the studio tab",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut studio = crate::studio::Studio::default();
+                    studio.tab(ui, Default::default(), None, None, crate::no_motion());
+                }),
+            ),
+            (
+                "the settings tab",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut settings = crate::settings::Settings::default();
+                    let ctx = ui.ctx().clone();
+                    // A reset of its own, rather than one shared with another
+                    // panel: this harness measures where controls land, and a
+                    // reset part-way through a confirmation draws a different
+                    // set of them.
+                    let mut reset = crate::reset::Reset::default();
+                    settings.tab(ui, &ctx, &mut reset);
+                }),
+            ),
+            (
+                "the group tab",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut group = crate::group::Group::default();
+                    let mut settings = crate::settings::Settings::default();
+                    group.tab(ui, &mut settings, crate::no_motion());
+                }),
+            ),
+            (
+                "the storage panel",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut storage = crate::storage::Storage::default();
+                    let _ = crate::storage::panel(&mut storage, ui);
+                }),
+            ),
+            (
+                "the update check",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut updates = crate::updates::Updates::default();
+                    updates.section(ui, "0.0.0", crate::no_motion());
+                }),
+            ),
+            (
+                "the first-run tour",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut run = crate::firstrun::FirstRun::default();
+                    let mut prefs = crate::settings::Settings::default();
+                    let mut security = crate::security::Security::default();
+                    let _ = run.panel(ui, &mut prefs, &mut security, (0, 0), crate::no_motion());
+                }),
+            ),
+        ]
+    }
+
+    /// Every row of controls agrees on height and on vertical centre.
+    ///
+    /// The two together are what "lined up" means: equal heights with different
+    /// centres is a row where one control sits low, and equal centres with
+    /// different heights is a row where one is squat. Roadmap item 168 asks for
+    /// both, and for the left edge, which is the test below.
+    #[test]
+    fn every_row_of_controls_agrees_on_height_and_centre() {
+        let mut wrong = Vec::new();
+        let mut compared = 0;
+        for (name, draw) in panels() {
+            for row in rows(controls(input(), |ui| {
+                egui::CentralPanel::default().show(ui, |ui| draw(ui));
+            })) {
+                if row.len() < 2 {
+                    continue;
+                }
+                compared += row.len();
+                let tallest = row.iter().fold(0.0_f32, |a, r| a.max(r.height()));
+                let shortest = row.iter().fold(f32::MAX, |a, r| a.min(r.height()));
+                if tallest - shortest > SLACK {
+                    wrong.push(format!(
+                        "{name}: a row at y={:.0} holds controls {:.1} and {:.1} high",
+                        row[0].top(),
+                        shortest,
+                        tallest
+                    ));
+                }
+                let highest = row.iter().fold(f32::MAX, |a, r| a.min(r.center().y));
+                let lowest = row.iter().fold(0.0_f32, |a, r| a.max(r.center().y));
+                if lowest - highest > SLACK {
+                    wrong.push(format!(
+                        "{name}: a row at y={:.0} has centres {:.1} apart",
+                        row[0].top(),
+                        lowest - highest
+                    ));
+                }
+            }
+        }
+        assert!(
+            wrong.is_empty(),
+            "these rows do not line up. Give the controls one height, the way \
+             `layout::button_height` and `layout::LOCK_WIDTH` do for the lock \
+             and unlock buttons:\n{}",
+            wrong.join("\n")
+        );
+        // Not vacuous. Every rectangle here is found by a filter, and a filter
+        // that is one line from finding nothing is how a guard comes to pass by
+        // drawing no conclusions: the first version of this counted a
+        // checkbox's tick box as a control beside its own label, and tightening
+        // that could as easily have left nothing to compare.
+        assert!(
+            compared > 30,
+            "only {compared} controls were in a row with anything, which is too \
+             few for this to have checked the interface"
+        );
+    }
+
+    /// Rows that nearly share a left edge share it.
+    ///
+    /// The left edge is the fourth of the four measurements roadmap item 168
+    /// asks for, and it is the one where "close" is the whole defect. Two rows
+    /// starting at the same x read as a column; two rows starting 40 points
+    /// apart read as a heading and an indented list, which is deliberate. Two
+    /// rows starting three points apart read as a mistake, because that is what
+    /// it is: nobody indents by three points on purpose.
+    ///
+    /// So the rule is about near misses only, and says so rather than pretending
+    /// to check alignment in general, which from a paint list it cannot: whether
+    /// two rows belong to one column is a question about the panel's structure,
+    /// and the answer is not in the shapes.
+    #[test]
+    fn rows_that_nearly_share_a_left_edge_share_it() {
+        /// How far apart two left edges have to be before they are meant to
+        /// differ rather than failing to match.
+        const DELIBERATE: f32 = 12.0;
+
+        let mut wrong = Vec::new();
+        let mut pairs = 0;
+        for (name, draw) in panels() {
+            let rows = rows(controls(input(), |ui| {
+                egui::CentralPanel::default().show(ui, |ui| draw(ui));
+            }));
+            let lefts: Vec<(f32, f32)> = rows
+                .iter()
+                .map(|row| (row[0].left(), row[0].top()))
+                .collect();
+            for (index, (left, top)) in lefts.iter().enumerate() {
+                for (other, other_top) in lefts.iter().skip(index + 1) {
+                    pairs += 1;
+                    let gap = (left - other).abs();
+                    if gap > SLACK && gap < DELIBERATE {
+                        wrong.push(format!(
+                            "{name}: a row at y={top:.0} starts at x={left:.1} and one \
+                             at y={other_top:.0} at x={other:.1}, {gap:.1} apart"
+                        ));
+                    }
+                }
+            }
+        }
+        assert!(
+            wrong.is_empty(),
+            "these rows almost line up, which reads worse than not lining up at \
+             all. Give them one left edge, with `layout::column` where a label \
+             has to hold the space:\n{}",
+            wrong.join("\n")
+        );
+        // Not vacuous, for the reason the test above gives: a rule that finds
+        // nothing and a rule that looks at nothing read the same from here.
+        assert!(
+            pairs > 20,
+            "only {pairs} pairs of rows were compared, which is too few for this \
+             to have looked at the interface"
+        );
+    }
+
+    /// Hovering a control changes its colour and not its shape.
+    ///
+    /// Driven with the pointer over the middle of each control in turn, and the
+    /// whole panel re-measured each time: a control that grows on hover pushes
+    /// everything after it along, so the assertion is about the panel and not
+    /// only about the control under the pointer.
+    ///
+    /// This is the half of roadmap item 168 that a reader cannot check by
+    /// looking, because a one-point shift is only visible as a flicker while the
+    /// pointer moves, and it is the half a future theme change is most likely to
+    /// undo: `egui::style::WidgetVisuals::expansion` is one field, it is zero in
+    /// this version of egui and it has not always been, and setting it is how
+    /// somebody would make hover "feel nicer".
+    #[test]
+    fn hovering_a_control_does_not_move_anything() {
+        let mut moved = Vec::new();
+        for (name, draw) in panels() {
+            let draw = &draw;
+            let at_rest = controls(input(), |ui| {
+                egui::CentralPanel::default().show(ui, |ui| draw(ui));
+            });
+            for target in &at_rest {
+                let hovered = controls(input_pointing(target.center()), |ui| {
+                    egui::CentralPanel::default().show(ui, |ui| draw(ui));
+                });
+                // Every rectangle that was there at rest must still be there,
+                // in the same place. Compared as a set rather than pairwise,
+                // because hover is allowed to paint *more*: a highlight behind
+                // the control under the pointer is a colour change, and it
+                // arrives as an extra shape that would offset every later
+                // comparison in a pairwise walk.
+                for rest in &at_rest {
+                    let still_there = hovered.iter().any(|over| {
+                        (rest.min - over.min).length() <= SLACK
+                            && (rest.max - over.max).length() <= SLACK
+                    });
+                    if !still_there {
+                        let nearest = hovered
+                            .iter()
+                            .min_by(|a, b| {
+                                (a.min - rest.min)
+                                    .length()
+                                    .total_cmp(&(b.min - rest.min).length())
+                            })
+                            .copied()
+                            .unwrap_or(*rest);
+                        moved.push(format!(
+                            "{name}: with the pointer at y={:.0}, the control at \
+                             {:?} {:.1}x{:.1} became {:?} {:.1}x{:.1}",
+                            target.top(),
+                            rest.min,
+                            rest.width(),
+                            rest.height(),
+                            nearest.min,
+                            nearest.width(),
+                            nearest.height()
+                        ));
+                        break;
+                    }
+                }
+            }
+        }
+        assert!(
+            moved.is_empty(),
+            "hover moves something, so text shifts under the pointer. Hover \
+             changes colour and nothing else: no weight, no padding, no \
+             `expansion`:\n{}",
+            moved.join("\n")
+        );
+    }
+}

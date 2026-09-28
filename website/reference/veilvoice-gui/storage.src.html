@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/storage.rs</code></h1>
-<p style="color:var(--muted)"><a href="storage.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 659 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="storage.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 661 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/storage.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -497,280 +497,282 @@
 <span class="ln" id="L384">            .<span class="tok-fn">unwrap_or</span>(Hidden::Unanswered);</span>
 <span class="ln" id="L385">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> choice = current;</span>
 <span class="ln" id="L386">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L387">            ui.<span class="tok-fn">selectable_value</span>(&amp;<span class="tok-kw">mut</span> choice, Hidden::NoHiddenVolume, <span class="tok-str">&quot;no hidden volume&quot;</span>);</span>
-<span class="ln" id="L388">            ui.<span class="tok-fn">selectable_value</span>(</span>
-<span class="ln" id="L389">                &amp;<span class="tok-kw">mut</span> choice,</span>
-<span class="ln" id="L390">                Hidden::IsTheHiddenVolume,</span>
-<span class="ln" id="L391">                <span class="tok-str">&quot;this is the hidden one&quot;</span>,</span>
-<span class="ln" id="L392">            );</span>
-<span class="ln" id="L393">            ui.<span class="tok-fn">selectable_value</span>(</span>
-<span class="ln" id="L394">                &amp;<span class="tok-kw">mut</span> choice,</span>
-<span class="ln" id="L395">                Hidden::OuterVolumeOfAHiddenPair,</span>
-<span class="ln" id="L396">                <span class="tok-str">&quot;this is the outer one&quot;</span>,</span>
-<span class="ln" id="L397">            );</span>
-<span class="ln" id="L398">        });</span>
-<span class="ln" id="L399">        <span class="tok-kw">if</span> choice != current {</span>
-<span class="ln" id="L400">            storage.<span class="tok-fn">answer_hidden</span>(choice);</span>
-<span class="ln" id="L401">        }</span>
-<span class="ln" id="L402">    }</span>
-<span class="ln" id="L403"></span>
-<span class="ln" id="L404">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
-<span class="ln" id="L405">    <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;look again&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L406">        storage.<span class="tok-fn">refresh</span>();</span>
-<span class="ln" id="L407">    }</span>
-<span class="ln" id="L408"></span>
-<span class="ln" id="L409">    <span class="tok-kw">for</span> volume <span class="tok-kw">in</span> storage.<span class="tok-fn">found</span>().<span class="tok-fn">to_vec</span>() {</span>
-<span class="ln" id="L410">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L411">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(volume.path.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
-<span class="ln" id="L412">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(volume.tool.<span class="tok-fn">name</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L413">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;write here&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
-<span class="ln" id="L414">                storage.<span class="tok-fn">choose</span>(volume.<span class="tok-fn">clone</span>());</span>
-<span class="ln" id="L415">            }</span>
-<span class="ln" id="L416">        });</span>
-<span class="ln" id="L417">    }</span>
-<span class="ln" id="L418"></span>
-<span class="ln" id="L419">    <span class="tok-com">// Roadmap item 84. The guided path, which is the main offer when nothing was</span></span>
-<span class="ln" id="L420">    <span class="tok-com">// found rather than a footnote under a list of nothing.</span></span>
-<span class="ln" id="L421">    <span class="tok-kw">if</span> storage.<span class="tok-fn">found_nothing</span>() {</span>
-<span class="ln" id="L422">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L423">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;no mounted Cryptomator vault or VeraCrypt volume was found&quot;</span>)</span>
-<span class="ln" id="L424">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
-<span class="ln" id="L425">        );</span>
-<span class="ln" id="L426">        <span class="tok-kw">for</span> (tool, evidence, present) <span class="tok-kw">in</span> storage.<span class="tok-fn">presence</span>().<span class="tok-fn">to_vec</span>() {</span>
-<span class="ln" id="L427">            ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L428">                RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{}: {evidence}&quot;</span>, tool.<span class="tok-fn">name</span>()))</span>
-<span class="ln" id="L429">                    .<span class="tok-fn">color</span>(<span class="tok-kw">if</span> present { p::<span class="tok-fn">green</span>() } <span class="tok-kw">else</span> { p::<span class="tok-fn">muted</span>() })</span>
-<span class="ln" id="L430">                    .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L431">            );</span>
-<span class="ln" id="L432">        }</span>
-<span class="ln" id="L433">        ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L434">            RichText::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L435">                <span class="tok-str">&quot;If one is open and VeilVoice did not see it, point at it by hand. \</span></span>
-<span class="ln" id="L436"><span class="tok-str">                 VeilVoice never opens or closes these itself and never asks for their \</span></span>
-<span class="ln" id="L437"><span class="tok-str">                 password: unlock it in its own program first.&quot;</span>,</span>
-<span class="ln" id="L438">            )</span>
-<span class="ln" id="L439">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L440">            .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L441">        );</span>
-<span class="ln" id="L442">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L443">            <span class="tok-kw">for</span> tool <span class="tok-kw">in</span> Tool::ALL {</span>
-<span class="ln" id="L444">                <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L445">                    .<span class="tok-fn">button</span>(format!(<span class="tok-str">&quot;choose a {} folder&#8230;&quot;</span>, tool.<span class="tok-fn">name</span>()))</span>
-<span class="ln" id="L446">                    .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L447">                {</span>
-<span class="ln" id="L448">                    storage.<span class="tok-fn">pick_by_hand</span>(*tool);</span>
-<span class="ln" id="L449">                }</span>
-<span class="ln" id="L450">            }</span>
-<span class="ln" id="L451">        });</span>
-<span class="ln" id="L452">    }</span>
-<span class="ln" id="L453"></span>
-<span class="ln" id="L454">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
-<span class="ln" id="L455">    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L456">        RichText::<span class="tok-fn">new</span>(volumes::DISK_ADVICE)</span>
-<span class="ln" id="L457">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
-<span class="ln" id="L458">            .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L459">    );</span>
-<span class="ln" id="L460"></span>
-<span class="ln" id="L461">    storage.destination != before</span>
-<span class="ln" id="L462">}</span>
+<span class="ln" id="L387">            <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice, Hidden::NoHiddenVolume, <span class="tok-str">&quot;no hidden volume&quot;</span>);</span>
+<span class="ln" id="L388">            <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(</span>
+<span class="ln" id="L389">                ui,</span>
+<span class="ln" id="L390">                &amp;<span class="tok-kw">mut</span> choice,</span>
+<span class="ln" id="L391">                Hidden::IsTheHiddenVolume,</span>
+<span class="ln" id="L392">                <span class="tok-str">&quot;this is the hidden one&quot;</span>,</span>
+<span class="ln" id="L393">            );</span>
+<span class="ln" id="L394">            <span class="tok-kw">crate</span>::layout::<span class="tok-fn">chip_value</span>(</span>
+<span class="ln" id="L395">                ui,</span>
+<span class="ln" id="L396">                &amp;<span class="tok-kw">mut</span> choice,</span>
+<span class="ln" id="L397">                Hidden::OuterVolumeOfAHiddenPair,</span>
+<span class="ln" id="L398">                <span class="tok-str">&quot;this is the outer one&quot;</span>,</span>
+<span class="ln" id="L399">            );</span>
+<span class="ln" id="L400">        });</span>
+<span class="ln" id="L401">        <span class="tok-kw">if</span> choice != current {</span>
+<span class="ln" id="L402">            storage.<span class="tok-fn">answer_hidden</span>(choice);</span>
+<span class="ln" id="L403">        }</span>
+<span class="ln" id="L404">    }</span>
+<span class="ln" id="L405"></span>
+<span class="ln" id="L406">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">8.0</span>);</span>
+<span class="ln" id="L407">    <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;look again&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L408">        storage.<span class="tok-fn">refresh</span>();</span>
+<span class="ln" id="L409">    }</span>
+<span class="ln" id="L410"></span>
+<span class="ln" id="L411">    <span class="tok-kw">for</span> volume <span class="tok-kw">in</span> storage.<span class="tok-fn">found</span>().<span class="tok-fn">to_vec</span>() {</span>
+<span class="ln" id="L412">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L413">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(volume.path.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>()));</span>
+<span class="ln" id="L414">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(volume.tool.<span class="tok-fn">name</span>()).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L415">            <span class="tok-kw">if</span> ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;write here&quot;</span>).<span class="tok-fn">clicked</span>() {</span>
+<span class="ln" id="L416">                storage.<span class="tok-fn">choose</span>(volume.<span class="tok-fn">clone</span>());</span>
+<span class="ln" id="L417">            }</span>
+<span class="ln" id="L418">        });</span>
+<span class="ln" id="L419">    }</span>
+<span class="ln" id="L420"></span>
+<span class="ln" id="L421">    <span class="tok-com">// Roadmap item 84. The guided path, which is the main offer when nothing was</span></span>
+<span class="ln" id="L422">    <span class="tok-com">// found rather than a footnote under a list of nothing.</span></span>
+<span class="ln" id="L423">    <span class="tok-kw">if</span> storage.<span class="tok-fn">found_nothing</span>() {</span>
+<span class="ln" id="L424">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L425">            RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;no mounted Cryptomator vault or VeraCrypt volume was found&quot;</span>)</span>
+<span class="ln" id="L426">                .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()),</span>
+<span class="ln" id="L427">        );</span>
+<span class="ln" id="L428">        <span class="tok-kw">for</span> (tool, evidence, present) <span class="tok-kw">in</span> storage.<span class="tok-fn">presence</span>().<span class="tok-fn">to_vec</span>() {</span>
+<span class="ln" id="L429">            ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L430">                RichText::<span class="tok-fn">new</span>(format!(<span class="tok-str">&quot;{}: {evidence}&quot;</span>, tool.<span class="tok-fn">name</span>()))</span>
+<span class="ln" id="L431">                    .<span class="tok-fn">color</span>(<span class="tok-kw">if</span> present { p::<span class="tok-fn">green</span>() } <span class="tok-kw">else</span> { p::<span class="tok-fn">muted</span>() })</span>
+<span class="ln" id="L432">                    .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L433">            );</span>
+<span class="ln" id="L434">        }</span>
+<span class="ln" id="L435">        ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L436">            RichText::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L437">                <span class="tok-str">&quot;If one is open and VeilVoice did not see it, point at it by hand. \</span></span>
+<span class="ln" id="L438"><span class="tok-str">                 VeilVoice never opens or closes these itself and never asks for their \</span></span>
+<span class="ln" id="L439"><span class="tok-str">                 password: unlock it in its own program first.&quot;</span>,</span>
+<span class="ln" id="L440">            )</span>
+<span class="ln" id="L441">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L442">            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L443">        );</span>
+<span class="ln" id="L444">        ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L445">            <span class="tok-kw">for</span> tool <span class="tok-kw">in</span> Tool::ALL {</span>
+<span class="ln" id="L446">                <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L447">                    .<span class="tok-fn">button</span>(format!(<span class="tok-str">&quot;choose a {} folder&#8230;&quot;</span>, tool.<span class="tok-fn">name</span>()))</span>
+<span class="ln" id="L448">                    .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L449">                {</span>
+<span class="ln" id="L450">                    storage.<span class="tok-fn">pick_by_hand</span>(*tool);</span>
+<span class="ln" id="L451">                }</span>
+<span class="ln" id="L452">            }</span>
+<span class="ln" id="L453">        });</span>
+<span class="ln" id="L454">    }</span>
+<span class="ln" id="L455"></span>
+<span class="ln" id="L456">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">6.0</span>);</span>
+<span class="ln" id="L457">    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L458">        RichText::<span class="tok-fn">new</span>(volumes::DISK_ADVICE)</span>
+<span class="ln" id="L459">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>())</span>
+<span class="ln" id="L460">            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L461">    );</span>
+<span class="ln" id="L462"></span>
+<span class="ln" id="L463">    storage.destination != before</span>
+<span class="ln" id="L464">}</span>
 </span>
-<span class="ln" id="L463"></span>
-<span class="ln" id="L464"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L465"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L466">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L467"></span>
-<span class="ln" id="L468">    <span class="tok-com">/// The mount list that holds the volume `vault` builds.</span></span>
-<span class="ln" id="L469">    <span class="tok-kw">fn</span> <span class="tok-fn">mounted</span>() -&gt; Vec&lt;Volume&gt; {</span>
-<span class="ln" id="L470">        vec![Volume::<span class="tok-fn">found</span>(</span>
-<span class="ln" id="L471">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>),</span>
-<span class="ln" id="L472">            Tool::VeraCrypt,</span>
-<span class="ln" id="L473">        )]</span>
-<span class="ln" id="L474">    }</span>
-<span class="ln" id="L475"></span>
-<span class="ln" id="L476">    <span class="tok-kw">fn</span> <span class="tok-fn">vault</span>(tool: Tool, hidden: Hidden) -&gt; Destination {</span>
-<span class="ln" id="L477">        Destination {</span>
-<span class="ln" id="L478">            volume: <span class="tok-fn">Some</span>(Volume {</span>
-<span class="ln" id="L479">                path: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>),</span>
-<span class="ln" id="L480">                tool,</span>
-<span class="ln" id="L481">                hidden,</span>
-<span class="ln" id="L482">            }),</span>
-<span class="ln" id="L483">        }</span>
-<span class="ln" id="L484">    }</span>
-<span class="ln" id="L485"></span>
-<span class="ln" id="L486">    <span class="tok-com">/// The panel draws every frame, so nothing in it may touch the disk.</span></span>
-<span class="ln" id="L487">    <span class="tok-com">/// Deciding whether the vault is mounted means reading the mount table, and</span></span>
-<span class="ln" id="L488">    <span class="tok-com">/// the first version of this module did it from the panel: sixty reads a</span></span>
-<span class="ln" id="L489">    <span class="tok-com">/// second for an answer</span></span>
-<span class="ln" id="L490">    <span class="tok-com">/// that changes when somebody unlocks a volume. `app.rs` already refuses</span></span>
-<span class="ln" id="L491">    <span class="tok-com">/// this in its own draw path; a new module is where that guard does not</span></span>
-<span class="ln" id="L492">    <span class="tok-com">/// look, which is exactly why it is worth repeating here.</span></span>
-<span class="ln" id="L493">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L494">    <span class="tok-kw">fn</span> <span class="tok-fn">the_panel_asks_the_disk_nothing</span>() {</span>
-<span class="ln" id="L495">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;storage.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L496">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn panel(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the panel exists&quot;</span>);</span>
-<span class="ln" id="L497">        <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L498">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>)</span>
-<span class="ln" id="L499">            .<span class="tok-fn">map</span>(|at| start + at)</span>
-<span class="ln" id="L500">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L501">        <span class="tok-kw">let</span> body: String = source[start..end]</span>
-<span class="ln" id="L502">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L503">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
-<span class="ln" id="L504">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L505">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L506">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L507">            <span class="tok-str">&quot;still_mounted(&quot;</span>,</span>
-<span class="ln" id="L508">            <span class="tok-str">&quot;try_exists&quot;</span>,</span>
-<span class="ln" id="L509">            <span class="tok-str">&quot;.exists()&quot;</span>,</span>
-<span class="ln" id="L510">            <span class="tok-str">&quot;read_to_string&quot;</span>,</span>
-<span class="ln" id="L511">            <span class="tok-str">&quot;std::fs::&quot;</span>,</span>
-<span class="ln" id="L512">        ] {</span>
-<span class="ln" id="L513">            assert!(</span>
-<span class="ln" id="L514">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L515">                <span class="tok-str">&quot;the panel calls {forbidden:?}, which asks the disk once per frame&quot;</span></span>
-<span class="ln" id="L516">            );</span>
-<span class="ln" id="L517">        }</span>
-<span class="ln" id="L518">    }</span>
-<span class="ln" id="L519"></span>
-<span class="ln" id="L520">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L521">    <span class="tok-kw">fn</span> <span class="tok-fn">no_destination_writes_where_veilvoice_always_did</span>() {</span>
-<span class="ln" id="L522">        <span class="tok-kw">let</span> d = Destination::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L523">        assert!(d.<span class="tok-fn">ready</span>(), <span class="tok-str">&quot;the ordinary path needs no permission&quot;</span>);</span>
-<span class="ln" id="L524">        assert!(d.<span class="tok-fn">blocked</span>().<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L525">        assert_eq!(</span>
-<span class="ln" id="L526">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;[]),</span>
-<span class="ln" id="L527">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>)</span>
-<span class="ln" id="L528">        );</span>
-<span class="ln" id="L529">    }</span>
-<span class="ln" id="L530"></span>
-<span class="ln" id="L531">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L532">    <span class="tok-kw">fn</span> <span class="tok-fn">a_chosen_vault_keeps_the_file_name_and_replaces_the_folder</span>() {</span>
-<span class="ln" id="L533">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::NoHiddenVolume);</span>
-<span class="ln" id="L534">        assert_eq!(</span>
-<span class="ln" id="L535">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;<span class="tok-fn">mounted</span>()),</span>
-<span class="ln" id="L536">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1/talk.veiled.wav&quot;</span>)</span>
-<span class="ln" id="L537">        );</span>
-<span class="ln" id="L538">    }</span>
-<span class="ln" id="L539"></span>
-<span class="ln" id="L540">    <span class="tok-com">/// F-95. F-93 fixed the panel; this is where the file is written.</span></span>
-<span class="ln" id="L541">    <span class="tok-com">///</span></span>
-<span class="ln" id="L542">    <span class="tok-com">/// A vault chosen and answered for, then locked, leaves its mount point</span></span>
-<span class="ln" id="L543">    <span class="tok-com">/// behind as an empty directory and nothing about the destination changes.</span></span>
-<span class="ln" id="L544">    <span class="tok-com">/// Writing there puts a veiled recording on the ordinary disk while its</span></span>
-<span class="ln" id="L545">    <span class="tok-com">/// owner believes it went inside.</span></span>
-<span class="ln" id="L546">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L547">    <span class="tok-kw">fn</span> <span class="tok-fn">a_vault_locked_since_it_was_chosen_never_receives_a_file</span>() {</span>
-<span class="ln" id="L548">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::NoHiddenVolume);</span>
-<span class="ln" id="L549">        assert!(d.<span class="tok-fn">ready</span>(), <span class="tok-str">&quot;the hidden question is answered, so it is ready&quot;</span>);</span>
-<span class="ln" id="L550">        assert_eq!(</span>
-<span class="ln" id="L551">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;[]),</span>
-<span class="ln" id="L552">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>),</span>
-<span class="ln" id="L553">            <span class="tok-str">&quot;an answered destination that is no longer mounted must not be used&quot;</span></span>
-<span class="ln" id="L554">        );</span>
-<span class="ln" id="L555">    }</span>
-<span class="ln" id="L556"></span>
-<span class="ln" id="L557">    <span class="tok-com">/// Roadmap item 83&#x27;s whole point, from the other side: a caller that forgets to</span></span>
-<span class="ln" id="L558">    <span class="tok-com">/// check `ready` must not be handed the vault path anyway.</span></span>
-<span class="ln" id="L559">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L560">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unanswered_destination_never_yields_a_vault_path</span>() {</span>
-<span class="ln" id="L561">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::Unanswered);</span>
-<span class="ln" id="L562">        assert!(!d.<span class="tok-fn">ready</span>());</span>
-<span class="ln" id="L563">        assert!(d.<span class="tok-fn">blocked</span>().<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L564">        assert_eq!(</span>
-<span class="ln" id="L565">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;<span class="tok-fn">mounted</span>()),</span>
-<span class="ln" id="L566">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>),</span>
-<span class="ln" id="L567">            <span class="tok-str">&quot;an unanswered destination must not place a file inside it&quot;</span></span>
-<span class="ln" id="L568">        );</span>
-<span class="ln" id="L569">    }</span>
-<span class="ln" id="L570"></span>
-<span class="ln" id="L571">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L572">    <span class="tok-kw">fn</span> <span class="tok-fn">the_outer_volume_of_a_hidden_pair_is_refused_here_too</span>() {</span>
-<span class="ln" id="L573">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::OuterVolumeOfAHiddenPair);</span>
-<span class="ln" id="L574">        assert!(!d.<span class="tok-fn">ready</span>());</span>
-<span class="ln" id="L575">        assert!(d.<span class="tok-fn">blocked</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a reason&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;destroy&quot;</span>));</span>
-<span class="ln" id="L576">    }</span>
-<span class="ln" id="L577"></span>
-<span class="ln" id="L578">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L579">    <span class="tok-kw">fn</span> <span class="tok-fn">a_cryptomator_vault_needs_no_answer</span>() {</span>
-<span class="ln" id="L580">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::Cryptomator, Hidden::Unanswered);</span>
-<span class="ln" id="L581">        assert!(d.<span class="tok-fn">ready</span>());</span>
-<span class="ln" id="L582">        assert_eq!(</span>
-<span class="ln" id="L583">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;<span class="tok-fn">mounted</span>()),</span>
-<span class="ln" id="L584">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1/talk.veiled.wav&quot;</span>)</span>
-<span class="ln" id="L585">        );</span>
-<span class="ln" id="L586">    }</span>
-<span class="ln" id="L587"></span>
-<span class="ln" id="L588">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L589">    <span class="tok-kw">fn</span> <span class="tok-fn">a_destination_round_trips_through_the_settings_file</span>() {</span>
-<span class="ln" id="L590">        <span class="tok-kw">let</span> original = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::IsTheHiddenVolume);</span>
-<span class="ln" id="L591">        <span class="tok-kw">let</span> (dir, tool, hidden) = original.<span class="tok-fn">to_prefs</span>();</span>
-<span class="ln" id="L592">        assert_eq!(Destination::<span class="tok-fn">from_prefs</span>(&amp;dir, &amp;tool, &amp;hidden), original);</span>
-<span class="ln" id="L593"></span>
-<span class="ln" id="L594">        <span class="tok-kw">let</span> none = Destination::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L595">        <span class="tok-kw">let</span> (dir, tool, hidden) = none.<span class="tok-fn">to_prefs</span>();</span>
-<span class="ln" id="L596">        assert_eq!(Destination::<span class="tok-fn">from_prefs</span>(&amp;dir, &amp;tool, &amp;hidden), none);</span>
-<span class="ln" id="L597">    }</span>
-<span class="ln" id="L598"></span>
-<span class="ln" id="L599">    <span class="tok-com">/// A settings file somebody edited must not be able to answer the one</span></span>
-<span class="ln" id="L600">    <span class="tok-com">/// question whose wrong answer destroys data.</span></span>
-<span class="ln" id="L601">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L602">    <span class="tok-kw">fn</span> <span class="tok-fn">a_nonsense_settings_file_leaves_the_question_unanswered</span>() {</span>
-<span class="ln" id="L603">        <span class="tok-kw">let</span> d = Destination::<span class="tok-fn">from_prefs</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>, <span class="tok-str">&quot;veracrypt&quot;</span>, <span class="tok-str">&quot;definitely-fine&quot;</span>);</span>
-<span class="ln" id="L604">        assert_eq!(</span>
-<span class="ln" id="L605">            d.volume.<span class="tok-fn">as_ref</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a volume&quot;</span>).hidden,</span>
-<span class="ln" id="L606">            Hidden::Unanswered</span>
-<span class="ln" id="L607">        );</span>
-<span class="ln" id="L608">        assert!(!d.<span class="tok-fn">ready</span>());</span>
-<span class="ln" id="L609"></span>
-<span class="ln" id="L610">        <span class="tok-com">// And an unrecognised tool produces no destination at all.</span></span>
-<span class="ln" id="L611">        assert_eq!(</span>
-<span class="ln" id="L612">            Destination::<span class="tok-fn">from_prefs</span>(<span class="tok-str">&quot;/media/x&quot;</span>, <span class="tok-str">&quot;bitlocker&quot;</span>, <span class="tok-str">&quot;none&quot;</span>),</span>
-<span class="ln" id="L613">            Destination::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L614">        );</span>
-<span class="ln" id="L615">    }</span>
-<span class="ln" id="L616"></span>
-<span class="ln" id="L617">    <span class="tok-com">/// A vault that has been locked since it was chosen is a directory that is</span></span>
-<span class="ln" id="L618">    <span class="tok-com">/// no longer encrypted, or is gone.</span></span>
-<span class="ln" id="L619">    <span class="tok-com">/// F-93. A locked vault leaves its mount point behind as an ordinary</span></span>
-<span class="ln" id="L620">    <span class="tok-com">/// directory, so existence says yes when the honest answer is no.</span></span>
-<span class="ln" id="L621">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L622">    <span class="tok-kw">fn</span> <span class="tok-fn">a_vault_that_is_no_longer_mounted_is_noticed</span>() {</span>
-<span class="ln" id="L623">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::NoHiddenVolume);</span>
-<span class="ln" id="L624">        <span class="tok-kw">let</span> mounted = vec![Volume::<span class="tok-fn">found</span>(</span>
-<span class="ln" id="L625">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>),</span>
-<span class="ln" id="L626">            Tool::VeraCrypt,</span>
-<span class="ln" id="L627">        )];</span>
-<span class="ln" id="L628">        assert!(d.<span class="tok-fn">still_mounted</span>(&amp;mounted));</span>
-<span class="ln" id="L629"></span>
-<span class="ln" id="L630">        <span class="tok-com">// The directory can still be there. Nothing is mounted on it.</span></span>
-<span class="ln" id="L631">        <span class="tok-kw">let</span> empty: Vec&lt;Volume&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L632">        assert!(</span>
-<span class="ln" id="L633">            !d.<span class="tok-fn">still_mounted</span>(&amp;empty),</span>
-<span class="ln" id="L634">            <span class="tok-str">&quot;an unmounted volume must not read as present just because its \</span></span>
-<span class="ln" id="L635"><span class="tok-str">             mount point is still a directory&quot;</span></span>
-<span class="ln" id="L636">        );</span>
-<span class="ln" id="L637"></span>
-<span class="ln" id="L638">        <span class="tok-com">// No destination is always fine: writing beside the source needs no</span></span>
-<span class="ln" id="L639">        <span class="tok-com">// volume at all.</span></span>
-<span class="ln" id="L640">        assert!(Destination::<span class="tok-fn">default</span>().<span class="tok-fn">still_mounted</span>(&amp;empty));</span>
-<span class="ln" id="L641">    }</span>
-<span class="ln" id="L642"></span>
-<span class="ln" id="L643">    <span class="tok-com">/// A folder chosen inside a mounted vault is inside it.</span></span>
-<span class="ln" id="L644">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L645">    <span class="tok-kw">fn</span> <span class="tok-fn">a_folder_within_a_mounted_vault_counts_as_mounted</span>() {</span>
-<span class="ln" id="L646">        <span class="tok-kw">let</span> inside = Destination {</span>
-<span class="ln" id="L647">            volume: <span class="tok-fn">Some</span>(Volume {</span>
-<span class="ln" id="L648">                path: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/home/u/Vault/recordings&quot;</span>),</span>
-<span class="ln" id="L649">                tool: Tool::Cryptomator,</span>
-<span class="ln" id="L650">                hidden: Hidden::Unanswered,</span>
-<span class="ln" id="L651">            }),</span>
-<span class="ln" id="L652">        };</span>
-<span class="ln" id="L653">        <span class="tok-kw">let</span> mounted = vec![Volume::<span class="tok-fn">found</span>(</span>
-<span class="ln" id="L654">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/home/u/Vault&quot;</span>),</span>
-<span class="ln" id="L655">            Tool::Cryptomator,</span>
-<span class="ln" id="L656">        )];</span>
-<span class="ln" id="L657">        assert!(inside.<span class="tok-fn">still_mounted</span>(&amp;mounted));</span>
-<span class="ln" id="L658">    }</span>
-<span class="ln" id="L659">}</span>
+<span class="ln" id="L465"></span>
+<span class="ln" id="L466"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L467"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L468">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L469"></span>
+<span class="ln" id="L470">    <span class="tok-com">/// The mount list that holds the volume `vault` builds.</span></span>
+<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">mounted</span>() -&gt; Vec&lt;Volume&gt; {</span>
+<span class="ln" id="L472">        vec![Volume::<span class="tok-fn">found</span>(</span>
+<span class="ln" id="L473">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>),</span>
+<span class="ln" id="L474">            Tool::VeraCrypt,</span>
+<span class="ln" id="L475">        )]</span>
+<span class="ln" id="L476">    }</span>
+<span class="ln" id="L477"></span>
+<span class="ln" id="L478">    <span class="tok-kw">fn</span> <span class="tok-fn">vault</span>(tool: Tool, hidden: Hidden) -&gt; Destination {</span>
+<span class="ln" id="L479">        Destination {</span>
+<span class="ln" id="L480">            volume: <span class="tok-fn">Some</span>(Volume {</span>
+<span class="ln" id="L481">                path: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>),</span>
+<span class="ln" id="L482">                tool,</span>
+<span class="ln" id="L483">                hidden,</span>
+<span class="ln" id="L484">            }),</span>
+<span class="ln" id="L485">        }</span>
+<span class="ln" id="L486">    }</span>
+<span class="ln" id="L487"></span>
+<span class="ln" id="L488">    <span class="tok-com">/// The panel draws every frame, so nothing in it may touch the disk.</span></span>
+<span class="ln" id="L489">    <span class="tok-com">/// Deciding whether the vault is mounted means reading the mount table, and</span></span>
+<span class="ln" id="L490">    <span class="tok-com">/// the first version of this module did it from the panel: sixty reads a</span></span>
+<span class="ln" id="L491">    <span class="tok-com">/// second for an answer</span></span>
+<span class="ln" id="L492">    <span class="tok-com">/// that changes when somebody unlocks a volume. `app.rs` already refuses</span></span>
+<span class="ln" id="L493">    <span class="tok-com">/// this in its own draw path; a new module is where that guard does not</span></span>
+<span class="ln" id="L494">    <span class="tok-com">/// look, which is exactly why it is worth repeating here.</span></span>
+<span class="ln" id="L495">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L496">    <span class="tok-kw">fn</span> <span class="tok-fn">the_panel_asks_the_disk_nothing</span>() {</span>
+<span class="ln" id="L497">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;storage.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L498">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn panel(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the panel exists&quot;</span>);</span>
+<span class="ln" id="L499">        <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L500">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>)</span>
+<span class="ln" id="L501">            .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L502">            .<span class="tok-fn">unwrap_or</span>(source.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L503">        <span class="tok-kw">let</span> body: String = source[start..end]</span>
+<span class="ln" id="L504">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L505">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
+<span class="ln" id="L506">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L507">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L508">        <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L509">            <span class="tok-str">&quot;still_mounted(&quot;</span>,</span>
+<span class="ln" id="L510">            <span class="tok-str">&quot;try_exists&quot;</span>,</span>
+<span class="ln" id="L511">            <span class="tok-str">&quot;.exists()&quot;</span>,</span>
+<span class="ln" id="L512">            <span class="tok-str">&quot;read_to_string&quot;</span>,</span>
+<span class="ln" id="L513">            <span class="tok-str">&quot;std::fs::&quot;</span>,</span>
+<span class="ln" id="L514">        ] {</span>
+<span class="ln" id="L515">            assert!(</span>
+<span class="ln" id="L516">                !body.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L517">                <span class="tok-str">&quot;the panel calls {forbidden:?}, which asks the disk once per frame&quot;</span></span>
+<span class="ln" id="L518">            );</span>
+<span class="ln" id="L519">        }</span>
+<span class="ln" id="L520">    }</span>
+<span class="ln" id="L521"></span>
+<span class="ln" id="L522">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L523">    <span class="tok-kw">fn</span> <span class="tok-fn">no_destination_writes_where_veilvoice_always_did</span>() {</span>
+<span class="ln" id="L524">        <span class="tok-kw">let</span> d = Destination::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L525">        assert!(d.<span class="tok-fn">ready</span>(), <span class="tok-str">&quot;the ordinary path needs no permission&quot;</span>);</span>
+<span class="ln" id="L526">        assert!(d.<span class="tok-fn">blocked</span>().<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L527">        assert_eq!(</span>
+<span class="ln" id="L528">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;[]),</span>
+<span class="ln" id="L529">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>)</span>
+<span class="ln" id="L530">        );</span>
+<span class="ln" id="L531">    }</span>
+<span class="ln" id="L532"></span>
+<span class="ln" id="L533">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L534">    <span class="tok-kw">fn</span> <span class="tok-fn">a_chosen_vault_keeps_the_file_name_and_replaces_the_folder</span>() {</span>
+<span class="ln" id="L535">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::NoHiddenVolume);</span>
+<span class="ln" id="L536">        assert_eq!(</span>
+<span class="ln" id="L537">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;<span class="tok-fn">mounted</span>()),</span>
+<span class="ln" id="L538">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1/talk.veiled.wav&quot;</span>)</span>
+<span class="ln" id="L539">        );</span>
+<span class="ln" id="L540">    }</span>
+<span class="ln" id="L541"></span>
+<span class="ln" id="L542">    <span class="tok-com">/// F-95. F-93 fixed the panel; this is where the file is written.</span></span>
+<span class="ln" id="L543">    <span class="tok-com">///</span></span>
+<span class="ln" id="L544">    <span class="tok-com">/// A vault chosen and answered for, then locked, leaves its mount point</span></span>
+<span class="ln" id="L545">    <span class="tok-com">/// behind as an empty directory and nothing about the destination changes.</span></span>
+<span class="ln" id="L546">    <span class="tok-com">/// Writing there puts a veiled recording on the ordinary disk while its</span></span>
+<span class="ln" id="L547">    <span class="tok-com">/// owner believes it went inside.</span></span>
+<span class="ln" id="L548">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L549">    <span class="tok-kw">fn</span> <span class="tok-fn">a_vault_locked_since_it_was_chosen_never_receives_a_file</span>() {</span>
+<span class="ln" id="L550">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::NoHiddenVolume);</span>
+<span class="ln" id="L551">        assert!(d.<span class="tok-fn">ready</span>(), <span class="tok-str">&quot;the hidden question is answered, so it is ready&quot;</span>);</span>
+<span class="ln" id="L552">        assert_eq!(</span>
+<span class="ln" id="L553">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;[]),</span>
+<span class="ln" id="L554">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>),</span>
+<span class="ln" id="L555">            <span class="tok-str">&quot;an answered destination that is no longer mounted must not be used&quot;</span></span>
+<span class="ln" id="L556">        );</span>
+<span class="ln" id="L557">    }</span>
+<span class="ln" id="L558"></span>
+<span class="ln" id="L559">    <span class="tok-com">/// Roadmap item 83&#x27;s whole point, from the other side: a caller that forgets to</span></span>
+<span class="ln" id="L560">    <span class="tok-com">/// check `ready` must not be handed the vault path anyway.</span></span>
+<span class="ln" id="L561">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L562">    <span class="tok-kw">fn</span> <span class="tok-fn">an_unanswered_destination_never_yields_a_vault_path</span>() {</span>
+<span class="ln" id="L563">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::Unanswered);</span>
+<span class="ln" id="L564">        assert!(!d.<span class="tok-fn">ready</span>());</span>
+<span class="ln" id="L565">        assert!(d.<span class="tok-fn">blocked</span>().<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L566">        assert_eq!(</span>
+<span class="ln" id="L567">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;<span class="tok-fn">mounted</span>()),</span>
+<span class="ln" id="L568">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>),</span>
+<span class="ln" id="L569">            <span class="tok-str">&quot;an unanswered destination must not place a file inside it&quot;</span></span>
+<span class="ln" id="L570">        );</span>
+<span class="ln" id="L571">    }</span>
+<span class="ln" id="L572"></span>
+<span class="ln" id="L573">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L574">    <span class="tok-kw">fn</span> <span class="tok-fn">the_outer_volume_of_a_hidden_pair_is_refused_here_too</span>() {</span>
+<span class="ln" id="L575">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::OuterVolumeOfAHiddenPair);</span>
+<span class="ln" id="L576">        assert!(!d.<span class="tok-fn">ready</span>());</span>
+<span class="ln" id="L577">        assert!(d.<span class="tok-fn">blocked</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a reason&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&quot;destroy&quot;</span>));</span>
+<span class="ln" id="L578">    }</span>
+<span class="ln" id="L579"></span>
+<span class="ln" id="L580">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L581">    <span class="tok-kw">fn</span> <span class="tok-fn">a_cryptomator_vault_needs_no_answer</span>() {</span>
+<span class="ln" id="L582">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::Cryptomator, Hidden::Unanswered);</span>
+<span class="ln" id="L583">        assert!(d.<span class="tok-fn">ready</span>());</span>
+<span class="ln" id="L584">        assert_eq!(</span>
+<span class="ln" id="L585">            d.<span class="tok-fn">place</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/u/talk.veiled.wav&quot;</span>), &amp;<span class="tok-fn">mounted</span>()),</span>
+<span class="ln" id="L586">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/media/veracrypt1/talk.veiled.wav&quot;</span>)</span>
+<span class="ln" id="L587">        );</span>
+<span class="ln" id="L588">    }</span>
+<span class="ln" id="L589"></span>
+<span class="ln" id="L590">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L591">    <span class="tok-kw">fn</span> <span class="tok-fn">a_destination_round_trips_through_the_settings_file</span>() {</span>
+<span class="ln" id="L592">        <span class="tok-kw">let</span> original = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::IsTheHiddenVolume);</span>
+<span class="ln" id="L593">        <span class="tok-kw">let</span> (dir, tool, hidden) = original.<span class="tok-fn">to_prefs</span>();</span>
+<span class="ln" id="L594">        assert_eq!(Destination::<span class="tok-fn">from_prefs</span>(&amp;dir, &amp;tool, &amp;hidden), original);</span>
+<span class="ln" id="L595"></span>
+<span class="ln" id="L596">        <span class="tok-kw">let</span> none = Destination::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L597">        <span class="tok-kw">let</span> (dir, tool, hidden) = none.<span class="tok-fn">to_prefs</span>();</span>
+<span class="ln" id="L598">        assert_eq!(Destination::<span class="tok-fn">from_prefs</span>(&amp;dir, &amp;tool, &amp;hidden), none);</span>
+<span class="ln" id="L599">    }</span>
+<span class="ln" id="L600"></span>
+<span class="ln" id="L601">    <span class="tok-com">/// A settings file somebody edited must not be able to answer the one</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// question whose wrong answer destroys data.</span></span>
+<span class="ln" id="L603">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L604">    <span class="tok-kw">fn</span> <span class="tok-fn">a_nonsense_settings_file_leaves_the_question_unanswered</span>() {</span>
+<span class="ln" id="L605">        <span class="tok-kw">let</span> d = Destination::<span class="tok-fn">from_prefs</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>, <span class="tok-str">&quot;veracrypt&quot;</span>, <span class="tok-str">&quot;definitely-fine&quot;</span>);</span>
+<span class="ln" id="L606">        assert_eq!(</span>
+<span class="ln" id="L607">            d.volume.<span class="tok-fn">as_ref</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a volume&quot;</span>).hidden,</span>
+<span class="ln" id="L608">            Hidden::Unanswered</span>
+<span class="ln" id="L609">        );</span>
+<span class="ln" id="L610">        assert!(!d.<span class="tok-fn">ready</span>());</span>
+<span class="ln" id="L611"></span>
+<span class="ln" id="L612">        <span class="tok-com">// And an unrecognised tool produces no destination at all.</span></span>
+<span class="ln" id="L613">        assert_eq!(</span>
+<span class="ln" id="L614">            Destination::<span class="tok-fn">from_prefs</span>(<span class="tok-str">&quot;/media/x&quot;</span>, <span class="tok-str">&quot;bitlocker&quot;</span>, <span class="tok-str">&quot;none&quot;</span>),</span>
+<span class="ln" id="L615">            Destination::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L616">        );</span>
+<span class="ln" id="L617">    }</span>
+<span class="ln" id="L618"></span>
+<span class="ln" id="L619">    <span class="tok-com">/// A vault that has been locked since it was chosen is a directory that is</span></span>
+<span class="ln" id="L620">    <span class="tok-com">/// no longer encrypted, or is gone.</span></span>
+<span class="ln" id="L621">    <span class="tok-com">/// F-93. A locked vault leaves its mount point behind as an ordinary</span></span>
+<span class="ln" id="L622">    <span class="tok-com">/// directory, so existence says yes when the honest answer is no.</span></span>
+<span class="ln" id="L623">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L624">    <span class="tok-kw">fn</span> <span class="tok-fn">a_vault_that_is_no_longer_mounted_is_noticed</span>() {</span>
+<span class="ln" id="L625">        <span class="tok-kw">let</span> d = <span class="tok-fn">vault</span>(Tool::VeraCrypt, Hidden::NoHiddenVolume);</span>
+<span class="ln" id="L626">        <span class="tok-kw">let</span> mounted = vec![Volume::<span class="tok-fn">found</span>(</span>
+<span class="ln" id="L627">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/media/veracrypt1&quot;</span>),</span>
+<span class="ln" id="L628">            Tool::VeraCrypt,</span>
+<span class="ln" id="L629">        )];</span>
+<span class="ln" id="L630">        assert!(d.<span class="tok-fn">still_mounted</span>(&amp;mounted));</span>
+<span class="ln" id="L631"></span>
+<span class="ln" id="L632">        <span class="tok-com">// The directory can still be there. Nothing is mounted on it.</span></span>
+<span class="ln" id="L633">        <span class="tok-kw">let</span> empty: Vec&lt;Volume&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L634">        assert!(</span>
+<span class="ln" id="L635">            !d.<span class="tok-fn">still_mounted</span>(&amp;empty),</span>
+<span class="ln" id="L636">            <span class="tok-str">&quot;an unmounted volume must not read as present just because its \</span></span>
+<span class="ln" id="L637"><span class="tok-str">             mount point is still a directory&quot;</span></span>
+<span class="ln" id="L638">        );</span>
+<span class="ln" id="L639"></span>
+<span class="ln" id="L640">        <span class="tok-com">// No destination is always fine: writing beside the source needs no</span></span>
+<span class="ln" id="L641">        <span class="tok-com">// volume at all.</span></span>
+<span class="ln" id="L642">        assert!(Destination::<span class="tok-fn">default</span>().<span class="tok-fn">still_mounted</span>(&amp;empty));</span>
+<span class="ln" id="L643">    }</span>
+<span class="ln" id="L644"></span>
+<span class="ln" id="L645">    <span class="tok-com">/// A folder chosen inside a mounted vault is inside it.</span></span>
+<span class="ln" id="L646">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L647">    <span class="tok-kw">fn</span> <span class="tok-fn">a_folder_within_a_mounted_vault_counts_as_mounted</span>() {</span>
+<span class="ln" id="L648">        <span class="tok-kw">let</span> inside = Destination {</span>
+<span class="ln" id="L649">            volume: <span class="tok-fn">Some</span>(Volume {</span>
+<span class="ln" id="L650">                path: PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/home/u/Vault/recordings&quot;</span>),</span>
+<span class="ln" id="L651">                tool: Tool::Cryptomator,</span>
+<span class="ln" id="L652">                hidden: Hidden::Unanswered,</span>
+<span class="ln" id="L653">            }),</span>
+<span class="ln" id="L654">        };</span>
+<span class="ln" id="L655">        <span class="tok-kw">let</span> mounted = vec![Volume::<span class="tok-fn">found</span>(</span>
+<span class="ln" id="L656">            PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;/home/u/Vault&quot;</span>),</span>
+<span class="ln" id="L657">            Tool::Cryptomator,</span>
+<span class="ln" id="L658">        )];</span>
+<span class="ln" id="L659">        assert!(inside.<span class="tok-fn">still_mounted</span>(&amp;mounted));</span>
+<span class="ln" id="L660">    }</span>
+<span class="ln" id="L661">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

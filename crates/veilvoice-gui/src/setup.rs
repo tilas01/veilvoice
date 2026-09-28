@@ -490,8 +490,8 @@ impl Setup {
         );
         ui.add_space(6.0);
         ui.horizontal(|ui| {
-            ui.selectable_value(&mut self.carry, Some(true), "carry them across");
-            ui.selectable_value(&mut self.carry, Some(false), "leave them here");
+            crate::layout::chip_value(ui, &mut self.carry, Some(true), "carry them across");
+            crate::layout::chip_value(ui, &mut self.carry, Some(false), "leave them here");
         });
         ui.label(
             RichText::new(match self.carry {

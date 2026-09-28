@@ -856,7 +856,7 @@ impl Verify {
                     Checker::Wsl => "GnuPG inside WSL",
                 };
                 if ui
-                    .add_enabled(usable, egui::Button::selectable(chosen, label))
+                    .add_enabled(usable, crate::layout::chip(chosen, label))
                     .clicked()
                 {
                     self.checker = Some(*choice);

@@ -1216,13 +1216,13 @@ impl Security {
         }
 
         ui.horizontal(|ui| {
-            ui.selectable_value(&mut self.sealing, Sealing::Password, "passphrase");
-            ui.selectable_value(&mut self.sealing, Sealing::PublicKey, "public key");
+            crate::layout::chip_value(ui, &mut self.sealing, Sealing::Password, "passphrase");
+            crate::layout::chip_value(ui, &mut self.sealing, Sealing::PublicKey, "public key");
             // Offered only where there is a lock to seal with. Showing a mode
             // that cannot work, greyed out, invites the reading that VeilVoice
             // is withholding something.
             if self.store.is_some() {
-                ui.selectable_value(&mut self.sealing, Sealing::AppLock, "app lock");
+                crate::layout::chip_value(ui, &mut self.sealing, Sealing::AppLock, "app lock");
             }
         });
 

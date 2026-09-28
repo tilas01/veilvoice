@@ -495,7 +495,7 @@ impl Group {
         ui.horizontal_wrapped(|ui| {
             for one in veilvoice_policy::workspace::BUILT_IN {
                 let chosen = self.profile == one.id;
-                if ui.selectable_label(chosen, one.name).clicked() && !chosen {
+                if ui.add(crate::layout::chip(chosen, one.name)).clicked() && !chosen {
                     self.apply_profile(one);
                 }
             }
@@ -639,7 +639,7 @@ impl Group {
         ui.horizontal(|ui| {
             for mode in [VoiceMode::Distinct, VoiceMode::Uniform] {
                 if ui
-                    .selectable_label(self.voices == mode, mode.label())
+                    .add(crate::layout::chip(self.voices == mode, mode.label()))
                     .clicked()
                     && self.voices != mode
                 {
@@ -1113,7 +1113,7 @@ impl Group {
                 .selected_text(self.theme.name)
                 .show_ui(ui, |ui| {
                     for palette in veilvoice_video::palette::PALETTES {
-                        ui.selectable_value(&mut self.theme, palette, palette.name);
+                        crate::layout::chip_value(ui, &mut self.theme, palette, palette.name);
                     }
                 });
             ui.label(
