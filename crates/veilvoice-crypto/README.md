@@ -112,19 +112,21 @@ flowchart TD
     n_aead["aead.rs<br/>280 lines"]
     n_amnesia["amnesia.rs<br/>472 lines"]
     n_container["container.rs<br/>627 lines"]
-    n_decoy["decoy.rs<br/>471 lines"]
+    n_decoy["decoy.rs<br/>897 lines"]
     n_hoard["hoard.rs<br/>1099 lines"]
     n_hybrid["hybrid.rs<br/>531 lines"]
     n_kdf["kdf.rs<br/>633 lines"]
     n_layout["layout.rs<br/>331 lines"]
-    n_lock["lock.rs<br/>2264 lines"]
+    n_lock["lock.rs<br/>2301 lines"]
     n_privatefile["privatefile.rs<br/>313 lines"]
     n_reset["reset.rs<br/>612 lines"]
     n_shred["shred.rs<br/>417 lines"]
     n_studio["studio.rs<br/>1522 lines"]
     n_tape["tape.rs<br/>391 lines"]
-    n_vault["vault.rs<br/>714 lines"]
+    n_vault["vault.rs<br/>769 lines"]
     n_weave["weave.rs<br/>1770 lines"]
+    n_decoy --> n_lock
+    n_decoy --> n_vault
     n_hoard --> n_amnesia
     n_hoard --> n_privatefile
     n_hoard --> n_weave
@@ -135,6 +137,7 @@ flowchart TD
     n_lock --> n_vault
     n_studio --> n_aead
     n_studio --> n_privatefile
+    n_vault --> n_decoy
     n_vault --> n_kdf
     n_vault --> n_lock
     n_vault --> n_privatefile
@@ -166,25 +169,25 @@ flowchart TD
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 280 | Authenticated encryption with XChaCha20-Poly1305. |
 | [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 472 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 627 | The .veil encrypted container format. |
-| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 471 | A second passphrase that opens a different, empty VeilVoice. |
+| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 897 | A second passphrase that opens a different, empty VeilVoice. |
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 531 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 633 | Password-based key derivation with Argon2id. |
 | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | 331 | Everything VeilVoice keeps between runs, in one list. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 243 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2264 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2301 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 313 | Writing a file that only its owner can read. |
 | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | 612 | Putting this machine back to a new install. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 417 | Secure erasure, the self-destruct. |
 | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1522 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | 391 | A recording held in locked, zeroizing memory while it is still being made. |
-| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 714 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 769 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1770 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**7,853 functional lines of Rust** in this crate. A functional line is a line
+**8,133 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -214,9 +217,12 @@ counts blank lines and comments too. Both are produced by
 | `fn open_with_password_within` | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | Decrypt a password-locked container, refusing one that declares a memory cost above max_m_cost. |
 | `fn open_with_secret_key` | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | Decrypt a container addressed to recipient. |
 | `enum Opened` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | Which passphrase was given. |
-| `struct Pair` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | A pair of passphrase verifiers, checked together. |
 | `const LEAST_DIFFERENCE` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | How similar two passphrases may be before the pair is refused. |
 | `enum Refused` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | Why a pair was refused. |
+| `struct Decoy` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | A decoy passphrase's stored form, on its own. |
+| `const RECORD_LEN` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | Exactly how long a record is: magic, version, three reserved bytes, the three costs, the salt, the derived key. |
+| `enum State` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | Whether this machine has a decoy passphrase, and whether it can be read. |
+| `struct Store` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | The decoy passphrase as this machine keeps it. |
 | `const SCOPE` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | What a decoy is worth, in the words a front end must show. |
 | `const WHY_NO_DESTRUCTION` | [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | Why no passphrase destroys anything, and why that is the honest choice. |
 | `struct StoreKey` | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | The key that names and opens everything in the hoard. |

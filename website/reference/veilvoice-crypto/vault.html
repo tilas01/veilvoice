@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/vault.svg" alt="vault.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/vault.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 714 lines &middot; <a href="vault.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 769 lines &middot; <a href="vault.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-is-real-here-and-what-is-only-awkward">What is real here and what is only awkward</a>
@@ -90,39 +90,51 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>714 lines defining <strong>13 functions</strong> (9 public), <strong>2 types</strong> and <strong>7 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>769 lines defining <strong>18 functions</strong> (14 public), <strong>2 types</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Found</code> <span style="color:var(--muted)">line 84</span> &middot; What Vault::load found when it went looking.</li>
-<li><code>struct Vault</code> <span style="color:var(--muted)">line 111</span> &middot; The two files a lock lives in, and the index that names them.</li>
+<li><code>enum Found</code> <span style="color:var(--muted)">line 92</span> &middot; What Vault::load found when it went looking.</li>
+<li><code>struct Vault</code> <span style="color:var(--muted)">line 119</span> &middot; The two files a lock lives in, and the index that names them.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Vault::at</code> <span style="color:var(--muted)">line 125</span> &middot; Resolve the vault under base, creating the index if there is none.
+<li><code>Vault::at</code> <span style="color:var(--muted)">line 134</span> &middot; Resolve the vault under base, creating the index if there is none.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>name_for</code></span>
 </li>
-<li><code>Vault::primary</code> <span style="color:var(--muted)">line 172</span> &middot; The file the lock is read from and written to.
+<li><code>Vault::primary</code> <span style="color:var(--muted)">line 182</span> &middot; The file the lock is read from and written to.
 </li>
-<li><code>Vault::shadow</code> <span style="color:var(--muted)">line 177</span> &middot; The second copy.
+<li><code>Vault::shadow</code> <span style="color:var(--muted)">line 187</span> &middot; The second copy.
 </li>
-<li><code>Vault::index</code> <span style="color:var(--muted)">line 182</span> &middot; The index that names both.
+<li><code>Vault::index</code> <span style="color:var(--muted)">line 192</span> &middot; The index that names both.
 </li>
-<li><code>Vault::load</code> <span style="color:var(--muted)">line 192</span> &middot; Read the lock, restoring one copy from the other if it has to.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>read_masked</code>, <code>write_one</code>, <code>mask</code></span>
+<li><code>Vault::decoy</code> <span style="color:var(--muted)">line 197</span> &middot; The decoy passphrase&#x27;s record, where one is set.
 </li>
-<li><code>Vault::store</code> <span style="color:var(--muted)">line 241</span> &middot; Write both copies, and say whether the spare is now current.
+<li><code>Vault::load_decoy</code> <span style="color:var(--muted)">line 212</span> &middot; Read the decoy record, or None when no decoy is set.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>mask</code></span>
+</li>
+<li><code>Vault::has_decoy_file</code> <span style="color:var(--muted)">line 223</span> &middot; Whether there is a decoy record at all, whether or not it reads.
+</li>
+<li><code>Vault::store_decoy</code> <span style="color:var(--muted)">line 228</span> &middot; Write the decoy record, masked, owner-only.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>write_one</code>, <code>mask</code></span>
 </li>
-<li><code>Vault::clear</code> <span style="color:var(--muted)">line 248</span> &middot; Remove both copies, and the index with them.
+<li><code>Vault::clear_decoy</code> <span style="color:var(--muted)">line 233</span> &middot; Remove the decoy record.
 </li>
-<li><code>admin_dir_present</code> <span style="color:var(--muted)">line 342</span> &middot; That same directory, but only when it is already there.
+<li><code>Vault::load</code> <span style="color:var(--muted)">line 247</span> &middot; Read the lock, restoring one copy from the other if it has to.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>read_masked</code>, <code>write_one</code>, <code>mask</code></span>
 </li>
-<li><code>admin_dir</code> <span style="color:var(--muted)">line 362</span> &middot; A directory only an administrator can write to, if this process can make one there.
+<li><code>Vault::store</code> <span style="color:var(--muted)">line 296</span> &middot; Write both copies, and say whether the spare is now current.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>write_one</code>, <code>mask</code></span>
+</li>
+<li><code>Vault::clear</code> <span style="color:var(--muted)">line 303</span> &middot; Remove both copies, and the index with them.
+</li>
+<li><code>admin_dir_present</code> <span style="color:var(--muted)">line 397</span> &middot; That same directory, but only when it is already there.
+</li>
+<li><code>admin_dir</code> <span style="color:var(--muted)">line 417</span> &middot; A directory only an administrator can write to, if this process can make one there.
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 617 615" width="617" height="615" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 633 715" width="633" height="715" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -131,127 +143,166 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="617" height="615" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M70.3 74.0 C 70.3 94.0, 499.5 300.0, 499.5 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M157.7 174.0 C 157.7 194.0, 340.7 300.0, 340.7 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M157.7 174.0 C 157.7 194.0, 149.7 300.0, 149.7 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M340.7 374.0 C 340.7 394.0, 308.4 400.0, 308.4 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M304.4 174.0 C 304.4 194.0, 149.7 300.0, 149.7 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M149.7 374.0 C 149.7 394.0, 308.4 400.0, 308.4 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<rect x="0" y="0" width="633" height="715" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M78.3 74.0 C 78.3 94.0, 507.5 400.0, 507.5 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M515.6 274.0 C 515.6 294.0, 348.7 400.0, 348.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M515.6 274.0 C 515.6 294.0, 157.7 400.0, 157.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M280.2 174.0 C 280.2 194.0, 316.5 500.0, 316.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M348.7 474.0 C 348.7 494.0, 316.5 500.0, 316.5 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M82.4 374.0 C 82.4 394.0, 157.7 400.0, 157.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M145.6 274.0 C 145.6 294.0, 157.7 400.0, 157.7 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M157.7 474.0 C 157.7 494.0, 316.5 500.0, 316.5 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <a href="vault.src.html#fn-vault-at">
-<rect x="20.0" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="70.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::at</text>
-<text x="70.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 125</text>
+<rect x="28.1" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="78.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::at</text>
+<text x="78.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
 </a>
 <a href="vault.src.html#fn-vault-primary">
-<rect x="146.5" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="217.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::primary</text>
-<text x="217.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 172</text>
+<rect x="154.6" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="225.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::primary</text>
+<text x="225.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 182</text>
 </a>
 <a href="vault.src.html#fn-vault-shadow">
-<rect x="313.4" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="379.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::shadow</text>
-<text x="379.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 177</text>
+<rect x="321.4" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="387.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::shadow</text>
+<text x="387.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 187</text>
 </a>
 <a href="vault.src.html#fn-vault-index">
-<rect x="472.2" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="534.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::index</text>
-<text x="534.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 182</text>
+<rect x="480.2" y="20.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="542.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::index</text>
+<text x="542.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
+</a>
+<a href="vault.src.html#fn-vault-decoy">
+<rect x="47.0" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="109.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::decoy</text>
+<text x="109.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
+</a>
+<a href="vault.src.html#fn-vault-load_decoy">
+<rect x="197.7" y="120.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="280.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::load_decoy</text>
+<text x="280.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 212</text>
+</a>
+<a href="vault.src.html#fn-vault-has_decoy_file">
+<rect x="388.7" y="120.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="487.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::has_decoy_file</text>
+<text x="487.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
+</a>
+<a href="vault.src.html#fn-vault-store_decoy">
+<rect x="59.1" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="145.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::store_decoy</text>
+<text x="145.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 228</text>
+</a>
+<a href="vault.src.html#fn-vault-clear_decoy">
+<rect x="258.2" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="344.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::clear_decoy</text>
+<text x="344.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 233</text>
 </a>
 <a href="vault.src.html#fn-vault-load">
-<rect x="99.4" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="157.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::load</text>
-<text x="157.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 192</text>
+<rect x="457.2" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="515.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::load</text>
+<text x="515.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 247</text>
 </a>
 <a href="vault.src.html#fn-vault-store">
-<rect x="242.1" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="304.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::store</text>
-<text x="304.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 241</text>
+<rect x="20.0" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="82.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::store</text>
+<text x="82.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 296</text>
 </a>
 <a href="vault.src.html#fn-vault-clear">
-<rect x="392.8" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="455.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::clear</text>
-<text x="455.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 248</text>
+<rect x="170.7" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="233.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::clear</text>
+<text x="233.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
 </a>
 <a href="vault.src.html#fn-vault-write_one">
-<rect x="71.2" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="149.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::write_one</text>
-<text x="149.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 268</text>
+<rect x="79.2" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="157.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::write_one</text>
+<text x="157.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 323</text>
 </a>
 <a href="vault.src.html#fn-vault-read_masked">
-<rect x="254.1" y="320.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="340.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::read_masked</text>
-<text x="340.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
+<rect x="262.2" y="420.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="348.7" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Vault::read_masked</text>
+<text x="348.7" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 342</text>
 </a>
 <a href="vault.src.html#fn-name_for">
-<rect x="453.2" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="499.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">name_for</text>
-<text x="499.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 295</text>
+<rect x="461.3" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="507.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">name_for</text>
+<text x="507.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 350</text>
 </a>
 <a href="vault.src.html#fn-mask">
-<rect x="262.2" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="308.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">mask</text>
-<text x="308.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 314</text>
+<rect x="270.3" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="316.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">mask</text>
+<text x="316.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 369</text>
 </a>
 <a href="vault.src.html#fn-admin_dir_present">
-<rect x="162.7" y="220.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="245.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">admin_dir_present</text>
-<text x="245.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 342</text>
+<rect x="321.4" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="403.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">admin_dir_present</text>
+<text x="403.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 397</text>
 </a>
 <a href="vault.src.html#fn-admin_dir-2">
-<rect x="353.7" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="403.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">admin_dir</text>
-<text x="403.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 362</text>
+<rect x="512.5" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="562.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">admin_dir</text>
+<text x="562.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 417</text>
 </a>
-<rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="520.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="529.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 540.5 L29.0 540.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="545.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="567.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="582.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="597.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
+<rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="620.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="629.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 640.5 L29.0 640.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="645.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="667.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="682.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
+<text x="20.0" y="697.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_at([&quot;Vault::at&lt;br/&gt;line 125&quot;])
-    n_primary([&quot;Vault::primary&lt;br/&gt;line 172&quot;])
-    n_shadow([&quot;Vault::shadow&lt;br/&gt;line 177&quot;])
-    n_index([&quot;Vault::index&lt;br/&gt;line 182&quot;])
-    n_load([&quot;Vault::load&lt;br/&gt;line 192&quot;])
-    n_store([&quot;Vault::store&lt;br/&gt;line 241&quot;])
-    n_clear([&quot;Vault::clear&lt;br/&gt;line 248&quot;])
-    n_write_one[&quot;Vault::write_one&lt;br/&gt;line 268&quot;]
-    n_read_masked[&quot;Vault::read_masked&lt;br/&gt;line 287&quot;]
-    n_name_for[&quot;name_for&lt;br/&gt;line 295&quot;]
-    n_mask[&quot;mask&lt;br/&gt;line 314&quot;]
-    n_admin_dir_present([&quot;admin_dir_present&lt;br/&gt;line 342&quot;])
-    n_admin_dir([&quot;admin_dir&lt;br/&gt;line 362&quot;])
+    n_at([&quot;Vault::at&lt;br/&gt;line 134&quot;])
+    n_primary([&quot;Vault::primary&lt;br/&gt;line 182&quot;])
+    n_shadow([&quot;Vault::shadow&lt;br/&gt;line 187&quot;])
+    n_index([&quot;Vault::index&lt;br/&gt;line 192&quot;])
+    n_decoy([&quot;Vault::decoy&lt;br/&gt;line 197&quot;])
+    n_load_decoy([&quot;Vault::load_decoy&lt;br/&gt;line 212&quot;])
+    n_has_decoy_file([&quot;Vault::has_decoy_file&lt;br/&gt;line 223&quot;])
+    n_store_decoy([&quot;Vault::store_decoy&lt;br/&gt;line 228&quot;])
+    n_clear_decoy([&quot;Vault::clear_decoy&lt;br/&gt;line 233&quot;])
+    n_load([&quot;Vault::load&lt;br/&gt;line 247&quot;])
+    n_store([&quot;Vault::store&lt;br/&gt;line 296&quot;])
+    n_clear([&quot;Vault::clear&lt;br/&gt;line 303&quot;])
+    n_write_one[&quot;Vault::write_one&lt;br/&gt;line 323&quot;]
+    n_read_masked[&quot;Vault::read_masked&lt;br/&gt;line 342&quot;]
+    n_name_for[&quot;name_for&lt;br/&gt;line 350&quot;]
+    n_mask[&quot;mask&lt;br/&gt;line 369&quot;]
+    n_admin_dir_present([&quot;admin_dir_present&lt;br/&gt;line 397&quot;])
+    n_admin_dir([&quot;admin_dir&lt;br/&gt;line 417&quot;])
     n_at --&gt; n_name_for
     n_load --&gt; n_read_masked
     n_load --&gt; n_write_one
+    n_load_decoy --&gt; n_mask
     n_read_masked --&gt; n_mask
     n_store --&gt; n_write_one
+    n_store_decoy --&gt; n_write_one
     n_write_one --&gt; n_mask
-    click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L125&quot; &quot;open the source&quot;
-    click n_primary href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L172&quot; &quot;open the source&quot;
-    click n_shadow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L177&quot; &quot;open the source&quot;
-    click n_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L182&quot; &quot;open the source&quot;
-    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L192&quot; &quot;open the source&quot;
-    click n_store href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L241&quot; &quot;open the source&quot;
-    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L248&quot; &quot;open the source&quot;
-    click n_write_one href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L268&quot; &quot;open the source&quot;
-    click n_read_masked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L287&quot; &quot;open the source&quot;
-    click n_name_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L295&quot; &quot;open the source&quot;
-    click n_mask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L314&quot; &quot;open the source&quot;
-    click n_admin_dir_present href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L342&quot; &quot;open the source&quot;
-    click n_admin_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L362&quot; &quot;open the source&quot;
+    click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L134&quot; &quot;open the source&quot;
+    click n_primary href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L182&quot; &quot;open the source&quot;
+    click n_shadow href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L187&quot; &quot;open the source&quot;
+    click n_index href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L192&quot; &quot;open the source&quot;
+    click n_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L197&quot; &quot;open the source&quot;
+    click n_load_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L212&quot; &quot;open the source&quot;
+    click n_has_decoy_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L223&quot; &quot;open the source&quot;
+    click n_store_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L228&quot; &quot;open the source&quot;
+    click n_clear_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L233&quot; &quot;open the source&quot;
+    click n_load href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L247&quot; &quot;open the source&quot;
+    click n_store href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L296&quot; &quot;open the source&quot;
+    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L303&quot; &quot;open the source&quot;
+    click n_write_one href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L323&quot; &quot;open the source&quot;
+    click n_read_masked href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L342&quot; &quot;open the source&quot;
+    click n_name_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L350&quot; &quot;open the source&quot;
+    click n_mask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L369&quot; &quot;open the source&quot;
+    click n_admin_dir_present href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L397&quot; &quot;open the source&quot;
+    click n_admin_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L417&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_at,n_primary,n_shadow,n_index,n_load,n_store,n_clear,n_admin_dir_present,n_admin_dir entry
+    class n_at,n_primary,n_shadow,n_index,n_decoy,n_load_decoy,n_has_decoy_file,n_store_decoy,n_clear_decoy,n_load,n_store,n_clear,n_admin_dir_present,n_admin_dir entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_write_one,n_read_masked,n_name_for,n_mask helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -266,22 +317,28 @@ flowchart TD
 <tr><td><code>LABEL_PRIMARY</code> <sub>const</sub></td><td><a href="vault.src.html#fn-label_primary">75</a></td><td>Derives the real vault&#x27;s key from the material the unlock produced.</td></tr>
 <tr><td><code>LABEL_SHADOW</code> <sub>const</sub></td><td><a href="vault.src.html#fn-label_shadow">78</a></td><td>Derives the decoy vault&#x27;s key from the same material, so the two keys are unrelated even though one passphrase leads to both.</td></tr>
 <tr><td><code>LABEL_MASK</code> <sub>const</sub></td><td><a href="vault.src.html#fn-label_mask">80</a></td><td>Derives the mask that hides which of the two an index entry belongs to.</td></tr>
-<tr><td><code>Found</code> <sub>pub enum</sub></td><td><a href="vault.src.html#fn-found">84</a></td><td>What Vault::load found when it went looking.</td></tr>
-<tr><td><code>Vault</code> <sub>pub struct</sub></td><td><a href="vault.src.html#fn-vault">111</a></td><td>The two files a lock lives in, and the index that names them.</td></tr>
-<tr><td><code>Vault::at</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-at">125</a></td><td>Resolve the vault under base, creating the index if there is none.</td></tr>
-<tr><td><code>Vault::primary</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-primary">172</a></td><td>The file the lock is read from and written to.</td></tr>
-<tr><td><code>Vault::shadow</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-shadow">177</a></td><td>The second copy.</td></tr>
-<tr><td><code>Vault::index</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-index">182</a></td><td>The index that names both.</td></tr>
-<tr><td><code>Vault::load</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-load">192</a></td><td>Read the lock, restoring one copy from the other if it has to.</td></tr>
-<tr><td><code>Vault::store</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-store">241</a></td><td>Write both copies, and say whether the spare is now current.</td></tr>
-<tr><td><code>Vault::clear</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-clear">248</a></td><td>Remove both copies, and the index with them.</td></tr>
-<tr><td><code>Vault::write_one</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-vault-write_one">268</a></td><td>Mask bytes for this site and write them at path, creating the directory if it is not there.</td></tr>
-<tr><td><code>Vault::read_masked</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-vault-read_masked">287</a></td><td>Read one file back and unmask it, or None if it is not a lock.</td></tr>
-<tr><td><code>name_for</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-name_for">295</a></td><td>The file name derived from site under label.</td></tr>
-<tr><td><code>mask</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-mask">314</a></td><td>Exclusive-or bytes with a keystream derived from site.</td></tr>
-<tr><td><code>ADMIN_DIR</code> <sub>const</sub></td><td><a href="vault.src.html#fn-admin_dir">333</a></td><td>Where an administrator&#x27;s copy of the lock goes, on a platform that has one.</td></tr>
-<tr><td><code>admin_dir_present</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-admin_dir_present">342</a></td><td>That same directory, but only when it is already there.</td></tr>
-<tr><td><code>admin_dir</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-admin_dir-2">362</a></td><td>A directory only an administrator can write to, if this process can make one there.</td></tr>
+<tr><td><code>LABEL_DECOY</code> <sub>const</sub></td><td><a href="vault.src.html#fn-label_decoy">88</a></td><td>The decoy passphrase&#x27;s own record, where one is set.</td></tr>
+<tr><td><code>Found</code> <sub>pub enum</sub></td><td><a href="vault.src.html#fn-found">92</a></td><td>What Vault::load found when it went looking.</td></tr>
+<tr><td><code>Vault</code> <sub>pub struct</sub></td><td><a href="vault.src.html#fn-vault">119</a></td><td>The two files a lock lives in, and the index that names them.</td></tr>
+<tr><td><code>Vault::at</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-at">134</a></td><td>Resolve the vault under base, creating the index if there is none.</td></tr>
+<tr><td><code>Vault::primary</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-primary">182</a></td><td>The file the lock is read from and written to.</td></tr>
+<tr><td><code>Vault::shadow</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-shadow">187</a></td><td>The second copy.</td></tr>
+<tr><td><code>Vault::index</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-index">192</a></td><td>The index that names both.</td></tr>
+<tr><td><code>Vault::decoy</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-decoy">197</a></td><td>The decoy passphrase&#x27;s record, where one is set.</td></tr>
+<tr><td><code>Vault::load_decoy</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-load_decoy">212</a></td><td>Read the decoy record, or None when no decoy is set.</td></tr>
+<tr><td><code>Vault::has_decoy_file</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-has_decoy_file">223</a></td><td>Whether there is a decoy record at all, whether or not it reads.</td></tr>
+<tr><td><code>Vault::store_decoy</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-store_decoy">228</a></td><td>Write the decoy record, masked, owner-only.</td></tr>
+<tr><td><code>Vault::clear_decoy</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-clear_decoy">233</a></td><td>Remove the decoy record.</td></tr>
+<tr><td><code>Vault::load</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-load">247</a></td><td>Read the lock, restoring one copy from the other if it has to.</td></tr>
+<tr><td><code>Vault::store</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-store">296</a></td><td>Write both copies, and say whether the spare is now current.</td></tr>
+<tr><td><code>Vault::clear</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-vault-clear">303</a></td><td>Remove both copies, and the index with them.</td></tr>
+<tr><td><code>Vault::write_one</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-vault-write_one">323</a></td><td>Mask bytes for this site and write them at path, creating the directory if it is not there.</td></tr>
+<tr><td><code>Vault::read_masked</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-vault-read_masked">342</a></td><td>Read one file back and unmask it, or None if it is not a lock.</td></tr>
+<tr><td><code>name_for</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-name_for">350</a></td><td>The file name derived from site under label.</td></tr>
+<tr><td><code>mask</code> <sub>fn</sub></td><td><a href="vault.src.html#fn-mask">369</a></td><td>Exclusive-or bytes with a keystream derived from site.</td></tr>
+<tr><td><code>ADMIN_DIR</code> <sub>const</sub></td><td><a href="vault.src.html#fn-admin_dir">388</a></td><td>Where an administrator&#x27;s copy of the lock goes, on a platform that has one.</td></tr>
+<tr><td><code>admin_dir_present</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-admin_dir_present">397</a></td><td>That same directory, but only when it is already there.</td></tr>
+<tr><td><code>admin_dir</code> <sub>pub fn</sub></td><td><a href="vault.src.html#fn-admin_dir-2">417</a></td><td>A directory only an administrator can write to, if this process can make one there.</td></tr>
 </tbody></table>
 </section>
 </div></div>
