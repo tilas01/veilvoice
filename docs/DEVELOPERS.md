@@ -120,6 +120,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | Guard | What it will not let you do |
 |---|---|
 | [`tools/audit/actions.py`](../tools/audit/actions.py) | Every GitHub Action a workflow runs is pinned to a commit, not to a tag |
+| [`tools/audit/authorship.py`](../tools/audit/authorship.py) | Every commit is tilas01's in both of its fields, names no assistant, and is signed |
 | [`tools/audit/build_output.py`](../tools/audit/build_output.py) | No build output lives inside this repository except where it is expected |
 | [`tools/audit/build_prerequisites.py`](../tools/audit/build_prerequisites.py) | What a fresh machine needs before it can build this, said once |
 | [`tools/audit/crate_tables.py`](../tools/audit/crate_tables.py) | Every crate in the workspace appears in every table that lists the crates |
@@ -199,6 +200,8 @@ And what it then checks:
 - **the release step tags the commit it built**: `python tools/audit/publishing.py`
 - **every file the build reads is in the repository**: `python tools/audit/fixtures.py`
 - **that guard catches what it claims to**: `python tools/audit/fixtures.py --self-test`
+- **every commit to push is tilas01's, and so is the next one**: `python tools/audit/authorship.py`
+- **the authorship guard catches what it claims to**: `python tools/audit/authorship.py --self-test`
 - **the updater can ask for every release that is published**: `python tools/audit/release_targets.py`
 - **that guard catches what it claims to, too**: `python tools/audit/release_targets.py --self-test`
 - **the app-manifest tooling works**: `python tools/sign/selftest.py`

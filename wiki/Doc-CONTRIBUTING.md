@@ -252,12 +252,56 @@ Backticks around a path or a command are fine where the name would otherwise
 be ambiguous, because a reader understands them and they are one character.
 The rule is against writing a document in the message, not against punctuation.
 
-Commits here have **one author**. Do not add `Co-Authored-By:` trailers, and do
-not put an assistant or model name in a commit message, a tag, a release note or
-a pull request body. That is a rule about where credit lives rather than a
-denial that it is owed: AI assistance is credited in the README and in the
-footer of every page of the website, which is where a reader looking for it will
-look.
+Commits here have **one author**, and three rules follow from it. The first
+two are enforced by `tools/audit/authorship.py`, which `tools/verify.py` runs
+before a commit is made and CI runs on every commit a push carries.
+
+**Author and committer are both tilas01.** Every commit says
+`tilas01 <tilas01@users.noreply.github.com>` in both fields. The one exception
+is GitHub itself as committer, on a commit it makes for him in the website. The
+committer matters as much as the author: it is the field a log shows least and
+the one GitHub checks a signature against, and four of the fifteen commits that
+once named somebody else did so only there (F-235).
+
+A cloud container sets its own identity for git, in a config file and in some
+containers in four environment variables as well. The variables beat every
+config file, so `git config user.name` changes nothing where they are set, and a
+plain `git commit` there is wrong by default. Set all four in the shell, before
+`tools/verify.py` and before the commit:
+
+```bash
+export GIT_AUTHOR_NAME=tilas01 GIT_AUTHOR_EMAIL=tilas01@users.noreply.github.com
+export GIT_COMMITTER_NAME=tilas01 GIT_COMMITTER_EMAIL=tilas01@users.noreply.github.com
+```
+
+The guard asks git what the next commit would say, so this is caught before the
+commit exists. A commit that went wrong and has not been pushed is repaired with
+`git commit --amend --no-edit --reset-author` once the identity is right;
+`--amend` alone keeps the old author.
+
+**No assistant is named in the history.** No `Co-Authored-By:` or session
+trailer, no "generated with" footer or session link, and no assistant, its
+maker or a model named anywhere in a commit message, a tag, a release note or a
+pull request body, including by the name of a file it keeps. That is a rule
+about where credit lives rather than a denial that it is owed: AI assistance is
+credited in the README and in the footer of every page of the website, which is
+where a reader looking for it will look.
+
+**Every commit is signed by a key GitHub verifies as tilas01's.** An unsigned
+commit shows no badge. A commit signed by a key registered to another account
+shows Unverified, which reads worse than none, and that is what a cloud
+container's own signing produces in his name: twenty-five of his commits read
+that way before it was noticed. The keys that count are `SIGNING_KEYS` in the
+guard, and CI asks GitHub whether it shows each pushed commit Verified. Until
+every place commits are made from can sign with one of those keys, a missing or
+foreign signature is reported rather than failed on; `SIGNATURES_REQUIRED` is
+the switch, and it turns on in the commit that makes that true.
+
+**A pushed commit is not rewritten.** Several sessions can be working from
+`dev` at once, and a force push moves the ground under every one of them. The
+rewrite that corrects the fifteen is `tools/repo/rewrite.py`, which keeps every
+tree and every date and refuses to push anything the guard would refuse. It is
+the one exception, not a precedent.
 
 ## Pull requests
 
