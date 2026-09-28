@@ -299,6 +299,28 @@ impl AppLock {
         Ok(())
     }
 
+    /// Whether `password` is this lock's, recording nothing.
+    ///
+    /// [`verify`](Self::verify) is what an unlock calls: it counts a failure,
+    /// applies the rate limit and judges the tamper tag. This does none of
+    /// that. It exists for [`crate::decoy::Store::judge`], which has a second
+    /// passphrase to consider and must do the same amount of work whichever one
+    /// was typed.
+    ///
+    /// **A decoy passphrase is not a failed attempt at the real one.** Counting
+    /// it as one would put the real lock into its cooldown for somebody using
+    /// the feature exactly as intended, and the moment that happens is the
+    /// moment they least need a delay. So the decoy path proves the real
+    /// passphrase was not given without leaving a mark, and the real path goes
+    /// on calling `verify` as it always has.
+    ///
+    /// The derivation is done in full every time, for the reason the whole
+    /// module gives: an answer that comes back faster is an answer.
+    pub fn would_open(&self, password: &[u8]) -> Result<bool, Error> {
+        let (candidate, _) = derive_pair(password, &self.salt, self.params)?;
+        Ok(candidate == self.verifier)
+    }
+
     /// Whether two records hold the same stored password.
     ///
     /// Compares the salt as well as the verifier, because two locks made from
@@ -757,6 +779,21 @@ impl LockStore {
     /// passphrase. See [`AppLock::tampered`].
     pub fn tampered(&self) -> bool {
         self.lock.tampered()
+    }
+
+    /// Whether `password` is this lock's, recording nothing. See
+    /// [`AppLock::would_open`].
+    pub fn would_open(&self, password: &[u8]) -> Result<bool, Error> {
+        self.lock.would_open(password)
+    }
+
+    /// The cost parameters this lock was made with.
+    ///
+    /// Read by [`crate::decoy::Store::judge`] so that a copy with no decoy set can do
+    /// the same amount of work as one that has: a derivation at different
+    /// parameters would take a different time, which is the thing being hidden.
+    pub fn params(&self) -> kdf::KdfParams {
+        self.lock.params()
     }
 
     /// Clear the tamper report, after proving the passphrase, and persist that.

@@ -78,6 +78,14 @@ const LABEL_PRIMARY: &[u8] = b"veilvoice/vault/primary";
 const LABEL_SHADOW: &[u8] = b"veilvoice/vault/shadow";
 /// Derives the mask that hides which of the two an index entry belongs to.
 const LABEL_MASK: &[u8] = b"veilvoice/vault/mask";
+/// The decoy passphrase's own record, where one is set.
+///
+/// A third derived name in the same folder, so a decoy record is as
+/// unremarkable in a listing as the two copies of the real lock. **There is
+/// deliberately no second copy of it**: the shadow exists so that deleting one
+/// file does not remove somebody's lock, and a decoy that was deleted is a
+/// decoy that is gone, which costs nothing and cannot lock anybody out.
+const LABEL_DECOY: &[u8] = b"veilvoice/vault/decoy";
 
 /// What [`Vault::load`] found when it went looking.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -112,6 +120,7 @@ pub struct Vault {
     index: PathBuf,
     primary: PathBuf,
     shadow: PathBuf,
+    decoy: PathBuf,
     site: [u8; SITE_LEN],
 }
 
@@ -164,6 +173,7 @@ impl Vault {
             index,
             primary,
             shadow,
+            decoy: base.join(name_for(&site, LABEL_DECOY)),
             site,
         })
     }
@@ -181,6 +191,51 @@ impl Vault {
     /// The index that names both.
     pub fn index(&self) -> &Path {
         &self.index
+    }
+
+    /// The decoy passphrase's record, where one is set.
+    pub fn decoy(&self) -> &Path {
+        &self.decoy
+    }
+
+    /// Read the decoy record, or `None` when no decoy is set.
+    ///
+    /// A file that will not parse is reported as no decoy rather than as an
+    /// error, which is the opposite of how the real lock is treated and is right
+    /// for the same reason: a damaged real lock must never be read as "no lock",
+    /// because that is somebody locked out of their recordings, and a damaged
+    /// decoy must never stop VeilVoice opening, because the decoy is a
+    /// convenience and the real passphrase still works. What it costs is that a
+    /// corrupt decoy record stops being a decoy silently, and
+    /// [`crate::decoy::Store::state`] is what reports that where somebody can
+    /// read it.
+    pub fn load_decoy(&self) -> Option<crate::decoy::Decoy> {
+        let mut bytes = std::fs::read(&self.decoy).ok()?;
+        mask(&self.site, &mut bytes);
+        crate::decoy::Decoy::parse(&bytes).ok()
+    }
+
+    /// Whether there is a decoy record at all, whether or not it reads.
+    ///
+    /// Separate from [`load_decoy`](Self::load_decoy) so that "there is no
+    /// decoy" and "the decoy is unreadable" are different answers, because they
+    /// need different things said about them.
+    pub fn has_decoy_file(&self) -> bool {
+        self.decoy.is_file()
+    }
+
+    /// Write the decoy record, masked, owner-only.
+    pub fn store_decoy(&self, decoy: &crate::decoy::Decoy) -> Result<(), Error> {
+        self.write_one(&self.decoy, &decoy.to_bytes())
+    }
+
+    /// Remove the decoy record. Missing is success: it is already not there.
+    pub fn clear_decoy(&self) -> Result<(), Error> {
+        match std::fs::remove_file(&self.decoy) {
+            Ok(()) => Ok(()),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(_) => Err(Error::AppLockStore),
+        }
     }
 
     /// Read the lock, restoring one copy from the other if it has to.
