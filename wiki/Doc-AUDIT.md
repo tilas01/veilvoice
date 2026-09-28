@@ -746,6 +746,135 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-231: every unlock kept an empty passphrase, and sealed with it
+
+Found by reading the unlock path in `crates/veilvoice-gui/src/security.rs`
+end to end during the audit of everything written since v0.1.22, then
+reproduced with a test before anything was changed.
+
+The unlock button moved what was typed out of the field and handed it to the
+worker that runs Argon2id:
+
+```text
+let entry = std::mem::take(&mut self.entry);
+self.spawn(Op::Unlock, entry, String::new());
+```
+
+When the worker answered, `poll` took the passphrase for the session **from the
+field**, which that line had just emptied:
+
+```text
+let opened = std::mem::take(&mut self.entry);
+```
+
+So every successful unlock kept `""`. Two things are built on what it keeps:
+
+- **App-lock sealing** (roadmap item 86, `Sealing::AppLock`) seals each
+  recording under the kept passphrase. It sealed every one under the empty
+  passphrase. A file sealed that way is a container anybody can open, which is
+  a recording in the clear with extra steps, and the window said "sealed".
+- **The integrity record.** `take_unlock_passphrase` hands the kept passphrase
+  to the launch check, which opens a sealed record with it or, finding a plain
+  one, seals it. A record sealed properly by `veilvoice guard init --sealed`
+  would not open, and the window reported it as changed or damaged at every
+  unlock. A plain record was sealed under the empty passphrase and the plain
+  copy removed, so anybody able to write that directory could forge it.
+
+**How long.** The capture in `poll` arrived in v0.1.15, and the line that
+empties the field is older than that, so every release from v0.1.15 to v0.1.22
+carries it. It matters more now than it did: roadmap item 170 made app-lock
+sealing the default for anybody who sets a lock, so v0.1.23 would have sealed
+every recording its users made under nothing at all.
+
+**Why nothing caught it.** Every test guarding this passphrase either read the
+source (that the capture is conditional, that a password change drops it, that
+locking wipes it) or set the kept passphrase by hand and checked what was done
+with it. Each was true. None started an unlock and looked at what came out, and
+the defect was only visible across the two functions, in the order they run. This is the same shape as F-210 and F-220, a check at the scope
+of one function while the fault sits between two.
+
+**The fix.** The worker gets a copy and the field keeps the original until
+`poll` collects the answer, where it is either moved on (success) or wiped
+(failure). The field is disabled while the worker runs, so nothing can be
+typed into it in between, and the copy is held no longer than the worker holds
+its own. The submission is now one method, `begin_unlock`, which the button
+calls and the test calls.
+
+**What is checked.** `an_unlock_keeps_the_passphrase_it_was_typed_with` makes a
+real lock file, starts an unlock the way the button does, collects the answer
+the way a frame does, and then asks the two questions that matter: that
+app-lock sealing produces a plan sealed under the passphrase typed, and that
+the integrity check is handed that passphrase. Against the old code it fails
+with the plan's passphrase empty, `left: []`, which is the defect in one line.
+
+**What it leaves for people who used the mode.** A recording the window sealed
+with the app lock under any release from v0.1.15 to v0.1.22 was sealed under
+the empty passphrase. It is not protected, and it will not open with the app
+lock passphrase. `veilvoice` refuses an empty passphrase when asked for one,
+so it cannot be opened with the tools as they stand either. That needs a
+decision rather than a guess: whether to offer a one-time way to open and
+re-seal those files, or to say plainly in the release notes that they should
+be treated as unencrypted.
+
+### F-230: the release gate checked one commit and merged another
+
+`.github/workflows/promote.yml` has two jobs. `check` checks out `dev`, runs
+`tools/release/readiness.py`, builds, runs `tools/verify.py --check` whole and
+asks the API whether `ci.yml` passed, all against one commit. `promote` then
+fetched `dev` again and merged `origin/dev`.
+
+Between the two, `dev` moves. The verification pass alone takes the better part
+of an hour, and eight threads push to `dev` in parallel, so the commit merged
+into `main` would routinely have been one no step of the gate had seen, with
+`ci.yml` possibly still running or already red on it. The summary would still
+have said that CI was green, naming the checked commit, above a merge of a
+different one. `docs/CONTRIBUTING.md` listed "`ci.yml` is green on the exact
+commit being promoted" as a gate, and it was only true when nobody pushed.
+
+**The fix.** `check` hands the commit it checked to `promote` as a job output,
+and `promote` merges that commit by hash. It first confirms the hash is one and
+that `dev` still contains it, because a commit rewritten away between the two
+jobs is not a release. The summary names both.
+
+**And the wiki.** A push made with a workflow's own token starts no workflow,
+which the file already said about `release.yml` and dispatched it for. The same
+applies to `wiki.yml`, which publishes on a push to `main` and on nothing else
+that happens here. The push this workflow makes is now the only way `main`
+moves, so without a dispatch of its own the wiki would have stayed on the
+previous release after every promotion. `promote` now dispatches it beside the
+release.
+
+`docs/CONTRIBUTING.md` says both. This is workflow text rather than code, so the
+check is the one CI already runs over every workflow (`tools/audit/actions.py`)
+plus reading the step: the hash is refused unless it is forty hex digits, and
+`git merge-base --is-ancestor` refuses one `dev` no longer carries.
+
+### F-229: a test that measured the panic hook, and failed under load
+
+`offthread::tests::a_dead_worker_leaves_the_last_answer` starts a worker that
+panics and waits, for up to five seconds, for `Answer` to notice the worker has
+gone. It failed in a full `cargo test --workspace` run during this audit, with
+`the dead worker is not still awaited`, and passed on its own.
+
+It was measuring the wrong thing. With `RUST_BACKTRACE=1` set, which is how
+most people debugging a test run, the panic hook walks and symbolises the
+worker's stack **before** the unwind that drops the channel's sender begins.
+In a debug build of the whole window crate, on four cores busy with every other
+test, that took longer than the five seconds allowed. The worker was dying the
+whole time; the test gave up first.
+
+Reproduced rather than inferred: two runs of the window's own suite with
+`RUST_BACKTRACE=1` failed once, and two with `RUST_BACKTRACE=0` did not.
+
+**The fix.** The worker leaves with `std::panic::resume_unwind`, which unwinds
+the same way and drops the same sender without running the hook, so the test
+measures `Answer` and not the backtrace printer. Every wait in that module now
+allows a minute rather than five seconds. Each loop leaves the moment its
+condition holds, so a passing run pays nothing for that, and a test is not
+deleted for failing on a busy runner, which is how F-220 says timing tests
+usually end. After the change, four consecutive runs with `RUST_BACKTRACE=1`
+passed.
+
 ### F-224: the audit outgrew the search index, and the index said nothing
 
 Found by pushing the audit past 512 KB while writing F-223 up.
@@ -7998,7 +8127,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1849 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1850 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -9646,7 +9775,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and twenty-eight defects found and fixed (F-1 to F-228), across
+**Two hundred and thirty-one defects found and fixed (F-1 to F-231), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

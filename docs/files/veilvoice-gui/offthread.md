@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/offthread.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 267 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 280 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/offthread.rs)
 
 ## Contents
 
@@ -81,7 +81,7 @@ is fifteen lines and the alternative is a promise with an exception in it.
 
 ## What this file contains
 
-267 lines defining **7 functions** (6 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+280 lines defining **7 functions** (6 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

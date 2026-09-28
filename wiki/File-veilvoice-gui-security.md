@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/security.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 2556 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 2622 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs)
 
 ## Contents
 
@@ -71,14 +71,14 @@ disk. Encrypting the recording is what protects the recording.
 
 ## What this file contains
 
-2556 lines defining **47 functions** (27 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+2622 lines defining **48 functions** (27 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Sealing` (line 81) -- How the recording that comes out of a job is protected.
 - `enum Op` (line 106) -- What a background lock operation was trying to do.
 - `struct Security` (line 129) -- Everything about locking the app and sealing its output.
-- `enum Plan` (line 1416) -- What a finished job should do with its bytes.
+- `enum Plan` (line 1430) -- What a finished job should do with its bytes.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -102,25 +102,25 @@ disk. Encrypting the recording is what protects the recording.
 - `Security::blocked_reason` (line 522) -- Why a job cannot start yet, for the button's tooltip.
   - reaches: `ready_to_write`
 - `Security::plan` (line 540) -- How the next job should protect its output.
-- `Security::is_busy` (line 700) -- Whether a lock operation is running, so the window keeps repainting and the indicator beside the field keeps moving.
+- `Security::is_busy` (line 715) -- Whether a lock operation is running, so the window keeps repainting and the indicator beside the field keeps moving.
   - reaches: `busy`
-- `Security::unlock_screen` (line 705) -- The full-window unlock screen.
-  - reaches: `busy`, `poll`, `spawn`, `unlock_row`, `apply_preferred_sealing`, `into_secret`, `wipe_form`, `run_op`, `reopen`
-- `Security::tab` (line 911) -- The security tab: manage the lock, and see what it is worth.
+- `Security::unlock_screen` (line 720) -- The full-window unlock screen.
+  - reaches: `begin_unlock`, `busy`, `poll`, `unlock_row`, `spawn`, `apply_preferred_sealing`, `into_secret`, `wipe_form`, `run_op`, `reopen`
+- `Security::tab` (line 925) -- The security tab: manage the lock, and see what it is worth.
   - reaches: `busy`, `button_column`, `has_lock`, `interference_banner`, `lock_now`, `password_row`, `poll`, `spawn`, `lock_inner`, `apply_preferred_sealing`, `into_secret`, `wipe_form`
-- `Security::load_mandate` (line 1090) -- Read the baseline from disk and apply it to the checkbox.
-- `Security::mandate_requires_app_lock` (line 1105) -- Whether the baseline insists on the app lock.
-- `Security::mandate_requires_encryption` (line 1110) -- Whether the baseline insists on encryption at rest.
-- `Security::mandate_history` (line 1115) -- The change log, for the panel that shows it.
-- `Security::recording_controls` (line 1138) -- The at-rest controls that sit inside the file tab.
+- `Security::load_mandate` (line 1104) -- Read the baseline from disk and apply it to the checkbox.
+- `Security::mandate_requires_app_lock` (line 1119) -- Whether the baseline insists on the app lock.
+- `Security::mandate_requires_encryption` (line 1124) -- Whether the baseline insists on encryption at rest.
+- `Security::mandate_history` (line 1129) -- The change log, for the panel that shows it.
+- `Security::recording_controls` (line 1152) -- The at-rest controls that sit inside the file tab.
   - reaches: `into_secret`, `mandate_history_panel`, `password_row`, `record`, `mandate_history_rows`
-- `Security::disable_dialogue` (line 1358) -- The dialogue shown when the user turns at-rest encryption off.
+- `Security::disable_dialogue` (line 1372) -- The dialogue shown when the user turns at-rest encryption off.
   - reaches: `record`
-- `Plan::write` (line 1441) -- Seal wav if the plan says to, and write it.
+- `Plan::write` (line 1455) -- Seal wav if the plan says to, and write it.
 
 ## What calls what
 
-_22 of 47 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 48 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
@@ -150,30 +150,27 @@ flowchart TD
     n_ready_to_write["Security::ready_to_write<br/>line 510"]
     n_blocked_reason(["Security::blocked_reason<br/>line 522"])
     n_spawn["Security::spawn<br/>line 572"]
-    n_poll["Security::poll<br/>line 587"]
-    n_is_busy(["Security::is_busy<br/>line 700"])
-    n_unlock_screen(["Security::unlock_screen<br/>line 705"])
-    n_tab(["Security::tab<br/>line 911"])
-    n_recording_controls(["Security::recording_controls<br/>line 1138"])
-    n_disable_dialogue(["Security::disable_dialogue<br/>line 1358"])
+    n_begin_unlock["Security::begin_unlock<br/>line 597"]
+    n_is_busy(["Security::is_busy<br/>line 715"])
+    n_unlock_screen(["Security::unlock_screen<br/>line 720"])
+    n_tab(["Security::tab<br/>line 925"])
+    n_recording_controls(["Security::recording_controls<br/>line 1152"])
+    n_disable_dialogue(["Security::disable_dialogue<br/>line 1372"])
+    n_begin_unlock --> n_spawn
     n_blocked_reason --> n_ready_to_write
     n_drop --> n_wipe_secrets
     n_load --> n_default
     n_lock_after_idle --> n_lock_inner
     n_lock_inner --> n_wipe_secrets
     n_lock_now --> n_lock_inner
-    n_poll --> n_apply_preferred_sealing
-    n_poll --> n_into_secret
     n_prefer_app_lock_sealing --> n_apply_preferred_sealing
     n_recording_controls --> n_into_secret
     n_set_lock_from_setup --> n_spawn
     n_set_recording_passphrase --> n_into_secret
     n_tab --> n_has_lock
     n_tab --> n_lock_now
-    n_tab --> n_poll
     n_tab --> n_spawn
-    n_unlock_screen --> n_poll
-    n_unlock_screen --> n_spawn
+    n_unlock_screen --> n_begin_unlock
     click n_into_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L72" "open the source"
     click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L242" "open the source"
     click n_drop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L280" "open the source"
@@ -190,18 +187,18 @@ flowchart TD
     click n_ready_to_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L510" "open the source"
     click n_blocked_reason href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L522" "open the source"
     click n_spawn href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L572" "open the source"
-    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L587" "open the source"
-    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L700" "open the source"
-    click n_unlock_screen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L705" "open the source"
-    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L911" "open the source"
-    click n_recording_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1138" "open the source"
-    click n_disable_dialogue href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1358" "open the source"
+    click n_begin_unlock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L597" "open the source"
+    click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L715" "open the source"
+    click n_unlock_screen href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L720" "open the source"
+    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L925" "open the source"
+    click n_recording_controls href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1152" "open the source"
+    click n_disable_dialogue href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1372" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_load,n_prefer_app_lock_sealing,n_set_lock_from_setup,n_set_recording_passphrase,n_lock_after_idle,n_blocked_reason,n_is_busy,n_unlock_screen,n_tab,n_recording_controls,n_disable_dialogue entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_has_lock,n_lock_now,n_ready_to_write api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_into_secret,n_default,n_drop,n_apply_preferred_sealing,n_lock_inner,n_wipe_secrets,n_spawn,n_poll helper
+    class n_into_secret,n_default,n_drop,n_apply_preferred_sealing,n_lock_inner,n_wipe_secrets,n_spawn,n_begin_unlock helper
 ```
 
 </details>
@@ -238,30 +235,31 @@ flowchart TD
 | `Security::blocked_reason` <sub>pub fn</sub> | [522](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L522) | Why a job cannot start yet, for the button's tooltip. |
 | `Security::plan` <sub>pub fn</sub> | [540](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L540) | How the next job should protect its output. |
 | `Security::spawn` <sub>fn</sub> | [572](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L572) | Run a lock operation on a thread, so the window keeps drawing. |
-| `Security::poll` <sub>fn</sub> | [587](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L587) | Collect a finished lock operation. |
-| `Security::wipe_form` <sub>fn</sub> | [686](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L686) | Clear what was typed, so a passphrase does not sit in a field after use. |
-| `Security::busy` <sub>fn</sub> | [694](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L694) | Whether an operation is in flight, so the panel can refuse a second one. |
-| `Security::is_busy` <sub>pub fn</sub> | [700](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L700) | Whether a lock operation is running, so the window keeps repainting and the indicator beside the field keeps moving. |
-| `Security::unlock_screen` <sub>pub fn</sub> | [705](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L705) | The full-window unlock screen. |
-| `Security::interference_banner` <sub>fn</sub> | [855](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L855) | The standing report that the lock file was interfered with. |
-| `Security::tab` <sub>pub fn</sub> | [911](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L911) | The security tab: manage the lock, and see what it is worth. |
-| `Security::load_mandate` <sub>pub fn</sub> | [1090](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1090) | Read the baseline from disk and apply it to the checkbox. |
-| `Security::mandate_requires_app_lock` <sub>pub fn</sub> | [1105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1105) | Whether the baseline insists on the app lock. |
-| `Security::mandate_requires_encryption` <sub>pub fn</sub> | [1110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1110) | Whether the baseline insists on encryption at rest. |
-| `Security::mandate_history` <sub>pub fn</sub> | [1115](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1115) | The change log, for the panel that shows it. |
-| `Security::record` <sub>fn</sub> | [1125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1125) | Record a change to the baseline, and write it down. |
-| `Security::recording_controls` <sub>pub fn</sub> | [1138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1138) | The at-rest controls that sit inside the file tab. |
-| `Security::mandate_history_panel` <sub>fn</sub> | [1328](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1328) | The log of every time a requirement was turned off or back on. |
-| `Security::mandate_history_rows` <sub>fn</sub> | [1347](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1347) | One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off. |
-| `Security::disable_dialogue` <sub>pub fn</sub> | [1358](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1358) | The dialogue shown when the user turns at-rest encryption off. |
-| `DISABLE_WARNING` <sub>pub const</sub> | [1400](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1400) | What the user is told before recordings stop being encrypted. |
-| `Plan` <sub>pub enum</sub> | [1416](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1416) | What a finished job should do with its bytes. |
-| `Plan::write` <sub>pub fn</sub> | [1441](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1441) | Seal wav if the plan says to, and write it. |
-| `Plan::fmt` <sub>fn</sub> | [1488](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1488) |  |
-| `run_op` <sub>fn</sub> | [1499](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1499) | Run one lock operation, off the UI thread. |
-| `reopen` <sub>fn</sub> | [1568](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1568) | Re-open the lock store from disk, or None when there is nothing to open. |
-| `PASSWORD_LABEL_WIDTH` <sub>const</sub> | [1575](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1575) | The width every passphrase label is given, so every field starts level. |
-| `PASSWORD_FIELD_WIDTH` <sub>const</sub> | [1580](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1580) | How wide every passphrase field is drawn, on this tab and on the lock screen. |
-| `button_column` <sub>fn</sub> | [1614](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1614) | One labelled passphrase field, with the field in the same place every time. |
-| `password_row` <sub>fn</sub> | [1629](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1629) | One passphrase field with its label, at the shared width. |
-| `unlock_row` <sub>fn</sub> | [1674](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1674) | The password row on the lock screen: the label, the field and the button. |
+| `Security::begin_unlock` <sub>fn</sub> | [597](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L597) | Check what was typed into the unlock field, on a worker. |
+| `Security::poll` <sub>fn</sub> | [602](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L602) | Collect a finished lock operation. |
+| `Security::wipe_form` <sub>fn</sub> | [701](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L701) | Clear what was typed, so a passphrase does not sit in a field after use. |
+| `Security::busy` <sub>fn</sub> | [709](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L709) | Whether an operation is in flight, so the panel can refuse a second one. |
+| `Security::is_busy` <sub>pub fn</sub> | [715](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L715) | Whether a lock operation is running, so the window keeps repainting and the indicator beside the field keeps moving. |
+| `Security::unlock_screen` <sub>pub fn</sub> | [720](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L720) | The full-window unlock screen. |
+| `Security::interference_banner` <sub>fn</sub> | [869](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L869) | The standing report that the lock file was interfered with. |
+| `Security::tab` <sub>pub fn</sub> | [925](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L925) | The security tab: manage the lock, and see what it is worth. |
+| `Security::load_mandate` <sub>pub fn</sub> | [1104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1104) | Read the baseline from disk and apply it to the checkbox. |
+| `Security::mandate_requires_app_lock` <sub>pub fn</sub> | [1119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1119) | Whether the baseline insists on the app lock. |
+| `Security::mandate_requires_encryption` <sub>pub fn</sub> | [1124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1124) | Whether the baseline insists on encryption at rest. |
+| `Security::mandate_history` <sub>pub fn</sub> | [1129](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1129) | The change log, for the panel that shows it. |
+| `Security::record` <sub>fn</sub> | [1139](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1139) | Record a change to the baseline, and write it down. |
+| `Security::recording_controls` <sub>pub fn</sub> | [1152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1152) | The at-rest controls that sit inside the file tab. |
+| `Security::mandate_history_panel` <sub>fn</sub> | [1342](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1342) | The log of every time a requirement was turned off or back on. |
+| `Security::mandate_history_rows` <sub>fn</sub> | [1361](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1361) | One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off. |
+| `Security::disable_dialogue` <sub>pub fn</sub> | [1372](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1372) | The dialogue shown when the user turns at-rest encryption off. |
+| `DISABLE_WARNING` <sub>pub const</sub> | [1414](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1414) | What the user is told before recordings stop being encrypted. |
+| `Plan` <sub>pub enum</sub> | [1430](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1430) | What a finished job should do with its bytes. |
+| `Plan::write` <sub>pub fn</sub> | [1455](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1455) | Seal wav if the plan says to, and write it. |
+| `Plan::fmt` <sub>fn</sub> | [1502](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1502) |  |
+| `run_op` <sub>fn</sub> | [1513](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1513) | Run one lock operation, off the UI thread. |
+| `reopen` <sub>fn</sub> | [1582](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1582) | Re-open the lock store from disk, or None when there is nothing to open. |
+| `PASSWORD_LABEL_WIDTH` <sub>const</sub> | [1589](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1589) | The width every passphrase label is given, so every field starts level. |
+| `PASSWORD_FIELD_WIDTH` <sub>const</sub> | [1594](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1594) | How wide every passphrase field is drawn, on this tab and on the lock screen. |
+| `button_column` <sub>fn</sub> | [1628](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1628) | One labelled passphrase field, with the field in the same place every time. |
+| `password_row` <sub>fn</sub> | [1643](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1643) | One passphrase field with its label, at the shared width. |
+| `unlock_row` <sub>fn</sub> | [1688](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1688) | The password row on the lock screen: the label, the field and the button. |

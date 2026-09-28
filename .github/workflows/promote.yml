@@ -74,6 +74,10 @@ jobs:
       # after the half-hour verification pass above it, which is the most
       # expensive possible place to discover a missing permission.
       actions: read
+    # The commit every step below was run against, handed to `promote` so that
+    # it merges that commit and not whatever `dev` has become since. F-230.
+    outputs:
+      sha: ${{ steps.ci.outputs.sha }}
     steps:
       # `ref: dev` explicitly. A dispatch runs from the branch it was
       # dispatched on, and dispatching this from anywhere else would otherwise
@@ -171,11 +175,13 @@ jobs:
       # targets, none of which this job repeats, and a release built from a
       # commit whose Windows build failed is a release nobody can run.
       - name: CI is green on the commit being promoted
+        id: ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           sha="$(git rev-parse HEAD)"
           echo "dev is at $sha"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
           runs="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${sha}&per_page=100" \
                     --jq '[.workflow_runs[] | select(.status == "completed")] | map(.conclusion) | unique | join(",")')"
           if [ -z "$runs" ]; then
@@ -220,19 +226,38 @@ jobs:
       # One author, as `docs/CONTRIBUTING.md` requires, and a merge commit is a
       # commit. A runner's default identity is github-actions[bot], which would
       # make every release the one non-tilas01 commit in the history.
+      #
+      # The commit merged is the one `check` passed, by hash, and not the tip
+      # of `dev`. The gate above takes the better part of an hour, several
+      # threads push to `dev` in that time, and merging `origin/dev` here would
+      # put commits on `main` that no step of the gate ever saw, which is the
+      # one thing the gate exists to prevent. F-230.
       - name: Merge dev into main
         env:
           GIT_AUTHOR_NAME: tilas01
           GIT_AUTHOR_EMAIL: tilas01@users.noreply.github.com
           GIT_COMMITTER_NAME: tilas01
           GIT_COMMITTER_EMAIL: tilas01@users.noreply.github.com
+          CHECKED: ${{ needs.check.outputs.sha }}
         run: |
+          set -euo pipefail
+          if ! [[ "$CHECKED" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::the check job handed over no commit to merge ('$CHECKED')"
+            exit 1
+          fi
           git fetch origin dev
+          # Still on `dev`. A commit the gate passed that `dev` no longer
+          # carries was rewritten away after the check, and is not a release.
+          if ! git merge-base --is-ancestor "$CHECKED" origin/dev; then
+            echo "::error::$CHECKED was checked and is no longer on dev. Run promote again."
+            exit 1
+          fi
+          echo "merging $CHECKED; dev is now at $(git rev-parse origin/dev)"
           # --no-ff on purpose. The release is tagged at the merge, and a
           # fast-forward would leave nothing to tag that says a release
           # happened here. Plain text, one line per line, like every other
           # commit message in this repository.
-          git merge --no-ff origin/dev -m "Release $VERSION_TAG
+          git merge --no-ff "$CHECKED" -m "Release $VERSION_TAG
 
           Merging dev into main to cut $VERSION_TAG. The release workflow
           builds this commit, and the tag is made at it.
@@ -251,16 +276,24 @@ jobs:
       # workflow from triggering itself. `workflow_dispatch` is the documented
       # exception, so this is also the only way the release could be started
       # from here at all.
-      - name: Start the release build
+      #
+      # The same is true of `wiki.yml`, which publishes the wiki on a push to
+      # `main` and on nothing else that happens here. Without its own dispatch
+      # the push above, the only way `main` now moves, would publish the
+      # release and leave the wiki on the previous one. F-230.
+      - name: Start the release build and publish the wiki
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECKED: ${{ needs.check.outputs.sha }}
         run: |
           gh workflow run release.yml --ref main -f tag="$VERSION_TAG"
+          gh workflow run wiki.yml --ref main
           {
             echo "### \`main\` is at \`$VERSION_TAG\`"
             echo
-            echo "- merged \`dev\` into \`main\` as $(git rev-parse --short HEAD)"
+            echo "- merged \`${CHECKED:0:12}\`, the commit the checks passed, into \`main\` as $(git rev-parse --short HEAD)"
             echo "- dispatched \`release.yml\` against \`main\` for \`$VERSION_TAG\`"
+            echo "- dispatched \`wiki.yml\` against \`main\`"
             echo "- the tag is created by the publishing step, at the commit it built"
             echo "- the website redeploys when that run finishes"
           } >> "$GITHUB_STEP_SUMMARY"
