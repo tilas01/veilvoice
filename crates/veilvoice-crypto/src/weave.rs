@@ -1330,6 +1330,47 @@ mod tests {
         assert!(Weave::Base91.undo(b"}A ").is_err());
     }
 
+    /// The encoder's tail, on the one leftover it has to make a decision about.
+    ///
+    /// `base91_encode` flushes what is still in the queue as one character and
+    /// emits a second only when the leftover will not fit in one, which it
+    /// tests as `bits > 7 || queue > 90`. Moving that second `>` to a `>=`
+    /// changes what is written only when exactly seven bits are left and they
+    /// read exactly 90, because that is the only state where the first half of
+    /// the condition is false and the second is on its boundary.
+    ///
+    /// **A round trip cannot see it**, which is why this is pinned on the
+    /// encoded bytes instead. The decoder rebuilds the same input from either
+    /// form: one trailing character is completed from `pending`, two are read
+    /// as an ordinary pair, and both paths land on the same byte. So the pair
+    /// still agrees, and only the bytes themselves say which was written. That
+    /// is the same blindness F-186 found across the whole of this file.
+    ///
+    /// Neither the pattern, the counter, the all-ones run, nor either of the
+    /// two inputs already searched out for the bit-width test ever leaves the
+    /// queue in that state. This one was searched for on the tail state
+    /// directly, and is the shortest of the first few thousand that reach it.
+    #[test]
+    fn the_base91_encoder_is_pinned_where_its_tail_has_a_choice() {
+        let input = [
+            133, 232, 243, 203, 199, 210, 54, 78, 45, 112, 3, 44, 241, 228, 62, 191, 128, 138, 35,
+            142, 178, 180,
+        ];
+        let encoded = Weave::Base91.apply(&input);
+        assert_eq!(
+            encoded,
+            b"}X|}syjm*6*(Ot/_]{/QjHy?jf\"".to_vec(),
+            "Base91 wrote a different tail: {}",
+            String::from_utf8_lossy(&encoded)
+        );
+        // And it is still a real encoding of that input, not merely a fixed
+        // string: the vector is worthless if it pins a form nothing decodes.
+        assert_eq!(
+            Weave::Base91.undo(&encoded).expect("valid base-91 decodes"),
+            input,
+        );
+    }
+
     #[test]
     fn every_encoding_emits_the_same_bytes_at_every_length() {
         let golden: &[(Weave, u64)] = LENGTH_DIGESTS;
