@@ -354,6 +354,8 @@ CHECKS = [
      [sys.executable, "tools/audit/authorship.py"]),
     ("the authorship guard catches what it claims to",
      [sys.executable, "tools/audit/authorship.py", "--self-test"]),
+    ("a signing key from the environment signs the next commit",
+     [sys.executable, "tools/repo/signing.py", "--self-test"]),
     # Roadmap item 179. The updater builds a download URL from a platform label,
     # and the labels live in the release workflow as well as in Rust. Drift
     # either way is silent: a platform nothing is offered for, or a build asking

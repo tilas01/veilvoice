@@ -47,6 +47,10 @@ plainly rather than rounding up to "everything":
   * **Everything else** (JavaScript, CSS, TOML, YAML, licence texts, ...) --
     the whole file, in consecutive chunks. Complete.
 
+One tracked text file is left out by name, and ``NOT_FOR_READERS`` says why:
+the instructions for the sessions that work here, which are about committing
+rather than about the program.
+
 Where a body is longer than ``MAX_EXCERPT`` it is **split into several
 sections**, never truncated: the bound is on how much one result *displays*,
 not on how much is searched. An earlier version truncated, which quietly left
@@ -110,6 +114,15 @@ GENERATED = frozenset({
     # Generated from the tab list in the desktop application's source and from
     # the command captures, both of which are indexed where they are written.
     "website/js/demo-data.js",
+})
+
+# Tracked, and deliberately not searchable from the website. The instructions
+# for the assistant sessions that work here are committed so a fresh clone has
+# them (F-235), and they are about how to commit rather than how to use the
+# program. The website names the assistance once, in its footer, and a search
+# result for the sessions' own instructions would be a second place.
+NOT_FOR_READERS = frozenset({
+    "CLAUDE.md",
 })
 
 # `tools/docs/generate.py` renders the doc comments in the source into four
@@ -509,6 +522,8 @@ def build(root):
 
     for rel in tracked_files(root):
         if BINARY.search(rel) or BINARY_DIRS.search(rel) or is_generated(rel):
+            continue
+        if rel in NOT_FOR_READERS:
             continue
         full = os.path.join(root, rel.replace("/", os.sep))
         try:

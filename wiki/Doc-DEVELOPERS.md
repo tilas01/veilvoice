@@ -206,6 +206,7 @@ And what it then checks:
 - **that guard catches what it claims to**: `python tools/audit/fixtures.py --self-test`
 - **every commit to push is tilas01's, and so is the next one**: `python tools/audit/authorship.py`
 - **the authorship guard catches what it claims to**: `python tools/audit/authorship.py --self-test`
+- **a signing key from the environment signs the next commit**: `python tools/repo/signing.py --self-test`
 - **the updater can ask for every release that is published**: `python tools/audit/release_targets.py`
 - **that guard catches what it claims to, too**: `python tools/audit/release_targets.py --self-test`
 - **the manual's platform table says what the workflow builds**: `python tools/audit/platform_table.py`
