@@ -20,9 +20,11 @@ machine other than the one it was written on: the signing key decides where.
 
 For every commit in the range: author and committer become tilas01, with their
 original dates; the message loses any co-author or session trailer and any
-assistant name, by the replacements in `REWORD`; a commit hash quoted in a
-message is translated to the rewritten commit it named; and the commit is
-signed with the key given, or left unsigned.
+assistant name, by the replacements in `REWORD`; a title that names the wrong
+finding is corrected, by `TITLE`; a title run straight into the lines below it
+gets the blank line it was missing; a commit hash quoted in a message is
+translated to the rewritten commit it named; and the commit is signed with the
+key given, or left unsigned.
 
 The tree of every commit is byte for byte what it was. That is checked, commit
 by commit, before anything is pushed, and it is what keeps a build of any
@@ -84,6 +86,14 @@ REWORD = [
     ("Claude Code", "cloud"),
 ]
 
+# Titles that name the wrong finding: each commit was pushed while another
+# session took the number in its title, and its write-up in docs/AUDIT.md was
+# renumbered while the title was not. Keyed on the original commit.
+TITLE = {
+    "262307427dc6b3062c0252e4115aaebfa697f995": ("F-227:", "F-228:"),
+    "b73ddd34bb08e74562f15aa13d6a29797b129d7a": ("F-233:", "F-234:"),
+}
+
 
 def git(args, env=None, check=True, stdin=None):
     done = subprocess.run(["git"] + args, cwd=ROOT, env=env, input=stdin,
@@ -106,9 +116,21 @@ def headers(sha):
     return message, dates["author"], dates["committer"]
 
 
-def reword(message, mapping):
-    """The message without trailers or names, and with hashes translated."""
+def reword(message, mapping, sha=None):
+    """The message without trailers or names, and with hashes translated.
+
+    A title followed straight by more text, with no blank line between, is
+    given one: git reads everything up to the first blank line as the title,
+    so without it the whole message shows as one line.
+    """
     lines = [line for line in message.split("\n") if not authorship.TRAILER.search(line)]
+    if sha in TITLE:
+        wrong, right = TITLE[sha]
+        if not lines[0].startswith(wrong):
+            raise SystemExit("%s no longer starts %r; TITLE is stale" % (sha[:10], wrong))
+        lines[0] = right + lines[0][len(wrong):]
+    if len(lines) > 1 and lines[1].strip():
+        lines.insert(1, "")
     text = "\n".join(lines)
     for old, new in REWORD:
         text = text.replace(old, new)
@@ -194,7 +216,7 @@ def main():
                     GIT_AUTHOR_DATE=authored, GIT_COMMITTER_NAME=authorship.NAME,
                     GIT_COMMITTER_EMAIL=authorship.EMAIL, GIT_COMMITTER_DATE=committed)
         mapping[sha] = git(args, env=step,
-                           stdin=reword(message, mapping).encode("utf-8"))
+                           stdin=reword(message, mapping, sha).encode("utf-8"))
 
     new_dev = mapping[old_dev]
     new_main = mapping.get(old_main, old_main)
