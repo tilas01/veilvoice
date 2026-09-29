@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/main.svg" alt="main.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/main.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 3749 lines &middot; <a href="main.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 3757 lines &middot; <a href="main.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-is-here">What is here</a>
@@ -104,21 +104,21 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>3749 lines defining <strong>31 functions</strong> (0 public), <strong>13 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>3757 lines defining <strong>31 functions</strong> (0 public), <strong>13 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Cli</code> <span style="color:var(--muted)">line 126</span> &middot; The whole command line, which is one subcommand and nothing else.</li>
 <li><code>enum Command</code> <span style="color:var(--muted)">line 141</span> &middot; Everything veilvoice can be asked to do.</li>
-<li><code>enum FixCommand</code> <span style="color:var(--muted)">line 810</span> &middot; The corrections veilvoice conversation fix can make.</li>
-<li><code>enum ConversationCommand</code> <span style="color:var(--muted)">line 895</span> &middot; What veilvoice conversation can be asked to do: read a plan, or render one.</li>
-<li><code>enum AppctlCommand</code> <span style="color:var(--muted)">line 1053</span> &middot; What veilvoice capture can do.</li>
-<li><code>enum InputCommand</code> <span style="color:var(--muted)">line 1086</span> &middot; What veilvoice input can be asked to do: what is watching input now, or everything this build is able to notice.</li>
-<li><code>enum CaptureCommand</code> <span style="color:var(--muted)">line 1102</span> &middot; What veilvoice capture can be asked to do about the microphone and camera, with the same pairing as InputCommand: what is happening now, and what this build is able to notice at all.</li>
-<li><code>enum MandateCommand</code> <span style="color:var(--muted)">line 1142</span> &middot; What veilvoice mandate can do.</li>
-<li><code>enum PolicyCommand</code> <span style="color:var(--muted)">line 1178</span> &middot; What veilvoice policy can do.</li>
-<li><code>enum SentryCommand</code> <span style="color:var(--muted)">line 1231</span> &middot; What veilvoice sentry can do.</li>
-<li><code>enum CleanPolicy</code> <span style="color:var(--muted)">line 1298</span> &middot; What to do with the tags in a file veilvoice clean is given.</li>
-<li><code>struct Tuning</code> <span style="color:var(--muted)">line 2422</span> &middot; The engine settings a user can reach from the command line.</li>
-<li><code>struct AtRest</code> <span style="color:var(--muted)">line 2499</span> &middot; What to do with the result once it exists.</li>
+<li><code>enum FixCommand</code> <span style="color:var(--muted)">line 818</span> &middot; The corrections veilvoice conversation fix can make.</li>
+<li><code>enum ConversationCommand</code> <span style="color:var(--muted)">line 903</span> &middot; What veilvoice conversation can be asked to do: read a plan, or render one.</li>
+<li><code>enum AppctlCommand</code> <span style="color:var(--muted)">line 1061</span> &middot; What veilvoice capture can do.</li>
+<li><code>enum InputCommand</code> <span style="color:var(--muted)">line 1094</span> &middot; What veilvoice input can be asked to do: what is watching input now, or everything this build is able to notice.</li>
+<li><code>enum CaptureCommand</code> <span style="color:var(--muted)">line 1110</span> &middot; What veilvoice capture can be asked to do about the microphone and camera, with the same pairing as InputCommand: what is happening now, and what this build is able to notice at all.</li>
+<li><code>enum MandateCommand</code> <span style="color:var(--muted)">line 1150</span> &middot; What veilvoice mandate can do.</li>
+<li><code>enum PolicyCommand</code> <span style="color:var(--muted)">line 1186</span> &middot; What veilvoice policy can do.</li>
+<li><code>enum SentryCommand</code> <span style="color:var(--muted)">line 1239</span> &middot; What veilvoice sentry can do.</li>
+<li><code>enum CleanPolicy</code> <span style="color:var(--muted)">line 1306</span> &middot; What to do with the tags in a file veilvoice clean is given.</li>
+<li><code>struct Tuning</code> <span style="color:var(--muted)">line 2430</span> &middot; The engine settings a user can reach from the command line.</li>
+<li><code>struct AtRest</code> <span style="color:var(--muted)">line 2507</span> &middot; What to do with the result once it exists.</li>
 </ul>
 </section>
 <section id="s-calls">
@@ -162,112 +162,112 @@
 <a href="main.src.html#fn-flavour_for">
 <rect x="71.1" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="129.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">flavour_for</text>
-<text x="129.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1320</text>
+<text x="129.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1328</text>
 </a>
 <a href="main.src.html#fn-explain_verification">
 <rect x="213.8" y="20.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="308.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">explain_verification</text>
-<text x="308.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1340</text>
+<text x="308.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1348</text>
 </a>
 <a href="main.src.html#fn-main">
 <rect x="429.0" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="479.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">main</text>
-<text x="479.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1418</text>
+<text x="479.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1426</text>
 </a>
 <a href="main.src.html#fn-run">
 <rect x="162.6" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="212.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1460</text>
+<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 1468</text>
 </a>
 <a href="main.src.html#fn-run_ffmpeg">
 <rect x="83.2" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="137.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run_ffmpeg</text>
-<text x="137.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2074</text>
+<text x="137.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2082</text>
 </a>
 <a href="main.src.html#fn-list_volumes">
 <rect x="217.8" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="280.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_volumes</text>
-<text x="280.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2149</text>
+<text x="280.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2157</text>
 </a>
 <a href="main.src.html#fn-list_companions">
 <rect x="368.5" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="443.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_companions</text>
-<text x="443.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2197</text>
+<text x="443.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2205</text>
 </a>
 <a href="main.src.html#fn-print_launch_check">
 <rect x="213.8" y="720.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="300.3" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">print_launch_check</text>
-<text x="300.3" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2241</text>
+<text x="300.3" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2249</text>
 </a>
 <a href="main.src.html#fn-say_what_a_video_will_need">
 <rect x="86.0" y="420.0" width="237.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="204.8" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">say_what_a_video_will_need</text>
-<text x="204.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2293</text>
+<text x="204.8" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2301</text>
 </a>
 <a href="main.src.html#fn-offer_line">
 <rect x="246.0" y="820.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="300.3" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">offer_line</text>
-<text x="300.3" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2315</text>
+<text x="300.3" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2323</text>
 </a>
 <a href="main.src.html#fn-install_companion">
 <rect x="349.6" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="432.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install_companion</text>
-<text x="432.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2339</text>
+<text x="432.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2347</text>
 </a>
 <a href="main.src.html#fn-reseed_range_from">
 <rect x="28.0" y="520.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="110.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">reseed_range_from</text>
-<text x="110.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2441</text>
+<text x="110.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2449</text>
 </a>
 <a href="main.src.html#fn-config">
 <rect x="219.0" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="269.3" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">config</text>
-<text x="269.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2461</text>
+<text x="269.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2469</text>
 </a>
 <a href="main.src.html#fn-describe_reseed_range">
 <rect x="63.1" y="120.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="161.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed_range</text>
-<text x="161.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2480</text>
+<text x="161.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2488</text>
 </a>
 <a href="main.src.html#fn-describe_reseed">
 <rect x="289.1" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="363.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe_reseed</text>
-<text x="363.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2490</text>
+<text x="363.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2498</text>
 </a>
 <a href="main.src.html#fn-anonymise">
 <rect x="345.6" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="395.8" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">anonymise</text>
-<text x="395.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2509</text>
+<text x="395.8" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2517</text>
 </a>
 <a href="main.src.html#fn-live">
 <rect x="472.1" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="522.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">live</text>
-<text x="522.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2652</text>
+<text x="522.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2660</text>
 </a>
 <a href="main.src.html#fn-list_devices">
 <rect x="107.4" y="620.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="169.7" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">list_devices</text>
-<text x="169.7" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2884</text>
+<text x="169.7" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2892</text>
 </a>
 <a href="main.src.html#fn-read_named">
 <rect x="286.3" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="340.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_named</text>
-<text x="340.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2935</text>
+<text x="340.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2943</text>
 </a>
 <a href="main.src.html#fn-video_plan">
 <rect x="258.1" y="620.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="312.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">video_plan</text>
-<text x="312.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2950</text>
+<text x="312.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2958</text>
 </a>
 <a href="main.src.html#fn-write_named">
 <rect x="420.9" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="479.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_named</text>
-<text x="479.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2967</text>
+<text x="479.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2975</text>
 </a>
 <a href="main.src.html#fn-clean">
 <rect x="392.7" y="620.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="443.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean</text>
-<text x="443.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2972</text>
+<text x="443.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 2980</text>
 </a>
 <rect x="20.0" y="904.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
 <text x="35.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
@@ -283,28 +283,28 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_flavour_for[&quot;flavour_for&lt;br/&gt;line 1320&quot;]
-    n_explain_verification[&quot;explain_verification&lt;br/&gt;line 1340&quot;]
-    n_main[&quot;main&lt;br/&gt;line 1418&quot;]
-    n_run[&quot;run&lt;br/&gt;line 1460&quot;]
-    n_run_ffmpeg[&quot;run_ffmpeg&lt;br/&gt;line 2074&quot;]
-    n_list_volumes[&quot;list_volumes&lt;br/&gt;line 2149&quot;]
-    n_list_companions[&quot;list_companions&lt;br/&gt;line 2197&quot;]
-    n_print_launch_check[&quot;print_launch_check&lt;br/&gt;line 2241&quot;]
-    n_say_what_a_video_will_need[&quot;say_what_a_video_will_need&lt;br/&gt;line 2293&quot;]
-    n_offer_line[&quot;offer_line&lt;br/&gt;line 2315&quot;]
-    n_install_companion[&quot;install_companion&lt;br/&gt;line 2339&quot;]
-    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 2441&quot;]
-    n_config[&quot;config&lt;br/&gt;line 2461&quot;]
-    n_describe_reseed_range[&quot;describe_reseed_range&lt;br/&gt;line 2480&quot;]
-    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 2490&quot;]
-    n_anonymise[&quot;anonymise&lt;br/&gt;line 2509&quot;]
-    n_live[&quot;live&lt;br/&gt;line 2652&quot;]
-    n_list_devices[&quot;list_devices&lt;br/&gt;line 2884&quot;]
-    n_read_named[&quot;read_named&lt;br/&gt;line 2935&quot;]
-    n_video_plan[&quot;video_plan&lt;br/&gt;line 2950&quot;]
-    n_write_named[&quot;write_named&lt;br/&gt;line 2967&quot;]
-    n_clean[&quot;clean&lt;br/&gt;line 2972&quot;]
+    n_flavour_for[&quot;flavour_for&lt;br/&gt;line 1328&quot;]
+    n_explain_verification[&quot;explain_verification&lt;br/&gt;line 1348&quot;]
+    n_main[&quot;main&lt;br/&gt;line 1426&quot;]
+    n_run[&quot;run&lt;br/&gt;line 1468&quot;]
+    n_run_ffmpeg[&quot;run_ffmpeg&lt;br/&gt;line 2082&quot;]
+    n_list_volumes[&quot;list_volumes&lt;br/&gt;line 2157&quot;]
+    n_list_companions[&quot;list_companions&lt;br/&gt;line 2205&quot;]
+    n_print_launch_check[&quot;print_launch_check&lt;br/&gt;line 2249&quot;]
+    n_say_what_a_video_will_need[&quot;say_what_a_video_will_need&lt;br/&gt;line 2301&quot;]
+    n_offer_line[&quot;offer_line&lt;br/&gt;line 2323&quot;]
+    n_install_companion[&quot;install_companion&lt;br/&gt;line 2347&quot;]
+    n_reseed_range_from[&quot;reseed_range_from&lt;br/&gt;line 2449&quot;]
+    n_config[&quot;config&lt;br/&gt;line 2469&quot;]
+    n_describe_reseed_range[&quot;describe_reseed_range&lt;br/&gt;line 2488&quot;]
+    n_describe_reseed[&quot;describe_reseed&lt;br/&gt;line 2498&quot;]
+    n_anonymise[&quot;anonymise&lt;br/&gt;line 2517&quot;]
+    n_live[&quot;live&lt;br/&gt;line 2660&quot;]
+    n_list_devices[&quot;list_devices&lt;br/&gt;line 2892&quot;]
+    n_read_named[&quot;read_named&lt;br/&gt;line 2943&quot;]
+    n_video_plan[&quot;video_plan&lt;br/&gt;line 2958&quot;]
+    n_write_named[&quot;write_named&lt;br/&gt;line 2975&quot;]
+    n_clean[&quot;clean&lt;br/&gt;line 2980&quot;]
     n_anonymise --&gt; n_config
     n_anonymise --&gt; n_describe_reseed_range
     n_clean --&gt; n_read_named
@@ -330,28 +330,28 @@ flowchart TD
     n_run --&gt; n_run_ffmpeg
     n_run --&gt; n_say_what_a_video_will_need
     n_run --&gt; n_video_plan
-    click n_flavour_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1320&quot; &quot;open the source&quot;
-    click n_explain_verification href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1340&quot; &quot;open the source&quot;
-    click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1418&quot; &quot;open the source&quot;
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1460&quot; &quot;open the source&quot;
-    click n_run_ffmpeg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2074&quot; &quot;open the source&quot;
-    click n_list_volumes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2149&quot; &quot;open the source&quot;
-    click n_list_companions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2197&quot; &quot;open the source&quot;
-    click n_print_launch_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2241&quot; &quot;open the source&quot;
-    click n_say_what_a_video_will_need href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2293&quot; &quot;open the source&quot;
-    click n_offer_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2315&quot; &quot;open the source&quot;
-    click n_install_companion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2339&quot; &quot;open the source&quot;
-    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2441&quot; &quot;open the source&quot;
-    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2461&quot; &quot;open the source&quot;
-    click n_describe_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2480&quot; &quot;open the source&quot;
-    click n_describe_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2490&quot; &quot;open the source&quot;
-    click n_anonymise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2509&quot; &quot;open the source&quot;
-    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2652&quot; &quot;open the source&quot;
-    click n_list_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2884&quot; &quot;open the source&quot;
-    click n_read_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2935&quot; &quot;open the source&quot;
-    click n_video_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2950&quot; &quot;open the source&quot;
-    click n_write_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2967&quot; &quot;open the source&quot;
-    click n_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2972&quot; &quot;open the source&quot;
+    click n_flavour_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1328&quot; &quot;open the source&quot;
+    click n_explain_verification href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1348&quot; &quot;open the source&quot;
+    click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1426&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L1468&quot; &quot;open the source&quot;
+    click n_run_ffmpeg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2082&quot; &quot;open the source&quot;
+    click n_list_volumes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2157&quot; &quot;open the source&quot;
+    click n_list_companions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2205&quot; &quot;open the source&quot;
+    click n_print_launch_check href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2249&quot; &quot;open the source&quot;
+    click n_say_what_a_video_will_need href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2301&quot; &quot;open the source&quot;
+    click n_offer_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2323&quot; &quot;open the source&quot;
+    click n_install_companion href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2347&quot; &quot;open the source&quot;
+    click n_reseed_range_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2449&quot; &quot;open the source&quot;
+    click n_config href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2469&quot; &quot;open the source&quot;
+    click n_describe_reseed_range href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2488&quot; &quot;open the source&quot;
+    click n_describe_reseed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2498&quot; &quot;open the source&quot;
+    click n_anonymise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2517&quot; &quot;open the source&quot;
+    click n_live href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2660&quot; &quot;open the source&quot;
+    click n_list_devices href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2892&quot; &quot;open the source&quot;
+    click n_read_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2943&quot; &quot;open the source&quot;
+    click n_video_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2958&quot; &quot;open the source&quot;
+    click n_write_named href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2975&quot; &quot;open the source&quot;
+    click n_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/main.rs#L2980&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_flavour_for,n_explain_verification,n_main,n_run,n_run_ffmpeg,n_list_volumes,n_list_companions,n_print_launch_check,n_say_what_a_video_will_need,n_offer_line,n_install_companion,n_reseed_range_from,n_config,n_describe_reseed_range,n_describe_reseed,n_anonymise,n_live,n_list_devices,n_read_named,n_video_plan,n_write_named,n_clean helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
@@ -362,48 +362,48 @@ flowchart TD
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>Cli</code> <sub>struct</sub></td><td><a href="main.src.html#fn-cli">126</a></td><td>The whole command line, which is one subcommand and nothing else.</td></tr>
 <tr><td><code>Command</code> <sub>enum</sub></td><td><a href="main.src.html#fn-command">141</a></td><td>Everything veilvoice can be asked to do.</td></tr>
-<tr><td><code>conversation::Fix::from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-conversation-fix-from">791</a></td><td></td></tr>
-<tr><td><code>FixCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-fixcommand">810</a></td><td>The corrections veilvoice conversation fix can make.</td></tr>
-<tr><td><code>ConversationCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-conversationcommand">895</a></td><td>What veilvoice conversation can be asked to do: read a plan, or render one.</td></tr>
-<tr><td><code>AppctlCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-appctlcommand">1053</a></td><td>What veilvoice capture can do.</td></tr>
-<tr><td><code>InputCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-inputcommand">1086</a></td><td>What veilvoice input can be asked to do: what is watching input now, or everything this build is able to notice.</td></tr>
-<tr><td><code>CaptureCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-capturecommand">1102</a></td><td>What veilvoice capture can be asked to do about the microphone and camera, with the same pairing as InputCommand: what is happening now, and what this build is able to notice at all.</td></tr>
-<tr><td><code>MandateCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-mandatecommand">1142</a></td><td>What veilvoice mandate can do.</td></tr>
-<tr><td><code>PolicyCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-policycommand">1178</a></td><td>What veilvoice policy can do.</td></tr>
-<tr><td><code>SentryCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-sentrycommand">1231</a></td><td>What veilvoice sentry can do.</td></tr>
-<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="main.src.html#fn-cleanpolicy">1298</a></td><td>What to do with the tags in a file veilvoice clean is given.</td></tr>
-<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-policy-from">1306</a></td><td></td></tr>
-<tr><td><code>flavour_for</code> <sub>fn</sub></td><td><a href="main.src.html#fn-flavour_for">1320</a></td><td>The verification script&#x27;s spelling for a system, in one place.</td></tr>
-<tr><td><code>explain_verification</code> <sub>fn</sub></td><td><a href="main.src.html#fn-explain_verification">1340</a></td><td>What checking a release actually involves, and who does which part.</td></tr>
-<tr><td><code>main</code> <sub>fn</sub></td><td><a href="main.src.html#fn-main">1418</a></td><td>Parse the command line and turn a failure into an exit code and a message.</td></tr>
-<tr><td><code>run</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run">1460</a></td><td>Carry out one subcommand.</td></tr>
-<tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run_ffmpeg">2074</a></td><td>Roadmap items 87 and 88.</td></tr>
-<tr><td><code>list_volumes</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_volumes">2149</a></td><td>Report the encrypted volumes this machine is offering.</td></tr>
-<tr><td><code>list_companions</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_companions">2197</a></td><td>Report every companion that means anything on this platform.</td></tr>
-<tr><td><code>print_launch_check</code> <sub>fn</sub></td><td><a href="main.src.html#fn-print_launch_check">2241</a></td><td>Roadmap item 163.</td></tr>
-<tr><td><code>say_what_a_video_will_need</code> <sub>fn</sub></td><td><a href="main.src.html#fn-say_what_a_video_will_need">2293</a></td><td>Roadmap item 163.</td></tr>
-<tr><td><code>offer_line</code> <sub>fn</sub></td><td><a href="main.src.html#fn-offer_line">2315</a></td><td>One line describing what VeilVoice can do about a missing companion.</td></tr>
-<tr><td><code>install_companion</code> <sub>fn</sub></td><td><a href="main.src.html#fn-install_companion">2339</a></td><td>Act on one named companion.</td></tr>
-<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="main.src.html#fn-tuning">2422</a></td><td>The engine settings a user can reach from the command line.</td></tr>
-<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-reseed_range_from">2441</a></td><td>Turn --reseed-range into a range, or into the reason it was not one.</td></tr>
-<tr><td><code>config</code> <sub>fn</sub></td><td><a href="main.src.html#fn-config">2461</a></td><td>The de-identification settings a Tuning describes, with every figure clamped.</td></tr>
-<tr><td><code>describe_reseed_range</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed_range">2480</a></td><td>How a randomised roll range reads in the output.</td></tr>
-<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed">2490</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
-<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="main.src.html#fn-atrest">2499</a></td><td>What to do with the result once it exists.</td></tr>
-<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="main.src.html#fn-anonymise">2509</a></td><td>veilvoice anonymise: veil a recording and write it somewhere else.</td></tr>
-<tr><td><code>live</code> <sub>fn</sub></td><td><a href="main.src.html#fn-live">2652</a></td><td>veilvoice live: veil the microphone as it is heard, with an optional preview.</td></tr>
-<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_devices">2884</a></td><td>veilvoice devices: every input and output this machine reports.</td></tr>
-<tr><td><code>read_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-read_named">2935</a></td><td>Read a file, naming it if that fails.</td></tr>
-<tr><td><code>video_plan</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-video_plan">2950</a></td><td>Read a --size and an --fps into a render plan, saying what was decided.</td></tr>
-<tr><td><code>write_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-write_named">2967</a></td><td>Write a file, naming it if that fails.</td></tr>
-<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="main.src.html#fn-clean">2972</a></td><td>veilvoice clean: strip the metadata a file carries, in place.</td></tr>
-<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-encrypt">2990</a></td><td>veilvoice encrypt: seal a file, to a passphrase or to a public key.</td></tr>
-<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-decrypt">3021</a></td><td>veilvoice decrypt: open a sealed file, given the passphrase or the secret key.</td></tr>
-<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="main.src.html#fn-load_secret_key">3053</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
-<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="main.src.html#fn-keygen">3063</a></td><td>veilvoice keygen: write a new key pair, refusing to overwrite either file.</td></tr>
-<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="main.src.html#fn-watch">3139</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
-<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="main.src.html#fn-shred">3229</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
-<tr><td><code>info</code> <sub>fn</sub></td><td><a href="main.src.html#fn-info">3298</a></td><td>veilvoice info: the versions, and what this build was compiled to do.</td></tr>
+<tr><td><code>conversation::Fix::from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-conversation-fix-from">799</a></td><td></td></tr>
+<tr><td><code>FixCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-fixcommand">818</a></td><td>The corrections veilvoice conversation fix can make.</td></tr>
+<tr><td><code>ConversationCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-conversationcommand">903</a></td><td>What veilvoice conversation can be asked to do: read a plan, or render one.</td></tr>
+<tr><td><code>AppctlCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-appctlcommand">1061</a></td><td>What veilvoice capture can do.</td></tr>
+<tr><td><code>InputCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-inputcommand">1094</a></td><td>What veilvoice input can be asked to do: what is watching input now, or everything this build is able to notice.</td></tr>
+<tr><td><code>CaptureCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-capturecommand">1110</a></td><td>What veilvoice capture can be asked to do about the microphone and camera, with the same pairing as InputCommand: what is happening now, and what this build is able to notice at all.</td></tr>
+<tr><td><code>MandateCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-mandatecommand">1150</a></td><td>What veilvoice mandate can do.</td></tr>
+<tr><td><code>PolicyCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-policycommand">1186</a></td><td>What veilvoice policy can do.</td></tr>
+<tr><td><code>SentryCommand</code> <sub>enum</sub></td><td><a href="main.src.html#fn-sentrycommand">1239</a></td><td>What veilvoice sentry can do.</td></tr>
+<tr><td><code>CleanPolicy</code> <sub>enum</sub></td><td><a href="main.src.html#fn-cleanpolicy">1306</a></td><td>What to do with the tags in a file veilvoice clean is given.</td></tr>
+<tr><td><code>Policy::from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-policy-from">1314</a></td><td></td></tr>
+<tr><td><code>flavour_for</code> <sub>fn</sub></td><td><a href="main.src.html#fn-flavour_for">1328</a></td><td>The verification script&#x27;s spelling for a system, in one place.</td></tr>
+<tr><td><code>explain_verification</code> <sub>fn</sub></td><td><a href="main.src.html#fn-explain_verification">1348</a></td><td>What checking a release actually involves, and who does which part.</td></tr>
+<tr><td><code>main</code> <sub>fn</sub></td><td><a href="main.src.html#fn-main">1426</a></td><td>Parse the command line and turn a failure into an exit code and a message.</td></tr>
+<tr><td><code>run</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run">1468</a></td><td>Carry out one subcommand.</td></tr>
+<tr><td><code>run_ffmpeg</code> <sub>fn</sub></td><td><a href="main.src.html#fn-run_ffmpeg">2082</a></td><td>Roadmap items 87 and 88.</td></tr>
+<tr><td><code>list_volumes</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_volumes">2157</a></td><td>Report the encrypted volumes this machine is offering.</td></tr>
+<tr><td><code>list_companions</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_companions">2205</a></td><td>Report every companion that means anything on this platform.</td></tr>
+<tr><td><code>print_launch_check</code> <sub>fn</sub></td><td><a href="main.src.html#fn-print_launch_check">2249</a></td><td>Roadmap item 163.</td></tr>
+<tr><td><code>say_what_a_video_will_need</code> <sub>fn</sub></td><td><a href="main.src.html#fn-say_what_a_video_will_need">2301</a></td><td>Roadmap item 163.</td></tr>
+<tr><td><code>offer_line</code> <sub>fn</sub></td><td><a href="main.src.html#fn-offer_line">2323</a></td><td>One line describing what VeilVoice can do about a missing companion.</td></tr>
+<tr><td><code>install_companion</code> <sub>fn</sub></td><td><a href="main.src.html#fn-install_companion">2347</a></td><td>Act on one named companion.</td></tr>
+<tr><td><code>Tuning</code> <sub>struct</sub></td><td><a href="main.src.html#fn-tuning">2430</a></td><td>The engine settings a user can reach from the command line.</td></tr>
+<tr><td><code>reseed_range_from</code> <sub>fn</sub></td><td><a href="main.src.html#fn-reseed_range_from">2449</a></td><td>Turn --reseed-range into a range, or into the reason it was not one.</td></tr>
+<tr><td><code>config</code> <sub>fn</sub></td><td><a href="main.src.html#fn-config">2469</a></td><td>The de-identification settings a Tuning describes, with every figure clamped.</td></tr>
+<tr><td><code>describe_reseed_range</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed_range">2488</a></td><td>How a randomised roll range reads in the output.</td></tr>
+<tr><td><code>describe_reseed</code> <sub>fn</sub></td><td><a href="main.src.html#fn-describe_reseed">2498</a></td><td>How the seed-rolling setting reads in the output.</td></tr>
+<tr><td><code>AtRest</code> <sub>struct</sub></td><td><a href="main.src.html#fn-atrest">2507</a></td><td>What to do with the result once it exists.</td></tr>
+<tr><td><code>anonymise</code> <sub>fn</sub></td><td><a href="main.src.html#fn-anonymise">2517</a></td><td>veilvoice anonymise: veil a recording and write it somewhere else.</td></tr>
+<tr><td><code>live</code> <sub>fn</sub></td><td><a href="main.src.html#fn-live">2660</a></td><td>veilvoice live: veil the microphone as it is heard, with an optional preview.</td></tr>
+<tr><td><code>list_devices</code> <sub>fn</sub></td><td><a href="main.src.html#fn-list_devices">2892</a></td><td>veilvoice devices: every input and output this machine reports.</td></tr>
+<tr><td><code>read_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-read_named">2943</a></td><td>Read a file, naming it if that fails.</td></tr>
+<tr><td><code>video_plan</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-video_plan">2958</a></td><td>Read a --size and an --fps into a render plan, saying what was decided.</td></tr>
+<tr><td><code>write_named</code> <sub>pub(crate) fn</sub></td><td><a href="main.src.html#fn-write_named">2975</a></td><td>Write a file, naming it if that fails.</td></tr>
+<tr><td><code>clean</code> <sub>fn</sub></td><td><a href="main.src.html#fn-clean">2980</a></td><td>veilvoice clean: strip the metadata a file carries, in place.</td></tr>
+<tr><td><code>encrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-encrypt">2998</a></td><td>veilvoice encrypt: seal a file, to a passphrase or to a public key.</td></tr>
+<tr><td><code>decrypt</code> <sub>fn</sub></td><td><a href="main.src.html#fn-decrypt">3029</a></td><td>veilvoice decrypt: open a sealed file, given the passphrase or the secret key.</td></tr>
+<tr><td><code>load_secret_key</code> <sub>fn</sub></td><td><a href="main.src.html#fn-load_secret_key">3061</a></td><td>Load a private key file, which is itself a password-locked container.</td></tr>
+<tr><td><code>keygen</code> <sub>fn</sub></td><td><a href="main.src.html#fn-keygen">3071</a></td><td>veilvoice keygen: write a new key pair, refusing to overwrite either file.</td></tr>
+<tr><td><code>watch</code> <sub>fn</sub></td><td><a href="main.src.html#fn-watch">3147</a></td><td>Report, and keep reporting, what is using the microphone and camera.</td></tr>
+<tr><td><code>shred</code> <sub>fn</sub></td><td><a href="main.src.html#fn-shred">3237</a></td><td>Destroy a file&#x27;s contents, then delete it.</td></tr>
+<tr><td><code>info</code> <sub>fn</sub></td><td><a href="main.src.html#fn-info">3306</a></td><td>veilvoice info: the versions, and what this build was compiled to do.</td></tr>
 </tbody></table>
 </section>
 </div></div>

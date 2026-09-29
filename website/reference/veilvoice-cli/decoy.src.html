@@ -63,69 +63,589 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/decoy.rs</code></h1>
-<p style="color:var(--muted)"><a href="decoy.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 58 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="decoy.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 550 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
 <span class="ln" id="L2"><span class="tok-com">//! `veilvoice decoy`, and what a second passphrase is worth and what it is not.</span></span>
 <span class="ln" id="L3"><span class="tok-com">//!</span></span>
-<span class="ln" id="L4"><span class="tok-com">//! # In plain words</span></span>
+<span class="ln" id="L4"><span class="tok-com">//! # What it is worth is printed on the way in, not behind a flag</span></span>
 <span class="ln" id="L5"><span class="tok-com">//!</span></span>
-<span class="ln" id="L6"><span class="tok-com">//! Explains the decoy passphrase: what it does, the two things it cannot do,</span></span>
-<span class="ln" id="L7"><span class="tok-com">//! and the rules a pair has to satisfy. It does not set one up. Choosing a</span></span>
-<span class="ln" id="L8"><span class="tok-com">//! passphrase is done where passphrases are already handled, and printing one</span></span>
-<span class="ln" id="L9"><span class="tok-com">//! into a terminal&#x27;s history would be a poor start.</span></span>
-<span class="ln" id="L10"></span>
-<span class="ln" id="L11"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, field, heading, paint};</span>
-<span class="ln" id="L12"></span>
-<span class="src-item" id="fn-explain">
-<span class="ln" id="L13"><span class="tok-com">/// Explain the feature and its limits.</span></span>
-<span class="ln" id="L14"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">explain</span>() -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L15">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;A second passphrase&quot;</span>));</span>
-<span class="ln" id="L16">    println!();</span>
-<span class="ln" id="L17">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_crypto::decoy::SCOPE, <span class="tok-num">72</span>) {</span>
-<span class="ln" id="L18">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
-<span class="ln" id="L19">    }</span>
-<span class="ln" id="L20"></span>
-<span class="ln" id="L21">    println!();</span>
-<span class="ln" id="L22">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT NO PASSPHRASE DOES&quot;</span>));</span>
-<span class="ln" id="L23">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_crypto::decoy::WHY_NO_DESTRUCTION, <span class="tok-num">72</span>) {</span>
-<span class="ln" id="L24">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
-<span class="ln" id="L25">    }</span>
-<span class="ln" id="L26"></span>
-<span class="ln" id="L27">    println!();</span>
-<span class="ln" id="L28">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;What a pair has to satisfy&quot;</span>));</span>
-<span class="ln" id="L29">    println!(</span>
-<span class="ln" id="L30">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L31">        <span class="tok-fn">field</span>(</span>
-<span class="ln" id="L32">            <span class="tok-str">&quot;different in at least&quot;</span>,</span>
-<span class="ln" id="L33">            &amp;format!(<span class="tok-str">&quot;{} places&quot;</span>, veilvoice_crypto::decoy::LEAST_DIFFERENCE)</span>
-<span class="ln" id="L34">        )</span>
-<span class="ln" id="L35">    );</span>
-<span class="ln" id="L36">    println!(</span>
-<span class="ln" id="L37">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L38">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L39">            colour::MUTED,</span>
-<span class="ln" id="L40">            <span class="tok-str">&quot;  A decoy that is nearly the real passphrase is not a decoy. Somebody\n  \</span></span>
-<span class="ln" id="L41"><span class="tok-str">             watching you type learns both at once, and somebody typing under\n  \</span></span>
-<span class="ln" id="L42"><span class="tok-str">             pressure gives away the wrong one. Length counts as difference, so\n  \</span></span>
-<span class="ln" id="L43"><span class="tok-str">             adding characters to the end does not make a second passphrase.&quot;</span>,</span>
-<span class="ln" id="L44">        )</span>
-<span class="ln" id="L45">    );</span>
-<span class="ln" id="L46">    println!();</span>
-<span class="ln" id="L47">    println!(</span>
-<span class="ln" id="L48">        <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L49">        <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L50">            colour::MUTED,</span>
-<span class="ln" id="L51">            <span class="tok-str">&quot;  Both passphrases are checked with the same Argon2id cost and compared\n  \</span></span>
-<span class="ln" id="L52"><span class="tok-str">             in constant time, and both are always derived even when the first one\n  \</span></span>
-<span class="ln" id="L53"><span class="tok-str">             matches. Returning early would make the real passphrase measurably\n  \</span></span>
-<span class="ln" id="L54"><span class="tok-str">             faster, which is enough to tell an observer which one was typed.&quot;</span>,</span>
-<span class="ln" id="L55">        )</span>
-<span class="ln" id="L56">    );</span>
-<span class="ln" id="L57">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L6"><span class="tok-com">//! Every path that reports on a decoy or sets one up prints</span></span>
+<span class="ln" id="L7"><span class="tok-com">//! [`veilvoice_crypto::decoy::SCOPE`], and the two that set one print</span></span>
+<span class="ln" id="L8"><span class="tok-com">//! [`veilvoice_crypto::decoy::WHY_NO_DESTRUCTION`] with it, for the same reason</span></span>
+<span class="ln" id="L9"><span class="tok-com">//! [`crate::lock`] prints the lock&#x27;s own: somebody who believes a decoy hides</span></span>
+<span class="ln" id="L10"><span class="tok-com">//! that a second passphrase exists has been made **less** safe by it, not more.</span></span>
+<span class="ln" id="L11"><span class="tok-com">//! They would rely on an argument they do not have.</span></span>
+<span class="ln" id="L12"><span class="tok-com">//!</span></span>
+<span class="ln" id="L13"><span class="tok-com">//! Removing one is the exception and prints neither. Nothing is being taken on</span></span>
+<span class="ln" id="L14"><span class="tok-com">//! trust there, and a reader who has just asked for the feature to go does not</span></span>
+<span class="ln" id="L15"><span class="tok-com">//! need a page on what it was worth.</span></span>
+<span class="ln" id="L16"><span class="tok-com">//!</span></span>
+<span class="ln" id="L17"><span class="tok-com">//! The window prints the same two passages from the same two constants, so</span></span>
+<span class="ln" id="L18"><span class="tok-com">//! neither front end can soften it without the other.</span></span>
+<span class="ln" id="L19"><span class="tok-com">//!</span></span>
+<span class="ln" id="L20"><span class="tok-com">//! # In plain words</span></span>
+<span class="ln" id="L21"><span class="tok-com">//!</span></span>
+<span class="ln" id="L22"><span class="tok-com">//! Explains the decoy passphrase, and sets, changes or removes one.</span></span>
+<span class="ln" id="L23"><span class="tok-com">//!</span></span>
+<span class="ln" id="L24"><span class="tok-com">//! A decoy opens VeilVoice with nothing in it. It is there for the situation</span></span>
+<span class="ln" id="L25"><span class="tok-com">//! where somebody is standing over you asking you to unlock your computer: it</span></span>
+<span class="ln" id="L26"><span class="tok-com">//! gives you something true to say.</span></span>
+<span class="ln" id="L27"><span class="tok-com">//!</span></span>
+<span class="ln" id="L28"><span class="tok-com">//! It does not hide that a second passphrase might exist, and no passphrase</span></span>
+<span class="ln" id="L29"><span class="tok-com">//! destroys your recordings. Both of those are printed every time, and the</span></span>
+<span class="ln" id="L30"><span class="tok-com">//! second is deliberate: on modern storage, deleting a file does not reliably</span></span>
+<span class="ln" id="L31"><span class="tok-com">//! remove it, so a feature that claimed to would be lying to you at the worst</span></span>
+<span class="ln" id="L32"><span class="tok-com">//! possible moment.</span></span>
+<span class="ln" id="L33"><span class="tok-com">//!</span></span>
+<span class="ln" id="L34"><span class="tok-com">//! Setting or removing a decoy asks for your real passphrase first, so nobody</span></span>
+<span class="ln" id="L35"><span class="tok-com">//! can do either at a window you left unlocked.</span></span>
+<span class="ln" id="L36"></span>
+<span class="ln" id="L37"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::atrest::prompt_secret;</span>
+<span class="ln" id="L38"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, field, heading, ok, paint, warn};</span>
+<span class="ln" id="L39"><span class="tok-kw">use</span> clap::Subcommand;</span>
+<span class="ln" id="L40"><span class="tok-kw">use</span> veilvoice_crypto::decoy::{<span class="tok-kw">self</span>, State};</span>
+<span class="ln" id="L41"><span class="tok-kw">use</span> veilvoice_crypto::{layout, LockStore, Secret};</span>
+<span class="ln" id="L42"></span>
+<span class="src-item" id="fn-action">
+<span class="ln" id="L43"><span class="tok-com">/// What `veilvoice decoy` can be asked to do.</span></span>
+<span class="ln" id="L44"><span class="tok-com">///</span></span>
+<span class="ln" id="L45"><span class="tok-com">/// There is deliberately no variant that reads a decoy out, exactly as there is</span></span>
+<span class="ln" id="L46"><span class="tok-com">/// none on [`crate::lock::Action`]: the only things that can be done to a</span></span>
+<span class="ln" id="L47"><span class="tok-com">/// passphrase are setting it, proving it and removing it.</span></span>
+<span class="ln" id="L48"><span class="tok-attr">#[derive</span>(Subcommand)]</span>
+<span class="ln" id="L49"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Action {</span>
+<span class="ln" id="L50">    <span class="tok-com">/// Report whether a decoy is set, and where it lives.</span></span>
+<span class="ln" id="L51">    Status,</span>
+<span class="ln" id="L52">    <span class="tok-com">/// Set a decoy passphrase. Refuses if one is already set.</span></span>
+<span class="ln" id="L53">    Set,</span>
+<span class="ln" id="L54">    <span class="tok-com">/// Replace the decoy passphrase, after proving the real one.</span></span>
+<span class="ln" id="L55">    Change,</span>
+<span class="ln" id="L56">    <span class="tok-com">/// Remove the decoy passphrase, after proving the real one.</span></span>
+<span class="ln" id="L57">    Remove,</span>
 <span class="ln" id="L58">}</span>
 </span>
+<span class="ln" id="L59"></span>
+<span class="src-item" id="fn-run">
+<span class="ln" id="L60"><span class="tok-com">/// Dispatch `veilvoice decoy`, or explain the feature when nothing was asked.</span></span>
+<span class="ln" id="L61"><span class="tok-com">///</span></span>
+<span class="ln" id="L62"><span class="tok-com">/// A bare `veilvoice decoy` explains and changes nothing, which is what it has</span></span>
+<span class="ln" id="L63"><span class="tok-com">/// always done and what the help screen promises. It is also the only path here</span></span>
+<span class="ln" id="L64"><span class="tok-com">/// that neither reads nor writes a file, so it is the one somebody can run</span></span>
+<span class="ln" id="L65"><span class="tok-com">/// while deciding.</span></span>
+<span class="ln" id="L66"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">run</span>(action: Option&lt;Action&gt;) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L67">    <span class="tok-kw">match</span> action {</span>
+<span class="ln" id="L68">        None =&gt; <span class="tok-fn">explain</span>(),</span>
+<span class="ln" id="L69">        <span class="tok-fn">Some</span>(Action::Status) =&gt; <span class="tok-fn">status</span>(),</span>
+<span class="ln" id="L70">        <span class="tok-fn">Some</span>(Action::Set) =&gt; <span class="tok-fn">set</span>(false),</span>
+<span class="ln" id="L71">        <span class="tok-fn">Some</span>(Action::Change) =&gt; <span class="tok-fn">set</span>(true),</span>
+<span class="ln" id="L72">        <span class="tok-fn">Some</span>(Action::Remove) =&gt; <span class="tok-fn">remove</span>(),</span>
+<span class="ln" id="L73">    }</span>
+<span class="ln" id="L74">}</span>
+</span>
+<span class="ln" id="L75"></span>
+<span class="src-item" id="fn-explain">
+<span class="ln" id="L76"><span class="tok-com">/// Explain the feature and its limits.</span></span>
+<span class="ln" id="L77"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">explain</span>() -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L78">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;A second passphrase&quot;</span>));</span>
+<span class="ln" id="L79">    println!();</span>
+<span class="ln" id="L80">    <span class="tok-fn">print_scope</span>();</span>
+<span class="ln" id="L81"></span>
+<span class="ln" id="L82">    println!();</span>
+<span class="ln" id="L83">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT NO PASSPHRASE DOES&quot;</span>));</span>
+<span class="ln" id="L84">    <span class="tok-fn">print_no_destruction</span>();</span>
+<span class="ln" id="L85"></span>
+<span class="ln" id="L86">    println!();</span>
+<span class="ln" id="L87">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;What a pair has to satisfy&quot;</span>));</span>
+<span class="ln" id="L88">    <span class="tok-fn">print_pair_rule</span>();</span>
+<span class="ln" id="L89">    println!();</span>
+<span class="ln" id="L90">    println!(</span>
+<span class="ln" id="L91">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L92">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L93">            colour::MUTED,</span>
+<span class="ln" id="L94">            <span class="tok-str">&quot;  Both passphrases are checked with the same Argon2id cost and compared\n  \</span></span>
+<span class="ln" id="L95"><span class="tok-str">             in constant time, and both are always derived even when the first one\n  \</span></span>
+<span class="ln" id="L96"><span class="tok-str">             matches. Returning early would make the real passphrase measurably\n  \</span></span>
+<span class="ln" id="L97"><span class="tok-str">             faster, which is enough to tell an observer which one was typed.&quot;</span>,</span>
+<span class="ln" id="L98">        )</span>
+<span class="ln" id="L99">    );</span>
+<span class="ln" id="L100">    println!();</span>
+<span class="ln" id="L101">    println!(</span>
+<span class="ln" id="L102">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L103">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L104">            colour::MUTED,</span>
+<span class="ln" id="L105">            <span class="tok-str">&quot;  Set one with:    veilvoice decoy set\n  \</span></span>
+<span class="ln" id="L106"><span class="tok-str">             or in the window: Settings, then Lock&quot;</span>,</span>
+<span class="ln" id="L107">        )</span>
+<span class="ln" id="L108">    );</span>
+<span class="ln" id="L109">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L110">}</span>
+</span>
+<span class="ln" id="L111"></span>
+<span class="src-item" id="fn-status">
+<span class="ln" id="L112"><span class="tok-com">/// `veilvoice decoy status`: whether a decoy is set, and where it lives.</span></span>
+<span class="ln" id="L113"><span class="tok-com">///</span></span>
+<span class="ln" id="L114"><span class="tok-com">/// Says nothing about the passphrase itself. What a reader learns here is what</span></span>
+<span class="ln" id="L115"><span class="tok-com">/// somebody holding the machine can work out anyway, and the one thing worth</span></span>
+<span class="ln" id="L116"><span class="tok-com">/// telling them is the answer this command exists for: a record that will not</span></span>
+<span class="ln" id="L117"><span class="tok-com">/// read is not a decoy, and they would find that out at the worst possible</span></span>
+<span class="ln" id="L118"><span class="tok-com">/// moment.</span></span>
+<span class="ln" id="L119"><span class="tok-kw">fn</span> <span class="tok-fn">status</span>() -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L120">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Decoy passphrase&quot;</span>));</span>
+<span class="ln" id="L121"></span>
+<span class="ln" id="L122">    <span class="tok-com">// Checked before anything opens the vault, because opening it writes the</span></span>
+<span class="ln" id="L123">    <span class="tok-com">// index that names the lock&#x27;s files. A machine with no lock has no decoy</span></span>
+<span class="ln" id="L124">    <span class="tok-com">// and should be left exactly as it was found.</span></span>
+<span class="ln" id="L125">    <span class="tok-kw">let</span> index = layout::<span class="tok-fn">path</span>(layout::Item::AppLock)</span>
+<span class="ln" id="L126">        .<span class="tok-fn">ok_or_else</span>(|| <span class="tok-str">&quot;cannot work out where this platform keeps configuration&quot;</span>.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L127">    <span class="tok-kw">if</span> !index.<span class="tok-fn">is_file</span>() {</span>
+<span class="ln" id="L128">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;State&quot;</span>, <span class="tok-str">&quot;not set&quot;</span>));</span>
+<span class="ln" id="L129">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;App lock&quot;</span>, <span class="tok-str">&quot;not set either&quot;</span>));</span>
+<span class="ln" id="L130">        println!();</span>
+<span class="ln" id="L131">        println!(</span>
+<span class="ln" id="L132">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L133">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L134">                colour::MUTED,</span>
+<span class="ln" id="L135">                <span class="tok-str">&quot;  A decoy is a second passphrase for the app lock, so the lock comes\n  \</span></span>
+<span class="ln" id="L136"><span class="tok-str">                 first: veilvoice lock set&quot;</span>,</span>
+<span class="ln" id="L137">            )</span>
+<span class="ln" id="L138">        );</span>
+<span class="ln" id="L139">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L140">    }</span>
+<span class="ln" id="L141"></span>
+<span class="ln" id="L142">    <span class="tok-kw">let</span> store = decoy::Store::<span class="tok-fn">here</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L143">    <span class="tok-com">// The folder rather than the file. The decoy&#x27;s own name is derived from the</span></span>
+<span class="ln" id="L144">    <span class="tok-com">// same index the lock&#x27;s two copies are, so printing it would tell a reader</span></span>
+<span class="ln" id="L145">    <span class="tok-com">// nothing and tell anybody reading over their shoulder which file to take.</span></span>
+<span class="ln" id="L146">    <span class="tok-kw">let</span> folder = <span class="tok-kw">match</span> index.<span class="tok-fn">parent</span>() {</span>
+<span class="ln" id="L147">        <span class="tok-fn">Some</span>(dir) =&gt; dir.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L148">        None =&gt; index.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L149">    };</span>
+<span class="ln" id="L150">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;Folder&quot;</span>, &amp;folder));</span>
+<span class="ln" id="L151">    <span class="tok-kw">let</span> state = store.<span class="tok-fn">state</span>();</span>
+<span class="ln" id="L152">    <span class="tok-kw">match</span> state {</span>
+<span class="ln" id="L153">        State::Absent =&gt; {</span>
+<span class="ln" id="L154">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;State&quot;</span>, <span class="tok-str">&quot;not set&quot;</span>));</span>
+<span class="ln" id="L155">            println!();</span>
+<span class="ln" id="L156">            println!(</span>
+<span class="ln" id="L157">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L158">                <span class="tok-fn">paint</span>(colour::MUTED, <span class="tok-str">&quot;  Set one with: veilvoice decoy set&quot;</span>)</span>
+<span class="ln" id="L159">            );</span>
+<span class="ln" id="L160">        }</span>
+<span class="ln" id="L161">        State::Set =&gt; {</span>
+<span class="ln" id="L162">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;State&quot;</span>, <span class="tok-str">&quot;set&quot;</span>));</span>
+<span class="ln" id="L163">            println!();</span>
+<span class="ln" id="L164">            println!(</span>
+<span class="ln" id="L165">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L166">                <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L167">                    colour::MUTED,</span>
+<span class="ln" id="L168">                    <span class="tok-str">&quot;  Typing it opens VeilVoice with nothing in it, and does not count\n  \</span></span>
+<span class="ln" id="L169"><span class="tok-str">                     against the app lock&#x27;s failed attempts.&quot;</span>,</span>
+<span class="ln" id="L170">                )</span>
+<span class="ln" id="L171">            );</span>
+<span class="ln" id="L172">        }</span>
+<span class="ln" id="L173">        State::Unreadable =&gt; {</span>
+<span class="ln" id="L174">            println!(</span>
+<span class="ln" id="L175">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L176">                <span class="tok-fn">field</span>(<span class="tok-str">&quot;State&quot;</span>, <span class="tok-str">&quot;there is a record and it does not read&quot;</span>)</span>
+<span class="ln" id="L177">            );</span>
+<span class="ln" id="L178">            println!();</span>
+<span class="ln" id="L179">            println!(</span>
+<span class="ln" id="L180">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L181">                <span class="tok-fn">warn</span>(</span>
+<span class="ln" id="L182">                    <span class="tok-str">&quot;so this machine has no working decoy. The passphrase you think \</span></span>
+<span class="ln" id="L183"><span class="tok-str">                     is a decoy would open nothing. Set it again with `veilvoice \</span></span>
+<span class="ln" id="L184"><span class="tok-str">                     decoy change`, or remove it with `veilvoice decoy remove`&quot;</span></span>
+<span class="ln" id="L185">                )</span>
+<span class="ln" id="L186">            );</span>
+<span class="ln" id="L187">            println!(</span>
+<span class="ln" id="L188">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L189">                <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L190">                    colour::MUTED,</span>
+<span class="ln" id="L191">                    <span class="tok-str">&quot;  The real passphrase is unaffected: it lives in the app lock and\n  \</span></span>
+<span class="ln" id="L192"><span class="tok-str">                     nothing here touches it.&quot;</span>,</span>
+<span class="ln" id="L193">                )</span>
+<span class="ln" id="L194">            );</span>
+<span class="ln" id="L195">        }</span>
+<span class="ln" id="L196">    }</span>
+<span class="ln" id="L197">    <span class="tok-kw">if</span> state != State::Absent {</span>
+<span class="ln" id="L198">        println!(</span>
+<span class="ln" id="L199">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L200">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L201">                colour::MUTED,</span>
+<span class="ln" id="L202">                <span class="tok-str">&quot;  The record&#x27;s own name in there is derived, like the lock&#x27;s two\n  \</span></span>
+<span class="ln" id="L203"><span class="tok-str">                 copies, so a folder listing does not say which file it is.&quot;</span></span>
+<span class="ln" id="L204">            )</span>
+<span class="ln" id="L205">        );</span>
+<span class="ln" id="L206">    }</span>
+<span class="ln" id="L207">    println!();</span>
+<span class="ln" id="L208">    <span class="tok-fn">print_scope</span>();</span>
+<span class="ln" id="L209">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L210">}</span>
+</span>
+<span class="ln" id="L211"></span>
+<span class="src-item" id="fn-set">
+<span class="ln" id="L212"><span class="tok-com">/// `veilvoice decoy set` and `veilvoice decoy change`, which are one path.</span></span>
+<span class="ln" id="L213"><span class="tok-com">///</span></span>
+<span class="ln" id="L214"><span class="tok-com">/// The same work either way, and deliberately not two functions: the only</span></span>
+<span class="ln" id="L215"><span class="tok-com">/// difference is which state is refused, and a second copy of the prompts and</span></span>
+<span class="ln" id="L216"><span class="tok-com">/// the printed scope is a second copy that can drift. Which one was asked for</span></span>
+<span class="ln" id="L217"><span class="tok-com">/// still matters, because a `set` that silently replaced would take away a</span></span>
+<span class="ln" id="L218"><span class="tok-com">/// decoy somebody is relying on without saying so.</span></span>
+<span class="ln" id="L219"><span class="tok-kw">fn</span> <span class="tok-fn">set</span>(replacing: bool) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L220">    <span class="tok-kw">let</span> lock = <span class="tok-fn">lock_or_explain</span>()?;</span>
+<span class="ln" id="L221">    <span class="tok-kw">let</span> store = decoy::Store::<span class="tok-fn">here</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L222">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(note) = <span class="tok-fn">allowed</span>(store.<span class="tok-fn">state</span>(), replacing)? {</span>
+<span class="ln" id="L223">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">warn</span>(note));</span>
+<span class="ln" id="L224">    }</span>
+<span class="ln" id="L225"></span>
+<span class="ln" id="L226">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;A second passphrase&quot;</span>));</span>
+<span class="ln" id="L227">    println!();</span>
+<span class="ln" id="L228">    <span class="tok-fn">print_scope</span>();</span>
+<span class="ln" id="L229">    println!();</span>
+<span class="ln" id="L230">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT NO PASSPHRASE DOES&quot;</span>));</span>
+<span class="ln" id="L231">    <span class="tok-fn">print_no_destruction</span>();</span>
+<span class="ln" id="L232">    println!();</span>
+<span class="ln" id="L233">    <span class="tok-fn">print_pair_rule</span>();</span>
+<span class="ln" id="L234">    println!();</span>
+<span class="ln" id="L235"></span>
+<span class="ln" id="L236">    <span class="tok-kw">let</span> real = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;App lock passphrase: &quot;</span>)?;</span>
+<span class="ln" id="L237">    println!(</span>
+<span class="ln" id="L238">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L239">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L240">            colour::MUTED,</span>
+<span class="ln" id="L241">            <span class="tok-str">&quot;  Checking it (Argon2id, deliberately slow)...&quot;</span></span>
+<span class="ln" id="L242">        )</span>
+<span class="ln" id="L243">    );</span>
+<span class="ln" id="L244">    <span class="tok-com">// Checked here as well as inside `Store::set`, which proves it too and has</span></span>
+<span class="ln" id="L245">    <span class="tok-com">// to: the crate cannot rely on a front end to have asked. What this buys is</span></span>
+<span class="ln" id="L246">    <span class="tok-com">// the order somebody experiences. Without it, a mistyped app-lock</span></span>
+<span class="ln" id="L247">    <span class="tok-com">// passphrase is reported after they have chosen a decoy and typed it twice,</span></span>
+<span class="ln" id="L248">    <span class="tok-com">// and the reason it failed looks like something they did wrong at the end.</span></span>
+<span class="ln" id="L249">    <span class="tok-kw">if</span> !lock.<span class="tok-fn">would_open</span>(real.<span class="tok-fn">expose</span>()).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())? {</span>
+<span class="ln" id="L250">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(</span>
+<span class="ln" id="L251">            <span class="tok-str">&quot;that is not this machine&#x27;s app lock passphrase, so nothing \</span></span>
+<span class="ln" id="L252"><span class="tok-str">                    was changed. A decoy can only be set by whoever can already \</span></span>
+<span class="ln" id="L253"><span class="tok-str">                    open VeilVoice&quot;</span></span>
+<span class="ln" id="L254">                .<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L255">        );</span>
+<span class="ln" id="L256">    }</span>
+<span class="ln" id="L257">    println!(</span>
+<span class="ln" id="L258">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L259">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L260">            colour::MUTED,</span>
+<span class="ln" id="L261">            <span class="tok-str">&quot;  Now the decoy, twice. Do NOT make it a version of the real one.&quot;</span></span>
+<span class="ln" id="L262">        )</span>
+<span class="ln" id="L263">    );</span>
+<span class="ln" id="L264">    <span class="tok-kw">let</span> decoyed = <span class="tok-fn">read_twice</span>()?;</span>
+<span class="ln" id="L265">    println!(</span>
+<span class="ln" id="L266">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L267">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L268">            colour::MUTED,</span>
+<span class="ln" id="L269">            <span class="tok-str">&quot;  Deriving (Argon2id, deliberately slow, twice)...&quot;</span></span>
+<span class="ln" id="L270">        )</span>
+<span class="ln" id="L271">    );</span>
+<span class="ln" id="L272">    store</span>
+<span class="ln" id="L273">        .<span class="tok-fn">set</span>(&amp;lock, <span class="tok-fn">text</span>(&amp;real)?, <span class="tok-fn">text</span>(&amp;decoyed)?)</span>
+<span class="ln" id="L274">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L275"></span>
+<span class="ln" id="L276">    println!(</span>
+<span class="ln" id="L277">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L278">        <span class="tok-fn">ok</span>(<span class="tok-kw">if</span> replacing {</span>
+<span class="ln" id="L279">            <span class="tok-str">&quot;decoy passphrase changed&quot;</span></span>
+<span class="ln" id="L280">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L281">            <span class="tok-str">&quot;decoy passphrase set&quot;</span></span>
+<span class="ln" id="L282">        })</span>
+<span class="ln" id="L283">    );</span>
+<span class="ln" id="L284">    println!(</span>
+<span class="ln" id="L285">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L286">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L287">            colour::MUTED,</span>
+<span class="ln" id="L288">            <span class="tok-str">&quot;  Typing it opens VeilVoice with nothing in it, and does not count\n  \</span></span>
+<span class="ln" id="L289"><span class="tok-str">             against the app lock&#x27;s failed attempts.&quot;</span>,</span>
+<span class="ln" id="L290">        )</span>
+<span class="ln" id="L291">    );</span>
+<span class="ln" id="L292">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L293">}</span>
+</span>
+<span class="ln" id="L294"></span>
+<span class="src-item" id="fn-remove">
+<span class="ln" id="L295"><span class="tok-com">/// `veilvoice decoy remove`: take the decoy off, after proving the real one.</span></span>
+<span class="ln" id="L296"><span class="tok-com">///</span></span>
+<span class="ln" id="L297"><span class="tok-com">/// Asks for the real passphrase for the same reason setting one does. A decoy</span></span>
+<span class="ln" id="L298"><span class="tok-com">/// anybody could remove is a decoy that can be taken away from the person</span></span>
+<span class="ln" id="L299"><span class="tok-com">/// relying on it, and they would not find out until they needed it.</span></span>
+<span class="ln" id="L300"><span class="tok-kw">fn</span> <span class="tok-fn">remove</span>() -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L301">    <span class="tok-kw">let</span> lock = <span class="tok-fn">lock_or_explain</span>()?;</span>
+<span class="ln" id="L302">    <span class="tok-kw">let</span> store = decoy::Store::<span class="tok-fn">here</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L303">    <span class="tok-kw">if</span> store.<span class="tok-fn">state</span>() == State::Absent {</span>
+<span class="ln" id="L304">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;no decoy is set here, so there is nothing to remove&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L305">    }</span>
+<span class="ln" id="L306"></span>
+<span class="ln" id="L307">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Decoy passphrase&quot;</span>));</span>
+<span class="ln" id="L308">    <span class="tok-kw">let</span> real = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;App lock passphrase: &quot;</span>)?;</span>
+<span class="ln" id="L309">    store</span>
+<span class="ln" id="L310">        .<span class="tok-fn">remove</span>(&amp;lock, <span class="tok-fn">text</span>(&amp;real)?)</span>
+<span class="ln" id="L311">        .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L312">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(<span class="tok-str">&quot;decoy passphrase removed&quot;</span>));</span>
+<span class="ln" id="L313">    println!(</span>
+<span class="ln" id="L314">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L315">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L316">            colour::MUTED,</span>
+<span class="ln" id="L317">            <span class="tok-str">&quot;  Only the real passphrase opens VeilVoice now. Nothing was deleted:\n  \</span></span>
+<span class="ln" id="L318"><span class="tok-str">             a decoy never held any of your recordings.&quot;</span>,</span>
+<span class="ln" id="L319">        )</span>
+<span class="ln" id="L320">    );</span>
+<span class="ln" id="L321">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L322">}</span>
+</span>
+<span class="ln" id="L323"></span>
+<span class="src-item" id="fn-allowed">
+<span class="ln" id="L324"><span class="tok-com">/// Whether the state on disk allows what was asked, and what to say first.</span></span>
+<span class="ln" id="L325"><span class="tok-com">///</span></span>
+<span class="ln" id="L326"><span class="tok-com">/// `Ok(None)` proceeds, `Ok(Some(note))` proceeds after a warning, and an error</span></span>
+<span class="ln" id="L327"><span class="tok-com">/// refuses with the command the reader wanted instead. Pulled out of [`set`] so</span></span>
+<span class="ln" id="L328"><span class="tok-com">/// the four combinations can be tested, which the prompts themselves cannot be:</span></span>
+<span class="ln" id="L329"><span class="tok-com">/// they need a terminal.</span></span>
+<span class="ln" id="L330"><span class="tok-kw">fn</span> <span class="tok-fn">allowed</span>(state: State, replacing: bool) -&gt; Result&lt;Option&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt;, String&gt; {</span>
+<span class="ln" id="L331">    <span class="tok-kw">match</span> (state, replacing) {</span>
+<span class="ln" id="L332">        (State::Set, false) =&gt; <span class="tok-fn">Err</span>(<span class="tok-str">&quot;a decoy is already set here. Use `veilvoice decoy change` \</span></span>
+<span class="ln" id="L333"><span class="tok-str">                                    to replace it, which asks for the real passphrase first&quot;</span></span>
+<span class="ln" id="L334">            .<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L335">        (State::Absent, true) =&gt; {</span>
+<span class="ln" id="L336">            <span class="tok-fn">Err</span>(<span class="tok-str">&quot;no decoy is set here, so use `veilvoice decoy set` instead&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L337">        }</span>
+<span class="ln" id="L338">        (State::Unreadable, _) =&gt; <span class="tok-fn">Ok</span>(<span class="tok-fn">Some</span>(</span>
+<span class="ln" id="L339">            <span class="tok-str">&quot;the record here does not read, so this machine has no working \</span></span>
+<span class="ln" id="L340"><span class="tok-str">             decoy. Setting one replaces it&quot;</span>,</span>
+<span class="ln" id="L341">        )),</span>
+<span class="ln" id="L342">        _ =&gt; <span class="tok-fn">Ok</span>(None),</span>
+<span class="ln" id="L343">    }</span>
+<span class="ln" id="L344">}</span>
+</span>
+<span class="ln" id="L345"></span>
+<span class="src-item" id="fn-lock_or_explain">
+<span class="ln" id="L346"><span class="tok-com">/// The app lock, or a message saying what to do about there not being one.</span></span>
+<span class="ln" id="L347"><span class="tok-com">///</span></span>
+<span class="ln" id="L348"><span class="tok-com">/// A decoy is a second passphrase for the app lock, so there is nothing for it</span></span>
+<span class="ln" id="L349"><span class="tok-com">/// to be second to until a lock exists. Said in those words rather than as a</span></span>
+<span class="ln" id="L350"><span class="tok-com">/// bare failure, because &quot;no app lock&quot; does not tell somebody what to run.</span></span>
+<span class="ln" id="L351"><span class="tok-kw">fn</span> <span class="tok-fn">lock_or_explain</span>() -&gt; Result&lt;LockStore, String&gt; {</span>
+<span class="ln" id="L352">    <span class="tok-kw">let</span> (store, _restored) = veilvoice_crypto::lock::<span class="tok-fn">open_default</span>().<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L353">    store.<span class="tok-fn">ok_or_else</span>(|| {</span>
+<span class="ln" id="L354">        <span class="tok-str">&quot;there is no app lock on this machine, so there is nothing for a decoy to \</span></span>
+<span class="ln" id="L355"><span class="tok-str">         be a second passphrase to. Set one with `veilvoice lock set` first&quot;</span></span>
+<span class="ln" id="L356">            .<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L357">    })</span>
+<span class="ln" id="L358">}</span>
+</span>
+<span class="ln" id="L359"></span>
+<span class="src-item" id="fn-read_twice">
+<span class="ln" id="L360"><span class="tok-com">/// Read the decoy twice, without echoing it, and check the two agree.</span></span>
+<span class="ln" id="L361"><span class="tok-com">///</span></span>
+<span class="ln" id="L362"><span class="tok-com">/// [`crate::atrest::read_new_password`] does this for the app lock and prompts</span></span>
+<span class="ln" id="L363"><span class="tok-com">/// with words that would be wrong here: somebody being asked for &quot;Passphrase:&quot;</span></span>
+<span class="ln" id="L364"><span class="tok-com">/// while setting a decoy has every reason to type the real one. The comparison</span></span>
+<span class="ln" id="L365"><span class="tok-com">/// is not constant time and does not need to be, because both sides are what</span></span>
+<span class="ln" id="L366"><span class="tok-com">/// the same person typed a moment ago.</span></span>
+<span class="ln" id="L367"><span class="tok-kw">fn</span> <span class="tok-fn">read_twice</span>() -&gt; Result&lt;Secret, String&gt; {</span>
+<span class="ln" id="L368">    <span class="tok-kw">let</span> first = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Decoy passphrase: &quot;</span>)?;</span>
+<span class="ln" id="L369">    <span class="tok-kw">if</span> first.<span class="tok-fn">expose</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L370">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;a decoy passphrase must not be empty&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L371">    }</span>
+<span class="ln" id="L372">    <span class="tok-kw">let</span> again = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Repeat: &quot;</span>)?;</span>
+<span class="ln" id="L373">    <span class="tok-kw">if</span> first.<span class="tok-fn">expose</span>() != again.<span class="tok-fn">expose</span>() {</span>
+<span class="ln" id="L374">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;the two do not match, so nothing was set&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L375">    }</span>
+<span class="ln" id="L376">    <span class="tok-fn">Ok</span>(first)</span>
+<span class="ln" id="L377">}</span>
+</span>
+<span class="ln" id="L378"></span>
+<span class="src-item" id="fn-text">
+<span class="ln" id="L379"><span class="tok-com">/// A typed passphrase as text.</span></span>
+<span class="ln" id="L380"><span class="tok-com">///</span></span>
+<span class="ln" id="L381"><span class="tok-com">/// The difference rule counts characters rather than bytes, so the crypto crate</span></span>
+<span class="ln" id="L382"><span class="tok-com">/// takes text. Anything a terminal hands back is already text; this is the arm</span></span>
+<span class="ln" id="L383"><span class="tok-com">/// for the case that cannot arrive rather than an `unwrap` that says so.</span></span>
+<span class="ln" id="L384"><span class="tok-kw">fn</span> <span class="tok-fn">text</span>(secret: &amp;Secret) -&gt; Result&lt;&amp;str, String&gt; {</span>
+<span class="ln" id="L385">    std::str::<span class="tok-fn">from_utf8</span>(secret.<span class="tok-fn">expose</span>())</span>
+<span class="ln" id="L386">        .<span class="tok-fn">map_err</span>(|_| <span class="tok-str">&quot;that passphrase is not valid text, so it cannot be used here&quot;</span>.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L387">}</span>
+</span>
+<span class="ln" id="L388"></span>
+<span class="src-item" id="fn-print_scope">
+<span class="ln" id="L389"><span class="tok-com">/// What a decoy is worth, wrapped, from the one constant both front ends read.</span></span>
+<span class="ln" id="L390"><span class="tok-kw">fn</span> <span class="tok-fn">print_scope</span>() {</span>
+<span class="ln" id="L391">    <span class="tok-fn">print_wrapped</span>(decoy::SCOPE);</span>
+<span class="ln" id="L392">}</span>
+</span>
+<span class="ln" id="L393"></span>
+<span class="src-item" id="fn-print_no_destruction">
+<span class="ln" id="L394"><span class="tok-com">/// Why no passphrase destroys anything, from the same place.</span></span>
+<span class="ln" id="L395"><span class="tok-kw">fn</span> <span class="tok-fn">print_no_destruction</span>() {</span>
+<span class="ln" id="L396">    <span class="tok-fn">print_wrapped</span>(decoy::WHY_NO_DESTRUCTION);</span>
+<span class="ln" id="L397">}</span>
+</span>
+<span class="ln" id="L398"></span>
+<span class="src-item" id="fn-print_wrapped">
+<span class="ln" id="L399"><span class="tok-com">/// Print an indented, wrapped passage, with the blank lines left blank.</span></span>
+<span class="ln" id="L400"><span class="tok-com">///</span></span>
+<span class="ln" id="L401"><span class="tok-com">/// An indented empty line is two spaces of trailing whitespace, which every</span></span>
+<span class="ln" id="L402"><span class="tok-com">/// generated copy of this output would then carry.</span></span>
+<span class="ln" id="L403"><span class="tok-kw">fn</span> <span class="tok-fn">print_wrapped</span>(text: &amp;str) {</span>
+<span class="ln" id="L404">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-fn">paragraphs</span>(text, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L405">        <span class="tok-kw">if</span> line.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L406">            println!();</span>
+<span class="ln" id="L407">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L408">            println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
+<span class="ln" id="L409">        }</span>
+<span class="ln" id="L410">    }</span>
+<span class="ln" id="L411">}</span>
+</span>
+<span class="ln" id="L412"></span>
+<span class="src-item" id="fn-print_pair_rule">
+<span class="ln" id="L413"><span class="tok-com">/// The rule about the pair, and why there is one.</span></span>
+<span class="ln" id="L414"><span class="tok-kw">fn</span> <span class="tok-fn">print_pair_rule</span>() {</span>
+<span class="ln" id="L415">    println!(</span>
+<span class="ln" id="L416">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L417">        <span class="tok-fn">field</span>(</span>
+<span class="ln" id="L418">            <span class="tok-str">&quot;different in at least&quot;</span>,</span>
+<span class="ln" id="L419">            &amp;format!(<span class="tok-str">&quot;{} places&quot;</span>, decoy::LEAST_DIFFERENCE)</span>
+<span class="ln" id="L420">        )</span>
+<span class="ln" id="L421">    );</span>
+<span class="ln" id="L422">    println!(</span>
+<span class="ln" id="L423">        <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L424">        <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L425">            colour::MUTED,</span>
+<span class="ln" id="L426">            <span class="tok-str">&quot;  A decoy that is nearly the real passphrase is not a decoy. Somebody\n  \</span></span>
+<span class="ln" id="L427"><span class="tok-str">             watching you type learns both at once, and somebody typing under\n  \</span></span>
+<span class="ln" id="L428"><span class="tok-str">             pressure gives away the wrong one. Length counts as difference, so\n  \</span></span>
+<span class="ln" id="L429"><span class="tok-str">             adding characters to the end does not make a second passphrase.&quot;</span>,</span>
+<span class="ln" id="L430">        )</span>
+<span class="ln" id="L431">    );</span>
+<span class="ln" id="L432">}</span>
+</span>
+<span class="ln" id="L433"></span>
+<span class="src-item" id="fn-paragraphs">
+<span class="ln" id="L434"><span class="tok-com">/// Wrap text that has paragraphs in it, and keep the paragraphs.</span></span>
+<span class="ln" id="L435"><span class="tok-com">///</span></span>
+<span class="ln" id="L436"><span class="tok-com">/// [`crate::sentry::wrap`] splits on whitespace, which runs a blank line into</span></span>
+<span class="ln" id="L437"><span class="tok-com">/// the sentence before it. That is fine for the one-paragraph notes it was</span></span>
+<span class="ln" id="L438"><span class="tok-com">/// written for and wrong for these two: [`decoy::WHY_NO_DESTRUCTION`] is three</span></span>
+<span class="ln" id="L439"><span class="tok-com">/// paragraphs and read as one wall of text, with the plain statement that</span></span>
+<span class="ln" id="L440"><span class="tok-com">/// nothing is destroyed buried in the middle of it.</span></span>
+<span class="ln" id="L441"><span class="tok-kw">fn</span> <span class="tok-fn">paragraphs</span>(text: &amp;str, width: usize) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L442">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> lines = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L443">    <span class="tok-kw">for</span> (i, para) <span class="tok-kw">in</span> text.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n\n&quot;</span>).<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L444">        <span class="tok-kw">if</span> i &gt; <span class="tok-num">0</span> {</span>
+<span class="ln" id="L445">            lines.<span class="tok-fn">push</span>(String::<span class="tok-fn">new</span>());</span>
+<span class="ln" id="L446">        }</span>
+<span class="ln" id="L447">        lines.<span class="tok-fn">extend</span>(<span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(para, width));</span>
+<span class="ln" id="L448">    }</span>
+<span class="ln" id="L449">    lines</span>
+<span class="ln" id="L450">}</span>
+</span>
+<span class="ln" id="L451"></span>
+<span class="ln" id="L452"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L453"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L454">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L455"></span>
+<span class="ln" id="L456">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L457">    <span class="tok-kw">fn</span> <span class="tok-fn">a_decoy_that_is_already_there_is_not_replaced_by_set</span>() {</span>
+<span class="ln" id="L458">        <span class="tok-kw">let</span> refusal = <span class="tok-fn">allowed</span>(State::Set, false).<span class="tok-fn">unwrap_err</span>();</span>
+<span class="ln" id="L459">        assert!(</span>
+<span class="ln" id="L460">            refusal.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice decoy change&quot;</span>),</span>
+<span class="ln" id="L461">            <span class="tok-str">&quot;the refusal has to name what to run instead: {refusal}&quot;</span></span>
+<span class="ln" id="L462">        );</span>
+<span class="ln" id="L463">    }</span>
+<span class="ln" id="L464"></span>
+<span class="ln" id="L465">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L466">    <span class="tok-kw">fn</span> <span class="tok-fn">changing_a_decoy_that_is_not_there_says_to_set_one</span>() {</span>
+<span class="ln" id="L467">        <span class="tok-kw">let</span> refusal = <span class="tok-fn">allowed</span>(State::Absent, true).<span class="tok-fn">unwrap_err</span>();</span>
+<span class="ln" id="L468">        assert!(refusal.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice decoy set&quot;</span>), <span class="tok-str">&quot;{refusal}&quot;</span>);</span>
+<span class="ln" id="L469">    }</span>
+<span class="ln" id="L470"></span>
+<span class="ln" id="L471">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L472">    <span class="tok-kw">fn</span> <span class="tok-fn">setting_a_first_decoy_and_changing_one_that_exists_both_proceed</span>() {</span>
+<span class="ln" id="L473">        assert_eq!(<span class="tok-fn">allowed</span>(State::Absent, false).<span class="tok-fn">unwrap</span>(), None);</span>
+<span class="ln" id="L474">        assert_eq!(<span class="tok-fn">allowed</span>(State::Set, true).<span class="tok-fn">unwrap</span>(), None);</span>
+<span class="ln" id="L475">    }</span>
+<span class="ln" id="L476"></span>
+<span class="ln" id="L477">    <span class="tok-com">/// A record that will not read is the case this state exists for: whoever</span></span>
+<span class="ln" id="L478">    <span class="tok-com">/// relies on it has no decoy and does not know. Setting one over it is</span></span>
+<span class="ln" id="L479">    <span class="tok-com">/// allowed, and saying nothing about it is not.</span></span>
+<span class="ln" id="L480">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L481">    <span class="tok-kw">fn</span> <span class="tok-fn">a_record_that_does_not_read_is_replaced_and_said_out_loud</span>() {</span>
+<span class="ln" id="L482">        <span class="tok-kw">for</span> replacing <span class="tok-kw">in</span> [false, true] {</span>
+<span class="ln" id="L483">            <span class="tok-kw">let</span> note = <span class="tok-fn">allowed</span>(State::Unreadable, replacing)</span>
+<span class="ln" id="L484">                .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L485">                .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a broken record has to be mentioned&quot;</span>);</span>
+<span class="ln" id="L486">            assert!(note.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not read&quot;</span>), <span class="tok-str">&quot;{note}&quot;</span>);</span>
+<span class="ln" id="L487">        }</span>
+<span class="ln" id="L488">    }</span>
+<span class="ln" id="L489"></span>
+<span class="ln" id="L490">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L491">    <span class="tok-kw">fn</span> <span class="tok-fn">wrapping_keeps_the_paragraphs_and_every_word</span>() {</span>
+<span class="ln" id="L492">        <span class="tok-kw">let</span> lines = <span class="tok-fn">paragraphs</span>(decoy::WHY_NO_DESTRUCTION, <span class="tok-num">60</span>);</span>
+<span class="ln" id="L493">        assert!(</span>
+<span class="ln" id="L494">            lines.<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|l| l.<span class="tok-fn">is_empty</span>()).<span class="tok-fn">count</span>() &gt;= <span class="tok-num">2</span>,</span>
+<span class="ln" id="L495">            <span class="tok-str">&quot;three paragraphs need two blank lines between them: {lines:?}&quot;</span></span>
+<span class="ln" id="L496">        );</span>
+<span class="ln" id="L497">        assert!(lines.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|l| l.<span class="tok-fn">len</span>() &lt;= <span class="tok-num">60</span> || !l.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27; &#x27;</span>)));</span>
+<span class="ln" id="L498">        assert_eq!(</span>
+<span class="ln" id="L499">            lines.<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">split_whitespace</span>().collect::&lt;Vec&lt;_&gt;&gt;(),</span>
+<span class="ln" id="L500">            decoy::WHY_NO_DESTRUCTION</span>
+<span class="ln" id="L501">                .<span class="tok-fn">split_whitespace</span>()</span>
+<span class="ln" id="L502">                .collect::&lt;Vec&lt;_&gt;&gt;(),</span>
+<span class="ln" id="L503">            <span class="tok-str">&quot;a word was lost or moved&quot;</span></span>
+<span class="ln" id="L504">        );</span>
+<span class="ln" id="L505">    }</span>
+<span class="ln" id="L506"></span>
+<span class="ln" id="L507">    <span class="tok-com">/// The uncomfortable half is the half a front end is tempted to drop.</span></span>
+<span class="ln" id="L508">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L509">    <span class="tok-kw">fn</span> <span class="tok-fn">what_is_printed_still_says_the_uncomfortable_part</span>() {</span>
+<span class="ln" id="L510">        <span class="tok-kw">let</span> scope = <span class="tok-fn">paragraphs</span>(decoy::SCOPE, <span class="tok-num">72</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>).<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L511">        assert!(scope.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not hide&quot;</span>), <span class="tok-str">&quot;{scope}&quot;</span>);</span>
+<span class="ln" id="L512">        <span class="tok-kw">let</span> destruction = <span class="tok-fn">paragraphs</span>(decoy::WHY_NO_DESTRUCTION, <span class="tok-num">72</span>)</span>
+<span class="ln" id="L513">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>)</span>
+<span class="ln" id="L514">            .<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L515">        assert!(</span>
+<span class="ln" id="L516">            destruction.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no passphrase that deletes your recordings&quot;</span>),</span>
+<span class="ln" id="L517">            <span class="tok-str">&quot;{destruction}&quot;</span></span>
+<span class="ln" id="L518">        );</span>
+<span class="ln" id="L519">    }</span>
+<span class="ln" id="L520"></span>
+<span class="ln" id="L521">    <span class="tok-com">/// Printed by the path that explains, the one that reports and the one</span></span>
+<span class="ln" id="L522">    <span class="tok-com">/// that sets. Read out of this file because the prompts in between need a</span></span>
+<span class="ln" id="L523">    <span class="tok-com">/// terminal: what this catches is a path that quietly stops printing it.</span></span>
+<span class="ln" id="L524">    <span class="tok-com">///</span></span>
+<span class="ln" id="L525">    <span class="tok-com">/// `remove` is not in the list on purpose, and the module note says why.</span></span>
+<span class="ln" id="L526">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L527">    <span class="tok-kw">fn</span> <span class="tok-fn">every_path_that_reports_or_sets_prints_what_a_decoy_is_worth</span>() {</span>
+<span class="ln" id="L528">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;decoy.rs&quot;</span>);</span>
+<span class="ln" id="L529">        <span class="tok-kw">for</span> function <span class="tok-kw">in</span> [<span class="tok-str">&quot;fn explain()&quot;</span>, <span class="tok-str">&quot;fn status()&quot;</span>, <span class="tok-str">&quot;fn set(&quot;</span>] {</span>
+<span class="ln" id="L530">            <span class="tok-kw">let</span> body = source</span>
+<span class="ln" id="L531">                .<span class="tok-fn">split</span>(function)</span>
+<span class="ln" id="L532">                .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L533">                .<span class="tok-fn">unwrap_or_else</span>(|| panic!(<span class="tok-str">&quot;{function} has to be findable&quot;</span>));</span>
+<span class="ln" id="L534">            <span class="tok-kw">let</span> body = body.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n/// &quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L535">            assert!(</span>
+<span class="ln" id="L536">                body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;print_scope()&quot;</span>),</span>
+<span class="ln" id="L537">                <span class="tok-str">&quot;{function} does not print what a decoy is worth&quot;</span></span>
+<span class="ln" id="L538">            );</span>
+<span class="ln" id="L539">        }</span>
+<span class="ln" id="L540">        <span class="tok-kw">let</span> setting = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn set(&quot;</span>).<span class="tok-fn">nth</span>(<span class="tok-num">1</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L541">        assert!(</span>
+<span class="ln" id="L542">            setting</span>
+<span class="ln" id="L543">                .<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n/// &quot;</span>)</span>
+<span class="ln" id="L544">                .<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L545">                .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L546">                .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;print_no_destruction()&quot;</span>),</span>
+<span class="ln" id="L547">            <span class="tok-str">&quot;setting a decoy has to say that no passphrase destroys anything&quot;</span></span>
+<span class="ln" id="L548">        );</span>
+<span class="ln" id="L549">    }</span>
+<span class="ln" id="L550">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

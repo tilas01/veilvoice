@@ -307,9 +307,11 @@ NOTES = {
     },
     "decoy": {
         "use": "A second passphrase that opens an empty VeilVoice, for "
-               "complying with somebody standing over you. It does not give "
-               "you deniability, since this feature is documented and the "
-               "program is open source, and no passphrase destroys anything.",
+               "complying with somebody standing over you: set it, change it, "
+               "remove it, or ask whether one is set and whether its record "
+               "still reads. It does not give you deniability, since this "
+               "feature is documented and the program is open source, and no "
+               "passphrase destroys anything.",
         "window": (None, "a decoy passphrase offered by the interface is not "
                    "a decoy. The **Browser** can fill the folder with decoy "
                    "vaults, which is the other half of the same idea"),

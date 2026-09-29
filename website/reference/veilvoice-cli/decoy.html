@@ -64,9 +64,10 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/decoy.svg" alt="decoy.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/decoy.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 58 lines &middot; <a href="decoy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 550 lines &middot; <a href="decoy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
+  <a href="#what-it-is-worth-is-printed-on-the-way-in-not-behind-a-flag">What it is worth is printed on the way in, not behind a flag</a>
   <a href="#in-plain-words">In plain words</a>
   <a href="#what-this-file-contains">What this file contains</a>
   <a href="#what-calls-what">What calls what</a>
@@ -75,21 +76,32 @@
 <div>
 <section id="s-about">
 <p><code>veilvoice decoy</code>, and what a second passphrase is worth and what it is not.</p>
+<h2 id="what-it-is-worth-is-printed-on-the-way-in-not-behind-a-flag">What it is worth is printed on the way in, not behind a flag</h2>
+<p>Every path that reports on a decoy or sets one up prints <code>veilvoice_crypto::decoy::SCOPE</code>, and the two that set one print <code>veilvoice_crypto::decoy::WHY_NO_DESTRUCTION</code> with it, for the same reason <code>crate::lock</code> prints the lock&#x27;s own: somebody who believes a decoy hides that a second passphrase exists has been made <strong>less</strong> safe by it, not more. They would rely on an argument they do not have.</p>
+<p>Removing one is the exception and prints neither. Nothing is being taken on trust there, and a reader who has just asked for the feature to go does not need a page on what it was worth.</p>
+<p>The window prints the same two passages from the same two constants, so neither front end can soften it without the other.</p>
 <h2 id="in-plain-words">In plain words</h2>
-<p>Explains the decoy passphrase: what it does, the two things it cannot do, and the rules a pair has to satisfy. It does not set one up. Choosing a passphrase is done where passphrases are already handled, and printing one into a terminal&#x27;s history would be a poor start.</p>
+<p>Explains the decoy passphrase, and sets, changes or removes one.</p>
+<p>A decoy opens VeilVoice with nothing in it. It is there for the situation where somebody is standing over you asking you to unlock your computer: it gives you something true to say.</p>
+<p>It does not hide that a second passphrase might exist, and no passphrase destroys your recordings. Both of those are printed every time, and the second is deliberate: on modern storage, deleting a file does not reliably remove it, so a feature that claimed to would be lying to you at the worst possible moment.</p>
+<p>Setting or removing a decoy asks for your real passphrase first, so nobody can do either at a window you left unlocked.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>58 lines defining <strong>1 function</strong> (1 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>550 lines defining <strong>14 functions</strong> (2 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>enum Action</code> <span style="color:var(--muted)">line 49</span> &middot; What veilvoice decoy can be asked to do.</li>
+</ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>explain</code> <span style="color:var(--muted)">line 14</span> &middot; Explain the feature and its limits.
+<li><code>run</code> <span style="color:var(--muted)">line 66</span> &middot; Dispatch veilvoice decoy, or explain the feature when nothing was asked.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>explain</code>, <code>remove</code>, <code>set</code>, <code>status</code>, <code>print_no_destruction</code>, <code>print_pair_rule</code>, <code>print_scope</code>, <code>lock_or_explain</code>, <code>text</code>, <code>allowed</code>, <code>read_twice</code>, <code>print_wrapped</code></span>
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 451 214" width="451" height="214" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 731" width="560" height="731" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -98,37 +110,189 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="451" height="214" fill="var(--bg-inset, #16161e)" rx="8"/>
-<a href="decoy.src.html#fn-explain">
-<rect x="183.1" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="225.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">explain</text>
-<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 14</text>
+<rect x="0" y="0" width="560" height="731" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M102.5 174.0 C 102.5 194.0, 264.1 300.0, 264.1 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M102.5 174.0 C 102.5 194.0, 459.2 300.0, 459.2 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M102.5 174.0 C 102.5 194.0, 85.2 300.0, 85.2 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M264.1 374.0 C 264.1 394.0, 280.2 400.0, 280.2 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M85.2 374.0 C 85.2 394.0, 280.2 400.0, 280.2 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M280.2 474.0 C 280.2 494.0, 280.2 500.0, 280.2 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M453.9 174.0 C 453.9 194.0, 212.9 200.0, 212.9 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M453.9 174.0 C 453.9 194.0, 494.2 200.0, 494.2 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M280.2 74.0 C 280.2 94.0, 102.5 100.0, 102.5 117.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M280.2 74.0 C 280.2 94.0, 453.9 100.0, 453.9 117.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M280.2 74.0 C 280.2 94.0, 335.4 100.0, 335.4 117.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M280.2 74.0 C 280.2 94.0, 217.0 100.0, 217.0 117.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M335.4 174.0 C 335.4 194.0, 66.2 200.0, 66.2 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M335.4 174.0 C 335.4 194.0, 212.9 200.0, 212.9 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M335.4 174.0 C 335.4 194.0, 264.1 300.0, 264.1 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M335.4 174.0 C 335.4 194.0, 459.2 300.0, 459.2 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M335.4 174.0 C 335.4 194.0, 85.2 300.0, 85.2 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M335.4 174.0 C 335.4 194.0, 367.7 200.0, 367.7 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M335.4 174.0 C 335.4 194.0, 494.2 200.0, 494.2 217.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M217.0 174.0 C 217.0 194.0, 85.2 300.0, 85.2 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<a href="decoy.src.html#fn-run">
+<rect x="238.0" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="280.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
+<text x="280.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 66</text>
 </a>
-<rect x="20.0" y="104.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<path d="M20.0 124.5 L29.0 124.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="129.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="151.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them.</text>
-<text x="20.0" y="166.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">An edge means the callee&#x27;s name appears, called, inside the</text>
-<text x="20.0" y="181.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">caller&#x27;s body. This is a syntactic reading, not a</text>
-<text x="20.0" y="196.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<a href="decoy.src.html#fn-explain">
+<rect x="60.3" y="120.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="102.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">explain</text>
+<text x="102.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 77</text>
+</a>
+<a href="decoy.src.html#fn-status">
+<rect x="170.7" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="217.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status</text>
+<text x="217.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 119</text>
+</a>
+<a href="decoy.src.html#fn-set">
+<rect x="289.2" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="335.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">set</text>
+<text x="335.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 219</text>
+</a>
+<a href="decoy.src.html#fn-remove">
+<rect x="407.7" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="453.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove</text>
+<text x="453.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
+</a>
+<a href="decoy.src.html#fn-allowed">
+<rect x="20.0" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="66.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">allowed</text>
+<text x="66.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 330</text>
+</a>
+<a href="decoy.src.html#fn-lock_or_explain">
+<rect x="138.5" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="212.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lock_or_explain</text>
+<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 351</text>
+</a>
+<a href="decoy.src.html#fn-read_twice">
+<rect x="313.4" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="367.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_twice</text>
+<text x="367.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 367</text>
+</a>
+<a href="decoy.src.html#fn-text">
+<rect x="448.0" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="494.2" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">text</text>
+<text x="494.2" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 384</text>
+</a>
+<a href="decoy.src.html#fn-print_scope">
+<rect x="26.8" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="85.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">print_scope</text>
+<text x="85.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
+</a>
+<a href="decoy.src.html#fn-print_no_destruction">
+<rect x="169.5" y="320.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="264.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">print_no_destruction</text>
+<text x="264.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 395</text>
+</a>
+<a href="decoy.src.html#fn-print_wrapped">
+<rect x="213.8" y="420.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="280.2" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">print_wrapped</text>
+<text x="280.2" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 403</text>
+</a>
+<a href="decoy.src.html#fn-print_pair_rule">
+<rect x="384.7" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="459.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">print_pair_rule</text>
+<text x="459.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 414</text>
+</a>
+<a href="decoy.src.html#fn-paragraphs">
+<rect x="225.9" y="520.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="280.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">paragraphs</text>
+<text x="280.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 441</text>
+</a>
+<rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="620.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="629.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="636.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="645.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 656.5 L29.0 656.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="661.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="683.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
+<text x="20.0" y="698.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
+<text x="20.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_explain([&quot;explain&lt;br/&gt;line 14&quot;])
-    click n_explain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L14&quot; &quot;open the source&quot;
+    n_run([&quot;run&lt;br/&gt;line 66&quot;])
+    n_explain[&quot;explain&lt;br/&gt;line 77&quot;]
+    n_status[&quot;status&lt;br/&gt;line 119&quot;]
+    n_set[&quot;set&lt;br/&gt;line 219&quot;]
+    n_remove[&quot;remove&lt;br/&gt;line 300&quot;]
+    n_allowed[&quot;allowed&lt;br/&gt;line 330&quot;]
+    n_lock_or_explain[&quot;lock_or_explain&lt;br/&gt;line 351&quot;]
+    n_read_twice[&quot;read_twice&lt;br/&gt;line 367&quot;]
+    n_text[&quot;text&lt;br/&gt;line 384&quot;]
+    n_print_scope[&quot;print_scope&lt;br/&gt;line 390&quot;]
+    n_print_no_destruction[&quot;print_no_destruction&lt;br/&gt;line 395&quot;]
+    n_print_wrapped[&quot;print_wrapped&lt;br/&gt;line 403&quot;]
+    n_print_pair_rule[&quot;print_pair_rule&lt;br/&gt;line 414&quot;]
+    n_paragraphs[&quot;paragraphs&lt;br/&gt;line 441&quot;]
+    n_explain --&gt; n_print_no_destruction
+    n_explain --&gt; n_print_pair_rule
+    n_explain --&gt; n_print_scope
+    n_print_no_destruction --&gt; n_print_wrapped
+    n_print_scope --&gt; n_print_wrapped
+    n_print_wrapped --&gt; n_paragraphs
+    n_remove --&gt; n_lock_or_explain
+    n_remove --&gt; n_text
+    n_run --&gt; n_explain
+    n_run --&gt; n_remove
+    n_run --&gt; n_set
+    n_run --&gt; n_status
+    n_set --&gt; n_allowed
+    n_set --&gt; n_lock_or_explain
+    n_set --&gt; n_print_no_destruction
+    n_set --&gt; n_print_pair_rule
+    n_set --&gt; n_print_scope
+    n_set --&gt; n_read_twice
+    n_set --&gt; n_text
+    n_status --&gt; n_print_scope
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L66&quot; &quot;open the source&quot;
+    click n_explain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L77&quot; &quot;open the source&quot;
+    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L119&quot; &quot;open the source&quot;
+    click n_set href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L219&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L300&quot; &quot;open the source&quot;
+    click n_allowed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L330&quot; &quot;open the source&quot;
+    click n_lock_or_explain href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L351&quot; &quot;open the source&quot;
+    click n_read_twice href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L367&quot; &quot;open the source&quot;
+    click n_text href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L384&quot; &quot;open the source&quot;
+    click n_print_scope href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L390&quot; &quot;open the source&quot;
+    click n_print_no_destruction href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L395&quot; &quot;open the source&quot;
+    click n_print_wrapped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L403&quot; &quot;open the source&quot;
+    click n_print_pair_rule href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L414&quot; &quot;open the source&quot;
+    click n_paragraphs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L441&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_explain entry</code></pre>
+    class n_run entry
+    classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
+    class n_explain api
+    classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
+    class n_status,n_set,n_remove,n_allowed,n_lock_or_explain,n_read_twice,n_text,n_print_scope,n_print_no_destruction,n_print_wrapped,n_print_pair_rule,n_paragraphs helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>explain</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-explain">14</a></td><td>Explain the feature and its limits.</td></tr>
+<tr><td><code>Action</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-action">49</a></td><td>What veilvoice decoy can be asked to do.</td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-run">66</a></td><td>Dispatch veilvoice decoy, or explain the feature when nothing was asked.</td></tr>
+<tr><td><code>explain</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-explain">77</a></td><td>Explain the feature and its limits.</td></tr>
+<tr><td><code>status</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-status">119</a></td><td>veilvoice decoy status: whether a decoy is set, and where it lives.</td></tr>
+<tr><td><code>set</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-set">219</a></td><td>veilvoice decoy set and veilvoice decoy change, which are one path.</td></tr>
+<tr><td><code>remove</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-remove">300</a></td><td>veilvoice decoy remove: take the decoy off, after proving the real one.</td></tr>
+<tr><td><code>allowed</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-allowed">330</a></td><td>Whether the state on disk allows what was asked, and what to say first.</td></tr>
+<tr><td><code>lock_or_explain</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-lock_or_explain">351</a></td><td>The app lock, or a message saying what to do about there not being one.</td></tr>
+<tr><td><code>read_twice</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-read_twice">367</a></td><td>Read the decoy twice, without echoing it, and check the two agree.</td></tr>
+<tr><td><code>text</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-text">384</a></td><td>A typed passphrase as text.</td></tr>
+<tr><td><code>print_scope</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-print_scope">390</a></td><td>What a decoy is worth, wrapped, from the one constant both front ends read.</td></tr>
+<tr><td><code>print_no_destruction</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-print_no_destruction">395</a></td><td>Why no passphrase destroys anything, from the same place.</td></tr>
+<tr><td><code>print_wrapped</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-print_wrapped">403</a></td><td>Print an indented, wrapped passage, with the blank lines left blank.</td></tr>
+<tr><td><code>print_pair_rule</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-print_pair_rule">414</a></td><td>The rule about the pair, and why there is one.</td></tr>
+<tr><td><code>paragraphs</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-paragraphs">441</a></td><td>Wrap text that has paragraphs in it, and keep the paragraphs.</td></tr>
 </tbody></table>
 </section>
 </div></div>
