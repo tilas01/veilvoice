@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/export.svg" alt="export.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/export.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 891 lines &middot; <a href="export.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 911 lines &middot; <a href="export.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-audio-is-lossless-whatever-the-video-is">The audio is lossless whatever the video is</a>
@@ -97,7 +97,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>891 lines defining <strong>23 functions</strong> (21 public), <strong>7 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>911 lines defining <strong>23 functions</strong> (21 public), <strong>7 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Content</code> <span style="color:var(--muted)">line 58</span> &middot; What an export writes.</li>
 <li><code>enum Container</code> <span style="color:var(--muted)">line 95</span> &middot; The file a video goes into.</li>
@@ -274,7 +274,7 @@
 <a href="export.src.html#fn-export-video_settings">
 <rect x="211.0" y="920.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="313.7" y="942.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Export::video_settings</text>
-<text x="313.7" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 579</text>
+<text x="313.7" y="959.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 587</text>
 </a>
 <rect x="20.0" y="1004.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="1013.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -315,7 +315,7 @@ flowchart TD
     n_extension([&quot;Export::extension&lt;br/&gt;line 441&quot;])
     n_describe([&quot;Export::describe&lt;br/&gt;line 455&quot;])
     n_command([&quot;Export::command&lt;br/&gt;line 490&quot;])
-    n_video_settings[&quot;Export::video_settings&lt;br/&gt;line 579&quot;]
+    n_video_settings[&quot;Export::video_settings&lt;br/&gt;line 587&quot;]
     n_command --&gt; n_checked
     n_command --&gt; n_video_settings
     click n_label href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L74&quot; &quot;open the source&quot;
@@ -339,7 +339,7 @@ flowchart TD
     click n_extension href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L441&quot; &quot;open the source&quot;
     click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L455&quot; &quot;open the source&quot;
     click n_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L490&quot; &quot;open the source&quot;
-    click n_video_settings href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L579&quot; &quot;open the source&quot;
+    click n_video_settings href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L587&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_wants_picture,n_wants_sound,n_label,n_extension,n_video_codecs,n_audio_codec,n_label,n_encoder,n_always_lossless,n_encoder,n_label,n_label,n_factor,n_prores_profile,n_label,n_extension,n_extension,n_describe,n_command entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -384,7 +384,7 @@ flowchart TD
 <tr><td><code>Export::extension</code> <sub>pub fn</sub></td><td><a href="export.src.html#fn-export-extension">441</a></td><td>The extension of the file this writes.</td></tr>
 <tr><td><code>Export::describe</code> <sub>pub fn</sub></td><td><a href="export.src.html#fn-export-describe">455</a></td><td>What will be written, in one line a person reads before pressing the button.</td></tr>
 <tr><td><code>Export::command</code> <sub>pub fn</sub></td><td><a href="export.src.html#fn-export-command">490</a></td><td>The command that writes the export.</td></tr>
-<tr><td><code>Export::video_settings</code> <sub>fn</sub></td><td><a href="export.src.html#fn-export-video_settings">579</a></td><td>The encoder settings for the chosen codec and quality.</td></tr>
+<tr><td><code>Export::video_settings</code> <sub>fn</sub></td><td><a href="export.src.html#fn-export-video_settings">587</a></td><td>The encoder settings for the chosen codec and quality.</td></tr>
 </tbody></table>
 </section>
 </div></div>

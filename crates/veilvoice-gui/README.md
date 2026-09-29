@@ -94,7 +94,7 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>1513 lines"])
+    n_lib(["lib.rs<br/>1518 lines"])
     n_main(["main.rs<br/>269 lines"])
     n_app["app.rs<br/>3675 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
@@ -103,6 +103,7 @@ flowchart TD
     n_crashreport["crashreport.rs<br/>289 lines"]
     n_decoys["decoys.rs<br/>216 lines"]
     n_dialog["dialog.rs<br/>430 lines"]
+    n_exporting["exporting.rs<br/>626 lines"]
     n_firstrun["firstrun.rs<br/>871 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
     n_group["group.rs<br/>2128 lines"]
@@ -169,6 +170,7 @@ flowchart TD
     n_crashreport --> n_theme
     n_decoys --> n_studio
     n_decoys --> n_theme
+    n_exporting --> n_progress
     n_firstrun --> n_layout
     n_firstrun --> n_offthread
     n_firstrun --> n_prefs
@@ -277,6 +279,7 @@ flowchart TD
     click n_crashreport href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" "open the source"
     click n_decoys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs" "open the source"
     click n_dialog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" "open the source"
+    click n_exporting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs" "open the source"
     click n_firstrun href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" "open the source"
     click n_graphics href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs" "open the source"
     click n_group href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" "open the source"
@@ -322,12 +325,13 @@ flowchart TD
 | [`crashreport.rs`](../../docs/files/veilvoice-gui/crashreport.md) | 289 | Offering the report from the last crash, on the run after it. |
 | [`decoys.rs`](../../docs/files/veilvoice-gui/decoys.md) | 216 | Decoy vaults: how many there is room for, and the panel that offers them. |
 | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | 430 | Asking for a file without stopping the window. |
+| [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | 626 | The Browser's export, the way a recording tool does it, and its thumbnails. |
 | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 871 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 214 | What the window is drawn with, asked for explicitly and then reported. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 2128 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 397 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 569 | Centring a row of widgets, which egui does not do by nesting. |
-| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 1513 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 1518 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 269 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 579 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
@@ -355,7 +359,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 249 | How big the window opens, and why it is not a constant. |
 
-**22,580 functional lines of Rust** in this crate. A functional line is a line
+**23,069 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -394,6 +398,17 @@ counts blank lines and comments too. Both are produced by
 | `fn panel` | [`decoys.rs`](../../docs/files/veilvoice-gui/decoys.md) | The panel, under the listing in the Browser. |
 | `enum Ask` | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | What is being asked for. |
 | `struct Pending` | [`dialog.rs`](../../docs/files/veilvoice-gui/dialog.md) | A file dialog that is open, or has just been answered. |
+| `const THUMB_WIDTH` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | Width of a thumbnail, in pixels. |
+| `const THUMB_HEIGHT` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | Height of a thumbnail, in pixels. |
+| `struct Choice` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | Everything the person has chosen about an export. |
+| `enum Outcome` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | How a finished export reads: good, worth a second look, or failed. |
+| `struct Job` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | Everything one export needs, taken at the moment the folder was chosen. |
+| `const NO_FRAMES` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | Why no bar can be drawn for an export that has no picture. |
+| `fn reach_for` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | How far an export with this choice can say it has got. |
+| `fn safe_stem` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | A file name built from what somebody called a recording. |
+| `fn samples_of` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | The samples and the rate of a canonical 16-bit WAV, mixed to one channel. |
+| `fn run` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | Do the export. |
+| `struct Thumbs` | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | A small picture of every recording in the list. |
 | `enum Step` | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | Which card is showing. |
 | `struct FirstRun` | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | What the setup is holding while it runs. |
 | `enum Outcome` | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | What the panel wants the application to do after drawing. |

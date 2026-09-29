@@ -146,6 +146,7 @@ pub mod crashlog;
 pub mod crashreport;
 pub mod decoys;
 pub mod dialog;
+pub mod exporting;
 pub mod firstrun;
 pub mod graphics;
 pub mod group;
@@ -251,6 +252,10 @@ pub(crate) fn sources() -> Vec<(&'static str, String)> {
         ),
         ("decoys.rs", include_str!("decoys.rs").replace("\r\n", "\n")),
         ("dialog.rs", include_str!("dialog.rs").replace("\r\n", "\n")),
+        (
+            "exporting.rs",
+            include_str!("exporting.rs").replace("\r\n", "\n"),
+        ),
         (
             "firstrun.rs",
             include_str!("firstrun.rs").replace("\r\n", "\n"),

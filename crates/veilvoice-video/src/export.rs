@@ -493,6 +493,14 @@ impl Export {
             "ffmpeg".into(),
             // Never overwrite, as everywhere else in this crate.
             "-n".into(),
+            // Errors only, and no running statistics. A front end reads what
+            // ffmpeg says only when it fails, and a caller that pipes the
+            // frames in and does not drain standard error as fast as ffmpeg
+            // fills it would otherwise stall both programs on a full pipe.
+            "-hide_banner".into(),
+            "-loglevel".into(),
+            "error".into(),
+            "-nostats".into(),
             // Nothing interactive: ffmpeg reads keystrokes from standard input
             // unless told not to, and here standard input is the picture.
             "-nostdin".into(),
@@ -787,6 +795,18 @@ mod tests {
             Some("+faststart")
         );
         assert_eq!(argv.last().map(String::as_str), Some("out"));
+    }
+
+    #[test]
+    fn ffmpeg_says_nothing_unless_something_went_wrong() {
+        for content in Content::ALL {
+            let argv = argv(&Export {
+                content,
+                ..Export::default()
+            });
+            assert_eq!(value_after(&argv, "-loglevel").as_deref(), Some("error"));
+            assert!(argv.iter().any(|arg| arg == "-nostats"));
+        }
     }
 
     #[test]
