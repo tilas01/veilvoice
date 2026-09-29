@@ -538,6 +538,14 @@ jobs:
           python tools/audit/release_targets.py
           python tools/audit/release_targets.py --self-test
 
+      # F-236. The manual's table of what runs where is a third copy of the
+      # build matrix, and it had the static and Raspberry Pi archives carrying
+      # a window and a live microphone that neither is built with.
+      - name: The manual's platform table must say what a release builds
+        run: |
+          python tools/audit/platform_table.py
+          python tools/audit/platform_table.py --self-test
+
       # Four more of `tools/verify.py`'s checks that ran only when somebody ran
       # them. Each needs nothing but the tree and an interpreter, so there was
       # no reason for them to be here and every reason: the first is the guard

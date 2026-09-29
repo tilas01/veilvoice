@@ -746,6 +746,38 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-236: the manual said the static and Raspberry Pi archives had a window, and neither has ever had one
+
+Found while working on roadmap item 162, by reading which archives carry the
+window in order to add FreeBSD to them.
+
+`docs/USER_GUIDE.md`'s table under *What runs where* said **yes** to the desktop
+application and **yes** to the live microphone for two rows: the statically
+linked Linux builds and the Raspberry Pi build. `.github/workflows/release.yml`
+builds all three archives those rows describe with `cli_only: true`, which is
+`-p veilvoice-cli --no-default-features`: the command line alone, with no live
+capture, because `cpal` cannot be linked into a static binary and the armv7
+cross toolchain has no ALSA. The per-program guides are generated from the
+manual, so `GUIDE_CLI.md`, `GUIDE_GUI.md` and `GUIDE_VERIFY.md` said the same.
+
+**The release page had it right.** `tools/site/releases.py` labels those
+archives "command line only", so a reader who looked at the downloads was told
+the truth and a reader who looked at the manual first was not. The manual is
+the one a person reads before choosing which archive to download, and on a
+Raspberry Pi it sent them to one with no window in it.
+
+The two rows now say `not shipped` and `no`. `tools/audit/platform_table.py`
+reads the build matrix and the table and fails when a row claims the window for
+archives that are all `cli_only`, claims a live microphone for them, or denies
+the window to archives that carry it, and when the matrix builds a label no row
+describes. It runs in `tools/verify.py` and in CI beside the updater's label
+check, with a `--self-test` that plants each of the three faults.
+
+The BSD row is deliberately not asserted on: since roadmap item 162 the FreeBSD
+job may carry the window, and whether a given release did is a fact about that
+release rather than about the workflow. The row stays `not shipped` until one
+does.
+
 ### F-235: fifteen commits named an assistant, and twenty-five of tilas01's read Unverified
 
 Found by tilas01, looking at GitHub's commit view of `dev` and at who it
@@ -10078,7 +10110,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and thirty-five defects found and fixed (F-1 to F-235), across
+**Two hundred and thirty-six defects found and fixed (F-1 to F-236), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

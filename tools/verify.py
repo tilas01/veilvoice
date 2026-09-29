@@ -362,6 +362,14 @@ CHECKS = [
      [sys.executable, "tools/audit/release_targets.py"]),
     ("that guard catches what it claims to, too",
      [sys.executable, "tools/audit/release_targets.py", "--self-test"]),
+    # F-236. The manual's table of what runs where said the static and
+    # Raspberry Pi archives had the window and the live microphone, and both
+    # are built command line only. The release page had it right and the two
+    # were never compared.
+    ("the manual's platform table says what the workflow builds",
+     [sys.executable, "tools/audit/platform_table.py"]),
+    ("that guard catches what it claims to, as well",
+     [sys.executable, "tools/audit/platform_table.py", "--self-test"]),
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),

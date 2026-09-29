@@ -133,6 +133,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/features.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/features.py) | Every feature selection a release builds is built here too |
 | [`tools/audit/fixtures.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/fixtures.py) | A file the build needs is in the commit, not merely on the machine that wrote it |
 | [`tools/audit/network_claims.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/network_claims.py) | The manual names every command that reaches the network |
+| [`tools/audit/platform_table.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/platform_table.py) | The table of what runs where says what the release workflow actually builds |
 | [`tools/audit/publishing.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/publishing.py) | The step that publishes a release says which commit it is publishing |
 | [`tools/audit/randomness.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/randomness.py) | Every random number this project draws comes from a cryptographic source |
 | [`tools/audit/reachable.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/reachable.py) | Every public item is named by something other than its own declaration |
@@ -207,6 +208,8 @@ And what it then checks:
 - **the authorship guard catches what it claims to**: `python tools/audit/authorship.py --self-test`
 - **the updater can ask for every release that is published**: `python tools/audit/release_targets.py`
 - **that guard catches what it claims to, too**: `python tools/audit/release_targets.py --self-test`
+- **the manual's platform table says what the workflow builds**: `python tools/audit/platform_table.py`
+- **that guard catches what it claims to, as well**: `python tools/audit/platform_table.py --self-test`
 - **the app-manifest tooling works**: `python tools/sign/selftest.py`
 - **artwork matches its generator**: `python assets/generate.py --check`
 - **the release cards match CHANGELOG.md**: `python tools/release/card.py --check`
