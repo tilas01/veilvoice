@@ -567,7 +567,15 @@ enum Command {
     /// **No passphrase destroys anything, deliberately.** On modern storage a
     /// write does not overwrite, so a feature that claimed to would be lying to
     /// you at the worst possible moment.
-    Decoy,
+    ///
+    /// With no subcommand it explains the feature and changes nothing. The
+    /// subcommands set, change and remove a decoy, and each asks for the app
+    /// lock's real passphrase first, so none of them can be done at a window
+    /// somebody left unlocked.
+    Decoy {
+        #[command(subcommand)]
+        action: Option<decoy::Action>,
+    },
 
     /// The safety catch: what it watches for, and what it cannot do.
     ///
@@ -1567,7 +1575,7 @@ fn run(command: Command) -> Result<(), String> {
         // Windows resolves those through the current directory first.
         Command::Accel => accel::show(),
 
-        Command::Decoy => decoy::explain(),
+        Command::Decoy { action } => decoy::run(action),
 
         Command::Gui { quiet } => gui::open(quiet),
 

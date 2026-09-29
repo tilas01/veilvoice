@@ -26,7 +26,7 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 |---|---|---:|---|
 | `fuzz` | - | 165 | [`fuzz/README.md`](../fuzz/README.md) |
 | `veilvoice-audio` | Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice. | 2,246 | [`crates/veilvoice-audio/README.md`](../crates/veilvoice-audio/README.md) |
-| `veilvoice-cli` | Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings. | 6,689 | [`crates/veilvoice-cli/README.md`](../crates/veilvoice-cli/README.md) |
+| `veilvoice-cli` | Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings. | 7,039 | [`crates/veilvoice-cli/README.md`](../crates/veilvoice-cli/README.md) |
 | `veilvoice-conversation` | Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles. | 2,644 | [`crates/veilvoice-conversation/README.md`](../crates/veilvoice-conversation/README.md) |
 | `veilvoice-core` | Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility. | 3,141 | [`crates/veilvoice-core/README.md`](../crates/veilvoice-core/README.md) |
 | `veilvoice-crypto` | Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice. | 8,151 | [`crates/veilvoice-crypto/README.md`](../crates/veilvoice-crypto/README.md) |

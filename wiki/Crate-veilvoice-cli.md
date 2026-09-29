@@ -97,13 +97,13 @@ thousand times.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_main(["main.rs<br/>3749 lines"])
+    n_main(["main.rs<br/>3757 lines"])
     n_accel["accel.rs<br/>90 lines"]
     n_appctl["appctl.rs<br/>295 lines"]
     n_atrest["atrest.rs<br/>455 lines"]
     n_capture["capture.rs<br/>339 lines"]
     n_conversation["conversation.rs<br/>1095 lines"]
-    n_decoy["decoy.rs<br/>58 lines"]
+    n_decoy["decoy.rs<br/>550 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
     n_guard["guard.rs<br/>369 lines"]
     n_gui["gui.rs<br/>247 lines"]
@@ -128,6 +128,7 @@ flowchart TD
     n_capture --> n_theme
     n_conversation --> n_sentry
     n_conversation --> n_theme
+    n_decoy --> n_atrest
     n_decoy --> n_sentry
     n_decoy --> n_theme
     n_failsafe --> n_sentry
@@ -194,13 +195,13 @@ flowchart TD
 | [[`atrest.rs`|File-veilvoice-cli-atrest]] | 455 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [[`capture.rs`|File-veilvoice-cli-capture]] | 339 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [[`conversation.rs`|File-veilvoice-cli-conversation]] | 1095 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
-| [[`decoy.rs`|File-veilvoice-cli-decoy]] | 58 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
+| [[`decoy.rs`|File-veilvoice-cli-decoy]] | 550 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
 | [[`failsafe.rs`|File-veilvoice-cli-failsafe]] | 112 | veilvoice failsafe is the safety catch. |
 | [[`guard.rs`|File-veilvoice-cli-guard]] | 369 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [[`gui.rs`|File-veilvoice-cli-gui]] | 247 | veilvoice gui opens the desktop application from the command line. |
 | [[`input.rs`|File-veilvoice-cli-input]] | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
 | [[`lock.rs`|File-veilvoice-cli-lock]] | 354 | veilvoice lock manages the application lock from the command line. |
-| [[`main.rs`|File-veilvoice-cli-main]] | 3749 | veilvoice, the command-line interface. |
+| [[`main.rs`|File-veilvoice-cli-main]] | 3757 | veilvoice, the command-line interface. |
 | [[`mandate.rs`|File-veilvoice-cli-mandate]] | 339 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
 | [[`meter.rs`|File-veilvoice-cli-meter]] | 259 | Level meters for veilvoice live, on a scale that means something. |
 | [[`policy.rs`|File-veilvoice-cli-policy]] | 249 | veilvoice policy -- settings that can only be tightened. |
@@ -211,7 +212,7 @@ flowchart TD
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 152 | Tokyo Night colouring for the terminal. |
 | [[`update.rs`|File-veilvoice-cli-update]] | 246 | veilvoice update: fetch the new release, check it, and put it in place. |
 
-**6,689 functional lines of Rust** in this crate. A functional line is a line
+**7,039 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
