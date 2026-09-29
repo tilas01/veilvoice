@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/export.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 891 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs)
+[[veilvoice-video|Crate-veilvoice-video]] &middot; 911 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs)
 
 ## Contents
 
@@ -65,7 +65,7 @@ without losing anything, because the voice is what the file is for.
 
 ## What this file contains
 
-891 lines defining **23 functions** (21 public), **7 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+911 lines defining **23 functions** (21 public), **7 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -138,7 +138,7 @@ flowchart TD
     n_extension(["Export::extension<br/>line 441"])
     n_describe(["Export::describe<br/>line 455"])
     n_command(["Export::command<br/>line 490"])
-    n_video_settings["Export::video_settings<br/>line 579"]
+    n_video_settings["Export::video_settings<br/>line 587"]
     n_command --> n_checked
     n_command --> n_video_settings
     click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L74" "open the source"
@@ -162,7 +162,7 @@ flowchart TD
     click n_extension href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L441" "open the source"
     click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L455" "open the source"
     click n_command href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L490" "open the source"
-    click n_video_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L579" "open the source"
+    click n_video_settings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L587" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_wants_picture,n_wants_sound,n_label,n_extension,n_video_codecs,n_audio_codec,n_label,n_encoder,n_always_lossless,n_encoder,n_label,n_label,n_factor,n_prores_profile,n_label,n_extension,n_extension,n_describe,n_command entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -209,4 +209,4 @@ flowchart TD
 | `Export::extension` <sub>pub fn</sub> | [441](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L441) | The extension of the file this writes. |
 | `Export::describe` <sub>pub fn</sub> | [455](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L455) | What will be written, in one line a person reads before pressing the button. |
 | `Export::command` <sub>pub fn</sub> | [490](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L490) | The command that writes the export. |
-| `Export::video_settings` <sub>fn</sub> | [579](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L579) | The encoder settings for the chosen codec and quality. |
+| `Export::video_settings` <sub>fn</sub> | [587](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs#L587) | The encoder settings for the chosen codec and quality. |

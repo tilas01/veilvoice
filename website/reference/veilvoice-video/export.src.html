@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-video/src/export.rs</code></h1>
-<p style="color:var(--muted)"><a href="export.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 891 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="export.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 911 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/export.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -624,405 +624,425 @@
 <span class="ln" id="L493">            <span class="tok-str">&quot;ffmpeg&quot;</span>.<span class="tok-fn">into</span>(),</span>
 <span class="ln" id="L494">            <span class="tok-com">// Never overwrite, as everywhere else in this crate.</span></span>
 <span class="ln" id="L495">            <span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L496">            <span class="tok-com">// Nothing interactive: ffmpeg reads keystrokes from standard input</span></span>
-<span class="ln" id="L497">            <span class="tok-com">// unless told not to, and here standard input is the picture.</span></span>
-<span class="ln" id="L498">            <span class="tok-str">&quot;-nostdin&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L499">        ];</span>
-<span class="ln" id="L500"></span>
-<span class="ln" id="L501">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.content.<span class="tok-fn">wants_picture</span>() {</span>
-<span class="ln" id="L502">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">into</span>(), audio.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()]);</span>
-<span class="ln" id="L503">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L504">            argv.<span class="tok-fn">push</span>(<span class="tok-kw">match</span> <span class="tok-kw">self</span>.audio_file {</span>
-<span class="ln" id="L505">                AudioFile::Flac =&gt; AudioCodec::Flac.<span class="tok-fn">encoder</span>().<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L506">                AudioFile::Wav =&gt; AudioCodec::Pcm.<span class="tok-fn">encoder</span>().<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L507">            });</span>
-<span class="ln" id="L508">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.audio_file == AudioFile::Flac {</span>
-<span class="ln" id="L509">                <span class="tok-com">// The slowest and smallest. FLAC&#x27;s levels differ in time</span></span>
-<span class="ln" id="L510">                <span class="tok-com">// spent, never in what comes back out.</span></span>
-<span class="ln" id="L511">                argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-compression_level&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;8&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L512">            }</span>
-<span class="ln" id="L513">            <span class="tok-com">// Strip whatever metadata the input carried rather than copy it:</span></span>
-<span class="ln" id="L514">            <span class="tok-com">// the vault&#x27;s WAV has none, and a rule that holds anyway costs</span></span>
-<span class="ln" id="L515">            <span class="tok-com">// one flag.</span></span>
-<span class="ln" id="L516">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-map_metadata&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;-1&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L517">            argv.<span class="tok-fn">push</span>(output.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L518">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(argv);</span>
-<span class="ln" id="L519">        }</span>
-<span class="ln" id="L520"></span>
-<span class="ln" id="L521">        <span class="tok-com">// `-nostdin` is wrong once standard input is the picture: it stops</span></span>
-<span class="ln" id="L522">        <span class="tok-com">// ffmpeg reading it as a keyboard, and `pipe:0` is read as a file,</span></span>
-<span class="ln" id="L523">        <span class="tok-com">// which is the point. Removed rather than left contradicting.</span></span>
-<span class="ln" id="L524">        argv.<span class="tok-fn">retain</span>(|arg| arg != <span class="tok-str">&quot;-nostdin&quot;</span>);</span>
-<span class="ln" id="L525">        argv.<span class="tok-fn">extend</span>([</span>
-<span class="ln" id="L526">            <span class="tok-str">&quot;-f&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L527">            <span class="tok-str">&quot;rawvideo&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L528">            <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L529">            <span class="tok-str">&quot;rgb24&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L530">            <span class="tok-str">&quot;-s&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L531">            <span class="tok-kw">self</span>.plan.size.<span class="tok-fn">geometry</span>(),</span>
-<span class="ln" id="L532">            <span class="tok-str">&quot;-r&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L533">            <span class="tok-kw">self</span>.plan.fps.<span class="tok-fn">get</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L534">            <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L535">            <span class="tok-str">&quot;pipe:0&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L536">        ]);</span>
-<span class="ln" id="L537">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.content.<span class="tok-fn">wants_sound</span>() {</span>
-<span class="ln" id="L538">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">into</span>(), audio.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()]);</span>
-<span class="ln" id="L539">        }</span>
-<span class="ln" id="L540"></span>
-<span class="ln" id="L541">        argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-map&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;0:v:0&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L542">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.content.<span class="tok-fn">wants_sound</span>() {</span>
-<span class="ln" id="L543">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-map&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;1:a:0&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L544">        }</span>
-<span class="ln" id="L545"></span>
-<span class="ln" id="L546">        argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-c:v&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-kw">self</span>.codec.<span class="tok-fn">encoder</span>().<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L547">        argv.<span class="tok-fn">extend</span>(<span class="tok-kw">self</span>.<span class="tok-fn">video_settings</span>());</span>
+<span class="ln" id="L496">            <span class="tok-com">// Errors only, and no running statistics. A front end reads what</span></span>
+<span class="ln" id="L497">            <span class="tok-com">// ffmpeg says only when it fails, and a caller that pipes the</span></span>
+<span class="ln" id="L498">            <span class="tok-com">// frames in and does not drain standard error as fast as ffmpeg</span></span>
+<span class="ln" id="L499">            <span class="tok-com">// fills it would otherwise stall both programs on a full pipe.</span></span>
+<span class="ln" id="L500">            <span class="tok-str">&quot;-hide_banner&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L501">            <span class="tok-str">&quot;-loglevel&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L502">            <span class="tok-str">&quot;error&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L503">            <span class="tok-str">&quot;-nostats&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L504">            <span class="tok-com">// Nothing interactive: ffmpeg reads keystrokes from standard input</span></span>
+<span class="ln" id="L505">            <span class="tok-com">// unless told not to, and here standard input is the picture.</span></span>
+<span class="ln" id="L506">            <span class="tok-str">&quot;-nostdin&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L507">        ];</span>
+<span class="ln" id="L508"></span>
+<span class="ln" id="L509">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.content.<span class="tok-fn">wants_picture</span>() {</span>
+<span class="ln" id="L510">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">into</span>(), audio.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()]);</span>
+<span class="ln" id="L511">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L512">            argv.<span class="tok-fn">push</span>(<span class="tok-kw">match</span> <span class="tok-kw">self</span>.audio_file {</span>
+<span class="ln" id="L513">                AudioFile::Flac =&gt; AudioCodec::Flac.<span class="tok-fn">encoder</span>().<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L514">                AudioFile::Wav =&gt; AudioCodec::Pcm.<span class="tok-fn">encoder</span>().<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L515">            });</span>
+<span class="ln" id="L516">            <span class="tok-kw">if</span> <span class="tok-kw">self</span>.audio_file == AudioFile::Flac {</span>
+<span class="ln" id="L517">                <span class="tok-com">// The slowest and smallest. FLAC&#x27;s levels differ in time</span></span>
+<span class="ln" id="L518">                <span class="tok-com">// spent, never in what comes back out.</span></span>
+<span class="ln" id="L519">                argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-compression_level&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;8&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L520">            }</span>
+<span class="ln" id="L521">            <span class="tok-com">// Strip whatever metadata the input carried rather than copy it:</span></span>
+<span class="ln" id="L522">            <span class="tok-com">// the vault&#x27;s WAV has none, and a rule that holds anyway costs</span></span>
+<span class="ln" id="L523">            <span class="tok-com">// one flag.</span></span>
+<span class="ln" id="L524">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-map_metadata&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;-1&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L525">            argv.<span class="tok-fn">push</span>(output.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L526">            <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(argv);</span>
+<span class="ln" id="L527">        }</span>
+<span class="ln" id="L528"></span>
+<span class="ln" id="L529">        <span class="tok-com">// `-nostdin` is wrong once standard input is the picture: it stops</span></span>
+<span class="ln" id="L530">        <span class="tok-com">// ffmpeg reading it as a keyboard, and `pipe:0` is read as a file,</span></span>
+<span class="ln" id="L531">        <span class="tok-com">// which is the point. Removed rather than left contradicting.</span></span>
+<span class="ln" id="L532">        argv.<span class="tok-fn">retain</span>(|arg| arg != <span class="tok-str">&quot;-nostdin&quot;</span>);</span>
+<span class="ln" id="L533">        argv.<span class="tok-fn">extend</span>([</span>
+<span class="ln" id="L534">            <span class="tok-str">&quot;-f&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L535">            <span class="tok-str">&quot;rawvideo&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L536">            <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L537">            <span class="tok-str">&quot;rgb24&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L538">            <span class="tok-str">&quot;-s&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L539">            <span class="tok-kw">self</span>.plan.size.<span class="tok-fn">geometry</span>(),</span>
+<span class="ln" id="L540">            <span class="tok-str">&quot;-r&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L541">            <span class="tok-kw">self</span>.plan.fps.<span class="tok-fn">get</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L542">            <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L543">            <span class="tok-str">&quot;pipe:0&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L544">        ]);</span>
+<span class="ln" id="L545">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.content.<span class="tok-fn">wants_sound</span>() {</span>
+<span class="ln" id="L546">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">into</span>(), audio.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()]);</span>
+<span class="ln" id="L547">        }</span>
 <span class="ln" id="L548"></span>
-<span class="ln" id="L549">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.content.<span class="tok-fn">wants_sound</span>() {</span>
-<span class="ln" id="L550">            <span class="tok-kw">let</span> audio_codec = <span class="tok-kw">self</span>.container.<span class="tok-fn">audio_codec</span>();</span>
-<span class="ln" id="L551">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">into</span>(), audio_codec.<span class="tok-fn">encoder</span>().<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L552">            <span class="tok-kw">if</span> audio_codec == AudioCodec::Flac {</span>
-<span class="ln" id="L553">                argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-compression_level&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;8&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L554">                <span class="tok-kw">if</span> <span class="tok-kw">self</span>.container == Container::Mp4 {</span>
-<span class="ln" id="L555">                    <span class="tok-com">// FLAC in MP4 was marked experimental until ffmpeg 6, and</span></span>
-<span class="ln" id="L556">                    <span class="tok-com">// every build before that refuses it without this. It</span></span>
-<span class="ln" id="L557">                    <span class="tok-com">// relaxes nothing else here: every codec is named.</span></span>
-<span class="ln" id="L558">                    argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-strict&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;experimental&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L559">                }</span>
-<span class="ln" id="L560">            }</span>
-<span class="ln" id="L561">            <span class="tok-com">// Stop at the end of the sound, so a frame too many can never</span></span>
-<span class="ln" id="L562">            <span class="tok-com">// leave a moment of silent picture on the end.</span></span>
-<span class="ln" id="L563">            argv.<span class="tok-fn">push</span>(<span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L564">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L565">            argv.<span class="tok-fn">push</span>(<span class="tok-str">&quot;-an&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L566">        }</span>
-<span class="ln" id="L567"></span>
-<span class="ln" id="L568">        <span class="tok-kw">if</span> matches!(<span class="tok-kw">self</span>.container, Container::Mp4 | Container::Mov) {</span>
-<span class="ln" id="L569">            <span class="tok-com">// The index at the front, so a phone starts playing before the</span></span>
-<span class="ln" id="L570">            <span class="tok-com">// whole file has arrived.</span></span>
-<span class="ln" id="L571">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-movflags&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;+faststart&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L572">        }</span>
-<span class="ln" id="L573">        argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-map_metadata&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;-1&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L574">        argv.<span class="tok-fn">push</span>(output.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L575">        <span class="tok-fn">Ok</span>(argv)</span>
-<span class="ln" id="L576">    }</span>
+<span class="ln" id="L549">        argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-map&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;0:v:0&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L550">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.content.<span class="tok-fn">wants_sound</span>() {</span>
+<span class="ln" id="L551">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-map&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;1:a:0&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L552">        }</span>
+<span class="ln" id="L553"></span>
+<span class="ln" id="L554">        argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-c:v&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-kw">self</span>.codec.<span class="tok-fn">encoder</span>().<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L555">        argv.<span class="tok-fn">extend</span>(<span class="tok-kw">self</span>.<span class="tok-fn">video_settings</span>());</span>
+<span class="ln" id="L556"></span>
+<span class="ln" id="L557">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.content.<span class="tok-fn">wants_sound</span>() {</span>
+<span class="ln" id="L558">            <span class="tok-kw">let</span> audio_codec = <span class="tok-kw">self</span>.container.<span class="tok-fn">audio_codec</span>();</span>
+<span class="ln" id="L559">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">into</span>(), audio_codec.<span class="tok-fn">encoder</span>().<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L560">            <span class="tok-kw">if</span> audio_codec == AudioCodec::Flac {</span>
+<span class="ln" id="L561">                argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-compression_level&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;8&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L562">                <span class="tok-kw">if</span> <span class="tok-kw">self</span>.container == Container::Mp4 {</span>
+<span class="ln" id="L563">                    <span class="tok-com">// FLAC in MP4 was marked experimental until ffmpeg 6, and</span></span>
+<span class="ln" id="L564">                    <span class="tok-com">// every build before that refuses it without this. It</span></span>
+<span class="ln" id="L565">                    <span class="tok-com">// relaxes nothing else here: every codec is named.</span></span>
+<span class="ln" id="L566">                    argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-strict&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;experimental&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L567">                }</span>
+<span class="ln" id="L568">            }</span>
+<span class="ln" id="L569">            <span class="tok-com">// Stop at the end of the sound, so a frame too many can never</span></span>
+<span class="ln" id="L570">            <span class="tok-com">// leave a moment of silent picture on the end.</span></span>
+<span class="ln" id="L571">            argv.<span class="tok-fn">push</span>(<span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L572">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L573">            argv.<span class="tok-fn">push</span>(<span class="tok-str">&quot;-an&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L574">        }</span>
+<span class="ln" id="L575"></span>
+<span class="ln" id="L576">        <span class="tok-kw">if</span> matches!(<span class="tok-kw">self</span>.container, Container::Mp4 | Container::Mov) {</span>
+<span class="ln" id="L577">            <span class="tok-com">// The index at the front, so a phone starts playing before the</span></span>
+<span class="ln" id="L578">            <span class="tok-com">// whole file has arrived.</span></span>
+<span class="ln" id="L579">            argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-movflags&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;+faststart&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L580">        }</span>
+<span class="ln" id="L581">        argv.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-map_metadata&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;-1&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L582">        argv.<span class="tok-fn">push</span>(output.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>());</span>
+<span class="ln" id="L583">        <span class="tok-fn">Ok</span>(argv)</span>
+<span class="ln" id="L584">    }</span>
 </span>
-<span class="ln" id="L577"></span>
+<span class="ln" id="L585"></span>
 <span class="src-item" id="fn-export-video_settings">
-<span class="ln" id="L578">    <span class="tok-com">/// The encoder settings for the chosen codec and quality.</span></span>
-<span class="ln" id="L579">    <span class="tok-kw">fn</span> <span class="tok-fn">video_settings</span>(&amp;<span class="tok-kw">self</span>) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L580">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out: Vec&lt;String&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L581">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.codec {</span>
-<span class="ln" id="L582">            VideoCodec::Ffv1 =&gt; {</span>
-<span class="ln" id="L583">                <span class="tok-com">// Version 3 with slice checksums, and the picture kept as RGB:</span></span>
-<span class="ln" id="L584">                <span class="tok-com">// converting to YUV would throw colour away, which is the one</span></span>
-<span class="ln" id="L585">                <span class="tok-com">// thing a lossless master exists not to do.</span></span>
-<span class="ln" id="L586">                out.<span class="tok-fn">extend</span>([</span>
-<span class="ln" id="L587">                    <span class="tok-str">&quot;-level&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L588">                    <span class="tok-str">&quot;3&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L589">                    <span class="tok-str">&quot;-slicecrc&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L590">                    <span class="tok-str">&quot;1&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L591">                    <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L592">                    <span class="tok-str">&quot;bgr0&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L593">                ]);</span>
-<span class="ln" id="L594">            }</span>
-<span class="ln" id="L595">            VideoCodec::ProRes =&gt; {</span>
-<span class="ln" id="L596">                <span class="tok-kw">let</span> profile = <span class="tok-kw">self</span>.quality.<span class="tok-fn">prores_profile</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">3</span>);</span>
-<span class="ln" id="L597">                out.<span class="tok-fn">extend</span>([</span>
-<span class="ln" id="L598">                    <span class="tok-str">&quot;-profile:v&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L599">                    profile.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L600">                    <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L601">                    <span class="tok-str">&quot;yuv422p10le&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L602">                ]);</span>
-<span class="ln" id="L603">            }</span>
-<span class="ln" id="L604">            VideoCodec::Vp9 =&gt; {</span>
-<span class="ln" id="L605">                <span class="tok-kw">let</span> factor = <span class="tok-kw">self</span>.quality.<span class="tok-fn">factor</span>(<span class="tok-kw">self</span>.codec).<span class="tok-fn">unwrap_or</span>(<span class="tok-num">31</span>);</span>
-<span class="ln" id="L606">                <span class="tok-com">// `-b:v 0` is what makes VP9&#x27;s `-crf` a constant quality</span></span>
-<span class="ln" id="L607">                <span class="tok-com">// rather than a cap on a bitrate nobody set.</span></span>
-<span class="ln" id="L608">                out.<span class="tok-fn">extend</span>([</span>
-<span class="ln" id="L609">                    <span class="tok-str">&quot;-crf&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L610">                    factor.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L611">                    <span class="tok-str">&quot;-b:v&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L612">                    <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L613">                    <span class="tok-str">&quot;-row-mt&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L614">                    <span class="tok-str">&quot;1&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L615">                    <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L616">                    <span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L617">                ]);</span>
-<span class="ln" id="L618">            }</span>
-<span class="ln" id="L619">            VideoCodec::H264 | VideoCodec::H265 | VideoCodec::Av1 =&gt; {</span>
-<span class="ln" id="L620">                <span class="tok-kw">let</span> factor = <span class="tok-kw">self</span>.quality.<span class="tok-fn">factor</span>(<span class="tok-kw">self</span>.codec).<span class="tok-fn">unwrap_or</span>(<span class="tok-num">21</span>);</span>
-<span class="ln" id="L621">                out.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-crf&quot;</span>.<span class="tok-fn">into</span>(), factor.<span class="tok-fn">to_string</span>()]);</span>
-<span class="ln" id="L622">                <span class="tok-kw">if</span> <span class="tok-kw">self</span>.codec != VideoCodec::Av1 {</span>
-<span class="ln" id="L623">                    <span class="tok-com">// Slower than the default and worth it: the frames are</span></span>
-<span class="ln" id="L624">                    <span class="tok-com">// flat colour and fine edges, which is what the slower</span></span>
-<span class="ln" id="L625">                    <span class="tok-com">// presets spend their time on.</span></span>
-<span class="ln" id="L626">                    out.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-preset&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;slow&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L627">                }</span>
-<span class="ln" id="L628">                <span class="tok-kw">if</span> <span class="tok-kw">self</span>.codec == VideoCodec::H265 &amp;&amp; <span class="tok-kw">self</span>.container != Container::Mkv {</span>
-<span class="ln" id="L629">                    <span class="tok-com">// Apple&#x27;s players refuse H.265 in an MP4 or MOV unless the</span></span>
-<span class="ln" id="L630">                    <span class="tok-com">// track is tagged `hvc1`, and play it perfectly once it is.</span></span>
-<span class="ln" id="L631">                    out.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-tag:v&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;hvc1&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L632">                }</span>
-<span class="ln" id="L633">                <span class="tok-com">// The pixel format every player and phone accepts, for the</span></span>
-<span class="ln" id="L634">                <span class="tok-com">// reason `crate::ffmpeg::command` gives.</span></span>
-<span class="ln" id="L635">                out.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">into</span>()]);</span>
-<span class="ln" id="L636">            }</span>
-<span class="ln" id="L637">        }</span>
-<span class="ln" id="L638">        out</span>
-<span class="ln" id="L639">    }</span>
+<span class="ln" id="L586">    <span class="tok-com">/// The encoder settings for the chosen codec and quality.</span></span>
+<span class="ln" id="L587">    <span class="tok-kw">fn</span> <span class="tok-fn">video_settings</span>(&amp;<span class="tok-kw">self</span>) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L588">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out: Vec&lt;String&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L589">        <span class="tok-kw">match</span> <span class="tok-kw">self</span>.codec {</span>
+<span class="ln" id="L590">            VideoCodec::Ffv1 =&gt; {</span>
+<span class="ln" id="L591">                <span class="tok-com">// Version 3 with slice checksums, and the picture kept as RGB:</span></span>
+<span class="ln" id="L592">                <span class="tok-com">// converting to YUV would throw colour away, which is the one</span></span>
+<span class="ln" id="L593">                <span class="tok-com">// thing a lossless master exists not to do.</span></span>
+<span class="ln" id="L594">                out.<span class="tok-fn">extend</span>([</span>
+<span class="ln" id="L595">                    <span class="tok-str">&quot;-level&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L596">                    <span class="tok-str">&quot;3&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L597">                    <span class="tok-str">&quot;-slicecrc&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L598">                    <span class="tok-str">&quot;1&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L599">                    <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L600">                    <span class="tok-str">&quot;bgr0&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L601">                ]);</span>
+<span class="ln" id="L602">            }</span>
+<span class="ln" id="L603">            VideoCodec::ProRes =&gt; {</span>
+<span class="ln" id="L604">                <span class="tok-kw">let</span> profile = <span class="tok-kw">self</span>.quality.<span class="tok-fn">prores_profile</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-num">3</span>);</span>
+<span class="ln" id="L605">                out.<span class="tok-fn">extend</span>([</span>
+<span class="ln" id="L606">                    <span class="tok-str">&quot;-profile:v&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L607">                    profile.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L608">                    <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L609">                    <span class="tok-str">&quot;yuv422p10le&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L610">                ]);</span>
+<span class="ln" id="L611">            }</span>
+<span class="ln" id="L612">            VideoCodec::Vp9 =&gt; {</span>
+<span class="ln" id="L613">                <span class="tok-kw">let</span> factor = <span class="tok-kw">self</span>.quality.<span class="tok-fn">factor</span>(<span class="tok-kw">self</span>.codec).<span class="tok-fn">unwrap_or</span>(<span class="tok-num">31</span>);</span>
+<span class="ln" id="L614">                <span class="tok-com">// `-b:v 0` is what makes VP9&#x27;s `-crf` a constant quality</span></span>
+<span class="ln" id="L615">                <span class="tok-com">// rather than a cap on a bitrate nobody set.</span></span>
+<span class="ln" id="L616">                out.<span class="tok-fn">extend</span>([</span>
+<span class="ln" id="L617">                    <span class="tok-str">&quot;-crf&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L618">                    factor.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L619">                    <span class="tok-str">&quot;-b:v&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L620">                    <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L621">                    <span class="tok-str">&quot;-row-mt&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L622">                    <span class="tok-str">&quot;1&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L623">                    <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L624">                    <span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L625">                ]);</span>
+<span class="ln" id="L626">            }</span>
+<span class="ln" id="L627">            VideoCodec::H264 | VideoCodec::H265 | VideoCodec::Av1 =&gt; {</span>
+<span class="ln" id="L628">                <span class="tok-kw">let</span> factor = <span class="tok-kw">self</span>.quality.<span class="tok-fn">factor</span>(<span class="tok-kw">self</span>.codec).<span class="tok-fn">unwrap_or</span>(<span class="tok-num">21</span>);</span>
+<span class="ln" id="L629">                out.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-crf&quot;</span>.<span class="tok-fn">into</span>(), factor.<span class="tok-fn">to_string</span>()]);</span>
+<span class="ln" id="L630">                <span class="tok-kw">if</span> <span class="tok-kw">self</span>.codec != VideoCodec::Av1 {</span>
+<span class="ln" id="L631">                    <span class="tok-com">// Slower than the default and worth it: the frames are</span></span>
+<span class="ln" id="L632">                    <span class="tok-com">// flat colour and fine edges, which is what the slower</span></span>
+<span class="ln" id="L633">                    <span class="tok-com">// presets spend their time on.</span></span>
+<span class="ln" id="L634">                    out.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-preset&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;slow&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L635">                }</span>
+<span class="ln" id="L636">                <span class="tok-kw">if</span> <span class="tok-kw">self</span>.codec == VideoCodec::H265 &amp;&amp; <span class="tok-kw">self</span>.container != Container::Mkv {</span>
+<span class="ln" id="L637">                    <span class="tok-com">// Apple&#x27;s players refuse H.265 in an MP4 or MOV unless the</span></span>
+<span class="ln" id="L638">                    <span class="tok-com">// track is tagged `hvc1`, and play it perfectly once it is.</span></span>
+<span class="ln" id="L639">                    out.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-tag:v&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;hvc1&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L640">                }</span>
+<span class="ln" id="L641">                <span class="tok-com">// The pixel format every player and phone accepts, for the</span></span>
+<span class="ln" id="L642">                <span class="tok-com">// reason `crate::ffmpeg::command` gives.</span></span>
+<span class="ln" id="L643">                out.<span class="tok-fn">extend</span>([<span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">into</span>(), <span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">into</span>()]);</span>
+<span class="ln" id="L644">            }</span>
+<span class="ln" id="L645">        }</span>
+<span class="ln" id="L646">        out</span>
+<span class="ln" id="L647">    }</span>
 </span>
-<span class="ln" id="L640">}</span>
-<span class="ln" id="L641"></span>
-<span class="ln" id="L642"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L643"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L644">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L645"></span>
-<span class="ln" id="L646">    <span class="tok-kw">fn</span> <span class="tok-fn">argv</span>(export: &amp;Export) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L647">        export</span>
-<span class="ln" id="L648">            .<span class="tok-fn">command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;in.wav&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;out&quot;</span>))</span>
-<span class="ln" id="L649">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the combination is valid&quot;</span>)</span>
-<span class="ln" id="L650">    }</span>
-<span class="ln" id="L651"></span>
-<span class="ln" id="L652">    <span class="tok-kw">fn</span> <span class="tok-fn">value_after</span>(argv: &amp;[String], flag: &amp;str) -&gt; Option&lt;String&gt; {</span>
-<span class="ln" id="L653">        argv.<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L654">            .<span class="tok-fn">position</span>(|arg| arg == flag)</span>
-<span class="ln" id="L655">            .<span class="tok-fn">and_then</span>(|at| argv.<span class="tok-fn">get</span>(at + <span class="tok-num">1</span>).<span class="tok-fn">cloned</span>())</span>
-<span class="ln" id="L656">    }</span>
-<span class="ln" id="L657"></span>
-<span class="ln" id="L658">    <span class="tok-com">/// The rule the roadmap row is built on: no lossy audio encoder, ever.</span></span>
-<span class="ln" id="L659">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L660">    <span class="tok-kw">fn</span> <span class="tok-fn">the_audio_is_lossless_whatever_the_video_is</span>() {</span>
-<span class="ln" id="L661">        <span class="tok-kw">let</span> lossless = [<span class="tok-str">&quot;flac&quot;</span>, <span class="tok-str">&quot;alac&quot;</span>, <span class="tok-str">&quot;pcm_s16le&quot;</span>];</span>
-<span class="ln" id="L662">        <span class="tok-kw">for</span> container <span class="tok-kw">in</span> Container::ALL {</span>
-<span class="ln" id="L663">            <span class="tok-kw">for</span> &amp;codec <span class="tok-kw">in</span> container.<span class="tok-fn">video_codecs</span>() {</span>
-<span class="ln" id="L664">                <span class="tok-kw">for</span> quality <span class="tok-kw">in</span> Quality::ALL {</span>
-<span class="ln" id="L665">                    <span class="tok-kw">for</span> content <span class="tok-kw">in</span> Content::ALL {</span>
-<span class="ln" id="L666">                        <span class="tok-kw">for</span> audio_file <span class="tok-kw">in</span> [AudioFile::Flac, AudioFile::Wav] {</span>
-<span class="ln" id="L667">                            <span class="tok-kw">let</span> export = Export {</span>
-<span class="ln" id="L668">                                content,</span>
-<span class="ln" id="L669">                                container,</span>
-<span class="ln" id="L670">                                codec,</span>
-<span class="ln" id="L671">                                quality,</span>
-<span class="ln" id="L672">                                audio_file,</span>
-<span class="ln" id="L673">                                ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L674">                            };</span>
-<span class="ln" id="L675">                            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(argv) = export.<span class="tok-fn">command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;a.wav&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;o&quot;</span>))</span>
-<span class="ln" id="L676">                            <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L677">                                continue;</span>
-<span class="ln" id="L678">                            };</span>
-<span class="ln" id="L679">                            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(audio) = <span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:a&quot;</span>) {</span>
-<span class="ln" id="L680">                                assert!(</span>
-<span class="ln" id="L681">                                    lossless.<span class="tok-fn">contains</span>(&amp;audio.<span class="tok-fn">as_str</span>()),</span>
-<span class="ln" id="L682">                                    <span class="tok-str">&quot;{audio} is not lossless, from {export:?}&quot;</span></span>
-<span class="ln" id="L683">                                );</span>
-<span class="ln" id="L684">                            }</span>
-<span class="ln" id="L685">                            <span class="tok-kw">for</span> lossy <span class="tok-kw">in</span> [<span class="tok-str">&quot;aac&quot;</span>, <span class="tok-str">&quot;libopus&quot;</span>, <span class="tok-str">&quot;libvorbis&quot;</span>, <span class="tok-str">&quot;libmp3lame&quot;</span>, <span class="tok-str">&quot;-b:a&quot;</span>] {</span>
-<span class="ln" id="L686">                                assert!(</span>
-<span class="ln" id="L687">                                    !argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == lossy),</span>
-<span class="ln" id="L688">                                    <span class="tok-str">&quot;{lossy} in {argv:?}&quot;</span></span>
-<span class="ln" id="L689">                                );</span>
-<span class="ln" id="L690">                            }</span>
-<span class="ln" id="L691">                        }</span>
-<span class="ln" id="L692">                    }</span>
-<span class="ln" id="L693">                }</span>
-<span class="ln" id="L694">            }</span>
-<span class="ln" id="L695">        }</span>
-<span class="ln" id="L696">    }</span>
-<span class="ln" id="L697"></span>
-<span class="ln" id="L698">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L699">    <span class="tok-kw">fn</span> <span class="tok-fn">every_container_offers_at_least_one_codec_at_every_lossy_quality</span>() {</span>
-<span class="ln" id="L700">        <span class="tok-kw">for</span> container <span class="tok-kw">in</span> Container::ALL {</span>
-<span class="ln" id="L701">            <span class="tok-kw">for</span> quality <span class="tok-kw">in</span> [Quality::High, Quality::Balanced, Quality::Small] {</span>
-<span class="ln" id="L702">                <span class="tok-kw">let</span> works = container.<span class="tok-fn">video_codecs</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|&amp;codec| {</span>
-<span class="ln" id="L703">                    Export {</span>
-<span class="ln" id="L704">                        container,</span>
-<span class="ln" id="L705">                        codec,</span>
-<span class="ln" id="L706">                        quality,</span>
-<span class="ln" id="L707">                        ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L708">                    }</span>
-<span class="ln" id="L709">                    .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L710">                    .<span class="tok-fn">is_ok</span>()</span>
-<span class="ln" id="L711">                });</span>
-<span class="ln" id="L712">                assert!(works, <span class="tok-str">&quot;{container:?} has nothing at {quality:?}&quot;</span>);</span>
-<span class="ln" id="L713">            }</span>
-<span class="ln" id="L714">        }</span>
-<span class="ln" id="L715">    }</span>
-<span class="ln" id="L716"></span>
-<span class="ln" id="L717">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L718">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lossless_master_is_ffv1_in_matroska_and_keeps_rgb</span>() {</span>
-<span class="ln" id="L719">        <span class="tok-kw">let</span> export = Export {</span>
-<span class="ln" id="L720">            container: Container::Mkv,</span>
-<span class="ln" id="L721">            codec: VideoCodec::Ffv1,</span>
-<span class="ln" id="L722">            quality: Quality::Lossless,</span>
-<span class="ln" id="L723">            ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L724">        };</span>
-<span class="ln" id="L725">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;export);</span>
-<span class="ln" id="L726">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:v&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;ffv1&quot;</span>));</span>
-<span class="ln" id="L727">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:a&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;flac&quot;</span>));</span>
-<span class="ln" id="L728">        <span class="tok-kw">let</span> formats: Vec&lt;_&gt; = argv</span>
-<span class="ln" id="L729">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L730">            .<span class="tok-fn">enumerate</span>()</span>
-<span class="ln" id="L731">            .<span class="tok-fn">filter</span>(|(_, arg)| *arg == <span class="tok-str">&quot;-pix_fmt&quot;</span>)</span>
-<span class="ln" id="L732">            .<span class="tok-fn">filter_map</span>(|(at, _)| argv.<span class="tok-fn">get</span>(at + <span class="tok-num">1</span>))</span>
-<span class="ln" id="L733">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L734">        assert!(</span>
-<span class="ln" id="L735">            formats.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|f| *f == <span class="tok-str">&quot;bgr0&quot;</span>),</span>
-<span class="ln" id="L736">            <span class="tok-str">&quot;the master must stay RGB, got {formats:?}&quot;</span></span>
-<span class="ln" id="L737">        );</span>
-<span class="ln" id="L738">        assert!(!formats.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|f| f.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;yuv&quot;</span>)));</span>
-<span class="ln" id="L739">    }</span>
-<span class="ln" id="L740"></span>
-<span class="ln" id="L741">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L742">    <span class="tok-kw">fn</span> <span class="tok-fn">a_refusal_names_what_would_have_worked</span>() {</span>
-<span class="ln" id="L743">        <span class="tok-kw">let</span> wrong = Export {</span>
-<span class="ln" id="L744">            container: Container::Mp4,</span>
-<span class="ln" id="L745">            codec: VideoCodec::ProRes,</span>
-<span class="ln" id="L746">            ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L747">        };</span>
-<span class="ln" id="L748">        <span class="tok-kw">let</span> why = wrong.<span class="tok-fn">checked</span>().<span class="tok-fn">unwrap_err</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L749">        assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;MOV&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>);</span>
-<span class="ln" id="L750">        assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;H.264&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>);</span>
-<span class="ln" id="L751"></span>
-<span class="ln" id="L752">        <span class="tok-kw">let</span> lossy_master = Export {</span>
-<span class="ln" id="L753">            quality: Quality::Lossless,</span>
+<span class="ln" id="L648">}</span>
+<span class="ln" id="L649"></span>
+<span class="ln" id="L650"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L651"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L652">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L653"></span>
+<span class="ln" id="L654">    <span class="tok-kw">fn</span> <span class="tok-fn">argv</span>(export: &amp;Export) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L655">        export</span>
+<span class="ln" id="L656">            .<span class="tok-fn">command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;in.wav&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;out&quot;</span>))</span>
+<span class="ln" id="L657">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the combination is valid&quot;</span>)</span>
+<span class="ln" id="L658">    }</span>
+<span class="ln" id="L659"></span>
+<span class="ln" id="L660">    <span class="tok-kw">fn</span> <span class="tok-fn">value_after</span>(argv: &amp;[String], flag: &amp;str) -&gt; Option&lt;String&gt; {</span>
+<span class="ln" id="L661">        argv.<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L662">            .<span class="tok-fn">position</span>(|arg| arg == flag)</span>
+<span class="ln" id="L663">            .<span class="tok-fn">and_then</span>(|at| argv.<span class="tok-fn">get</span>(at + <span class="tok-num">1</span>).<span class="tok-fn">cloned</span>())</span>
+<span class="ln" id="L664">    }</span>
+<span class="ln" id="L665"></span>
+<span class="ln" id="L666">    <span class="tok-com">/// The rule the roadmap row is built on: no lossy audio encoder, ever.</span></span>
+<span class="ln" id="L667">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L668">    <span class="tok-kw">fn</span> <span class="tok-fn">the_audio_is_lossless_whatever_the_video_is</span>() {</span>
+<span class="ln" id="L669">        <span class="tok-kw">let</span> lossless = [<span class="tok-str">&quot;flac&quot;</span>, <span class="tok-str">&quot;alac&quot;</span>, <span class="tok-str">&quot;pcm_s16le&quot;</span>];</span>
+<span class="ln" id="L670">        <span class="tok-kw">for</span> container <span class="tok-kw">in</span> Container::ALL {</span>
+<span class="ln" id="L671">            <span class="tok-kw">for</span> &amp;codec <span class="tok-kw">in</span> container.<span class="tok-fn">video_codecs</span>() {</span>
+<span class="ln" id="L672">                <span class="tok-kw">for</span> quality <span class="tok-kw">in</span> Quality::ALL {</span>
+<span class="ln" id="L673">                    <span class="tok-kw">for</span> content <span class="tok-kw">in</span> Content::ALL {</span>
+<span class="ln" id="L674">                        <span class="tok-kw">for</span> audio_file <span class="tok-kw">in</span> [AudioFile::Flac, AudioFile::Wav] {</span>
+<span class="ln" id="L675">                            <span class="tok-kw">let</span> export = Export {</span>
+<span class="ln" id="L676">                                content,</span>
+<span class="ln" id="L677">                                container,</span>
+<span class="ln" id="L678">                                codec,</span>
+<span class="ln" id="L679">                                quality,</span>
+<span class="ln" id="L680">                                audio_file,</span>
+<span class="ln" id="L681">                                ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L682">                            };</span>
+<span class="ln" id="L683">                            <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(argv) = export.<span class="tok-fn">command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;a.wav&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;o&quot;</span>))</span>
+<span class="ln" id="L684">                            <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L685">                                continue;</span>
+<span class="ln" id="L686">                            };</span>
+<span class="ln" id="L687">                            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(audio) = <span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:a&quot;</span>) {</span>
+<span class="ln" id="L688">                                assert!(</span>
+<span class="ln" id="L689">                                    lossless.<span class="tok-fn">contains</span>(&amp;audio.<span class="tok-fn">as_str</span>()),</span>
+<span class="ln" id="L690">                                    <span class="tok-str">&quot;{audio} is not lossless, from {export:?}&quot;</span></span>
+<span class="ln" id="L691">                                );</span>
+<span class="ln" id="L692">                            }</span>
+<span class="ln" id="L693">                            <span class="tok-kw">for</span> lossy <span class="tok-kw">in</span> [<span class="tok-str">&quot;aac&quot;</span>, <span class="tok-str">&quot;libopus&quot;</span>, <span class="tok-str">&quot;libvorbis&quot;</span>, <span class="tok-str">&quot;libmp3lame&quot;</span>, <span class="tok-str">&quot;-b:a&quot;</span>] {</span>
+<span class="ln" id="L694">                                assert!(</span>
+<span class="ln" id="L695">                                    !argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == lossy),</span>
+<span class="ln" id="L696">                                    <span class="tok-str">&quot;{lossy} in {argv:?}&quot;</span></span>
+<span class="ln" id="L697">                                );</span>
+<span class="ln" id="L698">                            }</span>
+<span class="ln" id="L699">                        }</span>
+<span class="ln" id="L700">                    }</span>
+<span class="ln" id="L701">                }</span>
+<span class="ln" id="L702">            }</span>
+<span class="ln" id="L703">        }</span>
+<span class="ln" id="L704">    }</span>
+<span class="ln" id="L705"></span>
+<span class="ln" id="L706">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L707">    <span class="tok-kw">fn</span> <span class="tok-fn">every_container_offers_at_least_one_codec_at_every_lossy_quality</span>() {</span>
+<span class="ln" id="L708">        <span class="tok-kw">for</span> container <span class="tok-kw">in</span> Container::ALL {</span>
+<span class="ln" id="L709">            <span class="tok-kw">for</span> quality <span class="tok-kw">in</span> [Quality::High, Quality::Balanced, Quality::Small] {</span>
+<span class="ln" id="L710">                <span class="tok-kw">let</span> works = container.<span class="tok-fn">video_codecs</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|&amp;codec| {</span>
+<span class="ln" id="L711">                    Export {</span>
+<span class="ln" id="L712">                        container,</span>
+<span class="ln" id="L713">                        codec,</span>
+<span class="ln" id="L714">                        quality,</span>
+<span class="ln" id="L715">                        ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L716">                    }</span>
+<span class="ln" id="L717">                    .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L718">                    .<span class="tok-fn">is_ok</span>()</span>
+<span class="ln" id="L719">                });</span>
+<span class="ln" id="L720">                assert!(works, <span class="tok-str">&quot;{container:?} has nothing at {quality:?}&quot;</span>);</span>
+<span class="ln" id="L721">            }</span>
+<span class="ln" id="L722">        }</span>
+<span class="ln" id="L723">    }</span>
+<span class="ln" id="L724"></span>
+<span class="ln" id="L725">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L726">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lossless_master_is_ffv1_in_matroska_and_keeps_rgb</span>() {</span>
+<span class="ln" id="L727">        <span class="tok-kw">let</span> export = Export {</span>
+<span class="ln" id="L728">            container: Container::Mkv,</span>
+<span class="ln" id="L729">            codec: VideoCodec::Ffv1,</span>
+<span class="ln" id="L730">            quality: Quality::Lossless,</span>
+<span class="ln" id="L731">            ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L732">        };</span>
+<span class="ln" id="L733">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;export);</span>
+<span class="ln" id="L734">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:v&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;ffv1&quot;</span>));</span>
+<span class="ln" id="L735">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:a&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;flac&quot;</span>));</span>
+<span class="ln" id="L736">        <span class="tok-kw">let</span> formats: Vec&lt;_&gt; = argv</span>
+<span class="ln" id="L737">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L738">            .<span class="tok-fn">enumerate</span>()</span>
+<span class="ln" id="L739">            .<span class="tok-fn">filter</span>(|(_, arg)| *arg == <span class="tok-str">&quot;-pix_fmt&quot;</span>)</span>
+<span class="ln" id="L740">            .<span class="tok-fn">filter_map</span>(|(at, _)| argv.<span class="tok-fn">get</span>(at + <span class="tok-num">1</span>))</span>
+<span class="ln" id="L741">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L742">        assert!(</span>
+<span class="ln" id="L743">            formats.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|f| *f == <span class="tok-str">&quot;bgr0&quot;</span>),</span>
+<span class="ln" id="L744">            <span class="tok-str">&quot;the master must stay RGB, got {formats:?}&quot;</span></span>
+<span class="ln" id="L745">        );</span>
+<span class="ln" id="L746">        assert!(!formats.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|f| f.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;yuv&quot;</span>)));</span>
+<span class="ln" id="L747">    }</span>
+<span class="ln" id="L748"></span>
+<span class="ln" id="L749">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L750">    <span class="tok-kw">fn</span> <span class="tok-fn">a_refusal_names_what_would_have_worked</span>() {</span>
+<span class="ln" id="L751">        <span class="tok-kw">let</span> wrong = Export {</span>
+<span class="ln" id="L752">            container: Container::Mp4,</span>
+<span class="ln" id="L753">            codec: VideoCodec::ProRes,</span>
 <span class="ln" id="L754">            ..Export::<span class="tok-fn">default</span>()</span>
 <span class="ln" id="L755">        };</span>
-<span class="ln" id="L756">        assert!(lossy_master</span>
-<span class="ln" id="L757">            .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L758">            .<span class="tok-fn">unwrap_err</span>()</span>
-<span class="ln" id="L759">            .<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L760">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;FFV1&quot;</span>));</span>
-<span class="ln" id="L761"></span>
-<span class="ln" id="L762">        <span class="tok-kw">let</span> small_ffv1 = Export {</span>
-<span class="ln" id="L763">            container: Container::Mkv,</span>
-<span class="ln" id="L764">            codec: VideoCodec::Ffv1,</span>
-<span class="ln" id="L765">            quality: Quality::Small,</span>
-<span class="ln" id="L766">            ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L767">        };</span>
-<span class="ln" id="L768">        assert!(small_ffv1.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L769">        assert!(small_ffv1.<span class="tok-fn">command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;a&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;b&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L770">    }</span>
-<span class="ln" id="L771"></span>
-<span class="ln" id="L772">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L773">    <span class="tok-kw">fn</span> <span class="tok-fn">the_picture_comes_from_standard_input_at_the_planned_size_and_rate</span>() {</span>
-<span class="ln" id="L774">        <span class="tok-kw">let</span> export = Export::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L775">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;export);</span>
-<span class="ln" id="L776">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-f&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;rawvideo&quot;</span>));</span>
-<span class="ln" id="L777">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-s&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;1920x1080&quot;</span>));</span>
-<span class="ln" id="L778">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-r&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;60&quot;</span>));</span>
-<span class="ln" id="L779">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;pipe:0&quot;</span>));</span>
-<span class="ln" id="L780">        assert!(</span>
-<span class="ln" id="L781">            !argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-nostdin&quot;</span>),</span>
-<span class="ln" id="L782">            <span class="tok-str">&quot;standard input is the picture&quot;</span></span>
-<span class="ln" id="L783">        );</span>
-<span class="ln" id="L784">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-shortest&quot;</span>));</span>
-<span class="ln" id="L785">        assert_eq!(</span>
-<span class="ln" id="L786">            <span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-movflags&quot;</span>).<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L787">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;+faststart&quot;</span>)</span>
-<span class="ln" id="L788">        );</span>
-<span class="ln" id="L789">        assert_eq!(argv.<span class="tok-fn">last</span>().<span class="tok-fn">map</span>(String::as_str), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;out&quot;</span>));</span>
-<span class="ln" id="L790">    }</span>
-<span class="ln" id="L791"></span>
-<span class="ln" id="L792">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L793">    <span class="tok-kw">fn</span> <span class="tok-fn">video_only_has_no_sound_track_and_reads_no_audio</span>() {</span>
-<span class="ln" id="L794">        <span class="tok-kw">let</span> export = Export {</span>
-<span class="ln" id="L795">            content: Content::Video,</span>
-<span class="ln" id="L796">            ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L797">        };</span>
-<span class="ln" id="L798">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;export);</span>
-<span class="ln" id="L799">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-an&quot;</span>));</span>
-<span class="ln" id="L800">        assert!(!argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;in.wav&quot;</span>));</span>
-<span class="ln" id="L801">        assert!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:a&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L802">    }</span>
-<span class="ln" id="L803"></span>
-<span class="ln" id="L804">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L805">    <span class="tok-kw">fn</span> <span class="tok-fn">audio_only_reads_nothing_from_standard_input</span>() {</span>
-<span class="ln" id="L806">        <span class="tok-kw">for</span> audio_file <span class="tok-kw">in</span> [AudioFile::Flac, AudioFile::Wav] {</span>
-<span class="ln" id="L807">            <span class="tok-kw">let</span> export = Export {</span>
-<span class="ln" id="L808">                content: Content::Audio,</span>
-<span class="ln" id="L809">                audio_file,</span>
-<span class="ln" id="L810">                ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L811">            };</span>
-<span class="ln" id="L812">            <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;export);</span>
-<span class="ln" id="L813">            assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-nostdin&quot;</span>));</span>
-<span class="ln" id="L814">            assert!(!argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;pipe:0&quot;</span>));</span>
-<span class="ln" id="L815">            assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-vn&quot;</span>));</span>
-<span class="ln" id="L816">            assert_eq!(export.<span class="tok-fn">extension</span>(), audio_file.<span class="tok-fn">extension</span>());</span>
-<span class="ln" id="L817">        }</span>
-<span class="ln" id="L818">    }</span>
-<span class="ln" id="L819"></span>
-<span class="ln" id="L820">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L821">    <span class="tok-kw">fn</span> <span class="tok-fn">flac_in_mp4_is_allowed_on_an_older_ffmpeg_too</span>() {</span>
-<span class="ln" id="L822">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;Export::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L823">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:a&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;flac&quot;</span>));</span>
-<span class="ln" id="L824">        assert_eq!(</span>
-<span class="ln" id="L825">            <span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-strict&quot;</span>).<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L826">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;experimental&quot;</span>)</span>
-<span class="ln" id="L827">        );</span>
-<span class="ln" id="L828">        <span class="tok-kw">let</span> mkv = <span class="tok-fn">argv_for</span>(Container::Mkv);</span>
-<span class="ln" id="L829">        assert!(!mkv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-strict&quot;</span>));</span>
-<span class="ln" id="L830">    }</span>
-<span class="ln" id="L831"></span>
-<span class="ln" id="L832">    <span class="tok-kw">fn</span> <span class="tok-fn">argv_for</span>(container: Container) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L833">        <span class="tok-fn">argv</span>(&amp;Export {</span>
-<span class="ln" id="L834">            container,</span>
-<span class="ln" id="L835">            ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L836">        })</span>
-<span class="ln" id="L837">    }</span>
-<span class="ln" id="L838"></span>
-<span class="ln" id="L839">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L840">    <span class="tok-kw">fn</span> <span class="tok-fn">h265_is_tagged_for_apple_players_outside_matroska</span>() {</span>
-<span class="ln" id="L841">        <span class="tok-kw">for</span> (container, tagged) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L842">            (Container::Mp4, true),</span>
-<span class="ln" id="L843">            (Container::Mov, true),</span>
-<span class="ln" id="L844">            (Container::Mkv, false),</span>
-<span class="ln" id="L845">        ] {</span>
-<span class="ln" id="L846">            <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;Export {</span>
-<span class="ln" id="L847">                container,</span>
-<span class="ln" id="L848">                codec: VideoCodec::H265,</span>
-<span class="ln" id="L849">                ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L850">            });</span>
-<span class="ln" id="L851">            assert_eq!(</span>
-<span class="ln" id="L852">                <span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-tag:v&quot;</span>).<span class="tok-fn">is_some</span>(),</span>
-<span class="ln" id="L853">                tagged,</span>
-<span class="ln" id="L854">                <span class="tok-str">&quot;{container:?}&quot;</span></span>
-<span class="ln" id="L855">            );</span>
-<span class="ln" id="L856">        }</span>
+<span class="ln" id="L756">        <span class="tok-kw">let</span> why = wrong.<span class="tok-fn">checked</span>().<span class="tok-fn">unwrap_err</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L757">        assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;MOV&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>);</span>
+<span class="ln" id="L758">        assert!(why.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;H.264&quot;</span>), <span class="tok-str">&quot;{why}&quot;</span>);</span>
+<span class="ln" id="L759"></span>
+<span class="ln" id="L760">        <span class="tok-kw">let</span> lossy_master = Export {</span>
+<span class="ln" id="L761">            quality: Quality::Lossless,</span>
+<span class="ln" id="L762">            ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L763">        };</span>
+<span class="ln" id="L764">        assert!(lossy_master</span>
+<span class="ln" id="L765">            .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L766">            .<span class="tok-fn">unwrap_err</span>()</span>
+<span class="ln" id="L767">            .<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L768">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;FFV1&quot;</span>));</span>
+<span class="ln" id="L769"></span>
+<span class="ln" id="L770">        <span class="tok-kw">let</span> small_ffv1 = Export {</span>
+<span class="ln" id="L771">            container: Container::Mkv,</span>
+<span class="ln" id="L772">            codec: VideoCodec::Ffv1,</span>
+<span class="ln" id="L773">            quality: Quality::Small,</span>
+<span class="ln" id="L774">            ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L775">        };</span>
+<span class="ln" id="L776">        assert!(small_ffv1.<span class="tok-fn">checked</span>().<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L777">        assert!(small_ffv1.<span class="tok-fn">command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;a&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;b&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L778">    }</span>
+<span class="ln" id="L779"></span>
+<span class="ln" id="L780">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L781">    <span class="tok-kw">fn</span> <span class="tok-fn">the_picture_comes_from_standard_input_at_the_planned_size_and_rate</span>() {</span>
+<span class="ln" id="L782">        <span class="tok-kw">let</span> export = Export::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L783">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;export);</span>
+<span class="ln" id="L784">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-f&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;rawvideo&quot;</span>));</span>
+<span class="ln" id="L785">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-s&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;1920x1080&quot;</span>));</span>
+<span class="ln" id="L786">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-r&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;60&quot;</span>));</span>
+<span class="ln" id="L787">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;pipe:0&quot;</span>));</span>
+<span class="ln" id="L788">        assert!(</span>
+<span class="ln" id="L789">            !argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-nostdin&quot;</span>),</span>
+<span class="ln" id="L790">            <span class="tok-str">&quot;standard input is the picture&quot;</span></span>
+<span class="ln" id="L791">        );</span>
+<span class="ln" id="L792">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-shortest&quot;</span>));</span>
+<span class="ln" id="L793">        assert_eq!(</span>
+<span class="ln" id="L794">            <span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-movflags&quot;</span>).<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L795">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;+faststart&quot;</span>)</span>
+<span class="ln" id="L796">        );</span>
+<span class="ln" id="L797">        assert_eq!(argv.<span class="tok-fn">last</span>().<span class="tok-fn">map</span>(String::as_str), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;out&quot;</span>));</span>
+<span class="ln" id="L798">    }</span>
+<span class="ln" id="L799"></span>
+<span class="ln" id="L800">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L801">    <span class="tok-kw">fn</span> <span class="tok-fn">ffmpeg_says_nothing_unless_something_went_wrong</span>() {</span>
+<span class="ln" id="L802">        <span class="tok-kw">for</span> content <span class="tok-kw">in</span> Content::ALL {</span>
+<span class="ln" id="L803">            <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;Export {</span>
+<span class="ln" id="L804">                content,</span>
+<span class="ln" id="L805">                ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L806">            });</span>
+<span class="ln" id="L807">            assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-loglevel&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;error&quot;</span>));</span>
+<span class="ln" id="L808">            assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-nostats&quot;</span>));</span>
+<span class="ln" id="L809">        }</span>
+<span class="ln" id="L810">    }</span>
+<span class="ln" id="L811"></span>
+<span class="ln" id="L812">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L813">    <span class="tok-kw">fn</span> <span class="tok-fn">video_only_has_no_sound_track_and_reads_no_audio</span>() {</span>
+<span class="ln" id="L814">        <span class="tok-kw">let</span> export = Export {</span>
+<span class="ln" id="L815">            content: Content::Video,</span>
+<span class="ln" id="L816">            ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L817">        };</span>
+<span class="ln" id="L818">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;export);</span>
+<span class="ln" id="L819">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-an&quot;</span>));</span>
+<span class="ln" id="L820">        assert!(!argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;in.wav&quot;</span>));</span>
+<span class="ln" id="L821">        assert!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:a&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L822">    }</span>
+<span class="ln" id="L823"></span>
+<span class="ln" id="L824">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L825">    <span class="tok-kw">fn</span> <span class="tok-fn">audio_only_reads_nothing_from_standard_input</span>() {</span>
+<span class="ln" id="L826">        <span class="tok-kw">for</span> audio_file <span class="tok-kw">in</span> [AudioFile::Flac, AudioFile::Wav] {</span>
+<span class="ln" id="L827">            <span class="tok-kw">let</span> export = Export {</span>
+<span class="ln" id="L828">                content: Content::Audio,</span>
+<span class="ln" id="L829">                audio_file,</span>
+<span class="ln" id="L830">                ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L831">            };</span>
+<span class="ln" id="L832">            <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;export);</span>
+<span class="ln" id="L833">            assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-nostdin&quot;</span>));</span>
+<span class="ln" id="L834">            assert!(!argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;pipe:0&quot;</span>));</span>
+<span class="ln" id="L835">            assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-vn&quot;</span>));</span>
+<span class="ln" id="L836">            assert_eq!(export.<span class="tok-fn">extension</span>(), audio_file.<span class="tok-fn">extension</span>());</span>
+<span class="ln" id="L837">        }</span>
+<span class="ln" id="L838">    }</span>
+<span class="ln" id="L839"></span>
+<span class="ln" id="L840">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L841">    <span class="tok-kw">fn</span> <span class="tok-fn">flac_in_mp4_is_allowed_on_an_older_ffmpeg_too</span>() {</span>
+<span class="ln" id="L842">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;Export::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L843">        assert_eq!(<span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-c:a&quot;</span>).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;flac&quot;</span>));</span>
+<span class="ln" id="L844">        assert_eq!(</span>
+<span class="ln" id="L845">            <span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-strict&quot;</span>).<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L846">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;experimental&quot;</span>)</span>
+<span class="ln" id="L847">        );</span>
+<span class="ln" id="L848">        <span class="tok-kw">let</span> mkv = <span class="tok-fn">argv_for</span>(Container::Mkv);</span>
+<span class="ln" id="L849">        assert!(!mkv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|arg| arg == <span class="tok-str">&quot;-strict&quot;</span>));</span>
+<span class="ln" id="L850">    }</span>
+<span class="ln" id="L851"></span>
+<span class="ln" id="L852">    <span class="tok-kw">fn</span> <span class="tok-fn">argv_for</span>(container: Container) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L853">        <span class="tok-fn">argv</span>(&amp;Export {</span>
+<span class="ln" id="L854">            container,</span>
+<span class="ln" id="L855">            ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L856">        })</span>
 <span class="ln" id="L857">    }</span>
 <span class="ln" id="L858"></span>
 <span class="ln" id="L859">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L860">    <span class="tok-kw">fn</span> <span class="tok-fn">smaller_means_a_higher_factor_for_every_codec_that_has_one</span>() {</span>
-<span class="ln" id="L861">        <span class="tok-kw">for</span> codec <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L862">            VideoCodec::H264,</span>
-<span class="ln" id="L863">            VideoCodec::H265,</span>
-<span class="ln" id="L864">            VideoCodec::Av1,</span>
-<span class="ln" id="L865">            VideoCodec::Vp9,</span>
-<span class="ln" id="L866">        ] {</span>
-<span class="ln" id="L867">            <span class="tok-kw">let</span> high = Quality::High.<span class="tok-fn">factor</span>(codec).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L868">            <span class="tok-kw">let</span> balanced = Quality::Balanced.<span class="tok-fn">factor</span>(codec).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L869">            <span class="tok-kw">let</span> small = Quality::Small.<span class="tok-fn">factor</span>(codec).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L870">            assert!(high &lt; balanced &amp;&amp; balanced &lt; small, <span class="tok-str">&quot;{codec:?}&quot;</span>);</span>
-<span class="ln" id="L871">        }</span>
-<span class="ln" id="L872">    }</span>
-<span class="ln" id="L873"></span>
-<span class="ln" id="L874">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L875">    <span class="tok-kw">fn</span> <span class="tok-fn">the_description_always_says_the_audio_is_lossless</span>() {</span>
-<span class="ln" id="L876">        <span class="tok-kw">for</span> content <span class="tok-kw">in</span> Content::ALL {</span>
-<span class="ln" id="L877">            <span class="tok-kw">for</span> quality <span class="tok-kw">in</span> [Quality::High, Quality::Small] {</span>
-<span class="ln" id="L878">                <span class="tok-kw">let</span> export = Export {</span>
-<span class="ln" id="L879">                    content,</span>
-<span class="ln" id="L880">                    quality,</span>
-<span class="ln" id="L881">                    ..Export::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L882">                };</span>
-<span class="ln" id="L883">                <span class="tok-kw">if</span> content.<span class="tok-fn">wants_sound</span>() {</span>
-<span class="ln" id="L884">                    assert!(export.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;lossless&quot;</span>), <span class="tok-str">&quot;{export:?}&quot;</span>);</span>
-<span class="ln" id="L885">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L886">                    assert!(export.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no sound&quot;</span>));</span>
-<span class="ln" id="L887">                }</span>
-<span class="ln" id="L888">            }</span>
-<span class="ln" id="L889">        }</span>
-<span class="ln" id="L890">    }</span>
-<span class="ln" id="L891">}</span>
+<span class="ln" id="L860">    <span class="tok-kw">fn</span> <span class="tok-fn">h265_is_tagged_for_apple_players_outside_matroska</span>() {</span>
+<span class="ln" id="L861">        <span class="tok-kw">for</span> (container, tagged) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L862">            (Container::Mp4, true),</span>
+<span class="ln" id="L863">            (Container::Mov, true),</span>
+<span class="ln" id="L864">            (Container::Mkv, false),</span>
+<span class="ln" id="L865">        ] {</span>
+<span class="ln" id="L866">            <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>(&amp;Export {</span>
+<span class="ln" id="L867">                container,</span>
+<span class="ln" id="L868">                codec: VideoCodec::H265,</span>
+<span class="ln" id="L869">                ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L870">            });</span>
+<span class="ln" id="L871">            assert_eq!(</span>
+<span class="ln" id="L872">                <span class="tok-fn">value_after</span>(&amp;argv, <span class="tok-str">&quot;-tag:v&quot;</span>).<span class="tok-fn">is_some</span>(),</span>
+<span class="ln" id="L873">                tagged,</span>
+<span class="ln" id="L874">                <span class="tok-str">&quot;{container:?}&quot;</span></span>
+<span class="ln" id="L875">            );</span>
+<span class="ln" id="L876">        }</span>
+<span class="ln" id="L877">    }</span>
+<span class="ln" id="L878"></span>
+<span class="ln" id="L879">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L880">    <span class="tok-kw">fn</span> <span class="tok-fn">smaller_means_a_higher_factor_for_every_codec_that_has_one</span>() {</span>
+<span class="ln" id="L881">        <span class="tok-kw">for</span> codec <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L882">            VideoCodec::H264,</span>
+<span class="ln" id="L883">            VideoCodec::H265,</span>
+<span class="ln" id="L884">            VideoCodec::Av1,</span>
+<span class="ln" id="L885">            VideoCodec::Vp9,</span>
+<span class="ln" id="L886">        ] {</span>
+<span class="ln" id="L887">            <span class="tok-kw">let</span> high = Quality::High.<span class="tok-fn">factor</span>(codec).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L888">            <span class="tok-kw">let</span> balanced = Quality::Balanced.<span class="tok-fn">factor</span>(codec).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L889">            <span class="tok-kw">let</span> small = Quality::Small.<span class="tok-fn">factor</span>(codec).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L890">            assert!(high &lt; balanced &amp;&amp; balanced &lt; small, <span class="tok-str">&quot;{codec:?}&quot;</span>);</span>
+<span class="ln" id="L891">        }</span>
+<span class="ln" id="L892">    }</span>
+<span class="ln" id="L893"></span>
+<span class="ln" id="L894">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L895">    <span class="tok-kw">fn</span> <span class="tok-fn">the_description_always_says_the_audio_is_lossless</span>() {</span>
+<span class="ln" id="L896">        <span class="tok-kw">for</span> content <span class="tok-kw">in</span> Content::ALL {</span>
+<span class="ln" id="L897">            <span class="tok-kw">for</span> quality <span class="tok-kw">in</span> [Quality::High, Quality::Small] {</span>
+<span class="ln" id="L898">                <span class="tok-kw">let</span> export = Export {</span>
+<span class="ln" id="L899">                    content,</span>
+<span class="ln" id="L900">                    quality,</span>
+<span class="ln" id="L901">                    ..Export::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L902">                };</span>
+<span class="ln" id="L903">                <span class="tok-kw">if</span> content.<span class="tok-fn">wants_sound</span>() {</span>
+<span class="ln" id="L904">                    assert!(export.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;lossless&quot;</span>), <span class="tok-str">&quot;{export:?}&quot;</span>);</span>
+<span class="ln" id="L905">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L906">                    assert!(export.<span class="tok-fn">describe</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;no sound&quot;</span>));</span>
+<span class="ln" id="L907">                }</span>
+<span class="ln" id="L908">            }</span>
+<span class="ln" id="L909">        }</span>
+<span class="ln" id="L910">    }</span>
+<span class="ln" id="L911">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

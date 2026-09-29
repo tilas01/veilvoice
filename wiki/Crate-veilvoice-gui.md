@@ -81,7 +81,7 @@ another thread, so the window keeps answering while it is busy.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>1513 lines"])
+    n_lib(["lib.rs<br/>1518 lines"])
     n_main(["main.rs<br/>269 lines"])
     n_app["app.rs<br/>3675 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
@@ -90,6 +90,7 @@ flowchart TD
     n_crashreport["crashreport.rs<br/>289 lines"]
     n_decoys["decoys.rs<br/>216 lines"]
     n_dialog["dialog.rs<br/>430 lines"]
+    n_exporting["exporting.rs<br/>626 lines"]
     n_firstrun["firstrun.rs<br/>871 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
     n_group["group.rs<br/>2128 lines"]
@@ -156,6 +157,7 @@ flowchart TD
     n_crashreport --> n_theme
     n_decoys --> n_studio
     n_decoys --> n_theme
+    n_exporting --> n_progress
     n_firstrun --> n_layout
     n_firstrun --> n_offthread
     n_firstrun --> n_prefs
@@ -264,6 +266,7 @@ flowchart TD
     click n_crashreport href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" "open the source"
     click n_decoys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs" "open the source"
     click n_dialog href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" "open the source"
+    click n_exporting href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs" "open the source"
     click n_firstrun href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/firstrun.rs" "open the source"
     click n_graphics href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/graphics.rs" "open the source"
     click n_group href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs" "open the source"
@@ -309,12 +312,13 @@ flowchart TD
 | [[`crashreport.rs`|File-veilvoice-gui-crashreport]] | 289 | Offering the report from the last crash, on the run after it. |
 | [[`decoys.rs`|File-veilvoice-gui-decoys]] | 216 | Decoy vaults: how many there is room for, and the panel that offers them. |
 | [[`dialog.rs`|File-veilvoice-gui-dialog]] | 430 | Asking for a file without stopping the window. |
+| [[`exporting.rs`|File-veilvoice-gui-exporting]] | 626 | The Browser's export, the way a recording tool does it, and its thumbnails. |
 | [[`firstrun.rs`|File-veilvoice-gui-firstrun]] | 871 | The first run: the four things worth deciding before anything else. |
 | [[`graphics.rs`|File-veilvoice-gui-graphics]] | 214 | What the window is drawn with, asked for explicitly and then reported. |
 | [[`group.rs`|File-veilvoice-gui-group]] | 2128 | Group mode: several people in one recording, each with a name and a colour. |
 | [[`integrity.rs`|File-veilvoice-gui-integrity]] | 397 | The integrity record, taken and checked by the window rather than by hand. |
 | [[`layout.rs`|File-veilvoice-gui-layout]] | 569 | Centring a row of widgets, which egui does not do by nesting. |
-| [[`lib.rs`|File-veilvoice-gui-lib]] | 1513 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [[`lib.rs`|File-veilvoice-gui-lib]] | 1518 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [[`main.rs`|File-veilvoice-gui-main]] | 269 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [[`monitor.rs`|File-veilvoice-gui-monitor]] | 579 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [[`notify.rs`|File-veilvoice-gui-notify]] | 460 | How the application tells you something, and the three ways to be told. |
@@ -342,7 +346,7 @@ flowchart TD
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 412 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 249 | How big the window opens, and why it is not a constant. |
 
-**22,580 functional lines of Rust** in this crate. A functional line is a line
+**23,069 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
