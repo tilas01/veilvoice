@@ -86,7 +86,8 @@
 <p><strong>Typed in by hand, from a hash somebody else produced</strong> by building the same tagged source themselves. A match proves something strictly stronger: that the published binary is what that source compiles to, on a machine that is not the publisher&#x27;s. That is <em>reproducibility</em>, and it is the only check that does not ultimately rest on trusting whoever signed the release.</p>
 <p>Most people want the first. The second is what makes the first worth anything, and it needs somebody other than the author to have done a build. <code>docs/REPRODUCIBLE_BUILDS.md</code> says how.</p>
 <h2 id="what-it-does-not-do">What it does not do</h2>
-<p>It does not download anything -- this project has no network code and this binary is not the exception. Fetch the files however you like; this reads them from disk. It does not install anything, and it writes nothing.</p>
+<p>It does not install anything, and it writes nothing outside the directory it is pointed at. <code>veilvoice verify file</code> does not download anything either: fetch the files however you like and it reads them from disk.</p>
+<p><code>veilvoice verify release</code> does fetch, and it is the one thing here that does. There is still no HTTP client in the dependency graph, which is the claim the front page makes and a CI job enforces; the download is done by the transfer tool the operating system already ships, as a subprocess. <code>fetch.rs</code> says why at length.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>This is the small program you can check a download with before trusting anything else here.</p>
 <p>It is deliberately tiny and it is on its own: no window, no other pieces, and it does not need any other software installed -- not even the usual signature program. That matters because it is the first thing you run, and the point of it is to be small enough to be worth reading.</p>
@@ -115,7 +116,7 @@
 <a href="veilvoice-verify/lib.src.html">
 <rect x="28.0" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="82.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="82.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">2579 lines</text>
+<text x="82.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">2585 lines</text>
 </a>
 <a href="veilvoice-verify/builder.src.html">
 <rect x="162.6" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -165,7 +166,7 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_lib([&quot;lib.rs&lt;br/&gt;2579 lines&quot;])
+    n_lib([&quot;lib.rs&lt;br/&gt;2585 lines&quot;])
     n_builder[&quot;builder.rs&lt;br/&gt;1210 lines&quot;]
     n_deps[&quot;deps.rs&lt;br/&gt;652 lines&quot;]
     n_discover[&quot;discover.rs&lt;br/&gt;460 lines&quot;]
@@ -201,7 +202,7 @@ flowchart TD
 <tr><td><a href="veilvoice-verify/discover.html"><code>discover.rs</code></a></td><td>460</td><td>Finding a release to check, without being told where it is.</td></tr>
 <tr><td><a href="veilvoice-verify/extracted.html"><code>extracted.rs</code></a></td><td>316</td><td>What came out of the archive, and the GnuPG somebody already has.</td></tr>
 <tr><td><a href="veilvoice-verify/fetch.html"><code>fetch.rs</code></a></td><td>382</td><td>Download a release, without putting an HTTP client in the dependency graph.</td></tr>
-<tr><td><a href="veilvoice-verify/lib.html"><code>lib.rs</code></a></td><td>2579</td><td>The portable verifier: check a VeilVoice release without GnuPG installed.</td></tr>
+<tr><td><a href="veilvoice-verify/lib.html"><code>lib.rs</code></a></td><td>2585</td><td>The portable verifier: check a VeilVoice release without GnuPG installed.</td></tr>
 <tr><td><a href="veilvoice-verify/report.html"><code>report.rs</code></a></td><td>385</td><td>How much this program says, and what it returns when it says nothing.</td></tr>
 <tr><td><a href="veilvoice-verify/tests.html"><code>tests.rs</code></a></td><td>1820</td><td>The verifier&#x27;s own tests.</td></tr>
 <tr><td><a href="veilvoice-verify/update.html"><code>update.rs</code></a></td><td>1333</td><td>The update that does the update.</td></tr>

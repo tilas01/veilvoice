@@ -79,6 +79,7 @@ rather than guessed at when this runs somewhere without it.
 Pure standard library, like everything in `tools/`.
 """
 
+import os
 import re
 import subprocess
 import sys
@@ -181,6 +182,82 @@ def git(root: Path, *args):
     return done.returncode == 0, (done.stdout + done.stderr).strip()
 
 
+def release_point(root: Path, tag: str):
+    """The commit a previous release was cut at, and how that was decided.
+
+    This exists because the tag cannot be trusted to be on the branch, and
+    that is not hypothetical: every one of this repository's twenty-three
+    release tags points at a commit reachable from neither `main` nor `dev`.
+    The history was rewritten at some point and the tags were left behind on
+    the pre-rewrite objects. The trees are identical, so what was published is
+    what the branch has, but the commits are a parallel line. That is F-254.
+
+    The first version of this function took the tag as the range boundary and
+    asked whether `docs/AUDIT.md` had changed since. With an off-branch tag
+    that range means "reachable from HEAD and not from the tag", which is most
+    of the branch's history rather than the part after the release, so the
+    question was answered by commits written *before* the release it was
+    gating. It passed every time, which is the worst way for a gate to be
+    wrong. That is F-255.
+
+    Three answers are tried, in order of how much they prove.
+
+    1. The tag, when it is genuinely an ancestor. That is what a healthy
+       repository looks like and what this one will look like once the tags
+       are moved.
+    2. The commit on this branch whose **tree is the tag's tree**. An
+       off-branch tag is still a record of exactly what was published, and
+       content is what a release is. This is exact: for `v0.1.22` it names
+       `ebde965f`, which is byte for byte the commit the tag points at.
+    3. The commit that added that version's heading to `CHANGELOG.md`.
+
+    The third is a fallback rather than the answer, and the reason is worth
+    writing down because it was the answer first. Cutting a release is not one
+    commit here: `Cut 0.1.22` wrote the heading at 17:23 and two more commits
+    landed before the release was built at 18:00. Taking the heading commit
+    therefore counts work that shipped *in* v0.1.22 as work since it, which is
+    a smaller version of the same mistake the tag range made. It is kept for
+    the case where the tag object is gone entirely, where being two commits
+    early beats having no boundary at all, and it says so in its reason.
+    """
+    on_branch, _ = git(root, "merge-base", "--is-ancestor", tag, "HEAD")
+    if on_branch:
+        return tag, "the tag, which is on this branch"
+
+    ok, tree = git(root, "rev-parse", tag + "^{tree}")
+    if ok and tree.strip():
+        # `--format=%T %H` rather than asking git to filter: there is no
+        # revision selector for "same tree as", and the branch is a few
+        # thousand commits.
+        listed, log = git(root, "log", "--format=%T %H", "HEAD")
+        if listed:
+            want = tree.strip()
+            for line in log.splitlines():
+                parts = line.split()
+                if len(parts) == 2 and parts[0] == want:
+                    return parts[1], (
+                        "%s is not on this branch, so the release point is the "
+                        "commit here with the same tree as the tag, which is "
+                        "the same content under a different parent" % tag
+                    )
+
+    found_ok, found = git(
+        root, "log", "--reverse", "--format=%H", "-S", "## " + tag,
+        "HEAD", "--", "CHANGELOG.md",
+    )
+    if found_ok and found.strip():
+        return found.split()[0], (
+            "%s is not on this branch and no commit here has its tree, so the "
+            "release point is the commit that added its CHANGELOG.md heading. "
+            "That is the start of cutting the release rather than the end of "
+            "it, so a little of what shipped may be counted as since" % tag
+        )
+    return None, (
+        "%s is not on this branch, no commit here has its tree, and no commit "
+        "here adds a '## %s' heading to CHANGELOG.md." % (tag, tag)
+    )
+
+
 def check(root: Path, tag: str) -> list:
     """Every gap, as a list of sentences. Empty means ready."""
     gaps = []
@@ -196,9 +273,13 @@ def check(root: Path, tag: str) -> list:
 
     sections = changelog_sections((root / "CHANGELOG.md").read_text(encoding="utf-8"))
     if tag not in sections:
+        under = "## Unreleased" in (root / "CHANGELOG.md").read_text(encoding="utf-8")
         gaps.append(
             "CHANGELOG.md has no '## %s' section, so the release would publish "
-            "with no notes. The heading must be exactly '## %s'." % (tag, tag)
+            "with no notes. The heading must be exactly '## %s'.%s"
+            % (tag, tag, " The notes for it are under '## Unreleased'; renaming "
+                         "that heading is part of the same commit as the version "
+                         "bump." if under else "")
         )
     elif sections[0] != tag:
         gaps.append(
@@ -242,26 +323,27 @@ def check(root: Path, tag: str) -> list:
         )
 
     # The newest release tag, by version rather than by ancestry.
-    #
-    # `git describe` is the obvious tool and the wrong one here. It walks back
-    # from HEAD, and a release tag is made on the *merge into `main`*, which is
-    # a commit `dev` does not contain: the merge takes `dev` into `main`, not
-    # the other way. So `describe` from `dev` reports that no tag can describe
-    # it, which is true and useless. Sorting the tag list by version answers
-    # the question actually being asked, which is what the last release was.
     ok, tags = git(root, "tag", "--list", "v*", "--sort=-v:refname")
     previous = tags.splitlines()[0].strip() if ok and tags.strip() else ""
     if not previous:
         gaps.append("no v* tag was found, so the audit round was not checked")
     else:
-        ok, touched = git(
-            root, "log", "--oneline", previous + "..HEAD", "--", "docs/AUDIT.md"
-        )
-        if ok and not touched:
+        boundary, how = release_point(root, previous)
+        if not boundary:
             gaps.append(
-                "docs/AUDIT.md has not changed since %s, so no audit round has "
-                "been written up for anything in this release." % previous
+                "the commit %s was cut at could not be identified, so the audit "
+                "round was not checked. %s" % (previous, how)
             )
+        else:
+            ok, touched = git(
+                root, "log", "--oneline", boundary + "..HEAD", "--", "docs/AUDIT.md"
+            )
+            if ok and not touched:
+                gaps.append(
+                    "docs/AUDIT.md has not changed since %s (%s), so no audit "
+                    "round has been written up for anything in this release."
+                    % (previous, how)
+                )
 
     # And the same asymmetry one more time, for the same reason.
     #
@@ -294,6 +376,103 @@ def check(root: Path, tag: str) -> list:
 # expression that stops matching reports a clean gate rather than a failure,
 # which is the one way a gate can be worse than no gate. So each is exercised
 # against text it must read and against text it must not.
+
+
+def release_point_self_test() -> list:
+    """Every branch of `release_point`, against a repository built for it.
+
+    The three answers differ by what they prove, so a test that only asserts
+    the first one is the half of this function that was never wrong. A throwaway
+    repository is cheap and it can be given the exact condition this repository
+    is in: a tag on a commit that is on no branch, with the same tree as one
+    that is.
+    """
+    import shutil
+    import tempfile
+
+    if shutil.which("git") is None:
+        return ["release_point: no git on this machine, so it went unchecked"]
+
+    problems = []
+    work = Path(tempfile.mkdtemp(prefix="veilvoice-release-point-"))
+    try:
+        env = dict(os.environ)
+        env.update(
+            GIT_AUTHOR_NAME="t",
+            GIT_AUTHOR_EMAIL="t@example.invalid",
+            GIT_COMMITTER_NAME="t",
+            GIT_COMMITTER_EMAIL="t@example.invalid",
+        )
+
+        def run(*args):
+            subprocess.run(
+                ("git",) + args, cwd=str(work), env=env,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True,
+            )
+
+        def commit(text, message):
+            (work / "CHANGELOG.md").write_text(text, encoding="utf-8")
+            run("add", "-A")
+            run("commit", "-m", message)
+
+        run("init", "-q", "-b", "dev")
+        commit("# Changelog\n", "first")
+        commit("# Changelog\n\n## v1.0.0\n\n- a thing\n", "Cut 1.0.0")
+        commit("# Changelog\n\n## v1.0.0\n\n- a thing\n- and another\n", "the rest of it")
+        released = subprocess.run(
+            ("git", "rev-parse", "HEAD"), cwd=str(work), env=env,
+            stdout=subprocess.PIPE, check=True,
+        ).stdout.decode().strip()
+
+        # An on-branch tag: the answer is the tag itself.
+        run("tag", "v1.0.0")
+        at, how = release_point(work, "v1.0.0")
+        if at != "v1.0.0" or "on this branch" not in how:
+            problems.append("release_point: an ancestor tag should be used as-is, got %r" % (how,))
+
+        # Now make it this repository's condition. An orphan commit carrying the
+        # released tree is exactly what a rewritten history leaves behind: same
+        # content, no parent in common with the branch.
+        run("tag", "-d", "v1.0.0")
+        orphan = subprocess.run(
+            ("git", "commit-tree", released + "^{tree}", "-m", "the same content, elsewhere"),
+            cwd=str(work), env=env, stdout=subprocess.PIPE, check=True,
+        ).stdout.decode().strip()
+        run("tag", "v1.0.0", orphan)
+
+        ancestor = subprocess.run(
+            ("git", "merge-base", "--is-ancestor", "v1.0.0", "HEAD"),
+            cwd=str(work), env=env,
+        ).returncode
+        if ancestor == 0:
+            problems.append("release_point: the fixture's tag is still an ancestor, so nothing below is tested")
+
+        commit("# Changelog\n\n## v1.0.0\n\n- a thing\n- and another\n\nlater work\n", "after the release")
+        at, how = release_point(work, "v1.0.0")
+        if at != released:
+            problems.append(
+                "release_point: an off-branch tag should resolve to the commit "
+                "with its tree (%s), got %r" % (released[:8], (at or "")[:8])
+            )
+        if "same tree" not in how:
+            problems.append("release_point: the reason should say the tree matched, got %r" % (how,))
+
+        # And the fallback, when the tag object is gone entirely. It lands on
+        # the commit that wrote the heading, which is two commits early here,
+        # and its reason has to admit that rather than sounding exact.
+        run("tag", "-d", "v1.0.0")
+        at, how = release_point(work, "v1.0.0")
+        heading = subprocess.run(
+            ("git", "log", "--reverse", "--format=%H", "-S", "## v1.0.0", "HEAD", "--", "CHANGELOG.md"),
+            cwd=str(work), env=env, stdout=subprocess.PIPE, check=True,
+        ).stdout.decode().split()
+        if not heading or at != heading[0]:
+            problems.append("release_point: with no tag it should fall back to the heading commit, got %r" % ((at or "")[:8],))
+        if "may be counted as since" not in how:
+            problems.append("release_point: the fallback must say it is approximate, got %r" % (how,))
+    finally:
+        shutil.rmtree(str(work), ignore_errors=True)
+    return problems
 
 
 def self_test() -> int:
@@ -338,6 +517,8 @@ def self_test() -> int:
     expect("emphasised status", item_status(roadmap, "167"), "planned")
     expect("plain status", item_status(roadmap, "181"), "done")
     expect("no such row", item_status(roadmap, "999"), None)
+
+    failures.extend(release_point_self_test())
 
     for line in failures:
         print("  " + line)

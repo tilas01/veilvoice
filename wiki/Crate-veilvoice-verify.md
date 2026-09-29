@@ -51,9 +51,15 @@ anything, and it needs somebody other than the author to have done a build.
 
 # What it does not do
 
-It does not download anything -- this project has no network code and this
-binary is not the exception. Fetch the files however you like; this reads
-them from disk. It does not install anything, and it writes nothing.
+It does not install anything, and it writes nothing outside the directory it
+is pointed at. `veilvoice verify file` does not download anything either:
+fetch the files however you like and it reads them from disk.
+
+`veilvoice verify release` does fetch, and it is the one thing here that
+does. There is still no HTTP client in the dependency graph, which is the
+claim the front page makes and a CI job enforces; the download is done by
+the transfer tool the operating system already ships, as a subprocess.
+`fetch.rs` says why at length.
 
 # In plain words
 
@@ -80,7 +86,7 @@ Give it arguments and it does exactly what you asked.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>2579 lines"])
+    n_lib(["lib.rs<br/>2585 lines"])
     n_builder["builder.rs<br/>1210 lines"]
     n_deps["deps.rs<br/>652 lines"]
     n_discover["discover.rs<br/>460 lines"]
@@ -118,7 +124,7 @@ flowchart TD
 | [[`discover.rs`|File-veilvoice-verify-discover]] | 460 | Finding a release to check, without being told where it is. |
 | [[`extracted.rs`|File-veilvoice-verify-extracted]] | 316 | What came out of the archive, and the GnuPG somebody already has. |
 | [[`fetch.rs`|File-veilvoice-verify-fetch]] | 382 | Download a release, without putting an HTTP client in the dependency graph. |
-| [[`lib.rs`|File-veilvoice-verify-lib]] | 2579 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [[`lib.rs`|File-veilvoice-verify-lib]] | 2585 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [[`report.rs`|File-veilvoice-verify-report]] | 385 | How much this program says, and what it returns when it says nothing. |
 | [[`tests.rs`|File-veilvoice-verify-tests]] | 1820 | The verifier's own tests. |
 | [[`update.rs`|File-veilvoice-verify-update]] | 1333 | The update that does the update. |

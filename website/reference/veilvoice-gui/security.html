@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/security.svg" alt="security.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/security.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 3174 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 3258 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-passwords-and-why">Two passwords, and why</a>
@@ -103,12 +103,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>3174 lines defining <strong>54 functions</strong> (29 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>3258 lines defining <strong>54 functions</strong> (29 public), <strong>4 types</strong> and <strong>5 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Sealing</code> <span style="color:var(--muted)">line 82</span> &middot; How the recording that comes out of a job is protected.</li>
 <li><code>enum Op</code> <span style="color:var(--muted)">line 107</span> &middot; What a background lock operation was trying to do.</li>
 <li><code>struct Security</code> <span style="color:var(--muted)">line 142</span> &middot; Everything about locking the app and sealing its output.</li>
-<li><code>enum Plan</code> <span style="color:var(--muted)">line 1700</span> &middot; What a finished job should do with its bytes.</li>
+<li><code>enum Plan</code> <span style="color:var(--muted)">line 1723</span> &middot; What a finished job should do with its bytes.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Security::load</code> <span style="color:var(--muted)">line 325</span> &middot; Read the lock file for this machine and start locked if one is set.
@@ -173,7 +173,7 @@
 <li><code>Security::disable_dialogue</code> <span style="color:var(--muted)">line 1642</span> &middot; The dialogue shown when the user turns at-rest encryption off.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>record</code></span>
 </li>
-<li><code>Plan::write</code> <span style="color:var(--muted)">line 1725</span> &middot; Seal wav if the plan says to, and write it.
+<li><code>Plan::write</code> <span style="color:var(--muted)">line 1748</span> &middot; Seal wav if the plan says to, and write it.
 </li>
 </ul>
 </section>
@@ -455,18 +455,20 @@ flowchart TD
 <tr><td><code>Security::mandate_history_panel</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_panel">1612</a></td><td>The log of every time a requirement was turned off or back on.</td></tr>
 <tr><td><code>Security::mandate_history_rows</code> <sub>fn</sub></td><td><a href="security.src.html#fn-security-mandate_history_rows">1631</a></td><td>One coloured line per change, newest concern last: green for a requirement put back, yellow for one turned off.</td></tr>
 <tr><td><code>Security::disable_dialogue</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-security-disable_dialogue">1642</a></td><td>The dialogue shown when the user turns at-rest encryption off.</td></tr>
-<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-disable_warning">1684</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
-<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="security.src.html#fn-plan">1700</a></td><td>What a finished job should do with its bytes.</td></tr>
-<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-plan-write">1725</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
-<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">1772</a></td><td></td></tr>
-<tr><td><code>decoy_store</code> <sub>fn</sub></td><td><a href="security.src.html#fn-decoy_store">1786</a></td><td>The decoy store that sits beside the lock file at path.</td></tr>
-<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">1793</a></td><td>Run one lock operation, off the UI thread.</td></tr>
-<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">1912</a></td><td>Re-open the lock store from disk, or None when there is nothing to open.</td></tr>
-<tr><td><code>PASSWORD_LABEL_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_label_width">1919</a></td><td>The width every passphrase label is given, so every field starts level.</td></tr>
-<tr><td><code>PASSWORD_FIELD_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_field_width">1924</a></td><td>How wide every passphrase field is drawn, on this tab and on the lock screen.</td></tr>
-<tr><td><code>button_column</code> <sub>fn</sub></td><td><a href="security.src.html#fn-button_column">1958</a></td><td>One labelled passphrase field, with the field in the same place every time.</td></tr>
-<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">1973</a></td><td>One passphrase field with its label, at the shared width.</td></tr>
-<tr><td><code>unlock_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-unlock_row">2018</a></td><td>The password row on the lock screen: the label, the field and the button.</td></tr>
+<tr><td><code>KEEP_ENCRYPTED</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-keep_encrypted">1698</a></td><td>The two answers to that question, as data.</td></tr>
+<tr><td><code>WRITE_UNENCRYPTED</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-write_unencrypted">1701</a></td><td>The other answer.</td></tr>
+<tr><td><code>DISABLE_WARNING</code> <sub>pub const</sub></td><td><a href="security.src.html#fn-disable_warning">1707</a></td><td>What the user is told before recordings stop being encrypted.</td></tr>
+<tr><td><code>Plan</code> <sub>pub enum</sub></td><td><a href="security.src.html#fn-plan">1723</a></td><td>What a finished job should do with its bytes.</td></tr>
+<tr><td><code>Plan::write</code> <sub>pub fn</sub></td><td><a href="security.src.html#fn-plan-write">1748</a></td><td>Seal wav if the plan says to, and write it.</td></tr>
+<tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">1795</a></td><td></td></tr>
+<tr><td><code>decoy_store</code> <sub>fn</sub></td><td><a href="security.src.html#fn-decoy_store">1809</a></td><td>The decoy store that sits beside the lock file at path.</td></tr>
+<tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">1816</a></td><td>Run one lock operation, off the UI thread.</td></tr>
+<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">1935</a></td><td>Re-open the lock store from disk, or None when there is nothing to open.</td></tr>
+<tr><td><code>PASSWORD_LABEL_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_label_width">1942</a></td><td>The width every passphrase label is given, so every field starts level.</td></tr>
+<tr><td><code>PASSWORD_FIELD_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_field_width">1947</a></td><td>How wide every passphrase field is drawn, on this tab and on the lock screen.</td></tr>
+<tr><td><code>button_column</code> <sub>fn</sub></td><td><a href="security.src.html#fn-button_column">1981</a></td><td>One labelled passphrase field, with the field in the same place every time.</td></tr>
+<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">1996</a></td><td>One passphrase field with its label, at the shared width.</td></tr>
+<tr><td><code>unlock_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-unlock_row">2041</a></td><td>The password row on the lock screen: the label, the field and the button.</td></tr>
 </tbody></table>
 </section>
 </div></div>
