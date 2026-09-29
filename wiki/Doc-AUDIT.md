@@ -41,6 +41,377 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
+
+The round before 0.1.23, and it is a different kind of round from the three
+before it. Those read the tree for defects. This one reads the **repairs**:
+every finding written up since v0.1.22 went out, **F-196 to F-215**, asked of
+the tree as it stands rather than as the write-up describes it. The boundary is
+itself one of the findings: it was F-198 to F-215 until F-255 established where
+v0.1.22 actually was, and the two the correction added are the two that
+mattered. F-216 to F-253 landed on `dev` while this round was being written and
+are **not** in it; re-checking them is the next round's work, and this sentence
+is here so nobody reads the round as covering them. The question for
+each is not "was this fixed" but "is the thing that was supposed to keep it
+fixed still doing so", and where a guard was the fix, the check is to break it
+and watch it fail.
+
+That is worth a round of its own because of what the last three found. F-176,
+F-177, F-197, F-199, F-204, F-207, F-210 and F-212 are all the same shape: a
+rule that was written down and then enforced over less than it claimed. A round
+that only reads for new defects will keep finding that shape and keep trusting
+the last fix for it.
+
+**What was re-checked, and how.** The whole of `tools/verify.py` was run,
+including the cargo steps rather than `--quick`, and `cargo test` across the
+workspace, which between them exercise the guards installed by F-198, F-199,
+F-200, F-201, F-204, F-205, F-206, F-207, F-209 and F-211. The two console
+guards, F-210 in `veilvoice-setup` and F-212 in `veilvoice-gui`, were each
+broken in both halves: a module removed from the scan list, and the list
+checked against `lib.rs`'s own `mod` declarations. Both failed, naming the
+module and saying what to do, so the half of those fixes that was itself the
+novel part holds. F-203's fingerprint comparison, F-213's wording and F-214's
+install paths were read against the code rather than run, since the first needs
+a signing key and the second two need Windows and a fresh machine.
+
+**Five did not hold**, and they are below. One is a fact about this
+repository's tags that nothing had noticed in twenty-three releases; one is a
+gate written four days ago that was passing for the wrong reason because of it;
+one is a correction that reached two of six copies of the same sentence; one is
+a rule about the size of every control in the window, guarded over one string in
+one function; and the fifth was found by the fourth's own guard while this round
+was being landed, because both of this crate's crate-wide guards had quietly
+started reading half of its largest module.
+
+**Four of the five are the same defect.** A rule was established and then
+enforced over a fraction of what it covers: six sentences of which two were
+corrected, and twelve controls of which one was guarded. F-255 is the same
+thing in a gate rather than in a scan. It is the most-repeated shape in this
+document, from F-176 and F-177 through F-197, F-199, F-204, F-207, F-210 and
+F-212 to these, and the useful conclusion is not "check more carefully" but
+that a guard has to be pointed at the whole of what its rule claims **at the
+moment it is written**, because nobody comes back to widen it.
+
+### F-254: every release tag points at a commit that is on no branch
+
+Found while asking `git` what the previous release was, which is a question
+`tools/release/readiness.py` has to answer and had been answering wrongly.
+
+`v0.1.22` names `b0070bf6`. `git branch -r --contains v0.1.22` names nothing,
+and neither `origin/main` nor `origin/dev` has that commit in its history. The
+same is true of **all twenty-three release tags**, `v0.1.0` to `v0.1.22`,
+without exception.
+
+**What happened, and what did not.** The tagged commit's tree is
+`055705de...`, and so is the tree of `ebde965f` on `dev`, which carries the
+same message and the same author date. They are the same content with a
+different parent chain: the history was rewritten at some point and the tags
+were left pointing at the objects from before the rewrite. So **nothing was
+published that the branch does not have.** A reader who checks out `v0.1.22`
+gets the tree the release was built from, byte for byte, and the
+reproducibility claim every other check exists to support is intact. The tag
+also still resolves, because a tag keeps its commit alive whatever else
+forgets it.
+
+**What it costs is navigation, and everything that walks from a tag.** The
+tagged commits are a parallel line of history beside the branch. `git describe`
+from `dev` or `main` answers "No tags can describe" and is correct. `git log
+v0.1.22..dev` does not mean "since the release": it means "reachable from `dev`
+and not from an orphan", which is most of the branch. Any question of the form
+"what changed since the last release" asked of `git` rather than of
+`CHANGELOG.md` gets an answer that is wrong in a direction nobody would
+suspect, because it is wrong by including too much rather than by failing.
+
+**This is not a thing to fix by reading.** Moving a tag rewrites what a
+published release points at, and twenty-three of them point at commits whose
+trees are correct, so the repair is to re-tag each version at the branch commit
+carrying its tree, which is a published-history change and the maintainer's
+call. It is recorded here, and named in `docs/CONTRIBUTING.md`, so the next
+tool that wants to walk from a tag is written knowing it cannot.
+
+The shape is the one F-200's write-up named and this is a fifth instance of:
+**a branch policy is not a fact about branches, it is a fact several things
+depend on.** Rewriting history is a branch policy change, and the tags were
+one of the things depending on it.
+
+### F-255: the release gate's audit-round question was answered by commits from before the release
+
+F-208's own fix, four days old, re-checked and found to be passing for a reason
+that has nothing to do with what it asks.
+
+`tools/release/readiness.py` refuses a promotion when no audit round has been
+written up for anything in the release. The way it asked was to take the
+newest `v*` tag, and list the commits touching `docs/AUDIT.md` in
+`<tag>..HEAD`.
+
+With the tags off the branch, as F-254 establishes, that range is not "since
+the release". Measured on the tree this round was written against, the tag
+range holds **53** commits touching `docs/AUDIT.md`, the oldest of them
+`102f7cd4`, which predates v0.1.21. The correct range holds **27**. So the
+gate's answer was yes because of round thirty-three, written before the
+previous release but two, and it would have been yes for a v0.1.23 with no
+audit round at all.
+
+**It could only ever have passed.** A gate that cannot fail is worse than no
+gate, because the checklist beside it reads as satisfied. This one was written
+in the same commit as a paragraph in `docs/CONTRIBUTING.md` telling a reader
+that the audit round is checked. That paragraph was false from the moment it
+was written.
+
+**The fix asks the branch rather than the tag.** `release_point()` uses the tag
+when it genuinely is an ancestor of `HEAD`, which is what a healthy repository
+looks like and what this one becomes if the tags are ever moved. Otherwise it
+looks for the commit on this branch whose **tree is the tag's tree**. An
+off-branch tag is still an exact record of what was published, and content is
+what a release is: for v0.1.22 that names `ebde965f`, byte for byte the commit
+the tag points at. When neither is available the gate says so and counts it as
+a gap, rather than skipping the question.
+
+**The first fix was two commits wrong, and finding that out is the more useful
+half of this entry.** It took the commit that added the `## v0.1.22` heading to
+`CHANGELOG.md`, on the reasoning that the branch records a release there
+whether or not a tag survived. That is a fact on the branch and it is not the
+release point, because cutting a release is not one commit: `Cut 0.1.22` wrote
+the heading at 17:23 and two more commits landed before the release was built
+at 18:00. Both of those shipped **in** v0.1.22 and the heading range counted
+them as work since it -- a smaller version of the same mistake the tag range
+made, arrived at while fixing it. It survives as the last fallback, for a tag
+object that is gone rather than merely misplaced, and its reason now says out
+loud that it may count a little of what shipped as since.
+
+**The self-test builds the condition rather than describing it.** Each of
+those three answers is a different amount of proof, and a test that only
+exercised the first would have covered the half that was never wrong. So
+`--self-test` makes a throwaway repository, commits a release, tags it, checks
+the ancestor answer, then deletes the tag and re-creates it on an orphan commit
+carrying the released tree -- exactly this repository's condition -- and checks
+the other two. It was proved able to fail: with the tree lookup removed it
+reports the wrong commit and the wrong reason, naming both.
+
+**The lesson is narrower than "test your gates" and worth stating as the
+narrow thing.** Both halves of this were verified when they were written: the
+readiness tool was run and its output read, and it correctly reported the ten
+things standing between `dev` and v0.1.23 at the time. What was never done was
+to check that each individual clause *could* report a gap. A gate is a
+conjunction, and a conjunction passes loudly and fails quietly: one clause
+stuck at true is invisible for as long as any other clause is false. The nine
+real gaps hid the tenth.
+
+### F-256: a sentence corrected in two places and left standing in four
+
+F-213 found two shipped sentences claiming VeilVoice reaches the network never
+and at all, beside a command that has downloaded from `github.com` since
+v0.1.11. It corrected `veilvoice --help` and the desktop application's install
+message, which are the two its write-up quotes. It did not look for the others.
+
+Four copies of the same claim were still in the tree:
+
+- `crashlog.rs` writes "This file was written on your machine and sent
+  nowhere. VeilVoice has no network code at all." into the crash log itself.
+- `crashreport.rs` says the same in the panel shown on the next launch.
+- A test in `crashlog.rs` asserted the log contains the words `no network
+  code`, so the false sentence was **held in place by a check**.
+- `veilvoice-verify`'s module documentation opened its "What it does not do"
+  section with "It does not download anything -- this project has no network
+  code and this binary is not the exception." That is the crate that contains
+  `fetch.rs`, and `veilvoice verify release` is the download F-213 is about.
+  It is published twice over, into `crates/veilvoice-verify/README.md` and
+  into `website/reference/`, by generators that faithfully carried it.
+
+**Where these are read is what makes it worse than the two that were fixed.**
+A crash log and a crash-report panel are what somebody reads in the one moment
+they are actively wondering whether this program sent anything off their
+machine. The sentence they are given as reassurance is false, and the true
+reassurance beside it -- that nothing uploads a crash report -- needs no help.
+An overclaim next to a true claim costs the true one its credit, which is
+F-213's own argument, made about sentences two files away from four more of
+them. And the verifier's copy denies the behaviour of the very binary whose
+documentation it is.
+
+All four say what is true now: nothing uploads a crash report, the only thing
+that reaches the network is a thing you ask for by name, and the graph contains
+no HTTP client, which is the claim that was always worth making.
+
+**And the guard, because the edit is not the fix.** `tools/audit/network_wording.py`
+reads every Rust source, hand-written document and hand-written page, flattens
+each to the sentence a reader sees rather than the line the source wraps at,
+and fails on a claim that is true of the dependency graph and false of the
+program: `has no network code` and `no network code at all` unless "dependency
+graph" is within eighty characters, `talks to no servers` in any form, and
+`never checks for updates` unless "on its own" follows. Its `--self-test` feeds
+it all four sentences that shipped and requires a complaint, then feeds it the
+true forms -- including the qualified claim wrapped across a string literal and
+across a doc comment, which is how every one of them is written -- and requires
+silence. It also asserts its own reach: that the walk reads the crash log and
+does not read `docs/AUDIT.md`, `CHANGELOG.md` or a generated crate `README.md`.
+
+Generated output, the documents that record what was said, and `tools/` are
+all skipped, each for a reason written into the tool. The first because a claim
+there is a claim in its source and reporting both sends a reader to the copy
+they must not edit; the second because a guard that fires on the write-up of a
+defect makes recording defects expensive; the third because those comments
+argue about the claims rather than making them.
+
+**The closest relative of this guard is the reason it is a guard.**
+`veilvoice_guard::SCOPE` refuses the words "prevent", "unbreakable",
+"guarantee" and "protects against", and it refuses them in exactly one string:
+its own. The vocabulary rule was right and its reach was one constant, which is
+F-212's shape applied to prose. This asks the same question of everything a
+reader sees, and the four sentences above are what it found the first time it
+was run.
+
+**And one guard had to be corrected to let the truth through.**
+`crashreport.rs` carries a test forbidding the words of sending in its own
+source, and its own comment explains that the file's comments are stripped
+first, because the first run of it failed on the sentence "a crash reporter
+that uploads": "a check that forbids describing the thing it forbids is a check
+that punishes writing the explanation down". The corrected panel text is a
+string literal rather than a comment, so the same test failed again, on the
+sentence "nothing in VeilVoice uploads a crash report" -- which is the true
+claim that replaced a false one. The needle is `upload(` now rather than
+`upload`: what the test exists to catch is a call, and the four others in its
+list are already machinery rather than vocabulary. The reach of a guard and the
+*vocabulary* of a guard fail in the same way, and this document has both in one
+round.
+
+### F-257: two spaces are not a width, and the guard for that read one function
+
+F-196 is the reason this round widened. Correcting the boundary of "since
+v0.1.22" from a tag to the commit carrying the released tree, which is F-255,
+pulled two earlier findings into scope, and re-checking the second of them
+found the same shape a third time in the same week.
+
+F-196's own words: "A space is not a fixed fraction of a letter, egui gives
+trailing whitespace no reliable width, and the result is a control whose size
+depends on the typeface the reader has installed." That is a rule about every
+control in the crate. What shipped to enforce it was
+`nothing_in_the_unlock_row_is_sized_with_spaces`, which reads `security.rs`,
+finds `fn unlock_row`, takes the 1600 bytes after it, and asserts the exact
+string `"  unlock  "` is not among them.
+
+**Twelve buttons in that crate were padded the same way when that guard was
+written, in five modules, and it could see none of them.** `app.rs` has five,
+`studio.rs` five, `security.rs` one and `decoys.rs` one. `layout.rs` has a
+thirteenth and it is legitimate: the test that records what the lock row
+measured *before* F-196, which has to draw the old control to measure it.
+
+**One of the twelve is the defect F-196 described, not merely the shape of
+it.** The modal that asks "Write recordings unencrypted?" draws two buttons
+side by side. One is the safe answer and was written
+`"  keep it encrypted  "`; the other is the destructive answer and was written
+`"write it unencrypted"`, with no padding. Measured in a headless frame with
+this application's theme installed:
+
+| control | width |
+| --- | --- |
+| keep it encrypted, padded | 184.4 |
+| write it unencrypted | 176.5 |
+| keep it encrypted, unpadded | 153.1 |
+
+**The padding very nearly worked, and that is why nobody saw it.** Four space
+glyphs took the shorter label from 153.1 to 184.4 and overshot the longer
+button by 7.9 points, so the two answers to one question look almost the same
+size in the font this project ships. They are the same size by coincidence, in
+one typeface, and the coincidence is what a reader would have to keep for the
+dialog to stay right. On a machine where the fallback font has a wider space,
+the safe answer grows and the dangerous one does not.
+
+**The repair is a measurement rather than a constant.**
+`crate::layout::choice_width` lays out each of a row's labels in the style's own
+button font, takes the widest, and adds the button padding plus
+`layout::EMPHASIS`, which is eight points and is a number somebody chose. Both
+answers are drawn at that width. It is measured rather than given as a constant
+because a constant is a promise that the longest label still fits and nothing
+would check that promise after somebody rewords a button: the regression test
+draws the longer answer with no width asked for and fails if the shared width
+is under what it needs. Proved able to fail -- with the shared width removed it
+reports 153.1 and 176.5 and names both.
+
+**And the guard reads the whole crate, with what is left on a ledger.**
+`no_button_is_sized_with_literal_spaces` reads `crate::sources()`, the
+crate-wide module list F-212 built and F-219 lifted out of the spawn test, and
+keeps its check that every `mod` in `lib.rs` appears in it. For each `button(` or `Button::new(` it reads
+to the end of the statement and fails on a single-line literal padded at either
+end.
+
+Ten of the twelve are in `app.rs` and `studio.rs`, which are being rewritten
+for roadmap item 167 as this is written. Ten one-line changes dropped into a
+file somebody else is restructuring cost more than they buy, so those ten are
+listed by module and label, and **the list is checked in both directions**: a
+padded label that is not on it fails, and an entry on it that is no longer
+padded fails. The second half is what makes it a ratchet rather than an
+allow-list, and it is there because F-210 was a hand-kept list that claimed to
+cover six modules and covered three. Roadmap item 187 carries the ten.
+
+**Getting the scan right took three tries and each failure is worth naming**,
+because all three are ways a source scan quietly reads less than it claims,
+which is the defect this entry is about:
+
+- Reading only the line the call opens on found nothing in `security.rs` after
+  it was repaired, because rustfmt had moved the label to a line of its own.
+  The window has to be the statement.
+- Widening to a fixed window then reported four wrapped hover-text literals,
+  because a window that stops inside a literal yields a fragment ending
+  wherever the cut fell, which is often the indentation of its continuation.
+  A label is one short literal on one line, and an odd quote count means the
+  window ended inside one.
+- Searching for `button(` alone missed `egui::Button::new(...)`, which is how a
+  disabled or explicitly sized button is written -- two of the ten.
+
+Each of those three passed while reading less than the rule, which is exactly
+what F-196's guard did, what F-210's list did and what F-212's scan did. A
+guard is not proved by passing.
+
+### F-258: both crate-wide guards were reading half of the largest module
+
+Found while rebasing this round onto `dev`, by the guard above reporting that
+five buttons on its ledger were no longer padded. They were still padded, on
+the same lines. It had stopped being able to see them.
+
+Both crate-wide guards in `veilvoice-gui` read each module's source and cut it
+at the **first `#[cfg(test)]`**, keeping what is above. The reason for the cut
+is good and is written down in F-212: two guards here name the call they forbid
+in order to forbid it, and a check that trips over its own source is a check
+somebody deletes. The reason the cut was written as "the first `#[cfg(test)]`
+anywhere in the file" is that in every file it had been tried on, that is the
+test module.
+
+`studio.rs` then grew a `#[cfg(test)]` **on a function**, so the function exists
+for the tests and the compiler forbids the window from calling it. It is at line
+1459 of 2766. From that commit both guards read the first half of the largest
+module in the crate and said nothing whatever about the second half, where the
+render path and five of the ten padded buttons live.
+
+**Neither guard failed, and neither could.** The spawn guard went on reporting
+that every subprocess in the crate is wrapped, over a file it was reading 53% of.
+What broke the silence was the *ledger*: the padded-button guard lists what is
+known to be wrong as well as forbidding what is not on the list, so when it went
+blind the list became stale and stale is a failure. **The half of that guard
+written for bookkeeping is what caught a defect in the guard itself**, which is
+an argument for the shape rather than for this instance.
+
+It is the same shape as F-210, F-212 and F-257 one turn further in. Those are
+rules enforced over part of a crate. This is a rule enforced over part of a
+**file**, arrived at by a change in a third file that mentions neither guard,
+which is worse in one specific way: no author was anywhere near the rule when
+it broke.
+
+**The fix is one cut, shared.** `crate::shipped()` cuts at the top-level test
+module -- `#[cfg(test)]` at column zero, any further attributes on the same item
+stepped over, then `mod` at column zero -- and both guards call it instead of
+carrying their own copy of the rule. A file with no test module is read whole.
+The attribute-stepping is not defensive padding: `studio.rs` writes
+`#[cfg(test)]`, then `#[path = "studio/tests.rs"]`, then `mod tests;`, so a
+version demanding `mod` immediately after the marker does not cut that file at
+all. That is harmless there, because its tests are in another file, and being
+harmless by accident is the thing this function exists to stop relying on.
+
+The test asserts the property rather than a length, since the file keeps
+growing: the shipped half of `studio.rs` has to reach the button that opens the
+vault, at line 2031, and must not carry the test module's declaration. Proved
+able to fail by putting the old cut back, which fails that test and takes the
+padded-button ledger down with it.
+
 ## The thirty-third round: the whole tree again, read for what accumulates
 
 The round after 0.1.21. The thirty-first and thirty-second rounds were about
@@ -9071,7 +9442,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1898 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1901 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -10719,8 +11090,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and fifty-three defects found and fixed (F-1 to F-253), across
-thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Two hundred and fifty-eight defects found and fixed (F-1 to F-258), across
+thirty-four rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

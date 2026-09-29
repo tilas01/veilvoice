@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/decoys.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 216 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 230 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs)
 
 ## Contents
 
@@ -48,15 +48,15 @@ inventing a figure.
 
 ## What this file contains
 
-216 lines defining **3 functions** (2 public), **1 type** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+230 lines defining **3 functions** (2 public), **1 type** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Advice` (line 48) -- What to offer, and on what evidence.
+- `struct Advice` (line 53) -- What to offer, and on what evidence.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `panel` (line 96) -- The panel, under the listing in the Browser.
+- `panel` (line 101) -- The panel, under the listing in the Browser.
   - reaches: `advise`, `counted_vaults`
 
 ## What calls what
@@ -79,14 +79,14 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_advise["advise<br/>line 65"]
-    n_panel(["panel<br/>line 96"])
-    n_counted_vaults["counted_vaults<br/>line 206"]
+    n_advise["advise<br/>line 70"]
+    n_panel(["panel<br/>line 101"])
+    n_counted_vaults["counted_vaults<br/>line 220"]
     n_panel --> n_advise
     n_panel --> n_counted_vaults
-    click n_advise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L65" "open the source"
-    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L96" "open the source"
-    click n_counted_vaults href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L206" "open the source"
+    click n_advise href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L70" "open the source"
+    click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L101" "open the source"
+    click n_counted_vaults href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L220" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_panel entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -103,10 +103,11 @@ flowchart TD
 |---|---:|---|
 | `SHARE` <sub>const</sub> | [37](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L37) | Never more than this share of what is free. |
 | `MOST` <sub>const</sub> | [44](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L44) | Never more than this many, however much room there is. |
-| `Advice` <sub>pub struct</sub> | [48](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L48) | What to offer, and on what evidence. |
-| `advise` <sub>pub fn</sub> | [65](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L65) | Work out what to offer from the vault's shape and whatever the disk says. |
-| `panel` <sub>pub fn</sub> | [96](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L96) | The panel, under the listing in the Browser. |
-| `counted_vaults` <sub>fn</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L206) | "one vault" or "four vaults", so the panel does not say "1 vaults". |
+| `MAKE_THEM` <sub>const</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L49) | The label on the button that makes them. |
+| `Advice` <sub>pub struct</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L53) | What to offer, and on what evidence. |
+| `advise` <sub>pub fn</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L70) | Work out what to offer from the vault's shape and whatever the disk says. |
+| `panel` <sub>pub fn</sub> | [101](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L101) | The panel, under the listing in the Browser. |
+| `counted_vaults` <sub>fn</sub> | [220](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L220) | "one vault" or "four vaults", so the panel does not say "1 vaults". |
 
 ---
 

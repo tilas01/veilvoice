@@ -37,9 +37,15 @@
 //!
 //! # What it does not do
 //!
-//! It does not download anything -- this project has no network code and this
-//! binary is not the exception. Fetch the files however you like; this reads
-//! them from disk. It does not install anything, and it writes nothing.
+//! It does not install anything, and it writes nothing outside the directory it
+//! is pointed at. `veilvoice verify file` does not download anything either:
+//! fetch the files however you like and it reads them from disk.
+//!
+//! `veilvoice verify release` does fetch, and it is the one thing here that
+//! does. There is still no HTTP client in the dependency graph, which is the
+//! claim the front page makes and a CI job enforces; the download is done by
+//! the transfer tool the operating system already ships, as a subprocess.
+//! `fetch.rs` says why at length.
 //!
 //! # In plain words
 //!

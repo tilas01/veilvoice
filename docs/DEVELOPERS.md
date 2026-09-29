@@ -31,7 +31,7 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 | `veilvoice-core` | Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility. | 3,141 | [`crates/veilvoice-core/README.md`](../crates/veilvoice-core/README.md) |
 | `veilvoice-crypto` | Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice. | 8,224 | [`crates/veilvoice-crypto/README.md`](../crates/veilvoice-crypto/README.md) |
 | `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them. | 2,947 | [`crates/veilvoice-guard/README.md`](../crates/veilvoice-guard/README.md) |
-| `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 23,853 | [`crates/veilvoice-gui/README.md`](../crates/veilvoice-gui/README.md) |
+| `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 24,106 | [`crates/veilvoice-gui/README.md`](../crates/veilvoice-gui/README.md) |
 | `veilvoice-meta` | Strip or spoof identifying metadata: audio tags, and image EXIF/GPS. | 696 | [`crates/veilvoice-meta/README.md`](../crates/veilvoice-meta/README.md) |
 | `veilvoice-policy` | Settings that can only be tightened, sealed with the project's own post-quantum cryptography. | 1,689 | [`crates/veilvoice-policy/README.md`](../crates/veilvoice-policy/README.md) |
 | `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,954 | [`crates/veilvoice-setup/README.md`](../crates/veilvoice-setup/README.md) |
@@ -130,6 +130,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/features.py`](../tools/audit/features.py) | Every feature selection a release builds is built here too |
 | [`tools/audit/fixtures.py`](../tools/audit/fixtures.py) | A file the build needs is in the commit, not merely on the machine that wrote it |
 | [`tools/audit/network_claims.py`](../tools/audit/network_claims.py) | The manual names every command that reaches the network |
+| [`tools/audit/network_wording.py`](../tools/audit/network_wording.py) | No sentence a reader sees may claim more about the network than is true |
 | [`tools/audit/platform_table.py`](../tools/audit/platform_table.py) | The table of what runs where says what the release workflow actually builds |
 | [`tools/audit/powershell.py`](../tools/audit/powershell.py) | No PowerShell function adds to a script's variable and keeps the result to itself |
 | [`tools/audit/publishing.py`](../tools/audit/publishing.py) | The step that publishes a release says which commit it is publishing |

@@ -481,7 +481,7 @@ jobs:
       # mutants.yml, because half an hour over eight files does not fit here.
       # This is the part that does: an entry in the committed list of survivors
       # names the line it is of, and a list whose lines have been edited under
-      # it is worse than no list. F-250 is why it is the line and not a line
+      # it is worse than no list. F-254 is why it is the line and not a line
       # number.
       - name: Every argued-for surviving mutant must still be about the code it names
         run: python tools/mutants/check.py --lint
@@ -651,6 +651,23 @@ jobs:
       # is the one way a gate is worse than no gate at all.
       - name: The promotion gate must still be able to read what it reads
         run: python tools/release/readiness.py --self-test
+
+      # F-256. The front page's claim is that there is no HTTP client in the
+      # dependency graph, and the job below this one fails the build if one
+      # appears, so that claim is enforced. Four other sentences said something
+      # that sounds the same and is false: that VeilVoice reaches the network
+      # never, at all. F-213 corrected the two its own write-up quoted and left
+      # the crash log, the crash-report panel and the verifier's own module
+      # documentation saying it, the last of those published to the website.
+      #
+      # The nearest relative of this guard is `veilvoice_guard::SCOPE`, which
+      # refuses "prevent", "unbreakable" and "guarantee" in exactly one string,
+      # its own. The rule was right and its reach was one constant.
+      - name: Every claim about the network must say which claim it is
+        run: python tools/audit/network_wording.py
+
+      - name: That guard must fire on the sentences that shipped
+        run: python tools/audit/network_wording.py --self-test
 
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested

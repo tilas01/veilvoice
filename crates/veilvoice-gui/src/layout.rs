@@ -239,6 +239,66 @@ pub fn chip_value<'a, Value: PartialEq>(
     response
 }
 
+/// The breathing room an emphasised button gets beyond its own text, per side.
+///
+/// **Finding F-257.** This used to be written as two literal spaces at each
+/// end of the label: `"  keep it encrypted  "`. Two spaces are not a width.
+/// They are two glyphs of whatever proportional font the reader has installed,
+/// egui gives trailing whitespace no reliable advance, and a screen reader is
+/// handed a label with padding in it. Eight points is eight points on every
+/// machine, and it is a number somebody chose.
+pub const EMPHASIS: f32 = 8.0;
+
+/// One width for a row of buttons that are alternative answers to one question.
+///
+/// **Finding F-257.** Where a row offers a choice, the buttons have to be the
+/// same size, and sizing each by its own text guarantees they are not: the
+/// modal that asks whether to keep recordings encrypted drew "keep it
+/// encrypted" padded with spaces beside "write it unencrypted" that was not,
+/// so the safe answer was wider than the unsafe one by an amount nobody had
+/// decided and that changed with the reader's typeface.
+///
+/// Measured from the longest label with this style's own button font rather
+/// than given as a constant, because a constant is a promise that the longest
+/// label still fits, and nothing would check it after somebody rewords a
+/// button. [`EMPHASIS`] is added on each side so an emphasised choice still
+/// reads as one.
+pub fn choice_width(ui: &Ui, labels: &[&str]) -> f32 {
+    let font = egui::TextStyle::Button.resolve(ui.style());
+    let widest = labels
+        .iter()
+        .map(|label| {
+            // Through the painter rather than `Ui::fonts`: the layout call
+            // needs the font cache mutably, to shape glyphs it has not seen,
+            // and `Ui::fonts` hands out a shared reference.
+            ui.painter()
+                .layout_no_wrap(
+                    (*label).to_owned(),
+                    font.clone(),
+                    egui::Color32::PLACEHOLDER,
+                )
+                .rect
+                .width()
+        })
+        .fold(0.0_f32, f32::max);
+    widest + 2.0 * ui.spacing().button_padding.x + 2.0 * EMPHASIS
+}
+
+/// One of those buttons: the shared width, and this style's button height.
+pub fn choice_button<'a>(text: egui::RichText, width: f32) -> egui::Button<'a> {
+    egui::Button::new(text).min_size(egui::vec2(width, 0.0))
+}
+
+/// The width of a single emphasised button: its text plus [`EMPHASIS`] a side.
+///
+/// The one-label case of [`choice_width`], for a primary action that stands
+/// alone. It is here so that "this button is deliberately roomier than its
+/// text" is written as a number in one place rather than as spaces inside
+/// eleven labels.
+pub fn emphasised_width(ui: &Ui, label: &str) -> f32 {
+    choice_width(ui, &[label])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

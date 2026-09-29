@@ -42,6 +42,7 @@
 <path d="M229.0 274.0 C 229.0 294.0, 165.7 1000.0, 165.7 1017.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M454.2 247.0 C 476.2 247.0, 476.2 247.0, 290.3 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M383.7 274.0 C 383.7 294.0, 367.6 1100.0, 367.6 1117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
+<path d="M208.8 174.0 C 208.8 194.0, 90.4 700.0, 90.4 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M208.8 174.0 C 208.8 194.0, 241.1 900.0, 241.1 917.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M208.8 174.0 C 208.8 194.0, 367.6 1100.0, 367.6 1117.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
 <path d="M94.4 374.0 C 94.4 394.0, 90.4 700.0, 90.4 717.0" fill="none" stroke="var(--muted, #737aa2)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-muted)"/>
@@ -151,7 +152,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" target="_blank" rel="noopener noreferrer">
 <rect x="48.1" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="102.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lib.rs</text>
-<text x="102.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1546 lines</text>
+<text x="102.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1814 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs" target="_blank" rel="noopener noreferrer">
 <rect x="182.8" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -176,17 +177,17 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashlog.rs" target="_blank" rel="noopener noreferrer">
 <rect x="170.7" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="229.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">crashlog.rs</text>
-<text x="229.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">448 lines</text>
+<text x="229.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">450 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs" target="_blank" rel="noopener noreferrer">
 <rect x="313.3" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="383.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">crashreport.rs</text>
-<text x="383.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">289 lines</text>
+<text x="383.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">306 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs" target="_blank" rel="noopener noreferrer">
 <rect x="158.6" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="208.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decoys.rs</text>
-<text x="208.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">216 lines</text>
+<text x="208.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">230 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/dialog.rs" target="_blank" rel="noopener noreferrer">
 <rect x="480.2" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -221,7 +222,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs" target="_blank" rel="noopener noreferrer">
 <rect x="40.1" y="720.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="90.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">layout.rs</text>
-<text x="90.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">569 lines</text>
+<text x="90.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">629 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/monitor.rs" target="_blank" rel="noopener noreferrer">
 <rect x="166.6" y="720.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -286,7 +287,7 @@
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" target="_blank" rel="noopener noreferrer">
 <rect x="309.3" y="820.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="367.6" y="842.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">security.rs</text>
-<text x="367.6" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">3174 lines</text>
+<text x="367.6" y="859.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">3258 lines</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/settings.rs" target="_blank" rel="noopener noreferrer">
 <rect x="452.0" y="820.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>

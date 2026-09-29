@@ -196,7 +196,7 @@ What it asks before anything moves:
 - the version a person typed is the version `Cargo.toml` declares
 - `CHANGELOG.md` has a `## v<version>` section and it is the newest one
 - every roadmap item that release's section names is marked done
-- `docs/AUDIT.md` has been written in since the previous tag
+- `docs/AUDIT.md` has been written in since the previous release
 - the tag does not exist, and nothing has landed on `main` that `dev` lacks
 - `tools/verify.py` passes whole, from a fresh checkout rather than a
   working tree
@@ -206,6 +206,22 @@ The first six are [`tools/release/readiness.py`](../tools/release/readiness.py),
 which runs anywhere: `python tools/release/readiness.py v0.1.23` answers the
 same question from a laptop, and is the quickest way to see what a release is
 still waiting on.
+
+**Every release tag in this repository points at a commit that is on no
+branch**, and anything written here that walks from a tag has to know it. All
+twenty-three of them do: the history was rewritten at some point and the tags
+were left behind on the pre-rewrite objects. The trees are identical, so what
+was published is exactly what the branch has, and the commits are a parallel
+line, so `git describe`, `git log <tag>..HEAD` and `git merge-base` all give
+answers about a history that is not this one. That is finding F-254, and F-255
+is the release gate quietly passing for four days because of it.
+
+Until the tags are moved, which is a change to published history and a decision
+for the repository's owner, `release_point()` in
+[`tools/release/readiness.py`](../tools/release/readiness.py) is how a previous
+release is located: the tag when it genuinely is an ancestor, otherwise the
+commit on this branch carrying **the tag's tree**, which is the same content
+under a different parent. Do not reach for the tag directly in a new script.
 
 **The fresh checkout is the part that is easy to skip and should not be.** A
 commit reached `dev` referencing a test fixture that `.gitignore` had kept out

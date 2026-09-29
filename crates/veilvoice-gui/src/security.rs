@@ -1655,14 +1655,27 @@ impl Security {
                 }
                 ui.add_space(6.0);
                 ui.horizontal(|ui| {
+                    // One width for both answers, measured from the longer of
+                    // them. F-257: the safe one used to be padded with literal
+                    // spaces and the unsafe one was not, so the two sizes of
+                    // this question differed by whatever the reader's font
+                    // made of four space glyphs.
+                    let width =
+                        crate::layout::choice_width(ui, &[KEEP_ENCRYPTED, WRITE_UNENCRYPTED]);
                     if ui
-                        .button(RichText::new("  keep it encrypted  ").strong())
+                        .add(crate::layout::choice_button(
+                            RichText::new(KEEP_ENCRYPTED).strong(),
+                            width,
+                        ))
                         .clicked()
                     {
                         self.confirm_disable = false;
                     }
                     if ui
-                        .button(RichText::new("write it unencrypted").color(p::red()))
+                        .add(crate::layout::choice_button(
+                            RichText::new(WRITE_UNENCRYPTED).color(p::red()),
+                            width,
+                        ))
                         .clicked()
                     {
                         self.encrypt_recordings = false;
@@ -1676,6 +1689,16 @@ impl Security {
         true
     }
 }
+
+/// The two answers to that question, as data.
+///
+/// Named rather than written at the call site because the row measures itself
+/// from the longer of them, and a label the measurement cannot see is a label
+/// the row is not sized for.
+pub const KEEP_ENCRYPTED: &str = "keep it encrypted";
+
+/// The other answer. See [`KEEP_ENCRYPTED`].
+pub const WRITE_UNENCRYPTED: &str = "write it unencrypted";
 
 /// What the user is told before recordings stop being encrypted.
 ///
@@ -2988,6 +3011,67 @@ mod tests {
         assert!(
             body.contains("soundbar::badge"),
             "a locked window has one thing in it and it should be the logo"
+        );
+    }
+
+    /// **Finding F-257.** The two answers to "write recordings unencrypted?"
+    /// are the same width, and the longer of them is not clipped.
+    ///
+    /// F-196 established that a control sized by literal spaces in its label
+    /// has a width the reader's typeface decides. This row was the same
+    /// mistake, in the dialog that decides whether recordings are encrypted,
+    /// and with the extra property that only one of the two answers was padded
+    /// -- so the safe one was the wider one by an amount nobody had chosen.
+    ///
+    /// The theme is installed first, for the reason the test below gives.
+    #[test]
+    fn the_two_answers_about_encryption_are_one_size() {
+        let ctx = egui::Context::default();
+        crate::theme::install(&ctx);
+        let (mut keep, mut write) = (egui::Rect::NOTHING, egui::Rect::NOTHING);
+        let mut natural = 0.0_f32;
+        let _ = crate::headless_frame(&ctx, Default::default(), |ui| {
+            egui::CentralPanel::default().show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    let width =
+                        crate::layout::choice_width(ui, &[KEEP_ENCRYPTED, WRITE_UNENCRYPTED]);
+                    keep = ui
+                        .add(crate::layout::choice_button(
+                            RichText::new(KEEP_ENCRYPTED).strong(),
+                            width,
+                        ))
+                        .rect;
+                    // The same label with no width asked for: what the button
+                    // needs. If the shared width were under this, the longer
+                    // answer would be clipped, which a constant would not
+                    // catch after somebody rewords a button.
+                    natural = ui
+                        .add(egui::Button::new(RichText::new(WRITE_UNENCRYPTED)))
+                        .rect
+                        .width();
+                    write = ui
+                        .add(crate::layout::choice_button(
+                            RichText::new(WRITE_UNENCRYPTED).color(p::red()),
+                            width,
+                        ))
+                        .rect;
+                });
+            });
+        });
+
+        assert!(keep.width() > 0.0 && write.width() > 0.0, "nothing drawn");
+        assert!(
+            (keep.width() - write.width()).abs() < 0.5,
+            "the two answers are {:.1} and {:.1} points wide",
+            keep.width(),
+            write.width()
+        );
+        assert!(
+            keep.width() >= natural,
+            "the shared width {:.1} is under what the longer answer needs \
+             ({:.1}), so it is clipped",
+            keep.width(),
+            natural
         );
     }
 
