@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/layout.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 569 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 629 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs)
 
 ## Contents
 
@@ -64,7 +64,7 @@ like permanently.
 
 ## What this file contains
 
-569 lines defining **6 functions** (6 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+629 lines defining **9 functions** (9 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -74,6 +74,9 @@ like permanently.
 - `lock_button` (line 184) -- A button that locks or unlocks: one width, and the height of its neighbour.
 - `chip_value` (line 228) -- chip, for the common case of choosing one value out of several.
   - reaches: `chip`
+- `choice_button` (line 288) -- One of those buttons: the shared width, and this style's button height.
+- `emphasised_width` (line 298) -- The width of a single emphasised button: its text plus EMPHASIS a side.
+  - reaches: `choice_width`
 
 ## What calls what
 
@@ -95,17 +98,24 @@ flowchart TD
     n_lock_button(["lock_button<br/>line 184"])
     n_chip["chip<br/>line 218"]
     n_chip_value(["chip_value<br/>line 228"])
+    n_choice_width["choice_width<br/>line 266"]
+    n_choice_button(["choice_button<br/>line 288"])
+    n_emphasised_width(["emphasised_width<br/>line 298"])
     n_chip_value --> n_chip
+    n_emphasised_width --> n_choice_width
     click n_centred_row href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L60" "open the source"
     click n_column href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L138" "open the source"
     click n_button_height href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L174" "open the source"
     click n_lock_button href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L184" "open the source"
     click n_chip href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L218" "open the source"
     click n_chip_value href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L228" "open the source"
+    click n_choice_width href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L266" "open the source"
+    click n_choice_button href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L288" "open the source"
+    click n_emphasised_width href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L298" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_centred_row,n_column,n_button_height,n_lock_button,n_chip_value entry
+    class n_centred_row,n_column,n_button_height,n_lock_button,n_chip_value,n_choice_button,n_emphasised_width entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_chip api
+    class n_chip,n_choice_width api
 ```
 
 </details>
@@ -121,3 +131,7 @@ flowchart TD
 | `lock_button` <sub>pub fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L184) | A button that locks or unlocks: one width, and the height of its neighbour. |
 | `chip` <sub>pub fn</sub> | [218](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L218) | One of a row of options, sized the same whether it is hovered or not. |
 | `chip_value` <sub>pub fn</sub> | [228](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L228) | chip, for the common case of choosing one value out of several. |
+| `EMPHASIS` <sub>pub const</sub> | [250](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L250) | The breathing room an emphasised button gets beyond its own text, per side. |
+| `choice_width` <sub>pub fn</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L266) | One width for a row of buttons that are alternative answers to one question. |
+| `choice_button` <sub>pub fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L288) | One of those buttons: the shared width, and this style's button height. |
+| `emphasised_width` <sub>pub fn</sub> | [298](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs#L298) | The width of a single emphasised button: its text plus EMPHASIS a side. |

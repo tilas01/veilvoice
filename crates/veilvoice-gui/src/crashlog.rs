@@ -111,8 +111,10 @@ pub fn write(path: &Path, kind: &str, detail: &str) {
     text.push_str(detail);
     text.push_str(
         "\n\n\
-         This file was written on your machine and sent nowhere. VeilVoice has\n\
-         no network code at all. Delete it whenever you like.\n\n",
+         This file was written on your machine and sent nowhere. Nothing in\n\
+         VeilVoice uploads a crash report, and the only thing here that\n\
+         reaches the network is the update check, when you press it.\n\
+         Delete it whenever you like.\n\n",
     );
     text.push_str(&advice(detail));
 
@@ -346,7 +348,7 @@ mod tests {
         write(&path, "a panic", "x");
         let text = std::fs::read_to_string(&path).expect("written");
         assert!(
-            text.contains("sent nowhere") && text.contains("no network code"),
+            text.contains("sent nowhere") && text.contains("uploads a crash report"),
             "the report must state that nothing was transmitted: {text}"
         );
         let _ = std::fs::remove_dir_all(path.parent().unwrap());

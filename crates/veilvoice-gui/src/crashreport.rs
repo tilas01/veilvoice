@@ -117,8 +117,9 @@ impl Offer {
         ui.label(
             RichText::new(format!(
                 "A report was written to {path}. It was written on this machine and \
-                 has been sent nowhere: VeilVoice has no network code at all, and \
-                 nothing here can send it. If you would like the fault fixed, the \
+                 has been sent nowhere: nothing in VeilVoice uploads a crash report, \
+                 and the only thing here that reaches the network is the update \
+                 check, when you press it. If you would like the fault fixed, the \
                  whole of it is below to copy into an issue."
             ))
             .color(p::muted())
@@ -261,8 +262,24 @@ mod tests {
         // The panel offers a clipboard and a browser link. If a request ever
         // appears in this file it is a change to what the project claims about
         // itself, and it should fail here first.
+        // `upload(` rather than the bare word, and that is F-256's lesson
+        // arriving one file later. The needle used to be `upload`, and the
+        // sentence the panel now shows says "nothing in VeilVoice uploads a
+        // crash report", which is the true claim that replaced a false one. A
+        // guard that forbids the vocabulary rather than the machinery forbids
+        // telling the reader what the program does not do -- the same trap the
+        // comment above `code` describes, one step further in, since the
+        // sentence is a string literal rather than a comment. What it has to
+        // catch is a call.
         let text = code();
-        for forbidden in ["reqwest", "ureq", "TcpStream", "http://", "post(", "upload"] {
+        for forbidden in [
+            "reqwest",
+            "ureq",
+            "TcpStream",
+            "http://",
+            "post(",
+            "upload(",
+        ] {
             assert!(
                 !text.contains(forbidden),
                 "this file must not learn to send anything: found {forbidden}"

@@ -334,6 +334,55 @@ pub(crate) fn sources() -> Vec<(&'static str, String)> {
     ]
 }
 
+/// The half of a module that ships, for a guard that reads source.
+///
+/// **Finding F-258.** Both crate-wide guards here cut each file at its first
+/// `#[cfg(test)]` and read what is above it, because two of them name the call
+/// they forbid in order to forbid it and a check that trips over its own source
+/// is a check somebody deletes. That cut was written as "the first
+/// `#[cfg(test)]` anywhere", which is the test module in every file it was
+/// tried on.
+///
+/// `studio.rs` then grew a `#[cfg(test)]` **on a function**, at line 1459 of
+/// 2766, so that it exists for the tests and the compiler forbids the window
+/// from calling it. From that commit both guards read the first half of the
+/// largest module in the crate and said nothing about the second, which is
+/// where five bare `ffmpeg`-era buttons and the render path live. Neither
+/// failed. The guards written to stop a rule being enforced over part of the
+/// crate were being enforced over part of a file, by a change in a file neither
+/// of them mentions.
+///
+/// So the cut is the **top-level test module** -- `#[cfg(test)]` at column zero
+/// followed by `mod ` at column zero -- and an attribute on an item in the
+/// middle of a file is passed over rather than treated as the end of it. A file
+/// with no test module is read whole.
+#[cfg(test)]
+pub(crate) fn shipped(source: &str) -> &str {
+    let mut at = 0;
+    while let Some(found) = source[at..].find("\n#[cfg(test)]\n") {
+        let end = at + found + 1;
+        // Further attributes at column zero belong to the same item, so they
+        // are stepped over rather than ending the search. `studio.rs` writes
+        // `#[cfg(test)]`, then `#[path = "studio/tests.rs"]`, then
+        // `mod tests;`, and a rule that demanded `mod` immediately after the
+        // marker would not cut that file at all -- which happens to be
+        // harmless there, since its tests are in another file, and is exactly
+        // the kind of accident this function exists to stop relying on.
+        let mut rest = &source[end + "#[cfg(test)]\n".len()..];
+        while rest.starts_with("#[") {
+            match rest.find('\n') {
+                Some(line) => rest = &rest[line + 1..],
+                None => break,
+            }
+        }
+        if rest.starts_with("mod ") {
+            return &source[..end];
+        }
+        at = end;
+    }
+    source
+}
+
 /// The modules `lib.rs` declares, as filenames.
 ///
 /// Read from this file rather than listed, so that [`sources`] can be checked
@@ -411,10 +460,7 @@ mod spawn_tests {
 
         let mut bare = Vec::new();
         for (name, source) in &sources {
-            let shipped = match source.find("#[cfg(test)]") {
-                Some(at) => &source[..at],
-                None => source.as_str(),
-            };
+            let shipped = crate::shipped(source);
             for (number, line) in shipped.lines().enumerate() {
                 let trimmed = line.trim_start();
                 if trimmed.starts_with("//") || trimmed.starts_with('*') {
@@ -1066,6 +1112,228 @@ mod draw_path_tests {
             "a channel on the draw path is read with a blocking recv; use \
              try_recv:\n{}",
             faults.join("\n")
+        );
+    }
+    /// **Finding F-258.** The cut is the test module, not any `#[cfg(test)]`.
+    ///
+    /// The literals here are built rather than written, because a file
+    /// containing the marker at column zero is exactly what the guards above
+    /// read, and this file is one of them.
+    #[test]
+    fn a_cfg_test_on_an_item_is_not_the_end_of_the_shipped_half() {
+        let marker = String::from("#[cfg(test)]");
+        let item =
+            format!("fn a() {{}}\n\n    {marker}\n    fn only_for_tests() {{}}\n\nfn b() {{}}\n");
+        assert_eq!(
+            crate::shipped(&item),
+            item,
+            "an attribute on an item is not the test module and must not cut the file"
+        );
+
+        let with_module = format!("{item}\n{marker}\nmod tests {{\n    fn c() {{}}\n}}\n");
+        let cut = crate::shipped(&with_module);
+        assert!(
+            cut.contains("fn b()"),
+            "the shipped half has to reach the last item before the tests"
+        );
+        assert!(
+            !cut.contains("mod tests"),
+            "the test module must not be in the shipped half"
+        );
+
+        // And the file it went unnoticed in. `studio.rs` is 2766 lines, its
+        // first `#[cfg(test)]` is on a function at 1459, and the padded label
+        // on the button that opens the vault is at 2031. A property is asserted
+        // rather than a length, because the file keeps growing: the shipped
+        // half has to reach past the old cut, and must not carry the test
+        // module's declaration.
+        let studio = crate::sources()
+            .into_iter()
+            .find(|(name, _)| *name == "studio.rs")
+            .expect("studio.rs is in the crate-wide list");
+        let read = crate::shipped(&studio.1);
+        assert!(
+            read.contains("open the vault"),
+            "the guards are reading only the first part of studio.rs again"
+        );
+        assert!(
+            !read.contains("mod tests"),
+            "the test module's declaration is in the shipped half"
+        );
+    }
+
+    /// No button in this crate is sized by literal spaces in its label.
+    ///
+    /// **Finding F-257.** F-196 established the rule: two spaces are not a
+    /// width. They are two glyphs of whatever proportional font the reader
+    /// has, egui gives trailing whitespace no reliable advance, and the label
+    /// a screen reader is handed has the padding in it. What F-196 shipped as
+    /// enforcement was `nothing_in_the_unlock_row_is_sized_with_spaces`, which
+    /// forbids the one string `"  unlock  "` inside the one function
+    /// `unlock_row`. Eleven other buttons in this crate were padded the same
+    /// way at the time, in five modules, and that guard could not see any of
+    /// them. It is the shape this round is about: a rule written down and then
+    /// enforced over less than it claims.
+    ///
+    /// # The ledger, and why there is one
+    ///
+    /// Two of the twelve are fixed here, in `security.rs` and `decoys.rs`. The
+    /// other ten are in `app.rs` and `studio.rs`, which are being rewritten
+    /// for roadmap item 167 as this is written, and ten one-line changes
+    /// dropped into a file somebody else is restructuring cost more than they
+    /// buy. So they are listed, by module and by label, and the list is
+    /// checked in both directions: a padded label that is not on it fails, and
+    /// an entry on it that no longer exists fails. The first stops a twelfth
+    /// being added. The second is what makes this a ratchet rather than an
+    /// allow-list: fixing one means deleting its line, and forgetting to is a
+    /// failure rather than a silence.
+    ///
+    /// `ROADMAP.md` carries the work. When the list is empty the `KNOWN` array
+    /// and this paragraph go with it.
+    #[test]
+    fn no_button_is_sized_with_literal_spaces() {
+        /// The ones that have not been repaired yet, as (module, label).
+        const KNOWN: &[(&str, &str)] = &[
+            ("app.rs", "anonymise"),
+            ("app.rs", "add a guest"),
+            ("app.rs", "start veiling"),
+            ("app.rs", "preview to my headphones"),
+            ("app.rs", "stop"),
+            ("studio.rs", "start recording"),
+            ("studio.rs", "stop and store"),
+            ("studio.rs", "stop"),
+            ("studio.rs", "play"),
+            ("studio.rs", "open the vault"),
+        ];
+
+        let sources = crate::sources();
+        let declared = crate::declared_modules();
+        assert!(!declared.is_empty(), "no modules were read out of lib.rs");
+        for module in &declared {
+            assert!(
+                sources.iter().any(|(name, _)| name == module),
+                "{module} is declared in lib.rs and is not scanned for padded \
+                 button labels. Add it to `crate::sources`: a module left out of \
+                 it is a module where this rule is not enforced, which is the \
+                 shape of the defect this test exists for."
+            );
+        }
+
+        // How far past `button(` a label can sit. A call site here is written
+        // over up to five lines by rustfmt, and a scan that reads only the line
+        // the call opens on is the first version of this guard: it found
+        // nothing when the label was moved to a line of its own, which is
+        // exactly how `security.rs` looks after being repaired. The window is
+        // generous because a false positive names a line for a reader to look
+        // at and a miss is the whole defect.
+        const REACH: usize = 260;
+
+        let mut found: Vec<(String, usize, String)> = Vec::new();
+        for (name, source) in &sources {
+            let shipped = crate::shipped(source);
+            // Comment lines are blanked rather than dropped, so line numbers
+            // still count and so the prose explaining this rule -- which has to
+            // quote a padded label to explain it -- is not itself a match.
+            let code: String = shipped
+                .lines()
+                .map(|line| {
+                    let trimmed = line.trim_start();
+                    if trimmed.starts_with("//") || trimmed.starts_with('*') {
+                        ""
+                    } else {
+                        line
+                    }
+                })
+                .collect::<Vec<_>>()
+                .join("\n");
+
+            let mut at = 0;
+            while at < code.len() {
+                // Both spellings. `ui.button("...")` is the common one and
+                // `egui::Button::new(...)` is what a disabled or sized button
+                // is written as; a scan for only the first missed `anonymise`
+                // in `app.rs` and `open the vault` in `studio.rs`, which is
+                // two of the ten this finding is about.
+                let opened = match ["button(", "Button::new("]
+                    .iter()
+                    .filter_map(|needle| code[at..].find(needle).map(|found| at + found))
+                    .min()
+                {
+                    Some(found) => found,
+                    None => break,
+                };
+                let capped = &code[opened..code.len().min(opened + REACH)];
+                // Cut at the statement's end. Without this the window runs on
+                // into whatever is drawn next, and the first thing it picked up
+                // was a `ui.label` two statements below a button in `tour.rs`.
+                // A label's text is allowed to begin with spaces; a control's
+                // size is not.
+                let window = match capped.find(';') {
+                    Some(at) => &capped[..at],
+                    None => capped,
+                };
+                let line = code[..opened].matches('\n').count() + 1;
+                let mut literals: Vec<&str> = window.split('"').skip(1).step_by(2).collect();
+                // An odd number of quotes means the window ended inside a
+                // literal, so the last piece is a fragment that ends wherever
+                // the cut fell rather than at a quote.
+                if window.matches('"').count() % 2 == 1 {
+                    literals.pop();
+                }
+                for piece in literals {
+                    // A label is one short literal on one line. Skipping the
+                    // rest is not tidiness: the window can stop in the middle
+                    // of a wrapped hover-text literal, and that fragment ends
+                    // wherever the cut fell, which is often the indentation of
+                    // its continuation. Four of those were the first thing this
+                    // widened scan reported.
+                    if piece.contains('\n') {
+                        continue;
+                    }
+                    if piece.starts_with("  ") || piece.ends_with("  ") {
+                        found.push(((*name).to_owned(), line, piece.trim().to_owned()));
+                    }
+                }
+                at = opened + 1;
+            }
+        }
+        // One `button(` can be inside another's window, so a label two calls
+        // deep is reported twice. The ledger compares by (module, label), so
+        // duplicates would make a fixed entry look stale while a copy of it
+        // remained.
+        found.sort();
+        found.dedup();
+
+        let mut unexpected = Vec::new();
+        for (name, number, label) in &found {
+            if !KNOWN.iter().any(|(m, l)| m == name && l == label) {
+                unexpected.push(format!("{name}:{number}: \"{label}\""));
+            }
+        }
+        assert!(
+            unexpected.is_empty(),
+            "these button labels are padded with literal spaces, which is a \
+             width the reader's typeface decides rather than one anybody chose \
+             (F-196, F-257). Use `layout::emphasised_width` for a lone button \
+             and `layout::choice_width` for a row of answers:\n{}",
+            unexpected.join("\n")
+        );
+
+        let mut stale = Vec::new();
+        for (module, label) in KNOWN {
+            if !found
+                .iter()
+                .any(|(name, _, seen)| name == module && seen == label)
+            {
+                stale.push(format!("{module}: \"{label}\""));
+            }
+        }
+        assert!(
+            stale.is_empty(),
+            "these are listed as still padded and are not padded any more. \
+             Delete their lines from KNOWN: a list that outlives what it \
+             describes is the defect F-210 and F-212 were both about:\n{}",
+            stale.join("\n")
         );
     }
 }

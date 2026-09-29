@@ -43,6 +43,11 @@ const SHARE: u64 = 20;
 /// and the folder becomes something its owner cannot look at and understand.
 const MOST: usize = 32;
 
+/// The label on the button that makes them.
+///
+/// Named so the row can measure itself from it. F-257.
+const MAKE_THEM: &str = "make them";
+
 /// What to offer, and on what evidence.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Advice {
@@ -162,7 +167,16 @@ pub fn panel(
                     );
                 });
                 ui.add_space(6.0);
-                if ui.button(RichText::new("  make them  ").strong()).clicked() {
+                // F-257: this used to be padded with two literal spaces at
+                // each end, which is a width the reader's typeface decides.
+                let make = crate::layout::emphasised_width(ui, MAKE_THEM);
+                if ui
+                    .add(crate::layout::choice_button(
+                        RichText::new(MAKE_THEM).strong(),
+                        make,
+                    ))
+                    .clicked()
+                {
                     asked = Some(*wanted);
                 }
             });

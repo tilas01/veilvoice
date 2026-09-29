@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/decoys.svg" alt="decoys.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/decoys.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 216 lines &middot; <a href="decoys.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 230 lines &middot; <a href="decoys.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-a-decoy-is-worth-said-plainly">What a decoy is worth, said plainly</a>
@@ -84,12 +84,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>216 lines defining <strong>3 functions</strong> (2 public), <strong>1 type</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>230 lines defining <strong>3 functions</strong> (2 public), <strong>1 type</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Advice</code> <span style="color:var(--muted)">line 48</span> &middot; What to offer, and on what evidence.</li>
+<li><code>struct Advice</code> <span style="color:var(--muted)">line 53</span> &middot; What to offer, and on what evidence.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>panel</code> <span style="color:var(--muted)">line 96</span> &middot; The panel, under the listing in the Browser.
+<li><code>panel</code> <span style="color:var(--muted)">line 101</span> &middot; The panel, under the listing in the Browser.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>advise</code>, <code>counted_vaults</code></span>
 </li>
 </ul>
@@ -107,22 +107,22 @@
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
 <rect x="0" y="0" width="451" height="346" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M322.7 47.0 C 344.7 47.0, 344.7 47.0, 215.3 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M326.7 47.0 C 348.7 47.0, 348.7 47.0, 211.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M280.5 74.0 C 280.5 94.0, 225.3 100.0, 225.3 117.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="decoys.src.html#fn-advise">
-<rect x="127.9" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="170.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">advise</text>
-<text x="170.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 65</text>
+<rect x="123.8" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="166.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">advise</text>
+<text x="166.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 70</text>
 </a>
 <a href="decoys.src.html#fn-panel">
-<rect x="238.3" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<rect x="234.2" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="280.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">panel</text>
-<text x="280.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 96</text>
+<text x="280.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 101</text>
 </a>
 <a href="decoys.src.html#fn-counted_vaults">
 <rect x="154.9" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="225.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">counted_vaults</text>
-<text x="225.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 206</text>
+<text x="225.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 220</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -142,14 +142,14 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_advise[&quot;advise&lt;br/&gt;line 65&quot;]
-    n_panel([&quot;panel&lt;br/&gt;line 96&quot;])
-    n_counted_vaults[&quot;counted_vaults&lt;br/&gt;line 206&quot;]
+    n_advise[&quot;advise&lt;br/&gt;line 70&quot;]
+    n_panel([&quot;panel&lt;br/&gt;line 101&quot;])
+    n_counted_vaults[&quot;counted_vaults&lt;br/&gt;line 220&quot;]
     n_panel --&gt; n_advise
     n_panel --&gt; n_counted_vaults
-    click n_advise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L65&quot; &quot;open the source&quot;
-    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L96&quot; &quot;open the source&quot;
-    click n_counted_vaults href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L206&quot; &quot;open the source&quot;
+    click n_advise href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L70&quot; &quot;open the source&quot;
+    click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L101&quot; &quot;open the source&quot;
+    click n_counted_vaults href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/decoys.rs#L220&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_panel entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -164,10 +164,11 @@ flowchart TD
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>SHARE</code> <sub>const</sub></td><td><a href="decoys.src.html#fn-share">37</a></td><td>Never more than this share of what is free.</td></tr>
 <tr><td><code>MOST</code> <sub>const</sub></td><td><a href="decoys.src.html#fn-most">44</a></td><td>Never more than this many, however much room there is.</td></tr>
-<tr><td><code>Advice</code> <sub>pub struct</sub></td><td><a href="decoys.src.html#fn-advice">48</a></td><td>What to offer, and on what evidence.</td></tr>
-<tr><td><code>advise</code> <sub>pub fn</sub></td><td><a href="decoys.src.html#fn-advise">65</a></td><td>Work out what to offer from the vault&#x27;s shape and whatever the disk says.</td></tr>
-<tr><td><code>panel</code> <sub>pub fn</sub></td><td><a href="decoys.src.html#fn-panel">96</a></td><td>The panel, under the listing in the Browser.</td></tr>
-<tr><td><code>counted_vaults</code> <sub>fn</sub></td><td><a href="decoys.src.html#fn-counted_vaults">206</a></td><td>&quot;one vault&quot; or &quot;four vaults&quot;, so the panel does not say &quot;1 vaults&quot;.</td></tr>
+<tr><td><code>MAKE_THEM</code> <sub>const</sub></td><td><a href="decoys.src.html#fn-make_them">49</a></td><td>The label on the button that makes them.</td></tr>
+<tr><td><code>Advice</code> <sub>pub struct</sub></td><td><a href="decoys.src.html#fn-advice">53</a></td><td>What to offer, and on what evidence.</td></tr>
+<tr><td><code>advise</code> <sub>pub fn</sub></td><td><a href="decoys.src.html#fn-advise">70</a></td><td>Work out what to offer from the vault&#x27;s shape and whatever the disk says.</td></tr>
+<tr><td><code>panel</code> <sub>pub fn</sub></td><td><a href="decoys.src.html#fn-panel">101</a></td><td>The panel, under the listing in the Browser.</td></tr>
+<tr><td><code>counted_vaults</code> <sub>fn</sub></td><td><a href="decoys.src.html#fn-counted_vaults">220</a></td><td>&quot;one vault&quot; or &quot;four vaults&quot;, so the panel does not say &quot;1 vaults&quot;.</td></tr>
 </tbody></table>
 </section>
 </div></div>
