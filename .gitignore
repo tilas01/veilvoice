@@ -68,6 +68,11 @@ gpg_secrets/
 __pycache__/
 *.pyc
 
+# `CLAUDE.md` is not in this list, on purpose. It carries the commit rules every
+# session working here has to follow, and while it was ignored every fresh clone
+# started without them, which is where the commits in the wrong name came from
+# (F-235). A rule only a local file knows is a rule the next clone does not.
+#
 # Local development files. These are working notes and editor configuration,
 # not part of what anybody downloads, and a public repository is not the place
 # for either.
@@ -82,8 +87,6 @@ HANDOFF.md
 HANDOVER.md
 .claude/
 .claude*/
-CLAUDE.md
-**/CLAUDE.md
 .mcp.json
 .cursor/
 .aider*

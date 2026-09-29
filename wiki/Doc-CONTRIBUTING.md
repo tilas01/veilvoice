@@ -158,6 +158,10 @@ and `tools/audit/dependabot.py` fails the build if one stops saying it, because
 a bump merged straight into `main` is a change `dev` does not have and the next
 release merge either loses it or conflicts with it.
 
+A bump is applied to `dev` by hand, in tilas01's name, and its pull request is
+closed rather than merged: a merge would make the bot an author of the history,
+which the rule under Commits does not allow.
+
 An early build is a tag rather than a branch: the same source, the same
 workflow, the same signing and the same hash lists, published as a prerelease
 so the download page never offers it by default. Roadmap item 165 is the rest
@@ -296,6 +300,15 @@ guard, and CI asks GitHub whether it shows each pushed commit Verified. Until
 every place commits are made from can sign with one of those keys, a missing or
 foreign signature is reported rather than failed on; `SIGNATURES_REQUIRED` is
 the switch, and it turns on in the commit that makes that true.
+
+Where a commit is made decides which key signs it. On tilas01's own machine it
+is his own key, `F8ADBAB7A4FB333C`. A cloud session cannot hold that one, so it
+signs with a key made for the purpose and registered to the same account, held
+base64-encoded in the project's `VEILVOICE_SIGNING_KEY` environment variable.
+`python tools/repo/signing.py` imports it and sets that clone up to sign with
+it, and fails, saying why, when the variable is missing, when the key is not one
+the guard accepts, or when the identity variables above would still win. A
+container's own signing key is never used in his name.
 
 **A pushed commit is not rewritten.** Several sessions can be working from
 `dev` at once, and a force push moves the ground under every one of them. The
