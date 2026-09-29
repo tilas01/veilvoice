@@ -67,8 +67,8 @@ limit of what the platform offers rather than something waiting to be written.
 | macOS on Intel | yes | yes | yes, with a virtual cable |
 | macOS on Apple Silicon | yes | yes | yes, with a virtual cable |
 | Linux, x86-64 and arm64 | yes | yes | yes, through PipeWire |
-| Linux, statically linked (musl) | yes | yes | yes |
-| Raspberry Pi and other armv7 | yes | yes | yes |
+| Linux, statically linked (musl) | yes | not shipped | no |
+| Raspberry Pi and other armv7 | yes | not shipped | no |
 | WSL on Windows | yes | yes, with WSLg | through the Windows side |
 | FreeBSD, OpenBSD, NetBSD | yes | not shipped | no |
 
