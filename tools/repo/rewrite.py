@@ -139,8 +139,11 @@ def reword(message, mapping, sha=None):
     def translate(match):
         short = match.group(0)
         named = [new for old, new in mapping.items() if old.startswith(short)]
-        # A run of digits is a number far more often than it is a commit.
-        if len(named) == 1 and re.search(r"[a-f]", short):
+        # A hash can be all digits: 2623074 is one, and is quoted. Seven digits
+        # that begin one of a few hundred hashes by chance is about one in a
+        # million, and every such run in the history was checked when this was
+        # written: the only one that matched was that quote.
+        if len(named) == 1:
             return named[0][:len(short)]
         return short
     return re.sub(r"\b[0-9a-f]{7,40}\b", translate, text)
