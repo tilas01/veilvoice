@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/studio.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 2769 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 2805 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs)
 
 ## Contents
 
@@ -106,7 +106,7 @@ anybody who can open the cupboard can then hear who was talking.
 
 ## What this file contains
 
-2769 lines defining **71 functions** (36 public), **16 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+2805 lines defining **70 functions** (36 public), **17 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -119,50 +119,51 @@ anybody who can open the cupboard can then hear who was talking.
 - `struct GuestTake` (line 299) -- What is being kept for one guest while a room take runs.
 - `enum Reading` (line 321) -- What a running session last reported about itself.
 - `struct Studio` (line 335) -- The Studio and the Browser.
-- `enum Keep` (line 2217) -- Which side of the engine a take keeps.
-- `enum Render` (line 2285) -- What a take is to be turned into.
-- `enum Act` (line 2359) -- Something a browser row asked for.
-- `struct Opened` (line 2472) -- Run ffmpeg to put the audio in a video with a black picture.
-- `struct DecoyRound` (line 2504) -- What one round of decoy making came back with.
-- `enum Tone` (line 2578) -- How a message about an export reads, without saying in what colour.
-- `struct ExportJob` (line 2606) -- Everything one export needs, taken at the moment the folder was chosen.
+- `enum Keep` (line 2310) -- Which side of the engine a take keeps.
+- `enum Render` (line 2378) -- What a take is to be turned into.
+- `enum ExportWork` (line 2386) -- One export, ready to run on a worker.
+- `enum Act` (line 2460) -- Something a browser row asked for.
+- `struct Opened` (line 2575) -- Run ffmpeg to put the audio in a video with a black picture.
+- `struct DecoyRound` (line 2607) -- What one round of decoy making came back with.
+- `enum Tone` (line 2681) -- How a message about an export reads, without saying in what colour.
+- `struct ExportJob` (line 2709) -- Everything one export needs, taken at the moment the folder was chosen.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `RoomGuest::called` (line 208) -- What to call this guest in slot slot, filling in a blank name.
-- `Studio::is_open` (line 468) -- Whether the vault is open.
-- `Studio::is_veiling` (line 488) -- Whether the veiled voice is going out.
-- `Studio::wants_a_room` (line 493) -- Whether the form is set to a room.
-- `Studio::want_a_room` (line 503) -- Switch the form between one microphone and a room.
-- `Studio::room_guests` (line 511) -- Who is in the room, in the order they were added.
-- `Studio::room_guest_mut` (line 516) -- One guest, to be edited by the controls that draw them.
-- `Studio::add_guest` (line 524) -- Add a guest, up to veilvoice_audio::MAX_GUESTS.
-- `Studio::remove_guest` (line 531) -- Take a guest out of the room.
-- `Studio::guest_levels` (line 541) -- The smoothed bars for the room, one pair per guest.
-- `Studio::levels` (line 552) -- The smoothed levels, for the monitor strip and for this tab.
-- `Studio::trouble` (line 562) -- What the audio path last reported about itself, and whether it is new.
-- `Studio::intruders` (line 569) -- The programs that took the microphone while this take has been running.
-- `Studio::note_microphone_holders` (line 584) -- Record which programs are holding the microphone right now.
-- `Studio::tick` (line 601) -- Read the session's counters, once a frame, and move the levels on.
+- `Studio::is_open` (line 480) -- Whether the vault is open.
+- `Studio::is_veiling` (line 500) -- Whether the veiled voice is going out.
+- `Studio::wants_a_room` (line 505) -- Whether the form is set to a room.
+- `Studio::want_a_room` (line 515) -- Switch the form between one microphone and a room.
+- `Studio::room_guests` (line 523) -- Who is in the room, in the order they were added.
+- `Studio::room_guest_mut` (line 528) -- One guest, to be edited by the controls that draw them.
+- `Studio::add_guest` (line 536) -- Add a guest, up to veilvoice_audio::MAX_GUESTS.
+- `Studio::remove_guest` (line 543) -- Take a guest out of the room.
+- `Studio::guest_levels` (line 553) -- The smoothed bars for the room, one pair per guest.
+- `Studio::levels` (line 564) -- The smoothed levels, for the monitor strip and for this tab.
+- `Studio::trouble` (line 574) -- What the audio path last reported about itself, and whether it is new.
+- `Studio::intruders` (line 581) -- The programs that took the microphone while this take has been running.
+- `Studio::note_microphone_holders` (line 596) -- Record which programs are holding the microphone right now.
+- `Studio::tick` (line 613) -- Read the session's counters, once a frame, and move the levels on.
   - reaches: `catch_a_fault`, `is_recording`, `stop_veiling`, `finish_take`, `counted_interruptions`, `store_take`, `take_name`, `length`
-- `Studio::start_veiling` (line 742) -- Start veiling, keeping nothing.
+- `Studio::start_veiling` (line 754) -- Start veiling, keeping nothing.
   - reaches: `start_session`, `sharing_a_microphone`
-- `Studio::start_room` (line 763) -- Roadmap item 147.
+- `Studio::start_room` (line 775) -- Roadmap item 147.
   - reaches: `start_session`, `sharing_a_microphone`
-- `Studio::close` (line 792) -- Shut the vault and forget the key.
+- `Studio::close` (line 804) -- Shut the vault and forget the key.
   - reaches: `stop_veiling`, `finish_take`, `is_recording`, `counted_interruptions`, `store_take`, `take_name`, `length`
-- `Studio::tab` (line 1550) -- The take half of the Recording Studio tab.
+- `Studio::tab` (line 1595) -- The take half of the Recording Studio tab.
   - reaches: `is_previewing`, `keep_form`, `length`, `phase`, `poll_decoys`, `poll_unlock`, `say`, `shut_panel`, `start_take`, `stop_take`, `take_form`, `is_recording`
-- `Studio::browser` (line 1688) -- The Recording Browser tab.
+- `Studio::browser` (line 1733) -- The Recording Browser tab.
   - reaches: `apply`, `counted`, `decoy_panel`, `length`, `made_on`, `poll_decoys`, `poll_unlock`, `say`, `shut_panel`, `size`, `start_export`, `play`
-- `Keep::wants_veiled` (line 2229) -- Whether the veiled voice is kept.
-- `Keep::wants_plain` (line 2237) -- Whether the real voice is kept.
-- `Keep::label` (line 2242) -- What this is called where it is chosen.
-- `Keep::cost` (line 2256) -- What it costs, in the words the plaintext path uses.
+- `Keep::wants_veiled` (line 2322) -- Whether the veiled voice is kept.
+- `Keep::wants_plain` (line 2330) -- Whether the real voice is kept.
+- `Keep::label` (line 2335) -- What this is called where it is chosen.
+- `Keep::cost` (line 2349) -- What it costs, in the words the plaintext path uses.
 
 ## What calls what
 
-_22 of 71 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 70 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **entry** -- a way in: public, and nothing in this file calls it; **api** -- public, and also used inside this file; **helper** -- private to this file._
 
@@ -180,24 +181,24 @@ flowchart TD
     n_default_dir["default_dir<br/>line 122"]
     n_sharing_a_microphone["sharing_a_microphone<br/>line 232"]
     n_take_name["take_name<br/>line 278"]
-    n_is_recording["Studio::is_recording<br/>line 480"]
-    n_is_previewing["Studio::is_previewing<br/>line 547"]
-    n_tick(["Studio::tick<br/>line 601"])
-    n_catch_a_fault["Studio::catch_a_fault<br/>line 693"]
-    n_phase["Studio::phase<br/>line 729"]
-    n_start_veiling(["Studio::start_veiling<br/>line 742"])
-    n_start_room(["Studio::start_room<br/>line 763"])
-    n_stop_veiling["Studio::stop_veiling<br/>line 774"]
-    n_close(["Studio::close<br/>line 792"])
-    n_start_unlock["Studio::start_unlock<br/>line 832"]
-    n_tab(["Studio::tab<br/>line 1550"])
-    n_browser(["Studio::browser<br/>line 1688"])
-    n_counted_interruptions["counted_interruptions<br/>line 2378"]
-    n_counted_decoys["counted_decoys<br/>line 2387"]
-    n_counted["counted<br/>line 2396"]
-    n_made_on["made_on<br/>line 2409"]
-    n_length["length<br/>line 2752"]
-    n_size["size<br/>line 2758"]
+    n_is_recording["Studio::is_recording<br/>line 492"]
+    n_is_previewing["Studio::is_previewing<br/>line 559"]
+    n_tick(["Studio::tick<br/>line 613"])
+    n_catch_a_fault["Studio::catch_a_fault<br/>line 705"]
+    n_phase["Studio::phase<br/>line 741"]
+    n_start_veiling(["Studio::start_veiling<br/>line 754"])
+    n_start_room(["Studio::start_room<br/>line 775"])
+    n_stop_veiling["Studio::stop_veiling<br/>line 786"]
+    n_close(["Studio::close<br/>line 804"])
+    n_start_unlock["Studio::start_unlock<br/>line 848"]
+    n_tab(["Studio::tab<br/>line 1595"])
+    n_browser(["Studio::browser<br/>line 1733"])
+    n_counted_interruptions["counted_interruptions<br/>line 2481"]
+    n_counted_decoys["counted_decoys<br/>line 2490"]
+    n_counted["counted<br/>line 2499"]
+    n_made_on["made_on<br/>line 2512"]
+    n_length["length<br/>line 2788"]
+    n_size["size<br/>line 2794"]
     n_browser --> n_counted
     n_browser --> n_length
     n_browser --> n_made_on
@@ -218,24 +219,24 @@ flowchart TD
     click n_default_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L122" "open the source"
     click n_sharing_a_microphone href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L232" "open the source"
     click n_take_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L278" "open the source"
-    click n_is_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L480" "open the source"
-    click n_is_previewing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L547" "open the source"
-    click n_tick href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L601" "open the source"
-    click n_catch_a_fault href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L693" "open the source"
-    click n_phase href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L729" "open the source"
-    click n_start_veiling href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L742" "open the source"
-    click n_start_room href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L763" "open the source"
-    click n_stop_veiling href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L774" "open the source"
-    click n_close href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L792" "open the source"
-    click n_start_unlock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L832" "open the source"
-    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1550" "open the source"
-    click n_browser href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1688" "open the source"
-    click n_counted_interruptions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2378" "open the source"
-    click n_counted_decoys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2387" "open the source"
-    click n_counted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2396" "open the source"
-    click n_made_on href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2409" "open the source"
-    click n_length href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2752" "open the source"
-    click n_size href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2758" "open the source"
+    click n_is_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L492" "open the source"
+    click n_is_previewing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L559" "open the source"
+    click n_tick href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L613" "open the source"
+    click n_catch_a_fault href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L705" "open the source"
+    click n_phase href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L741" "open the source"
+    click n_start_veiling href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L754" "open the source"
+    click n_start_room href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L775" "open the source"
+    click n_stop_veiling href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L786" "open the source"
+    click n_close href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L804" "open the source"
+    click n_start_unlock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L848" "open the source"
+    click n_tab href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1595" "open the source"
+    click n_browser href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1733" "open the source"
+    click n_counted_interruptions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2481" "open the source"
+    click n_counted_decoys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2490" "open the source"
+    click n_counted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2499" "open the source"
+    click n_made_on href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2512" "open the source"
+    click n_length href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2788" "open the source"
+    click n_size href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2794" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_tick,n_start_veiling,n_start_room,n_close,n_tab,n_browser entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -264,77 +265,77 @@ flowchart TD
 | `GuestTake` <sub>struct</sub> | [299](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L299) | What is being kept for one guest while a room take runs. |
 | `Reading` <sub>pub enum</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L321) | What a running session last reported about itself. |
 | `Studio` <sub>pub struct</sub> | [335](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L335) | The Studio and the Browser. |
-| `Studio::is_open` <sub>pub fn</sub> | [468](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L468) | Whether the vault is open. |
-| `Studio::is_recording` <sub>pub fn</sub> | [480](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L480) | Whether a take is being kept. |
-| `Studio::is_veiling` <sub>pub fn</sub> | [488](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L488) | Whether the veiled voice is going out. |
-| `Studio::wants_a_room` <sub>pub fn</sub> | [493](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L493) | Whether the form is set to a room. |
-| `Studio::want_a_room` <sub>pub fn</sub> | [503](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L503) | Switch the form between one microphone and a room. |
-| `Studio::room_guests` <sub>pub fn</sub> | [511](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L511) | Who is in the room, in the order they were added. |
-| `Studio::room_guest_mut` <sub>pub fn</sub> | [516](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L516) | One guest, to be edited by the controls that draw them. |
-| `Studio::add_guest` <sub>pub fn</sub> | [524](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L524) | Add a guest, up to veilvoice_audio::MAX_GUESTS. |
-| `Studio::remove_guest` <sub>pub fn</sub> | [531](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L531) | Take a guest out of the room. |
-| `Studio::guest_levels` <sub>pub fn</sub> | [541](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L541) | The smoothed bars for the room, one pair per guest. |
-| `Studio::is_previewing` <sub>pub fn</sub> | [547](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L547) | Whether what is going out is a preview to this machine's own output rather than to the chosen one. |
-| `Studio::levels` <sub>pub fn</sub> | [552](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L552) | The smoothed levels, for the monitor strip and for this tab. |
-| `Studio::trouble` <sub>pub fn</sub> | [562](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L562) | What the audio path last reported about itself, and whether it is new. |
-| `Studio::intruders` <sub>pub fn</sub> | [569](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L569) | The programs that took the microphone while this take has been running. |
-| `Studio::note_microphone_holders` <sub>pub fn</sub> | [584](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L584) | Record which programs are holding the microphone right now. |
-| `Studio::tick` <sub>pub fn</sub> | [601](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L601) | Read the session's counters, once a frame, and move the levels on. |
-| `Studio::catch_a_fault` <sub>fn</sub> | [693](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L693) | Roadmap item 145. |
-| `Studio::phase` <sub>fn</sub> | [729](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L729) | What phase the take half of the tab is in. |
-| `Studio::start_veiling` <sub>pub fn</sub> | [742](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L742) | Start veiling, keeping nothing. |
-| `Studio::start_room` <sub>pub fn</sub> | [763](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L763) | Roadmap item 147. |
-| `Studio::stop_veiling` <sub>pub fn</sub> | [774](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L774) | Stop the audio. |
-| `Studio::close` <sub>pub fn</sub> | [792](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L792) | Shut the vault and forget the key. |
-| `Studio::start_unlock` <sub>fn</sub> | [832](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L832) | Start deriving the key from both entries and opening the vault. |
-| `Studio::poll_unlock` <sub>fn</sub> | [859](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L859) | Collect a finished unlock. |
-| `Studio::start_decoys` <sub>fn</sub> | [902](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L902) | Start making count decoys beside the open vault, on a thread. |
-| `Studio::poll_decoys` <sub>fn</sub> | [923](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L923) | Collect a finished round of decoys. |
-| `Studio::start_take` <sub>fn</sub> | [970](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L970) | Start recording into the vault's holding area. |
-| `Studio::start_session` <sub>fn</sub> | [996](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L996) | Start, or restart, the live session setup describes. |
-| `Studio::stop_take` <sub>fn</sub> | [1160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1160) | Stop keeping, seal what was captured, and carry on veiling. |
-| `Studio::finish_take` <sub>fn</sub> | [1172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1172) | Stop recording and seal what was captured into the vault. |
-| `Studio::store_take` <sub>fn</sub> | [1289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1289) | Seal one recorder's audio into the vault under name. |
-| `Studio::play` <sub>fn</sub> | [1358](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1358) | Play a take, straight out of the vault and out of locked memory. |
-| `Studio::start_export` <sub>fn</sub> | [1417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1417) | Start turning a take into a page, a video, or both, in into. |
-| `Studio::export` <sub>fn</sub> | [1460](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1460) | Export here and now, for tests only. |
-| `Studio::write_page` <sub>fn</sub> | [1486](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1486) | The player page, its subtitles, and the drawing they sit in. |
-| `Studio::refresh` <sub>fn</sub> | [1528](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1528) | Re-read the listing from the vault. |
-| `Studio::tab` <sub>pub fn</sub> | [1550](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1550) | The take half of the Recording Studio tab. |
-| `Studio::browser` <sub>pub fn</sub> | [1688](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1688) | The Recording Browser tab. |
-| `Studio::decoy_panel` <sub>fn</sub> | [1959](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1959) | The decoy panel, under the listing. |
-| `Studio::shut_panel` <sub>fn</sub> | [1988](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1988) | The panel shown while the vault is shut, in both tabs. |
-| `Studio::take_form` <sub>fn</sub> | [2063](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2063) | The name field for the next take. |
-| `Studio::keep_form` <sub>fn</sub> | [2094](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2094) | Which side of the engine to keep, asked before anything starts. |
-| `Studio::say` <sub>fn</sub> | [2124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2124) | Show the last message, if there is one. |
-| `Studio::apply` <sub>fn</sub> | [2135](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2135) | Carry out a row action. |
-| `Keep` <sub>pub enum</sub> | [2217](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2217) | Which side of the engine a take keeps. |
-| `Keep::wants_veiled` <sub>pub fn</sub> | [2229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2229) | Whether the veiled voice is kept. |
-| `Keep::wants_plain` <sub>pub fn</sub> | [2237](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2237) | Whether the real voice is kept. |
-| `Keep::label` <sub>pub fn</sub> | [2242](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2242) | What this is called where it is chosen. |
-| `Keep::cost` <sub>pub fn</sub> | [2256](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2256) | What it costs, in the words the plaintext path uses. |
-| `Render` <sub>pub enum</sub> | [2285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2285) | What a take is to be turned into. |
-| `Render::wants_page` <sub>fn</sub> | [2300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2300) | Whether this choice draws the still preview. |
-| `Render::wants_video` <sub>fn</sub> | [2305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2305) | Whether this choice renders the video. |
-| `wav_shape` <sub>fn</sub> | [2316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2316) | The sample rate and frame count a canonical WAV header states. |
-| `plan_for` <sub>fn</sub> | [2340](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2340) | A one-speaker plan spanning a take. |
-| `Act` <sub>enum</sub> | [2359](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2359) | Something a browser row asked for. |
-| `counted_interruptions` <sub>pub fn</sub> | [2378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2378) | "one interruption" or "three interruptions". |
-| `counted_decoys` <sub>pub fn</sub> | [2387](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2387) | "One decoy" or "four decoys", so the interface does not say "1 decoys". |
-| `counted` <sub>pub fn</sub> | [2396](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2396) | "One recording" or "four recordings", so the interface does not say "1 recordings". |
-| `made_on` <sub>pub fn</sub> | [2409](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2409) | A Unix time as a date somebody reads. |
-| `pcm16` <sub>fn</sub> | [2433](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2433) | Sixteen-bit PCM from a WAV, as the waveform drawer wants it. |
-| `safe_stem` <sub>fn</sub> | [2448](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2448) | A file name built from what somebody called a recording. |
-| `Opened` <sub>struct</sub> | [2472](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2472) | Run ffmpeg to put the audio in a video with a black picture. |
-| `open_vault` <sub>fn</sub> | [2483](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2483) | Derive the key and open the vault, on a worker. |
-| `DecoyRound` <sub>struct</sub> | [2504](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2504) | What one round of decoy making came back with. |
-| `DecoyShape` <sub>type</sub> | [2517](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2517) | The shape a decoy is built to, named here so the signatures read. |
-| `make_decoys_now` <sub>fn</sub> | [2525](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2525) | Make count decoys in parent, then read the folder again. |
-| `measure_folder` <sub>fn</sub> | [2562](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2562) | How much room is free where the vaults are, and how many are there. |
-| `Tone` <sub>enum</sub> | [2578](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2578) | How a message about an export reads, without saying in what colour. |
-| `Tone::colour` <sub>fn</sub> | [2592](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2592) | The colour for this tone, from the palette that is active now. |
-| `ExportJob` <sub>struct</sub> | [2606](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2606) | Everything one export needs, taken at the moment the folder was chosen. |
-| `export_now` <sub>fn</sub> | [2627](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2627) | Do the export. |
-| `run_ffmpeg` <sub>fn</sub> | [2725](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2725) | Turn a rendered take into a video by running ffmpeg, on a worker rather than on the thread that draws. |
-| `length` <sub>pub fn</sub> | [2752](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2752) | A length in seconds, as m:ss, for somewhere a person reads. |
-| `size` <sub>pub fn</sub> | [2758](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2758) | A size in bytes, rounded to something a person can compare. |
+| `Studio::is_open` <sub>pub fn</sub> | [480](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L480) | Whether the vault is open. |
+| `Studio::is_recording` <sub>pub fn</sub> | [492](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L492) | Whether a take is being kept. |
+| `Studio::is_veiling` <sub>pub fn</sub> | [500](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L500) | Whether the veiled voice is going out. |
+| `Studio::wants_a_room` <sub>pub fn</sub> | [505](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L505) | Whether the form is set to a room. |
+| `Studio::want_a_room` <sub>pub fn</sub> | [515](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L515) | Switch the form between one microphone and a room. |
+| `Studio::room_guests` <sub>pub fn</sub> | [523](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L523) | Who is in the room, in the order they were added. |
+| `Studio::room_guest_mut` <sub>pub fn</sub> | [528](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L528) | One guest, to be edited by the controls that draw them. |
+| `Studio::add_guest` <sub>pub fn</sub> | [536](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L536) | Add a guest, up to veilvoice_audio::MAX_GUESTS. |
+| `Studio::remove_guest` <sub>pub fn</sub> | [543](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L543) | Take a guest out of the room. |
+| `Studio::guest_levels` <sub>pub fn</sub> | [553](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L553) | The smoothed bars for the room, one pair per guest. |
+| `Studio::is_previewing` <sub>pub fn</sub> | [559](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L559) | Whether what is going out is a preview to this machine's own output rather than to the chosen one. |
+| `Studio::levels` <sub>pub fn</sub> | [564](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L564) | The smoothed levels, for the monitor strip and for this tab. |
+| `Studio::trouble` <sub>pub fn</sub> | [574](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L574) | What the audio path last reported about itself, and whether it is new. |
+| `Studio::intruders` <sub>pub fn</sub> | [581](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L581) | The programs that took the microphone while this take has been running. |
+| `Studio::note_microphone_holders` <sub>pub fn</sub> | [596](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L596) | Record which programs are holding the microphone right now. |
+| `Studio::tick` <sub>pub fn</sub> | [613](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L613) | Read the session's counters, once a frame, and move the levels on. |
+| `Studio::catch_a_fault` <sub>fn</sub> | [705](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L705) | Roadmap item 145. |
+| `Studio::phase` <sub>fn</sub> | [741](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L741) | What phase the take half of the tab is in. |
+| `Studio::start_veiling` <sub>pub fn</sub> | [754](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L754) | Start veiling, keeping nothing. |
+| `Studio::start_room` <sub>pub fn</sub> | [775](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L775) | Roadmap item 147. |
+| `Studio::stop_veiling` <sub>pub fn</sub> | [786](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L786) | Stop the audio. |
+| `Studio::close` <sub>pub fn</sub> | [804](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L804) | Shut the vault and forget the key. |
+| `Studio::start_unlock` <sub>fn</sub> | [848](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L848) | Start deriving the key from both entries and opening the vault. |
+| `Studio::poll_unlock` <sub>fn</sub> | [875](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L875) | Collect a finished unlock. |
+| `Studio::start_decoys` <sub>fn</sub> | [918](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L918) | Start making count decoys beside the open vault, on a thread. |
+| `Studio::poll_decoys` <sub>fn</sub> | [939](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L939) | Collect a finished round of decoys. |
+| `Studio::start_take` <sub>fn</sub> | [986](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L986) | Start recording into the vault's holding area. |
+| `Studio::start_session` <sub>fn</sub> | [1012](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1012) | Start, or restart, the live session setup describes. |
+| `Studio::stop_take` <sub>fn</sub> | [1176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1176) | Stop keeping, seal what was captured, and carry on veiling. |
+| `Studio::finish_take` <sub>fn</sub> | [1188](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1188) | Stop recording and seal what was captured into the vault. |
+| `Studio::store_take` <sub>fn</sub> | [1305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1305) | Seal one recorder's audio into the vault under name. |
+| `Studio::play` <sub>fn</sub> | [1374](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1374) | Play a take, straight out of the vault and out of locked memory. |
+| `Studio::start_export` <sub>fn</sub> | [1433](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1433) | Start turning a take into a page, a video, or both, in into. |
+| `Studio::export_work` <sub>fn</sub> | [1467](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1467) | The work one export is, taken from what is on screen now. |
+| `Studio::export` <sub>fn</sub> | [1509](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1509) | Export here and now, for tests only. |
+| `Studio::write_page` <sub>fn</sub> | [1531](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1531) | The player page, its subtitles, and the drawing they sit in. |
+| `Studio::refresh` <sub>fn</sub> | [1573](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1573) | Re-read the listing from the vault. |
+| `Studio::tab` <sub>pub fn</sub> | [1595](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1595) | The take half of the Recording Studio tab. |
+| `Studio::browser` <sub>pub fn</sub> | [1733](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L1733) | The Recording Browser tab. |
+| `Studio::decoy_panel` <sub>fn</sub> | [2046](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2046) | The decoy panel, under the listing. |
+| `Studio::shut_panel` <sub>fn</sub> | [2075](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2075) | The panel shown while the vault is shut, in both tabs. |
+| `Studio::take_form` <sub>fn</sub> | [2150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2150) | The name field for the next take. |
+| `Studio::keep_form` <sub>fn</sub> | [2181](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2181) | Which side of the engine to keep, asked before anything starts. |
+| `Studio::say` <sub>fn</sub> | [2211](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2211) | Show the last message, if there is one. |
+| `Studio::apply` <sub>fn</sub> | [2222](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2222) | Carry out a row action. |
+| `Keep` <sub>pub enum</sub> | [2310](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2310) | Which side of the engine a take keeps. |
+| `Keep::wants_veiled` <sub>pub fn</sub> | [2322](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2322) | Whether the veiled voice is kept. |
+| `Keep::wants_plain` <sub>pub fn</sub> | [2330](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2330) | Whether the real voice is kept. |
+| `Keep::label` <sub>pub fn</sub> | [2335](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2335) | What this is called where it is chosen. |
+| `Keep::cost` <sub>pub fn</sub> | [2349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2349) | What it costs, in the words the plaintext path uses. |
+| `Render` <sub>pub enum</sub> | [2378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2378) | What a take is to be turned into. |
+| `ExportWork` <sub>enum</sub> | [2386](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2386) | One export, ready to run on a worker. |
+| `ExportWork::run` <sub>fn</sub> | [2395](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2395) | Do it, and say what happened. |
+| `wav_shape` <sub>fn</sub> | [2417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2417) | The sample rate and frame count a canonical WAV header states. |
+| `plan_for` <sub>fn</sub> | [2441](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2441) | A one-speaker plan spanning a take. |
+| `Act` <sub>enum</sub> | [2460](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2460) | Something a browser row asked for. |
+| `counted_interruptions` <sub>pub fn</sub> | [2481](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2481) | "one interruption" or "three interruptions". |
+| `counted_decoys` <sub>pub fn</sub> | [2490](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2490) | "One decoy" or "four decoys", so the interface does not say "1 decoys". |
+| `counted` <sub>pub fn</sub> | [2499](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2499) | "One recording" or "four recordings", so the interface does not say "1 recordings". |
+| `made_on` <sub>pub fn</sub> | [2512](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2512) | A Unix time as a date somebody reads. |
+| `pcm16` <sub>fn</sub> | [2536](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2536) | Sixteen-bit PCM from a WAV, as the waveform drawer wants it. |
+| `safe_stem` <sub>fn</sub> | [2551](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2551) | A file name built from what somebody called a recording. |
+| `Opened` <sub>struct</sub> | [2575](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2575) | Run ffmpeg to put the audio in a video with a black picture. |
+| `open_vault` <sub>fn</sub> | [2586](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2586) | Derive the key and open the vault, on a worker. |
+| `DecoyRound` <sub>struct</sub> | [2607](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2607) | What one round of decoy making came back with. |
+| `DecoyShape` <sub>type</sub> | [2620](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2620) | The shape a decoy is built to, named here so the signatures read. |
+| `make_decoys_now` <sub>fn</sub> | [2628](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2628) | Make count decoys in parent, then read the folder again. |
+| `measure_folder` <sub>fn</sub> | [2665](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2665) | How much room is free where the vaults are, and how many are there. |
+| `Tone` <sub>enum</sub> | [2681](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2681) | How a message about an export reads, without saying in what colour. |
+| `Tone::colour` <sub>fn</sub> | [2695](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2695) | The colour for this tone, from the palette that is active now. |
+| `ExportJob` <sub>struct</sub> | [2709](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2709) | Everything one export needs, taken at the moment the folder was chosen. |
+| `export_now` <sub>fn</sub> | [2731](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2731) | Write the player page, and the audio and captions beside it. |
+| `length` <sub>pub fn</sub> | [2788](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2788) | A length in seconds, as m:ss, for somewhere a person reads. |
+| `size` <sub>pub fn</sub> | [2794](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/studio.rs#L2794) | A size in bytes, rounded to something a person can compare. |

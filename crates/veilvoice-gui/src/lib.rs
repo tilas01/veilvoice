@@ -1175,6 +1175,11 @@ mod row_tests {
     /// Two controls side by side never contain one another, so nothing this rule
     /// drops is a thing this test is about.
     ///
+    /// A slider is the same thing sideways: its handle is taller than its rail,
+    /// so neither contains the other, but the handle lies within the rail's
+    /// width on the rail's centre line. Two controls side by side never overlap
+    /// in width at all, so that rule drops nothing this test is about either.
+    ///
     /// **The hairlines**: separators and strokes, which are under six points.
     fn controls(raw: egui::RawInput, draw: impl FnMut(&mut egui::Ui)) -> Vec<Rect> {
         let ctx = egui::Context::default();
@@ -1205,7 +1210,12 @@ mod row_tests {
         let whole = painted.clone();
         painted.retain(|rect| {
             !whole.iter().any(|other| {
-                other != rect && other.contains_rect(*rect) && other.area() > rect.area()
+                let inside = other.contains_rect(*rect) && other.area() > rect.area();
+                let riding = other.left() <= rect.left()
+                    && rect.right() <= other.right()
+                    && other.width() > rect.width()
+                    && (other.center().y - rect.center().y).abs() <= SLACK;
+                other != rect && (inside || riding)
             })
         });
         painted
@@ -1273,6 +1283,24 @@ mod row_tests {
                 Box::new(|ui: &mut egui::Ui| {
                     let mut studio = crate::studio::Studio::default();
                     studio.browser(ui, crate::no_motion());
+                }),
+            ),
+            (
+                // Drawn on its own, since the browser above is shut and the
+                // form only opens under a recording. Advanced and with a
+                // gradient, so every control it can show is measured.
+                "the export form",
+                Box::new(|ui: &mut egui::Ui| {
+                    let mut choice = crate::exporting::Choice {
+                        advanced: true,
+                        ..Default::default()
+                    };
+                    choice.motion.background = veilvoice_video::motion::Fill::Gradient {
+                        from: [0, 0, 0],
+                        to: [255, 255, 255],
+                        direction: veilvoice_video::motion::Direction::Down,
+                    };
+                    crate::exporting::form(ui, &mut choice);
                 }),
             ),
             (

@@ -443,6 +443,18 @@ pub struct Studio {
     exporting: Option<mpsc::Receiver<(String, Tone)>>,
     /// What the picker is open for: which take, and what to make of it.
     choosing: Option<(String, Render)>,
+    /// **Roadmap item 175.** What the export form is set to.
+    ///
+    /// One for the window rather than one per recording: somebody taking
+    /// several recordings out wants the same kind of file each time.
+    export_choice: crate::exporting::Choice,
+    /// The recording whose export form is open.
+    export_form: Option<String>,
+    /// How far the running export has got, in frames when it draws a picture.
+    /// `None` while a page is being written, which has nothing to count.
+    export_reach: Option<std::sync::Arc<crate::progress::Reach>>,
+    /// A small picture of each recording in the list, drawn on a worker.
+    thumbs: crate::exporting::Thumbs,
 
     // --- decoys ---
     /// How many decoys the slider is on.
@@ -806,6 +818,10 @@ impl Studio {
         // A picker still open belongs to a vault that is now shut. Its answer
         // must not arrive later and export from a vault nobody opened.
         self.choosing = None;
+        self.export_form = None;
+        self.export_reach = None;
+        // Pictures of what is in a vault that is now shut.
+        self.thumbs.clear();
         // And a take still playing is a decrypted recording in memory. The
         // window is locking; it goes with the vault.
         self.playing = None;
@@ -1415,7 +1431,7 @@ impl Studio {
     /// So the answer to the picker starts a worker. The vault is shared into it
     /// rather than copied, which is why [`Studio::vault`] is an `Arc`.
     fn start_export(&mut self, ctx: &egui::Context, id: &str, what: Render, into: &Path) {
-        let Some(vault) = &self.vault else {
+        let Some(vault) = self.vault.clone() else {
             return;
         };
         let Some(entry) = self.entries.iter().find(|e| e.id == id).cloned() else {
@@ -1426,13 +1442,7 @@ impl Studio {
             return;
         };
 
-        let job = ExportJob {
-            vault: std::sync::Arc::clone(vault),
-            id: id.to_string(),
-            name: entry.name.clone(),
-            what,
-            into: into.to_path_buf(),
-        };
+        let work = self.export_work(&vault, id, &entry.name, what, into);
         let (tx, rx) = mpsc::channel();
         self.exporting = Some(rx);
         // Said on screen by `browser`, because a button that goes quiet for the
@@ -1443,9 +1453,48 @@ impl Studio {
             // The receiver is gone if the vault was shut while this ran, which
             // is ordinary: the files are still written, and there is nobody
             // left to tell about them.
-            let _ = tx.send(export_now(job));
+            let _ = tx.send(work.run());
             ctx.request_repaint();
         });
+    }
+
+    /// The work one export is, taken from what is on screen now.
+    ///
+    /// Shared by the worker and the test-only door, so the two cannot disagree
+    /// about what a choice means. A file export counts its frames into a
+    /// [`crate::progress::Reach`] the Browser draws; a page has nothing to
+    /// count.
+    fn export_work(
+        &mut self,
+        vault: &std::sync::Arc<Vault>,
+        id: &str,
+        name: &str,
+        what: Render,
+        into: &Path,
+    ) -> ExportWork {
+        match what {
+            Render::Preview => {
+                self.export_reach = None;
+                ExportWork::Page(ExportJob {
+                    vault: std::sync::Arc::clone(vault),
+                    id: id.to_string(),
+                    name: name.to_string(),
+                    into: into.to_path_buf(),
+                })
+            }
+            Render::File => {
+                let reach = std::sync::Arc::new(crate::exporting::reach_for(&self.export_choice));
+                self.export_reach = Some(std::sync::Arc::clone(&reach));
+                ExportWork::File(crate::exporting::Job {
+                    vault: std::sync::Arc::clone(vault),
+                    id: id.to_string(),
+                    name: name.to_string(),
+                    choice: self.export_choice.clone(),
+                    into: into.to_path_buf(),
+                    reach,
+                })
+            }
+        }
     }
 
     /// Export here and now, for tests only.
@@ -1458,7 +1507,9 @@ impl Studio {
     /// has its own test.
     #[cfg(test)]
     fn export(&mut self, id: &str, what: Render, into: &Path) {
-        let Some(vault) = &self.vault else { return };
+        let Some(vault) = self.vault.clone() else {
+            return;
+        };
         let Some(entry) = self.entries.iter().find(|e| e.id == id).cloned() else {
             self.message = Some((
                 "That recording is not in the listing any more.".into(),
@@ -1466,13 +1517,7 @@ impl Studio {
             ));
             return;
         };
-        let (said, tone) = export_now(ExportJob {
-            vault: std::sync::Arc::clone(vault),
-            id: id.to_string(),
-            name: entry.name.clone(),
-            what,
-            into: into.to_path_buf(),
-        });
+        let (said, tone) = self.export_work(&vault, id, &entry.name, what, into).run();
         self.message = Some((said, tone.colour()));
     }
 
@@ -1723,6 +1768,7 @@ impl Studio {
                 Ok((said, tone)) => {
                     self.message = Some((said, tone.colour()));
                     self.exporting = None;
+                    self.export_reach = None;
                 }
                 Err(mpsc::TryRecvError::Empty) => {}
                 Err(mpsc::TryRecvError::Disconnected) => {
@@ -1733,24 +1779,28 @@ impl Studio {
                         p::red(),
                     ));
                     self.exporting = None;
+                    self.export_reach = None;
                 }
             }
         }
         if self.exporting.is_some() {
-            // No bar, and the reason for there being none is on screen. A video
-            // is most of what an export costs and `ffmpeg` is handed the whole
-            // render in one command, so there is nothing here to count: a bar
-            // would be an invention, which roadmap item 167 rules out. The
-            // repaint this needs is asked for inside `strip`.
-            crate::progress::strip(
-                ui,
-                "writing what you asked for",
-                &crate::progress::Reach::unmeasurable(
-                    "a video is rendered by ffmpeg in one command, which reports \
-                     nothing back that this window can read",
-                ),
-                motion,
-            );
+            // A picture is drawn here a frame at a time and piped to `ffmpeg`,
+            // so it is counted (roadmap item 175). Sound alone and the page have
+            // nothing in the middle to count, and say so rather than drawing a
+            // bar that would be an invention, which roadmap item 167 rules out.
+            // The repaint this needs is asked for inside `strip`.
+            let page;
+            let reach = match &self.export_reach {
+                Some(reach) => reach.as_ref(),
+                None => {
+                    page = crate::progress::Reach::unmeasurable(
+                        "a page is written in one piece, with nothing in the middle \
+                         to count",
+                    );
+                    &page
+                }
+            };
+            crate::progress::strip(ui, "writing what you asked for", reach, motion);
             ui.add_space(6.0);
         }
 
@@ -1772,6 +1822,24 @@ impl Studio {
             return;
         }
 
+        // **Roadmap item 175.** A picture of each recording, in the look the
+        // export form is set to. Drawn on a worker and collected here; asked
+        // for once per recording, not once per frame.
+        self.thumbs.poll(ui.ctx());
+        if let Some(vault) = &self.vault {
+            self.thumbs.ask(
+                ui.ctx(),
+                vault,
+                &self
+                    .entries
+                    .iter()
+                    .map(|e| e.id.clone())
+                    .collect::<Vec<_>>(),
+                self.export_choice.template,
+                &self.export_choice.motion,
+            );
+        }
+
         ui.label(
             RichText::new(format!("{} in the vault", counted(self.entries.len())))
                 .color(p::blue())
@@ -1790,6 +1858,20 @@ impl Studio {
                 for entry in &rows {
                     let chosen = self.selected.as_deref() == Some(entry.id.as_str());
                     ui.horizontal(|ui| {
+                        let thumb = egui::vec2(
+                            crate::exporting::THUMB_WIDTH as f32,
+                            crate::exporting::THUMB_HEIGHT as f32,
+                        );
+                        // The space is kept while the picture is still being
+                        // drawn, so the names do not jump sideways when it lands.
+                        match self.thumbs.get(&entry.id) {
+                            Some(texture) => {
+                                ui.add(egui::Image::new((texture.id(), thumb)));
+                            }
+                            None => {
+                                ui.allocate_exact_size(thumb, egui::Sense::hover());
+                            }
+                        }
                         if ui
                             .add(crate::layout::chip(
                                 chosen,
@@ -1903,22 +1985,27 @@ impl Studio {
                                 {
                                     act = Some(Act::Export(entry.id.clone(), Render::Preview));
                                 }
+                                let open = self.export_form.as_deref() == Some(entry.id.as_str());
                                 if ui
-                                    .button("render video")
+                                    .add(crate::layout::chip(open, "export"))
                                     .on_hover_text(
-                                        "An MP4 with a black picture, for somewhere that \
-                                         will not accept an audio file. Needs ffmpeg, \
-                                         which VeilVoice does not ship: the Setup tab \
-                                         can install it.",
+                                        "A file of the sound, a video of it, or both, \
+                                         with the sound lossless whatever the picture \
+                                         is. Everything but a WAV needs ffmpeg, which \
+                                         VeilVoice does not ship: the Setup tab can \
+                                         install it.",
                                     )
                                     .clicked()
                                 {
-                                    act = Some(Act::Export(entry.id.clone(), Render::Video));
-                                }
-                                if ui.button("both").clicked() {
-                                    act = Some(Act::Export(entry.id.clone(), Render::Both));
+                                    act = Some(Act::ExportForm(entry.id.clone()));
                                 }
                             });
+                            if self.export_form.as_deref() == Some(entry.id.as_str()) {
+                                ui.add_space(4.0);
+                                if crate::exporting::form(ui, &mut self.export_choice) {
+                                    act = Some(Act::Export(entry.id.clone(), Render::File));
+                                }
+                            }
                             ui.label(
                                 RichText::new(
                                     "Anything taken out is written unsealed. The voice in \
@@ -2169,6 +2256,12 @@ impl Studio {
                 // exists to prevent.
                 self.playing = None;
             }
+            Act::ExportForm(id) => {
+                self.export_form = match self.export_form.take() {
+                    Some(open) if open == id => None,
+                    _ => Some(id),
+                };
+            }
             Act::Export(id, what) => {
                 // Off the render loop. `rfd`'s blocking picker freezes the
                 // window until it is answered, which `dialog` exists to avoid
@@ -2277,33 +2370,41 @@ impl Keep {
 
 /// What a take is to be turned into.
 ///
-/// Three, because the two useful things are genuinely separate and doing both
-/// is the common case: the page is something to look at now, the video is
-/// something to send somewhere that will not take an audio file, and somebody
-/// who wants the second usually wants to check the first.
+/// Two, because they are for different things: the page is something to look
+/// at now, and the file is something to send. The black-picture MP4 that used
+/// to be a third choice is one of the files the export form offers since
+/// roadmap item 175, with a picture that moves and sound that is lossless.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Render {
     /// The self-contained player page, and the audio and subtitles beside it.
     Preview,
-    /// An MP4, through `ffmpeg`.
-    Video,
-    /// Both.
-    Both,
+    /// The file the export form describes: the sound, a video of it, or both.
+    File,
 }
 
-impl Render {
-    /// Whether this choice draws the still preview.
-    ///
-    /// Asked rather than matched on at each site, because `Both` has to answer
-    /// yes to this and to [`Render::wants_video`], and a `match` written out
-    /// twice is the place that forgets it.
-    fn wants_page(self) -> bool {
-        matches!(self, Render::Preview | Render::Both)
-    }
+/// One export, ready to run on a worker.
+enum ExportWork {
+    /// The player page.
+    Page(ExportJob),
+    /// A file, as the export form describes it.
+    File(crate::exporting::Job),
+}
 
-    /// Whether this choice renders the video.
-    fn wants_video(self) -> bool {
-        matches!(self, Render::Video | Render::Both)
+impl ExportWork {
+    /// Do it, and say what happened.
+    fn run(self) -> (String, Tone) {
+        match self {
+            ExportWork::Page(job) => export_now(job),
+            ExportWork::File(job) => {
+                let (said, outcome) = crate::exporting::run(job);
+                let tone = match outcome {
+                    crate::exporting::Outcome::Good => Tone::Good,
+                    crate::exporting::Outcome::Warn => Tone::Warn,
+                    crate::exporting::Outcome::Bad => Tone::Bad,
+                };
+                (said, tone)
+            }
+        }
     }
 }
 
@@ -2365,6 +2466,8 @@ enum Act {
     CancelRemove,
     Remove(String),
     Export(String, Render),
+    /// Open or close the export form under a recording.
+    ExportForm(String),
     Play(String),
     Stop,
 }
@@ -2607,11 +2710,12 @@ struct ExportJob {
     vault: std::sync::Arc<Vault>,
     id: String,
     name: String,
-    what: Render,
     into: std::path::PathBuf,
 }
 
-/// Do the export. Runs on a worker; see [`Studio::start_export`].
+/// Write the player page, and the audio and captions beside it. Runs on a
+/// worker; see [`Studio::start_export`]. A file export is
+/// [`crate::exporting::run`], which keeps to the same rule about the vault.
 ///
 /// Every failure is a sentence and a tone rather than an early `self.message`,
 /// because the thread doing this owns nothing of the window's.
@@ -2629,7 +2733,6 @@ fn export_now(job: ExportJob) -> (String, Tone) {
         vault,
         id,
         name,
-        what,
         into,
     } = job;
     let loaded = vault.load(&id);
@@ -2661,42 +2764,9 @@ fn export_now(job: ExportJob) -> (String, Tone) {
     }
 
     let mut wrote = vec![audio_path.clone()];
-
-    if what.wants_page() {
-        match Studio::write_page(&plan, wav.expose(), &stem, &into, &audio_path) {
-            Ok(mut paths) => wrote.append(&mut paths),
-            Err(why) => return (why, Tone::Bad),
-        }
-    }
-
-    if what.wants_video() {
-        let video = into.join(format!("{stem}.mp4"));
-        match veilvoice_video::ffmpeg::found() {
-            Some(_) => match run_ffmpeg(&audio_path, &video) {
-                Ok(()) => wrote.push(video),
-                Err(why) => return (why, Tone::Bad),
-            },
-            // The same answer the command line gives: the exact command,
-            // rather than an offer to fetch a program this does not ship.
-            None => {
-                let argv = veilvoice_video::ffmpeg::black_command(
-                    &audio_path,
-                    &video,
-                    veilvoice_video::ffmpeg::Encoding::default(),
-                );
-                return (
-                    format!(
-                        "The audio and the page are written. `ffmpeg` is not on this \
-                         machine, so the video is not.\n\nThe Setup tab lists \
-                         `ffmpeg` under companion software, with the install command \
-                         for this system and a button to run it. Or run this yourself, \
-                         which is the same command:\n\n{}",
-                        veilvoice_video::ffmpeg::command_line(&argv)
-                    ),
-                    Tone::Warn,
-                );
-            }
-        }
+    match Studio::write_page(&plan, wav.expose(), &stem, &into, &audio_path) {
+        Ok(mut paths) => wrote.append(&mut paths),
+        Err(why) => return (why, Tone::Bad),
     }
 
     let names: Vec<String> = wrote
@@ -2712,40 +2782,6 @@ fn export_now(job: ExportJob) -> (String, Tone) {
         ),
         Tone::Good,
     )
-}
-
-/// Turn a rendered take into a video by running `ffmpeg`, on a worker rather
-/// than on the thread that draws.
-///
-/// The command comes from `veilvoice_video::ffmpeg` rather than being written
-/// here, so the window and the command line run the same arguments. `ffmpeg`
-/// being found earlier is not treated as it still being there: it can be
-/// uninstalled between the check and the run, and the message says exactly that
-/// rather than reporting a missing program as a render failure.
-fn run_ffmpeg(audio: &std::path::Path, video: &std::path::Path) -> Result<(), String> {
-    let argv = veilvoice_video::ffmpeg::black_command(
-        audio,
-        video,
-        veilvoice_video::ffmpeg::Encoding::default(),
-    );
-    let Some(program) = veilvoice_video::ffmpeg::found() else {
-        return Err("`ffmpeg` went away between the check and the run.".into());
-    };
-    let output = crate::command(program)
-        .args(argv.iter().skip(1))
-        .output()
-        .map_err(|error| error.to_string())?;
-    if output.status.success() {
-        return Ok(());
-    }
-    // The last line of ffmpeg's complaint, which is the one that says what
-    // was wrong. The whole of it is pages of build configuration.
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    let last = stderr.lines().rev().find(|line| !line.trim().is_empty());
-    Err(format!(
-        "`ffmpeg` refused: {}",
-        last.unwrap_or("it gave no reason").trim()
-    ))
 }
 
 /// A length in seconds, as `m:ss`, for somewhere a person reads.

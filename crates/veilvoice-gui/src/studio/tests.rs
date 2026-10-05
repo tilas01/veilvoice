@@ -226,11 +226,21 @@ fn a_plan_for_a_take_is_one_speaker_for_the_whole_of_it() {
     assert_eq!(plan.title.as_deref(), Some("Ada"));
 }
 
+/// **Roadmap item 175.** The export form opens under one recording, closes
+/// when pressed again, moves when another recording's is pressed, and goes
+/// when the vault shuts.
 #[test]
-fn what_each_render_choice_asks_for() {
-    assert!(Render::Preview.wants_page() && !Render::Preview.wants_video());
-    assert!(!Render::Video.wants_page() && Render::Video.wants_video());
-    assert!(Render::Both.wants_page() && Render::Both.wants_video());
+fn the_export_form_opens_under_one_recording_at_a_time() {
+    let mut studio = Studio::default();
+    studio.apply(Act::ExportForm("a".into()));
+    assert_eq!(studio.export_form.as_deref(), Some("a"));
+    studio.apply(Act::ExportForm("b".into()));
+    assert_eq!(studio.export_form.as_deref(), Some("b"));
+    studio.apply(Act::ExportForm("b".into()));
+    assert_eq!(studio.export_form, None);
+    studio.apply(Act::ExportForm("a".into()));
+    studio.close();
+    assert_eq!(studio.export_form, None, "the form outlived the vault");
 }
 
 #[test]
@@ -491,7 +501,7 @@ fn exporting_something_that_is_not_in_the_vault_writes_nothing() {
     let into = dir.path().join("out");
     std::fs::create_dir_all(&into).unwrap();
 
-    studio.export("0123456789abcdef", Render::Both, &into);
+    studio.export("0123456789abcdef", Render::File, &into);
 
     assert_eq!(
         std::fs::read_dir(&into).unwrap().count(),
@@ -500,28 +510,27 @@ fn exporting_something_that_is_not_in_the_vault_writes_nothing() {
     );
 }
 
+/// **Roadmap item 175.** A file export writes the file the form describes, or
+/// says what is missing and where to get it; never a silent nothing.
+///
+/// Run whichever way the machine is set up. The form's own default is a
+/// 1080p video, so this asks for 720p to keep the render short.
 #[test]
-fn without_ffmpeg_the_command_is_printed_rather_than_the_video_promised() {
-    // VeilVoice does not ship or install ffmpeg, so the honest answer when it
-    // is missing is the exact command, which is what the command line gives.
-    // This runs whichever way the machine is set up: with ffmpeg the video is
-    // written, without it the command is offered, and neither is a silent
-    // nothing.
+fn a_file_export_writes_the_file_or_says_what_is_missing() {
     let (dir, mut studio, id) = studio_with_a_take("a take");
     let into = dir.path().join("out");
     std::fs::create_dir_all(&into).unwrap();
+    studio.export_choice.export.plan.size = veilvoice_video::size::Preset::Hd720.size();
 
-    studio.export(&id, Render::Video, &into);
+    studio.export(&id, Render::File, &into);
     let (said, _) = studio.message.clone().expect("something should be said");
 
     if veilvoice_video::ffmpeg::found().is_some() {
         assert!(into.join("a-take.mp4").is_file(), "{said}");
+        assert!(said.contains("not sealed"), "{said}");
+        let reach = studio.export_reach.as_ref().expect("a picture is counted");
+        assert!(reach.total() > 0 && reach.done() == reach.total(), "{said}");
     } else {
-        // Named, and pointed somewhere. "VeilVoice does not ship it" was what
-        // this used to check, and it is true but it is only half a message:
-        // somebody reading it still has nowhere to go. The Setup tab now lists
-        // `ffmpeg` and installs it, so the message says so, and this checks the
-        // half that is useful rather than the half that is merely accurate.
         assert!(
             said.contains("ffmpeg"),
             "the missing tool has to be named, and this said: {said}"
@@ -530,14 +539,31 @@ fn without_ffmpeg_the_command_is_printed_rather_than_the_video_promised() {
             said.contains("Setup tab"),
             "the message names a tool without saying where to get it: {said}"
         );
-        assert!(
-            said.contains("-i") || said.contains("ffmpeg "),
-            "the command has to be there to copy, and this said: {said}"
-        );
-        // The audio was still written: it is the input the printed command
-        // needs, so offering the command and not the file would be useless.
-        assert!(into.join("a-take.wav").is_file(), "{said}");
+        assert_eq!(std::fs::read_dir(&into).unwrap().count(), 0, "{said}");
     }
+}
+
+/// A WAV needs nothing installed, and is the recording as it is in the vault.
+#[test]
+fn a_wav_export_needs_nothing_installed() {
+    let (dir, mut studio, id) = studio_with_a_take("a take");
+    let into = dir.path().join("out");
+    std::fs::create_dir_all(&into).unwrap();
+    studio.export_choice.export.content = veilvoice_video::export::Content::Audio;
+    studio.export_choice.export.audio_file = veilvoice_video::export::AudioFile::Wav;
+
+    studio.export(&id, Render::File, &into);
+
+    let written = std::fs::read(into.join("a-take.wav")).expect("the WAV was written");
+    assert_eq!(
+        written,
+        a_wav(2.0),
+        "the WAV is not the recording bit for bit"
+    );
+    assert!(
+        studio.export_reach.as_ref().unwrap().because().is_some(),
+        "sound alone drew a bar it has nothing to count for"
+    );
 }
 
 #[test]
@@ -548,7 +574,7 @@ fn asking_where_to_put_it_does_not_block_the_window() {
     let (_dir, mut studio, id) = studio_with_a_take("a take");
     assert!(!studio.picker.is_open());
 
-    studio.apply(Act::Export(id.clone(), Render::Both));
+    studio.apply(Act::Export(id.clone(), Render::File));
 
     assert!(
         studio.picker.is_open(),
@@ -556,7 +582,7 @@ fn asking_where_to_put_it_does_not_block_the_window() {
     );
     assert_eq!(
         studio.choosing,
-        Some((id, Render::Both)),
+        Some((id, Render::File)),
         "the picker was opened without recording what it is for, so its answer \
          would arrive with nothing to do"
     );

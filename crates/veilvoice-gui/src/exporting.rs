@@ -348,6 +348,239 @@ fn render(
     ))
 }
 
+/// The export form, drawn under the recording it is for.
+///
+/// Returns true on the frame the button that asks for a folder is pressed,
+/// and only when what is chosen can be written: a combination `ffmpeg` would
+/// refuse is named in red and the button is not offered, rather than being
+/// found out a render later.
+///
+/// Reads and writes nothing but `choice`. The folder, the vault and the work
+/// are the caller's, on a worker.
+pub fn form(ui: &mut egui::Ui, choice: &mut Choice) -> bool {
+    use crate::layout::{chip, chip_value};
+    use crate::theme::palette as p;
+    use egui::RichText;
+    use veilvoice_video::export::{AudioFile, Container, Quality};
+    use veilvoice_video::size::{FrameRate, Preset};
+
+    let heading = |ui: &mut egui::Ui, text: &str| {
+        ui.label(RichText::new(text).color(p::muted()).small());
+    };
+
+    heading(ui, "what goes in it");
+    ui.horizontal_wrapped(|ui| {
+        for content in Content::ALL {
+            chip_value(ui, &mut choice.export.content, content, content.label());
+        }
+    });
+
+    if choice.export.content == Content::Audio {
+        heading(ui, "the file");
+        ui.horizontal_wrapped(|ui| {
+            for file in [AudioFile::Flac, AudioFile::Wav] {
+                chip_value(ui, &mut choice.export.audio_file, file, file.label());
+            }
+        });
+    } else {
+        heading(ui, "container");
+        ui.horizontal_wrapped(|ui| {
+            for container in Container::ALL {
+                if chip_value(
+                    ui,
+                    &mut choice.export.container,
+                    container,
+                    container.label(),
+                )
+                .changed()
+                    && !container.video_codecs().contains(&choice.export.codec)
+                {
+                    // The codec follows the container rather than leaving a
+                    // combination on screen that the button would refuse.
+                    choice.export.codec = container.video_codecs()[0];
+                }
+            }
+        });
+        heading(ui, "codec");
+        ui.horizontal_wrapped(|ui| {
+            for codec in choice.export.container.video_codecs() {
+                chip_value(ui, &mut choice.export.codec, *codec, codec.label());
+            }
+        });
+        heading(ui, "quality");
+        ui.horizontal_wrapped(|ui| {
+            for quality in Quality::ALL {
+                chip_value(ui, &mut choice.export.quality, quality, quality.label());
+            }
+        });
+        heading(ui, "size and smoothness");
+        ui.horizontal_wrapped(|ui| {
+            for preset in Preset::ALL {
+                if ui
+                    .add(chip(
+                        choice.export.plan.size == preset.size(),
+                        preset.name(),
+                    ))
+                    .clicked()
+                {
+                    choice.export.plan.size = preset.size();
+                }
+            }
+            for fps in [24, 30, 60] {
+                if let Ok(rate) = FrameRate::new(fps) {
+                    if ui
+                        .add(chip(choice.export.plan.fps == rate, format!("{fps} fps")))
+                        .clicked()
+                    {
+                        choice.export.plan.fps = rate;
+                    }
+                }
+            }
+        });
+        heading(ui, "the look");
+        ui.horizontal_wrapped(|ui| {
+            for template in motion::templates() {
+                if ui
+                    .add(chip(choice.template == template.id, template.name))
+                    .clicked()
+                {
+                    choice.use_template(template.id);
+                }
+            }
+        });
+        if ui
+            .add(chip(choice.advanced, "the look, in detail"))
+            .clicked()
+        {
+            choice.advanced = !choice.advanced;
+        }
+        if choice.advanced {
+            look(ui, &mut choice.motion);
+        }
+    }
+
+    ui.add_space(4.0);
+    ui.label(
+        RichText::new(choice.export.describe())
+            .color(p::fg())
+            .small(),
+    );
+    let refused = choice
+        .export
+        .checked()
+        .err()
+        .map(|why| why.to_string())
+        .or_else(|| choice.motion.checked().err().map(|why| why.to_string()));
+    match refused {
+        Some(why) => {
+            ui.label(RichText::new(why).color(p::red()).small());
+            false
+        }
+        None => ui.button("choose a folder and export").clicked(),
+    }
+}
+
+/// The advanced half of the form: the typeface, the colours and the motion.
+///
+/// One kind of control to a line, so no row mixes a slider with a colour
+/// button of a different height; `row_tests` in `lib.rs` measures it.
+fn look(ui: &mut egui::Ui, chosen: &mut Motion) {
+    use crate::layout::chip_value;
+    use crate::theme::palette as p;
+    use egui::RichText;
+    use veilvoice_video::motion::{Face, Style, RESPONSE_RANGE, SETTLE_RANGE, WINDOW_RANGE};
+
+    ui.horizontal_wrapped(|ui| {
+        for face in Face::ALL {
+            chip_value(ui, &mut chosen.face, face, face.label());
+        }
+    });
+    ui.horizontal_wrapped(|ui| {
+        for style in Style::ALL {
+            chip_value(ui, &mut chosen.style, style, style.label());
+        }
+    });
+    // The value is written into the label rather than shown in the box a
+    // slider puts beside itself, which is a control of another height on the
+    // same row.
+    let response = chosen.response;
+    ui.add(
+        egui::Slider::new(&mut chosen.response, RESPONSE_RANGE.0..=RESPONSE_RANGE.1)
+            .show_value(false)
+            .text(format!(
+                "how strongly the wave answers the sound, {response:.2}"
+            )),
+    );
+    let window = chosen.window_secs;
+    ui.add(
+        egui::Slider::new(&mut chosen.window_secs, WINDOW_RANGE.0..=WINDOW_RANGE.1)
+            .show_value(false)
+            .text(format!("seconds shown at once, {window:.1}")),
+    );
+    let settle = chosen.settle_secs;
+    ui.add(
+        egui::Slider::new(&mut chosen.settle_secs, SETTLE_RANGE.0..=SETTLE_RANGE.1)
+            .show_value(false)
+            .text(format!("seconds it takes to settle, {settle:.2}")),
+    );
+    fill(ui, "background", &mut chosen.background);
+    fill(ui, "wave", &mut chosen.wave);
+    ui.horizontal(|ui| {
+        ui.color_edit_button_srgb(&mut chosen.ink);
+        ui.label(RichText::new("lettering").color(p::muted()).small());
+    });
+}
+
+/// One colour, or two with a gradient between them.
+fn fill(ui: &mut egui::Ui, what: &str, fill: &mut motion::Fill) {
+    use crate::layout::chip;
+    use crate::theme::palette as p;
+    use egui::RichText;
+    use motion::{Direction, Fill};
+
+    ui.horizontal(|ui| {
+        match fill {
+            Fill::Solid(colour) => {
+                ui.color_edit_button_srgb(colour);
+            }
+            Fill::Gradient { from, to, .. } => {
+                ui.color_edit_button_srgb(from);
+                ui.color_edit_button_srgb(to);
+            }
+        }
+        ui.label(RichText::new(what).color(p::muted()).small());
+    });
+    ui.horizontal_wrapped(|ui| {
+        let solid = matches!(fill, Fill::Solid(_));
+        if ui.add(chip(solid, "one colour")).clicked() && !solid {
+            *fill = Fill::Solid(fill.middle());
+        }
+        for direction in Direction::ALL {
+            let chosen = matches!(fill, Fill::Gradient { direction: d, .. } if *d == direction);
+            if ui
+                .add(chip(
+                    chosen,
+                    format!("gradient {}", direction.label().to_lowercase()),
+                ))
+                .clicked()
+            {
+                *fill = match *fill {
+                    Fill::Solid(colour) => Fill::Gradient {
+                        from: colour,
+                        to: [255 - colour[0], 255 - colour[1], 255 - colour[2]],
+                        direction,
+                    },
+                    Fill::Gradient { from, to, .. } => Fill::Gradient {
+                        from,
+                        to,
+                        direction,
+                    },
+                };
+            }
+        }
+    });
+}
+
 /// A small picture of every recording in the list.
 #[derive(Default)]
 pub struct Thumbs {
