@@ -579,13 +579,12 @@ recording.
 
 | Control | What it is |
 |---|---|
-| **the list** | Each recording's name, size and the date it was made. The date and not the time: a listing open on a screen in an office already says enough. |
+| **the list** | Each recording's name, size and the date it was made, beside a small picture of its sound drawn in the look the export is set to. The date and not the time: a listing open on a screen in an office already says enough. The pictures are drawn in the background while the vault is open and are never written anywhere. |
 | **rename** | Rewrites the index only. The audio is sealed under an identifier rather than a name, so renaming never re-encrypts anything and cannot lose a recording if it is interrupted. |
 | **play** | Plays it straight out of locked memory. **Nothing is written to the disk**, so there is no copy to remember to shred afterwards. Stopping releases the samples, and so does locking the window. |
 | **remove** | Asks first, and cannot be undone. |
 | **preview page** | Writes the audio, a self-contained player page and its captions into a folder you pick. The page plays the recording, draws its waveform, lights whoever is speaking and moves a level under their name, and needs nothing installed. |
-| **render video** | Writes an MP4 with a black picture, for somewhere that will not accept an audio file. Needs `ffmpeg`, which VeilVoice does not ship and will not install: without it you get the exact command to run, and the audio it needs, rather than a promise. |
-| **both** | The page and the video. |
+| **export** | Opens a form under the recording that asks what a recording tool asks: the sound, a video of it, or both; a container (MP4, MKV or MOV) and a codec; a quality, from a lossless master down to something small enough to send; the size and the frame rate; and the look of the moving wave, from a template for every theme and seven more. **The look, in detail** opens the typeface, the colours (each one colour or a gradient), how strongly the wave answers the sound, how many seconds of it are shown at once and how quickly it settles. **The sound is lossless whatever the picture is**: FLAC, ALAC or PCM, never a lossy codec. A combination `ffmpeg` would refuse is named in red with one that works, and the button is not offered until it is fixed. While a video is written, a bar counts its frames. Everything but a WAV needs `ffmpeg`, which VeilVoice does not ship and will not install; nothing is ever written over an existing file. |
 
 **The level under each name, and what it means.** A lit circle says whose turn
 it is. It says nothing about whether that person is mid-sentence or mid-pause,

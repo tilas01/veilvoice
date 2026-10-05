@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/exporting.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 626 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 859 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs)
 
 ## Contents
 
@@ -53,14 +53,14 @@ same style the video will be.
 
 ## What this file contains
 
-626 lines defining **13 functions** (9 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+859 lines defining **16 functions** (10 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `struct Choice` (line 55) -- Everything the person has chosen about an export.
 - `enum Outcome` (line 93) -- How a finished export reads: good, worth a second look, or failed.
 - `struct Job` (line 103) -- Everything one export needs, taken at the moment the folder was chosen.
-- `struct Thumbs` (line 353) -- A small picture of every recording in the list.
+- `struct Thumbs` (line 586) -- A small picture of every recording in the list.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -68,9 +68,11 @@ same style the video will be.
 - `reach_for` (line 127) -- How far an export with this choice can say it has got.
 - `run` (line 184) -- Do the export.
   - reaches: `render`, `safe_stem`, `samples_of`, `wrote`
-- `Thumbs::get` (line 362) -- The picture for a recording, once it has been drawn.
-- `Thumbs::poll` (line 376) -- Take whatever pictures have arrived.
-- `Thumbs::ask` (line 402) -- Draw the pictures nobody has asked for yet, on a worker.
+- `form` (line 360) -- The export form, drawn under the recording it is for.
+  - reaches: `look`, `fill`
+- `Thumbs::get` (line 595) -- The picture for a recording, once it has been drawn.
+- `Thumbs::poll` (line 609) -- Take whatever pictures have arrived.
+- `Thumbs::ask` (line 635) -- Draw the pictures nobody has asked for yet, on a worker.
   - reaches: `clear`, `draw_thumbnails`, `samples_of`
 
 ## What calls what
@@ -95,14 +97,19 @@ flowchart TD
     n_run(["run<br/>line 184"])
     n_wrote["wrote<br/>line 269"]
     n_render["render<br/>line 279"]
-    n_get(["Thumbs::get<br/>line 362"])
-    n_clear["Thumbs::clear<br/>line 368"]
-    n_poll(["Thumbs::poll<br/>line 376"])
-    n_ask(["Thumbs::ask<br/>line 402"])
-    n_draw_thumbnails["draw_thumbnails<br/>line 436"]
+    n_form(["form<br/>line 360"])
+    n_look["look<br/>line 487"]
+    n_fill["fill<br/>line 535"]
+    n_get(["Thumbs::get<br/>line 595"])
+    n_clear["Thumbs::clear<br/>line 601"]
+    n_poll(["Thumbs::poll<br/>line 609"])
+    n_ask(["Thumbs::ask<br/>line 635"])
+    n_draw_thumbnails["draw_thumbnails<br/>line 669"]
     n_ask --> n_clear
     n_ask --> n_draw_thumbnails
     n_draw_thumbnails --> n_samples_of
+    n_form --> n_look
+    n_look --> n_fill
     n_run --> n_render
     n_run --> n_safe_stem
     n_run --> n_samples_of
@@ -115,17 +122,20 @@ flowchart TD
     click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L184" "open the source"
     click n_wrote href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L269" "open the source"
     click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L279" "open the source"
-    click n_get href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L362" "open the source"
-    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L368" "open the source"
-    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L376" "open the source"
-    click n_ask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L402" "open the source"
-    click n_draw_thumbnails href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L436" "open the source"
+    click n_form href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L360" "open the source"
+    click n_look href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L487" "open the source"
+    click n_fill href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L535" "open the source"
+    click n_get href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L595" "open the source"
+    click n_clear href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L601" "open the source"
+    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L609" "open the source"
+    click n_ask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L635" "open the source"
+    click n_draw_thumbnails href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L669" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_use_template,n_reach_for,n_run,n_get,n_poll,n_ask entry
+    class n_use_template,n_reach_for,n_run,n_form,n_get,n_poll,n_ask entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_safe_stem,n_samples_of,n_clear api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_default,n_wrote,n_render,n_draw_thumbnails helper
+    class n_default,n_wrote,n_render,n_look,n_fill,n_draw_thumbnails helper
 ```
 
 </details>
@@ -148,9 +158,12 @@ flowchart TD
 | `run` <sub>pub fn</sub> | [184](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L184) | Do the export. |
 | `wrote` <sub>fn</sub> | [269](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L269) | What a successful export says. |
 | `render` <sub>fn</sub> | [279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L279) | Run ffmpeg, drawing and piping the frames when there is a picture. |
-| `Thumbs` <sub>pub struct</sub> | [353](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L353) | A small picture of every recording in the list. |
-| `Thumbs::get` <sub>pub fn</sub> | [362](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L362) | The picture for a recording, once it has been drawn. |
-| `Thumbs::clear` <sub>pub fn</sub> | [368](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L368) | Forget every picture. |
-| `Thumbs::poll` <sub>pub fn</sub> | [376](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L376) | Take whatever pictures have arrived. |
-| `Thumbs::ask` <sub>pub fn</sub> | [402](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L402) | Draw the pictures nobody has asked for yet, on a worker. |
-| `draw_thumbnails` <sub>fn</sub> | [436](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L436) | The worker behind Thumbs::ask. |
+| `form` <sub>pub fn</sub> | [360](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L360) | The export form, drawn under the recording it is for. |
+| `look` <sub>fn</sub> | [487](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L487) | The advanced half of the form: the typeface, the colours and the motion. |
+| `fill` <sub>fn</sub> | [535](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L535) | One colour, or two with a gradient between them. |
+| `Thumbs` <sub>pub struct</sub> | [586](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L586) | A small picture of every recording in the list. |
+| `Thumbs::get` <sub>pub fn</sub> | [595](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L595) | The picture for a recording, once it has been drawn. |
+| `Thumbs::clear` <sub>pub fn</sub> | [601](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L601) | Forget every picture. |
+| `Thumbs::poll` <sub>pub fn</sub> | [609](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L609) | Take whatever pictures have arrived. |
+| `Thumbs::ask` <sub>pub fn</sub> | [635](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L635) | Draw the pictures nobody has asked for yet, on a worker. |
+| `draw_thumbnails` <sub>fn</sub> | [669](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L669) | The worker behind Thumbs::ask. |

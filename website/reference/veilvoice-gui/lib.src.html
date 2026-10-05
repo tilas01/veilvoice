@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1518 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1546 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1270,347 +1270,375 @@
 <span class="ln" id="L1175">    <span class="tok-com">/// Two controls side by side never contain one another, so nothing this rule</span></span>
 <span class="ln" id="L1176">    <span class="tok-com">/// drops is a thing this test is about.</span></span>
 <span class="ln" id="L1177">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1178">    <span class="tok-com">/// **The hairlines**: separators and strokes, which are under six points.</span></span>
-<span class="ln" id="L1179">    <span class="tok-kw">fn</span> <span class="tok-fn">controls</span>(raw: egui::RawInput, draw: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> egui::Ui)) -&gt; Vec&lt;Rect&gt; {</span>
-<span class="ln" id="L1180">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1181">        <span class="tok-kw">crate</span>::theme::<span class="tok-fn">install</span>(&amp;ctx);</span>
-<span class="ln" id="L1182">        <span class="tok-com">// Twice: the first frame of anything that remembers a width has nothing</span></span>
-<span class="ln" id="L1183">        <span class="tok-com">// remembered, which `layout`&#x27;s tests document at length. The second is</span></span>
-<span class="ln" id="L1184">        <span class="tok-com">// the frame a reader sees.</span></span>
-<span class="ln" id="L1185">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> painted = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1186">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> draw = draw;</span>
-<span class="ln" id="L1187">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
-<span class="ln" id="L1188">            <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, raw.<span class="tok-fn">clone</span>(), &amp;<span class="tok-kw">mut</span> draw);</span>
-<span class="ln" id="L1189">            painted.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L1190">            <span class="tok-kw">for</span> clipped <span class="tok-kw">in</span> output.shapes {</span>
-<span class="ln" id="L1191">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::Shape::<span class="tok-fn">Rect</span>(rect) = &amp;clipped.shape {</span>
-<span class="ln" id="L1192">                    <span class="tok-kw">let</span> rect = rect.rect;</span>
-<span class="ln" id="L1193">                    <span class="tok-kw">if</span> rect.<span class="tok-fn">width</span>() &gt; <span class="tok-num">800.0</span></span>
-<span class="ln" id="L1194">                        || rect.<span class="tok-fn">width</span>() &lt; <span class="tok-num">6.0</span></span>
-<span class="ln" id="L1195">                        || !CONTROL_HEIGHT.<span class="tok-fn">contains</span>(&amp;rect.<span class="tok-fn">height</span>())</span>
-<span class="ln" id="L1196">                    {</span>
-<span class="ln" id="L1197">                        continue;</span>
-<span class="ln" id="L1198">                    }</span>
-<span class="ln" id="L1199">                    painted.<span class="tok-fn">push</span>(rect);</span>
-<span class="ln" id="L1200">                }</span>
-<span class="ln" id="L1201">            }</span>
-<span class="ln" id="L1202">        }</span>
-<span class="ln" id="L1203">        <span class="tok-com">// A part of a control rather than a control: see the note above. Done</span></span>
-<span class="ln" id="L1204">        <span class="tok-com">// after the loop because it is a question about the whole frame.</span></span>
-<span class="ln" id="L1205">        <span class="tok-kw">let</span> whole = painted.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L1206">        painted.<span class="tok-fn">retain</span>(|rect| {</span>
-<span class="ln" id="L1207">            !whole.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|other| {</span>
-<span class="ln" id="L1208">                other != rect &amp;&amp; other.<span class="tok-fn">contains_rect</span>(*rect) &amp;&amp; other.<span class="tok-fn">area</span>() &gt; rect.<span class="tok-fn">area</span>()</span>
-<span class="ln" id="L1209">            })</span>
-<span class="ln" id="L1210">        });</span>
-<span class="ln" id="L1211">        painted</span>
-<span class="ln" id="L1212">    }</span>
-<span class="ln" id="L1213"></span>
-<span class="ln" id="L1214">    <span class="tok-com">/// The painted controls gathered into rows, top to bottom.</span></span>
-<span class="ln" id="L1215">    <span class="tok-kw">fn</span> <span class="tok-fn">rows</span>(<span class="tok-kw">mut</span> painted: Vec&lt;Rect&gt;) -&gt; Vec&lt;Vec&lt;Rect&gt;&gt; {</span>
-<span class="ln" id="L1216">        painted.<span class="tok-fn">sort_by</span>(|a, b| a.<span class="tok-fn">top</span>().<span class="tok-fn">total_cmp</span>(&amp;b.<span class="tok-fn">top</span>()));</span>
-<span class="ln" id="L1217">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rows: Vec&lt;Vec&lt;Rect&gt;&gt; = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1218">        <span class="tok-kw">for</span> rect <span class="tok-kw">in</span> painted {</span>
-<span class="ln" id="L1219">            <span class="tok-kw">match</span> rows.<span class="tok-fn">last_mut</span>() {</span>
-<span class="ln" id="L1220">                <span class="tok-com">// Compared against the row&#x27;s first member rather than its last,</span></span>
-<span class="ln" id="L1221">                <span class="tok-com">// so a run of slightly taller controls cannot walk a row down</span></span>
-<span class="ln" id="L1222">                <span class="tok-com">// the panel one comparison at a time.</span></span>
-<span class="ln" id="L1223">                <span class="tok-fn">Some</span>(row)</span>
-<span class="ln" id="L1224">                    <span class="tok-kw">if</span> (row[<span class="tok-num">0</span>].<span class="tok-fn">bottom</span>() - rect.<span class="tok-fn">top</span>()).<span class="tok-fn">min</span>(rect.<span class="tok-fn">bottom</span>() - row[<span class="tok-num">0</span>].<span class="tok-fn">top</span>())</span>
-<span class="ln" id="L1225">                        &gt; OVERLAP =&gt;</span>
-<span class="ln" id="L1226">                {</span>
-<span class="ln" id="L1227">                    row.<span class="tok-fn">push</span>(rect)</span>
-<span class="ln" id="L1228">                }</span>
-<span class="ln" id="L1229">                _ =&gt; rows.<span class="tok-fn">push</span>(vec![rect]),</span>
-<span class="ln" id="L1230">            }</span>
-<span class="ln" id="L1231">        }</span>
-<span class="ln" id="L1232">        <span class="tok-kw">for</span> row <span class="tok-kw">in</span> &amp;<span class="tok-kw">mut</span> rows {</span>
-<span class="ln" id="L1233">            row.<span class="tok-fn">sort_by</span>(|a, b| a.<span class="tok-fn">left</span>().<span class="tok-fn">total_cmp</span>(&amp;b.<span class="tok-fn">left</span>()));</span>
-<span class="ln" id="L1234">        }</span>
-<span class="ln" id="L1235">        rows</span>
-<span class="ln" id="L1236">    }</span>
-<span class="ln" id="L1237"></span>
-<span class="ln" id="L1238">    <span class="tok-com">/// The panels this drives, named for the failure message.</span></span>
-<span class="ln" id="L1239">    <span class="tok-kw">type</span> Panel = (&amp;&#x27;<span class="tok-kw">static</span> str, Box&lt;<span class="tok-kw">dyn</span> <span class="tok-fn">Fn</span>(&amp;<span class="tok-kw">mut</span> egui::Ui)&gt;);</span>
-<span class="ln" id="L1240"></span>
-<span class="ln" id="L1241">    <span class="tok-kw">fn</span> <span class="tok-fn">panels</span>() -&gt; Vec&lt;Panel&gt; {</span>
-<span class="ln" id="L1242">        vec![</span>
-<span class="ln" id="L1243">            (</span>
-<span class="ln" id="L1244">                <span class="tok-str">&quot;the verify tab&quot;</span>,</span>
-<span class="ln" id="L1245">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1246">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = <span class="tok-kw">crate</span>::verify::Verify::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1247">                    verify.<span class="tok-fn">tab</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
-<span class="ln" id="L1248">                }),</span>
-<span class="ln" id="L1249">            ),</span>
-<span class="ln" id="L1250">            (</span>
-<span class="ln" id="L1251">                <span class="tok-str">&quot;the setup tab&quot;</span>,</span>
-<span class="ln" id="L1252">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1253">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> setup = <span class="tok-kw">crate</span>::setup::Setup::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1254">                    setup.<span class="tok-fn">tab</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
-<span class="ln" id="L1255">                }),</span>
-<span class="ln" id="L1256">            ),</span>
-<span class="ln" id="L1257">            (</span>
-<span class="ln" id="L1258">                <span class="tok-str">&quot;the security tab&quot;</span>,</span>
-<span class="ln" id="L1259">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1260">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1261">                    security.<span class="tok-fn">tab</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
-<span class="ln" id="L1262">                }),</span>
-<span class="ln" id="L1263">            ),</span>
-<span class="ln" id="L1264">            (</span>
-<span class="ln" id="L1265">                <span class="tok-str">&quot;the lock screen&quot;</span>,</span>
-<span class="ln" id="L1266">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1267">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1268">                    security.<span class="tok-fn">unlock_screen</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
-<span class="ln" id="L1269">                }),</span>
-<span class="ln" id="L1270">            ),</span>
-<span class="ln" id="L1271">            (</span>
-<span class="ln" id="L1272">                <span class="tok-str">&quot;the recordings browser&quot;</span>,</span>
-<span class="ln" id="L1273">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1274">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> studio = <span class="tok-kw">crate</span>::studio::Studio::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1275">                    studio.<span class="tok-fn">browser</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
-<span class="ln" id="L1276">                }),</span>
-<span class="ln" id="L1277">            ),</span>
-<span class="ln" id="L1278">            (</span>
-<span class="ln" id="L1279">                <span class="tok-str">&quot;the studio tab&quot;</span>,</span>
-<span class="ln" id="L1280">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1281">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> studio = <span class="tok-kw">crate</span>::studio::Studio::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1282">                    studio.<span class="tok-fn">tab</span>(ui, Default::<span class="tok-fn">default</span>(), None, None, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
-<span class="ln" id="L1283">                }),</span>
-<span class="ln" id="L1284">            ),</span>
-<span class="ln" id="L1285">            (</span>
-<span class="ln" id="L1286">                <span class="tok-str">&quot;the settings tab&quot;</span>,</span>
-<span class="ln" id="L1287">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1288">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = <span class="tok-kw">crate</span>::settings::Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1289">                    <span class="tok-kw">let</span> ctx = ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L1290">                    <span class="tok-com">// A reset of its own, rather than one shared with another</span></span>
-<span class="ln" id="L1291">                    <span class="tok-com">// panel: this harness measures where controls land, and a</span></span>
-<span class="ln" id="L1292">                    <span class="tok-com">// reset part-way through a confirmation draws a different</span></span>
-<span class="ln" id="L1293">                    <span class="tok-com">// set of them.</span></span>
-<span class="ln" id="L1294">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> reset = <span class="tok-kw">crate</span>::reset::Reset::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1295">                    settings.<span class="tok-fn">tab</span>(ui, &amp;ctx, &amp;<span class="tok-kw">mut</span> reset);</span>
-<span class="ln" id="L1296">                }),</span>
-<span class="ln" id="L1297">            ),</span>
-<span class="ln" id="L1298">            (</span>
-<span class="ln" id="L1299">                <span class="tok-str">&quot;the group tab&quot;</span>,</span>
-<span class="ln" id="L1300">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1301">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = <span class="tok-kw">crate</span>::group::Group::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1302">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = <span class="tok-kw">crate</span>::settings::Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1303">                    group.<span class="tok-fn">tab</span>(ui, &amp;<span class="tok-kw">mut</span> settings, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1178">    <span class="tok-com">/// A slider is the same thing sideways: its handle is taller than its rail,</span></span>
+<span class="ln" id="L1179">    <span class="tok-com">/// so neither contains the other, but the handle lies within the rail&#x27;s</span></span>
+<span class="ln" id="L1180">    <span class="tok-com">/// width on the rail&#x27;s centre line. Two controls side by side never overlap</span></span>
+<span class="ln" id="L1181">    <span class="tok-com">/// in width at all, so that rule drops nothing this test is about either.</span></span>
+<span class="ln" id="L1182">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1183">    <span class="tok-com">/// **The hairlines**: separators and strokes, which are under six points.</span></span>
+<span class="ln" id="L1184">    <span class="tok-kw">fn</span> <span class="tok-fn">controls</span>(raw: egui::RawInput, draw: <span class="tok-kw">impl</span> <span class="tok-fn">FnMut</span>(&amp;<span class="tok-kw">mut</span> egui::Ui)) -&gt; Vec&lt;Rect&gt; {</span>
+<span class="ln" id="L1185">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1186">        <span class="tok-kw">crate</span>::theme::<span class="tok-fn">install</span>(&amp;ctx);</span>
+<span class="ln" id="L1187">        <span class="tok-com">// Twice: the first frame of anything that remembers a width has nothing</span></span>
+<span class="ln" id="L1188">        <span class="tok-com">// remembered, which `layout`&#x27;s tests document at length. The second is</span></span>
+<span class="ln" id="L1189">        <span class="tok-com">// the frame a reader sees.</span></span>
+<span class="ln" id="L1190">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> painted = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1191">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> draw = draw;</span>
+<span class="ln" id="L1192">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">2</span> {</span>
+<span class="ln" id="L1193">            <span class="tok-kw">let</span> output = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, raw.<span class="tok-fn">clone</span>(), &amp;<span class="tok-kw">mut</span> draw);</span>
+<span class="ln" id="L1194">            painted.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L1195">            <span class="tok-kw">for</span> clipped <span class="tok-kw">in</span> output.shapes {</span>
+<span class="ln" id="L1196">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> egui::Shape::<span class="tok-fn">Rect</span>(rect) = &amp;clipped.shape {</span>
+<span class="ln" id="L1197">                    <span class="tok-kw">let</span> rect = rect.rect;</span>
+<span class="ln" id="L1198">                    <span class="tok-kw">if</span> rect.<span class="tok-fn">width</span>() &gt; <span class="tok-num">800.0</span></span>
+<span class="ln" id="L1199">                        || rect.<span class="tok-fn">width</span>() &lt; <span class="tok-num">6.0</span></span>
+<span class="ln" id="L1200">                        || !CONTROL_HEIGHT.<span class="tok-fn">contains</span>(&amp;rect.<span class="tok-fn">height</span>())</span>
+<span class="ln" id="L1201">                    {</span>
+<span class="ln" id="L1202">                        continue;</span>
+<span class="ln" id="L1203">                    }</span>
+<span class="ln" id="L1204">                    painted.<span class="tok-fn">push</span>(rect);</span>
+<span class="ln" id="L1205">                }</span>
+<span class="ln" id="L1206">            }</span>
+<span class="ln" id="L1207">        }</span>
+<span class="ln" id="L1208">        <span class="tok-com">// A part of a control rather than a control: see the note above. Done</span></span>
+<span class="ln" id="L1209">        <span class="tok-com">// after the loop because it is a question about the whole frame.</span></span>
+<span class="ln" id="L1210">        <span class="tok-kw">let</span> whole = painted.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L1211">        painted.<span class="tok-fn">retain</span>(|rect| {</span>
+<span class="ln" id="L1212">            !whole.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|other| {</span>
+<span class="ln" id="L1213">                <span class="tok-kw">let</span> inside = other.<span class="tok-fn">contains_rect</span>(*rect) &amp;&amp; other.<span class="tok-fn">area</span>() &gt; rect.<span class="tok-fn">area</span>();</span>
+<span class="ln" id="L1214">                <span class="tok-kw">let</span> riding = other.<span class="tok-fn">left</span>() &lt;= rect.<span class="tok-fn">left</span>()</span>
+<span class="ln" id="L1215">                    &amp;&amp; rect.<span class="tok-fn">right</span>() &lt;= other.<span class="tok-fn">right</span>()</span>
+<span class="ln" id="L1216">                    &amp;&amp; other.<span class="tok-fn">width</span>() &gt; rect.<span class="tok-fn">width</span>()</span>
+<span class="ln" id="L1217">                    &amp;&amp; (other.<span class="tok-fn">center</span>().y - rect.<span class="tok-fn">center</span>().y).<span class="tok-fn">abs</span>() &lt;= SLACK;</span>
+<span class="ln" id="L1218">                other != rect &amp;&amp; (inside || riding)</span>
+<span class="ln" id="L1219">            })</span>
+<span class="ln" id="L1220">        });</span>
+<span class="ln" id="L1221">        painted</span>
+<span class="ln" id="L1222">    }</span>
+<span class="ln" id="L1223"></span>
+<span class="ln" id="L1224">    <span class="tok-com">/// The painted controls gathered into rows, top to bottom.</span></span>
+<span class="ln" id="L1225">    <span class="tok-kw">fn</span> <span class="tok-fn">rows</span>(<span class="tok-kw">mut</span> painted: Vec&lt;Rect&gt;) -&gt; Vec&lt;Vec&lt;Rect&gt;&gt; {</span>
+<span class="ln" id="L1226">        painted.<span class="tok-fn">sort_by</span>(|a, b| a.<span class="tok-fn">top</span>().<span class="tok-fn">total_cmp</span>(&amp;b.<span class="tok-fn">top</span>()));</span>
+<span class="ln" id="L1227">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> rows: Vec&lt;Vec&lt;Rect&gt;&gt; = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1228">        <span class="tok-kw">for</span> rect <span class="tok-kw">in</span> painted {</span>
+<span class="ln" id="L1229">            <span class="tok-kw">match</span> rows.<span class="tok-fn">last_mut</span>() {</span>
+<span class="ln" id="L1230">                <span class="tok-com">// Compared against the row&#x27;s first member rather than its last,</span></span>
+<span class="ln" id="L1231">                <span class="tok-com">// so a run of slightly taller controls cannot walk a row down</span></span>
+<span class="ln" id="L1232">                <span class="tok-com">// the panel one comparison at a time.</span></span>
+<span class="ln" id="L1233">                <span class="tok-fn">Some</span>(row)</span>
+<span class="ln" id="L1234">                    <span class="tok-kw">if</span> (row[<span class="tok-num">0</span>].<span class="tok-fn">bottom</span>() - rect.<span class="tok-fn">top</span>()).<span class="tok-fn">min</span>(rect.<span class="tok-fn">bottom</span>() - row[<span class="tok-num">0</span>].<span class="tok-fn">top</span>())</span>
+<span class="ln" id="L1235">                        &gt; OVERLAP =&gt;</span>
+<span class="ln" id="L1236">                {</span>
+<span class="ln" id="L1237">                    row.<span class="tok-fn">push</span>(rect)</span>
+<span class="ln" id="L1238">                }</span>
+<span class="ln" id="L1239">                _ =&gt; rows.<span class="tok-fn">push</span>(vec![rect]),</span>
+<span class="ln" id="L1240">            }</span>
+<span class="ln" id="L1241">        }</span>
+<span class="ln" id="L1242">        <span class="tok-kw">for</span> row <span class="tok-kw">in</span> &amp;<span class="tok-kw">mut</span> rows {</span>
+<span class="ln" id="L1243">            row.<span class="tok-fn">sort_by</span>(|a, b| a.<span class="tok-fn">left</span>().<span class="tok-fn">total_cmp</span>(&amp;b.<span class="tok-fn">left</span>()));</span>
+<span class="ln" id="L1244">        }</span>
+<span class="ln" id="L1245">        rows</span>
+<span class="ln" id="L1246">    }</span>
+<span class="ln" id="L1247"></span>
+<span class="ln" id="L1248">    <span class="tok-com">/// The panels this drives, named for the failure message.</span></span>
+<span class="ln" id="L1249">    <span class="tok-kw">type</span> Panel = (&amp;&#x27;<span class="tok-kw">static</span> str, Box&lt;<span class="tok-kw">dyn</span> <span class="tok-fn">Fn</span>(&amp;<span class="tok-kw">mut</span> egui::Ui)&gt;);</span>
+<span class="ln" id="L1250"></span>
+<span class="ln" id="L1251">    <span class="tok-kw">fn</span> <span class="tok-fn">panels</span>() -&gt; Vec&lt;Panel&gt; {</span>
+<span class="ln" id="L1252">        vec![</span>
+<span class="ln" id="L1253">            (</span>
+<span class="ln" id="L1254">                <span class="tok-str">&quot;the verify tab&quot;</span>,</span>
+<span class="ln" id="L1255">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1256">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> verify = <span class="tok-kw">crate</span>::verify::Verify::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1257">                    verify.<span class="tok-fn">tab</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1258">                }),</span>
+<span class="ln" id="L1259">            ),</span>
+<span class="ln" id="L1260">            (</span>
+<span class="ln" id="L1261">                <span class="tok-str">&quot;the setup tab&quot;</span>,</span>
+<span class="ln" id="L1262">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1263">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> setup = <span class="tok-kw">crate</span>::setup::Setup::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1264">                    setup.<span class="tok-fn">tab</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1265">                }),</span>
+<span class="ln" id="L1266">            ),</span>
+<span class="ln" id="L1267">            (</span>
+<span class="ln" id="L1268">                <span class="tok-str">&quot;the security tab&quot;</span>,</span>
+<span class="ln" id="L1269">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1270">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1271">                    security.<span class="tok-fn">tab</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1272">                }),</span>
+<span class="ln" id="L1273">            ),</span>
+<span class="ln" id="L1274">            (</span>
+<span class="ln" id="L1275">                <span class="tok-str">&quot;the lock screen&quot;</span>,</span>
+<span class="ln" id="L1276">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1277">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1278">                    security.<span class="tok-fn">unlock_screen</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1279">                }),</span>
+<span class="ln" id="L1280">            ),</span>
+<span class="ln" id="L1281">            (</span>
+<span class="ln" id="L1282">                <span class="tok-str">&quot;the recordings browser&quot;</span>,</span>
+<span class="ln" id="L1283">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1284">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> studio = <span class="tok-kw">crate</span>::studio::Studio::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1285">                    studio.<span class="tok-fn">browser</span>(ui, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1286">                }),</span>
+<span class="ln" id="L1287">            ),</span>
+<span class="ln" id="L1288">            (</span>
+<span class="ln" id="L1289">                <span class="tok-com">// Drawn on its own, since the browser above is shut and the</span></span>
+<span class="ln" id="L1290">                <span class="tok-com">// form only opens under a recording. Advanced and with a</span></span>
+<span class="ln" id="L1291">                <span class="tok-com">// gradient, so every control it can show is measured.</span></span>
+<span class="ln" id="L1292">                <span class="tok-str">&quot;the export form&quot;</span>,</span>
+<span class="ln" id="L1293">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1294">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> choice = <span class="tok-kw">crate</span>::exporting::Choice {</span>
+<span class="ln" id="L1295">                        advanced: true,</span>
+<span class="ln" id="L1296">                        ..Default::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1297">                    };</span>
+<span class="ln" id="L1298">                    choice.motion.background = veilvoice_video::motion::Fill::Gradient {</span>
+<span class="ln" id="L1299">                        from: [<span class="tok-num">0</span>, <span class="tok-num">0</span>, <span class="tok-num">0</span>],</span>
+<span class="ln" id="L1300">                        to: [<span class="tok-num">255</span>, <span class="tok-num">255</span>, <span class="tok-num">255</span>],</span>
+<span class="ln" id="L1301">                        direction: veilvoice_video::motion::Direction::Down,</span>
+<span class="ln" id="L1302">                    };</span>
+<span class="ln" id="L1303">                    <span class="tok-kw">crate</span>::exporting::<span class="tok-fn">form</span>(ui, &amp;<span class="tok-kw">mut</span> choice);</span>
 <span class="ln" id="L1304">                }),</span>
 <span class="ln" id="L1305">            ),</span>
 <span class="ln" id="L1306">            (</span>
-<span class="ln" id="L1307">                <span class="tok-str">&quot;the storage panel&quot;</span>,</span>
+<span class="ln" id="L1307">                <span class="tok-str">&quot;the studio tab&quot;</span>,</span>
 <span class="ln" id="L1308">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1309">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> storage = <span class="tok-kw">crate</span>::storage::Storage::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1310">                    <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::storage::<span class="tok-fn">panel</span>(&amp;<span class="tok-kw">mut</span> storage, ui);</span>
+<span class="ln" id="L1309">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> studio = <span class="tok-kw">crate</span>::studio::Studio::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1310">                    studio.<span class="tok-fn">tab</span>(ui, Default::<span class="tok-fn">default</span>(), None, None, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
 <span class="ln" id="L1311">                }),</span>
 <span class="ln" id="L1312">            ),</span>
 <span class="ln" id="L1313">            (</span>
-<span class="ln" id="L1314">                <span class="tok-str">&quot;the update check&quot;</span>,</span>
+<span class="ln" id="L1314">                <span class="tok-str">&quot;the settings tab&quot;</span>,</span>
 <span class="ln" id="L1315">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1316">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = <span class="tok-kw">crate</span>::updates::Updates::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1317">                    updates.<span class="tok-fn">section</span>(ui, <span class="tok-str">&quot;0.0.0&quot;</span>, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
-<span class="ln" id="L1318">                }),</span>
-<span class="ln" id="L1319">            ),</span>
-<span class="ln" id="L1320">            (</span>
-<span class="ln" id="L1321">                <span class="tok-str">&quot;the first-run tour&quot;</span>,</span>
-<span class="ln" id="L1322">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
-<span class="ln" id="L1323">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> run = <span class="tok-kw">crate</span>::firstrun::FirstRun::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1324">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> prefs = <span class="tok-kw">crate</span>::settings::Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1325">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1326">                    <span class="tok-kw">let</span> _ = run.<span class="tok-fn">panel</span>(ui, &amp;<span class="tok-kw">mut</span> prefs, &amp;<span class="tok-kw">mut</span> security, (<span class="tok-num">0</span>, <span class="tok-num">0</span>), <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
-<span class="ln" id="L1327">                }),</span>
-<span class="ln" id="L1328">            ),</span>
-<span class="ln" id="L1329">        ]</span>
-<span class="ln" id="L1330">    }</span>
-<span class="ln" id="L1331"></span>
-<span class="ln" id="L1332">    <span class="tok-com">/// Every row of controls agrees on height and on vertical centre.</span></span>
-<span class="ln" id="L1333">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1334">    <span class="tok-com">/// The two together are what &quot;lined up&quot; means: equal heights with different</span></span>
-<span class="ln" id="L1335">    <span class="tok-com">/// centres is a row where one control sits low, and equal centres with</span></span>
-<span class="ln" id="L1336">    <span class="tok-com">/// different heights is a row where one is squat. Roadmap item 168 asks for</span></span>
-<span class="ln" id="L1337">    <span class="tok-com">/// both, and for the left edge, which is the test below.</span></span>
-<span class="ln" id="L1338">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1339">    <span class="tok-kw">fn</span> <span class="tok-fn">every_row_of_controls_agrees_on_height_and_centre</span>() {</span>
-<span class="ln" id="L1340">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wrong = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1341">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> compared = <span class="tok-num">0</span>;</span>
-<span class="ln" id="L1342">        <span class="tok-kw">for</span> (name, draw) <span class="tok-kw">in</span> <span class="tok-fn">panels</span>() {</span>
-<span class="ln" id="L1343">            <span class="tok-kw">for</span> row <span class="tok-kw">in</span> <span class="tok-fn">rows</span>(<span class="tok-fn">controls</span>(<span class="tok-fn">input</span>(), |ui| {</span>
-<span class="ln" id="L1344">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(ui));</span>
-<span class="ln" id="L1345">            })) {</span>
-<span class="ln" id="L1346">                <span class="tok-kw">if</span> row.<span class="tok-fn">len</span>() &lt; <span class="tok-num">2</span> {</span>
-<span class="ln" id="L1347">                    continue;</span>
-<span class="ln" id="L1348">                }</span>
-<span class="ln" id="L1349">                compared += row.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L1350">                <span class="tok-kw">let</span> tallest = row.<span class="tok-fn">iter</span>().<span class="tok-fn">fold</span>(<span class="tok-num">0</span>.0_f32, |a, r| a.<span class="tok-fn">max</span>(r.<span class="tok-fn">height</span>()));</span>
-<span class="ln" id="L1351">                <span class="tok-kw">let</span> shortest = row.<span class="tok-fn">iter</span>().<span class="tok-fn">fold</span>(f32::MAX, |a, r| a.<span class="tok-fn">min</span>(r.<span class="tok-fn">height</span>()));</span>
-<span class="ln" id="L1352">                <span class="tok-kw">if</span> tallest - shortest &gt; SLACK {</span>
-<span class="ln" id="L1353">                    wrong.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L1354">                        <span class="tok-str">&quot;{name}: a row at y={:.0} holds controls {:.1} and {:.1} high&quot;</span>,</span>
-<span class="ln" id="L1355">                        row[<span class="tok-num">0</span>].<span class="tok-fn">top</span>(),</span>
-<span class="ln" id="L1356">                        shortest,</span>
-<span class="ln" id="L1357">                        tallest</span>
-<span class="ln" id="L1358">                    ));</span>
-<span class="ln" id="L1359">                }</span>
-<span class="ln" id="L1360">                <span class="tok-kw">let</span> highest = row.<span class="tok-fn">iter</span>().<span class="tok-fn">fold</span>(f32::MAX, |a, r| a.<span class="tok-fn">min</span>(r.<span class="tok-fn">center</span>().y));</span>
-<span class="ln" id="L1361">                <span class="tok-kw">let</span> lowest = row.<span class="tok-fn">iter</span>().<span class="tok-fn">fold</span>(<span class="tok-num">0</span>.0_f32, |a, r| a.<span class="tok-fn">max</span>(r.<span class="tok-fn">center</span>().y));</span>
-<span class="ln" id="L1362">                <span class="tok-kw">if</span> lowest - highest &gt; SLACK {</span>
-<span class="ln" id="L1363">                    wrong.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L1364">                        <span class="tok-str">&quot;{name}: a row at y={:.0} has centres {:.1} apart&quot;</span>,</span>
-<span class="ln" id="L1365">                        row[<span class="tok-num">0</span>].<span class="tok-fn">top</span>(),</span>
-<span class="ln" id="L1366">                        lowest - highest</span>
-<span class="ln" id="L1367">                    ));</span>
-<span class="ln" id="L1368">                }</span>
-<span class="ln" id="L1369">            }</span>
-<span class="ln" id="L1370">        }</span>
-<span class="ln" id="L1371">        assert!(</span>
-<span class="ln" id="L1372">            wrong.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1373">            <span class="tok-str">&quot;these rows do not line up. Give the controls one height, the way \</span></span>
-<span class="ln" id="L1374"><span class="tok-str">             `layout::button_height` and `layout::LOCK_WIDTH` do for the lock \</span></span>
-<span class="ln" id="L1375"><span class="tok-str">             and unlock buttons:\n{}&quot;</span>,</span>
-<span class="ln" id="L1376">            wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L1377">        );</span>
-<span class="ln" id="L1378">        <span class="tok-com">// Not vacuous. Every rectangle here is found by a filter, and a filter</span></span>
-<span class="ln" id="L1379">        <span class="tok-com">// that is one line from finding nothing is how a guard comes to pass by</span></span>
-<span class="ln" id="L1380">        <span class="tok-com">// drawing no conclusions: the first version of this counted a</span></span>
-<span class="ln" id="L1381">        <span class="tok-com">// checkbox&#x27;s tick box as a control beside its own label, and tightening</span></span>
-<span class="ln" id="L1382">        <span class="tok-com">// that could as easily have left nothing to compare.</span></span>
-<span class="ln" id="L1383">        assert!(</span>
-<span class="ln" id="L1384">            compared &gt; <span class="tok-num">30</span>,</span>
-<span class="ln" id="L1385">            <span class="tok-str">&quot;only {compared} controls were in a row with anything, which is too \</span></span>
-<span class="ln" id="L1386"><span class="tok-str">             few for this to have checked the interface&quot;</span></span>
-<span class="ln" id="L1387">        );</span>
-<span class="ln" id="L1388">    }</span>
-<span class="ln" id="L1389"></span>
-<span class="ln" id="L1390">    <span class="tok-com">/// Rows that nearly share a left edge share it.</span></span>
-<span class="ln" id="L1391">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1392">    <span class="tok-com">/// The left edge is the fourth of the four measurements roadmap item 168</span></span>
-<span class="ln" id="L1393">    <span class="tok-com">/// asks for, and it is the one where &quot;close&quot; is the whole defect. Two rows</span></span>
-<span class="ln" id="L1394">    <span class="tok-com">/// starting at the same x read as a column; two rows starting 40 points</span></span>
-<span class="ln" id="L1395">    <span class="tok-com">/// apart read as a heading and an indented list, which is deliberate. Two</span></span>
-<span class="ln" id="L1396">    <span class="tok-com">/// rows starting three points apart read as a mistake, because that is what</span></span>
-<span class="ln" id="L1397">    <span class="tok-com">/// it is: nobody indents by three points on purpose.</span></span>
-<span class="ln" id="L1398">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1399">    <span class="tok-com">/// So the rule is about near misses only, and says so rather than pretending</span></span>
-<span class="ln" id="L1400">    <span class="tok-com">/// to check alignment in general, which from a paint list it cannot: whether</span></span>
-<span class="ln" id="L1401">    <span class="tok-com">/// two rows belong to one column is a question about the panel&#x27;s structure,</span></span>
-<span class="ln" id="L1402">    <span class="tok-com">/// and the answer is not in the shapes.</span></span>
-<span class="ln" id="L1403">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1404">    <span class="tok-kw">fn</span> <span class="tok-fn">rows_that_nearly_share_a_left_edge_share_it</span>() {</span>
-<span class="ln" id="L1405">        <span class="tok-com">/// How far apart two left edges have to be before they are meant to</span></span>
-<span class="ln" id="L1406">        <span class="tok-com">/// differ rather than failing to match.</span></span>
-<span class="ln" id="L1407">        <span class="tok-kw">const</span> DELIBERATE: f32 = <span class="tok-num">12.0</span>;</span>
-<span class="ln" id="L1408"></span>
-<span class="ln" id="L1409">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wrong = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1410">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pairs = <span class="tok-num">0</span>;</span>
-<span class="ln" id="L1411">        <span class="tok-kw">for</span> (name, draw) <span class="tok-kw">in</span> <span class="tok-fn">panels</span>() {</span>
-<span class="ln" id="L1412">            <span class="tok-kw">let</span> rows = <span class="tok-fn">rows</span>(<span class="tok-fn">controls</span>(<span class="tok-fn">input</span>(), |ui| {</span>
-<span class="ln" id="L1413">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(ui));</span>
-<span class="ln" id="L1414">            }));</span>
-<span class="ln" id="L1415">            <span class="tok-kw">let</span> lefts: Vec&lt;(f32, f32)&gt; = rows</span>
-<span class="ln" id="L1416">                .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L1417">                .<span class="tok-fn">map</span>(|row| (row[<span class="tok-num">0</span>].<span class="tok-fn">left</span>(), row[<span class="tok-num">0</span>].<span class="tok-fn">top</span>()))</span>
-<span class="ln" id="L1418">                .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1419">            <span class="tok-kw">for</span> (index, (left, top)) <span class="tok-kw">in</span> lefts.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L1420">                <span class="tok-kw">for</span> (other, other_top) <span class="tok-kw">in</span> lefts.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(index + <span class="tok-num">1</span>) {</span>
-<span class="ln" id="L1421">                    pairs += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L1422">                    <span class="tok-kw">let</span> gap = (left - other).<span class="tok-fn">abs</span>();</span>
-<span class="ln" id="L1423">                    <span class="tok-kw">if</span> gap &gt; SLACK &amp;&amp; gap &lt; DELIBERATE {</span>
-<span class="ln" id="L1424">                        wrong.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L1425">                            <span class="tok-str">&quot;{name}: a row at y={top:.0} starts at x={left:.1} and one \</span></span>
-<span class="ln" id="L1426"><span class="tok-str">                             at y={other_top:.0} at x={other:.1}, {gap:.1} apart&quot;</span></span>
-<span class="ln" id="L1427">                        ));</span>
-<span class="ln" id="L1428">                    }</span>
-<span class="ln" id="L1429">                }</span>
-<span class="ln" id="L1430">            }</span>
-<span class="ln" id="L1431">        }</span>
-<span class="ln" id="L1432">        assert!(</span>
-<span class="ln" id="L1433">            wrong.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1434">            <span class="tok-str">&quot;these rows almost line up, which reads worse than not lining up at \</span></span>
-<span class="ln" id="L1435"><span class="tok-str">             all. Give them one left edge, with `layout::column` where a label \</span></span>
-<span class="ln" id="L1436"><span class="tok-str">             has to hold the space:\n{}&quot;</span>,</span>
-<span class="ln" id="L1437">            wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L1438">        );</span>
-<span class="ln" id="L1439">        <span class="tok-com">// Not vacuous, for the reason the test above gives: a rule that finds</span></span>
-<span class="ln" id="L1440">        <span class="tok-com">// nothing and a rule that looks at nothing read the same from here.</span></span>
-<span class="ln" id="L1441">        assert!(</span>
-<span class="ln" id="L1442">            pairs &gt; <span class="tok-num">20</span>,</span>
-<span class="ln" id="L1443">            <span class="tok-str">&quot;only {pairs} pairs of rows were compared, which is too few for this \</span></span>
-<span class="ln" id="L1444"><span class="tok-str">             to have looked at the interface&quot;</span></span>
-<span class="ln" id="L1445">        );</span>
-<span class="ln" id="L1446">    }</span>
-<span class="ln" id="L1447"></span>
-<span class="ln" id="L1448">    <span class="tok-com">/// Hovering a control changes its colour and not its shape.</span></span>
-<span class="ln" id="L1449">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1450">    <span class="tok-com">/// Driven with the pointer over the middle of each control in turn, and the</span></span>
-<span class="ln" id="L1451">    <span class="tok-com">/// whole panel re-measured each time: a control that grows on hover pushes</span></span>
-<span class="ln" id="L1452">    <span class="tok-com">/// everything after it along, so the assertion is about the panel and not</span></span>
-<span class="ln" id="L1453">    <span class="tok-com">/// only about the control under the pointer.</span></span>
-<span class="ln" id="L1454">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1455">    <span class="tok-com">/// This is the half of roadmap item 168 that a reader cannot check by</span></span>
-<span class="ln" id="L1456">    <span class="tok-com">/// looking, because a one-point shift is only visible as a flicker while the</span></span>
-<span class="ln" id="L1457">    <span class="tok-com">/// pointer moves, and it is the half a future theme change is most likely to</span></span>
-<span class="ln" id="L1458">    <span class="tok-com">/// undo: `egui::style::WidgetVisuals::expansion` is one field, it is zero in</span></span>
-<span class="ln" id="L1459">    <span class="tok-com">/// this version of egui and it has not always been, and setting it is how</span></span>
-<span class="ln" id="L1460">    <span class="tok-com">/// somebody would make hover &quot;feel nicer&quot;.</span></span>
-<span class="ln" id="L1461">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1462">    <span class="tok-kw">fn</span> <span class="tok-fn">hovering_a_control_does_not_move_anything</span>() {</span>
-<span class="ln" id="L1463">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> moved = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1464">        <span class="tok-kw">for</span> (name, draw) <span class="tok-kw">in</span> <span class="tok-fn">panels</span>() {</span>
-<span class="ln" id="L1465">            <span class="tok-kw">let</span> draw = &amp;draw;</span>
-<span class="ln" id="L1466">            <span class="tok-kw">let</span> at_rest = <span class="tok-fn">controls</span>(<span class="tok-fn">input</span>(), |ui| {</span>
-<span class="ln" id="L1467">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(ui));</span>
-<span class="ln" id="L1468">            });</span>
-<span class="ln" id="L1469">            <span class="tok-kw">for</span> target <span class="tok-kw">in</span> &amp;at_rest {</span>
-<span class="ln" id="L1470">                <span class="tok-kw">let</span> hovered = <span class="tok-fn">controls</span>(<span class="tok-fn">input_pointing</span>(target.<span class="tok-fn">center</span>()), |ui| {</span>
-<span class="ln" id="L1471">                    egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(ui));</span>
-<span class="ln" id="L1472">                });</span>
-<span class="ln" id="L1473">                <span class="tok-com">// Every rectangle that was there at rest must still be there,</span></span>
-<span class="ln" id="L1474">                <span class="tok-com">// in the same place. Compared as a set rather than pairwise,</span></span>
-<span class="ln" id="L1475">                <span class="tok-com">// because hover is allowed to paint *more*: a highlight behind</span></span>
-<span class="ln" id="L1476">                <span class="tok-com">// the control under the pointer is a colour change, and it</span></span>
-<span class="ln" id="L1477">                <span class="tok-com">// arrives as an extra shape that would offset every later</span></span>
-<span class="ln" id="L1478">                <span class="tok-com">// comparison in a pairwise walk.</span></span>
-<span class="ln" id="L1479">                <span class="tok-kw">for</span> rest <span class="tok-kw">in</span> &amp;at_rest {</span>
-<span class="ln" id="L1480">                    <span class="tok-kw">let</span> still_there = hovered.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|over| {</span>
-<span class="ln" id="L1481">                        (rest.min - over.min).<span class="tok-fn">length</span>() &lt;= SLACK</span>
-<span class="ln" id="L1482">                            &amp;&amp; (rest.max - over.max).<span class="tok-fn">length</span>() &lt;= SLACK</span>
-<span class="ln" id="L1483">                    });</span>
-<span class="ln" id="L1484">                    <span class="tok-kw">if</span> !still_there {</span>
-<span class="ln" id="L1485">                        <span class="tok-kw">let</span> nearest = hovered</span>
-<span class="ln" id="L1486">                            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L1487">                            .<span class="tok-fn">min_by</span>(|a, b| {</span>
-<span class="ln" id="L1488">                                (a.min - rest.min)</span>
-<span class="ln" id="L1489">                                    .<span class="tok-fn">length</span>()</span>
-<span class="ln" id="L1490">                                    .<span class="tok-fn">total_cmp</span>(&amp;(b.min - rest.min).<span class="tok-fn">length</span>())</span>
-<span class="ln" id="L1491">                            })</span>
-<span class="ln" id="L1492">                            .<span class="tok-fn">copied</span>()</span>
-<span class="ln" id="L1493">                            .<span class="tok-fn">unwrap_or</span>(*rest);</span>
-<span class="ln" id="L1494">                        moved.<span class="tok-fn">push</span>(format!(</span>
-<span class="ln" id="L1495">                            <span class="tok-str">&quot;{name}: with the pointer at y={:.0}, the control at \</span></span>
-<span class="ln" id="L1496"><span class="tok-str">                             {:?} {:.1}x{:.1} became {:?} {:.1}x{:.1}&quot;</span>,</span>
-<span class="ln" id="L1497">                            target.<span class="tok-fn">top</span>(),</span>
-<span class="ln" id="L1498">                            rest.min,</span>
-<span class="ln" id="L1499">                            rest.<span class="tok-fn">width</span>(),</span>
-<span class="ln" id="L1500">                            rest.<span class="tok-fn">height</span>(),</span>
-<span class="ln" id="L1501">                            nearest.min,</span>
-<span class="ln" id="L1502">                            nearest.<span class="tok-fn">width</span>(),</span>
-<span class="ln" id="L1503">                            nearest.<span class="tok-fn">height</span>()</span>
-<span class="ln" id="L1504">                        ));</span>
-<span class="ln" id="L1505">                        break;</span>
-<span class="ln" id="L1506">                    }</span>
-<span class="ln" id="L1507">                }</span>
-<span class="ln" id="L1508">            }</span>
-<span class="ln" id="L1509">        }</span>
-<span class="ln" id="L1510">        assert!(</span>
-<span class="ln" id="L1511">            moved.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1512">            <span class="tok-str">&quot;hover moves something, so text shifts under the pointer. Hover \</span></span>
-<span class="ln" id="L1513"><span class="tok-str">             changes colour and nothing else: no weight, no padding, no \</span></span>
-<span class="ln" id="L1514"><span class="tok-str">             `expansion`:\n{}&quot;</span>,</span>
-<span class="ln" id="L1515">            moved.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
-<span class="ln" id="L1516">        );</span>
-<span class="ln" id="L1517">    }</span>
-<span class="ln" id="L1518">}</span>
+<span class="ln" id="L1316">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = <span class="tok-kw">crate</span>::settings::Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1317">                    <span class="tok-kw">let</span> ctx = ui.<span class="tok-fn">ctx</span>().<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L1318">                    <span class="tok-com">// A reset of its own, rather than one shared with another</span></span>
+<span class="ln" id="L1319">                    <span class="tok-com">// panel: this harness measures where controls land, and a</span></span>
+<span class="ln" id="L1320">                    <span class="tok-com">// reset part-way through a confirmation draws a different</span></span>
+<span class="ln" id="L1321">                    <span class="tok-com">// set of them.</span></span>
+<span class="ln" id="L1322">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> reset = <span class="tok-kw">crate</span>::reset::Reset::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1323">                    settings.<span class="tok-fn">tab</span>(ui, &amp;ctx, &amp;<span class="tok-kw">mut</span> reset);</span>
+<span class="ln" id="L1324">                }),</span>
+<span class="ln" id="L1325">            ),</span>
+<span class="ln" id="L1326">            (</span>
+<span class="ln" id="L1327">                <span class="tok-str">&quot;the group tab&quot;</span>,</span>
+<span class="ln" id="L1328">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1329">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> group = <span class="tok-kw">crate</span>::group::Group::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1330">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> settings = <span class="tok-kw">crate</span>::settings::Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1331">                    group.<span class="tok-fn">tab</span>(ui, &amp;<span class="tok-kw">mut</span> settings, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1332">                }),</span>
+<span class="ln" id="L1333">            ),</span>
+<span class="ln" id="L1334">            (</span>
+<span class="ln" id="L1335">                <span class="tok-str">&quot;the storage panel&quot;</span>,</span>
+<span class="ln" id="L1336">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1337">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> storage = <span class="tok-kw">crate</span>::storage::Storage::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1338">                    <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::storage::<span class="tok-fn">panel</span>(&amp;<span class="tok-kw">mut</span> storage, ui);</span>
+<span class="ln" id="L1339">                }),</span>
+<span class="ln" id="L1340">            ),</span>
+<span class="ln" id="L1341">            (</span>
+<span class="ln" id="L1342">                <span class="tok-str">&quot;the update check&quot;</span>,</span>
+<span class="ln" id="L1343">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1344">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> updates = <span class="tok-kw">crate</span>::updates::Updates::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1345">                    updates.<span class="tok-fn">section</span>(ui, <span class="tok-str">&quot;0.0.0&quot;</span>, <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1346">                }),</span>
+<span class="ln" id="L1347">            ),</span>
+<span class="ln" id="L1348">            (</span>
+<span class="ln" id="L1349">                <span class="tok-str">&quot;the first-run tour&quot;</span>,</span>
+<span class="ln" id="L1350">                Box::<span class="tok-fn">new</span>(|ui: &amp;<span class="tok-kw">mut</span> egui::Ui| {</span>
+<span class="ln" id="L1351">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> run = <span class="tok-kw">crate</span>::firstrun::FirstRun::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1352">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> prefs = <span class="tok-kw">crate</span>::settings::Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1353">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1354">                    <span class="tok-kw">let</span> _ = run.<span class="tok-fn">panel</span>(ui, &amp;<span class="tok-kw">mut</span> prefs, &amp;<span class="tok-kw">mut</span> security, (<span class="tok-num">0</span>, <span class="tok-num">0</span>), <span class="tok-kw">crate</span>::<span class="tok-fn">no_motion</span>());</span>
+<span class="ln" id="L1355">                }),</span>
+<span class="ln" id="L1356">            ),</span>
+<span class="ln" id="L1357">        ]</span>
+<span class="ln" id="L1358">    }</span>
+<span class="ln" id="L1359"></span>
+<span class="ln" id="L1360">    <span class="tok-com">/// Every row of controls agrees on height and on vertical centre.</span></span>
+<span class="ln" id="L1361">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1362">    <span class="tok-com">/// The two together are what &quot;lined up&quot; means: equal heights with different</span></span>
+<span class="ln" id="L1363">    <span class="tok-com">/// centres is a row where one control sits low, and equal centres with</span></span>
+<span class="ln" id="L1364">    <span class="tok-com">/// different heights is a row where one is squat. Roadmap item 168 asks for</span></span>
+<span class="ln" id="L1365">    <span class="tok-com">/// both, and for the left edge, which is the test below.</span></span>
+<span class="ln" id="L1366">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1367">    <span class="tok-kw">fn</span> <span class="tok-fn">every_row_of_controls_agrees_on_height_and_centre</span>() {</span>
+<span class="ln" id="L1368">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wrong = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1369">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> compared = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L1370">        <span class="tok-kw">for</span> (name, draw) <span class="tok-kw">in</span> <span class="tok-fn">panels</span>() {</span>
+<span class="ln" id="L1371">            <span class="tok-kw">for</span> row <span class="tok-kw">in</span> <span class="tok-fn">rows</span>(<span class="tok-fn">controls</span>(<span class="tok-fn">input</span>(), |ui| {</span>
+<span class="ln" id="L1372">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(ui));</span>
+<span class="ln" id="L1373">            })) {</span>
+<span class="ln" id="L1374">                <span class="tok-kw">if</span> row.<span class="tok-fn">len</span>() &lt; <span class="tok-num">2</span> {</span>
+<span class="ln" id="L1375">                    continue;</span>
+<span class="ln" id="L1376">                }</span>
+<span class="ln" id="L1377">                compared += row.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L1378">                <span class="tok-kw">let</span> tallest = row.<span class="tok-fn">iter</span>().<span class="tok-fn">fold</span>(<span class="tok-num">0</span>.0_f32, |a, r| a.<span class="tok-fn">max</span>(r.<span class="tok-fn">height</span>()));</span>
+<span class="ln" id="L1379">                <span class="tok-kw">let</span> shortest = row.<span class="tok-fn">iter</span>().<span class="tok-fn">fold</span>(f32::MAX, |a, r| a.<span class="tok-fn">min</span>(r.<span class="tok-fn">height</span>()));</span>
+<span class="ln" id="L1380">                <span class="tok-kw">if</span> tallest - shortest &gt; SLACK {</span>
+<span class="ln" id="L1381">                    wrong.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1382">                        <span class="tok-str">&quot;{name}: a row at y={:.0} holds controls {:.1} and {:.1} high&quot;</span>,</span>
+<span class="ln" id="L1383">                        row[<span class="tok-num">0</span>].<span class="tok-fn">top</span>(),</span>
+<span class="ln" id="L1384">                        shortest,</span>
+<span class="ln" id="L1385">                        tallest</span>
+<span class="ln" id="L1386">                    ));</span>
+<span class="ln" id="L1387">                }</span>
+<span class="ln" id="L1388">                <span class="tok-kw">let</span> highest = row.<span class="tok-fn">iter</span>().<span class="tok-fn">fold</span>(f32::MAX, |a, r| a.<span class="tok-fn">min</span>(r.<span class="tok-fn">center</span>().y));</span>
+<span class="ln" id="L1389">                <span class="tok-kw">let</span> lowest = row.<span class="tok-fn">iter</span>().<span class="tok-fn">fold</span>(<span class="tok-num">0</span>.0_f32, |a, r| a.<span class="tok-fn">max</span>(r.<span class="tok-fn">center</span>().y));</span>
+<span class="ln" id="L1390">                <span class="tok-kw">if</span> lowest - highest &gt; SLACK {</span>
+<span class="ln" id="L1391">                    wrong.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1392">                        <span class="tok-str">&quot;{name}: a row at y={:.0} has centres {:.1} apart&quot;</span>,</span>
+<span class="ln" id="L1393">                        row[<span class="tok-num">0</span>].<span class="tok-fn">top</span>(),</span>
+<span class="ln" id="L1394">                        lowest - highest</span>
+<span class="ln" id="L1395">                    ));</span>
+<span class="ln" id="L1396">                }</span>
+<span class="ln" id="L1397">            }</span>
+<span class="ln" id="L1398">        }</span>
+<span class="ln" id="L1399">        assert!(</span>
+<span class="ln" id="L1400">            wrong.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1401">            <span class="tok-str">&quot;these rows do not line up. Give the controls one height, the way \</span></span>
+<span class="ln" id="L1402"><span class="tok-str">             `layout::button_height` and `layout::LOCK_WIDTH` do for the lock \</span></span>
+<span class="ln" id="L1403"><span class="tok-str">             and unlock buttons:\n{}&quot;</span>,</span>
+<span class="ln" id="L1404">            wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1405">        );</span>
+<span class="ln" id="L1406">        <span class="tok-com">// Not vacuous. Every rectangle here is found by a filter, and a filter</span></span>
+<span class="ln" id="L1407">        <span class="tok-com">// that is one line from finding nothing is how a guard comes to pass by</span></span>
+<span class="ln" id="L1408">        <span class="tok-com">// drawing no conclusions: the first version of this counted a</span></span>
+<span class="ln" id="L1409">        <span class="tok-com">// checkbox&#x27;s tick box as a control beside its own label, and tightening</span></span>
+<span class="ln" id="L1410">        <span class="tok-com">// that could as easily have left nothing to compare.</span></span>
+<span class="ln" id="L1411">        assert!(</span>
+<span class="ln" id="L1412">            compared &gt; <span class="tok-num">30</span>,</span>
+<span class="ln" id="L1413">            <span class="tok-str">&quot;only {compared} controls were in a row with anything, which is too \</span></span>
+<span class="ln" id="L1414"><span class="tok-str">             few for this to have checked the interface&quot;</span></span>
+<span class="ln" id="L1415">        );</span>
+<span class="ln" id="L1416">    }</span>
+<span class="ln" id="L1417"></span>
+<span class="ln" id="L1418">    <span class="tok-com">/// Rows that nearly share a left edge share it.</span></span>
+<span class="ln" id="L1419">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1420">    <span class="tok-com">/// The left edge is the fourth of the four measurements roadmap item 168</span></span>
+<span class="ln" id="L1421">    <span class="tok-com">/// asks for, and it is the one where &quot;close&quot; is the whole defect. Two rows</span></span>
+<span class="ln" id="L1422">    <span class="tok-com">/// starting at the same x read as a column; two rows starting 40 points</span></span>
+<span class="ln" id="L1423">    <span class="tok-com">/// apart read as a heading and an indented list, which is deliberate. Two</span></span>
+<span class="ln" id="L1424">    <span class="tok-com">/// rows starting three points apart read as a mistake, because that is what</span></span>
+<span class="ln" id="L1425">    <span class="tok-com">/// it is: nobody indents by three points on purpose.</span></span>
+<span class="ln" id="L1426">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1427">    <span class="tok-com">/// So the rule is about near misses only, and says so rather than pretending</span></span>
+<span class="ln" id="L1428">    <span class="tok-com">/// to check alignment in general, which from a paint list it cannot: whether</span></span>
+<span class="ln" id="L1429">    <span class="tok-com">/// two rows belong to one column is a question about the panel&#x27;s structure,</span></span>
+<span class="ln" id="L1430">    <span class="tok-com">/// and the answer is not in the shapes.</span></span>
+<span class="ln" id="L1431">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1432">    <span class="tok-kw">fn</span> <span class="tok-fn">rows_that_nearly_share_a_left_edge_share_it</span>() {</span>
+<span class="ln" id="L1433">        <span class="tok-com">/// How far apart two left edges have to be before they are meant to</span></span>
+<span class="ln" id="L1434">        <span class="tok-com">/// differ rather than failing to match.</span></span>
+<span class="ln" id="L1435">        <span class="tok-kw">const</span> DELIBERATE: f32 = <span class="tok-num">12.0</span>;</span>
+<span class="ln" id="L1436"></span>
+<span class="ln" id="L1437">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> wrong = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1438">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> pairs = <span class="tok-num">0</span>;</span>
+<span class="ln" id="L1439">        <span class="tok-kw">for</span> (name, draw) <span class="tok-kw">in</span> <span class="tok-fn">panels</span>() {</span>
+<span class="ln" id="L1440">            <span class="tok-kw">let</span> rows = <span class="tok-fn">rows</span>(<span class="tok-fn">controls</span>(<span class="tok-fn">input</span>(), |ui| {</span>
+<span class="ln" id="L1441">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(ui));</span>
+<span class="ln" id="L1442">            }));</span>
+<span class="ln" id="L1443">            <span class="tok-kw">let</span> lefts: Vec&lt;(f32, f32)&gt; = rows</span>
+<span class="ln" id="L1444">                .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L1445">                .<span class="tok-fn">map</span>(|row| (row[<span class="tok-num">0</span>].<span class="tok-fn">left</span>(), row[<span class="tok-num">0</span>].<span class="tok-fn">top</span>()))</span>
+<span class="ln" id="L1446">                .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1447">            <span class="tok-kw">for</span> (index, (left, top)) <span class="tok-kw">in</span> lefts.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1448">                <span class="tok-kw">for</span> (other, other_top) <span class="tok-kw">in</span> lefts.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(index + <span class="tok-num">1</span>) {</span>
+<span class="ln" id="L1449">                    pairs += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L1450">                    <span class="tok-kw">let</span> gap = (left - other).<span class="tok-fn">abs</span>();</span>
+<span class="ln" id="L1451">                    <span class="tok-kw">if</span> gap &gt; SLACK &amp;&amp; gap &lt; DELIBERATE {</span>
+<span class="ln" id="L1452">                        wrong.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1453">                            <span class="tok-str">&quot;{name}: a row at y={top:.0} starts at x={left:.1} and one \</span></span>
+<span class="ln" id="L1454"><span class="tok-str">                             at y={other_top:.0} at x={other:.1}, {gap:.1} apart&quot;</span></span>
+<span class="ln" id="L1455">                        ));</span>
+<span class="ln" id="L1456">                    }</span>
+<span class="ln" id="L1457">                }</span>
+<span class="ln" id="L1458">            }</span>
+<span class="ln" id="L1459">        }</span>
+<span class="ln" id="L1460">        assert!(</span>
+<span class="ln" id="L1461">            wrong.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1462">            <span class="tok-str">&quot;these rows almost line up, which reads worse than not lining up at \</span></span>
+<span class="ln" id="L1463"><span class="tok-str">             all. Give them one left edge, with `layout::column` where a label \</span></span>
+<span class="ln" id="L1464"><span class="tok-str">             has to hold the space:\n{}&quot;</span>,</span>
+<span class="ln" id="L1465">            wrong.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1466">        );</span>
+<span class="ln" id="L1467">        <span class="tok-com">// Not vacuous, for the reason the test above gives: a rule that finds</span></span>
+<span class="ln" id="L1468">        <span class="tok-com">// nothing and a rule that looks at nothing read the same from here.</span></span>
+<span class="ln" id="L1469">        assert!(</span>
+<span class="ln" id="L1470">            pairs &gt; <span class="tok-num">20</span>,</span>
+<span class="ln" id="L1471">            <span class="tok-str">&quot;only {pairs} pairs of rows were compared, which is too few for this \</span></span>
+<span class="ln" id="L1472"><span class="tok-str">             to have looked at the interface&quot;</span></span>
+<span class="ln" id="L1473">        );</span>
+<span class="ln" id="L1474">    }</span>
+<span class="ln" id="L1475"></span>
+<span class="ln" id="L1476">    <span class="tok-com">/// Hovering a control changes its colour and not its shape.</span></span>
+<span class="ln" id="L1477">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1478">    <span class="tok-com">/// Driven with the pointer over the middle of each control in turn, and the</span></span>
+<span class="ln" id="L1479">    <span class="tok-com">/// whole panel re-measured each time: a control that grows on hover pushes</span></span>
+<span class="ln" id="L1480">    <span class="tok-com">/// everything after it along, so the assertion is about the panel and not</span></span>
+<span class="ln" id="L1481">    <span class="tok-com">/// only about the control under the pointer.</span></span>
+<span class="ln" id="L1482">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1483">    <span class="tok-com">/// This is the half of roadmap item 168 that a reader cannot check by</span></span>
+<span class="ln" id="L1484">    <span class="tok-com">/// looking, because a one-point shift is only visible as a flicker while the</span></span>
+<span class="ln" id="L1485">    <span class="tok-com">/// pointer moves, and it is the half a future theme change is most likely to</span></span>
+<span class="ln" id="L1486">    <span class="tok-com">/// undo: `egui::style::WidgetVisuals::expansion` is one field, it is zero in</span></span>
+<span class="ln" id="L1487">    <span class="tok-com">/// this version of egui and it has not always been, and setting it is how</span></span>
+<span class="ln" id="L1488">    <span class="tok-com">/// somebody would make hover &quot;feel nicer&quot;.</span></span>
+<span class="ln" id="L1489">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1490">    <span class="tok-kw">fn</span> <span class="tok-fn">hovering_a_control_does_not_move_anything</span>() {</span>
+<span class="ln" id="L1491">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> moved = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1492">        <span class="tok-kw">for</span> (name, draw) <span class="tok-kw">in</span> <span class="tok-fn">panels</span>() {</span>
+<span class="ln" id="L1493">            <span class="tok-kw">let</span> draw = &amp;draw;</span>
+<span class="ln" id="L1494">            <span class="tok-kw">let</span> at_rest = <span class="tok-fn">controls</span>(<span class="tok-fn">input</span>(), |ui| {</span>
+<span class="ln" id="L1495">                egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(ui));</span>
+<span class="ln" id="L1496">            });</span>
+<span class="ln" id="L1497">            <span class="tok-kw">for</span> target <span class="tok-kw">in</span> &amp;at_rest {</span>
+<span class="ln" id="L1498">                <span class="tok-kw">let</span> hovered = <span class="tok-fn">controls</span>(<span class="tok-fn">input_pointing</span>(target.<span class="tok-fn">center</span>()), |ui| {</span>
+<span class="ln" id="L1499">                    egui::CentralPanel::<span class="tok-fn">default</span>().<span class="tok-fn">show</span>(ui, |ui| <span class="tok-fn">draw</span>(ui));</span>
+<span class="ln" id="L1500">                });</span>
+<span class="ln" id="L1501">                <span class="tok-com">// Every rectangle that was there at rest must still be there,</span></span>
+<span class="ln" id="L1502">                <span class="tok-com">// in the same place. Compared as a set rather than pairwise,</span></span>
+<span class="ln" id="L1503">                <span class="tok-com">// because hover is allowed to paint *more*: a highlight behind</span></span>
+<span class="ln" id="L1504">                <span class="tok-com">// the control under the pointer is a colour change, and it</span></span>
+<span class="ln" id="L1505">                <span class="tok-com">// arrives as an extra shape that would offset every later</span></span>
+<span class="ln" id="L1506">                <span class="tok-com">// comparison in a pairwise walk.</span></span>
+<span class="ln" id="L1507">                <span class="tok-kw">for</span> rest <span class="tok-kw">in</span> &amp;at_rest {</span>
+<span class="ln" id="L1508">                    <span class="tok-kw">let</span> still_there = hovered.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|over| {</span>
+<span class="ln" id="L1509">                        (rest.min - over.min).<span class="tok-fn">length</span>() &lt;= SLACK</span>
+<span class="ln" id="L1510">                            &amp;&amp; (rest.max - over.max).<span class="tok-fn">length</span>() &lt;= SLACK</span>
+<span class="ln" id="L1511">                    });</span>
+<span class="ln" id="L1512">                    <span class="tok-kw">if</span> !still_there {</span>
+<span class="ln" id="L1513">                        <span class="tok-kw">let</span> nearest = hovered</span>
+<span class="ln" id="L1514">                            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L1515">                            .<span class="tok-fn">min_by</span>(|a, b| {</span>
+<span class="ln" id="L1516">                                (a.min - rest.min)</span>
+<span class="ln" id="L1517">                                    .<span class="tok-fn">length</span>()</span>
+<span class="ln" id="L1518">                                    .<span class="tok-fn">total_cmp</span>(&amp;(b.min - rest.min).<span class="tok-fn">length</span>())</span>
+<span class="ln" id="L1519">                            })</span>
+<span class="ln" id="L1520">                            .<span class="tok-fn">copied</span>()</span>
+<span class="ln" id="L1521">                            .<span class="tok-fn">unwrap_or</span>(*rest);</span>
+<span class="ln" id="L1522">                        moved.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L1523">                            <span class="tok-str">&quot;{name}: with the pointer at y={:.0}, the control at \</span></span>
+<span class="ln" id="L1524"><span class="tok-str">                             {:?} {:.1}x{:.1} became {:?} {:.1}x{:.1}&quot;</span>,</span>
+<span class="ln" id="L1525">                            target.<span class="tok-fn">top</span>(),</span>
+<span class="ln" id="L1526">                            rest.min,</span>
+<span class="ln" id="L1527">                            rest.<span class="tok-fn">width</span>(),</span>
+<span class="ln" id="L1528">                            rest.<span class="tok-fn">height</span>(),</span>
+<span class="ln" id="L1529">                            nearest.min,</span>
+<span class="ln" id="L1530">                            nearest.<span class="tok-fn">width</span>(),</span>
+<span class="ln" id="L1531">                            nearest.<span class="tok-fn">height</span>()</span>
+<span class="ln" id="L1532">                        ));</span>
+<span class="ln" id="L1533">                        break;</span>
+<span class="ln" id="L1534">                    }</span>
+<span class="ln" id="L1535">                }</span>
+<span class="ln" id="L1536">            }</span>
+<span class="ln" id="L1537">        }</span>
+<span class="ln" id="L1538">        assert!(</span>
+<span class="ln" id="L1539">            moved.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1540">            <span class="tok-str">&quot;hover moves something, so text shifts under the pointer. Hover \</span></span>
+<span class="ln" id="L1541"><span class="tok-str">             changes colour and nothing else: no weight, no padding, no \</span></span>
+<span class="ln" id="L1542"><span class="tok-str">             `expansion`:\n{}&quot;</span>,</span>
+<span class="ln" id="L1543">            moved.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>)</span>
+<span class="ln" id="L1544">        );</span>
+<span class="ln" id="L1545">    }</span>
+<span class="ln" id="L1546">}</span>
 </span>
 </code></pre>
 </main>
