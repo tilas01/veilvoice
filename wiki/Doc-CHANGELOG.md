@@ -5560,7 +5560,7 @@ Documentation you cannot outrun.
 Every crate and **every one of the 63 `.rs` files** in this repository now has a
 page, a flowchart and a banner, generated from the doc comments in the source
 and mirrored to the website and the GitHub wiki. A fifth audit round found
-twelve defects ([`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-AUDIT)); two of them had shipped.
+twelve defects ([`docs/AUDIT.md`](Doc-AUDIT)); two of them had shipped.
 
 ### A page for every file
 
@@ -5626,7 +5626,7 @@ This release adds a search index over the whole repository and website, a
 portable verifier that checks a release **without GnuPG installed**, install
 scripts that refuse rather than continue, package definitions for six formats,
 and OpenBSD and NetBSD builds. A fourth audit round found ten defects
-([`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-AUDIT)); three of them had shipped.
+([`docs/AUDIT.md`](Doc-AUDIT)); three of them had shipped.
 
 ### Verify a download without installing anything
 
@@ -5667,7 +5667,7 @@ under `--yes` -- which means "do not ask me", not "assume yes". VB-CABLE is
 proprietary donationware, so the Windows script only opens VB-Audio's page: it
 will not accept somebody else's licence on your behalf.
 
-Documented in [`docs/INSTALL.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-INSTALL), which puts the **by-hand**
+Documented in [`docs/INSTALL.md`](Doc-INSTALL), which puts the **by-hand**
 route first, because "run this script and trust it" is a strange thing to ask on
 behalf of a tool whose argument is that you should not have to trust anybody.
 
@@ -5699,7 +5699,7 @@ scheduled task or anything that runs at startup.
 
 **None of the package definitions has been built or installed yet** -- they
 parse, and that is the whole of what is claimed.
-[`docs/PACKAGING.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-PACKAGING) carries a per-format status table.
+[`docs/PACKAGING.md`](Doc-PACKAGING) carries a per-format status table.
 
 OpenBSD and NetBSD builds join FreeBSD. All three run in emulated VMs, are
 allowed to fail without blocking a release, and are marked `not-verified` for
@@ -5724,7 +5724,7 @@ reproducibility because they are built once rather than twice.
   document.
 - Seven further defects were found in code written during this round and fixed
   before release. They are written up at the same length in
-  [`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-AUDIT) rather than omitted, because a round that
+  [`docs/AUDIT.md`](Doc-AUDIT) rather than omitted, because a round that
   quietly drops them looks cleaner than it was.
 
 ### The banner
@@ -5780,7 +5780,7 @@ rather than against a list of things that seemed worth checking, found and fixed
 Nothing here is a confidentiality failure: no finding let anyone recover a
 voiceprint, read a sealed recording or bypass a password. Several are worse than
 that sounds anyway, because they are failures of the thing being relied on. Full
-write-ups, one per finding, are in [`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-AUDIT).
+write-ups, one per finding, are in [`docs/AUDIT.md`](Doc-AUDIT).
 
 ### Security fixes -- the engine and the tools
 
@@ -5977,7 +5977,7 @@ was a confidentiality failure.
 ### Website fixes
 
 - **Empty links.** A link whose label was inline code rendered as an empty
-  anchor, so "see [`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-AUDIT)." was published as "see.".
+  anchor, so "see [`docs/AUDIT.md`](Doc-AUDIT)." was published as "see.".
 - **Invisible paragraphs.** Three parts of the walkthrough never appeared,
   including the box stating the app lock is not tamper-proof. A viewport jump
   carried them past the observer without the intersection ratio ever changing.

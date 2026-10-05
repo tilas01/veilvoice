@@ -71,11 +71,19 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 
-HELP = os.path.join(ROOT, "assets", "screenshots", "cli-help.txt")
-GUIDE = os.path.join(ROOT, "docs", "USER_GUIDE.md")
-
 HELP_REL = "assets/screenshots/cli-help.txt"
-GUIDE_REL = "docs/USER_GUIDE.md"
+
+# Every document that makes this claim to a reader, and how much of it the claim
+# covers. "section" means the whole section under the heading that contains
+# SUBJECT, which is the manual's long explanation. "paragraph" means the one
+# paragraph that makes the claim, which is how a page whose subject is something
+# else carries it. The difference matters: docs/COMMANDS.md is a table of every
+# command in backticks, so a whole-page search would find every name in it and
+# report that everything was fine.
+CLAIMANTS = [
+    ("docs/USER_GUIDE.md", "section"),
+    ("docs/COMMANDS.md", "paragraph"),
+]
 
 # The sentence in the program's own description, and the heading in the manual.
 # Both are matched on the same words, because both are about the same thing and
@@ -88,8 +96,8 @@ SUBJECT = "reaches the network"
 COMMAND = re.compile(r"`(veilvoice(?: [a-z][a-z-]*)+)`")
 
 
-def read(path):
-    with io.open(path, encoding="utf-8") as handle:
+def read(rel):
+    with io.open(os.path.join(ROOT, rel), encoding="utf-8") as handle:
         return handle.read()
 
 
@@ -177,29 +185,44 @@ def names(text, command):
     return re.search("`" + re.escape(command) + "(?![a-z-])", flat(text)) is not None
 
 
-def problems(help_text, guide_text):
+def scope(text, how, rel):
+    """The part of `text` the claim covers, or a sentence saying it is gone."""
+    if how == "paragraph":
+        body = paragraph(text)
+        if body is None:
+            return None, ("%s has no paragraph about what %s. That page told a "
+                          "reader nothing reached the network at all, so its "
+                          "losing the claim entirely is a change to look at "
+                          "rather than to pass." % (rel, SUBJECT))
+        return body, None
+    body = section(text)
+    if body is None:
+        return None, ("%s has no heading about what %s. It explained this at "
+                      "length and the section is gone, which is a bigger "
+                      "change than this check can decide about."
+                      % (rel, SUBJECT))
+    return body, None
+
+
+def problems(help_text, claimants):
+    """`claimants` maps a relative path to its text."""
     found = []
     commands = claimed(help_text)
     if not commands:
-        found.append(
-            "%s has no sentence about what %s, so there is nothing to hold the "
-            "manual to. If that sentence has been reworded, reword this check "
-            "with it." % (HELP_REL, SUBJECT))
-        return found
+        return ["%s has no sentence about what %s, so there is nothing to hold "
+                "these pages to. If that sentence has been reworded, reword "
+                "this check with it." % (HELP_REL, SUBJECT)]
 
-    body = section(guide_text)
-    if body is None:
-        found.append(
-            "%s has no heading about what %s. The manual explained this at "
-            "length and the section is gone, which is a bigger change than this "
-            "check can decide about." % (GUIDE_REL, SUBJECT))
-        return found
-
-    for name in commands:
-        if not names(body, name):
-            found.append(
-                "the program says `%s` reaches the network, and the manual's "
-                "section about that does not name it" % name)
+    for rel, how in CLAIMANTS:
+        body, gone = scope(claimants[rel], how, rel)
+        if gone:
+            found.append(gone)
+            continue
+        for name in commands:
+            if not names(body, name):
+                found.append(
+                    "the program says `%s` reaches the network, and %s does not "
+                    "name it where it makes that claim" % (name, rel))
     return found
 
 
@@ -207,22 +230,25 @@ def main():
     if "--self-test" in sys.argv:
         return self_test()
 
-    found = problems(read(HELP), read(GUIDE))
+    claimants = dict((rel, read(rel)) for rel, _ in CLAIMANTS)
+    found = problems(read(HELP_REL), claimants)
     if found:
         print("  the manual and the program disagree about what reaches the "
               "network:")
         for line in found:
             print("    %s" % line)
         print()
-        print("    Name it in %s's section about that, and say what it does" % GUIDE_REL)
+        print("    Name it where the claim is made, and say what it does")
         print("    there. A command that reaches the network and is not")
         print("    explained where a reader looks for the explanation is the")
         print("    one thing this project cannot leave to somebody's `--help`.")
+        print("    docs/COMMANDS.md is generated: fix tools/docs/commands.py.")
         return 1
 
-    commands = claimed(read(HELP))
-    print("  %d command(s) reach the network, and the manual names each: %s"
-          % (len(commands), ", ".join(commands)))
+    commands = claimed(read(HELP_REL))
+    print("  %d command(s) reach the network, and all %d page(s) that say so "
+          "name each: %s"
+          % (len(commands), len(CLAIMANTS), ", ".join(commands)))
     return 0
 
 
@@ -250,6 +276,31 @@ and reaches nothing.
 
 `veilvoice update` is mentioned here too, outside the section.
 """
+
+
+COMMANDS_SAMPLE = """# Every command, and the same job in the window
+
+VeilVoice is two programs over one engine.
+
+**Nothing here reaches the network except two commands, and only when you ask
+for them by name.** `veilvoice update` and `veilvoice verify release` are the
+two, and nothing else opens a connection for any reason.
+
+## The whole list
+
+| Command | What it does |
+|---|---|
+| `veilvoice anonymise` | De-identify an audio file |
+| `veilvoice update` | Fetch the newest release |
+| `veilvoice verify release` | Check a published release |
+"""
+
+
+def pages(**changes):
+    files = {"docs/USER_GUIDE.md": GUIDE_SAMPLE,
+             "docs/COMMANDS.md": COMMANDS_SAMPLE}
+    files.update(changes)
+    return files
 
 
 def self_test():
@@ -281,12 +332,12 @@ def self_test():
                    "\nCommands:\n  anonymise  De-identify an audio file.\n"),
            ["veilvoice update", "veilvoice verify release"])
 
-    expect("a sound pair has nothing to report",
-           problems(HELP_SAMPLE, GUIDE_SAMPLE), [])
+    expect("a sound set has nothing to report",
+           problems(HELP_SAMPLE, pages()), [])
 
     # The F-222 shape: the manual names one of them and not the other.
     without = GUIDE_SAMPLE.replace("`veilvoice verify release\n<tag>`", "it")
-    found = problems(HELP_SAMPLE, without)
+    found = problems(HELP_SAMPLE, pages(**{"docs/USER_GUIDE.md": without}))
     expect("a command missing from the section is reported", len(found), 1)
     if found and "veilvoice verify release" not in found[0]:
         failures.append("and it must name the command: %r" % found[0])
@@ -295,7 +346,8 @@ def self_test():
     # finding the section rather than searching the file.
     only_elsewhere = GUIDE_SAMPLE.replace(
         "`veilvoice update --check` looks for a newer version. ", "")
-    found = problems(HELP_SAMPLE, only_elsewhere)
+    found = problems(HELP_SAMPLE,
+                     pages(**{"docs/USER_GUIDE.md": only_elsewhere}))
     expect("a mention outside the section does not satisfy it", len(found), 1)
     if found and "veilvoice update" not in found[0]:
         failures.append("and it must name that one: %r" % found[0])
@@ -308,9 +360,25 @@ def self_test():
         failures.append("and must not start before its own heading")
 
     expect("a guide with no such section is reported rather than passed",
-           len(problems(HELP_SAMPLE, "## Nothing relevant\n\nwords\n")), 1)
+           len(problems(HELP_SAMPLE, pages(
+               **{"docs/USER_GUIDE.md": "## Nothing relevant\n\nwords\n"}))), 1)
     expect("and so is a program that no longer makes the claim",
-           len(problems("Some other description entirely.\n", GUIDE_SAMPLE)), 1)
+           len(problems("Some other description entirely.\n", pages())), 1)
+
+    # The F-235 shape, and the reason this reads a paragraph rather than a page:
+    # docs/COMMANDS.md is a table of every command, so a page-wide search finds
+    # every name in it and reports that nothing is wrong.
+    found = problems(HELP_SAMPLE, pages(**{"docs/COMMANDS.md": COMMANDS_SAMPLE.replace(
+        "`veilvoice update` and `veilvoice verify release` are the\ntwo",
+        "the window's check-for-updates button is the one, and it is not a\ncommand")}))
+    expect("a claim beside a table of every command is read as a paragraph",
+           len(found), 2)
+    if found and "docs/COMMANDS.md" not in found[0]:
+        failures.append("and names the page: %r" % found[0])
+
+    expect("a page that loses the claim entirely is reported",
+           len(problems(HELP_SAMPLE, pages(
+               **{"docs/COMMANDS.md": "# Every command\n\nA table.\n"}))), 1)
 
     # The manual writes invocations. Each of these names `veilvoice update`.
     for how in ("`veilvoice update`", "`veilvoice update --check`",

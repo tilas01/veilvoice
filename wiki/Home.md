@@ -13,7 +13,7 @@ This wiki is generated from the repository. Every page here has a source file th
 - **[[What VeilVoice is|Doc-README]]** · The whole project in one page: what it does, what it refuses to claim, and how to install it
 - **[[User guide|Doc-USER-GUIDE]]** · Every screen and every command, in order
 - **[[Installing|Doc-INSTALL]]** · Per operating system, with the verification step in place rather than bolted on
-- **[[Every command|Doc-COMMANDS]]** · All thirty-two, what each is for, and where the same job is in the window
+- **[[Every command|Doc-COMMANDS]]** · Every one of them, what each is for, and where the same job is in the window
 - **[[Questions|Doc-FAQ]]** · The questions people actually ask
 
 ## One program at a time

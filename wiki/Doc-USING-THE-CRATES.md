@@ -288,7 +288,7 @@ other, and never let unlocking an application unseal recordings.
 - **Guarantee an erase on flash storage.** `shred_file` overwrites and unlinks,
   and the report says what that is and is not worth.
 
-The full argument is in [WHITEPAPER.md](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-WHITEPAPER), and every limit above is
+The full argument is in [WHITEPAPER.md](Doc-WHITEPAPER), and every limit above is
 stated there too, at greater length. If you build something on these crates,
 please do not describe it as doing more than they do. Several tests in this
 repository exist purely to fail the build if that wording softens here.

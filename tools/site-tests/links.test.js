@@ -143,9 +143,18 @@ function run() {
         continue;
       }
       checked++;
-      if (!fs.existsSync(resolved)) {
-        broken.push(`${rel} -> ${target}`);
+      if (fs.existsSync(resolved)) { continue; }
+      // A page of `wiki/` refers to another page by its name and not by its
+      // file name, because that is what a GitHub wiki resolves: the wiki is a
+      // flat repository whose page *is* `<name>.md`, and `[text](Doc-INSTALL)`
+      // is how a reader gets there. On disk there is no such file, so without
+      // this every repaired cross-document link reads as broken here. The
+      // `.md` has to exist, so a typo is still caught.
+      if (rel.startsWith("wiki/") && !path.extname(target.split("#")[0])
+          && fs.existsSync(resolved + ".md")) {
+        continue;
       }
+      broken.push(`${rel} -> ${target}`);
     }
   }
 

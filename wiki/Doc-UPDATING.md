@@ -142,8 +142,8 @@ transfer tool for the updater to borrow:
    from source.
 2. **Check it before you put it in place**, exactly as you checked your first
    copy: the signature over the hash list, against the fingerprint published in
-   [`INSTALL.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL) and [`README.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-README).
-   [`GUIDE_VERIFY.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUIDE-VERIFY) is the whole account of it.
+   [`INSTALL.md`](Doc-INSTALL) and [`README.md`](Doc-README).
+   [`GUIDE_VERIFY.md`](Doc-GUIDE-VERIFY) is the whole account of it.
 3. **Check it with the copy you already trust**, not with the copy you just
    downloaded. Your existing `veilvoice verify` has the signing key compiled
    into it. The new archive's own copy of anything cannot vouch for itself,
@@ -158,7 +158,7 @@ If this machine has an app lock, `veilvoice update` asks for the passphrase
 before it downloads anything, and refuses to go on without it.
 
 That is not an access check. The integrity record described in
-[`GUARD.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUARD) is sealed under the app lock's passphrase, and an update
+[`GUARD.md`](Doc-GUARD) is sealed under the app lock's passphrase, and an update
 has to rewrite that record, because the files it describes are about to be
 different ones. An update that went ahead without the passphrase would leave the
 machine with new files and a sealed record of the old ones, and at the next
@@ -204,7 +204,7 @@ launch.
 
 ## Where to go next
 
-- [`GUARD.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUARD): the change report, and what to do about one.
-- [`GUIDE_VERIFY.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUIDE-VERIFY): checking a download, at length.
-- [`INSTALL.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL): the fingerprint, and installing per system.
-- [`CHANGELOG.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-CHANGELOG): what actually changed, per release.
+- [`GUARD.md`](Doc-GUARD): the change report, and what to do about one.
+- [`GUIDE_VERIFY.md`](Doc-GUIDE-VERIFY): checking a download, at length.
+- [`INSTALL.md`](Doc-INSTALL): the fingerprint, and installing per system.
+- [`CHANGELOG.md`](Doc-CHANGELOG): what actually changed, per release.

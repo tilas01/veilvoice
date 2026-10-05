@@ -88,7 +88,7 @@ GitHub refuses that, the one-time step is:
 
 What that first page says does not matter. Everything the wiki holds is
 replaced from `wiki/` on the first successful run. See F-199 in
-[`AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-AUDIT), where this went unnoticed for seven consecutive failed
+[`AUDIT.md`](Doc-AUDIT), where this went unnoticed for seven consecutive failed
 runs.
 
 ## The scripts

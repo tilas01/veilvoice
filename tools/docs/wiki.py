@@ -32,9 +32,18 @@ the same reason, as every other generator here.
 The wiki has no directories. A document in `docs/` links to its neighbour as
 `WHITEPAPER.md`, which is right in `docs/` and wrong in the wiki. Three cases:
 
-  * a neighbour that has a wiki page becomes a `[[wiki link]]`,
+  * a neighbour that has a wiki page becomes a link to that page, fragment and
+    all, because a wiki page keeps the headings of the document it was made
+    from and a link to part of one should still land on that part,
   * a neighbour that does not becomes an absolute URL into the repository,
   * a link to a file elsewhere in the tree becomes an absolute URL too.
+
+All three in one pass. They were two passes, and the second had no way of
+telling a link the first had finished with from one it had not, so every
+`](WHITEPAPER.md)` became `](Doc-WHITEPAPER)` and then a repository URL ending
+in `docs/Doc-WHITEPAPER`, which has never been a file. `rewritten_twice` below
+is the guard, since a URL is not a `[[link]]` and the dangling-link check
+cannot see one.
 
 The third matters more than it looks: a relative link to `crates/...` or
 `tools/...` resolves, in a wiki, to a wiki page of that name, which does not
@@ -113,8 +122,11 @@ DOCUMENTS = [
     ("docs/INSTALL.md", "Installing", "start",
      "Per operating system, with the verification step in place rather than "
      "bolted on"),
+    # No count here. It said thirty-two while the table held thirty-four, and a
+    # number typed beside a generated list is wrong from the next command
+    # onwards. The page is the list, and "every" is the claim that matters.
     ("docs/COMMANDS.md", "Every command", "start",
-     "All thirty-two, what each is for, and where the same job is in the "
+     "Every one of them, what each is for, and where the same job is in the "
      "window"),
     ("docs/FAQ.md", "Questions", "start",
      "The questions people actually ask"),
@@ -190,9 +202,14 @@ GUIDES = [
 
 # A relative link to a Markdown file: `](NAME.md)` or `](dir/NAME.md)`, with an
 # optional fragment. Anything absolute, or a bare fragment, is left alone.
-RELATIVE_MD = re.compile(r"\]\((?!https?:|#|/)([A-Za-z0-9_./-]+\.md)(#[^)]*)?\)")
-# A relative link to anything else in the tree: source, a script, a directory.
-RELATIVE_OTHER = re.compile(r"\]\((?!https?:|#|/|[A-Za-z0-9_./-]+\.md)([A-Za-z0-9_./-]+)(#[^)]*)?\)")
+# Any relative link, whether or not it ends in `.md`. This used to be two
+# patterns applied one after the other, and that is what made every
+# cross-document link in the wiki a 404: the first rewrote `](INSTALL.md)` to
+# `](Doc-INSTALL)`, and then the second, whose only guard against touching a
+# finished link was that it did not end in `.md`, rewrote that to
+# `](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL)`, a path
+# that has never existed. One pass cannot rewrite its own output.
+RELATIVE = re.compile(r"\]\((?!https?:|#|/)([A-Za-z0-9_./-]+)(#[^)]*)?\)")
 # A relative image, which in a wiki must be an absolute raw URL to render.
 RELATIVE_IMG = re.compile(r"!\[([^\]]*)\]\((?!https?:|/)([A-Za-z0-9_./-]+)\)")
 
@@ -216,30 +233,32 @@ def rewrite(text, source):
     # its neighbour.
     by_base = {os.path.basename(src): page for src, page in pages.items()}
 
-    def md_link(found):
+    def link(found):
         target, fragment = found.group(1), found.group(2) or ""
         joined = os.path.normpath(os.path.join(here, target)) if here else target
         joined = joined.replace(os.sep, "/")
         if joined in pages:
-            return "](%s)" % pages[joined]
-        base = os.path.basename(target)
-        if base in by_base and not target.startswith("../"):
-            return "](%s)" % by_base[base]
+            # The fragment is kept. A wiki page has the same headings as the
+            # document it was made from, so a link to a part of one still lands
+            # on that part; dropping it landed every such link at the top.
+            return "](%s%s)" % (pages[joined], fragment)
+        # A bare neighbour name, which is how one document in `docs/` refers to
+        # another. Only a bare name: `tools/README.md` and `docs/README.md` have
+        # the same basename and are not the same file, so a target with a
+        # directory in it is resolved above or not at all.
+        if "/" not in target and target in by_base:
+            return "](%s%s)" % (by_base[target], fragment)
         return "](%s/blob/main/%s%s)" % (REPO, joined, fragment)
-
-    def other_link(found):
-        target, fragment = found.group(1), found.group(2) or ""
-        joined = os.path.normpath(os.path.join(here, target)) if here else target
-        return "](%s/blob/main/%s%s)" % (REPO, joined.replace(os.sep, "/"), fragment)
 
     def image(found):
         alt, target = found.group(1), found.group(2)
         joined = os.path.normpath(os.path.join(here, target)) if here else target
         return "![%s](%s/raw/main/%s)" % (alt, REPO, joined.replace(os.sep, "/"))
 
+    # Images first, so they are absolute URLs by the time the link pass runs
+    # and its `(?!https?:)` leaves them alone.
     text = RELATIVE_IMG.sub(image, text)
-    text = RELATIVE_MD.sub(md_link, text)
-    text = RELATIVE_OTHER.sub(other_link, text)
+    text = RELATIVE.sub(link, text)
     return text
 
 
@@ -402,6 +421,49 @@ def dead_links():
     return dead
 
 
+# A repository URL whose last path segment is a wiki page name. Nothing in the
+# tree is called `Doc-INSTALL`, so such a link is always the signature of one
+# rewriting pass having run over another's output.
+REWRITTEN_TWICE = re.compile(
+    re.escape(REPO) + r"/(?:blob|raw)/main/[A-Za-z0-9_./-]*?([A-Za-z0-9_-]+)\)")
+
+
+def rewritten_twice():
+    """Every link in the wiki that points at a wiki page inside a repo path.
+
+    `dead_links` cannot see these, because by the time a `[[link]]` became a
+    URL it is no longer a `[[link]]`, and a URL into this repository is exactly
+    what the rewriting is supposed to produce for everything that is not a
+    page. What makes these wrong is the last segment: it names a wiki page, and
+    the repository has no file of that name, so every one is a 404.
+
+    Sixty-three of them were published before anything looked.
+
+    A quoted one is skipped, on the same reasoning as `links_in` above and for
+    the same reason: text quoting a broken link is not a broken link. The write
+    up of this very defect in `docs/AUDIT.md` shows the URL the two passes
+    produced, in backticks, three times, because showing it is how the entry
+    explains what went wrong. A guard that cannot tell the description of a
+    defect from the defect fails on the commit that fixes it.
+    """
+    have = {name[: -len(".md")]
+            for name in os.listdir(WIKI) if name.endswith(".md")}
+    found = []
+    for name in sorted(os.listdir(WIKI)):
+        if not name.endswith(".md"):
+            continue
+        with io.open(os.path.join(WIKI, name), encoding="utf-8") as handle:
+            text = handle.read()
+        spans = quoted_spans(text)
+        for match in REWRITTEN_TWICE.finditer(text):
+            start, end = match.span()
+            if any(a <= start and end <= b for a, b in spans):
+                continue
+            if match.group(1) in have:
+                found.append((name, match.group(1)))
+    return found
+
+
 # A page name a GitHub wiki can hold. The wiki is a flat repository of
 # Markdown files and the page name *is* the file name, so a character the wiki
 # treats specially produces a page under a name nobody linked to.
@@ -545,12 +607,24 @@ def main():
             if len(dead) > 20:
                 print("    ... and %d more" % (len(dead) - 20))
             return 1
+        twice = rewritten_twice()
+        if twice:
+            print("  these links point into the repository at a path that "
+                  "names a wiki page, so every one is a 404:")
+            for where, target in twice[:20]:
+                print("    %-38s -> .../%s" % (where, target))
+            if len(twice) > 20:
+                print("    ... and %d more" % (len(twice) - 20))
+            print()
+            print("    That is one rewriting pass having run over another's")
+            print("    output. `rewrite` in this file must stay one pass.")
+            return 1
 
         total = sum(len(links_in(
             io.open(os.path.join(WIKI, n), encoding="utf-8").read()))
             for n in os.listdir(WIKI) if n.endswith(".md"))
         print("  %d wiki page(s) current, from %d document(s); "
-              "%d internal link(s), all resolving"
+              "%d internal link(s), all resolving, and none rewritten twice"
               % (len(pages), len(DOCUMENTS), total))
         return 0
 
