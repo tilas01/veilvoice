@@ -535,8 +535,9 @@ directory short for that reason, and says so plainly if your `TEMP` is long
 enough that even a short name overflows. Gpg4win is a native build and has no
 such limit.
 
-**`~/.local/bin` may not be on your `PATH`.** The script says so if it is not,
-and prints the line to add.
+**`~/.local/bin` may not be on your `PATH`.** The script and `veilvoice
+install` both say so if it is not, and print the line to add. Neither edits a
+shell profile for you.
 
 **macOS Gatekeeper.** The binaries are not notarised, because notarisation requires an
 Apple Developer account, which requires a legal identity, which this project

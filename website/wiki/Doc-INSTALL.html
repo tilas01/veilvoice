@@ -241,7 +241,7 @@ veilvoice companions --install audacity   <span class="tok-com"># the explicit y
 <hr>
 <h2 id="known-rough-edges">Known rough edges</h2>
 <p><strong>Git for Windows' bundled GnuPG has a path-length limit.</strong> It is an MSYS build, and its agent puts a Unix-domain socket inside the home directory it is given, which cannot exceed about 108 bytes. <code>install.ps1</code> keeps its temporary directory short for that reason, and says so plainly if your <code>TEMP</code> is long enough that even a short name overflows. Gpg4win is a native build and has no such limit.</p>
-<p><strong><code>~/.local/bin</code> may not be on your <code>PATH</code>.</strong> The script says so if it is not, and prints the line to add.</p>
+<p><strong><code>~/.local/bin</code> may not be on your <code>PATH</code>.</strong> The script and <code>veilvoice install</code> both say so if it is not, and print the line to add. Neither edits a shell profile for you.</p>
 <p><strong>macOS Gatekeeper.</strong> The binaries are not notarised, because notarisation requires an Apple Developer account, which requires a legal identity, which this project does not have. macOS will refuse to run them until you allow it explicitly in <em>System Settings → Privacy &amp; Security</em>. This is stated rather than worked around: a project that publishes under a pseudonym cannot also be notarised, and pretending otherwise would be worse than the inconvenience.</p>
 <hr>
 <h2 id="what-is-not-finished">What is not finished</h2>
