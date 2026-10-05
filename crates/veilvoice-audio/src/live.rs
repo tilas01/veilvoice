@@ -88,34 +88,94 @@ struct Shared {
     stats: Mutex<LiveStats>,
     dropped: AtomicU64,
     starved: AtomicU64,
-    /// How many times either stream has reported trouble.
-    troubles: AtomicU64,
-    /// The most recent one, for a caller that asks.
-    trouble: Mutex<Option<Interference>>,
+    /// What the platform has said about either stream.
+    troubles: Troubles,
 }
 
-impl Shared {
-    /// Record what the platform said about a stream.
-    ///
-    /// Called from cpal's error callback, which is **not** the realtime data
-    /// callback: it runs when something has gone wrong rather than every
-    /// block, so allocating a string and taking a lock here costs nothing that
-    /// is being timed. The guard that forbids both reads the data callbacks
-    /// and is right not to object to this one.
-    fn report(&self, side: Side, error: &cpal::Error) {
-        let count = self.troubles.fetch_add(1, Ordering::Relaxed) + 1;
-        // Still printed. The command line has a console and somebody watching
-        // it, and this is the only place `veilvoice live` can say anything
-        // once it is running.
+/// What the platform has said about a session's streams, counted where it is
+/// said and read by whoever asks. The single-microphone path and a room keep
+/// one each.
+///
+/// **F-245.** This was written on the understanding that cpal's error callback
+/// is not the realtime one, and every report printed a line and took a lock.
+/// On ALSA it is the realtime one: the stream's own worker thread calls it,
+/// inline, between the data callback and the `prepare` that recovers from an
+/// overrun or underrun. Those are the one report that recurs while a stream is
+/// working, and on a loaded machine each one printed and waited on a lock on
+/// the audio thread before recovery could start, which is how one glitch
+/// becomes the next. So a glitch is two atomic stores and nothing else, and
+/// the words for it are written by [`latest`](Self::latest) on the caller's
+/// thread. Everything else still prints and is kept as it was: it means the
+/// stream is already failing, and it is the only thing `veilvoice live` can
+/// say once it is running.
+#[derive(Default)]
+pub(crate) struct Troubles {
+    /// Every report, glitches included.
+    count: AtomicU64,
+    /// The newest report that was not a glitch.
+    kept: Mutex<Option<Interference>>,
+    /// The newest glitch, as the count it arrived at shifted up one bit with
+    /// its side in the bottom bit, so the two are written together. Zero
+    /// until there is one.
+    glitch: AtomicU64,
+}
+
+/// What a glitch is called when somebody asks, since the audio thread that
+/// reported it does not stop to say.
+const GLITCH: &str = "the audio ran over or under its buffer, which is an audible glitch";
+
+impl Troubles {
+    /// Record what the platform said about a stream. Called from cpal's error
+    /// callback, which on ALSA runs on the audio thread itself.
+    pub(crate) fn report(&self, side: Side, error: &cpal::Error) {
+        let count = self.count.fetch_add(1, Ordering::Relaxed) + 1;
+        if error.kind() == cpal::ErrorKind::Xrun {
+            let side_bit = match side {
+                Side::Input => 0,
+                Side::Output => 1,
+            };
+            self.glitch
+                .store((count << 1) | side_bit, Ordering::Relaxed);
+            return;
+        }
         eprintln!("veilvoice: {} stream error: {error}", side.word());
-        if let Ok(mut held) = self.trouble.lock() {
+        if let Ok(mut held) = self.kept.lock() {
             *held = Some(Interference {
                 side,
-                device_gone: matches!(error.kind(), cpal::ErrorKind::DeviceNotAvailable),
+                device_gone: matches!(
+                    error.kind(),
+                    cpal::ErrorKind::DeviceNotAvailable | cpal::ErrorKind::StreamInvalidated
+                ),
                 said: error.to_string(),
                 count,
             });
         }
+    }
+
+    /// How many reports there have been, glitches included.
+    pub(crate) fn count(&self) -> u64 {
+        self.count.load(Ordering::Relaxed)
+    }
+
+    /// The newest report. A glitch newer than anything kept is described
+    /// here, on the thread that asked.
+    pub(crate) fn latest(&self) -> Option<Interference> {
+        let kept = self.kept.lock().ok()?.clone();
+        let glitch = self.glitch.load(Ordering::Relaxed);
+        let at = glitch >> 1;
+        if at == 0 || kept.as_ref().is_some_and(|kept| kept.count > at) {
+            return kept;
+        }
+        Some(Interference {
+            side: if glitch & 1 == 0 {
+                Side::Input
+            } else {
+                Side::Output
+            },
+            device_gone: false,
+            said: GLITCH.to_string(),
+            count: self.count(),
+        })
     }
 }
 
@@ -447,7 +507,7 @@ impl LiveSession {
                 },
                 {
                     let shared = Arc::clone(&shared);
-                    move |e| shared.report(Side::Input, &e)
+                    move |e| shared.troubles.report(Side::Input, &e)
                 },
                 None,
             )
@@ -506,7 +566,7 @@ impl LiveSession {
                 },
                 {
                     let shared = Arc::clone(&shared);
-                    move |e| shared.report(Side::Output, &e)
+                    move |e| shared.troubles.report(Side::Output, &e)
                 },
                 None,
             )
@@ -547,7 +607,7 @@ impl LiveSession {
         // `dropped` and `starved` come from. A device that has gone stops
         // calling that callback, and the one number that has to survive a
         // stream which is no longer running is the one saying it stopped.
-        snapshot.interfered = self.shared.troubles.load(Ordering::Relaxed);
+        snapshot.interfered = self.shared.troubles.count();
         snapshot
     }
 
@@ -556,7 +616,7 @@ impl LiveSession {
     /// `None` until something goes wrong. Asked when [`LiveStats::interfered`]
     /// moves, rather than every frame: this clones a `String`.
     pub fn interference(&self) -> Option<Interference> {
-        self.shared.trouble.lock().ok()?.clone()
+        self.shared.troubles.latest()
     }
 }
 
@@ -731,37 +791,27 @@ mod tests {
     /// device unplugged mid-call was silent and the recording carried on.
     #[test]
     fn trouble_is_recorded_rather_than_only_printed() {
-        let shared = Shared::default();
-        assert!(shared.trouble.lock().expect("a fresh lock").is_none());
+        let troubles = Troubles::default();
+        assert!(troubles.latest().is_none());
 
-        shared.report(
+        troubles.report(
             Side::Input,
             &cpal::Error::new(cpal::ErrorKind::DeviceNotAvailable),
         );
-        let first = shared
-            .trouble
-            .lock()
-            .expect("a fresh lock")
-            .clone()
-            .expect("the report was kept");
+        let first = troubles.latest().expect("the report was kept");
         assert_eq!(first.side, Side::Input);
         assert!(first.device_gone, "a device that has gone says so");
         assert_eq!(first.count, 1);
 
-        shared.report(
+        troubles.report(
             Side::Output,
             &cpal::Error::with_message(cpal::ErrorKind::Other, "the mixer said no"),
         );
-        let second = shared
-            .trouble
-            .lock()
-            .expect("a fresh lock")
-            .clone()
-            .expect("the report was kept");
+        let second = troubles.latest().expect("the report was kept");
         assert_eq!(second.side, Side::Output);
         assert!(
             !second.device_gone,
-            "only a missing device is a missing device"
+            "only a stream that has ended is a stream that has ended"
         );
         assert!(
             second.said.contains("the mixer said no"),
@@ -770,5 +820,51 @@ mod tests {
             second.said
         );
         assert_eq!(second.count, 2, "the count is of both streams together");
+    }
+
+    /// F-245. A stream the platform has invalidated is over, as a device that
+    /// has gone is: no further sample arrives on either.
+    #[test]
+    fn an_invalidated_stream_is_a_stream_that_has_ended() {
+        let troubles = Troubles::default();
+        troubles.report(
+            Side::Input,
+            &cpal::Error::new(cpal::ErrorKind::StreamInvalidated),
+        );
+        assert!(troubles.latest().expect("kept").device_gone);
+        troubles.report(Side::Input, &cpal::Error::new(cpal::ErrorKind::DeviceBusy));
+        assert!(
+            !troubles.latest().expect("kept").device_gone,
+            "a busy device comes back, and must not end a take"
+        );
+    }
+
+    /// F-245. A glitch touches nothing but two atomics, is counted, and is
+    /// still described to whoever asks, without hiding a report older than
+    /// it or being hidden by one newer.
+    #[test]
+    fn a_glitch_is_counted_and_described_without_taking_the_lock() {
+        let troubles = Troubles::default();
+        // Held for the whole report: a glitch that tried to take it would wait
+        // here for ever, which is the stall on the audio thread this is about.
+        {
+            let _held = troubles.kept.lock().expect("a fresh lock");
+            troubles.report(Side::Output, &cpal::Error::new(cpal::ErrorKind::Xrun));
+        }
+        assert_eq!(troubles.count(), 1);
+        let glitch = troubles.latest().expect("the glitch is described");
+        assert_eq!(glitch.side, Side::Output);
+        assert!(!glitch.device_gone, "a glitch does not end a take");
+        assert_eq!(glitch.said, GLITCH);
+
+        troubles.report(
+            Side::Input,
+            &cpal::Error::new(cpal::ErrorKind::DeviceNotAvailable),
+        );
+        assert!(troubles.latest().expect("kept").device_gone, "newer wins");
+
+        troubles.report(Side::Input, &cpal::Error::new(cpal::ErrorKind::Xrun));
+        let newest = troubles.latest().expect("described");
+        assert_eq!((newest.said.as_str(), newest.count), (GLITCH, 3));
     }
 }

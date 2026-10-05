@@ -146,6 +146,10 @@ New-Item -ItemType Directory -Force (Split-Path $settings) | Out-Null
 Set-Content -Path $settings -Value $forced -Encoding utf8
 
 $PW_RENDERFULLCONTENT = 2
+# Written to as `$script:problems` inside `Shoot`, as `$script:taken` is. A
+# function that says `$problems +=` appends to a copy of its own, which is
+# thrown away when it returns, and every problem it had found went with it.
+# F-241, and `tools/audit/powershell.py` is the guard.
 $problems = @()
 $prints = @{}
 $taken = 0
@@ -171,7 +175,7 @@ function Shoot([string]$name, [string[]]$arguments) {
     $h = [Shot]::Found
   }
   if ($h -eq [IntPtr]::Zero) {
-    $problems += "$name : the window never appeared"
+    $script:problems += "$name : the window never appeared"
     $proc | Stop-Process -Force -ErrorAction SilentlyContinue
     return
   }
@@ -195,7 +199,7 @@ function Shoot([string]$name, [string[]]$arguments) {
   $w = $r.Right - $r.Left
   $hh = $r.Bottom - $r.Top
   if ($w -le 100 -or $hh -le 100) {
-    $problems += "$name : the window measured ${w}x${hh}"
+    $script:problems += "$name : the window measured ${w}x${hh}"
     $proc | Stop-Process -Force -ErrorAction SilentlyContinue
     return
   }
@@ -208,7 +212,7 @@ function Shoot([string]$name, [string[]]$arguments) {
   $g.Dispose()
 
   if (-not $drew) {
-    $problems += "$name : PrintWindow refused"
+    $script:problems += "$name : PrintWindow refused"
     $bmp.Dispose()
     $proc | Stop-Process -Force -ErrorAction SilentlyContinue
     return
@@ -229,7 +233,7 @@ function Shoot([string]$name, [string[]]$arguments) {
   }
   $print = $sb.ToString()
   if ($prints.ContainsKey($print)) {
-    $problems += "$name : identical to $($prints[$print]) -- the screen did not change"
+    $script:problems += "$name : identical to $($prints[$print]) -- the screen did not change"
   } else {
     $prints[$print] = $name
   }

@@ -5,8 +5,8 @@ Branch housekeeping for this repository, run from a machine that can push.
 
 # Why this exists rather than a note in a checklist
 
-Two things accumulate on the remote and neither has an owner: branches Claude
-Code opened for a session, and branches Dependabot opened for an upgrade. Both
+Two things accumulate on the remote and neither has an owner: branches a cloud
+session opened for its work, and branches Dependabot opened for an upgrade. Both
 are fully merged long before anybody notices them, and a list of stale branches
 is exactly the kind of thing that gets tidied by hand once and then never again.
 
@@ -14,7 +14,7 @@ is exactly the kind of thing that gets tidied by hand once and then never again.
 
 Deleting a branch is not a thing to do on a schedule without somebody watching,
 and the session this was written in could not do it at all: the git proxy in a
-Claude Code container answers a ref deletion with 403 while allowing every other
+cloud container answers a ref deletion with 403 while allowing every other
 push, so the deletion has to happen somewhere with ordinary credentials.
 
 # What it will not do
@@ -34,6 +34,7 @@ Pure standard library.
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 
@@ -43,26 +44,50 @@ import sys
 PROTECTED = {"main", "dev", "HEAD"}
 
 
-def git(*args, check=True):
+def git(*args, check=True, cwd=None):
     """Run git and give back its output, with the command in any error."""
-    done = subprocess.run(["git", *args], capture_output=True, text=True)
+    done = subprocess.run(["git", *args], capture_output=True, text=True, cwd=cwd)
     if check and done.returncode != 0:
         raise SystemExit("git %s failed: %s" % (" ".join(args), done.stderr.strip()))
     return done.stdout.strip()
 
 
-def remote_branches(remote):
-    """Every branch on the remote, without the remote's name on the front."""
-    out = git("for-each-ref", "--format=%(refname:short)", "refs/remotes/%s" % remote)
+# The full name of each remote ref, then what it points at when it is a
+# symbolic ref and nothing when it is a branch.
+LISTING = "--format=%(refname) %(symref)"
+
+
+def branch_names(listing, remote):
+    """The branches in a `LISTING` of one remote, without its name on the front.
+
+    F-242. This used `%(refname:short)` and cut the remote's name off the front
+    of each line. Every clone has `refs/remotes/origin/HEAD`, a symbolic ref
+    naming the remote's default branch, and git shortens that one to `origin`
+    alone, because `origin` is enough to find it. Cutting eight characters off
+    a six-character name left an empty branch name, which no check here
+    recognised, so the dry run went on to ask git about `origin/` and stopped
+    with "ambiguous argument". The tool failed on every fresh clone.
+
+    So the full ref name is read, and a symbolic ref is skipped: it is another
+    name for a branch already in the list, not a branch of its own.
+    """
+    prefix = "refs/remotes/%s/" % remote
     names = []
-    for line in out.split("\n"):
-        if not line:
+    for line in listing.split("\n"):
+        ref, _, target = line.strip().partition(" ")
+        if not ref or target or not ref.startswith(prefix):
             continue
-        name = line[len(remote) + 1:]
+        name = ref[len(prefix):]
         if name in PROTECTED:
             continue
         names.append(name)
     return names
+
+
+def remote_branches(remote, cwd=None):
+    """Every branch on the remote, without the remote's name on the front."""
+    return branch_names(
+        git("for-each-ref", LISTING, "refs/remotes/%s" % remote, cwd=cwd), remote)
 
 
 def contained_in_main(remote, branch):
@@ -158,5 +183,40 @@ def main():
     return 1 if failed else 0
 
 
+def self_test():
+    """Read the branches of a real clone, made here. Returns the exit status.
+
+    A real one rather than text, because the defect was in what git prints,
+    and a sample written here would only be a record of what somebody
+    believed it printed. The clone has the `origin/HEAD` every clone has.
+    """
+    import tempfile
+
+    quiet = ["-c", "user.name=tidy", "-c", "user.email=tidy@localhost",
+             "-c", "init.defaultBranch=main", "-c", "commit.gpgsign=false"]
+    with tempfile.TemporaryDirectory() as scratch:
+        upstream = os.path.join(scratch, "upstream")
+        clone = os.path.join(scratch, "clone")
+        git(*quiet, "init", "-q", upstream)
+        git(*quiet, "commit", "-q", "--allow-empty", "-m", "first", cwd=upstream)
+        git("branch", "-q", "finished", cwd=upstream)
+        git("branch", "-q", "dev", cwd=upstream)
+        git("clone", "-q", upstream, clone)
+        listing = git("for-each-ref", LISTING, "refs/remotes/origin", cwd=clone)
+        if "refs/remotes/origin/HEAD refs/remotes/origin/main" not in listing:
+            print("the clone has no origin/HEAD, so this proves nothing:\n%s"
+                  % listing)
+            return 1
+        found = remote_branches("origin", cwd=clone)
+    if found != ["finished"]:
+        print("a fresh clone's branches read as %r, not ['finished']" % (found,))
+        return 1
+    print("  a fresh clone's branches read as its branches, origin/HEAD and "
+          "the protected ones left out")
+    return 0
+
+
 if __name__ == "__main__":
+    if "--self-test" in sys.argv[1:]:
+        sys.exit(self_test())
     sys.exit(main())

@@ -746,6 +746,280 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-245: every audio glitch printed and took a lock on the audio thread, and an invalidated stream was not an ended one
+
+Found reading the error callbacks in `crates/veilvoice-audio/src/live.rs` and
+`room.rs` against `cpal` 0.18's own source, during the audit of everything
+written since v0.1.22, which is when `cpal` moved from 0.15.
+
+Both paths handed every stream error to one `report`, which counted it, printed
+a line to standard error and took a mutex to keep it. Its comment said why that
+was acceptable: cpal's error callback "is **not** the realtime data callback",
+so nothing timed is paid for. On ALSA that is not so. `cpal`'s ALSA backend
+runs each stream on a worker thread of its own, and on an overrun or underrun
+that thread calls the error callback inline, then `prepare()` to recover, then
+goes back to calling the data callback. An xrun is also the one report that
+recurs while a stream is otherwise working: it is what a loaded machine
+produces. So on Linux each glitch printed and waited on a lock, on the audio
+thread, before the stream could recover from it, which is the shape that turns
+one glitch into the next. Playback's own error callback printed every one too.
+
+The second half is which errors end a session. `device_gone` was true for
+`DeviceNotAvailable` only. `cpal` 0.18 also reports `StreamInvalidated`, which
+it documents as a stream that "must be rebuilt": WASAPI maps
+`AUDCLNT_E_RESOURCES_INVALIDATED` to it, and the PulseAudio host reports a lost
+server as it. No further sample arrives after either, and the Studio's
+failsafe, which stops and stores a take whose device has gone, did not stop
+for it: the take went on recording nothing and looked as though it worked,
+which is the case roadmap item 145 was written to end.
+
+**The fix.** One type, `live::Troubles`, which both paths keep, where there
+were two copies of the same `report`. A glitch is two atomic stores, the count
+and which side, and nothing else; the sentence describing it is written by
+`latest` on the thread that asks, which is also where the kept report is read.
+Everything else is printed and kept as before, because it means the stream is
+already failing and it is the only thing `veilvoice live` can say once it is
+running. `device_gone` is true for `StreamInvalidated` as well as
+`DeviceNotAvailable`, and still false for `DeviceBusy`, which comes back.
+Playback's callback no longer prints a glitch.
+
+**What is checked.** `a_glitch_is_counted_and_described_without_taking_the_lock`
+holds the lock for the whole of a glitch's report, which would wait for ever if
+the report took it, then checks that the glitch is counted, described, and
+ordered correctly against a report older and newer than it.
+`an_invalidated_stream_is_a_stream_that_has_ended` checks `StreamInvalidated`
+against `DeviceBusy`.
+
+### F-244: one sound card was listed ten times under one name, and only the first could be chosen
+
+`devices::list` names each device by what `cpal` calls it, and `devices::open`
+finds a device by that name. `cpal` 0.18 replaced `Device::name` with a
+description, and on ALSA the description's name is the first line of the
+card's own description, which every PCM on that card shares. `cpal` enumerates
+every PCM ALSA hints at plus `hw:` and `plughw:` for each card, so a laptop's
+one sound card appeared as `HDA Intel PCH, ALC3246 Analog` for `sysdefault`,
+`front`, `hw`, `plughw`, `dsnoop` and the rest. The list offered identical
+entries, and `open` took the first carrying the name, so choosing any of the
+others opened a different device from the one chosen.
+
+And the names changed underneath people. `cpal` 0.15, which v0.1.22 was built
+with, named an ALSA device by its PCM, `hw:CARD=PCH,DEV=0`, which is what that
+release's `veilvoice devices` printed and what `--input` and `--output` were
+given. None of those names opened anything any more.
+
+Found reading `cpal` 0.18's ALSA backend (`host/alsa/mod.rs`, `description`,
+and `enumerate.rs`) after the migration commit's note that the name "is the
+only field wanted".
+
+**The fix.** A device is listed under its own name unless another in the same
+list has that name too, and then with the platform's identifier after it in
+brackets: `HDA Intel PCH, ALC3246 Analog (hw:CARD=PCH,DEV=0)`. Only then,
+because on Windows the identifier is a GUID and a name nothing else shares
+already says which device it is. `open` finds the listed name first, then an
+identifier on its own, which is the name v0.1.22 used, then the first device
+with that bare name, which is what the development builds since the migration
+matched. The default is recognised by identifier, since two devices can share
+a name and only one of them is the default. The window keeps no device names
+between runs, so nothing saved needs moving.
+
+**What is checked.** Against one ALSA card as `cpal` 0.18 describes it:
+`every_listed_name_opens_the_device_it_was_listed_for` checks that no two
+listed names are alike and that each finds its own device, and
+`a_name_from_an_earlier_release_still_opens_something` checks the PCM name
+v0.1.22 printed and the bare card name.
+
+### F-243: the Dependabot guard passed every entry when it could not read `ci.yml`
+
+`tools/audit/dependabot.py` checks that each Dependabot entry targets a branch
+`ci.yml` builds on a push, which is F-200, and derives that list from `ci.yml`
+so that the two cannot drift. Its reader understood one way of writing it,
+`branches: [main, dev]`. The block form, a `- dev` per line, is the other way
+YAML writes a list and the one GitHub's own examples use; a trailing comment
+on the one-line form defeated it as well. Either read as no branches, and the
+comparison was written as `wanted and target not in wanted`, so no branches
+meant nothing was compared and every entry passed. A `ci.yml` building `main`
+alone, which is exactly F-197, left the same empty list once `main` was set
+aside, and passed too.
+
+So the guard's one derived fact had a silent failure, which is the thing the
+guard exists to prevent in the file it reads. Its self-test, the check that it
+can fail, ran in `tools/verify.py` and not in CI.
+
+**The fix.** Both list forms are read, quoted and commented; a push with no
+filter, or `on: [push]`, is every branch; `branches-ignore` is read as an
+answer it cannot give rather than as everything. An empty reading is now a
+failure that says so, and each target is compared against the branches CI
+builds rather than against those branches with `main` removed. CI runs the
+self-test beside the guard.
+
+**What is checked.** The self-test reads seven ways of writing the trigger,
+including a `push:` key further down a job that is not a trigger, and asks
+whether an entry aimed at `dev` is complained about when nothing could be read,
+when CI builds `main` alone, when it builds every branch and when it builds
+this repository's two. The old reader gets all seven readings wrong and passes
+the first two cases.
+
+### F-242: the branch tidier failed on every fresh clone
+
+`tools/repo/tidy.py` lists the remote's branches with `git for-each-ref
+--format=%(refname:short)` and cuts the remote's name off the front of each.
+Every clone has `refs/remotes/origin/HEAD`, which git shortens to `origin`
+alone because that is enough to find it, and cutting `origin/` off `origin`
+left an empty name. Nothing recognised it, so the dry run went on to ask git
+for the history of `origin/` and stopped with "ambiguous argument". Reproduced
+on a fresh clone of a two-branch repository before anything was changed.
+
+**The fix.** It reads each ref's full name and whether it is symbolic, and
+skips a symbolic one: `origin/HEAD` is another name for a branch already in the
+list. **What is checked.** `tidy.py --self-test` makes a repository and a clone
+of it, confirms the clone has `origin/HEAD`, and checks that its branches read
+as the one that is not protected. A sample of git's output written into the
+test would only have recorded what somebody believed git printed, so it is
+run against git. `tools/verify.py` and CI both run it, because a tool run by
+hand and rarely is the kind that is found broken on the day it is needed.
+
+### F-241: the screenshot script found broken captures and forgot them
+
+`tools/shots/gui.ps1` collects what went wrong while photographing the window
+into `$problems`, and exits 1 at the end if the list is not empty. When the
+capture moved into a function, `Shoot`, so that the Settings pages could be
+photographed by the same code as the tabs, its four `$problems +=` lines went
+on appending to a copy local to the function. PowerShell scopes a variable to
+the function that assigns it: reading `$problems` found the script's list, and
+assigning the longer list made a new one that was thrown away on return. A
+window that never appeared, a capture that measured nothing, a refused
+`PrintWindow` and two tabs that came out identical were each detected and then
+lost, and the script printed how many captures it had taken and exited 0. The
+same function already wrote `$script:taken`, which is why the count was right.
+
+**The fix.** The four lines say `$script:problems`. **What is checked.**
+`tools/audit/powershell.py` reads every tracked `.ps1` for a compound
+assignment inside a function to a name the script sets at its own level, which
+is always this mistake, and leaves a plain `=` alone because `install.ps1`
+sets `$ErrorActionPreference` inside a function on purpose. Running the script
+needs Windows and a window to photograph, so it is read rather than run; its
+self-test holds the reading to the shapes that matter, including a `#` inside
+quotes and a comment block. It found the four lines and nothing else.
+
+### F-240: the screen-recorder allowlist was readable by every account on the machine
+
+`veilvoice capture allow` saves the programs somebody has said they meant to
+run with `Allowlist::save`, in `crates/veilvoice-watch/src/capture/mod.rs`,
+and the command line described the file as "readable by its owner and nobody
+else". It was `std::fs::write`, which creates the file under the umask, so on
+most systems it was mode 0644 and any account on the machine could read which
+screen recorders its owner uses.
+
+**The fix.** The file is opened with mode 0600 on Unix, so it never exists
+readable by anybody else, and one an earlier build left readable is tightened
+before anything is written into it. `veilvoice-watch` takes no dependencies by
+design, so this is written out in six lines rather than taken from
+`veilvoice-crypto`. On Windows the profile's ACL already excludes other
+unprivileged accounts. **What is checked.**
+`a_saved_allowlist_is_readable_by_its_owner_alone` saves a new allowlist and one
+over a 0644 file left by an earlier build, and checks both are 0600. Against
+the old code it fails with the mode 420, which is 0644.
+
+### F-239: an empty home directory aimed the uninstall at the working directory
+
+Found reading `crates/veilvoice-setup/src/install.rs` after F-214 moved the
+binaries, during the audit of everything written since v0.1.22.
+
+`prefix()` and `bin_dir()` built their paths from `HOME`, or `LOCALAPPDATA` on
+Windows, as whatever string the variable held. Set but empty, which is what a
+service manager, a `sudo -H` gone wrong or a scrubbed environment leaves, that
+string is `""`, and `PathBuf::from("")` joined with `.local/share/veilvoice` is
+a relative path. Relative paths are resolved against the directory the program
+was started in, so:
+
+- `veilvoice install` copied the programs into a `.local/bin` under whatever
+  directory the terminal was in, and reported success.
+- `veilvoice uninstall` passed `.local/share/veilvoice` to
+  `removable_prefix()`, whose only check is that the last component names
+  VeilVoice, which it does. That is the one `remove_dir_all` in the crate, and
+  it was aimed at whatever sat at that name under the working directory.
+
+The lock file had the same fault once and was fixed for the empty case, F-143.
+Neither fix looked at a relative value, which names the working directory just
+as surely.
+
+**The fix.** Both functions read the variable through one helper, `home_like`,
+which treats an empty or relative value as no home at all. Every caller already
+handles "no per-user program directory could be found", which is the true
+answer. **What is checked:** `an_empty_or_relative_home_is_no_home` gives the
+rule an unset, empty, relative and `.` value, and an absolute one, without
+touching the test process's own environment.
+
+### F-238: install said the programs were on the path without looking
+
+The Unix half of `add_to_path` was:
+
+```text
+let _ = dir;
+Ok(false)
+```
+
+and `install()` reports `Ok(false)` as "`<dir>` was already on your PATH". Its
+comment said the caller prints the line for the person to add, and no caller
+did. So on macOS, where `~/.local/bin` is never on `PATH` by default, and on
+any Linux without it, `veilvoice install` said it had succeeded and that the
+directory was already on the path, and `veilvoice` was then not found. That is
+the outcome F-214 was fixed to end, reached by a second route: F-214 made the
+copy go to the right directory, and this made the report about that directory
+untrue.
+
+**The fix.** It looks, with the same `path_contains` that `status()` uses. Where
+the directory is missing, it answers with an error carrying the line to add to
+a shell profile, which `install()` prints as "PATH was not changed: ...". It
+still edits no profile. `docs/INSTALL.md` says so where it describes what
+`install.sh` does in the same case. **What is checked:**
+`a_directory_missing_from_path_is_not_reported_as_present` asks about a
+directory on nobody's path and one taken from the test's own `PATH`, and checks
+that the first is refused with the `export` line and the second is not.
+
+### F-237: installing over a link wrote through it, and could empty the copy being installed
+
+`copy_programs` replaced each installed program with `std::fs::copy(from, to)`.
+That opens `to` for writing and truncates it, and opening follows a symbolic
+link and writes into a hard link. Outside Windows `to` is in `~/.local/bin`,
+which is exactly where somebody links a portable copy:
+
+```text
+ln -s ~/Apps/veilvoice/veilvoice ~/.local/bin/veilvoice
+veilvoice install
+```
+
+The program installs from the folder it is running from. Started from the
+portable folder, or on Linux through the link, which the kernel reports as the
+file it points at, the source is `~/Apps/veilvoice/veilvoice` and the
+destination is the link. `copy_programs` compares the two paths as text, so it
+does not see that they are the same file. The copy then opened the destination
+through the link, which truncated the portable `veilvoice` to nothing, and read
+that same file as the source. Reproduced with
+the standard library on its own before anything was changed: the copy returned
+`Ok(0)` and left the portable program at zero bytes. A link pointing anywhere
+else had that file overwritten with VeilVoice instead.
+
+**The fix.** `replace_with_copy` writes the copy to a new file beside the
+destination, created with `create_new` so nothing already at that name is
+followed, gives it the source's permissions and renames it over the destination.
+A rename replaces the directory entry: a link is replaced by the file rather
+than written through, a hard link keeps its old contents under its other name,
+and on Unix an installed program that is running is replaced rather than
+refused with "text file busy". A failed copy removes its staged file.
+
+`veilvoice verify install --from <DIR>` copies into the same directory with
+`std::fs::copy` too, in `crates/veilvoice-verify/src/lib.rs`, which another
+thread owns, and has been passed to it. The updater's `put_in_place` renames
+the old file aside before copying and was never affected.
+
+**What is checked.** `installing_over_a_link_replaces_the_link_and_not_what_it_points_at`
+is the case above with the destination linked to the source itself, then to
+somebody else's file, and checks that both are unchanged afterwards.
+`installing_over_a_hard_link_does_not_write_through_it` checks that the other
+name keeps the old contents. `a_copy_replaces_an_older_one_and_leaves_nothing_beside_it`
+checks that the execute bit survives and nothing staged is left behind.
+
 ### F-236: the manual said the static and Raspberry Pi archives had a window, and neither has ever had one
 
 Found while working on roadmap item 162, by reading which archives carry the
@@ -8462,7 +8736,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1878 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1888 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -10110,7 +10384,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and thirty-six defects found and fixed (F-1 to F-236), across
+**Two hundred and forty-five defects found and fixed (F-1 to F-245), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

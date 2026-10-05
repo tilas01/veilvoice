@@ -148,8 +148,14 @@ def entries():
         return read_entries(handle.read())
 
 
+# What `read_ci_push_branches` answers for a push trigger with no branch
+# filter, which GitHub reads as every branch. It is GitHub's own spelling of
+# "any branch at any depth", so it cannot collide with a real branch name.
+EVERY_BRANCH = "**"
+
+
 def read_ci_push_branches(text):
-    """The branches `ci.yml` builds on a push, from its own `branches:` line.
+    """The branches `ci.yml` builds on a push, from its own trigger.
 
     Derived rather than written down here, because the last two findings in
     this area were both a branch policy changed in one file and not in the
@@ -157,31 +163,68 @@ def read_ci_push_branches(text):
     is also the file that says which branch a dependency bump may be aimed at:
     a bump opened against a branch nothing builds is a bump nobody can judge.
 
-    Only the `push:` trigger's list counts. `pull_request:` has one here with
-    no branches at all, and reading a `branches:` from anywhere in the file
-    would take whichever came first.
+    Only the `push:` trigger under `on:` counts. `pull_request:` has one here
+    with no branches at all, and reading a `branches:` from anywhere in the
+    file would take whichever came first.
+
+    F-243. This read only the one-line form, `branches: [main, dev]`. The block
+    form, one `- dev` per line, is the other way YAML writes a list and the one
+    GitHub's own examples use; it read as no branches, and no branches made
+    the check below pass every entry unread. So both forms are read now, a
+    push with no filter is `[EVERY_BRANCH]`, and an empty answer means "could
+    not read", which `branch_gaps` reports rather than passes.
     """
     branches = []
-    in_push = False
+    in_on = in_push = in_list = False
+    push_at = list_at = 0
     for line in text.splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
+        # A trailing comment, which YAML starts with a space and a hash.
+        stripped = stripped.split(" #", 1)[0].rstrip()
         indent = len(line) - len(line.lstrip())
-        if stripped.startswith("push:"):
-            in_push = True
-            push_at = indent
+        if in_list:
+            if stripped.startswith("-") and indent >= list_at:
+                name = stripped[1:].strip().strip("\"'")
+                if name:
+                    branches.append(name)
+                continue
+            in_list = False
+        if indent == 0:
+            in_on = in_push = False
+            key, _, inline = stripped.partition(":")
+            if key.strip("\"'") == "on":
+                in_on = True
+                # `on: push` and `on: [push, pull_request]` build every branch.
+                names = [n.strip().strip("\"'") for n in inline.strip().strip("[]").split(",")]
+                if "push" in names:
+                    branches = [EVERY_BRANCH]
+            continue
+        if not in_on:
             continue
         if in_push and indent <= push_at:
-            # Any key back at the trigger's own level ends the push block.
             in_push = False
-        if not in_push or not stripped.startswith("branches:"):
+        if not in_push:
+            if stripped == "push:":
+                in_push, push_at = True, indent
+                # Until a filter below says otherwise.
+                branches = [EVERY_BRANCH]
             continue
-        listed = stripped.split("branches:", 1)[1].strip()
-        if listed.startswith("[") and listed.endswith("]"):
-            branches = [b.strip().strip("\"'") for b in listed[1:-1].split(",")]
-            branches = [b for b in branches if b]
-        in_push = False
+        key, _, listed = stripped.partition(":")
+        listed = listed.strip()
+        if key == "branches":
+            if listed.startswith("[") and listed.endswith("]"):
+                branches = [b.strip().strip("\"'") for b in listed[1:-1].split(",")]
+                branches = [b for b in branches if b]
+            elif listed:
+                branches = [listed.strip("\"'")]
+            else:
+                branches, in_list, list_at = [], True, indent
+        elif key == "branches-ignore":
+            # Which branches that leaves is a pattern match this does not do,
+            # so it is an answer this cannot read, not "every branch".
+            branches = []
     return branches
 
 
@@ -201,7 +244,15 @@ def branch_gaps(declared, built):
     it was written for.
     """
     gaps = []
-    wanted = [b for b in built if b != RELEASE_BRANCH]
+    if not built:
+        # F-243. This used to be silence: with no branches read, the last test
+        # below was skipped for every entry, so the check passed an entry
+        # aimed anywhere at all.
+        gaps.append(
+            "no branch ci.yml builds on a push could be read, so nothing here "
+            "can say whether a bump would be checked. Name them in its push "
+            "trigger's branches, as a list"
+        )
     for entry in declared:
         where = "%s in %s" % (entry["ecosystem"], entry["directory"])
         target = entry["target_branch"]
@@ -218,7 +269,10 @@ def branch_gaps(declared, built):
                 "when a release is cut, by merging the development branch "
                 "into it" % (where, RELEASE_BRANCH)
             )
-        elif wanted and target not in wanted:
+        elif built and EVERY_BRANCH not in built and target not in built:
+            # Against `built` itself. A `ci.yml` building only the released
+            # branch, which is F-197, used to leave nothing to compare with,
+            # and every target passed.
             gaps.append(
                 "%s targets %s, which is not a branch ci.yml builds on a "
                 "push (%s), so nothing would check the bump"
@@ -519,6 +573,35 @@ updates:
 ]
 
 
+# How `ci.yml` might say which branches it builds on a push, and what each
+# must read as. F-243 was the block form reading as nothing at all.
+CI_READINGS = [
+    ("on:\n  push:\n    branches:\n      - main\n      - dev\n  pull_request:\n",
+     ["main", "dev"], "the block form, the other way YAML writes a list"),
+    ("on:\n  push:\n    branches:\n    - dev\n  workflow_dispatch:\n",
+     ["dev"], "the block form with its dashes level with the key"),
+    ("on:\n  push:\n    branches: [ \"dev\" ]  # the working branch\n",
+     ["dev"], "quoted, spaced and commented"),
+    ("on:\n  push:\n  pull_request:\n", [EVERY_BRANCH],
+     "a push with no filter builds every branch"),
+    ("on: [push, pull_request]\n", [EVERY_BRANCH], "the one-line trigger list"),
+    ("on:\n  pull_request:\n    branches: [dev]\njobs:\n  x:\n    steps:\n"
+     "      - uses: some/action\n        with:\n          push:\n",
+     [], "no push trigger, and a push key further down that is not one"),
+    ("on:\n  push:\n    branches-ignore: [main]\n", [],
+     "an ignore list, which this does not read as a list of what is built"),
+]
+
+# Which branches `ci.yml` builds, and whether an entry aimed at `dev` should
+# be complained about. The first two passed every entry before F-243.
+BUILT_CASES = [
+    ([], 1, "nothing could be read, which must not read as nothing wrong"),
+    (["main"], 1, "CI on the released branch alone, which is F-197"),
+    ([EVERY_BRANCH], 0, "a push builds every branch, dev among them"),
+    (["main", "dev"], 0, "this repository"),
+]
+
+
 def self_test():
     """Drive the branch check over the cases above. Returns the exit status.
 
@@ -531,6 +614,23 @@ def self_test():
     if sorted(built) != ["dev", "main"]:
         print("the ci.yml reader is wrong about the sample: %r" % (built,))
         return 1
+    misread = [
+        "  %r read as %r, not %r  (%s)" % (text, got, expected, why)
+        for text, expected, why in CI_READINGS
+        for got in [read_ci_push_branches(text)]
+        if got != expected
+    ]
+    if misread:
+        print("the ci.yml reader is wrong on %d form(s):" % len(misread))
+        print("\n".join(misread))
+        return 1
+    aimed_at_dev = read_entries(CASES[0][0])
+    for triggers, expected, why in BUILT_CASES:
+        got = len(branch_gaps(aimed_at_dev, triggers))
+        if (got > 0) != (expected > 0):
+            print("  building %r, an entry aimed at dev gave %d complaint(s)  (%s)"
+                  % (triggers, got, why))
+            return 1
 
     wrong = []
     for text, expected, why in CASES:
@@ -544,7 +644,8 @@ def self_test():
         print("\n".join(wrong))
         return 1
     print("  the branch check is right on all %d cases, and reads ci.yml's "
-          "push branches" % len(CASES))
+          "push branches in all %d forms"
+          % (len(CASES) + len(BUILT_CASES), len(CI_READINGS)))
     return 0
 
 

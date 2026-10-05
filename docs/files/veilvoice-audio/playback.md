@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-audio/src/playback.rs`
 
-[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 212 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs)
+[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 219 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs)
 
 ## Contents
 
@@ -56,7 +56,7 @@ never leaves a copy on the disk for somebody to find later.
 
 ## What this file contains
 
-212 lines defining **5 functions** (5 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+219 lines defining **5 functions** (5 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

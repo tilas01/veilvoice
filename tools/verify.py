@@ -329,6 +329,15 @@ CHECKS = [
     # and a token.
     ("every action a workflow runs is pinned to a commit",
      [sys.executable, "tools/audit/actions.py"]),
+    # F-241. A PowerShell function that adds to a script's variable adds to a
+    # copy of its own. The screenshot script found four kinds of broken capture
+    # that way and forgot every one, then exited 0. Running that script needs
+    # Windows and a window to photograph, so the scripts are read instead, and
+    # the self-test is what shows the reading can fail.
+    ("no PowerShell function keeps a script variable's change to itself",
+     [sys.executable, "tools/audit/powershell.py"]),
+    ("that guard catches what it claims to, as well",
+     [sys.executable, "tools/audit/powershell.py", "--self-test"]),
     # F-170. The tag a release publishes must name the commit that was built,
     # or the reproducibility every other check exists to support is a claim
     # about a different tree than the one somebody would check out.
@@ -356,6 +365,13 @@ CHECKS = [
      [sys.executable, "tools/audit/authorship.py", "--self-test"]),
     ("a signing key from the environment signs the next commit",
      [sys.executable, "tools/repo/signing.py", "--self-test"]),
+    # F-242. The branch tidier is run by hand, rarely, from a machine that can
+    # delete branches, which is the kind of tool that is found broken on the
+    # day somebody needs it. It failed on every fresh clone, because of the
+    # `origin/HEAD` every clone has. This makes a clone and reads it the way
+    # the tool does.
+    ("the branch tidier reads a fresh clone's branches",
+     [sys.executable, "tools/repo/tidy.py", "--self-test"]),
     # Roadmap item 179. The updater builds a download URL from a platform label,
     # and the labels live in the release workflow as well as in Rust. Drift
     # either way is silent: a platform nothing is offered for, or a build asking

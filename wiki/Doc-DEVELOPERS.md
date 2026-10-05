@@ -28,7 +28,7 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 | Crate | What it is | Lines | Detail |
 |---|---|---:|---|
 | `fuzz` | - | 165 | [`fuzz/README.md`](https://github.com/tilas01/veilvoice/blob/main/fuzz/README.md) |
-| `veilvoice-audio` | Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice. | 2,246 | [`crates/veilvoice-audio/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/README.md) |
+| `veilvoice-audio` | Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice. | 2,399 | [`crates/veilvoice-audio/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/README.md) |
 | `veilvoice-cli` | Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings. | 7,039 | [`crates/veilvoice-cli/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/README.md) |
 | `veilvoice-conversation` | Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles. | 2,644 | [`crates/veilvoice-conversation/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/README.md) |
 | `veilvoice-core` | Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility. | 3,141 | [`crates/veilvoice-core/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/README.md) |
@@ -40,7 +40,7 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 | `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,954 | [`crates/veilvoice-setup/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/README.md) |
 | `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 9,642 | [`crates/veilvoice-verify/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/README.md) |
 | `veilvoice-video` | A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg. | 6,025 | [`crates/veilvoice-video/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/README.md) |
-| `veilvoice-watch` | Detect which applications are currently using the microphone and camera, with alerts on change. | 3,917 | [`crates/veilvoice-watch/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/README.md) |
+| `veilvoice-watch` | Detect which applications are currently using the microphone and camera, with alerts on change. | 3,952 | [`crates/veilvoice-watch/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/README.md) |
 
 The same crates, drawn as a graph of what calls what, are on each crate's page in the reference. Those pages are generated from the doc comments, so they are as current as the code.
 
@@ -134,6 +134,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/fixtures.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/fixtures.py) | A file the build needs is in the commit, not merely on the machine that wrote it |
 | [`tools/audit/network_claims.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/network_claims.py) | The manual names every command that reaches the network |
 | [`tools/audit/platform_table.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/platform_table.py) | The table of what runs where says what the release workflow actually builds |
+| [`tools/audit/powershell.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/powershell.py) | No PowerShell function adds to a script's variable and keeps the result to itself |
 | [`tools/audit/publishing.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/publishing.py) | The step that publishes a release says which commit it is publishing |
 | [`tools/audit/randomness.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/randomness.py) | Every random number this project draws comes from a cryptographic source |
 | [`tools/audit/reachable.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/reachable.py) | Every public item is named by something other than its own declaration |
@@ -201,12 +202,15 @@ And what it then checks:
 - **no crate reaching pgp performs a private-key operation**: `python tools/audit/rsa_usage.py`
 - **every random draw comes from the OS CSPRNG**: `python tools/audit/randomness.py`
 - **every action a workflow runs is pinned to a commit**: `python tools/audit/actions.py`
+- **no PowerShell function keeps a script variable's change to itself**: `python tools/audit/powershell.py`
+- **that guard catches what it claims to, as well**: `python tools/audit/powershell.py --self-test`
 - **the release step tags the commit it built**: `python tools/audit/publishing.py`
 - **every file the build reads is in the repository**: `python tools/audit/fixtures.py`
 - **that guard catches what it claims to**: `python tools/audit/fixtures.py --self-test`
 - **every commit to push is tilas01's, and so is the next one**: `python tools/audit/authorship.py`
 - **the authorship guard catches what it claims to**: `python tools/audit/authorship.py --self-test`
 - **a signing key from the environment signs the next commit**: `python tools/repo/signing.py --self-test`
+- **the branch tidier reads a fresh clone's branches**: `python tools/repo/tidy.py --self-test`
 - **the updater can ask for every release that is published**: `python tools/audit/release_targets.py`
 - **that guard catches what it claims to, too**: `python tools/audit/release_targets.py --self-test`
 - **the manual's platform table says what the workflow builds**: `python tools/audit/platform_table.py`

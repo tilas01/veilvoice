@@ -51,12 +51,20 @@ impl Side {
 pub struct Interference {
     /// Which stream it happened on.
     pub side: Side,
-    /// Whether the device that side was using stopped existing.
+    /// Whether that side's stream is over: the device it was using stopped
+    /// existing, or the platform invalidated the stream.
     ///
     /// This is the swapped-device case and the unplugged-device case, and it
     /// is the platform saying so rather than this crate polling for it: a
     /// device list read once a second is a guess between reads, and on Windows
     /// enumerating devices from another thread is what F-163 and F-165 were.
+    ///
+    /// **F-245.** Only `DeviceNotAvailable` used to count. `cpal` 0.18 reports
+    /// some of the same endings as `StreamInvalidated`, which it documents as
+    /// a stream that "must be rebuilt": WASAPI when the endpoint's resources
+    /// are invalidated under it, and the PulseAudio host when the server goes.
+    /// No further sample arrives either way, and a take the Studio kept
+    /// recording after one was recording nothing.
     pub device_gone: bool,
     /// What the platform said, verbatim.
     pub said: String,

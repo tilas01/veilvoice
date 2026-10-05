@@ -489,8 +489,13 @@ jobs:
       # does not make anything watch it: a crate outside the workspace, or a
       # second workflow directory, falls outside every Dependabot entry and
       # stops being monitored without anything saying so.
+      # The self-test ran only in `tools/verify.py` until F-243, which was the
+      # reader it proves passing every entry because it could not read the
+      # branch list it compared against.
       - name: Every manifest must be covered by a Dependabot entry
-        run: python tools/audit/dependabot.py
+        run: |
+          python tools/audit/dependabot.py
+          python tools/audit/dependabot.py --self-test
 
       # And the supply-chain half. `uses: owner/action@v2` names a label, not a
       # version, and the owner can move it whenever they like: two of the ones
@@ -498,6 +503,16 @@ jobs:
       # executed on a runner holding a checkout of this repository and a token.
       - name: Every action a workflow runs must be pinned to a commit
         run: python tools/audit/actions.py
+
+      # F-241. PowerShell scopes a variable to the function that assigns it, so
+      # `$problems +=` inside a function appends to a copy that is discarded
+      # when the function returns. The screenshot script lost every problem it
+      # found that way and exited 0. The scripts are read rather than run,
+      # because running that one needs Windows and a window to photograph.
+      - name: No PowerShell function may keep a script variable's change to itself
+        run: |
+          python tools/audit/powershell.py
+          python tools/audit/powershell.py --self-test
 
       # The seed that does the veiling is what stands between a recording and
       # the voice it came from, and a nonce reused is an AEAD broken. Neither
@@ -527,6 +542,12 @@ jobs:
         run: |
           python tools/audit/fixtures.py
           python tools/audit/fixtures.py --self-test
+
+      # F-242. The branch tidier is run by hand, rarely, and failed on every
+      # fresh clone because of the `origin/HEAD` every clone has. This makes a
+      # clone and reads its branches the way the tool does.
+      - name: The branch tidier must read a fresh clone's branches
+        run: python tools/repo/tidy.py --self-test
 
       # Roadmap item 179. The updater's platform labels and the release workflow's
       # build matrix are two copies of one list, in two languages, and nothing
