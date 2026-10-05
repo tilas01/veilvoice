@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-setup/install.svg" alt="install.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-setup/src/install.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 867 lines &middot; <a href="install.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 1101 lines &middot; <a href="install.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#portable-is-the-default-and-installing-is-the-exception">Portable is the default, and installing is the exception</a>
@@ -87,7 +87,7 @@
 <p>Everything here is per-user: <code>%LOCALAPPDATA%</code> on Windows, <code>~/.local</code> on everything else, and on Windows the <code>HKCU</code> registry rather than <code>HKLM</code>. No elevation is requested, nothing is written to a system directory, and no service is created.</p>
 <p>That is a deliberate limit rather than an oversight. A per-user install can be undone by the user who made it, needs no privilege to audit, and cannot break anybody else&#x27;s account. A machine-wide install would need administrator rights, and the reason to ask for those has to be better than &quot;so the program is on everyone&#x27;s PATH&quot;.</p>
 <h2 id="every-change-is-reversible-and-uninstall-reverses-exactly-these">Every change is reversible, and <code>uninstall</code> reverses exactly these</h2>
-<p>| What | Where | Undone by | |---|---|---| | The binaries | <code>&lt;prefix&gt;/VeilVoice</code> | removing that directory | | <code>PATH</code> entry | <code>HKCU\Environment</code>, or a shell profile line | removing just that entry | | Uninstall entry | <code>HKCU\...\Uninstall\VeilVoice</code> | deleting that key |</p>
+<p>| What | Where | Undone by | |---|---|---| | The binaries | <code>bin_dir</code>: <code>%LOCALAPPDATA%\Programs\VeilVoice</code>, or <code>~/.local/bin</code> | removing those files by name, never the directory | | <code>PATH</code> entry | <code>HKCU\Environment</code>, or a shell profile line | removing just that entry | | Uninstall entry | <code>HKCU\...\Uninstall\VeilVoice</code> | deleting that key |</p>
 <p>The <code>PATH</code> edit is the one that can damage something, so it is the one handled most carefully: the existing value is read, the entry is appended only if absent, and removal takes out that entry and nothing else. A tool that overwrites <code>PATH</code> wholesale has broken a machine, and doing it during an <em>uninstall</em> is worse -- that is the moment somebody is least inclined to check.</p>
 <h2 id="why-the-registry-through-regexe">Why the registry through <code>reg.exe</code></h2>
 <p>The same reason <code>veilvoice-watch</code> reads it that way: this workspace carries <code>#![forbid(unsafe_code)]</code> in every crate, and the Win32 registry API needs <code>unsafe</code> FFI. Shelling out to a system tool keeps that guarantee and costs a subprocess on an operation that runs once. <code>reg.exe</code> is resolved by absolute path -- resolving it by name would search the working directory first, which is finding F-13.</p>
@@ -98,27 +98,27 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>867 lines defining <strong>20 functions</strong> (5 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1101 lines defining <strong>24 functions</strong> (5 public), <strong>2 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Status</code> <span style="color:var(--muted)">line 160</span> &middot; What an installation currently looks like.</li>
-<li><code>enum UserPath</code> <span style="color:var(--muted)">line 322</span> &middot; What reading this user&#x27;s PATH out of the registry found.</li>
+<li><code>struct Status</code> <span style="color:var(--muted)">line 178</span> &middot; What an installation currently looks like.</li>
+<li><code>enum UserPath</code> <span style="color:var(--muted)">line 388</span> &middot; What reading this user&#x27;s PATH out of the registry found.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>status</code> <span style="color:var(--muted)">line 185</span> &middot; Read the current state without changing anything.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>bin_dir</code>, <code>exe_name</code>, <code>path_contains</code>, <code>prefix</code></span>
+<li><code>status</code> <span style="color:var(--muted)">line 203</span> &middot; Read the current state without changing anything.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>bin_dir</code>, <code>exe_name</code>, <code>path_contains</code>, <code>home_like</code>, <code>prefix</code>, <code>home_from</code></span>
 </li>
-<li><code>install</code> <span style="color:var(--muted)">line 524</span> &middot; Install for this user.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>add_to_path</code>, <code>bin_dir</code>, <code>copy_programs</code>, <code>register_uninstall</code>, <code>read_user_path</code>, <code>reg_exe</code>, <code>prefix</code>, <code>exe_name</code></span>
+<li><code>install</code> <span style="color:var(--muted)">line 610</span> &middot; Install for this user.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>add_to_path</code>, <code>bin_dir</code>, <code>copy_programs</code>, <code>register_uninstall</code>, <code>read_user_path</code>, <code>reg_exe</code>, <code>home_like</code>, <code>prefix</code>, <code>exe_name</code>, <code>replace_with_copy</code>, <code>home_from</code></span>
 </li>
-<li><code>uninstall</code> <span style="color:var(--muted)">line 553</span> &middot; Remove what install added.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>bin_dir</code>, <code>removable_prefix</code>, <code>remove_from_path</code>, <code>remove_programs</code>, <code>unregister_uninstall</code>, <code>prefix</code>, <code>read_user_path</code>, <code>reg_exe</code>, <code>exe_name</code></span>
+<li><code>uninstall</code> <span style="color:var(--muted)">line 639</span> &middot; Remove what install added.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>bin_dir</code>, <code>removable_prefix</code>, <code>remove_from_path</code>, <code>remove_programs</code>, <code>unregister_uninstall</code>, <code>home_like</code>, <code>prefix</code>, <code>read_user_path</code>, <code>reg_exe</code>, <code>exe_name</code>, <code>home_from</code></span>
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 655 831" width="655" height="831" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 655 946" width="655" height="946" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -127,30 +127,31 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="655" height="831" fill="var(--bg-inset, #16161e)" rx="8"/>
+<rect x="0" y="0" width="655" height="946" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M540.4 147.0 C 562.4 147.0, 562.4 147.0, 400.7 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M540.4 147.0 C 562.4 147.0, 562.4 47.0, 115.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M303.1 74.0 C 303.1 94.0, 93.2 500.0, 93.2 517.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <path d="M349.4 47.0 C 371.4 47.0, 371.4 47.0, 233.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M560.3 74.0 C 560.3 94.0, 160.5 500.0, 160.5 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M560.3 74.0 C 560.3 94.0, 215.7 500.0, 215.7 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M560.3 74.0 C 560.3 94.0, 529.2 500.0, 529.2 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M93.2 574.0 C 93.2 594.0, 327.3 700.0, 327.3 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M310.3 447.0 C 562.4 447.0, 562.4 147.0, 543.4 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M310.3 447.0 C 371.4 447.0, 371.4 47.0, 352.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M310.3 447.0 C 648.6 447.0, 648.6 47.0, 629.6 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M310.3 447.0 C 443.9 447.0, 443.9 247.0, 424.9 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M184.7 74.0 C 184.7 94.0, 93.2 500.0, 93.2 517.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <path d="M397.7 147.0 C 419.7 147.0, 419.7 47.0, 115.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M335.4 274.0 C 335.4 294.0, 160.5 500.0, 160.5 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M335.4 274.0 C 335.4 294.0, 215.7 500.0, 215.7 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M421.9 247.0 C 443.9 247.0, 443.9 47.0, 115.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M405.8 647.0 C 427.8 647.0, 427.8 47.0, 352.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M405.8 647.0 C 427.8 647.0, 427.8 47.0, 233.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M190.6 347.0 C 419.7 347.0, 419.7 147.0, 400.7 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M190.6 347.0 C 212.6 347.0, 212.6 47.0, 115.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M540.4 547.0 C 562.4 547.0, 562.4 547.0, 209.7 547.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M401.8 647.0 C 423.8 647.0, 423.8 547.0, 264.9 547.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M467.9 47.0 C 489.9 47.0, 489.9 47.0, 352.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M421.6 74.0 C 421.6 94.0, 160.5 500.0, 160.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M421.6 74.0 C 421.6 94.0, 299.1 500.0, 299.1 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M421.6 74.0 C 421.6 94.0, 215.7 500.0, 215.7 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M421.6 74.0 C 421.6 94.0, 354.3 500.0, 354.3 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M436.8 447.0 C 458.8 447.0, 458.8 47.0, 352.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M386.6 474.0 C 386.6 494.0, 327.3 600.0, 327.3 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M436.8 447.0 C 458.8 447.0, 458.8 347.0, 193.6 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M386.6 474.0 C 386.6 494.0, 466.0 500.0, 466.0 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M386.6 474.0 C 386.6 494.0, 327.3 600.0, 327.3 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M436.8 447.0 C 643.0 447.0, 643.0 347.0, 624.0 347.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M621.0 347.0 C 643.0 347.0, 643.0 47.0, 115.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <a href="install.src.html#fn-reg_exe">
@@ -163,146 +164,161 @@
 <text x="184.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">prefix</text>
 <text x="184.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
 </a>
+<a href="install.src.html#fn-home_like">
+<rect x="42.9" y="520.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="93.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">home_like</text>
+<text x="93.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
+</a>
+<a href="install.src.html#fn-home_from">
+<rect x="277.1" y="720.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="327.3" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">home_from</text>
+<text x="327.3" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
+</a>
 <a href="install.src.html#fn-bin_dir">
 <rect x="256.9" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="303.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">bin_dir</text>
-<text x="303.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
+<text x="303.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
 </a>
 <a href="install.src.html#fn-status-2">
 <rect x="375.4" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="421.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">status</text>
-<text x="421.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 185</text>
+<text x="421.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 203</text>
 </a>
 <a href="install.src.html#fn-exe_name">
-<rect x="114.2" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="160.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">exe_name</text>
-<text x="160.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 209</text>
+<rect x="169.5" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="215.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">exe_name</text>
+<text x="215.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 227</text>
 </a>
 <a href="install.src.html#fn-path_contains">
-<rect x="232.7" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="299.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">path_contains</text>
-<text x="299.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
+<rect x="287.9" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="354.3" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">path_contains</text>
+<text x="354.3" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 241</text>
 </a>
 <a href="install.src.html#fn-copy_programs">
 <rect x="493.9" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="560.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">copy_programs</text>
-<text x="560.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 231</text>
+<text x="560.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 249</text>
+</a>
+<a href="install.src.html#fn-replace_with_copy">
+<rect x="446.7" y="520.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="529.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">replace_with_copy</text>
+<text x="529.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
 </a>
 <a href="install.src.html#fn-add_to_path">
 <rect x="423.7" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="482.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">add_to_path</text>
-<text x="482.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 274</text>
+<text x="482.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 340</text>
 </a>
 <a href="install.src.html#fn-read_user_path">
 <rect x="256.9" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="327.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_user_path</text>
-<text x="327.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 342</text>
+<text x="327.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 408</text>
 </a>
 <a href="install.src.html#fn-add_to_path-2">
 <rect x="423.7" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="482.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">add_to_path</text>
-<text x="482.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 391</text>
+<text x="482.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 466</text>
 </a>
 <a href="install.src.html#fn-register_uninstall">
 <rect x="248.8" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="335.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">register_uninstall</text>
-<text x="335.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 401</text>
+<text x="335.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 487</text>
 </a>
 <a href="install.src.html#fn-register_uninstall-2">
 <rect x="248.8" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="335.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">register_uninstall</text>
-<text x="335.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 442</text>
+<text x="335.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 528</text>
 </a>
 <a href="install.src.html#fn-remove_from_path">
 <rect x="33.6" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="112.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_from_path</text>
-<text x="112.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 453</text>
+<text x="112.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 539</text>
 </a>
 <a href="install.src.html#fn-remove_from_path-2">
 <rect x="33.6" y="320.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="112.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_from_path</text>
-<text x="112.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 499</text>
+<text x="112.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 585</text>
 </a>
 <a href="install.src.html#fn-unregister_uninstall">
 <rect x="431.8" y="320.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="526.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unregister_uninstall</text>
-<text x="526.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 509</text>
+<text x="526.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 595</text>
 </a>
 <a href="install.src.html#fn-unregister_uninstall-2">
 <rect x="431.8" y="320.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="526.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">unregister_uninstall</text>
-<text x="526.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 519</text>
+<text x="526.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 605</text>
 </a>
 <a href="install.src.html#fn-install">
 <rect x="217.8" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="264.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
-<text x="264.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 524</text>
+<text x="264.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 610</text>
 </a>
 <a href="install.src.html#fn-uninstall">
 <rect x="336.3" y="420.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="386.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">uninstall</text>
-<text x="386.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 553</text>
+<text x="386.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 639</text>
 </a>
 <a href="install.src.html#fn-remove_programs">
-<rect x="391.5" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="466.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_programs</text>
-<text x="466.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 626</text>
+<rect x="252.9" y="620.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="327.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_programs</text>
+<text x="327.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 712</text>
 </a>
-<a href="install.src.html#fn-removable_prefix">
-<rect x="248.8" y="620.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="327.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">removable_prefix</text>
-<text x="327.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 664</text>
-</a>
-<rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="720.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
-<text x="35.0" y="729.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
-<rect x="20.0" y="736.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="745.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 756.5 L29.0 756.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="761.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
-<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
-<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
+<rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="820.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="829.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="836.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="845.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 856.5 L29.0 856.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="861.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="883.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
+<text x="20.0" y="898.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
+<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one. 22 of 20 functions are drawn; the diagram is bounded at 22 so it stays</text>
+<text x="20.0" y="928.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 20 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_reg_exe[&quot;reg_exe&lt;br/&gt;line 94&quot;]
     n_prefix[&quot;prefix&lt;br/&gt;line 110&quot;]
-    n_bin_dir[&quot;bin_dir&lt;br/&gt;line 143&quot;]
-    n_status([&quot;status&lt;br/&gt;line 185&quot;])
-    n_exe_name[&quot;exe_name&lt;br/&gt;line 209&quot;]
-    n_path_contains[&quot;path_contains&lt;br/&gt;line 223&quot;]
-    n_copy_programs[&quot;copy_programs&lt;br/&gt;line 231&quot;]
-    n_add_to_path[&quot;add_to_path&lt;br/&gt;line 274&quot;]
-    n_read_user_path[&quot;read_user_path&lt;br/&gt;line 342&quot;]
-    n_add_to_path[&quot;add_to_path&lt;br/&gt;line 391&quot;]
-    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 401&quot;]
-    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 442&quot;]
-    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 453&quot;]
-    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 499&quot;]
-    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 509&quot;]
-    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 519&quot;]
-    n_install([&quot;install&lt;br/&gt;line 524&quot;])
-    n_uninstall([&quot;uninstall&lt;br/&gt;line 553&quot;])
-    n_remove_programs[&quot;remove_programs&lt;br/&gt;line 626&quot;]
-    n_removable_prefix[&quot;removable_prefix&lt;br/&gt;line 664&quot;]
+    n_home_like[&quot;home_like&lt;br/&gt;line 131&quot;]
+    n_home_from[&quot;home_from&lt;br/&gt;line 137&quot;]
+    n_bin_dir[&quot;bin_dir&lt;br/&gt;line 161&quot;]
+    n_status([&quot;status&lt;br/&gt;line 203&quot;])
+    n_exe_name[&quot;exe_name&lt;br/&gt;line 227&quot;]
+    n_path_contains[&quot;path_contains&lt;br/&gt;line 241&quot;]
+    n_copy_programs[&quot;copy_programs&lt;br/&gt;line 249&quot;]
+    n_replace_with_copy[&quot;replace_with_copy&lt;br/&gt;line 303&quot;]
+    n_add_to_path[&quot;add_to_path&lt;br/&gt;line 340&quot;]
+    n_read_user_path[&quot;read_user_path&lt;br/&gt;line 408&quot;]
+    n_add_to_path[&quot;add_to_path&lt;br/&gt;line 466&quot;]
+    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 487&quot;]
+    n_register_uninstall[&quot;register_uninstall&lt;br/&gt;line 528&quot;]
+    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 539&quot;]
+    n_remove_from_path[&quot;remove_from_path&lt;br/&gt;line 585&quot;]
+    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 595&quot;]
+    n_unregister_uninstall[&quot;unregister_uninstall&lt;br/&gt;line 605&quot;]
+    n_install([&quot;install&lt;br/&gt;line 610&quot;])
+    n_uninstall([&quot;uninstall&lt;br/&gt;line 639&quot;])
+    n_remove_programs[&quot;remove_programs&lt;br/&gt;line 712&quot;]
     n_add_to_path --&gt; n_read_user_path
     n_add_to_path --&gt; n_reg_exe
+    n_bin_dir --&gt; n_home_like
     n_bin_dir --&gt; n_prefix
     n_copy_programs --&gt; n_exe_name
+    n_copy_programs --&gt; n_replace_with_copy
+    n_home_like --&gt; n_home_from
     n_install --&gt; n_add_to_path
     n_install --&gt; n_bin_dir
     n_install --&gt; n_copy_programs
     n_install --&gt; n_register_uninstall
+    n_prefix --&gt; n_home_like
     n_read_user_path --&gt; n_reg_exe
     n_register_uninstall --&gt; n_exe_name
     n_register_uninstall --&gt; n_reg_exe
-    n_removable_prefix --&gt; n_bin_dir
-    n_removable_prefix --&gt; n_prefix
     n_remove_from_path --&gt; n_read_user_path
     n_remove_from_path --&gt; n_reg_exe
     n_remove_programs --&gt; n_exe_name
@@ -310,37 +326,38 @@ flowchart TD
     n_status --&gt; n_exe_name
     n_status --&gt; n_path_contains
     n_uninstall --&gt; n_bin_dir
-    n_uninstall --&gt; n_removable_prefix
     n_uninstall --&gt; n_remove_from_path
     n_uninstall --&gt; n_remove_programs
     n_uninstall --&gt; n_unregister_uninstall
     n_unregister_uninstall --&gt; n_reg_exe
     click n_reg_exe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L94&quot; &quot;open the source&quot;
     click n_prefix href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L110&quot; &quot;open the source&quot;
-    click n_bin_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L143&quot; &quot;open the source&quot;
-    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L185&quot; &quot;open the source&quot;
-    click n_exe_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L209&quot; &quot;open the source&quot;
-    click n_path_contains href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L223&quot; &quot;open the source&quot;
-    click n_copy_programs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L231&quot; &quot;open the source&quot;
-    click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L274&quot; &quot;open the source&quot;
-    click n_read_user_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L342&quot; &quot;open the source&quot;
-    click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L391&quot; &quot;open the source&quot;
-    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L401&quot; &quot;open the source&quot;
-    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L442&quot; &quot;open the source&quot;
-    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L453&quot; &quot;open the source&quot;
-    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L499&quot; &quot;open the source&quot;
-    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L509&quot; &quot;open the source&quot;
-    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L519&quot; &quot;open the source&quot;
-    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L524&quot; &quot;open the source&quot;
-    click n_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L553&quot; &quot;open the source&quot;
-    click n_remove_programs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L626&quot; &quot;open the source&quot;
-    click n_removable_prefix href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L664&quot; &quot;open the source&quot;
+    click n_home_like href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L131&quot; &quot;open the source&quot;
+    click n_home_from href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L137&quot; &quot;open the source&quot;
+    click n_bin_dir href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L161&quot; &quot;open the source&quot;
+    click n_status href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L203&quot; &quot;open the source&quot;
+    click n_exe_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L227&quot; &quot;open the source&quot;
+    click n_path_contains href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L241&quot; &quot;open the source&quot;
+    click n_copy_programs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L249&quot; &quot;open the source&quot;
+    click n_replace_with_copy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L303&quot; &quot;open the source&quot;
+    click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L340&quot; &quot;open the source&quot;
+    click n_read_user_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L408&quot; &quot;open the source&quot;
+    click n_add_to_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L466&quot; &quot;open the source&quot;
+    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L487&quot; &quot;open the source&quot;
+    click n_register_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L528&quot; &quot;open the source&quot;
+    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L539&quot; &quot;open the source&quot;
+    click n_remove_from_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L585&quot; &quot;open the source&quot;
+    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L595&quot; &quot;open the source&quot;
+    click n_unregister_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L605&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L610&quot; &quot;open the source&quot;
+    click n_uninstall href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L639&quot; &quot;open the source&quot;
+    click n_remove_programs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/install.rs#L712&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_status,n_install,n_uninstall entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_prefix,n_bin_dir api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_reg_exe,n_exe_name,n_path_contains,n_copy_programs,n_add_to_path,n_read_user_path,n_add_to_path,n_register_uninstall,n_register_uninstall,n_remove_from_path,n_remove_from_path,n_unregister_uninstall,n_unregister_uninstall,n_remove_programs,n_removable_prefix helper</code></pre>
+    class n_reg_exe,n_home_like,n_home_from,n_exe_name,n_path_contains,n_copy_programs,n_replace_with_copy,n_add_to_path,n_read_user_path,n_add_to_path,n_register_uninstall,n_register_uninstall,n_remove_from_path,n_remove_from_path,n_unregister_uninstall,n_unregister_uninstall,n_remove_programs helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -351,26 +368,30 @@ flowchart TD
 <tr><td><code>PROGRAMS</code> <sub>const</sub></td><td><a href="install.src.html#fn-programs">85</a></td><td>Files that make up an installation, if they are beside the running binary.</td></tr>
 <tr><td><code>reg_exe</code> <sub>fn</sub></td><td><a href="install.src.html#fn-reg_exe">94</a></td><td>reg.exe, by absolute path.</td></tr>
 <tr><td><code>prefix</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-prefix">110</a></td><td>The directory VeilVoice owns on this machine, for this user only.</td></tr>
-<tr><td><code>bin_dir</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-bin_dir">143</a></td><td>Where the binaries go, and therefore the directory PATH must contain.</td></tr>
-<tr><td><code>Status</code> <sub>pub struct</sub></td><td><a href="install.src.html#fn-status">160</a></td><td>What an installation currently looks like.</td></tr>
-<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-status-2">185</a></td><td>Read the current state without changing anything.</td></tr>
-<tr><td><code>exe_name</code> <sub>fn</sub></td><td><a href="install.src.html#fn-exe_name">209</a></td><td>A program&#x27;s file name on this platform.</td></tr>
-<tr><td><code>path_contains</code> <sub>fn</sub></td><td><a href="install.src.html#fn-path_contains">223</a></td><td>Is dir already on this user&#x27;s PATH?</td></tr>
-<tr><td><code>copy_programs</code> <sub>fn</sub></td><td><a href="install.src.html#fn-copy_programs">231</a></td><td>Copy the binaries into place.</td></tr>
-<tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-add_to_path">274</a></td><td>Add dir to the user&#x27;s PATH, if it is not there already.</td></tr>
-<tr><td><code>UserPath</code> <sub>enum</sub></td><td><a href="install.src.html#fn-userpath">322</a></td><td>What reading this user&#x27;s PATH out of the registry found.</td></tr>
-<tr><td><code>read_user_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-read_user_path">342</a></td><td>Read this user&#x27;s PATH, distinguishing &quot;not set&quot; from &quot;could not tell&quot;.</td></tr>
-<tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-add_to_path-2">391</a></td><td>The Unix half: report that nothing was written, because nothing was.</td></tr>
-<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-register_uninstall">401</a></td><td>Register with Add/Remove Programs, so the system can list and remove it.</td></tr>
-<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-register_uninstall-2">442</a></td><td>The Unix half: nothing to register.</td></tr>
-<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_from_path">453</a></td><td>Take this directory back out of the user&#x27;s PATH, leaving the rest of it exactly as it was.</td></tr>
-<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_from_path-2">499</a></td><td>The Unix half: nothing was written to a profile, so nothing is taken out.</td></tr>
-<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unregister_uninstall">509</a></td><td>Take the Add/Remove Programs entry away again.</td></tr>
-<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unregister_uninstall-2">519</a></td><td>The Unix half: nothing was registered, so nothing is unregistered.</td></tr>
-<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-install">524</a></td><td>Install for this user.</td></tr>
-<tr><td><code>uninstall</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-uninstall">553</a></td><td>Remove what install added.</td></tr>
-<tr><td><code>remove_programs</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_programs">626</a></td><td>Remove the programs install wrote, by name, and say which are still in use.</td></tr>
-<tr><td><code>removable_prefix</code> <sub>fn</sub></td><td><a href="install.src.html#fn-removable_prefix">664</a></td><td>prefix, but only when it is genuinely a directory VeilVoice made for itself.</td></tr>
+<tr><td><code>home_like</code> <sub>fn</sub></td><td><a href="install.src.html#fn-home_like">131</a></td><td>A directory named by an environment variable, when it names one.</td></tr>
+<tr><td><code>home_from</code> <sub>fn</sub></td><td><a href="install.src.html#fn-home_from">137</a></td><td>home_like with the value given, so the rule can be tested without changing this process&#x27;s environment.</td></tr>
+<tr><td><code>bin_dir</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-bin_dir">161</a></td><td>Where the binaries go, and therefore the directory PATH must contain.</td></tr>
+<tr><td><code>Status</code> <sub>pub struct</sub></td><td><a href="install.src.html#fn-status">178</a></td><td>What an installation currently looks like.</td></tr>
+<tr><td><code>status</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-status-2">203</a></td><td>Read the current state without changing anything.</td></tr>
+<tr><td><code>exe_name</code> <sub>fn</sub></td><td><a href="install.src.html#fn-exe_name">227</a></td><td>A program&#x27;s file name on this platform.</td></tr>
+<tr><td><code>path_contains</code> <sub>fn</sub></td><td><a href="install.src.html#fn-path_contains">241</a></td><td>Is dir already on this user&#x27;s PATH?</td></tr>
+<tr><td><code>copy_programs</code> <sub>fn</sub></td><td><a href="install.src.html#fn-copy_programs">249</a></td><td>Copy the binaries into place.</td></tr>
+<tr><td><code>replace_with_copy</code> <sub>fn</sub></td><td><a href="install.src.html#fn-replace_with_copy">303</a></td><td>Put a copy of from at to, replacing whatever name is there rather than writing through it.</td></tr>
+<tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-add_to_path">340</a></td><td>Add dir to the user&#x27;s PATH, if it is not there already.</td></tr>
+<tr><td><code>UserPath</code> <sub>enum</sub></td><td><a href="install.src.html#fn-userpath">388</a></td><td>What reading this user&#x27;s PATH out of the registry found.</td></tr>
+<tr><td><code>read_user_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-read_user_path">408</a></td><td>Read this user&#x27;s PATH, distinguishing &quot;not set&quot; from &quot;could not tell&quot;.</td></tr>
+<tr><td><code>add_to_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-add_to_path-2">466</a></td><td>The Unix half: nothing is ever written, and the answer says which of the two reasons applies.</td></tr>
+<tr><td><code>unix_path_advice</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unix_path_advice">475</a></td><td>What to add to a shell profile so dir is on PATH, in words.</td></tr>
+<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-register_uninstall">487</a></td><td>Register with Add/Remove Programs, so the system can list and remove it.</td></tr>
+<tr><td><code>register_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-register_uninstall-2">528</a></td><td>The Unix half: nothing to register.</td></tr>
+<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_from_path">539</a></td><td>Take this directory back out of the user&#x27;s PATH, leaving the rest of it exactly as it was.</td></tr>
+<tr><td><code>remove_from_path</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_from_path-2">585</a></td><td>The Unix half: nothing was written to a profile, so nothing is taken out.</td></tr>
+<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unregister_uninstall">595</a></td><td>Take the Add/Remove Programs entry away again.</td></tr>
+<tr><td><code>unregister_uninstall</code> <sub>fn</sub></td><td><a href="install.src.html#fn-unregister_uninstall-2">605</a></td><td>The Unix half: nothing was registered, so nothing is unregistered.</td></tr>
+<tr><td><code>install</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-install">610</a></td><td>Install for this user.</td></tr>
+<tr><td><code>uninstall</code> <sub>pub fn</sub></td><td><a href="install.src.html#fn-uninstall">639</a></td><td>Remove what install added.</td></tr>
+<tr><td><code>remove_programs</code> <sub>fn</sub></td><td><a href="install.src.html#fn-remove_programs">712</a></td><td>Remove the programs install wrote, by name, and say which are still in use.</td></tr>
+<tr><td><code>removable_prefix</code> <sub>fn</sub></td><td><a href="install.src.html#fn-removable_prefix">750</a></td><td>prefix, but only when it is genuinely a directory VeilVoice made for itself.</td></tr>
 </tbody></table>
 </section>
 </div></div>

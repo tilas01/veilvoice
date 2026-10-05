@@ -743,6 +743,106 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-239: an empty home directory aimed the uninstall at the working directory
+
+Found reading `crates/veilvoice-setup/src/install.rs` after F-214 moved the
+binaries, during the audit of everything written since v0.1.22.
+
+`prefix()` and `bin_dir()` built their paths from `HOME`, or `LOCALAPPDATA` on
+Windows, as whatever string the variable held. Set but empty, which is what a
+service manager, a `sudo -H` gone wrong or a scrubbed environment leaves, that
+string is `""`, and `PathBuf::from("")` joined with `.local/share/veilvoice` is
+a relative path. Relative paths are resolved against the directory the program
+was started in, so:
+
+- `veilvoice install` copied the programs into a `.local/bin` under whatever
+  directory the terminal was in, and reported success.
+- `veilvoice uninstall` passed `.local/share/veilvoice` to
+  `removable_prefix()`, whose only check is that the last component names
+  VeilVoice, which it does. That is the one `remove_dir_all` in the crate, and
+  it was aimed at whatever sat at that name under the working directory.
+
+The lock file had the same fault once and was fixed for the empty case, F-143.
+Neither fix looked at a relative value, which names the working directory just
+as surely.
+
+**The fix.** Both functions read the variable through one helper, `home_like`,
+which treats an empty or relative value as no home at all. Every caller already
+handles "no per-user program directory could be found", which is the true
+answer. **What is checked:** `an_empty_or_relative_home_is_no_home` gives the
+rule an unset, empty, relative and `.` value, and an absolute one, without
+touching the test process's own environment.
+
+### F-238: install said the programs were on the path without looking
+
+The Unix half of `add_to_path` was:
+
+```text
+let _ = dir;
+Ok(false)
+```
+
+and `install()` reports `Ok(false)` as "`<dir>` was already on your PATH". Its
+comment said the caller prints the line for the person to add, and no caller
+did. So on macOS, where `~/.local/bin` is never on `PATH` by default, and on
+any Linux without it, `veilvoice install` said it had succeeded and that the
+directory was already on the path, and `veilvoice` was then not found. That is
+the outcome F-214 was fixed to end, reached by a second route: F-214 made the
+copy go to the right directory, and this made the report about that directory
+untrue.
+
+**The fix.** It looks, with the same `path_contains` that `status()` uses. Where
+the directory is missing, it answers with an error carrying the line to add to
+a shell profile, which `install()` prints as "PATH was not changed: ...". It
+still edits no profile. `docs/INSTALL.md` says so where it describes what
+`install.sh` does in the same case. **What is checked:**
+`a_directory_missing_from_path_is_not_reported_as_present` asks about a
+directory on nobody's path and one taken from the test's own `PATH`, and checks
+that the first is refused with the `export` line and the second is not.
+
+### F-237: installing over a link wrote through it, and could empty the copy being installed
+
+`copy_programs` replaced each installed program with `std::fs::copy(from, to)`.
+That opens `to` for writing and truncates it, and opening follows a symbolic
+link and writes into a hard link. Outside Windows `to` is in `~/.local/bin`,
+which is exactly where somebody links a portable copy:
+
+```text
+ln -s ~/Apps/veilvoice/veilvoice ~/.local/bin/veilvoice
+veilvoice install
+```
+
+The program installs from the folder it is running from. Started from the
+portable folder, or on Linux through the link, which the kernel reports as the
+file it points at, the source is `~/Apps/veilvoice/veilvoice` and the
+destination is the link. `copy_programs` compares the two paths as text, so it
+does not see that they are the same file. The copy then opened the destination
+through the link, which truncated the portable `veilvoice` to nothing, and read
+that same file as the source. Reproduced with
+the standard library on its own before anything was changed: the copy returned
+`Ok(0)` and left the portable program at zero bytes. A link pointing anywhere
+else had that file overwritten with VeilVoice instead.
+
+**The fix.** `replace_with_copy` writes the copy to a new file beside the
+destination, created with `create_new` so nothing already at that name is
+followed, gives it the source's permissions and renames it over the destination.
+A rename replaces the directory entry: a link is replaced by the file rather
+than written through, a hard link keeps its old contents under its other name,
+and on Unix an installed program that is running is replaced rather than
+refused with "text file busy". A failed copy removes its staged file.
+
+`veilvoice verify install --from <DIR>` copies into the same directory with
+`std::fs::copy` too, in `crates/veilvoice-verify/src/lib.rs`, which another
+thread owns, and has been passed to it. The updater's `put_in_place` renames
+the old file aside before copying and was never affected.
+
+**What is checked.** `installing_over_a_link_replaces_the_link_and_not_what_it_points_at`
+is the case above with the destination linked to the source itself, then to
+somebody else's file, and checks that both are unchanged afterwards.
+`installing_over_a_hard_link_does_not_write_through_it` checks that the other
+name keeps the old contents. `a_copy_replaces_an_older_one_and_leaves_nothing_beside_it`
+checks that the execute bit survives and nothing staged is left behind.
+
 ### F-236: the manual said the static and Raspberry Pi archives had a window, and neither has ever had one
 
 Found while working on roadmap item 162, by reading which archives carry the
@@ -10107,7 +10207,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and thirty-six defects found and fixed (F-1 to F-236), across
+**Two hundred and thirty-nine defects found and fixed (F-1 to F-239), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

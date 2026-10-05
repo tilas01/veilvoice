@@ -35,7 +35,7 @@
 //!
 //! | What | Where | Undone by |
 //! |---|---|---|
-//! | The binaries | `<prefix>/VeilVoice` | removing that directory |
+//! | The binaries | [`bin_dir`]: `%LOCALAPPDATA%\Programs\VeilVoice`, or `~/.local/bin` | removing those files by name, never the directory |
 //! | `PATH` entry | `HKCU\Environment`, or a shell profile line | removing just that entry |
 //! | Uninstall entry | `HKCU\...\Uninstall\VeilVoice` | deleting that key |
 //!
@@ -110,17 +110,35 @@ fn reg_exe() -> PathBuf {
 pub fn prefix() -> Option<PathBuf> {
     #[cfg(windows)]
     {
-        std::env::var_os("LOCALAPPDATA").map(|base| PathBuf::from(base).join("Programs").join(NAME))
+        home_like("LOCALAPPDATA").map(|base| base.join("Programs").join(NAME))
     }
     #[cfg(not(windows))]
     {
-        std::env::var_os("HOME").map(|home| {
-            PathBuf::from(home)
-                .join(".local")
-                .join("share")
-                .join("veilvoice")
-        })
+        home_like("HOME").map(|home| home.join(".local").join("share").join("veilvoice"))
     }
+}
+
+/// A directory named by an environment variable, when it names one.
+///
+/// **F-239.** An empty value, or a relative one, names the directory the
+/// program happened to be started in. `HOME=""` made [`prefix`]
+/// `.local/share/veilvoice` relative to wherever `veilvoice uninstall` was run,
+/// a path that passes [`removable_prefix`]'s name check, so the one recursive
+/// delete in this crate was aimed at whatever sat at that name there, and
+/// `install` copied into a `.local/bin` beside it and reported success. The
+/// lock file's `config_path` refuses an empty value for the same reason
+/// (F-143); a relative one names the working directory just as surely.
+fn home_like(variable: &str) -> Option<PathBuf> {
+    home_from(std::env::var_os(variable))
+}
+
+/// [`home_like`] with the value given, so the rule can be tested without
+/// changing this process's environment.
+fn home_from(value: Option<std::ffi::OsString>) -> Option<PathBuf> {
+    value
+        .filter(|value| !value.is_empty())
+        .map(PathBuf::from)
+        .filter(|path| path.is_absolute())
 }
 
 /// Where the binaries go, and therefore the directory `PATH` must contain.
@@ -147,7 +165,7 @@ pub fn bin_dir() -> Option<PathBuf> {
     }
     #[cfg(not(windows))]
     {
-        std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".local").join("bin"))
+        home_like("HOME").map(|home| home.join(".local").join("bin"))
     }
 }
 
@@ -255,7 +273,7 @@ fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
                 into.display()
             ));
         }
-        std::fs::copy(&from, &to)
+        replace_with_copy(&from, &to)
             .map_err(|e| format!("cannot copy {} to {}: {e}", from.display(), to.display()))?;
         copied.push(name);
     }
@@ -263,6 +281,54 @@ fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
         return Err("found none of the VeilVoice programs beside this one".to_string());
     }
     Ok(copied)
+}
+
+/// Put a copy of `from` at `to`, replacing whatever name is there rather than
+/// writing through it.
+///
+/// **F-237.** This was `std::fs::copy(from, to)`, which opens `to` and
+/// truncates it, following a symbolic link and writing into a hard link. On
+/// every platform but Windows `to` is in `~/.local/bin`, which is exactly where
+/// people link a portable copy (`ln -s ~/Apps/veilvoice/veilvoice*
+/// ~/.local/bin/`). Installing from that portable folder then opened the
+/// portable `veilvoice` through the link and truncated it to nothing before
+/// reading it, and a link pointing anywhere else had that file overwritten.
+///
+/// So the copy is written to a new file beside `to`, created fresh so that
+/// nothing already at that name is followed, given the source's permissions,
+/// and renamed over `to`. A rename replaces the directory entry: a link is
+/// replaced by the file rather than written through, a hard link is left
+/// holding the old contents, and on Unix a `to` that is running is replaced
+/// rather than refused with "text file busy".
+fn replace_with_copy(from: &Path, to: &Path) -> std::io::Result<()> {
+    let name = to
+        .file_name()
+        .ok_or_else(|| std::io::Error::other("the destination names no file"))?;
+    let mut staged_name = std::ffi::OsString::from(".");
+    staged_name.push(name);
+    staged_name.push(".installing");
+    let staged = to.with_file_name(staged_name);
+    // Left by an install that was interrupted. `remove_file` removes a link
+    // rather than what it points at, and `create_new` below refuses anything
+    // that appears in between.
+    let _ = std::fs::remove_file(&staged);
+
+    let written = (|| {
+        let mut source = std::fs::File::open(from)?;
+        let mut copy = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&staged)?;
+        std::io::copy(&mut source, &mut copy)?;
+        copy.sync_all()?;
+        drop(copy);
+        std::fs::set_permissions(&staged, std::fs::metadata(from)?.permissions())?;
+        std::fs::rename(&staged, to)
+    })();
+    if written.is_err() {
+        let _ = std::fs::remove_file(&staged);
+    }
+    written
 }
 
 /// Add `dir` to the user's `PATH`, if it is not there already.
@@ -383,17 +449,37 @@ fn read_user_path() -> Result<UserPath, String> {
     Err("could not parse the PATH value reg.exe printed. Refusing to change it.".to_string())
 }
 
-/// The Unix half: report that nothing was written, because nothing was.
+/// The Unix half: nothing is ever written, and the answer says which of the
+/// two reasons applies.
 ///
-/// Answering `Ok(false)` rather than doing it is the decision, and the body
-/// says why. The caller prints the line for the person to add themselves.
+/// On Unix the convention is a line in a shell profile, and rewriting
+/// somebody's profile without asking is not this program's business.
+///
+/// **F-238.** This answered `Ok(false)` without looking, which `install`
+/// reports as "was already on your PATH". On macOS, where `~/.local/bin` is
+/// never on `PATH` by default, and on any distribution without it, install
+/// then said it had succeeded and `veilvoice` was not found: the outcome F-214
+/// was fixed to end. It looks now, and where the directory is missing the
+/// error carries the line to add, which is the line its caller used to be
+/// said to print and never did.
 #[cfg(not(windows))]
 fn add_to_path(dir: &Path) -> Result<bool, String> {
-    // On Unix the convention is a line in a shell profile, and rewriting
-    // somebody's profile without asking is not this program's business. The
-    // line is printed for them to add.
-    let _ = dir;
-    Ok(false)
+    if path_contains(dir) {
+        return Ok(false);
+    }
+    Err(unix_path_advice(dir))
+}
+
+/// What to add to a shell profile so `dir` is on `PATH`, in words.
+#[cfg(not(windows))]
+fn unix_path_advice(dir: &Path) -> String {
+    format!(
+        "{} is not on your PATH, and VeilVoice does not edit shell profiles. \
+         Add this line to yours (~/.profile, ~/.bashrc or ~/.zshrc) and open a \
+         new terminal: export PATH=\"{}:$PATH\"",
+        dir.display(),
+        dir.display()
+    )
 }
 
 /// Register with Add/Remove Programs, so the system can list and remove it.
@@ -863,5 +949,153 @@ mod tests {
         }
         let nonsense = PathBuf::from("this-directory-is-not-on-anybody-s-path-42");
         assert!(!path_contains(&nonsense));
+    }
+
+    /// A scratch directory of this test's own, removed by the caller.
+    fn scratch(label: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!(
+            "veilvoice-{label}-{:x}-{:?}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0),
+            std::thread::current().id()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    /// F-237. A link at the destination is replaced, and what it pointed at is
+    /// left exactly as it was.
+    ///
+    /// The case that lost data: a portable copy linked into `~/.local/bin`,
+    /// then installed from. The destination is a link to the source itself.
+    #[cfg(unix)]
+    #[test]
+    fn installing_over_a_link_replaces_the_link_and_not_what_it_points_at() {
+        let dir = scratch("install-link");
+        let portable = dir.join("portable");
+        let bin = dir.join("bin");
+        std::fs::create_dir_all(&portable).unwrap();
+        std::fs::create_dir_all(&bin).unwrap();
+        let from = portable.join("veilvoice");
+        std::fs::write(&from, b"the portable program").unwrap();
+        let to = bin.join("veilvoice");
+        std::os::unix::fs::symlink(&from, &to).unwrap();
+
+        replace_with_copy(&from, &to).expect("the copy goes in");
+
+        assert_eq!(
+            std::fs::read(&from).unwrap(),
+            b"the portable program",
+            "installing truncated or rewrote the copy it was installing from"
+        );
+        let meta = std::fs::symlink_metadata(&to).unwrap();
+        assert!(meta.file_type().is_file(), "the link was left in place");
+        assert_eq!(std::fs::read(&to).unwrap(), b"the portable program");
+
+        // And a link to somebody else's file leaves that file alone.
+        let theirs = dir.join("somebody-elses-file");
+        std::fs::write(&theirs, b"not VeilVoice").unwrap();
+        std::fs::remove_file(&to).unwrap();
+        std::os::unix::fs::symlink(&theirs, &to).unwrap();
+        replace_with_copy(&from, &to).expect("the copy goes in");
+        assert_eq!(std::fs::read(&theirs).unwrap(), b"not VeilVoice");
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// F-237, the hard-link half: the other name keeps the old contents.
+    #[cfg(unix)]
+    #[test]
+    fn installing_over_a_hard_link_does_not_write_through_it() {
+        let dir = scratch("install-hardlink");
+        let from = dir.join("new-veilvoice");
+        std::fs::write(&from, b"new").unwrap();
+        let elsewhere = dir.join("kept-elsewhere");
+        std::fs::write(&elsewhere, b"old").unwrap();
+        let to = dir.join("veilvoice");
+        std::fs::hard_link(&elsewhere, &to).unwrap();
+
+        replace_with_copy(&from, &to).expect("the copy goes in");
+
+        assert_eq!(std::fs::read(&to).unwrap(), b"new");
+        assert_eq!(
+            std::fs::read(&elsewhere).unwrap(),
+            b"old",
+            "the install wrote through a hard link into another name"
+        );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// The copy keeps the source's permissions, and leaves nothing staged
+    /// behind it.
+    #[test]
+    fn a_copy_replaces_an_older_one_and_leaves_nothing_beside_it() {
+        let dir = scratch("install-replace");
+        let from = dir.join("source");
+        std::fs::write(&from, b"new").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&from, std::fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        let into = dir.join("into");
+        std::fs::create_dir_all(&into).unwrap();
+        let to = into.join("veilvoice");
+        std::fs::write(&to, b"an older install").unwrap();
+
+        replace_with_copy(&from, &to).expect("the copy goes in");
+
+        assert_eq!(std::fs::read(&to).unwrap(), b"new");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mode = std::fs::metadata(&to).unwrap().permissions().mode() & 0o777;
+            assert_eq!(mode, 0o755, "the installed program lost its execute bit");
+        }
+        let left: Vec<_> = std::fs::read_dir(&into)
+            .unwrap()
+            .flatten()
+            .map(|entry| entry.file_name())
+            .collect();
+        assert_eq!(
+            left,
+            vec![std::ffi::OsString::from("veilvoice")],
+            "{left:?}"
+        );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// F-239. An environment variable that is empty or relative names no home.
+    #[test]
+    fn an_empty_or_relative_home_is_no_home() {
+        assert_eq!(home_from(None), None);
+        assert_eq!(home_from(Some("".into())), None);
+        assert_eq!(home_from(Some("relative/home".into())), None);
+        assert_eq!(home_from(Some(".".into())), None);
+        let absolute = std::env::temp_dir();
+        assert_eq!(home_from(Some(absolute.clone().into())), Some(absolute));
+    }
+
+    /// F-238. On Unix, a directory missing from `PATH` is said to be missing,
+    /// with the line that would add it, and never reported as already there.
+    #[cfg(not(windows))]
+    #[test]
+    fn a_directory_missing_from_path_is_not_reported_as_present() {
+        let missing = PathBuf::from("/this-directory-is-not-on-anybody-s-path-42");
+        let error = add_to_path(&missing).expect_err("reported as already on PATH");
+        assert!(error.contains("is not on your PATH"), "{error}");
+        assert!(
+            error.contains("export PATH=\"/this-directory-is-not-on-anybody-s-path-42:$PATH\""),
+            "{error}"
+        );
+
+        // And one that is there is said to be there.
+        if let Some(present) = std::env::var_os("PATH")
+            .and_then(|path| std::env::split_paths(&path).find(|entry| entry.is_absolute()))
+        {
+            assert_eq!(add_to_path(&present), Ok(false));
+        }
     }
 }

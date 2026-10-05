@@ -110,7 +110,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>226 lines"])
     n_companions["companions.rs<br/>1100 lines"]
-    n_install["install.rs<br/>867 lines"]
+    n_install["install.rs<br/>1101 lines"]
     n_needs["needs.rs<br/>565 lines"]
     n_space["space.rs<br/>170 lines"]
     n_update["update.rs<br/>892 lines"]
@@ -134,14 +134,14 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`companions.rs`](../../docs/files/veilvoice-setup/companions.md) | 1100 | Optional third-party software, detected rather than assumed. |
-| [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 867 | Put this program somewhere the system can find it. |
+| [`install.rs`](../../docs/files/veilvoice-setup/install.md) | 1101 | Put this program somewhere the system can find it. |
 | [`lib.rs`](../../docs/files/veilvoice-setup/lib.md) | 226 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [`needs.rs`](../../docs/files/veilvoice-setup/needs.md) | 565 | What this machine is missing, asked once and at the right moment. |
 | [`space.rs`](../../docs/files/veilvoice-setup/space.md) | 170 | How much room is actually free where VeilVoice keeps things. |
 | [`update.rs`](../../docs/files/veilvoice-setup/update.md) | 892 | Ask, only when told to, whether a newer VeilVoice release exists. |
 | [`volumes.rs`](../../docs/files/veilvoice-setup/volumes.md) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**2,793 functional lines of Rust** in this crate. A functional line is a line
+**2,954 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
