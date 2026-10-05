@@ -63,7 +63,7 @@ Work through these in order.
 **Did you just update?** Then the change is the update, and this is the whole
 of the ambiguity: an update you installed and a file somebody swapped are
 identical on disk. There is nothing clever to be done about that, so
-[`UPDATING.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-UPDATING) says how to make the difference in advance,
+[`UPDATING.md`](Doc-UPDATING) says how to make the difference in advance,
 by checking the new archive's signature before you put it in place.
 
 **Did anything else touch the folder?** An antivirus product that rewrites
@@ -74,7 +74,7 @@ report and none of them is an attack.
 **Neither of those?** Then treat it as a possible tamper, and the response is
 the same as for any binary you are unsure about: do not run it, fetch a fresh
 release, and check that release against the published signature as described in
-[`GUIDE_VERIFY.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUIDE-VERIFY). Do not use the suspect copy to do the
+[`GUIDE_VERIFY.md`](Doc-GUIDE-VERIFY). Do not use the suspect copy to do the
 checking, for the obvious reason.
 
 ## Taking the record again
@@ -126,9 +126,9 @@ taken in one is seen by the other.
 
 ## Where to go next
 
-- [`UPDATING.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-UPDATING): why an update looks exactly like a tamper, and
+- [`UPDATING.md`](Doc-UPDATING): why an update looks exactly like a tamper, and
   what to do about it.
-- [`GUIDE_VERIFY.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUIDE-VERIFY): checking a release against the
+- [`GUIDE_VERIFY.md`](Doc-GUIDE-VERIFY): checking a release against the
   published signature, which is the check this one is not.
-- [`USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USER-GUIDE): the app lock, and the rest of the window.
-- [`COMMANDS.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-COMMANDS): `veilvoice guard` in the list of every command.
+- [`USER_GUIDE.md`](Doc-USER-GUIDE): the app lock, and the rest of the window.
+- [`COMMANDS.md`](Doc-COMMANDS): `veilvoice guard` in the list of every command.

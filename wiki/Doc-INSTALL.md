@@ -39,7 +39,7 @@ Everything below rests on one value:
 ```
 
 That is the OpenPGP key VeilVoice releases are signed with. It is published in
-[`README.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-README), on
+[`README.md`](Doc-README), on
 [the website](https://tilas01.github.io/veilvoice/), in the wiki, and in every
 release's notes, and it is **hardcoded in the install scripts** rather than
 fetched, because a fingerprint you download alongside the thing it is meant to
@@ -423,12 +423,12 @@ server or a container often does not. On Debian and Ubuntu the package is
 ### If you want to compare your build against the published one
 
 A build from the same source is not automatically byte-for-byte identical to
-the release, and [REPRODUCIBLE_BUILDS.md](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-REPRODUCIBLE-BUILDS) explains what
+the release, and [REPRODUCIBLE_BUILDS.md](Doc-REPRODUCIBLE-BUILDS) explains what
 has to match for it to be and how to check.
 
 ### If you want to work on it
 
-[CONTRIBUTING.md](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-CONTRIBUTING) covers the test suite, the checks that run
+[CONTRIBUTING.md](Doc-CONTRIBUTING) covers the test suite, the checks that run
 before a push, and the house rules. The build above is the same one, so nothing
 here has to be undone first.
 
@@ -572,7 +572,7 @@ Recorded here rather than left for you to discover:
   checks. macOS is still unrun, and its `sh` is not Linux's.
 - **The packaged installers (WiX, `.deb`, `.rpm`, Flatpak, Homebrew), the
   OpenBSD and NetBSD builds and the Gentoo ebuild are not built yet.** They are
-  specified in [`ROADMAP.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-ROADMAP). macOS Intel and Apple Silicon are already
+  specified in [`ROADMAP.md`](Doc-ROADMAP). macOS Intel and Apple Silicon are already
   separate builds, and a single Windows executable already covers 10 and 11.
 - **The portable verifier exists and is tested**, including against the real
   published v0.1.8 signature, but like the scripts it has only been run by its

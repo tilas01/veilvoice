@@ -11,7 +11,7 @@ to the document that has the detail, because the detail is written once and
 this is the way in to it.
 
 If you would rather read about what VeilVoice actually does to a voice before
-you install it, that is [`WHITEPAPER.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-WHITEPAPER), and it does not
+you install it, that is [`WHITEPAPER.md`](Doc-WHITEPAPER), and it does not
 assume you have installed anything.
 
 ---
@@ -23,8 +23,8 @@ the people who reach for one are the people worth attacking, and a swapped
 archive that records you is the obvious way to do it.
 
 Everything rests on one value, the OpenPGP fingerprint releases are signed
-with. It is printed in [`INSTALL.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL), in
-[`README.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-README), on the website and in every release's notes, and
+with. It is printed in [`INSTALL.md`](Doc-INSTALL), in
+[`README.md`](Doc-README), on the website and in every release's notes, and
 it is written into the install scripts rather than fetched, because a
 fingerprint you download beside the thing it is meant to authenticate is a
 formality rather than a check. If the value you see anywhere disagrees with the
@@ -33,13 +33,13 @@ value in those places, stop.
 There are three ways to do the check and they answer the same question:
 
 - **By hand**, with GnuPG and a SHA-256 tool. Four commands, written out in
-  [`INSTALL.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL).
+  [`INSTALL.md`](Doc-INSTALL#1-by-hand).
 - **With the install script**, which does the same four things and refuses to
-  continue if any of them fails. [`INSTALL.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL).
+  continue if any of them fails. [`INSTALL.md`](Doc-INSTALL#2-with-the-install-script).
 - **With VeilVoice itself**, once it is unpacked: `veilvoice verify` in the
   folder you unpacked into, or the Verify tab in the window. The signing key is
   compiled into the binary, so an archive that brings its own key and its own
-  signature cannot vouch for itself. [`GUIDE_VERIFY.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUIDE-VERIFY) is
+  signature cannot vouch for itself. [`GUIDE_VERIFY.md`](Doc-GUIDE-VERIFY) is
   the whole account of what each verdict is worth.
 
 The third of those has an obvious circularity, and it is worth naming rather
@@ -54,7 +54,7 @@ VeilVoice runs from the folder you unpacked it into. Nothing installs a
 service, writes to a registry, or phones home; deleting the folder deletes the
 program. Installing it properly, so that it is on your path and has a menu
 entry, is a convenience and is described per operating system in
-[`INSTALL.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL).
+[`INSTALL.md`](Doc-INSTALL).
 
 Two executables come out of a release, and which one you want depends only on
 what is in front of you:
@@ -74,7 +74,7 @@ install time, because installing a package runs as an administrator and the
 record belongs to the account that will actually run the program.
 
 That is the whole of it, and what it is worth is
-[`GUARD.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUARD).
+[`GUARD.md`](Doc-GUARD).
 
 ## 4. Your first veiled recording
 
@@ -82,12 +82,12 @@ The shortest path to seeing what this program is for:
 
 - **In the window**: open the Studio tab, record a few seconds, and play back
   what comes out. The tabs, in the order you meet them, are section 3 of
-  [`USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USER-GUIDE).
+  [`USER_GUIDE.md`](Doc-USER-GUIDE).
 - **At the terminal**: `veilvoice anonymise` on a file you already have, or
   `veilvoice record` to capture and veil in one step. Every command with a
   worked example is [`GUIDE_CLI.md`](https://github.com/tilas01/veilvoice/blob/main/docs/GUIDE_CLI.md), and the one-line summary of
   each, with where the same job lives in the window, is
-  [`COMMANDS.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-COMMANDS).
+  [`COMMANDS.md`](Doc-COMMANDS).
 
 Listen to the result before you rely on it. Veiling is not reversible and is
 not meant to be, which means there is no way to recover the original from the
@@ -102,12 +102,12 @@ sealed under your passphrase, and is checked at the moment you unlock, which is
 the one moment that passphrase exists. Without one the record is written in the
 clear and catches accidents rather than attackers.
 
-Section 5 of [`USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USER-GUIDE) is the lock, what it protects and
+Section 5 of [`USER_GUIDE.md`](Doc-USER-GUIDE) is the lock, what it protects and
 what it does not.
 
 ## 6. Know what it will not do
 
-Section 6 of [`USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USER-GUIDE) is the list, and it is short and
+Section 6 of [`USER_GUIDE.md`](Doc-USER-GUIDE) is the list, and it is short and
 worth reading before you need it. The two that catch people out:
 
 - **Veiling a voice does not keep the words secret.** The words survive on
@@ -121,9 +121,9 @@ worth reading before you need it. The two that catch people out:
 
 ## Where to go next
 
-- [`USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USER-GUIDE): every screen and every command, in the
+- [`USER_GUIDE.md`](Doc-USER-GUIDE): every screen and every command, in the
   order somebody meets them.
-- [`UPDATING.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-UPDATING): getting a newer version, and what to expect
+- [`UPDATING.md`](Doc-UPDATING): getting a newer version, and what to expect
   when you do.
-- [`GUARD.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-GUARD): what a changed file means.
-- [`FAQ.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-FAQ): the questions people actually arrive with.
+- [`GUARD.md`](Doc-GUARD): what a changed file means.
+- [`FAQ.md`](Doc-FAQ): the questions people actually arrive with.

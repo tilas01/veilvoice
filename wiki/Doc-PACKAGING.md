@@ -134,13 +134,13 @@ manual pages away as it installs them. The pages were in the packages the whole
 time.
 
 Doing it found two defects, F-80 and F-81, both recorded in
-[`AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-AUDIT). The first was that the recipe below could not run at
+[`AUDIT.md`](Doc-AUDIT). The first was that the recipe below could not run at
 all. The second was that every definition here still named v0.1.9 while the
 workspace was at v0.1.15, and nothing was watching:
 `tools/site-tests/packaging.test.js` is watching now.
 
 The install scripts and the portable verifier are tested, as
-[INSTALL.md](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL) records, and they are the supported route until the rest of
+[INSTALL.md](Doc-INSTALL) records, and they are the supported route until the rest of
 this table changes. If you build one of these and it works, or does not, saying
 so in an issue is the most useful thing you could contribute.
 
@@ -214,7 +214,7 @@ produce different files for a reason that has nothing to do with the source.
 Authenticode and notarisation both require a certificate tied to a verified
 legal identity. Windows will show "unknown publisher" and macOS Gatekeeper will
 refuse to run the binaries until allowed explicitly. Both are stated in
-[INSTALL.md](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL) rather than worked around, and both are why the OpenPGP
+[INSTALL.md](Doc-INSTALL) rather than worked around, and both are why the OpenPGP
 signature over the hash list remains the real check: **verify the archive, then
 install it.**
 

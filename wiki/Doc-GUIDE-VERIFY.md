@@ -12,7 +12,7 @@
 
 The short version: unpack the archive, run `veilvoice verify` inside the folder, read the verdict. If you would rather not use a terminal, the desktop application's Verify tab does the same check with the same code underneath.
 
-The whole story, including the parts about the other two programs, is in [`USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USER-GUIDE). This is the same text, narrowed to one program.
+The whole story, including the parts about the other two programs, is in [`USER_GUIDE.md`](Doc-USER-GUIDE). This is the same text, narrowed to one program.
 
 ---
 
@@ -159,7 +159,7 @@ the **Check for updates** button on the window's About tab, and it is
 there is no timer, no check at startup and nothing in the background, and no
 setting turns either into a schedule. `veilvoice update` without `--check` goes
 on to fetch the release, check its signature against the key compiled into this
-program, and put it in place. [Updating](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-UPDATING) is the whole of what that
+program, and put it in place. [Updating](Doc-UPDATING) is the whole of what that
 does and what you see afterwards.
 
 **Fetching a release to check it** is the other one. `veilvoice verify release

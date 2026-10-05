@@ -11,13 +11,13 @@
 
 # Working on VeilVoice: the shape of the repository
 
-This is the developer's way in. It is not the user guide ([`docs/USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USER-GUIDE)) and not the reference (a page for every crate and every file, in the wiki and on the website). It is the part in between: what is where, what the build will refuse to let you do, and which file to open for the change you came to make.
+This is the developer's way in. It is not the user guide ([`docs/USER_GUIDE.md`](Doc-USER-GUIDE)) and not the reference (a page for every crate and every file, in the wiki and on the website). It is the part in between: what is where, what the build will refuse to let you do, and which file to open for the change you came to make.
 
 If you are reading this to work out whether you can understand this codebase without asking anybody: that is what it is for, and so is the rest of the documentation. Every claim below is generated from the tree, so it cannot describe a repository that no longer exists.
 
 ## Two programs, one engine
 
-`veilvoice` is the command line and `veilvoice-gui` is the window. They are the only two binaries, and both are built from the same crates: the window is not a wrapper around the command line, and neither shells out to the other. What each one has that the other does not, and why, is [`docs/COMMANDS.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-COMMANDS).
+`veilvoice` is the command line and `veilvoice-gui` is the window. They are the only two binaries, and both are built from the same crates: the window is not a wrapper around the command line, and neither shells out to the other. What each one has that the other does not, and why, is [`docs/COMMANDS.md`](Doc-COMMANDS).
 
 The verifier is folded into both rather than shipped as a third binary, so a release is checked by the program it ships beside. `crates/veilvoice-verify/src/lib.rs` says what that cost and why it was worth it.
 
@@ -90,7 +90,7 @@ Six observers behind one interface, each of which says what it cannot see on the
 
 ### Change the website or the documentation
 
-[`docs/WEBSITE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-WEBSITE), [`tools/verify.py`](https://github.com/tilas01/veilvoice/blob/main/tools/verify.py)
+[`docs/WEBSITE.md`](Doc-WEBSITE), [`tools/verify.py`](https://github.com/tilas01/veilvoice/blob/main/tools/verify.py)
 
 Nothing in `website/` or `docs/files/` is written by hand. The first says which script owns which page; the second runs all of them in dependency order and then checks the result.
 
@@ -102,7 +102,7 @@ Nothing in `website/` or `docs/files/` is written by hand. The first says which 
 
 ## The rules, and why they are rules
 
-The long version is [`docs/CONTRIBUTING.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-CONTRIBUTING). These are the ones that will stop a change getting in.
+The long version is [`docs/CONTRIBUTING.md`](Doc-CONTRIBUTING). These are the ones that will stop a change getting in.
 
 **No `unsafe`, anywhere.** Every crate carries `#![forbid(unsafe_code)]`. It is a publicly stated promise and it is load bearing: it is why a memory-safety claim about this program is checkable rather than a matter of trust. A feature that needs `unsafe` is a feature this project does not have, and two of them are named on the roadmap for exactly that reason.
 
@@ -142,7 +142,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/rsa_usage.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/rsa_usage.py) | No crate reaching `pgp` may gain an RSA private-key code path |
 | [`tools/audit/state_paths.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/state_paths.py) | Find state files that one part of VeilVoice writes and another reads |
 
-Every one of them was written after something got through. The reasoning is in [`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-AUDIT) under a finding number, which is worth reading before deciding a guard is unnecessary.
+Every one of them was written after something got through. The reasoning is in [`docs/AUDIT.md`](Doc-AUDIT) under a finding number, which is worth reading before deciding a guard is unnecessary.
 
 ## Running the checks
 
@@ -262,9 +262,9 @@ Add to them rather than replacing them. If a comment has become wrong, the fix i
 
 ## Where to read next
 
-- [`docs/CONTRIBUTING.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-CONTRIBUTING): building, the house style, and what a change has to pass.
-- [`docs/COMMANDS.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-COMMANDS): every command, and the same job in the window.
-- [`docs/WEBSITE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-WEBSITE): both editions of the site and the script that writes each page.
-- [`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-AUDIT): every defect found and fixed, in order, which is the fastest way to learn what this code is careful about.
-- [`docs/USING_THE_CRATES.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USING-THE-CRATES): depending on one of these crates from your own project.
-- [`ROADMAP.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-ROADMAP): what is done, what is next, and what is deliberately not being done.
+- [`docs/CONTRIBUTING.md`](Doc-CONTRIBUTING): building, the house style, and what a change has to pass.
+- [`docs/COMMANDS.md`](Doc-COMMANDS): every command, and the same job in the window.
+- [`docs/WEBSITE.md`](Doc-WEBSITE): both editions of the site and the script that writes each page.
+- [`docs/AUDIT.md`](Doc-AUDIT): every defect found and fixed, in order, which is the fastest way to learn what this code is careful about.
+- [`docs/USING_THE_CRATES.md`](Doc-USING-THE-CRATES): depending on one of these crates from your own project.
+- [`ROADMAP.md`](Doc-ROADMAP): what is done, what is next, and what is deliberately not being done.

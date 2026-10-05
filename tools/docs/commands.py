@@ -543,9 +543,18 @@ def document():
                "in its list with no section below, because there is nothing "
                "to say about it that this sentence has not.")
     out.append("")
-    out.append("**Nothing here reaches the network.** The one thing in "
-               "VeilVoice that does is the window's check-for-updates button, "
-               "and it is not a command.")
+    # F-235. This said the only thing reaching the network was the window's
+    # check-for-updates button and that it was not a command, on the page whose
+    # subject is every command. Two commands reach it, and this is where a
+    # reader looks for that. `tools/audit/network_claims.py` holds this
+    # paragraph to what the program's own help text says.
+    out.append("**Nothing here reaches the network except two commands, and "
+               "only when you ask for them by name.** `veilvoice update` "
+               "fetches a newer release and puts it in place, and `veilvoice "
+               "verify release` fetches a published release to check a "
+               "download against. The window's check-for-updates button is the "
+               "same code as `veilvoice update --check`, and nothing else in "
+               "either program opens a connection for any reason.")
     out.append("")
     out.append("## The whole list")
     out.append("")

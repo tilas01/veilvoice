@@ -189,8 +189,22 @@ def destination(name, already, ours):
     return None
 
 
+# A link to a wiki page written the ordinary way, which is what
+# `tools/docs/wiki.py` produces for a document that links to its neighbour:
+# `](Doc-INSTALL)` or `](Doc-INSTALL#the-fingerprint)`. In a wiki that is a
+# page reference and resolves; on this site a page is a file and it does not,
+# so it is resolved here the same way a `[[link]]` is.
+PAGE_LINK = re.compile(r"\]\((?!https?:|#|/)([A-Za-z0-9_-]+)(#[^)]*)?\)")
+
+
 def resolve_links(text, page, already, ours):
-    """Turn every `[[wiki link]]` into a link to wherever that page is here.
+    """Turn every link to a wiki page into a link to wherever that page is here.
+
+    Both spellings: `[[wiki link]]`, which the sidebar and the landing page
+    use, and the ordinary `](Page)` that the rewriting in
+    `tools/docs/wiki.py` produces for a document linking to its neighbour.
+    Before that rewriting was fixed there were no links of the second kind,
+    because every one of them had been turned into a repository URL that 404s.
 
     A link inside a code span is left alone, which is the rule
     `tools/docs/wiki.py` already applies for the same reason: the roadmap's own
@@ -213,7 +227,19 @@ def resolve_links(text, page, already, ours):
             return found.group(0)
         return "[%s](%s%s)" % (label, up, where)
 
+    def plain(found):
+        start, end = found.span()
+        if any(a <= start and end <= b for a, b in spans):
+            return found.group(0)
+        target, fragment = found.group(1), found.group(2) or ""
+        where = destination(target, already, ours)
+        if where is None:
+            missing.append(target)
+            return found.group(0)
+        return "](%s%s%s)" % (up, where, fragment)
+
     out = WIKI_LINK.sub(one, text)
+    out = PAGE_LINK.sub(plain, out)
     if missing:
         raise SystemExit(
             "wiki/%s.md links to %s, which is not a page of the wiki and has\n"

@@ -43,7 +43,7 @@ identity beside the OpenPGP key. It is trust-on-first-use, not a certificate
 authority, and it does not replace the OpenPGP check; what it adds is a
 publisher an organisation can import once to reduce low-reputation false
 positives, and an independent second signature. See
-[docs/SELF_SIGNING.md](https://github.com/tilas01/veilvoice/blob/main/Doc-SELF-SIGNING).
+[docs/SELF_SIGNING.md](Doc-SELF-SIGNING).
 
 VeilVoice destroys the *biometric voiceprint* of a speaker, meaning pitch,
 formants, timbre, micro-timing and the melody of an accent, so that neither software nor
@@ -111,7 +111,7 @@ talk to no servers at all.
 > volume.
 >
 > The full argument, and everything an attacker can still learn, is in
-> [`docs/WHITEPAPER.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-WHITEPAPER).
+> [`docs/WHITEPAPER.md`](Doc-WHITEPAPER).
 
 ---
 
@@ -122,7 +122,7 @@ Every picture below is of this build. The window captures are taken by
 which drives the release build and photographs each tab; the terminal drawings
 are generated from the command output committed beside them, and CI fails if a
 drawing and its output disagree. See
-[`assets/screenshots/README.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-README) for why those two
+[`assets/screenshots/README.md`](https://github.com/tilas01/veilvoice/blob/main/assets/screenshots/README.md) for why those two
 are different kinds of thing.
 
 ### The desktop application
@@ -358,7 +358,7 @@ that cause a mismatch on an otherwise honest machine:
    you built by hand, `git status` should be clean.
 
 If all three are ruled out, that is worth reporting, and
-[`docs/REPRODUCIBLE_BUILDS.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-REPRODUCIBLE-BUILDS) explains what is
+[`docs/REPRODUCIBLE_BUILDS.md`](Doc-REPRODUCIBLE-BUILDS) explains what is
 pinned and why.
 
 </details>
@@ -367,14 +367,14 @@ pinned and why.
 
 | If you have | Read |
 |---|---|
-| an archive you just downloaded | [Checking a download](https://github.com/tilas01/veilvoice/blob/main/Doc-GUIDE-VERIFY) |
+| an archive you just downloaded | [Checking a download](Doc-GUIDE-VERIFY) |
 | a terminal | [The command line](https://github.com/tilas01/veilvoice/blob/main/docs/GUIDE_CLI.md) |
 | a window | [The desktop application](https://github.com/tilas01/veilvoice/blob/main/docs/GUIDE_GUI.md) |
-| all of it | [The full user guide](https://github.com/tilas01/veilvoice/blob/main/Doc-USER-GUIDE) |
+| all of it | [The full user guide](Doc-USER-GUIDE) |
 
-Also: [installing in detail](https://github.com/tilas01/veilvoice/blob/main/Doc-INSTALL),
-[packaging it yourself](https://github.com/tilas01/veilvoice/blob/main/Doc-PACKAGING),
-[reproducible builds](https://github.com/tilas01/veilvoice/blob/main/Doc-REPRODUCIBLE-BUILDS).
+Also: [installing in detail](Doc-INSTALL),
+[packaging it yourself](Doc-PACKAGING),
+[reproducible builds](Doc-REPRODUCIBLE-BUILDS).
 
 ---
 
@@ -606,7 +606,7 @@ route audio on these systems for other reasons, this is what people use:
 ## Use it as a library
 
 **Worked examples, with the licence implications spelled out, are in
-[`docs/USING_THE_CRATES.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-USING-THE-CRATES).** Every example there is
+[`docs/USING_THE_CRATES.md`](Doc-USING-THE-CRATES).** Every example there is
 a real file under `crates/*/examples/`, compiled on every commit, so none of it
 can quietly stop being true:
 
@@ -681,7 +681,7 @@ what you said. If the content is sensitive too, do not upload it at all:
 transcribe locally.
 
 Local transcription is the stronger answer and is a planned integration (see
-[`ROADMAP.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-ROADMAP)); until then, `whisper.cpp` reads the WAV VeilVoice
+[`ROADMAP.md`](Doc-ROADMAP)); until then, `whisper.cpp` reads the WAV VeilVoice
 writes with no extra work.
 
 ---
@@ -768,7 +768,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Thirty-three audit rounds have found and fixed **245 defects**.
+Thirty-three audit rounds have found and fixed **247 defects**.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a
@@ -778,17 +778,17 @@ sealed recording, bypass a password or weaken the cryptography. The two
 encrypted-volume defects came closest, and `docs/AUDIT.md` is exact about which
 side of that line they fall on rather than leaving the claim to do the work. Every one is written up individually, including
 the ones earlier rounds had declared clean, in
-[`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-AUDIT).
+[`docs/AUDIT.md`](Doc-AUDIT).
 
 **Found something?** Report it privately through
 [GitHub's security advisories](https://github.com/tilas01/veilvoice/security/advisories/new)
-rather than as a public issue. [`docs/SECURITY.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-SECURITY) says what
+rather than as a public issue. [`docs/SECURITY.md`](Doc-SECURITY) says what
 counts as a vulnerability here, what is a documented limitation rather than
 one, and why there is no PGP address to send it to.
 
-Using it: [`docs/USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-USER-GUIDE), or
+Using it: [`docs/USER_GUIDE.md`](Doc-USER-GUIDE), or
 [the wiki](https://tilas01.github.io/veilvoice/wiki.html).
-Roadmap and open work: [`ROADMAP.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-ROADMAP).
+Roadmap and open work: [`ROADMAP.md`](Doc-ROADMAP).
 
 ## Credits
 
@@ -800,7 +800,7 @@ directly.
 Some of the code, the documentation and this website were drafted with the help
 of **Claude**, Anthropic's assistant, working to that direction. Nothing reaches
 a release unread: every change is reviewed, built and tested before it is
-committed, and the audit rounds in [`docs/AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/Doc-AUDIT) are the
+committed, and the audit rounds in [`docs/AUDIT.md`](Doc-AUDIT) are the
 record of that review finding its own mistakes.
 
 The credit is stated here, and once more in the "Who wrote it" answer on the

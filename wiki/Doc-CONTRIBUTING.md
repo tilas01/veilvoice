@@ -7,7 +7,7 @@
 ## Before anything else
 
 **A security problem does not go here.** Report it privately, the way
-[`docs/SECURITY.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-SECURITY) describes. The ordinary issue tracker is
+[`docs/SECURITY.md`](Doc-SECURITY) describes. The ordinary issue tracker is
 right for everything else, including a bug that is merely embarrassing.
 
 ## Getting it building
@@ -17,7 +17,7 @@ needs the toolchain `rust-toolchain.toml` pins, 1.96.0, which rustup fetches
 for you on the first build, and on Linux the ALSA headers and `pkg-config`.
 Running the desktop application on Linux also needs `libxkbcommon-x11-0`, which
 is loaded at startup rather than linked against;
-[INSTALL.md](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-INSTALL) has the whole from-source walkthrough, including the
+[INSTALL.md](Doc-INSTALL) has the whole from-source walkthrough, including the
 package names on Fedora and Arch.
 
 ```bash
@@ -222,7 +222,7 @@ there. The gate runs where a reader stands.
 publishes from `main`, so a release merge is when it runs, and it has something
 to push to only if the wiki repository exists. It tries to create that
 repository itself, and where GitHub refuses, the one-time step in the web
-interface is written out in [`WEBSITE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-WEBSITE) under *The wiki, in two
+interface is written out in [`WEBSITE.md`](Doc-WEBSITE) under *The wiki, in two
 places, from one source*. It is named here so a release merge is not where it
 is discovered.
 

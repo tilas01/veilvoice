@@ -14,7 +14,7 @@ VeilVoice is two programs over one engine. `veilvoice` is the command line and `
 
 This page is the whole of the command line, in the program's own order, with what each command is for in plain words and where the same job lives in the window. Every command also takes `--help`, which is the reference for its flags; this is the part that says what to reach for. The program's own `help` command prints those same pages, and is the one entry in its list with no section below, because there is nothing to say about it that this sentence has not.
 
-**Nothing here reaches the network.** The one thing in VeilVoice that does is the window's check-for-updates button, and it is not a command.
+**Nothing here reaches the network except two commands, and only when you ask for them by name.** `veilvoice update` fetches a newer release and puts it in place, and `veilvoice verify release` fetches a published release to check a download against. The window's check-for-updates button is the same code as `veilvoice update --check`, and nothing else in either program opens a connection for any reason.
 
 ## The whole list
 
@@ -469,7 +469,7 @@ veilvoice volumes
 
 ## Where to read next
 
-- [`docs/USER_GUIDE.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-USER-GUIDE) walks through the window screen by screen and the command line in order.
+- [`docs/USER_GUIDE.md`](Doc-USER-GUIDE) walks through the window screen by screen and the command line in order.
 - [`docs/GUIDE_CLI.md`](https://github.com/tilas01/veilvoice/blob/main/docs/GUIDE_CLI.md) is the same guide with the window's half left out, for somebody at a terminal.
 - [`docs/GUIDE_GUI.md`](https://github.com/tilas01/veilvoice/blob/main/docs/GUIDE_GUI.md) is the other half.
-- [`docs/DEVELOPERS.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-DEVELOPERS) is where the code that answers each of these commands lives.
+- [`docs/DEVELOPERS.md`](Doc-DEVELOPERS) is where the code that answers each of these commands lives.

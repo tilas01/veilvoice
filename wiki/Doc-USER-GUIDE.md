@@ -7,8 +7,8 @@
 
 For people using VeilVoice, rather than reading its source. If you want the
 argument for *why* any of this works, that is
-[`WHITEPAPER.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-WHITEPAPER); if you want to know what has and has not been
-checked, that is [`AUDIT.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-AUDIT).
+[`WHITEPAPER.md`](Doc-WHITEPAPER); if you want to know what has and has not been
+checked, that is [`AUDIT.md`](Doc-AUDIT).
 
 There is a web version of this material at
 [tilas01.github.io/veilvoice/wiki.html](https://tilas01.github.io/veilvoice/wiki.html).
@@ -38,7 +38,7 @@ cargo build --release
 ```
 
 **Verify the download before running it.** Instructions are in
-[`REPRODUCIBLE_BUILDS.md`](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-REPRODUCIBLE-BUILDS) and on the site; there is also
+[`REPRODUCIBLE_BUILDS.md`](Doc-REPRODUCIBLE-BUILDS) and on the site; there is also
 an in-browser hash verifier that uploads nothing.
 
 Nothing installs a service, writes to a registry, or phones home. Delete the
@@ -189,7 +189,7 @@ the **Check for updates** button on the window's About tab, and it is
 there is no timer, no check at startup and nothing in the background, and no
 setting turns either into a schedule. `veilvoice update` without `--check` goes
 on to fetch the release, check its signature against the key compiled into this
-program, and put it in place. [Updating](https://github.com/tilas01/veilvoice/blob/main/docs/Doc-UPDATING) is the whole of what that
+program, and put it in place. [Updating](Doc-UPDATING) is the whole of what that
 does and what you see afterwards.
 
 **Fetching a release to check it** is the other one. `veilvoice verify release
