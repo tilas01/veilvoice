@@ -203,14 +203,41 @@ impl Allowlist {
         Ok(allowlist)
     }
 
-    /// Write the allowlist to `path`.
+    /// Write the allowlist to `path`, readable by its owner and nobody else.
+    ///
+    /// **F-240.** This was `std::fs::write`, which creates the file under the
+    /// umask, so on most systems every account on the machine could read which
+    /// screen recorders somebody had said they meant to run, while the command
+    /// line described the file as owner-only. The mode is now set in the open
+    /// itself, so there is no moment at which the file exists and is readable
+    /// by anybody else, and a file an earlier build left readable is tightened
+    /// before anything is written into it.
+    ///
+    /// Written here rather than taken from `veilvoice_crypto::privatefile`,
+    /// because this crate takes no dependencies and the rule is six lines. On
+    /// Windows there is no mode: a file under the user's profile inherits an
+    /// ACL that already excludes other unprivileged accounts.
     pub fn save(&self, path: &Path) -> Result<(), Error> {
         if let Some(parent) = path.parent() {
             if !parent.as_os_str().is_empty() {
                 std::fs::create_dir_all(parent)?;
             }
         }
-        std::fs::write(path, self.to_text())?;
+        let mut options = std::fs::OpenOptions::new();
+        options.write(true).create(true).truncate(true);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::OpenOptionsExt;
+            options.mode(0o600);
+        }
+        let mut file = options.open(path)?;
+        // `mode` applies only when the open creates the file.
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            file.set_permissions(std::fs::Permissions::from_mode(0o600))?;
+        }
+        std::io::Write::write_all(&mut file, self.to_text().as_bytes())?;
         Ok(())
     }
 
@@ -462,6 +489,33 @@ mod tests {
         let path = dir.path().join("deeper").join("allow.txt");
         allowlist.save(&path).unwrap();
         assert_eq!(Allowlist::load(&path).unwrap(), allowlist);
+    }
+
+    /// F-240. The allowlist is readable by its owner alone, whether the save
+    /// creates it or finds one an earlier build left readable by everybody.
+    #[cfg(unix)]
+    #[test]
+    fn a_saved_allowlist_is_readable_by_its_owner_alone() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let mut allowlist = Allowlist::new();
+        allowlist.allow("obs").unwrap();
+        let mode = |path: &Path| std::fs::metadata(path).unwrap().permissions().mode() & 0o777;
+
+        let fresh = dir.path().join("fresh.txt");
+        allowlist.save(&fresh).unwrap();
+        assert_eq!(
+            mode(&fresh),
+            0o600,
+            "a new allowlist was readable by others"
+        );
+
+        let older = dir.path().join("older.txt");
+        std::fs::write(&older, "left by an earlier build").unwrap();
+        std::fs::set_permissions(&older, std::fs::Permissions::from_mode(0o644)).unwrap();
+        allowlist.save(&older).unwrap();
+        assert_eq!(mode(&older), 0o600, "an old allowlist kept its loose mode");
+        assert_eq!(Allowlist::load(&older).unwrap(), allowlist);
     }
 
     /// Nothing allowed yet is the ordinary state, not an error.

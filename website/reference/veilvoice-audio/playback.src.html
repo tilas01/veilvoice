@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-audio/src/playback.rs</code></h1>
-<p style="color:var(--muted)"><a href="playback.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 212 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="playback.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 219 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -260,38 +260,45 @@
 <span class="ln" id="L179">                    *p = p.<span class="tok-fn">max</span>(loudest);</span>
 <span class="ln" id="L180">                }</span>
 <span class="ln" id="L181">            },</span>
-<span class="ln" id="L182">            <span class="tok-kw">move</span> |e| eprintln!(<span class="tok-str">&quot;veilvoice: playback stream error: {e}&quot;</span>),</span>
-<span class="ln" id="L183">            None,</span>
-<span class="ln" id="L184">        )</span>
-<span class="ln" id="L185">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
-<span class="ln" id="L186"></span>
-<span class="ln" id="L187">    stream.<span class="tok-fn">play</span>().<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
-<span class="ln" id="L188"></span>
-<span class="ln" id="L189">    <span class="tok-fn">Ok</span>(Playing {</span>
-<span class="ln" id="L190">        _stream: stream,</span>
-<span class="ln" id="L191">        shared,</span>
-<span class="ln" id="L192">        samples: total,</span>
-<span class="ln" id="L193">        rate,</span>
-<span class="ln" id="L194">    })</span>
-<span class="ln" id="L195">}</span>
+<span class="ln" id="L182">            <span class="tok-com">// Not for a glitch: on ALSA this runs on the audio thread, before</span></span>
+<span class="ln" id="L183">            <span class="tok-com">// the stream recovers, and a line per glitch is how one becomes</span></span>
+<span class="ln" id="L184">            <span class="tok-com">// the next. F-245.</span></span>
+<span class="ln" id="L185">            <span class="tok-kw">move</span> |e: cpal::Error| {</span>
+<span class="ln" id="L186">                <span class="tok-kw">if</span> e.<span class="tok-fn">kind</span>() != cpal::ErrorKind::Xrun {</span>
+<span class="ln" id="L187">                    eprintln!(<span class="tok-str">&quot;veilvoice: playback stream error: {e}&quot;</span>);</span>
+<span class="ln" id="L188">                }</span>
+<span class="ln" id="L189">            },</span>
+<span class="ln" id="L190">            None,</span>
+<span class="ln" id="L191">        )</span>
+<span class="ln" id="L192">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
+<span class="ln" id="L193"></span>
+<span class="ln" id="L194">    stream.<span class="tok-fn">play</span>().<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
+<span class="ln" id="L195"></span>
+<span class="ln" id="L196">    <span class="tok-fn">Ok</span>(Playing {</span>
+<span class="ln" id="L197">        _stream: stream,</span>
+<span class="ln" id="L198">        shared,</span>
+<span class="ln" id="L199">        samples: total,</span>
+<span class="ln" id="L200">        rate,</span>
+<span class="ln" id="L201">    })</span>
+<span class="ln" id="L202">}</span>
 </span>
-<span class="ln" id="L196"></span>
-<span class="ln" id="L197"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L198"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L199">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L200"></span>
-<span class="ln" id="L201">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L202">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_to_play_is_refused_rather_than_started</span>() {</span>
-<span class="ln" id="L203">        <span class="tok-com">// A stream that plays an empty buffer reaches the end immediately and</span></span>
-<span class="ln" id="L204">        <span class="tok-com">// looks like a device fault. Saying so is more use.</span></span>
-<span class="ln" id="L205">        assert!(<span class="tok-fn">start</span>(Vec::<span class="tok-fn">new</span>(), <span class="tok-num">48_000</span>, None).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L206">    }</span>
+<span class="ln" id="L203"></span>
+<span class="ln" id="L204"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L205"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L206">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L207"></span>
 <span class="ln" id="L208">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L209">    <span class="tok-kw">fn</span> <span class="tok-fn">a_rate_of_zero_is_refused_rather_than_divided_by</span>() {</span>
-<span class="ln" id="L210">        assert!(<span class="tok-fn">start</span>(vec![<span class="tok-num">0.0</span>; <span class="tok-num">10</span>], <span class="tok-num">0</span>, None).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L211">    }</span>
-<span class="ln" id="L212">}</span>
+<span class="ln" id="L209">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_to_play_is_refused_rather_than_started</span>() {</span>
+<span class="ln" id="L210">        <span class="tok-com">// A stream that plays an empty buffer reaches the end immediately and</span></span>
+<span class="ln" id="L211">        <span class="tok-com">// looks like a device fault. Saying so is more use.</span></span>
+<span class="ln" id="L212">        assert!(<span class="tok-fn">start</span>(Vec::<span class="tok-fn">new</span>(), <span class="tok-num">48_000</span>, None).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L213">    }</span>
+<span class="ln" id="L214"></span>
+<span class="ln" id="L215">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L216">    <span class="tok-kw">fn</span> <span class="tok-fn">a_rate_of_zero_is_refused_rather_than_divided_by</span>() {</span>
+<span class="ln" id="L217">        assert!(<span class="tok-fn">start</span>(vec![<span class="tok-num">0.0</span>; <span class="tok-num">10</span>], <span class="tok-num">0</span>, None).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L218">    }</span>
+<span class="ln" id="L219">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

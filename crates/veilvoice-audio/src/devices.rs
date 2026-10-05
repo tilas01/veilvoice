@@ -98,15 +98,79 @@ fn name_of_opt(device: &cpal::Device) -> Option<String> {
     device.description().ok().map(|d| d.name().to_string())
 }
 
-/// List the devices available in one direction.
-pub fn list(direction: Direction) -> Result<Vec<DeviceInfo>, Error> {
-    let host = cpal::default_host();
-    let default_name = match direction {
-        Direction::Input => host.default_input_device().and_then(|d| name_of_opt(&d)),
-        Direction::Output => host.default_output_device().and_then(|d| name_of_opt(&d)),
-    };
+/// A device as `list` shows it and `open` finds it.
+///
+/// **F-244.** `cpal` 0.18 named devices by their description, and on ALSA that
+/// is the first line of the card's description, which every PCM on one card
+/// shares. A laptop's one sound card was listed as the same name ten times or
+/// more, for `sysdefault`, `front`, `hw`, `plughw`, `dsnoop` and the rest, and
+/// `open` took whichever carried that name first, so choosing any entry but
+/// the first opened a different device from the one chosen. And `cpal` 0.15,
+/// which v0.1.22 used, named an ALSA device by its PCM, `hw:CARD=PCH,DEV=0`,
+/// so a name typed from that release's `veilvoice devices` opened nothing.
+struct Described {
+    /// The name the platform gives it.
+    name: String,
+    /// The platform's own identifier for it: the PCM on ALSA.
+    id: Option<String>,
+}
 
-    let devices: Vec<cpal::Device> = match direction {
+/// What `cpal` says about a device, or `None` when it will not say.
+fn describe(device: &cpal::Device) -> Option<Described> {
+    Some(Described {
+        name: name_of_opt(device)?,
+        id: device.id().ok().map(|id| id.id().to_string()),
+    })
+}
+
+/// The name each device is listed under.
+///
+/// Its own, unless another device in the same list has that name too, and
+/// then with the platform's identifier after it in brackets. Only when it is
+/// needed: an identifier on Windows is a GUID, which nobody wants to read when
+/// the name alone already says which device it is.
+fn listed_names(described: &[Option<Described>]) -> Vec<Option<String>> {
+    let mut uses = std::collections::HashMap::<&str, usize>::new();
+    for device in described.iter().flatten() {
+        *uses.entry(device.name.as_str()).or_default() += 1;
+    }
+    described
+        .iter()
+        .map(|device| {
+            device.as_ref().map(|device| match &device.id {
+                Some(id) if uses[device.name.as_str()] > 1 => format!("{} ({id})", device.name),
+                _ => device.name.clone(),
+            })
+        })
+        .collect()
+}
+
+/// Which device a name asked for means, as a position in `described`.
+///
+/// The name [`list`] shows, first. Then the platform identifier on its own,
+/// which is what an ALSA device was called before F-244, so a command written
+/// against v0.1.22 still opens the device it named. Then the first device
+/// whose own name it is, which is what this matched before F-244.
+fn position_of(described: &[Option<Described>], wanted: &str) -> Option<usize> {
+    let listed = listed_names(described);
+    listed
+        .iter()
+        .position(|name| name.as_deref() == Some(wanted))
+        .or_else(|| {
+            described
+                .iter()
+                .position(|d| d.as_ref().and_then(|d| d.id.as_deref()) == Some(wanted))
+        })
+        .or_else(|| {
+            described
+                .iter()
+                .position(|d| d.as_ref().map(|d| d.name.as_str()) == Some(wanted))
+        })
+}
+
+/// Every device in one direction, in the order the platform gives them.
+fn every(host: &cpal::Host, direction: Direction) -> Result<Vec<cpal::Device>, Error> {
+    Ok(match direction {
         Direction::Input => host
             .input_devices()
             .map_err(|e| Error::Device(e.to_string()))?
@@ -115,13 +179,36 @@ pub fn list(direction: Direction) -> Result<Vec<DeviceInfo>, Error> {
             .output_devices()
             .map_err(|e| Error::Device(e.to_string()))?
             .collect(),
-    };
+    })
+}
 
-    Ok(devices
-        .into_iter()
-        .filter_map(|d| name_of_opt(&d))
-        .map(|name| DeviceInfo {
-            is_default: Some(&name) == default_name.as_ref(),
+/// List the devices available in one direction.
+///
+/// Each name is one [`open`] finds that same device by, which F-244 is about.
+pub fn list(direction: Direction) -> Result<Vec<DeviceInfo>, Error> {
+    let host = cpal::default_host();
+    let default = match direction {
+        Direction::Input => host.default_input_device(),
+        Direction::Output => host.default_output_device(),
+    }
+    .and_then(|d| describe(&d));
+
+    let described: Vec<Option<Described>> = every(&host, direction)?.iter().map(describe).collect();
+    let listed = listed_names(&described);
+
+    Ok(described
+        .iter()
+        .zip(listed)
+        .filter_map(|(device, name)| Some((device.as_ref()?, name?)))
+        .map(|(device, name)| DeviceInfo {
+            // By identifier where both have one, because two devices can
+            // share a name and only one of them is the default.
+            is_default: default
+                .as_ref()
+                .is_some_and(|default| match (&default.id, &device.id) {
+                    (Some(a), Some(b)) => a == b,
+                    _ => default.name == device.name,
+                }),
             is_virtual_cable: looks_virtual(&name),
             name,
         })
@@ -146,7 +233,8 @@ pub fn name_of(device: &cpal::Device) -> String {
     name_of_opt(device).unwrap_or_else(|| "<unnamed device>".into())
 }
 
-/// Look up a device by exact name, or the host default when `name` is `None`.
+/// Look up a device by the name [`list`] gave it, or the host default when
+/// `name` is `None`. See [`position_of`] for the names it also accepts.
 pub fn open(direction: Direction, name: Option<&str>) -> Result<cpal::Device, Error> {
     let host = cpal::default_host();
     match name {
@@ -156,18 +244,10 @@ pub fn open(direction: Direction, name: Option<&str>) -> Result<cpal::Device, Er
         }
         .ok_or_else(|| Error::Device("no default device".into())),
         Some(wanted) => {
-            let mut devices: Box<dyn Iterator<Item = cpal::Device>> = match direction {
-                Direction::Input => Box::new(
-                    host.input_devices()
-                        .map_err(|e| Error::Device(e.to_string()))?,
-                ),
-                Direction::Output => Box::new(
-                    host.output_devices()
-                        .map_err(|e| Error::Device(e.to_string()))?,
-                ),
-            };
-            devices
-                .find(|d| name_of_opt(d).map(|n| n == wanted).unwrap_or(false))
+            let devices = every(&host, direction)?;
+            let described: Vec<Option<Described>> = devices.iter().map(describe).collect();
+            position_of(&described, wanted)
+                .and_then(|at| devices.into_iter().nth(at))
                 .ok_or_else(|| Error::Device(format!("no device named {wanted:?}")))
         }
     }
@@ -220,6 +300,71 @@ mod tests {
                 Err(e) => panic!("unexpected error: {e}"),
             }
         }
+    }
+
+    /// One ALSA sound card, as `cpal` 0.18 describes its PCMs: one name, many
+    /// identifiers.
+    fn one_alsa_card() -> Vec<Option<Described>> {
+        let card = "HDA Intel PCH, ALC3246 Analog";
+        let mut described = vec![Some(Described {
+            name: "Default ALSA Output (currently PipeWire Media Server)".into(),
+            id: Some("default".into()),
+        })];
+        for pcm in [
+            "sysdefault:CARD=PCH",
+            "front:CARD=PCH,DEV=0",
+            "hw:CARD=PCH,DEV=0",
+        ] {
+            described.push(Some(Described {
+                name: card.into(),
+                id: Some(pcm.into()),
+            }));
+        }
+        described.push(None);
+        described
+    }
+
+    /// F-244. Every name listed is different, and each opens the device it
+    /// was listed for rather than the first with the same card name.
+    #[test]
+    fn every_listed_name_opens_the_device_it_was_listed_for() {
+        let described = one_alsa_card();
+        let listed = listed_names(&described);
+        let names: Vec<&str> = listed.iter().flatten().map(String::as_str).collect();
+        let mut unique = names.clone();
+        unique.sort_unstable();
+        unique.dedup();
+        assert_eq!(
+            unique.len(),
+            names.len(),
+            "two devices listed alike: {names:?}"
+        );
+        assert_eq!(
+            names[0], "Default ALSA Output (currently PipeWire Media Server)",
+            "a name nothing else shares is shown as it is"
+        );
+        assert_eq!(
+            names[3],
+            "HDA Intel PCH, ALC3246 Analog (hw:CARD=PCH,DEV=0)"
+        );
+        for (at, name) in listed.iter().enumerate() {
+            if let Some(name) = name {
+                assert_eq!(position_of(&described, name), Some(at), "{name}");
+            }
+        }
+    }
+
+    /// F-244. The names earlier builds used still find a device: the PCM that
+    /// v0.1.22 listed, and the bare card name the development builds did.
+    #[test]
+    fn a_name_from_an_earlier_release_still_opens_something() {
+        let described = one_alsa_card();
+        assert_eq!(position_of(&described, "hw:CARD=PCH,DEV=0"), Some(3));
+        assert_eq!(
+            position_of(&described, "HDA Intel PCH, ALC3246 Analog"),
+            Some(1)
+        );
+        assert_eq!(position_of(&described, "no such device"), None);
     }
 
     #[test]

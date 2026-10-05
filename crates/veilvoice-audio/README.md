@@ -82,14 +82,14 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>278 lines"])
     n_absent["absent.rs<br/>309 lines"]
-    n_devices["devices.rs<br/>238 lines"]
+    n_devices["devices.rs<br/>383 lines"]
     n_io["io.rs<br/>574 lines"]
-    n_kinds["kinds.rs<br/>182 lines"]
-    n_live["live.rs<br/>774 lines"]
+    n_kinds["kinds.rs<br/>190 lines"]
+    n_live["live.rs<br/>870 lines"]
     n_meter["meter.rs<br/>166 lines"]
-    n_playback["playback.rs<br/>212 lines"]
+    n_playback["playback.rs<br/>219 lines"]
     n_record["record.rs<br/>543 lines"]
-    n_room["room.rs<br/>575 lines"]
+    n_room["room.rs<br/>555 lines"]
     n_absent --> n_devices
     n_absent --> n_kinds
     n_absent --> n_live
@@ -120,17 +120,17 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`absent.rs`](../../docs/files/veilvoice-audio/absent.md) | 309 | The live modules, in a build that has no live capture. |
-| [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 238 | Enumerating audio devices, and guessing which of them are virtual cables. |
+| [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 383 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 574 | Reading and writing audio files. |
-| [`kinds.rs`](../../docs/files/veilvoice-audio/kinds.md) | 182 | What the live path reports, kept apart from the live path itself. |
+| [`kinds.rs`](../../docs/files/veilvoice-audio/kinds.md) | 190 | What the live path reports, kept apart from the live path itself. |
 | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 278 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
-| [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 774 | Live microphone scrambling. |
+| [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 870 | Live microphone scrambling. |
 | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 166 | The scale a level meter is drawn on. |
-| [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | 212 | Playing a recording that is only in memory, and never on disk. |
+| [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | 219 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
-| [`room.rs`](../../docs/files/veilvoice-audio/room.md) | 575 | Roadmap item 147. |
+| [`room.rs`](../../docs/files/veilvoice-audio/room.md) | 555 | Roadmap item 147. |
 
-**2,246 functional lines of Rust** in this crate. A functional line is a line
+**2,399 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -150,7 +150,7 @@ counts blank lines and comments too. Both are produced by
 | `fn list` | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | List the devices available in one direction. |
 | `fn find_virtual_cable` | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | Find the first output device that looks like a virtual audio cable. |
 | `fn name_of` | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | The name of an opened device, or a placeholder when the OS will not say. |
-| `fn open` | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | Look up a device by exact name, or the host default when name is None. |
+| `fn open` | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | Look up a device by the name list gave it, or the host default when name is None. |
 | `const MAX_DECODED_SAMPLES` | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | The most decoded audio load will hold, in mono f32 samples. |
 | `fn preflight` | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file. |
 | `struct Audio` | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | Mono audio in memory. |

@@ -113,7 +113,7 @@ flowchart TD
 | [`windows.rs`](../../docs/files/veilvoice-watch/windows.md) | 622 | Windows detection, via the Capability Access Manager. |
 | [`scan_once.rs`](../../docs/files/veilvoice-watch/examples-scan_once.md) | 30 | Print what is using the microphone and camera right now. |
 
-**3,917 functional lines of Rust** in this crate. A functional line is a line
+**3,952 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

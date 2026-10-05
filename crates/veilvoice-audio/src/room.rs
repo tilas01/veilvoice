@@ -120,30 +120,10 @@ struct Shared {
     stats: Mutex<RoomStats>,
     /// How often a stream asked for samples that were not ready yet.
     starved: AtomicU64,
-    /// How many times any of the streams has reported trouble.
-    troubles: AtomicU64,
-    /// The most recent one, for a caller that asks.
-    trouble: Mutex<Option<crate::live::Interference>>,
-}
-
-impl Shared {
-    /// Record what the platform said about one of the streams.
-    ///
-    /// The same shape as the single-microphone path's, and not a realtime
-    /// callback: cpal calls this when something has gone wrong rather than
-    /// every block.
-    fn report(&self, side: crate::live::Side, error: &cpal::Error) {
-        let count = self.troubles.fetch_add(1, Ordering::Relaxed) + 1;
-        eprintln!("veilvoice: {} stream error: {error}", side.word());
-        if let Ok(mut held) = self.trouble.lock() {
-            *held = Some(crate::live::Interference {
-                side,
-                device_gone: matches!(error.kind(), cpal::ErrorKind::DeviceNotAvailable),
-                said: error.to_string(),
-                count,
-            });
-        }
-    }
+    /// What the platform has said about any of the streams. The same type the
+    /// single-microphone path keeps, since F-245 made it one rather than two
+    /// copies of the same mistake.
+    troubles: crate::live::Troubles,
 }
 
 /// Everything one guest's engine needs, owned by the output callback.
@@ -269,7 +249,7 @@ impl RoomSession {
                     },
                     {
                         let shared = Arc::clone(&shared);
-                        move |e| shared.report(crate::live::Side::Input, &e)
+                        move |e| shared.troubles.report(crate::live::Side::Input, &e)
                     },
                     None,
                 )
@@ -382,7 +362,7 @@ impl RoomSession {
                 },
                 {
                     let shared = Arc::clone(&shared);
-                    move |e| shared.report(crate::live::Side::Output, &e)
+                    move |e| shared.troubles.report(crate::live::Side::Output, &e)
                 },
                 None,
             )
@@ -426,7 +406,7 @@ impl RoomSession {
         // single-microphone path reads it here: a device that has gone stops
         // calling its callback, and the number that has to survive a stream
         // which is no longer running is the one saying it stopped.
-        stats.interfered = self.shared.troubles.load(Ordering::Relaxed);
+        stats.interfered = self.shared.troubles.count();
         let snapshot = stats.clone();
         for guest in stats.guests.iter_mut() {
             guest.input_peak = 0.0;
@@ -442,7 +422,7 @@ impl RoomSession {
     /// says which side, not which guest: cpal's error callback is per stream
     /// and this keeps the most recent one, which is the one worth showing.
     pub fn interference(&self) -> Option<crate::live::Interference> {
-        self.shared.trouble.lock().ok()?.clone()
+        self.shared.troubles.latest()
     }
 }
 

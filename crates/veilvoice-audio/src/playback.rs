@@ -179,7 +179,14 @@ pub fn start(samples: Vec<f32>, rate: u32, device: Option<&str>) -> Result<Playi
                     *p = p.max(loudest);
                 }
             },
-            move |e| eprintln!("veilvoice: playback stream error: {e}"),
+            // Not for a glitch: on ALSA this runs on the audio thread, before
+            // the stream recovers, and a line per glitch is how one becomes
+            // the next. F-245.
+            move |e: cpal::Error| {
+                if e.kind() != cpal::ErrorKind::Xrun {
+                    eprintln!("veilvoice: playback stream error: {e}");
+                }
+            },
             None,
         )
         .map_err(|e| Error::Stream(e.to_string()))?;
