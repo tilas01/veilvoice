@@ -305,5 +305,10 @@ mod tests {
         said(playback::start(vec![0.0; 4], 48_000, None).err().unwrap());
         assert!(devices::find_virtual_cable().is_none());
         const { assert!(!crate::CAN_CAPTURE) };
+        assert_eq!(
+            crate::WHY_NO_CAPTURE,
+            Some(REASON),
+            "the notice shown up front and the refusal say different things"
+        );
     }
 }

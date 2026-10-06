@@ -1947,6 +1947,11 @@ impl Studio {
                                             .color(p::fg()),
                                         );
                                     }
+                                } else if let Some(why) = veilvoice_audio::WHY_NO_CAPTURE {
+                                    // Roadmap item 162: said where the button
+                                    // would be, rather than after pressing it.
+                                    ui.add_enabled(false, egui::Button::new("  play  "))
+                                        .on_disabled_hover_text(why);
                                 } else if ui
                                     .button("  play  ")
                                     .on_hover_text(
@@ -2782,6 +2787,40 @@ fn export_now(job: ExportJob) -> (String, Tone) {
         ),
         Tone::Good,
     )
+}
+
+/// Say, before anything is pressed, that this build cannot capture.
+///
+/// **Roadmap item 162.** On the BSDs the window is built without live audio,
+/// and every way into it refuses. Refusing is right; being the first thing a
+/// person hears of it is not. So the Studio says it at the top, in the same
+/// words the refusal would use, and says what still works, and draws none of
+/// the controls that could only refuse. Returns whether it said so, so the
+/// caller stops there.
+///
+/// `why` is [`veilvoice_audio::WHY_NO_CAPTURE`] in the window, and a sentence
+/// of a test's choosing in a test, since the test build has live audio.
+pub fn cannot_capture(ui: &mut Ui, why: Option<&str>) -> bool {
+    let Some(why) = why else {
+        return false;
+    };
+    ui.add_space(4.0);
+    ui.label(
+        RichText::new("This system cannot capture sound")
+            .color(p::yellow())
+            .strong(),
+    );
+    ui.label(RichText::new(why).color(p::fg()));
+    ui.add_space(6.0);
+    ui.label(
+        RichText::new(
+            "The Browser tab still opens the vault, renames, removes and exports what \
+             is in it. Anonymising a file works exactly as it does everywhere else.",
+        )
+        .color(p::muted())
+        .small(),
+    );
+    true
 }
 
 /// A length in seconds, as `m:ss`, for somewhere a person reads.

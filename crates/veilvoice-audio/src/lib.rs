@@ -85,6 +85,23 @@ pub use absent::{devices, live, playback, record, room};
 /// refusal be the first they hear of it.
 pub const CAN_CAPTURE: bool = cfg!(feature = "live");
 
+/// Why this build cannot capture, in the words a person reads, or `None` when
+/// it can.
+///
+/// **Roadmap item 162.** The same sentence every constructor refuses with, so
+/// the notice a front end shows before anything is pressed and the refusal it
+/// would get afterwards cannot say different things.
+#[cfg(feature = "live")]
+pub const WHY_NO_CAPTURE: Option<&str> = None;
+/// Why this build cannot capture, in the words a person reads, or `None` when
+/// it can.
+///
+/// **Roadmap item 162.** The same sentence every constructor refuses with, so
+/// the notice a front end shows before anything is pressed and the refusal it
+/// would get afterwards cannot say different things.
+#[cfg(not(feature = "live"))]
+pub const WHY_NO_CAPTURE: Option<&str> = Some(absent::REASON);
+
 pub use devices::{DeviceInfo, Direction};
 pub use io::Audio;
 pub use live::{Interference, Keeping, Kept, LiveSession, LiveStats, Side};
@@ -203,6 +220,12 @@ pub fn deidentify(audio: &Audio, config: veilvoice_core::DeidConfig) -> Result<A
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The two answers to "can this build capture?" never disagree.
+    #[test]
+    fn a_build_that_can_capture_gives_no_reason_why_not() {
+        assert_eq!(WHY_NO_CAPTURE.is_none(), CAN_CAPTURE);
+    }
 
     fn speech_like(sample_rate: u32, secs: f32) -> Audio {
         let n = (sample_rate as f32 * secs) as usize;

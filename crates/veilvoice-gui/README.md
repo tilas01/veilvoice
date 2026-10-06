@@ -96,7 +96,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>1546 lines"])
     n_main(["main.rs<br/>269 lines"])
-    n_app["app.rs<br/>3675 lines"]
+    n_app["app.rs<br/>3680 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>305 lines"]
     n_crashlog["crashlog.rs<br/>448 lines"]
@@ -126,7 +126,7 @@ flowchart TD
     n_setup["setup.rs<br/>1144 lines"]
     n_soundbar["soundbar.rs<br/>782 lines"]
     n_storage["storage.rs<br/>661 lines"]
-    n_studio["studio.rs<br/>2805 lines"]
+    n_studio["studio.rs<br/>2844 lines"]
     n_theme["theme.rs<br/>813 lines"]
     n_tour["tour.rs<br/>1237 lines"]
     n_updates["updates.rs<br/>276 lines"]
@@ -322,7 +322,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3675 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3680 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 305 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 448 | Make a failure that produces no output produce some. |
@@ -354,7 +354,7 @@ flowchart TD
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 782 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 661 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2805 | The Recording Studio and the Recording Browser. |
+| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2844 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 813 | Colour schemes for the desktop app. |
 | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 1237 | The short walkthrough on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 276 | The manual update check, as the window shows it. |
@@ -363,7 +363,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 249 | How big the window opens, and why it is not a constant. |
 
-**23,349 functional lines of Rust** in this crate. A functional line is a line
+**23,404 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -515,6 +515,7 @@ counts blank lines and comments too. Both are produced by
 | `fn counted_decoys` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | "One decoy" or "four decoys", so the interface does not say "1 decoys". |
 | `fn counted` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | "One recording" or "four recordings", so the interface does not say "1 recordings". |
 | `fn made_on` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | A Unix time as a date somebody reads. |
+| `fn cannot_capture` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | Say, before anything is pressed, that this build cannot capture. |
 | `fn length` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | A length in seconds, as m:ss, for somewhere a person reads. |
 | `fn size` | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | A size in bytes, rounded to something a person can compare. |
 | `struct Theme` | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | One complete colour scheme. |
