@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/tour.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1237 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1321 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs)
 
 ## Contents
 
@@ -130,27 +130,29 @@ seen, because "show me that again" is not a question about what is new.
 
 ## What this file contains
 
-1237 lines defining **20 functions** (9 public), **5 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1321 lines defining **22 functions** (10 public), **5 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Stage` (line 214) -- One stop on the walkthrough.
-- `struct Already` (line 281) -- What is already true, so the tour can leave out what it would only repeat.
-- `struct Tour` (line 310) -- Where the tour is up to.
-- `enum Outcome` (line 635) -- What the window should do once the tour is out of the way.
-- `enum Press` (line 826) -- What a frame of the card asked for.
+- `struct Already` (line 299) -- What is already true, so the tour can leave out what it would only repeat.
+- `struct Tour` (line 329) -- Where the tour is up to.
+- `enum Outcome` (line 672) -- What the window should do once the tour is out of the way.
+- `enum Press` (line 873) -- What a frame of the card asked for.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `Stage::key` (line 239) -- The name this stop is remembered by.
-- `all_keys` (line 332) -- Every stop's name, for storing once the tour has run.
+- `all_keys` (line 354) -- Every stop's name.
   - reaches: `stages`
-- `Tour::start_new_only` (line 361) -- Start it showing only the stops that are not in known.
+- `keys_settled` (line 365) -- The stops a finished tour has settled, for storing.
   - reaches: `stages`
-- `Tour::running` (line 378) -- Whether the tour is on screen.
-- `Tour::restart` (line 411) -- Start it again from the beginning, because somebody asked.
+- `Tour::start_new_only` (line 398) -- Start it showing only the stops that are not in known.
+  - reaches: `stages`
+- `Tour::running` (line 415) -- Whether the tour is on screen.
+- `Tour::restart` (line 448) -- Start it again from the beginning, because somebody asked.
   - reaches: `start`, `stages`
-- `Tour::overlay` (line 426) -- Draw the current stop over the window.
+- `Tour::overlay` (line 463) -- Draw the current stop over the window.
   - reaches: `body`, `finished`, `stop`, `wipe`, `app_lock`, `at_rest`, `decoy`, `heading`, `install`, `settings_headings`, `secret`
 
 ## What calls what
@@ -174,25 +176,27 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_key(["Stage::key<br/>line 239"])
-    n_applies["Stage::applies<br/>line 257"]
-    n_stages["stages<br/>line 296"]
-    n_all_keys(["all_keys<br/>line 332"])
-    n_start["Tour::start<br/>line 338"]
-    n_start_new_only(["Tour::start_new_only<br/>line 361"])
-    n_running(["Tour::running<br/>line 378"])
-    n_stop["Tour::stop<br/>line 383"]
-    n_wipe["Tour::wipe<br/>line 395"]
-    n_restart(["Tour::restart<br/>line 411"])
-    n_overlay(["Tour::overlay<br/>line 426"])
-    n_body["Tour::body<br/>line 539"]
-    n_app_lock["Tour::app_lock<br/>line 569"]
-    n_finished["Outcome::finished<br/>line 652"]
-    n_at_rest["at_rest<br/>line 663"]
-    n_decoy["decoy<br/>line 713"]
-    n_install["install<br/>line 732"]
-    n_settings_headings["settings_headings<br/>line 786"]
-    n_heading["heading<br/>line 802"]
-    n_secret["secret<br/>line 808"]
+    n_settled["Stage::settled<br/>line 255"]
+    n_applies["Stage::applies<br/>line 276"]
+    n_stages["stages<br/>line 315"]
+    n_all_keys(["all_keys<br/>line 354"])
+    n_keys_settled(["keys_settled<br/>line 365"])
+    n_start["Tour::start<br/>line 375"]
+    n_start_new_only(["Tour::start_new_only<br/>line 398"])
+    n_running(["Tour::running<br/>line 415"])
+    n_stop["Tour::stop<br/>line 420"]
+    n_wipe["Tour::wipe<br/>line 432"]
+    n_restart(["Tour::restart<br/>line 448"])
+    n_overlay(["Tour::overlay<br/>line 463"])
+    n_body["Tour::body<br/>line 576"]
+    n_app_lock["Tour::app_lock<br/>line 606"]
+    n_finished["Outcome::finished<br/>line 689"]
+    n_at_rest["at_rest<br/>line 700"]
+    n_decoy["decoy<br/>line 750"]
+    n_install["install<br/>line 779"]
+    n_settings_headings["settings_headings<br/>line 833"]
+    n_heading["heading<br/>line 849"]
+    n_secret["secret<br/>line 855"]
     n_all_keys --> n_stages
     n_app_lock --> n_heading
     n_app_lock --> n_secret
@@ -205,41 +209,45 @@ flowchart TD
     n_body --> n_settings_headings
     n_decoy --> n_heading
     n_install --> n_heading
+    n_keys_settled --> n_stages
     n_overlay --> n_body
     n_overlay --> n_finished
     n_overlay --> n_stop
     n_overlay --> n_wipe
     n_restart --> n_start
     n_settings_headings --> n_heading
+    n_settled --> n_applies
     n_start --> n_stages
     n_start_new_only --> n_stages
     n_stop --> n_wipe
     click n_key href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L239" "open the source"
-    click n_applies href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L257" "open the source"
-    click n_stages href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L296" "open the source"
-    click n_all_keys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L332" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L338" "open the source"
-    click n_start_new_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L361" "open the source"
-    click n_running href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L378" "open the source"
-    click n_stop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L383" "open the source"
-    click n_wipe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L395" "open the source"
-    click n_restart href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L411" "open the source"
-    click n_overlay href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L426" "open the source"
-    click n_body href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L539" "open the source"
-    click n_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L569" "open the source"
-    click n_finished href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L652" "open the source"
-    click n_at_rest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L663" "open the source"
-    click n_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L713" "open the source"
-    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L732" "open the source"
-    click n_settings_headings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L786" "open the source"
-    click n_heading href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L802" "open the source"
-    click n_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L808" "open the source"
+    click n_settled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L255" "open the source"
+    click n_applies href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L276" "open the source"
+    click n_stages href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L315" "open the source"
+    click n_all_keys href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L354" "open the source"
+    click n_keys_settled href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L365" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L375" "open the source"
+    click n_start_new_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L398" "open the source"
+    click n_running href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L415" "open the source"
+    click n_stop href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L420" "open the source"
+    click n_wipe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L432" "open the source"
+    click n_restart href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L448" "open the source"
+    click n_overlay href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L463" "open the source"
+    click n_body href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L576" "open the source"
+    click n_app_lock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L606" "open the source"
+    click n_finished href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L689" "open the source"
+    click n_at_rest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L700" "open the source"
+    click n_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L750" "open the source"
+    click n_install href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L779" "open the source"
+    click n_settings_headings href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L833" "open the source"
+    click n_heading href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L849" "open the source"
+    click n_secret href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L855" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_key,n_all_keys,n_start_new_only,n_running,n_restart,n_overlay entry
+    class n_key,n_all_keys,n_keys_settled,n_start_new_only,n_running,n_restart,n_overlay entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_stages,n_start,n_stop api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_applies,n_wipe,n_body,n_app_lock,n_finished,n_at_rest,n_decoy,n_install,n_settings_headings,n_heading,n_secret helper
+    class n_settled,n_applies,n_wipe,n_body,n_app_lock,n_finished,n_at_rest,n_decoy,n_install,n_settings_headings,n_heading,n_secret helper
 ```
 
 </details>
@@ -253,29 +261,31 @@ flowchart TD
 | `CARDS` <sub>pub const</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L132) | One card: the tab it is about, and what that tab is for. |
 | `Stage` <sub>pub enum</sub> | [214](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L214) | One stop on the walkthrough. |
 | `Stage::key` <sub>pub fn</sub> | [239](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L239) | The name this stop is remembered by. |
-| `Stage::applies` <sub>fn</sub> | [257](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L257) | Whether this stop has anything to say, given what is already set up. |
-| `Already` <sub>pub struct</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L281) | What is already true, so the tour can leave out what it would only repeat. |
-| `stages` <sub>pub fn</sub> | [296](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L296) | Every stop, in the order a reader meets them. |
-| `Tour` <sub>pub struct</sub> | [310](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L310) | Where the tour is up to. |
-| `all_keys` <sub>pub fn</sub> | [332](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L332) | Every stop's name, for storing once the tour has run. |
-| `Tour::start` <sub>pub fn</sub> | [338](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L338) | Start the tour from the beginning, showing every stop that applies. |
-| `Tour::start_new_only` <sub>pub fn</sub> | [361](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L361) | Start it showing only the stops that are not in known. |
-| `Tour::running` <sub>pub fn</sub> | [378](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L378) | Whether the tour is on screen. |
-| `Tour::stop` <sub>pub fn</sub> | [383](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L383) | Stop it, and wipe anything typed into it. |
-| `Tour::wipe` <sub>fn</sub> | [395](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L395) | Clear the typed passphrase fields. |
-| `Tour::restart` <sub>pub fn</sub> | [411](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L411) | Start it again from the beginning, because somebody asked. |
-| `Tour::overlay` <sub>pub fn</sub> | [426](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L426) | Draw the current stop over the window. |
-| `Tour::body` <sub>fn</sub> | [539](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L539) | What one stop says, and what it offers. |
-| `Tour::app_lock` <sub>fn</sub> | [569](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L569) | The app lock, offered to somebody who has not set one. |
-| `Outcome` <sub>pub enum</sub> | [635](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L635) | What the window should do once the tour is out of the way. |
-| `Outcome::finished` <sub>fn</sub> | [652](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L652) | Finished, with nowhere in particular to go. |
-| `at_rest` <sub>fn</sub> | [663](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L663) | At-rest encryption: on, and what that means. |
-| `decoy` <sub>fn</sub> | [713](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L713) | The decoy passphrase: what it is, and what it is not. |
-| `install` <sub>fn</sub> | [732](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L732) | Installed or portable, and the offer that follows from it. |
-| `settings_headings` <sub>fn</sub> | [786](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L786) | Every heading in Settings, and what it covers. |
-| `heading` <sub>fn</sub> | [802](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L802) | A stop's title. |
-| `secret` <sub>fn</sub> | [808](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L808) | A password field. |
-| `Press` <sub>enum</sub> | [826](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L826) | What a frame of the card asked for. |
+| `Stage::settled` <sub>fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L255) | Whether a finished tour leaves this stop with nothing further to say. |
+| `Stage::applies` <sub>fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L276) | Whether this stop has anything to say, given what is already set up. |
+| `Already` <sub>pub struct</sub> | [299](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L299) | What is already true, so the tour can leave out what it would only repeat. |
+| `stages` <sub>pub fn</sub> | [315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L315) | Every stop, in the order a reader meets them. |
+| `Tour` <sub>pub struct</sub> | [329](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L329) | Where the tour is up to. |
+| `all_keys` <sub>pub fn</sub> | [354](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L354) | Every stop's name. |
+| `keys_settled` <sub>pub fn</sub> | [365](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L365) | The stops a finished tour has settled, for storing. |
+| `Tour::start` <sub>pub fn</sub> | [375](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L375) | Start the tour from the beginning, showing every stop that applies. |
+| `Tour::start_new_only` <sub>pub fn</sub> | [398](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L398) | Start it showing only the stops that are not in known. |
+| `Tour::running` <sub>pub fn</sub> | [415](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L415) | Whether the tour is on screen. |
+| `Tour::stop` <sub>pub fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L420) | Stop it, and wipe anything typed into it. |
+| `Tour::wipe` <sub>fn</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L432) | Clear the typed passphrase fields. |
+| `Tour::restart` <sub>pub fn</sub> | [448](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L448) | Start it again from the beginning, because somebody asked. |
+| `Tour::overlay` <sub>pub fn</sub> | [463](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L463) | Draw the current stop over the window. |
+| `Tour::body` <sub>fn</sub> | [576](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L576) | What one stop says, and what it offers. |
+| `Tour::app_lock` <sub>fn</sub> | [606](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L606) | The app lock, offered to somebody who has not set one. |
+| `Outcome` <sub>pub enum</sub> | [672](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L672) | What the window should do once the tour is out of the way. |
+| `Outcome::finished` <sub>fn</sub> | [689](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L689) | Finished, with nowhere in particular to go. |
+| `at_rest` <sub>fn</sub> | [700](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L700) | At-rest encryption: on, and what that means. |
+| `decoy` <sub>fn</sub> | [750](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L750) | The decoy passphrase: what it is, and what it is not. |
+| `install` <sub>fn</sub> | [779](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L779) | Installed or portable, and the offer that follows from it. |
+| `settings_headings` <sub>fn</sub> | [833](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L833) | Every heading in Settings, and what it covers. |
+| `heading` <sub>fn</sub> | [849](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L849) | A stop's title. |
+| `secret` <sub>fn</sub> | [855](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L855) | A password field. |
+| `Press` <sub>enum</sub> | [873](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L873) | What a frame of the card asked for. |
 
 ---
 

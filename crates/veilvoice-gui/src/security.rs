@@ -56,8 +56,9 @@
 
 use crate::theme::palette as p;
 use egui::{Color32, RichText};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::mpsc;
+use veilvoice_crypto::decoy::{self, Opened};
 use veilvoice_crypto::{container, kdf, lock, LockStore, Secret};
 use veilvoice_policy::{Field as MField, Mandate};
 use zeroize::Zeroize;
@@ -111,6 +112,18 @@ enum Op {
     /// Clear an outstanding interference report. Needs the passphrase, which is
     /// the whole reason it is an operation and not a button.
     Acknowledge,
+    /// Set or replace the decoy passphrase. The real one proves it first.
+    DecoySet,
+    /// Remove the decoy passphrase, after proving the real one.
+    DecoyRemove,
+    /// **An answer, never a request.** What [`run_op`] reports when the
+    /// passphrase typed at the lock screen was the decoy.
+    ///
+    /// A separate variant rather than a flag beside `Unlock`, because every
+    /// arm of [`Security::poll`] already switches on this and the two unlocks
+    /// differ in what they hand over afterwards: see
+    /// [`Security::finish_unlock`].
+    OpenedDecoy,
 }
 
 /// A finished lock operation: the store as it now stands, and how it went.
@@ -202,6 +215,26 @@ pub struct Security {
     held: Option<Secret>,
     /// Whether `passphrase` has been confirmed against `passphrase_repeat`.
     passphrase_set: bool,
+
+    // --- the decoy passphrase ---
+    /// What is on disk, or `None` until the tab has looked.
+    ///
+    /// Read once and after each change rather than per frame, because reading
+    /// it opens a file and a tab is drawn sixty times a second.
+    decoy_state: Option<decoy::State>,
+    /// The real passphrase, which every decoy action has to prove.
+    decoy_real: String,
+    /// The decoy being set, twice.
+    decoy_fresh: String,
+    decoy_repeat: String,
+    /// Whether this session was opened with the decoy rather than the real
+    /// passphrase.
+    ///
+    /// What it changes is what the unlock hands over: the folder is opened
+    /// with a key derived from the decoy, so nothing already in it is found,
+    /// and the sealed record of VeilVoice's own files is not opened at all.
+    /// See [`Security::finish_unlock`].
+    opened_with_decoy: bool,
     passphrase_repeat: String,
     /// Whether the "write it unencrypted?" dialogue is open.
     confirm_disable: bool,
@@ -266,6 +299,11 @@ impl Default for Security {
             held: None,
             passphrase_set: false,
             passphrase_repeat: String::new(),
+            decoy_state: None,
+            decoy_real: String::new(),
+            decoy_fresh: String::new(),
+            decoy_repeat: String::new(),
+            opened_with_decoy: false,
             confirm_disable: false,
             encryption_pinned: false,
             lock_required: false,
@@ -488,6 +526,9 @@ impl Security {
             &mut self.repeat,
             &mut self.passphrase,
             &mut self.passphrase_repeat,
+            &mut self.decoy_real,
+            &mut self.decoy_fresh,
+            &mut self.decoy_repeat,
         ] {
             field.zeroize();
         }
@@ -628,29 +669,8 @@ impl Security {
         self.tampered = self.store.as_ref().is_some_and(LockStore::tampered) || self.tampered;
 
         match outcome {
-            Ok(Op::Unlock) => {
-                self.locked = false;
-                self.auto_locked = false;
-                // Moved rather than wiped, for one caller and one frame. The
-                // integrity record is sealed under this passphrase and the
-                // unlock is the only moment it exists, so wiping it here would
-                // mean the record could never be opened. Whoever takes it is
-                // responsible for wiping it; `take_unlock_passphrase` says so,
-                // and `wipe_secrets` catches the case where nobody does.
-                let opened = std::mem::take(&mut self.entry);
-                // Roadmap item 86. Kept for the session only when the mode that
-                // needs it is already chosen. A user who has not asked for
-                // this keeps the old behaviour exactly: the passphrase is
-                // wiped the moment it has been checked, and never sits in
-                // memory waiting for a feature nobody switched on.
-                if self.sealing == Sealing::AppLock {
-                    let mut copy = opened.clone();
-                    self.app_secret = Some(into_secret(&mut copy));
-                }
-                self.just_unlocked = Some(opened);
-                self.just_unlocked_key = store_key;
-                self.message = None;
-            }
+            Ok(Op::Unlock) => self.finish_unlock(store_key, false),
+            Ok(Op::OpenedDecoy) => self.finish_unlock(store_key, true),
             Ok(Op::Acknowledge) => {
                 self.tampered = false;
                 self.wipe_form();
@@ -688,6 +708,27 @@ impl Security {
                 self.auto_locked = false;
                 self.message = Some(("app lock removed".into(), p::yellow()));
             }
+            Ok(Op::DecoySet) => {
+                self.wipe_form();
+                self.refresh_decoy_state();
+                self.message = Some((
+                    "decoy passphrase set. Typing it opens VeilVoice with nothing in \
+                     it, and does not count against this lock's failed attempts."
+                        .into(),
+                    p::green(),
+                ));
+            }
+            Ok(Op::DecoyRemove) => {
+                self.wipe_form();
+                self.refresh_decoy_state();
+                self.message = Some((
+                    "decoy passphrase removed. Only the real passphrase opens \
+                     VeilVoice now, and nothing was deleted: a decoy never held any \
+                     of your recordings."
+                        .into(),
+                    p::yellow(),
+                ));
+            }
             Err(e) => {
                 self.entry.zeroize();
                 self.message = Some((e, p::red()));
@@ -696,12 +737,100 @@ impl Security {
         true
     }
 
+    /// Open the window after an unlock, with the decoy taken into account.
+    ///
+    /// Both passphrases open the same window, and that is the point: a decoy
+    /// that looked different would not be one. What differs is what this hands
+    /// over afterwards.
+    ///
+    /// `store_key` is derived from whichever passphrase was typed, so a decoy
+    /// session opens VeilVoice's own folder under names nothing in it was
+    /// written with. It reads as empty rather than as refused, which is the
+    /// whole feature: a folder that said "there is something here you cannot
+    /// see" would be worse than no decoy at all.
+    ///
+    /// The sealed record of VeilVoice's own files is a different matter and is
+    /// **not** opened in a decoy session. It is sealed under the real
+    /// passphrase, so it could not be opened anyway, and handing the decoy to
+    /// [`crate::integrity`] would report a record that will not open, which is
+    /// the one alarming thing a decoy session must not do. What a reader sees
+    /// instead is the state a window is in before it is unlocked at all.
+    fn finish_unlock(&mut self, store_key: Option<StoreKey>, by_decoy: bool) {
+        self.locked = false;
+        self.auto_locked = false;
+        self.opened_with_decoy = by_decoy;
+        // Moved rather than wiped, for one caller and one frame. The
+        // integrity record is sealed under this passphrase and the
+        // unlock is the only moment it exists, so wiping it here would
+        // mean the record could never be opened. Whoever takes it is
+        // responsible for wiping it; `take_unlock_passphrase` says so,
+        // and `wipe_secrets` catches the case where nobody does.
+        let opened = std::mem::take(&mut self.entry);
+        // Roadmap item 86. Kept for the session only when the mode that
+        // needs it is already chosen. A user who has not asked for
+        // this keeps the old behaviour exactly: the passphrase is
+        // wiped the moment it has been checked, and never sits in
+        // memory waiting for a feature nobody switched on.
+        if self.sealing == Sealing::AppLock {
+            let mut copy = opened.clone();
+            self.app_secret = Some(into_secret(&mut copy));
+        }
+        if by_decoy {
+            let mut carried = opened;
+            carried.zeroize();
+        } else {
+            self.just_unlocked = Some(opened);
+        }
+        self.just_unlocked_key = store_key;
+        self.message = None;
+    }
+
+    /// Whether this session was opened with the decoy passphrase.
+    ///
+    /// Nothing in the window says so on screen, deliberately. It is here for
+    /// the parts of the program that must not act as though the real folder
+    /// were open.
+    pub fn opened_with_decoy(&self) -> bool {
+        self.opened_with_decoy
+    }
+
+    /// Whether a decoy could be set on this machine.
+    ///
+    /// A decoy is a second passphrase for the app lock, so there is nothing
+    /// for it to be second to until a lock exists. Read by the tour, which
+    /// skips the stop rather than offering something that would refuse.
+    pub fn decoy_can_be_set(&self) -> bool {
+        self.has_lock()
+    }
+
+    /// Read what is on disk, once, so the tab does not open a file per frame.
+    ///
+    /// Beside `self.path`, which is the lock this window is actually using, and
+    /// **not** through `decoy::Store::here`. Those are the same folder on a real
+    /// machine and different ones everywhere else, and a window that wrote in
+    /// one place and looked in another is F-141 exactly: it appeared to work,
+    /// and the state it reported was somebody else's.
+    fn refresh_decoy_state(&mut self) {
+        if !self.has_lock() {
+            // Nothing to read, and asking would create the index that names
+            // the lock's files on a machine that has none.
+            self.decoy_state = None;
+            return;
+        }
+        self.decoy_state = decoy_store(self.path.as_deref())
+            .ok()
+            .map(|store| store.state());
+    }
+
     /// Clear what was typed, so a passphrase does not sit in a field after
     /// use.
     fn wipe_form(&mut self) {
         self.current.zeroize();
         self.fresh.zeroize();
         self.repeat.zeroize();
+        self.decoy_real.zeroize();
+        self.decoy_fresh.zeroize();
+        self.decoy_repeat.zeroize();
     }
 
     /// Whether an operation is in flight, so the panel can refuse a second
@@ -1094,6 +1223,147 @@ impl Security {
                 .small(),
         );
         ui.label(RichText::new(lock::SCOPE).color(p::fg()));
+
+        if self.has_lock() {
+            ui.add_space(16.0);
+            ui.separator();
+            self.decoy_panel(ui, busy);
+        }
+    }
+
+    /// The decoy passphrase, set, changed and removed from the window.
+    ///
+    /// Behind the app lock and not on the lock screen, which is the only place
+    /// it could be and still be a decoy: a lock screen offering a second
+    /// passphrase has announced that there is one.
+    ///
+    /// Both scope notes are shown here in full rather than behind a link, from
+    /// the same two constants `veilvoice decoy` prints. A reader who sets this
+    /// up believing it hides the existence of a second passphrase has been made
+    /// less safe by it, and the only moment to say so is before they rely on it.
+    fn decoy_panel(&mut self, ui: &mut egui::Ui, busy: bool) {
+        if self.decoy_state.is_none() {
+            self.refresh_decoy_state();
+        }
+
+        ui.label(
+            RichText::new("A second passphrase")
+                .color(p::blue())
+                .small(),
+        );
+        match self.decoy_state {
+            None => {
+                ui.label(
+                    RichText::new(
+                        "The decoy record here could not be read at all, so this cannot \
+                         say whether one is set. The real passphrase is unaffected.",
+                    )
+                    .color(p::yellow()),
+                );
+                return;
+            }
+            Some(decoy::State::Absent) => {
+                ui.label(RichText::new("no decoy is set").color(p::muted()));
+            }
+            Some(decoy::State::Set) => {
+                ui.label(RichText::new("a decoy is set").color(p::green()));
+            }
+            Some(decoy::State::Unreadable) => {
+                ui.label(
+                    RichText::new(
+                        "There is a decoy record and it does not read, so this machine \
+                         has no working decoy: the passphrase you believe is one would \
+                         open nothing. Setting it again replaces the record.",
+                    )
+                    .color(p::yellow()),
+                );
+            }
+        }
+
+        ui.add_space(8.0);
+        ui.label(RichText::new(decoy::SCOPE).color(p::fg()));
+        ui.add_space(8.0);
+        ui.label(
+            RichText::new("What no passphrase does")
+                .color(p::yellow())
+                .small(),
+        );
+        ui.label(RichText::new(decoy::WHY_NO_DESTRUCTION).color(p::fg()));
+
+        ui.add_space(8.0);
+        ui.label(
+            RichText::new(format!(
+                "A decoy has to differ from the real passphrase in at least {} \
+                 places. One that is nearly the real one is not a decoy: somebody \
+                 watching you type learns both at once, and somebody typing under \
+                 pressure gives away the wrong one.",
+                decoy::LEAST_DIFFERENCE
+            ))
+            .color(p::muted())
+            .small(),
+        );
+
+        let is_set = self.decoy_state != Some(decoy::State::Absent);
+        ui.add_space(8.0);
+        ui.add_enabled_ui(!busy, |ui| {
+            password_row(ui, "app lock", &mut self.decoy_real);
+            password_row(ui, "decoy", &mut self.decoy_fresh);
+            password_row(ui, "repeat", &mut self.decoy_repeat);
+        });
+        let matched = !self.decoy_fresh.is_empty() && self.decoy_fresh == self.decoy_repeat;
+        let differ = !self.decoy_fresh.is_empty() && !matched;
+
+        let mut set = false;
+        let mut remove = false;
+        button_column(ui, |ui| {
+            if ui
+                .add_enabled(
+                    !busy && matched && !self.decoy_real.is_empty(),
+                    egui::Button::new(if is_set {
+                        "change the decoy"
+                    } else {
+                        "set a decoy"
+                    }),
+                )
+                .clicked()
+            {
+                set = true;
+            }
+            if is_set
+                && ui
+                    .add_enabled(
+                        !busy && !self.decoy_real.is_empty(),
+                        egui::Button::new(RichText::new("remove the decoy").color(p::red())),
+                    )
+                    .clicked()
+            {
+                remove = true;
+            }
+        });
+        if differ {
+            ui.label(
+                RichText::new("the two entries differ")
+                    .color(p::yellow())
+                    .small(),
+            );
+        }
+
+        // Taken out of the fields rather than copied: the worker needs them and
+        // nothing here needs them afterwards. The repeat is wiped either way,
+        // since it was only ever there to be compared.
+        if set {
+            let (real, fresh) = (
+                std::mem::take(&mut self.decoy_real),
+                std::mem::take(&mut self.decoy_fresh),
+            );
+            self.decoy_repeat.zeroize();
+            self.spawn(Op::DecoySet, real, fresh);
+        } else if remove {
+            let real = std::mem::take(&mut self.decoy_real);
+            self.decoy_fresh.zeroize();
+            self.decoy_repeat.zeroize();
+            self.spawn(Op::DecoyRemove, real, String::new());
+        }
     }
 
     /// Read the baseline from disk and apply it to the checkbox.
@@ -1509,6 +1779,16 @@ impl std::fmt::Debug for Plan {
     }
 }
 
+/// The decoy store that sits beside the lock file at `path`.
+///
+/// The lock's path is a file and the store wants the folder it is in, which is
+/// the same conversion `Op::Set` does above.
+fn decoy_store(path: Option<&Path>) -> Result<decoy::Store, String> {
+    let path = path.ok_or_else(|| "no configuration directory".to_string())?;
+    let base = path.parent().unwrap_or(path);
+    decoy::Store::at(base).map_err(|e| e.to_string())
+}
+
 /// Run one lock operation, off the UI thread.
 fn run_op(
     op: Op,
@@ -1520,14 +1800,42 @@ fn run_op(
     let outcome: OpResult = match (op, store) {
         // The store is handed back on failure too: it now carries the recorded
         // attempt, and dropping it would reset the rate limit.
-        (Op::Unlock, Some(mut store)) => match store.unlock(password.as_bytes()) {
-            Ok(()) => {
-                // Derived here, while the passphrase is in hand and this
-                // thread is already the one paying for Argon2.
-                let key = store.store_key(password.as_bytes()).ok();
-                (Some(store), Ok(Op::Unlock), key)
-            }
-            Err(e) => (Some(store), Err(e.to_string()), None),
+        // Through the decoy store, which asks both questions in one breath and
+        // takes the same time whichever passphrase was typed. A decoy store
+        // that will not open falls back to the lock alone: the decoy is a
+        // convenience and the real passphrase is somebody's recordings, so a
+        // broken decoy must never be what stops an unlock.
+        (Op::Unlock, Some(mut store)) => match decoy_store(path.as_deref()) {
+            Err(_) => match store.unlock(password.as_bytes()) {
+                Ok(()) => {
+                    let key = store.store_key(password.as_bytes()).ok();
+                    (Some(store), Ok(Op::Unlock), key)
+                }
+                Err(e) => (Some(store), Err(e.to_string()), None),
+            },
+            Ok(decoys) => match decoys.judge(&mut store, &password) {
+                // Derived here either way, while the passphrase is in hand and
+                // this thread is already the one paying for Argon2. The decoy
+                // derives a different key, which is what makes the folder read
+                // as empty rather than as refused.
+                Ok(answer @ (Opened::Real | Opened::Decoy)) => {
+                    let key = store.store_key(password.as_bytes()).ok();
+                    let op = if answer == Opened::Real {
+                        Op::Unlock
+                    } else {
+                        Op::OpenedDecoy
+                    };
+                    (Some(store), Ok(op), key)
+                }
+                // The lock's own words for a wrong passphrase, so the lock
+                // screen says the same thing it has always said.
+                Ok(Opened::Wrong) => (
+                    Some(store),
+                    Err(veilvoice_crypto::Error::AppLockRejected.to_string()),
+                    None,
+                ),
+                Err(e) => (Some(store), Err(e.to_string()), None),
+            },
         },
         (Op::Acknowledge, Some(mut store)) => match store.acknowledge(password.as_bytes()) {
             Ok(()) => (Some(store), Ok(Op::Acknowledge), None),
@@ -1564,6 +1872,24 @@ fn run_op(
             // recorded failure. A lock that vanished because the password was
             // wrong would be a spectacular own goal.
             Err(e) => (reopen(path.as_deref()), Err(e.to_string()), None),
+        },
+        // `password` is the real passphrase and `replacement` the decoy, which
+        // is the same pairing `Op::Change` uses. The store proves the real one
+        // before it writes anything, so a window somebody walked away from
+        // cannot have a decoy set or taken away at it.
+        (Op::DecoySet, Some(store)) => match decoy_store(path.as_deref()) {
+            Err(e) => (Some(store), Err(e), None),
+            Ok(decoys) => match decoys.set(&store, &password, &replacement) {
+                Ok(()) => (Some(store), Ok(Op::DecoySet), None),
+                Err(e) => (Some(store), Err(e.to_string()), None),
+            },
+        },
+        (Op::DecoyRemove, Some(store)) => match decoy_store(path.as_deref()) {
+            Err(e) => (Some(store), Err(e), None),
+            Ok(decoys) => match decoys.remove(&store, &password) {
+                Ok(()) => (Some(store), Ok(Op::DecoyRemove), None),
+                Err(e) => (Some(store), Err(e.to_string()), None),
+            },
         },
         // The UI never offers these combinations; refusing beats guessing.
         (_, store) => (
@@ -1953,6 +2279,228 @@ mod tests {
             security.entry.is_empty(),
             "the passphrase is still sitting in the unlock field"
         );
+    }
+
+    /// A machine with a lock and a decoy beside it, and a `Security` pointed at
+    /// the same folder so the worker resolves the same decoy store.
+    ///
+    /// The lock is the plain single-file kind rather than a vault-backed one.
+    /// `lock::create_in` would resolve the administrator-owned directory and
+    /// write a second copy into it, which a test has no business doing, and the
+    /// decoy store does not care either way: it derives its own name from its
+    /// own index in this folder.
+    fn machine_with_a_decoy(
+        real: &str,
+        decoyed: &str,
+    ) -> (tempfile::TempDir, Security, veilvoice_crypto::decoy::Store) {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("applock.bin");
+        let store = LockStore::create(&path, real.as_bytes(), weak_params()).unwrap();
+        let decoys = decoy::Store::at(dir.path()).unwrap();
+        decoys.set(&store, real, decoyed).unwrap();
+
+        let mut security = Security::default();
+        security.path = Some(path);
+        security.store = Some(store);
+        security.locked = true;
+        (dir, security, decoys)
+    }
+
+    /// The parameters every test here derives with. The real ones take a
+    /// quarter of a gigabyte and a noticeable fraction of a second, twice per
+    /// unlock now that both passphrases are always checked.
+    fn weak_params() -> kdf::KdfParams {
+        kdf::KdfParams::weak_for_tests()
+    }
+
+    /// Wait for the worker, the way a frame does.
+    fn settle(security: &mut Security) {
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+        while !security.poll() && std::time::Instant::now() < deadline {
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+    }
+
+    /// Roadmap 173. The decoy opens the window, and the folder it opens holds
+    /// nothing, because the key it was opened with is not the one anything in
+    /// there was written with.
+    ///
+    /// Driven through `begin_unlock` and `poll` rather than through the crypto
+    /// crate, because what this is checking is the handover: which key comes
+    /// back, and that the real passphrase is not carried on to the sealed
+    /// record.
+    #[test]
+    fn the_decoy_opens_a_window_whose_folder_reads_as_empty() {
+        let (dir, mut security, _decoys) =
+            machine_with_a_decoy("the real one", "a different thing");
+
+        // Something in the folder, written the way a real session writes it.
+        let real_key = security
+            .store
+            .as_ref()
+            .unwrap()
+            .store_key(b"the real one")
+            .unwrap();
+        let real_hoard = veilvoice_crypto::hoard::Hoard::open(dir.path(), real_key);
+        real_hoard
+            .write("settings.conf", b"what the real session kept")
+            .unwrap();
+
+        security.entry = "a different thing".to_string();
+        security.begin_unlock();
+        settle(&mut security);
+
+        assert!(!security.locked, "the decoy did not open the window");
+        assert!(
+            security.opened_with_decoy(),
+            "it opened as the real session"
+        );
+        assert!(
+            security.take_unlock_passphrase().is_none(),
+            "the decoy was handed to the sealed record of VeilVoice's own files, \
+             which would report a record that will not open"
+        );
+
+        let key = security
+            .take_unlock_store_key()
+            .expect("a key, so the folder reads as empty rather than as refused");
+        let decoy_hoard = veilvoice_crypto::hoard::Hoard::open(dir.path(), key);
+        assert_eq!(
+            decoy_hoard.read("settings.conf").unwrap(),
+            None,
+            "the decoy session found what the real one wrote"
+        );
+        assert!(
+            decoy_hoard.roster().unwrap().is_empty(),
+            "the decoy session could see that something is there"
+        );
+    }
+
+    /// And the real passphrase still opens everything, with a decoy set.
+    #[test]
+    fn the_real_passphrase_opens_the_real_session_with_a_decoy_set() {
+        let (dir, mut security, _decoys) =
+            machine_with_a_decoy("the real one", "a different thing");
+        security.entry = "the real one".to_string();
+        security.begin_unlock();
+        settle(&mut security);
+
+        assert!(!security.locked);
+        assert!(!security.opened_with_decoy());
+        assert_eq!(
+            security.take_unlock_passphrase().as_deref(),
+            Some("the real one"),
+            "the sealed record could not be opened"
+        );
+        let key = security.take_unlock_store_key().expect("the folder's key");
+        let hoard = veilvoice_crypto::hoard::Hoard::open(dir.path(), key);
+        hoard.write("settings.conf", b"kept").unwrap();
+        assert!(hoard.read("settings.conf").unwrap().is_some());
+    }
+
+    /// Neither passphrase, and the lock says what it has always said.
+    #[test]
+    fn a_wrong_passphrase_is_still_wrong_when_a_decoy_is_set() {
+        let (_dir, mut security, _decoys) =
+            machine_with_a_decoy("the real one", "a different thing");
+        security.entry = "neither of them".to_string();
+        security.begin_unlock();
+        settle(&mut security);
+
+        assert!(security.locked, "a wrong passphrase opened the window");
+        assert!(!security.opened_with_decoy());
+        let (text, _) = security.message.clone().expect("a message");
+        assert_eq!(
+            text,
+            veilvoice_crypto::Error::AppLockRejected.to_string(),
+            "the lock screen stopped saying what it says without a decoy, which \
+             is itself a way of noticing that a decoy is configured"
+        );
+        assert_eq!(
+            security.store.as_ref().unwrap().failures(),
+            1,
+            "a wrong passphrase was not counted"
+        );
+    }
+
+    /// Roadmap 173. The window sets one and takes it away, through the worker
+    /// the buttons drive, and the real passphrase is proved either way.
+    #[test]
+    fn a_decoy_can_be_set_and_removed_from_the_window() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("applock.bin");
+        let store = LockStore::create(&path, b"the real one", weak_params()).unwrap();
+        let mut security = Security::default();
+        security.path = Some(path);
+        security.store = Some(store);
+
+        let decoys = decoy::Store::at(dir.path()).unwrap();
+        assert_eq!(decoys.state(), decoy::State::Absent);
+
+        security.spawn(
+            Op::DecoySet,
+            "the real one".to_string(),
+            "a different thing".to_string(),
+        );
+        settle(&mut security);
+        assert_eq!(
+            decoys.state(),
+            decoy::State::Set,
+            "nothing was written: {:?}",
+            security.message
+        );
+        assert_eq!(security.decoy_state, Some(decoy::State::Set));
+
+        // The wrong real passphrase, which must change nothing.
+        security.spawn(
+            Op::DecoyRemove,
+            "not the real one".to_string(),
+            String::new(),
+        );
+        settle(&mut security);
+        assert_eq!(
+            decoys.state(),
+            decoy::State::Set,
+            "a decoy was removed by somebody who could not open the lock"
+        );
+
+        security.spawn(Op::DecoyRemove, "the real one".to_string(), String::new());
+        settle(&mut security);
+        assert_eq!(decoys.state(), decoy::State::Absent);
+        assert_eq!(security.decoy_state, Some(decoy::State::Absent));
+    }
+
+    /// Locking the window puts back the state a fresh launch is in, and the
+    /// decoy form is part of that. A passphrase left in a field survives a
+    /// lock, which is what locking is supposed to undo.
+    #[test]
+    fn locking_the_window_wipes_the_decoy_form() {
+        let mut security = Security::default();
+        security.store = Some(
+            LockStore::create(
+                &tempfile::tempdir().unwrap().path().join("applock.bin"),
+                b"the real one",
+                weak_params(),
+            )
+            .unwrap(),
+        );
+        security.decoy_real = "the real one".to_string();
+        security.decoy_fresh = "a different thing".to_string();
+        security.decoy_repeat = "a different thing".to_string();
+        security.opened_with_decoy = true;
+
+        security.lock_now();
+
+        for (field, name) in [
+            (&security.decoy_real, "the real passphrase"),
+            (&security.decoy_fresh, "the decoy"),
+            (&security.decoy_repeat, "the repeat"),
+        ] {
+            assert!(
+                field.is_empty(),
+                "{name} is still in its field after a lock"
+            );
+        }
     }
 
     /// Roadmap item 86. The plan has to be a password plan, because that is what

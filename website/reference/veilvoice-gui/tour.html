@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/tour.svg" alt="tour.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/tour.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1237 lines &middot; <a href="tour.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1321 lines &middot; <a href="tour.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-it-is-for">What it is for</a>
@@ -105,29 +105,32 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1237 lines defining <strong>20 functions</strong> (9 public), <strong>5 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1321 lines defining <strong>22 functions</strong> (10 public), <strong>5 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Stage</code> <span style="color:var(--muted)">line 214</span> &middot; One stop on the walkthrough.</li>
-<li><code>struct Already</code> <span style="color:var(--muted)">line 281</span> &middot; What is already true, so the tour can leave out what it would only repeat.</li>
-<li><code>struct Tour</code> <span style="color:var(--muted)">line 310</span> &middot; Where the tour is up to.</li>
-<li><code>enum Outcome</code> <span style="color:var(--muted)">line 635</span> &middot; What the window should do once the tour is out of the way.</li>
-<li><code>enum Press</code> <span style="color:var(--muted)">line 826</span> &middot; What a frame of the card asked for.</li>
+<li><code>struct Already</code> <span style="color:var(--muted)">line 299</span> &middot; What is already true, so the tour can leave out what it would only repeat.</li>
+<li><code>struct Tour</code> <span style="color:var(--muted)">line 329</span> &middot; Where the tour is up to.</li>
+<li><code>enum Outcome</code> <span style="color:var(--muted)">line 672</span> &middot; What the window should do once the tour is out of the way.</li>
+<li><code>enum Press</code> <span style="color:var(--muted)">line 873</span> &middot; What a frame of the card asked for.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Stage::key</code> <span style="color:var(--muted)">line 239</span> &middot; The name this stop is remembered by.
 </li>
-<li><code>all_keys</code> <span style="color:var(--muted)">line 332</span> &middot; Every stop&#x27;s name, for storing once the tour has run.
+<li><code>all_keys</code> <span style="color:var(--muted)">line 354</span> &middot; Every stop&#x27;s name.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>stages</code></span>
 </li>
-<li><code>Tour::start_new_only</code> <span style="color:var(--muted)">line 361</span> &middot; Start it showing only the stops that are not in known.
+<li><code>keys_settled</code> <span style="color:var(--muted)">line 365</span> &middot; The stops a finished tour has settled, for storing.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>stages</code></span>
 </li>
-<li><code>Tour::running</code> <span style="color:var(--muted)">line 378</span> &middot; Whether the tour is on screen.
+<li><code>Tour::start_new_only</code> <span style="color:var(--muted)">line 398</span> &middot; Start it showing only the stops that are not in known.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>stages</code></span>
 </li>
-<li><code>Tour::restart</code> <span style="color:var(--muted)">line 411</span> &middot; Start it again from the beginning, because somebody asked.
+<li><code>Tour::running</code> <span style="color:var(--muted)">line 415</span> &middot; Whether the tour is on screen.
+</li>
+<li><code>Tour::restart</code> <span style="color:var(--muted)">line 448</span> &middot; Start it again from the beginning, because somebody asked.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>start</code>, <code>stages</code></span>
 </li>
-<li><code>Tour::overlay</code> <span style="color:var(--muted)">line 426</span> &middot; Draw the current stop over the window.
+<li><code>Tour::overlay</code> <span style="color:var(--muted)">line 463</span> &middot; Draw the current stop over the window.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>body</code>, <code>finished</code>, <code>stop</code>, <code>wipe</code>, <code>app_lock</code>, <code>at_rest</code>, <code>decoy</code>, <code>heading</code>, <code>install</code>, <code>settings_headings</code>, <code>secret</code></span>
 </li>
 </ul>
@@ -135,7 +138,7 @@
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 568 831" width="568" height="831" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 641 931" width="641" height="931" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -144,139 +147,151 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="568" height="831" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M540.4 47.0 C 562.4 47.0, 562.4 47.0, 424.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M106.5 474.0 C 106.5 494.0, 225.0 600.0, 225.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M106.5 474.0 C 106.5 494.0, 343.4 600.0, 343.4 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M249.1 474.0 C 249.1 494.0, 225.0 600.0, 225.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M256.0 374.0 C 256.0 394.0, 106.5 400.0, 106.5 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M256.0 374.0 C 256.0 394.0, 249.1 400.0, 249.1 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M256.0 374.0 C 256.0 394.0, 367.6 400.0, 367.6 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M256.0 374.0 C 256.0 394.0, 225.0 600.0, 225.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M256.0 374.0 C 256.0 394.0, 486.1 400.0, 486.1 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M256.0 374.0 C 256.0 394.0, 284.2 500.0, 284.2 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M367.6 474.0 C 367.6 494.0, 225.0 600.0, 225.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M486.1 474.0 C 486.1 494.0, 225.0 600.0, 225.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M430.9 274.0 C 430.9 294.0, 256.0 300.0, 256.0 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M430.9 274.0 C 430.9 294.0, 418.8 300.0, 418.8 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M497.3 247.0 C 519.3 247.0, 519.3 247.0, 182.7 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M430.9 274.0 C 430.9 294.0, 121.4 300.0, 121.4 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M338.5 247.0 C 360.5 247.0, 360.5 147.0, 158.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M284.2 574.0 C 284.2 594.0, 225.0 600.0, 225.0 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M155.5 147.0 C 443.9 147.0, 443.9 47.0, 424.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M370.7 147.0 C 443.9 147.0, 443.9 47.0, 424.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M125.4 274.0 C 125.4 294.0, 121.4 300.0, 121.4 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<rect x="0" y="0" width="641" height="931" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M576.7 47.0 C 598.7 47.0, 598.7 47.0, 461.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M142.7 574.0 C 142.7 594.0, 261.2 700.0, 261.2 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M142.7 574.0 C 142.7 594.0, 379.7 700.0, 379.7 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M285.4 574.0 C 285.4 594.0, 261.2 700.0, 261.2 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M471.2 374.0 C 471.2 394.0, 142.7 500.0, 142.7 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M471.2 374.0 C 471.2 394.0, 285.4 500.0, 285.4 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M471.2 374.0 C 471.2 394.0, 403.9 500.0, 403.9 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M471.2 374.0 C 471.2 394.0, 261.2 700.0, 261.2 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M471.2 374.0 C 471.2 394.0, 522.4 500.0, 522.4 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M471.2 374.0 C 471.2 394.0, 320.5 600.0, 320.5 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M403.9 574.0 C 403.9 594.0, 261.2 700.0, 261.2 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M522.4 574.0 C 522.4 594.0, 261.2 700.0, 261.2 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M203.9 147.0 C 480.2 147.0, 480.2 47.0, 461.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M546.5 274.0 C 546.5 294.0, 471.2 300.0, 471.2 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M546.5 274.0 C 546.5 294.0, 320.5 400.0, 320.5 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M612.9 247.0 C 634.9 247.0, 634.9 247.0, 298.4 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M546.5 274.0 C 546.5 294.0, 336.6 300.0, 336.6 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M454.2 247.0 C 476.2 247.0, 476.2 147.0, 349.6 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M320.5 674.0 C 320.5 694.0, 261.2 700.0, 261.2 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M269.3 74.0 C 269.3 94.0, 185.9 300.0, 185.9 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M346.6 147.0 C 480.2 147.0, 480.2 47.0, 461.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M561.8 147.0 C 583.8 147.0, 583.8 47.0, 461.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M241.1 274.0 C 241.1 294.0, 336.6 300.0, 336.6 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <a href="tour.src.html#fn-stage-key">
-<rect x="28.0" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="82.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Stage::key</text>
-<text x="82.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 239</text>
+<rect x="64.3" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="118.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Stage::key</text>
+<text x="118.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 239</text>
+</a>
+<a href="tour.src.html#fn-stage-settled">
+<rect x="198.9" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="269.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Stage::settled</text>
+<text x="269.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 255</text>
 </a>
 <a href="tour.src.html#fn-stage-applies">
-<rect x="162.6" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="233.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Stage::applies</text>
-<text x="233.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 257</text>
+<rect x="115.4" y="320.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="185.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Stage::applies</text>
+<text x="185.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 276</text>
 </a>
 <a href="tour.src.html#fn-stages">
-<rect x="329.4" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="375.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">stages</text>
-<text x="375.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 296</text>
+<rect x="365.7" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="411.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">stages</text>
+<text x="411.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 315</text>
 </a>
 <a href="tour.src.html#fn-all_keys">
-<rect x="447.9" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="494.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">all_keys</text>
-<text x="494.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 332</text>
+<rect x="484.2" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="530.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">all_keys</text>
+<text x="530.4" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 354</text>
+</a>
+<a href="tour.src.html#fn-keys_settled">
+<rect x="79.2" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="141.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">keys_settled</text>
+<text x="141.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 365</text>
 </a>
 <a href="tour.src.html#fn-tour-start">
-<rect x="38.9" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="97.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::start</text>
-<text x="97.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 338</text>
+<rect x="229.9" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="288.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::start</text>
+<text x="288.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 375</text>
 </a>
 <a href="tour.src.html#fn-tour-start_new_only">
-<rect x="181.5" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="276.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::start_new_only</text>
-<text x="276.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 361</text>
+<rect x="372.6" y="120.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="467.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::start_new_only</text>
+<text x="467.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 398</text>
 </a>
 <a href="tour.src.html#fn-tour-running">
-<rect x="396.7" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="463.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::running</text>
-<text x="463.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 378</text>
+<rect x="28.0" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="94.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::running</text>
+<text x="94.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
 </a>
 <a href="tour.src.html#fn-tour-stop">
-<rect x="71.1" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="125.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::stop</text>
-<text x="125.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 383</text>
+<rect x="186.8" y="220.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="241.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::stop</text>
+<text x="241.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 420</text>
 </a>
 <a href="tour.src.html#fn-tour-wipe">
-<rect x="67.1" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="121.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::wipe</text>
-<text x="121.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 395</text>
+<rect x="282.3" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="336.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::wipe</text>
+<text x="336.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 432</text>
 </a>
 <a href="tour.src.html#fn-tour-restart">
-<rect x="205.7" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="272.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::restart</text>
-<text x="272.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 411</text>
+<rect x="321.4" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="387.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::restart</text>
+<text x="387.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 448</text>
 </a>
 <a href="tour.src.html#fn-tour-overlay">
-<rect x="364.5" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="430.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::overlay</text>
-<text x="430.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 426</text>
+<rect x="480.2" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="546.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::overlay</text>
+<text x="546.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 463</text>
 </a>
 <a href="tour.src.html#fn-tour-body">
-<rect x="201.7" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="256.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::body</text>
-<text x="256.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 539</text>
+<rect x="416.9" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="471.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::body</text>
+<text x="471.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 576</text>
 </a>
 <a href="tour.src.html#fn-tour-app_lock">
-<rect x="36.1" y="420.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="106.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::app_lock</text>
-<text x="106.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 569</text>
+<rect x="72.3" y="520.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="142.7" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Tour::app_lock</text>
+<text x="142.7" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 606</text>
 </a>
 <a href="tour.src.html#fn-outcome-finished">
-<rect x="336.3" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="418.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outcome::finished</text>
-<text x="418.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 652</text>
+<rect x="238.0" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="320.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Outcome::finished</text>
+<text x="320.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 689</text>
 </a>
 <a href="tour.src.html#fn-at_rest">
-<rect x="202.9" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="249.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">at_rest</text>
-<text x="249.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 663</text>
+<rect x="239.2" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="285.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">at_rest</text>
+<text x="285.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 700</text>
 </a>
 <a href="tour.src.html#fn-decoy">
-<rect x="321.4" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="367.6" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decoy</text>
-<text x="367.6" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 713</text>
+<rect x="357.6" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="403.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">decoy</text>
+<text x="403.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 750</text>
 </a>
 <a href="tour.src.html#fn-install">
-<rect x="439.9" y="420.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="486.1" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
-<text x="486.1" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 732</text>
+<rect x="476.1" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="522.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install</text>
+<text x="522.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 779</text>
 </a>
 <a href="tour.src.html#fn-settings_headings">
-<rect x="201.7" y="520.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="284.2" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">settings_headings</text>
-<text x="284.2" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 786</text>
+<rect x="238.0" y="620.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="320.5" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">settings_headings</text>
+<text x="320.5" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 833</text>
 </a>
 <a href="tour.src.html#fn-heading">
-<rect x="178.7" y="620.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="225.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">heading</text>
-<text x="225.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 802</text>
+<rect x="215.0" y="720.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="261.2" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">heading</text>
+<text x="261.2" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 849</text>
 </a>
 <a href="tour.src.html#fn-secret">
-<rect x="297.2" y="620.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="343.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">secret</text>
-<text x="343.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 808</text>
+<rect x="333.5" y="720.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="379.7" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">secret</text>
+<text x="379.7" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 855</text>
 </a>
-<rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="720.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
-<text x="35.0" y="729.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
-<rect x="20.0" y="736.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="745.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 756.5 L29.0 756.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="761.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="783.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
-<text x="20.0" y="798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
-<text x="20.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
+<rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="820.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="829.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="836.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="845.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 856.5 L29.0 856.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="861.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="883.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the callee&#x27;s</text>
+<text x="20.0" y="898.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">name appears, called, inside the caller&#x27;s body. This is a syntactic reading, not a</text>
+<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
@@ -284,25 +299,27 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_key([&quot;Stage::key&lt;br/&gt;line 239&quot;])
-    n_applies[&quot;Stage::applies&lt;br/&gt;line 257&quot;]
-    n_stages[&quot;stages&lt;br/&gt;line 296&quot;]
-    n_all_keys([&quot;all_keys&lt;br/&gt;line 332&quot;])
-    n_start[&quot;Tour::start&lt;br/&gt;line 338&quot;]
-    n_start_new_only([&quot;Tour::start_new_only&lt;br/&gt;line 361&quot;])
-    n_running([&quot;Tour::running&lt;br/&gt;line 378&quot;])
-    n_stop[&quot;Tour::stop&lt;br/&gt;line 383&quot;]
-    n_wipe[&quot;Tour::wipe&lt;br/&gt;line 395&quot;]
-    n_restart([&quot;Tour::restart&lt;br/&gt;line 411&quot;])
-    n_overlay([&quot;Tour::overlay&lt;br/&gt;line 426&quot;])
-    n_body[&quot;Tour::body&lt;br/&gt;line 539&quot;]
-    n_app_lock[&quot;Tour::app_lock&lt;br/&gt;line 569&quot;]
-    n_finished[&quot;Outcome::finished&lt;br/&gt;line 652&quot;]
-    n_at_rest[&quot;at_rest&lt;br/&gt;line 663&quot;]
-    n_decoy[&quot;decoy&lt;br/&gt;line 713&quot;]
-    n_install[&quot;install&lt;br/&gt;line 732&quot;]
-    n_settings_headings[&quot;settings_headings&lt;br/&gt;line 786&quot;]
-    n_heading[&quot;heading&lt;br/&gt;line 802&quot;]
-    n_secret[&quot;secret&lt;br/&gt;line 808&quot;]
+    n_settled[&quot;Stage::settled&lt;br/&gt;line 255&quot;]
+    n_applies[&quot;Stage::applies&lt;br/&gt;line 276&quot;]
+    n_stages[&quot;stages&lt;br/&gt;line 315&quot;]
+    n_all_keys([&quot;all_keys&lt;br/&gt;line 354&quot;])
+    n_keys_settled([&quot;keys_settled&lt;br/&gt;line 365&quot;])
+    n_start[&quot;Tour::start&lt;br/&gt;line 375&quot;]
+    n_start_new_only([&quot;Tour::start_new_only&lt;br/&gt;line 398&quot;])
+    n_running([&quot;Tour::running&lt;br/&gt;line 415&quot;])
+    n_stop[&quot;Tour::stop&lt;br/&gt;line 420&quot;]
+    n_wipe[&quot;Tour::wipe&lt;br/&gt;line 432&quot;]
+    n_restart([&quot;Tour::restart&lt;br/&gt;line 448&quot;])
+    n_overlay([&quot;Tour::overlay&lt;br/&gt;line 463&quot;])
+    n_body[&quot;Tour::body&lt;br/&gt;line 576&quot;]
+    n_app_lock[&quot;Tour::app_lock&lt;br/&gt;line 606&quot;]
+    n_finished[&quot;Outcome::finished&lt;br/&gt;line 689&quot;]
+    n_at_rest[&quot;at_rest&lt;br/&gt;line 700&quot;]
+    n_decoy[&quot;decoy&lt;br/&gt;line 750&quot;]
+    n_install[&quot;install&lt;br/&gt;line 779&quot;]
+    n_settings_headings[&quot;settings_headings&lt;br/&gt;line 833&quot;]
+    n_heading[&quot;heading&lt;br/&gt;line 849&quot;]
+    n_secret[&quot;secret&lt;br/&gt;line 855&quot;]
     n_all_keys --&gt; n_stages
     n_app_lock --&gt; n_heading
     n_app_lock --&gt; n_secret
@@ -315,41 +332,45 @@ flowchart TD
     n_body --&gt; n_settings_headings
     n_decoy --&gt; n_heading
     n_install --&gt; n_heading
+    n_keys_settled --&gt; n_stages
     n_overlay --&gt; n_body
     n_overlay --&gt; n_finished
     n_overlay --&gt; n_stop
     n_overlay --&gt; n_wipe
     n_restart --&gt; n_start
     n_settings_headings --&gt; n_heading
+    n_settled --&gt; n_applies
     n_start --&gt; n_stages
     n_start_new_only --&gt; n_stages
     n_stop --&gt; n_wipe
     click n_key href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L239&quot; &quot;open the source&quot;
-    click n_applies href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L257&quot; &quot;open the source&quot;
-    click n_stages href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L296&quot; &quot;open the source&quot;
-    click n_all_keys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L332&quot; &quot;open the source&quot;
-    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L338&quot; &quot;open the source&quot;
-    click n_start_new_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L361&quot; &quot;open the source&quot;
-    click n_running href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L378&quot; &quot;open the source&quot;
-    click n_stop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L383&quot; &quot;open the source&quot;
-    click n_wipe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L395&quot; &quot;open the source&quot;
-    click n_restart href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L411&quot; &quot;open the source&quot;
-    click n_overlay href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L426&quot; &quot;open the source&quot;
-    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L539&quot; &quot;open the source&quot;
-    click n_app_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L569&quot; &quot;open the source&quot;
-    click n_finished href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L652&quot; &quot;open the source&quot;
-    click n_at_rest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L663&quot; &quot;open the source&quot;
-    click n_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L713&quot; &quot;open the source&quot;
-    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L732&quot; &quot;open the source&quot;
-    click n_settings_headings href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L786&quot; &quot;open the source&quot;
-    click n_heading href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L802&quot; &quot;open the source&quot;
-    click n_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L808&quot; &quot;open the source&quot;
+    click n_settled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L255&quot; &quot;open the source&quot;
+    click n_applies href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L276&quot; &quot;open the source&quot;
+    click n_stages href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L315&quot; &quot;open the source&quot;
+    click n_all_keys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L354&quot; &quot;open the source&quot;
+    click n_keys_settled href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L365&quot; &quot;open the source&quot;
+    click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L375&quot; &quot;open the source&quot;
+    click n_start_new_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L398&quot; &quot;open the source&quot;
+    click n_running href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L415&quot; &quot;open the source&quot;
+    click n_stop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L420&quot; &quot;open the source&quot;
+    click n_wipe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L432&quot; &quot;open the source&quot;
+    click n_restart href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L448&quot; &quot;open the source&quot;
+    click n_overlay href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L463&quot; &quot;open the source&quot;
+    click n_body href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L576&quot; &quot;open the source&quot;
+    click n_app_lock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L606&quot; &quot;open the source&quot;
+    click n_finished href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L689&quot; &quot;open the source&quot;
+    click n_at_rest href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L700&quot; &quot;open the source&quot;
+    click n_decoy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L750&quot; &quot;open the source&quot;
+    click n_install href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L779&quot; &quot;open the source&quot;
+    click n_settings_headings href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L833&quot; &quot;open the source&quot;
+    click n_heading href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L849&quot; &quot;open the source&quot;
+    click n_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs#L855&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_key,n_all_keys,n_start_new_only,n_running,n_restart,n_overlay entry
+    class n_key,n_all_keys,n_keys_settled,n_start_new_only,n_running,n_restart,n_overlay entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_stages,n_start,n_stop api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_applies,n_wipe,n_body,n_app_lock,n_finished,n_at_rest,n_decoy,n_install,n_settings_headings,n_heading,n_secret helper</code></pre>
+    class n_settled,n_applies,n_wipe,n_body,n_app_lock,n_finished,n_at_rest,n_decoy,n_install,n_settings_headings,n_heading,n_secret helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -361,29 +382,31 @@ flowchart TD
 <tr><td><code>CARDS</code> <sub>pub const</sub></td><td><a href="tour.src.html#fn-cards">132</a></td><td>One card: the tab it is about, and what that tab is for.</td></tr>
 <tr><td><code>Stage</code> <sub>pub enum</sub></td><td><a href="tour.src.html#fn-stage">214</a></td><td>One stop on the walkthrough.</td></tr>
 <tr><td><code>Stage::key</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-stage-key">239</a></td><td>The name this stop is remembered by.</td></tr>
-<tr><td><code>Stage::applies</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-stage-applies">257</a></td><td>Whether this stop has anything to say, given what is already set up.</td></tr>
-<tr><td><code>Already</code> <sub>pub struct</sub></td><td><a href="tour.src.html#fn-already">281</a></td><td>What is already true, so the tour can leave out what it would only repeat.</td></tr>
-<tr><td><code>stages</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-stages">296</a></td><td>Every stop, in the order a reader meets them.</td></tr>
-<tr><td><code>Tour</code> <sub>pub struct</sub></td><td><a href="tour.src.html#fn-tour">310</a></td><td>Where the tour is up to.</td></tr>
-<tr><td><code>all_keys</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-all_keys">332</a></td><td>Every stop&#x27;s name, for storing once the tour has run.</td></tr>
-<tr><td><code>Tour::start</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-start">338</a></td><td>Start the tour from the beginning, showing every stop that applies.</td></tr>
-<tr><td><code>Tour::start_new_only</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-start_new_only">361</a></td><td>Start it showing only the stops that are not in known.</td></tr>
-<tr><td><code>Tour::running</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-running">378</a></td><td>Whether the tour is on screen.</td></tr>
-<tr><td><code>Tour::stop</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-stop">383</a></td><td>Stop it, and wipe anything typed into it.</td></tr>
-<tr><td><code>Tour::wipe</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-tour-wipe">395</a></td><td>Clear the typed passphrase fields.</td></tr>
-<tr><td><code>Tour::restart</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-restart">411</a></td><td>Start it again from the beginning, because somebody asked.</td></tr>
-<tr><td><code>Tour::overlay</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-overlay">426</a></td><td>Draw the current stop over the window.</td></tr>
-<tr><td><code>Tour::body</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-tour-body">539</a></td><td>What one stop says, and what it offers.</td></tr>
-<tr><td><code>Tour::app_lock</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-tour-app_lock">569</a></td><td>The app lock, offered to somebody who has not set one.</td></tr>
-<tr><td><code>Outcome</code> <sub>pub enum</sub></td><td><a href="tour.src.html#fn-outcome">635</a></td><td>What the window should do once the tour is out of the way.</td></tr>
-<tr><td><code>Outcome::finished</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-outcome-finished">652</a></td><td>Finished, with nowhere in particular to go.</td></tr>
-<tr><td><code>at_rest</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-at_rest">663</a></td><td>At-rest encryption: on, and what that means.</td></tr>
-<tr><td><code>decoy</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-decoy">713</a></td><td>The decoy passphrase: what it is, and what it is not.</td></tr>
-<tr><td><code>install</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-install">732</a></td><td>Installed or portable, and the offer that follows from it.</td></tr>
-<tr><td><code>settings_headings</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-settings_headings">786</a></td><td>Every heading in Settings, and what it covers.</td></tr>
-<tr><td><code>heading</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-heading">802</a></td><td>A stop&#x27;s title.</td></tr>
-<tr><td><code>secret</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-secret">808</a></td><td>A password field.</td></tr>
-<tr><td><code>Press</code> <sub>enum</sub></td><td><a href="tour.src.html#fn-press">826</a></td><td>What a frame of the card asked for.</td></tr>
+<tr><td><code>Stage::settled</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-stage-settled">255</a></td><td>Whether a finished tour leaves this stop with nothing further to say.</td></tr>
+<tr><td><code>Stage::applies</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-stage-applies">276</a></td><td>Whether this stop has anything to say, given what is already set up.</td></tr>
+<tr><td><code>Already</code> <sub>pub struct</sub></td><td><a href="tour.src.html#fn-already">299</a></td><td>What is already true, so the tour can leave out what it would only repeat.</td></tr>
+<tr><td><code>stages</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-stages">315</a></td><td>Every stop, in the order a reader meets them.</td></tr>
+<tr><td><code>Tour</code> <sub>pub struct</sub></td><td><a href="tour.src.html#fn-tour">329</a></td><td>Where the tour is up to.</td></tr>
+<tr><td><code>all_keys</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-all_keys">354</a></td><td>Every stop&#x27;s name.</td></tr>
+<tr><td><code>keys_settled</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-keys_settled">365</a></td><td>The stops a finished tour has settled, for storing.</td></tr>
+<tr><td><code>Tour::start</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-start">375</a></td><td>Start the tour from the beginning, showing every stop that applies.</td></tr>
+<tr><td><code>Tour::start_new_only</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-start_new_only">398</a></td><td>Start it showing only the stops that are not in known.</td></tr>
+<tr><td><code>Tour::running</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-running">415</a></td><td>Whether the tour is on screen.</td></tr>
+<tr><td><code>Tour::stop</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-stop">420</a></td><td>Stop it, and wipe anything typed into it.</td></tr>
+<tr><td><code>Tour::wipe</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-tour-wipe">432</a></td><td>Clear the typed passphrase fields.</td></tr>
+<tr><td><code>Tour::restart</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-restart">448</a></td><td>Start it again from the beginning, because somebody asked.</td></tr>
+<tr><td><code>Tour::overlay</code> <sub>pub fn</sub></td><td><a href="tour.src.html#fn-tour-overlay">463</a></td><td>Draw the current stop over the window.</td></tr>
+<tr><td><code>Tour::body</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-tour-body">576</a></td><td>What one stop says, and what it offers.</td></tr>
+<tr><td><code>Tour::app_lock</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-tour-app_lock">606</a></td><td>The app lock, offered to somebody who has not set one.</td></tr>
+<tr><td><code>Outcome</code> <sub>pub enum</sub></td><td><a href="tour.src.html#fn-outcome">672</a></td><td>What the window should do once the tour is out of the way.</td></tr>
+<tr><td><code>Outcome::finished</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-outcome-finished">689</a></td><td>Finished, with nowhere in particular to go.</td></tr>
+<tr><td><code>at_rest</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-at_rest">700</a></td><td>At-rest encryption: on, and what that means.</td></tr>
+<tr><td><code>decoy</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-decoy">750</a></td><td>The decoy passphrase: what it is, and what it is not.</td></tr>
+<tr><td><code>install</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-install">779</a></td><td>Installed or portable, and the offer that follows from it.</td></tr>
+<tr><td><code>settings_headings</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-settings_headings">833</a></td><td>Every heading in Settings, and what it covers.</td></tr>
+<tr><td><code>heading</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-heading">849</a></td><td>A stop&#x27;s title.</td></tr>
+<tr><td><code>secret</code> <sub>fn</sub></td><td><a href="tour.src.html#fn-secret">855</a></td><td>A password field.</td></tr>
+<tr><td><code>Press</code> <sub>enum</sub></td><td><a href="tour.src.html#fn-press">873</a></td><td>What a frame of the card asked for.</td></tr>
 </tbody></table>
 </section>
 </div></div>

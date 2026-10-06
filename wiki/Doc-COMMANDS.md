@@ -43,7 +43,7 @@ This page is the whole of the command line, in the program's own order, with wha
 | [`veilvoice mandate`](#veilvoice-mandate) | The two things VeilVoice insists on, unless you say otherwise | command line only |
 | [`veilvoice conversation`](#veilvoice-conversation) | A recording with several people in it: a voice each, and subtitles | **Group** tab |
 | [`veilvoice capture`](#veilvoice-capture) | Which screen recorders are running, and which you meant to run | **Monitor** tab |
-| [`veilvoice decoy`](#veilvoice-decoy) | A second passphrase that opens an empty VeilVoice, and its limits | command line only |
+| [`veilvoice decoy`](#veilvoice-decoy) | A second passphrase that opens an empty VeilVoice, and its limits | **Lock** tab |
 | [`veilvoice failsafe`](#veilvoice-failsafe) | The safety catch: what it watches for, and what it cannot do | **Studio** tab |
 | [`veilvoice privilege`](#veilvoice-privilege) | What VeilVoice is running with, and what that lets it see | command line only |
 | [`veilvoice appctl`](#veilvoice-appctl) | Learn what normally runs here, then notice what does not | command line only |
@@ -339,7 +339,7 @@ veilvoice capture status
 
 A second passphrase that opens an empty VeilVoice, for complying with somebody standing over you: set it, change it, remove it, or ask whether one is set and whether its record still reads. It does not give you deniability, since this feature is documented and the program is open source, and no passphrase destroys anything.
 
-**In the window:** nothing, and that is deliberate: a decoy passphrase offered by the interface is not a decoy. The **Browser** can fill the folder with decoy vaults, which is the other half of the same idea.
+**In the window:** the **Lock** tab, behind the app lock and not on the lock screen: a lock screen that offered a second passphrase would have announced that there is one. It has the same three actions and prints the same two notes about what a decoy is worth. The **Browser** can fill the folder with decoy vaults, which is the other half of the same idea.
 
 ```bash
 veilvoice decoy

@@ -312,9 +312,13 @@ NOTES = {
                "still reads. It does not give you deniability, since this "
                "feature is documented and the program is open source, and no "
                "passphrase destroys anything.",
-        "window": (None, "a decoy passphrase offered by the interface is not "
-                   "a decoy. The **Browser** can fill the folder with decoy "
-                   "vaults, which is the other half of the same idea"),
+        "window": ("lock", "the **Lock** tab, behind the app lock and not on "
+                   "the lock screen: a lock screen that offered a second "
+                   "passphrase would have announced that there is one. It has "
+                   "the same three actions and prints the same two notes about "
+                   "what a decoy is worth. The **Browser** can fill the folder "
+                   "with decoy vaults, which is the other half of the same "
+                   "idea"),
         "example": "veilvoice decoy",
     },
     "failsafe": {

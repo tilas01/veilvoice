@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/decoy.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 897 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 907 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs)
 
 ## Contents
 
@@ -113,7 +113,7 @@ that claimed to would be lying to you at the worst possible moment.
 
 ## What this file contains
 
-897 lines defining **17 functions** (9 public), **6 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+907 lines defining **17 functions** (9 public), **6 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -135,7 +135,7 @@ that claimed to would be lying to you at the worst possible moment.
   - reaches: `create`, `prove`
 - `Store::remove` (line 453) -- Remove the decoy passphrase, after proving the real one.
   - reaches: `prove`
-- `Store::judge` (line 485) -- Which passphrase was typed.
+- `Store::judge` (line 495) -- Which passphrase was typed.
   - reaches: `nothing`
 
 ## What calls what
@@ -168,7 +168,7 @@ flowchart TD
     n_set(["Store::set<br/>line 435"])
     n_remove(["Store::remove<br/>line 453"])
     n_prove["Store::prove<br/>line 461"]
-    n_judge(["Store::judge<br/>line 485"])
+    n_judge(["Store::judge<br/>line 495"])
     n_here --> n_at
     n_judge --> n_nothing
     n_matches --> n_constant_time_eq
@@ -191,7 +191,7 @@ flowchart TD
     click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L435" "open the source"
     click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L453" "open the source"
     click n_prove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L461" "open the source"
-    click n_judge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L485" "open the source"
+    click n_judge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L495" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_parse,n_here,n_state,n_set,n_remove,n_judge entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -232,6 +232,6 @@ flowchart TD
 | `Store::set` <sub>pub fn</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L435) | Set or replace the decoy passphrase. |
 | `Store::remove` <sub>pub fn</sub> | [453](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L453) | Remove the decoy passphrase, after proving the real one. |
 | `Store::prove` <sub>fn</sub> | [461](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L461) | That real really is this machine's passphrase. |
-| `Store::judge` <sub>pub fn</sub> | [485](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L485) | Which passphrase was typed. |
-| `SCOPE` <sub>pub const</sub> | [515](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L515) | What a decoy is worth, in the words a front end must show. |
-| `WHY_NO_DESTRUCTION` <sub>pub const</sub> | [528](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L528) | Why no passphrase destroys anything, and why that is the honest choice. |
+| `Store::judge` <sub>pub fn</sub> | [495](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L495) | Which passphrase was typed. |
+| `SCOPE` <sub>pub const</sub> | [525](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L525) | What a decoy is worth, in the words a front end must show. |
+| `WHY_NO_DESTRUCTION` <sub>pub const</sub> | [538](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L538) | Why no passphrase destroys anything, and why that is the honest choice. |

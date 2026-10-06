@@ -247,6 +247,25 @@ impl Stage {
         }
     }
 
+    /// Whether a finished tour leaves this stop with nothing further to say.
+    ///
+    /// True for a stop that was shown, and for one skipped because what it
+    /// offers is already done. False for one skipped because it cannot be
+    /// offered yet: see [`keys_settled`], which is what this exists for.
+    fn settled(self, already: &Already) -> bool {
+        if self.applies(already) {
+            return true;
+        }
+        match self {
+            // Skipped for want of an app lock to be a second passphrase to.
+            // Storing it would mean that the day somebody sets a lock, the one
+            // card that says what a decoy is worth is never shown to them.
+            Self::Decoy => false,
+            // Every other skip is an answer.
+            _ => true,
+        }
+    }
+
     /// Whether this stop has anything to say, given what is already set up.
     ///
     /// This is the "adapts to what is already set rather than asking again"
@@ -260,11 +279,10 @@ impl Stage {
             // about what it is worth is on the Lock tab, which the reader has
             // already been to.
             Self::AppLock => !already.app_lock,
-            // The decoy passphrase is offered where one can be set. Nothing
-            // yet can: `veilvoice_crypto::decoy` is written and tested and
-            // nothing stores a pair, which is roadmap item 173's half of this.
-            // The stop is here, with its words, so that item is a wiring
-            // change rather than a second design.
+            // The decoy passphrase is offered where one can be set, which
+            // since roadmap item 173 means wherever there is an app lock for it
+            // to be a second passphrase to. Offering it without one would
+            // describe a control that would refuse.
             Self::Decoy => already.decoy_can_be_set,
             // The rest always have something to say. At-rest encryption is on
             // by default since roadmap item 170, so its stop reports rather than
@@ -285,7 +303,8 @@ pub struct Already {
     pub installed: bool,
     /// Whether a decoy passphrase can be set at all.
     ///
-    /// False in this release. See [`Stage::applies`].
+    /// True wherever there is an app lock for one to be a second passphrase to.
+    /// See [`Stage::applies`].
     pub decoy_can_be_set: bool,
 }
 
@@ -324,13 +343,31 @@ pub struct Tour {
     lock_requested: bool,
 }
 
-/// Every stop's name, for storing once the tour has run.
+/// Every stop's name.
 ///
 /// The name is historical: this used to be the tab keys and nothing else, and
 /// the settings file still calls the list `toured_tabs` for the reason
 /// [`Stage::key`] gives. What it holds now is every stop.
+///
+/// For what to store once the tour has run, see [`keys_settled`]. The two are
+/// not the same list.
 pub fn all_keys() -> Vec<String> {
     stages().into_iter().map(|stage| stage.key()).collect()
+}
+
+/// The stops a finished tour has settled, for storing.
+///
+/// Not [`all_keys`], and the difference is a whole stop. A stop left out
+/// because it was **already so** has nothing further to say, and storing it is
+/// what stops the next launch offering it again. A stop left out because it
+/// **could not be offered yet** is the opposite: the reader has never been told
+/// what it is, and the day it becomes possible is the day to tell them.
+pub fn keys_settled(already: &Already) -> Vec<String> {
+    stages()
+        .into_iter()
+        .filter(|stage| stage.settled(already))
+        .map(|stage| stage.key())
+        .collect()
 }
 
 impl Tour {
@@ -724,6 +761,16 @@ fn decoy(ui: &mut Ui) -> Press {
         RichText::new(veilvoice_crypto::decoy::WHY_NO_DESTRUCTION)
             .small()
             .color(p::muted()),
+    );
+    ui.add_space(8.0);
+    ui.label(
+        RichText::new(
+            "Set one on the Lock tab, which asks for your real passphrase first. \
+             It is there and not on the lock screen: a lock screen that offered a \
+             second passphrase would have announced that there is one.",
+        )
+        .small()
+        .color(p::muted()),
     );
     Press::Stay
 }
@@ -1125,19 +1172,56 @@ mod tests {
         assert!(tour.running(), "the rest of the walkthrough still runs");
     }
 
-    /// Roadmap item 171. The window has to store every stop, not the ones this
-    /// run happened to show.
+    /// The two kinds of skip, told apart.
+    ///
+    /// A stop skipped because what it offers is already done is settled, and a
+    /// stop skipped because it cannot be offered yet is not. Storing the second
+    /// is how the decoy card went unshown to everybody who had toured before
+    /// roadmap item 173 turned it on.
+    #[test]
+    fn the_decoy_stop_is_not_stored_when_it_could_not_be_offered() {
+        let nothing_set = Already::default();
+        let settled = keys_settled(&nothing_set);
+        assert!(
+            !settled.contains(&Stage::Decoy.key()),
+            "a stop that could not be offered was stored as though it had been"
+        );
+        // Everything else was either shown or already answered.
+        for stage in stages() {
+            if stage == Stage::Decoy {
+                continue;
+            }
+            assert!(
+                settled.contains(&stage.key()),
+                "{stage:?} was left out, so it will be offered again next launch"
+            );
+        }
+
+        let with_a_lock = Already {
+            app_lock: true,
+            decoy_can_be_set: true,
+            ..Already::default()
+        };
+        assert_eq!(
+            keys_settled(&with_a_lock),
+            all_keys(),
+            "with a lock set, every stop is either shown or answered"
+        );
+    }
+
+    /// Roadmap item 171. The window stores the stops this run settled, not the
+    /// ones it happened to show.
     ///
     /// A stop left out because it was already answered has nothing left to
     /// say, and storing it is what stops the next launch offering it. Storing
     /// only what was shown means somebody who set a password before their
     /// first tour is asked to set one on every launch after it.
     #[test]
-    fn the_window_stores_every_stop_rather_than_the_ones_it_showed() {
+    fn the_window_stores_every_stop_it_settled_rather_than_the_ones_it_showed() {
         let app = include_str!("app.rs").replace("\r\n", "\n");
         assert!(
-            app.contains("mark_toured(&crate::tour::all_keys())"),
-            "the window stores something other than the whole list"
+            app.contains("mark_toured(&crate::tour::keys_settled(&already))"),
+            "the window stores something other than the settled list"
         );
         assert!(
             app.contains("show.and_then(Tab::from_key)"),
