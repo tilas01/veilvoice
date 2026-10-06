@@ -21,10 +21,11 @@ machine other than the one it was written on: the signing key decides where.
 For every commit in the range: author and committer become tilas01, with their
 original dates; the message loses any co-author or session trailer and any
 assistant name, by the replacements in `REWORD`; a title that names the wrong
-finding is corrected, by `TITLE`; a title run straight into the lines below it
-gets the blank line it was missing; a commit hash quoted in a message is
-translated to the rewritten commit it named; and the commit is signed with the
-key given, or left unsigned.
+finding is corrected, by `TITLE`, and a number in a body likewise, by `BODY`;
+a title run straight into the lines below it gets the blank line it was
+missing; a commit hash quoted in a message is translated to the rewritten
+commit it named; and the commit is signed with the key given, or left
+unsigned.
 
 The tree of every commit is byte for byte what it was. That is checked, commit
 by commit, before anything is pushed, and it is what keeps a build of any
@@ -92,6 +93,14 @@ REWORD = [
 TITLE = {
     "262307427dc6b3062c0252e4115aaebfa697f995": ("F-227:", "F-228:"),
     "b73ddd34bb08e74562f15aa13d6a29797b129d7a": ("F-233:", "F-234:"),
+    "d1ed9d536f2f2906f01a2bf55b12180831ba518b": ("F-247:", "F-248:"),
+}
+
+# Finding numbers in a message body that the write-ups landed under others.
+# Each replacement must match exactly once in that commit's body.
+BODY = {
+    "cb9a6da6fb43d5f761061134b14ef461f3e15e51": [("- F-238. ", "- F-247. "),
+                                                 ("- F-237. ", "- F-246. ")],
 }
 
 
@@ -129,6 +138,11 @@ def reword(message, mapping, sha=None):
         if not lines[0].startswith(wrong):
             raise SystemExit("%s no longer starts %r; TITLE is stale" % (sha[:10], wrong))
         lines[0] = right + lines[0][len(wrong):]
+    for wrong, right in BODY.get(sha, []):
+        hits = [n for n, line in enumerate(lines) if n and wrong in line]
+        if len(hits) != 1:
+            raise SystemExit("%s: %r found %d times; BODY is stale" % (sha[:10], wrong, len(hits)))
+        lines[hits[0]] = lines[hits[0]].replace(wrong, right, 1)
     if len(lines) > 1 and lines[1].strip():
         lines.insert(1, "")
     text = "\n".join(lines)

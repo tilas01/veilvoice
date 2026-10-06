@@ -746,7 +746,7 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
-### F-247: two commits ran their body into their title, and nothing checked the shape of a message
+### F-248: two commits ran their body into their title, and nothing checked the shape of a message
 
 **Where:** `tools/audit/authorship.py`, which reads every commit about to be
 pushed and every commit a push carries, and checked who made it, what its
@@ -10523,7 +10523,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and forty-seven defects found and fixed (F-1 to F-247), across
+**Two hundred and forty-eight defects found and fixed (F-1 to F-248), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
