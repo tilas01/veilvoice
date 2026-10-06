@@ -162,10 +162,13 @@ passphrase and nothing about any audio. That list is in the panel too, because
 
 **The BSDs get the command line only, and the reason is specific.** The audio
 library VeilVoice uses has no backend for them, so live capture cannot work
-there and the desktop application is built around a window that would have
-nothing to listen to. Everything that operates on a file, meaning
-de-identification, encryption, metadata cleaning and verification, is pure Rust
-and runs exactly as it does anywhere else.
+there. Everything that operates on a file, meaning de-identification,
+encryption, metadata cleaning and verification, is pure Rust and runs exactly
+as it does anywhere else. The window can be built there without live audio, and
+a build like that says so at the top of the Studio tab before anything is
+pressed, leaves out the controls that could only refuse, and greys out
+**play** in the Browser with the reason beside it. No release has shipped that
+window yet, which is why the table says `not shipped`.
 
 **WSL is Linux**, so the command line runs unchanged. The window needs WSLg,
 which recent Windows has by default. A microphone belongs to Windows rather

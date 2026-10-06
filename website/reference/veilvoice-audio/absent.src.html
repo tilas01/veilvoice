@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-audio/src/absent.rs</code></h1>
-<p style="color:var(--muted)"><a href="absent.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 309 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="absent.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 314 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -387,8 +387,13 @@
 <span class="ln" id="L305">        <span class="tok-fn">said</span>(playback::<span class="tok-fn">start</span>(vec![<span class="tok-num">0.0</span>; <span class="tok-num">4</span>], <span class="tok-num">48_000</span>, None).<span class="tok-fn">err</span>().<span class="tok-fn">unwrap</span>());</span>
 <span class="ln" id="L306">        assert!(devices::<span class="tok-fn">find_virtual_cable</span>().<span class="tok-fn">is_none</span>());</span>
 <span class="ln" id="L307">        <span class="tok-kw">const</span> { assert!(!<span class="tok-kw">crate</span>::CAN_CAPTURE) };</span>
-<span class="ln" id="L308">    }</span>
-<span class="ln" id="L309">}</span>
+<span class="ln" id="L308">        assert_eq!(</span>
+<span class="ln" id="L309">            <span class="tok-kw">crate</span>::WHY_NO_CAPTURE,</span>
+<span class="ln" id="L310">            <span class="tok-fn">Some</span>(REASON),</span>
+<span class="ln" id="L311">            <span class="tok-str">&quot;the notice shown up front and the refusal say different things&quot;</span></span>
+<span class="ln" id="L312">        );</span>
+<span class="ln" id="L313">    }</span>
+<span class="ln" id="L314">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

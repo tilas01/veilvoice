@@ -1267,3 +1267,34 @@ fn a_decoy_round_that_fails_does_not_finish_its_bar() {
         "the bar claims progress that did not happen"
     );
 }
+
+/// **Roadmap item 162.** A build that cannot capture says so, in the words it
+/// was given, and a build that can draws nothing extra.
+#[test]
+fn a_build_without_capture_says_so_before_anything_is_pressed() {
+    let ctx = egui::Context::default();
+    let mut said = None;
+    let output = crate::headless_frame(&ctx, Default::default(), |ui| {
+        said = Some(cannot_capture(ui, Some("no backend for this system")));
+    });
+    assert_eq!(said, Some(true));
+    let text = format!("{:?}", output.shapes);
+    assert!(
+        text.contains("no backend for this system"),
+        "the reason was not drawn"
+    );
+    assert!(
+        text.contains("Browser tab"),
+        "what still works was not said"
+    );
+
+    let mut said = None;
+    let output = crate::headless_frame(&ctx, Default::default(), |ui| {
+        said = Some(cannot_capture(ui, None));
+    });
+    assert_eq!(said, Some(false));
+    assert!(
+        output.shapes.is_empty(),
+        "a build that can capture was shown a notice"
+    );
+}

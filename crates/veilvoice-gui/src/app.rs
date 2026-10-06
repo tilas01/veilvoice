@@ -2064,6 +2064,11 @@ impl VeilVoiceApp {
 
     /// Draw the Recording Studio: record into the vault, veiled on the way in.
     fn studio_tab(&mut self, ui: &mut egui::Ui, motion: crate::prefs::Motion) {
+        // Roadmap item 162: a build with no live audio says so here, and draws
+        // none of the controls that could only refuse.
+        if crate::studio::cannot_capture(ui, veilvoice_audio::WHY_NO_CAPTURE) {
+            return;
+        }
         let veiling = self.studio.is_veiling();
 
         ui.add_space(4.0);

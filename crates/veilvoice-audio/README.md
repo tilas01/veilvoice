@@ -80,8 +80,8 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>278 lines"])
-    n_absent["absent.rs<br/>309 lines"]
+    n_lib(["lib.rs<br/>301 lines"])
+    n_absent["absent.rs<br/>314 lines"]
     n_devices["devices.rs<br/>383 lines"]
     n_io["io.rs<br/>574 lines"]
     n_kinds["kinds.rs<br/>190 lines"]
@@ -119,18 +119,18 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`absent.rs`](../../docs/files/veilvoice-audio/absent.md) | 309 | The live modules, in a build that has no live capture. |
+| [`absent.rs`](../../docs/files/veilvoice-audio/absent.md) | 314 | The live modules, in a build that has no live capture. |
 | [`devices.rs`](../../docs/files/veilvoice-audio/devices.md) | 383 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 574 | Reading and writing audio files. |
 | [`kinds.rs`](../../docs/files/veilvoice-audio/kinds.md) | 190 | What the live path reports, kept apart from the live path itself. |
-| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 278 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
+| [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 301 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 870 | Live microphone scrambling. |
 | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 166 | The scale a level meter is drawn on. |
 | [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | 219 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
 | [`room.rs`](../../docs/files/veilvoice-audio/room.md) | 555 | Roadmap item 147. |
 
-**2,399 functional lines of Rust** in this crate. A functional line is a line
+**2,412 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -167,6 +167,8 @@ counts blank lines and comments too. Both are produced by
 | `enum Direction` | [`kinds.rs`](../../docs/files/veilvoice-audio/kinds.md) | Which direction a device carries audio. |
 | `struct DeviceInfo` | [`kinds.rs`](../../docs/files/veilvoice-audio/kinds.md) | A device the user can choose. |
 | `const CAN_CAPTURE` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | Whether this build can capture and play sound. |
+| `const WHY_NO_CAPTURE` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | Why this build cannot capture, in the words a person reads, or None when it can. |
+| `const WHY_NO_CAPTURE` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | Why this build cannot capture, in the words a person reads, or None when it can. |
 | `const VERSION` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | Crate version string, surfaced in the About panel. |
 | `enum Error` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | Everything that can go wrong in this crate. |
 | `fn deidentify` | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | De-identify a whole buffer of audio in one call. |
