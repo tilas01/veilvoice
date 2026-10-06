@@ -1529,11 +1529,16 @@ impl eframe::App for VeilVoiceApp {
                 self.tour
                     .overlay(ctx, &mut self.preferences, &mut self.security, &already);
             if let crate::tour::Outcome::Finished { show } = outcome {
-                // Every stop, not the ones this run happened to show. A stop
-                // left out because it was already answered has nothing left to
-                // say, and storing it is what stops the next launch offering
-                // it again.
-                self.preferences.mark_toured(&crate::tour::all_keys());
+                // Every stop this run settled, which is more than the ones it
+                // showed and less than all of them. A stop left out because it
+                // was already answered has nothing left to say, and storing it
+                // is what stops the next launch offering it again. A stop left
+                // out because it could not be offered yet has never been seen,
+                // and storing that one is how the decoy card went unshown for
+                // everybody who had toured before roadmap item 173 turned it
+                // on. `keys_settled` is where the difference is written down.
+                self.preferences
+                    .mark_toured(&crate::tour::keys_settled(&already));
                 if let Some(tab) = show.and_then(Tab::from_key) {
                     self.tab = tab;
                 }
@@ -2480,15 +2485,15 @@ impl VeilVoiceApp {
     /// because the app lock can be set while the tour is on screen: the stop
     /// that sets it watches this answer to know the worker has finished.
     ///
-    /// `decoy_can_be_set` is false here and not a preference, because nothing
-    /// in the workspace stores a decoy pair yet. `veilvoice_crypto::decoy` is
-    /// written and tested and wired to nothing, which is roadmap item 173's
-    /// half of it; this is the one line that turns the stop on when it is.
+    /// **Roadmap item 173.** `decoy_can_be_set` is the app lock, because a
+    /// decoy is a second passphrase for it and there is nothing for it to be
+    /// second to until one is set. Not a preference: what the stop needs to
+    /// know is whether the Lock tab's control would work, and that is this.
     fn tour_already(&self) -> crate::tour::Already {
         crate::tour::Already {
             app_lock: self.security.has_lock(),
             installed: self.setup.running_installed(),
-            decoy_can_be_set: false,
+            decoy_can_be_set: self.security.decoy_can_be_set(),
         }
     }
 

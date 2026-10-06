@@ -482,6 +482,16 @@ impl Store {
     /// answers without deriving anything. That is deliberate and it is not a
     /// leak: a cooldown announces itself anyway, in words, to whoever is looking
     /// at the screen.
+    ///
+    /// **A decoy opens during a cooldown.** The decoy is derived and compared
+    /// before the real lock is consulted, and the branch that answers
+    /// [`Opened::Decoy`] never reaches [`crate::lock::LockStore::unlock`], so
+    /// the rate limit does not apply to it. That is the right way round. The
+    /// moment somebody needs this feature is the moment they are least able to
+    /// wait out a delay, and a fumbled real passphrase a minute earlier is
+    /// exactly how they would arrive at it. What it costs is that the decoy
+    /// itself is not rate limited, and what that buys an attacker is a full
+    /// Argon2id run per guess at a passphrase that opens nothing.
     pub fn judge(&self, lock: &mut crate::lock::LockStore, given: &str) -> Result<Opened, Error> {
         let record = match self.vault.load_decoy() {
             Some(record) => record,

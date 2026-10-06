@@ -112,7 +112,7 @@ flowchart TD
     n_aead["aead.rs<br/>280 lines"]
     n_amnesia["amnesia.rs<br/>472 lines"]
     n_container["container.rs<br/>627 lines"]
-    n_decoy["decoy.rs<br/>897 lines"]
+    n_decoy["decoy.rs<br/>907 lines"]
     n_hoard["hoard.rs<br/>1099 lines"]
     n_hybrid["hybrid.rs<br/>531 lines"]
     n_kdf["kdf.rs<br/>633 lines"]
@@ -169,7 +169,7 @@ flowchart TD
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 280 | Authenticated encryption with XChaCha20-Poly1305. |
 | [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 472 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 627 | The .veil encrypted container format. |
-| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 897 | A second passphrase that opens a different, empty VeilVoice. |
+| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 907 | A second passphrase that opens a different, empty VeilVoice. |
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 531 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 633 | Password-based key derivation with Argon2id. |

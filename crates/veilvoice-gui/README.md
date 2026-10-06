@@ -96,7 +96,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>1546 lines"])
     n_main(["main.rs<br/>269 lines"])
-    n_app["app.rs<br/>3680 lines"]
+    n_app["app.rs<br/>3685 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>305 lines"]
     n_crashlog["crashlog.rs<br/>448 lines"]
@@ -121,14 +121,14 @@ flowchart TD
     n_progress["progress.rs<br/>539 lines"]
     n_reduced_motion["reduced_motion.rs<br/>285 lines"]
     n_reset["reset.rs<br/>576 lines"]
-    n_security["security.rs<br/>2622 lines"]
+    n_security["security.rs<br/>3170 lines"]
     n_settings["settings.rs<br/>1686 lines"]
     n_setup["setup.rs<br/>1144 lines"]
     n_soundbar["soundbar.rs<br/>782 lines"]
     n_storage["storage.rs<br/>661 lines"]
     n_studio["studio.rs<br/>2844 lines"]
     n_theme["theme.rs<br/>813 lines"]
-    n_tour["tour.rs<br/>1237 lines"]
+    n_tour["tour.rs<br/>1321 lines"]
     n_updates["updates.rs<br/>276 lines"]
     n_vault_store["vault_store.rs<br/>807 lines"]
     n_verify["verify.rs<br/>1836 lines"]
@@ -322,7 +322,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3680 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3685 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 305 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 448 | Make a failure that produces no output produce some. |
@@ -349,21 +349,21 @@ flowchart TD
 | [`progress.rs`](../../docs/files/veilvoice-gui/progress.md) | 539 | How far through a job is, in the two cases that exist: the ones that can honestly say, and the ones that cannot. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 285 | Whether the operating system has been asked to reduce motion. |
 | [`reset.rs`](../../docs/files/veilvoice-gui/reset.md) | 576 | Starting again from the window: what would go, then going. |
-| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 2622 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 3170 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1686 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 782 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 661 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2844 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 813 | Colour schemes for the desktop app. |
-| [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 1237 | The short walkthrough on a first run, and after an upgrade. |
+| [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 1321 | The short walkthrough on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 276 | The manual update check, as the window shows it. |
 | [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | 807 | Where the desktop application keeps its own files, and what the app lock buys for them. |
 | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1836 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 249 | How big the window opens, and why it is not a constant. |
 
-**23,404 functional lines of Rust** in this crate. A functional line is a line
+**23,853 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -534,7 +534,8 @@ counts blank lines and comments too. Both are produced by
 | `struct Already` | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | What is already true, so the tour can leave out what it would only repeat. |
 | `fn stages` | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | Every stop, in the order a reader meets them. |
 | `struct Tour` | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | Where the tour is up to. |
-| `fn all_keys` | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | Every stop's name, for storing once the tour has run. |
+| `fn all_keys` | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | Every stop's name. |
+| `fn keys_settled` | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | The stops a finished tour has settled, for storing. |
 | `enum Outcome` | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | What the window should do once the tour is out of the way. |
 | `struct Updates` | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | The panel's state. |
 | `mod records` | [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | The logical names of every record the application keeps. |

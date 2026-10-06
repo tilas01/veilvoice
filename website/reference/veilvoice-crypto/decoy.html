@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/decoy.svg" alt="decoy.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/decoy.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 897 lines &middot; <a href="decoy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 907 lines &middot; <a href="decoy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for-and-what-it-is-honestly-worth">What this is for, and what it is honestly worth</a>
@@ -105,7 +105,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>897 lines defining <strong>17 functions</strong> (9 public), <strong>6 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>907 lines defining <strong>17 functions</strong> (9 public), <strong>6 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Opened</code> <span style="color:var(--muted)">line 101</span> &middot; Which passphrase was given.</li>
 <li><code>struct Verifier</code> <span style="color:var(--muted)">line 112</span> &middot; One passphrase&#x27;s stored form.</li>
@@ -130,7 +130,7 @@
 <li><code>Store::remove</code> <span style="color:var(--muted)">line 453</span> &middot; Remove the decoy passphrase, after proving the real one.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>prove</code></span>
 </li>
-<li><code>Store::judge</code> <span style="color:var(--muted)">line 485</span> &middot; Which passphrase was typed.
+<li><code>Store::judge</code> <span style="color:var(--muted)">line 495</span> &middot; Which passphrase was typed.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>nothing</code></span>
 </li>
 </ul>
@@ -237,7 +237,7 @@
 <a href="decoy.src.html#fn-store-judge">
 <rect x="262.1" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="324.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Store::judge</text>
-<text x="324.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 485</text>
+<text x="324.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 495</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -272,7 +272,7 @@ flowchart TD
     n_set([&quot;Store::set&lt;br/&gt;line 435&quot;])
     n_remove([&quot;Store::remove&lt;br/&gt;line 453&quot;])
     n_prove[&quot;Store::prove&lt;br/&gt;line 461&quot;]
-    n_judge([&quot;Store::judge&lt;br/&gt;line 485&quot;])
+    n_judge([&quot;Store::judge&lt;br/&gt;line 495&quot;])
     n_here --&gt; n_at
     n_judge --&gt; n_nothing
     n_matches --&gt; n_constant_time_eq
@@ -295,7 +295,7 @@ flowchart TD
     click n_set href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L435&quot; &quot;open the source&quot;
     click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L453&quot; &quot;open the source&quot;
     click n_prove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L461&quot; &quot;open the source&quot;
-    click n_judge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L485&quot; &quot;open the source&quot;
+    click n_judge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L495&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_parse,n_here,n_state,n_set,n_remove,n_judge entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -334,9 +334,9 @@ flowchart TD
 <tr><td><code>Store::set</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-set">435</a></td><td>Set or replace the decoy passphrase.</td></tr>
 <tr><td><code>Store::remove</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-remove">453</a></td><td>Remove the decoy passphrase, after proving the real one.</td></tr>
 <tr><td><code>Store::prove</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-store-prove">461</a></td><td>That real really is this machine&#x27;s passphrase.</td></tr>
-<tr><td><code>Store::judge</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-judge">485</a></td><td>Which passphrase was typed.</td></tr>
-<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-scope">515</a></td><td>What a decoy is worth, in the words a front end must show.</td></tr>
-<tr><td><code>WHY_NO_DESTRUCTION</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-why_no_destruction">528</a></td><td>Why no passphrase destroys anything, and why that is the honest choice.</td></tr>
+<tr><td><code>Store::judge</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-judge">495</a></td><td>Which passphrase was typed.</td></tr>
+<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-scope">525</a></td><td>What a decoy is worth, in the words a front end must show.</td></tr>
+<tr><td><code>WHY_NO_DESTRUCTION</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-why_no_destruction">538</a></td><td>Why no passphrase destroys anything, and why that is the honest choice.</td></tr>
 </tbody></table>
 </section>
 </div></div>

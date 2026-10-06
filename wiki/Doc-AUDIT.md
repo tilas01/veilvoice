@@ -746,6 +746,41 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-249: the tour stored a stop it had never shown, so the decoy card would have reached nobody who had already toured
+
+Found while wiring roadmap item 173's window half, by reading what the window
+stores when the walkthrough finishes.
+
+`crate::tour::Stage::applies` leaves a stop out for two different reasons, and
+`app.rs` stored both as though they were one. A stop can be left out because
+what it offers is already done, which is an answer: the app-lock stop is not
+shown to somebody who already has a lock, and storing its name is what stops
+the next launch offering it again. Or it can be left out because it cannot be
+offered at all yet, which is the opposite. The decoy stop was gated on
+`Already::decoy_can_be_set`, false in every build up to and including v0.1.22
+because nothing in the window could set a decoy, and
+`mark_toured(&all_keys())` stored its name regardless.
+
+So every reader who finished the walkthrough in a release before this one has
+`setup-decoy` in `toured_tabs`, and `Tour::start_new_only` honours it. Roadmap
+item 173 makes that stop showable. Without this fix it would have been shown to
+new readers only, and the one card that says what a decoy is worth, and that no
+passphrase destroys anything, would never have reached the people already using
+VeilVoice.
+
+`tour::keys_settled` now answers what a finished run settled, `Stage::settled`
+is where the difference between the two kinds of skip is written down, and the
+window stores that. `the_window_stores_every_stop_it_settled_rather_than_the_ones_it_showed`
+reads `app.rs` for the call, and `the_decoy_stop_is_not_stored_when_it_could_not_be_offered`
+drives the two cases through `keys_settled` itself.
+
+**What this does not do is repair a settings file written by an older build.**
+A stored `setup-decoy` cannot be told apart from a stop genuinely seen, so
+dropping it would offer the card again, for ever, to the readers who have seen
+it. The way back for somebody who upgraded is Settings, then *The tour*, which
+shows every stop that applies whatever is stored. That is a smaller remedy than
+the defect, and it is the honest one.
+
 ### F-248: two commits ran their body into their title, and nothing checked the shape of a message
 
 **Where:** `tools/audit/authorship.py`, which reads every commit about to be
@@ -8875,7 +8910,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1890 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1896 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -10523,7 +10558,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and forty-eight defects found and fixed (F-1 to F-248), across
+**Two hundred and forty-nine defects found and fixed (F-1 to F-249), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
