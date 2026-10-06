@@ -40,6 +40,9 @@ message carries no co-author trailer, no session trailer or link, no
 "generated with" footer, and no assistant or model name anywhere, because
 credit for assistance lives in the README and the website footer and nowhere
 else.
+And its title stands alone: a message longer than one line has a blank line
+after the first, because git takes everything before the first blank line as
+the title, and a body run on beneath it becomes one enormous title (F-247).
 
 **The signature.** Every commit carries one, made by a key in
 `SIGNING_KEYS`: keys registered to tilas01's GitHub account, which is what
@@ -291,7 +294,14 @@ def commit_faults(cwd, sha, keys=None):
     for role, (name, email) in (("author", author), ("committer", committer)):
         if email in ACCOUNT_EMAILS and ASSISTANT.search(name):
             faults.append("%s name %r names an assistant" % (role, name))
-    for number, line in enumerate(message.split("\n"), 1):
+    # git reads everything up to the first blank line as the title, so a body
+    # that starts on the line after it becomes part of the title: in
+    # `git log --oneline`, in GitHub's commit list and on the releases page.
+    lines = message.split("\n")
+    if len(lines) > 1 and lines[1].strip():
+        faults.append("message line 2 follows the title with no blank line between, "
+                      "so the whole paragraph reads as the title")
+    for number, line in enumerate(lines, 1):
         if TRAILER.search(line):
             faults.append("message line %d carries %r" % (number, line.strip()[:72]))
             continue
@@ -474,6 +484,9 @@ def self_test():
         ("a model by name and number",
          dict(message="Fix\n\nWritten with Opus 5"),
          "names 'Opus 5'"),
+        ("a title run straight into its body",
+         dict(message="Fix\n- the change"),
+         "no blank line"),
         ("an address that is nobody's",
          dict(message="Fix", author=(NAME, "someone@example.com")),
          "not tilas01"),
@@ -499,6 +512,7 @@ def self_test():
         clean = [
             dict(message="The session marker, regenerated with the new seed"),
             dict(message="A sonnet, an opus and a haiku walk into a changelog"),
+            dict(message="A title\n\n- one change\n- and another"),
             dict(message="Edited on the website",
                  author=("Starlight", "95286414+tilas01@users.noreply.github.com"),
                  committer=("GitHub", GITHUB_COMMITTER)),
@@ -510,7 +524,7 @@ def self_test():
                 failures += 1
                 print("    MISSED: a sound commit was refused: %s" % "; ".join(faults))
         if not failures:
-            print("    clean: three sound commits, one of them made by GitHub")
+            print("    clean: four sound commits, one of them made by GitHub")
 
         # Unsigned: reported while signatures are optional, failing once not.
         sha = git(["rev-parse", "HEAD"], where).strip()

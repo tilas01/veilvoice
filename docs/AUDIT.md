@@ -743,6 +743,30 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-247: two commits ran their body into their title, and nothing checked the shape of a message
+
+**Where:** `tools/audit/authorship.py`, which reads every commit about to be
+pushed and every commit a push carries, and checked who made it, what its
+message names and how it is signed, but not how the message is laid out.
+
+**What happened:** ab1fbbc and c95a1ef reached `dev` with the first hyphen line
+of their body on the line straight after the title. git takes everything up to
+the first blank line as the title, so each whole message, 604 and 588
+characters, became its title: one line in `git log --oneline`, one line in
+GitHub's commit list, and one line on the releases page, which builds its
+notes from titles. `docs/CONTRIBUTING.md` already asked for a blank line after
+the title; nothing held anybody to it.
+
+**Fix:** a commit whose message is longer than one line must have a blank second
+line, and the guard refuses one that does not, before it is made into a push
+and again in CI on every commit a push carries. The one-time rewrite of the
+history (`tools/repo/rewrite.py`) gives those two commits the blank line they
+were missing.
+
+**Regression test:** the guard's self-test builds a commit with a hyphen line
+straight under its title and must refuse it, and builds one with the blank line
+and must pass it.
+
 ### F-245: every audio glitch printed and took a lock on the audio thread, and an invalidated stream was not an ended one
 
 Found reading the error callbacks in `crates/veilvoice-audio/src/live.rs` and
