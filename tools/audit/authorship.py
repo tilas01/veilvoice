@@ -42,7 +42,7 @@ credit for assistance lives in the README and the website footer and nowhere
 else.
 And its title stands alone: a message longer than one line has a blank line
 after the first, because git takes everything before the first blank line as
-the title, and a body run on beneath it becomes one enormous title (F-247).
+the title, and a body run on beneath it becomes one enormous title (F-248).
 
 **The signature.** Every commit carries one, made by a key in
 `SIGNING_KEYS`: keys registered to tilas01's GitHub account, which is what
