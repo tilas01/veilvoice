@@ -174,12 +174,6 @@ DOCUMENTS = [
 # claim of the wiki is that it is the whole manual, and a document nobody
 # listed is a document nobody can find.
 NOT_A_WIKI_PAGE = {
-    # Instructions for the assistant sessions that work here, committed so a
-    # fresh clone has them (F-235). They say how to commit, not how to use the
-    # program, and the website's footer is the one place a reader meets the
-    # assistance, so this is not published as a page.
-    "CLAUDE.md":
-        "instructions for the sessions that work here, not a page for a reader",
     "docs/GUIDE_CLI.md":
         "tools/docs/guides.py writes it into the wiki as Guide-command-line",
     "docs/GUIDE_GUI.md":

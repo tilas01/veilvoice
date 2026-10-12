@@ -35,7 +35,7 @@ than named here**: the target of every entry has to be a branch `ci.yml`
 actually builds on a push, and must not be the release branch. Writing `dev`
 into a third file is how this happens a third time.
 
-`CLAUDE.md` asks that a fact existing in more than one place be derived or
+`docs/CONTRIBUTING.md` asks that a fact existing in more than one place be derived or
 checked rather than repeated. The list of directories to monitor exists in the
 configuration and in the tree, and the tree is the one that is true. This is
 the check that keeps them the same.

@@ -523,15 +523,15 @@
 <rect x="20.0" y="5473.5" width="20" height="12" rx="3" fill="var(--ok, #9ece6a)"/>
 <text x="30.0" y="5483.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="9" fill="var(--bg-inset, #16161e)" text-anchor="middle">126</text>
 <text x="48.0" y="5483.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--fg, #c0caf5)">Written so the next pass finds nothing: the practices that pass established</text>
-<text x="48.0" y="5500.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">are now the standing way this project is written, in CLAUDE.md, and three of</text>
-<text x="48.0" y="5517.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">the four are enforced by a build rather than by somebody remembering. No</text>
-<text x="48.0" y="5534.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">audio callback may allocate, block or print, checked by a test that reads</text>
-<text x="48.0" y="5551.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">the callbacks themselves rather than by the comments that said so. Every</text>
-<text x="48.0" y="5568.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">dependency says what it is for on the line that declares it, checked in CI,</text>
-<text x="48.0" y="5585.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">which found three on its first run that no line of code referred to. Work</text>
-<text x="48.0" y="5602.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">that can be done once is done once, and the comment says what made it</text>
-<text x="48.0" y="5619.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">constant. The fourth is a habit and is written as one: the reading happens</text>
-<text x="48.0" y="5636.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">before the push rather than to the tree once a year</text>
+<text x="48.0" y="5500.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">are now the standing way this project is written, in docs/CONTRIBUTING.md,</text>
+<text x="48.0" y="5517.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">and three of the four are enforced by a build rather than by somebody</text>
+<text x="48.0" y="5534.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">remembering. No audio callback may allocate, block or print, checked by a</text>
+<text x="48.0" y="5551.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">test that reads the callbacks themselves rather than by the comments that</text>
+<text x="48.0" y="5568.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">said so. Every dependency says what it is for on the line that declares it,</text>
+<text x="48.0" y="5585.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">checked in CI, which found three on its first run that no line of code</text>
+<text x="48.0" y="5602.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">referred to. Work that can be done once is done once, and the comment says</text>
+<text x="48.0" y="5619.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">what made it constant. The fourth is a habit and is written as one: the</text>
+<text x="48.0" y="5636.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">reading happens before the push rather than to the tree once a year</text>
 <rect x="20.0" y="5650.5" width="20" height="12" rx="3" fill="var(--ok, #9ece6a)"/>
 <text x="30.0" y="5660.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="9" fill="var(--bg-inset, #16161e)" text-anchor="middle">128</text>
 <text x="48.0" y="5660.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--fg, #c0caf5)">The BSDs built twice, like everywhere else: FreeBSD, OpenBSD and NetBSD were</text>
@@ -747,12 +747,12 @@
 <text x="48.0" y="8798.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">not there</text>
 <rect x="20.0" y="8812.5" width="20" height="12" rx="3" fill="var(--ok, #9ece6a)"/>
 <text x="30.0" y="8822.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="9" fill="var(--bg-inset, #16161e)" text-anchor="middle">144</text>
-<text x="48.0" y="8822.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--fg, #c0caf5)">Staleness as an invariant rather than a habit: CLAUDE.md now states that a</text>
-<text x="48.0" y="8839.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">change is not finished until everything describing it has changed with it,</text>
-<text x="48.0" y="8856.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">that a fact appearing twice is derived or checked rather than repeated, and</text>
-<text x="48.0" y="8873.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">that the only exception is a record of the past. Written down because the</text>
-<text x="48.0" y="8890.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">two roadmap items above were the same failure found twice, in different</text>
-<text x="48.0" y="8907.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">files, months apart</text>
+<text x="48.0" y="8822.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--fg, #c0caf5)">Staleness as an invariant rather than a habit: docs/CONTRIBUTING.md now</text>
+<text x="48.0" y="8839.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">states that a change is not finished until everything describing it has</text>
+<text x="48.0" y="8856.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">changed with it, that a fact appearing twice is derived or checked rather</text>
+<text x="48.0" y="8873.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">than repeated, and that the only exception is a record of the past. Written</text>
+<text x="48.0" y="8890.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">down because the two roadmap items above were the same failure found twice,</text>
+<text x="48.0" y="8907.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">in different files, months apart</text>
 <rect x="20.0" y="8921.5" width="20" height="12" rx="3" fill="var(--ok, #9ece6a)"/>
 <text x="30.0" y="8931.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="9" fill="var(--bg-inset, #16161e)" text-anchor="middle">145</text>
 <text x="48.0" y="8931.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--fg, #c0caf5)">The Recording Studio, in full: everything roadmap items 121 to 137 specify,</text>

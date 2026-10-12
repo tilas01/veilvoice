@@ -27,10 +27,14 @@ missing; a commit hash quoted in a message is translated to the rewritten
 commit it named; and the commit is signed with the key given, or left
 unsigned.
 
-The tree of every commit is byte for byte what it was. That is checked, commit
-by commit, before anything is pushed, and it is what keeps a build of any
-rewritten commit identical to a build of the original: the release builds take
-`SOURCE_DATE_EPOCH` from the committer date, and that is kept too.
+The tree of every commit is byte for byte what it was, except that an
+instruction file for an AI assistant (`authorship.ASSISTANT_FILES`: the rules
+file at the root, `.claude/` and the like) is taken out of every commit that
+carried one, so neither branch ever has. That is checked, commit by commit,
+before anything is pushed: the only paths that may differ are those. Neither is
+read by any build, so a build of any rewritten commit is identical to a build
+of the original: the release builds take `SOURCE_DATE_EPOCH` from the committer
+date, and that is kept too.
 
 No tag is touched. Every published release tag points at a commit outside the
 history of both branches, so a rewrite of them moves no release.
@@ -56,7 +60,8 @@ with work on top of the old `dev` moves it across with:
     git rebase --onto origin/dev OLD_DEV_TIP
 
 where OLD_DEV_TIP is the first line this prints. Nothing else is needed: the
-trees are identical, so the rebase has nothing to resolve.
+trees differ only by the instruction files, which nobody's work touches, so the
+rebase has nothing to resolve.
 
 Pure standard library, and GnuPG when signing.
 """
@@ -163,6 +168,24 @@ def reword(message, mapping, sha=None):
     return re.sub(r"\b[0-9a-f]{7,40}\b", translate, text)
 
 
+def stripped(tree, cache={}):
+    """`tree` without any assistant instruction file, as a tree id."""
+    if tree in cache:
+        return cache[tree]
+    paths = [p for p in git(["ls-tree", "-r", "--name-only", tree]).split("\n")
+             if p and authorship.ASSISTANT_FILES.search(p)]
+    if not paths:
+        cache[tree] = tree
+        return tree
+    index = os.path.join(ROOT, ".git", "rewrite-index")
+    env = dict(os.environ, GIT_INDEX_FILE=index)
+    git(["read-tree", tree], env=env)
+    git(["rm", "-q", "--cached", "--"] + paths, env=env)
+    cache[tree] = git(["write-tree"], env=env)
+    os.remove(index)
+    return cache[tree]
+
+
 def wrong(sha, signing):
     """Whether a commit has to be rewritten.
 
@@ -226,7 +249,7 @@ def main():
     for sha in history[first:]:
         message, authored, committed = headers(sha)
         parents = git(["rev-list", "--parents", "-n", "1", sha]).split()[1:]
-        args = list(sign) + [sha + "^{tree}"]
+        args = list(sign) + [stripped(git(["rev-parse", sha + "^{tree}"]))]
         for parent in parents:
             args += ["-p", mapping.get(parent, parent)]
         step = dict(env, GIT_AUTHOR_NAME=authorship.NAME, GIT_AUTHOR_EMAIL=authorship.EMAIL,
@@ -240,8 +263,11 @@ def main():
 
     # Proof before anything leaves this machine.
     for old, new in mapping.items():
-        if git(["rev-parse", old + "^{tree}"]) != git(["rev-parse", new + "^{tree}"]):
-            raise SystemExit("the tree of %s changed in the rewrite; nothing pushed" % old[:10])
+        changed = [p for p in git(["diff-tree", "-r", "--name-only", "--no-renames",
+                                   old, new]).split("\n") if p]
+        if any(not authorship.ASSISTANT_FILES.search(p) for p in changed):
+            raise SystemExit("the tree of %s changed beyond the instruction files in the "
+                             "rewrite; nothing pushed" % old[:10])
     failures, notes = authorship.audit(ROOT, [mapping[s] for s in history[first:]],
                                        required=signing, look_ahead=False)
     if failures:
@@ -258,7 +284,7 @@ def main():
     print("dev   %s -> %s" % (old_dev[:10], new_dev[:10]))
     print("main  %s -> %s%s" % (old_main[:10], new_main[:10],
                                  "" if new_main != old_main else "  (unchanged)"))
-    print("%d commit(s) rewritten from %s, every tree identical, %s"
+    print("%d commit(s) rewritten from %s, every tree identical but for instruction files, %s"
           % (len(mapping), history[first][:10],
              "every one signed with %s" % options.sign if signing else "unsigned"))
     if notes and signing:
