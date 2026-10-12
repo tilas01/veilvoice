@@ -479,11 +479,15 @@ jobs:
 
       # Roadmap item 151. The campaign that produces this list runs weekly in
       # mutants.yml, because half an hour over eight files does not fit here.
-      # This is the part that does: the line numbers in the committed list of
-      # survivors move whenever the code above them moves, and a list pointing
-      # at the wrong lines is worse than no list.
-      - name: Every argued-for surviving mutant must still point at real code
+      # This is the part that does: an entry in the committed list of survivors
+      # names the line it is of, and a list whose lines have been edited under
+      # it is worse than no list. F-250 is why it is the line and not a line
+      # number.
+      - name: Every argued-for surviving mutant must still be about the code it names
         run: python tools/mutants/check.py --lint
+
+      - name: The comparison against the campaign must object to what it says it does
+        run: python tools/mutants/check.py --self-test
 
       # And the other half of the question. Saying what a dependency is for
       # does not make anything watch it: a crate outside the workspace, or a
