@@ -282,11 +282,14 @@ CHECKS = [
      [sys.executable, "tools/audit/build_output.py"]),
     # Roadmap item 151. The mutation campaign itself is weekly, because half an hour
     # does not fit a per-push job. What fits here is the half that does not need
-    # a campaign: every argued-for survivor still points at a real file and a
-    # real line. Those move whenever code above them moves, and without this the
-    # list would quietly point at the wrong lines until the next weekly run.
-    ("every argued-for surviving mutant still points at real code",
+    # a campaign: every argued-for survivor is still about a line that is in the
+    # file, and every file it names is one the campaign runs. Since F-250 an
+    # entry names the line it is of rather than a line number, so this fires
+    # when that line is edited rather than when code above it moves.
+    ("every argued-for surviving mutant is still about the code it names",
      [sys.executable, "tools/mutants/check.py", "--lint"]),
+    ("the comparison against the campaign objects to what it says it does",
+     [sys.executable, "tools/mutants/check.py", "--self-test"]),
     # Beside it, and answering the other question. `dependencies.py` asks
     # whether somebody said why each dependency is here; this asks whether
     # anything is watching it. A manifest outside every Dependabot entry is

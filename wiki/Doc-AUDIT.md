@@ -2590,6 +2590,7 @@ pushing to hourly, and `--lint` cannot tell a stale number from a right one
 because it only asks whether the line exists. Keying each entry on the mutation
 rather than on where it sits would remove the whole class, and is not done here
 because it changes what `check.py` compares and belongs in a round of its own.
+F-250 is that round.
 
 ### F-232: the base-91 encoder's last character was written by a decision nothing tested
 
@@ -2625,6 +2626,77 @@ cannot quietly become a fixed string that nothing produces.
 **Measured after.** All 41 mutants of `base91_encode` are now caught, where the
 campaign had reported one surviving.
 
+
+### F-250: the baseline named each survivor by a line number, and nine of the twenty were pointing at the wrong line
+
+F-227 promised this round and said why: `tools/mutants/survivors.txt` was copied
+straight out of `cargo mutants`, which names a mutant by where it is,
+`<path>:<line>:<column>`, and the comparison against a campaign was a string
+comparison of those names.
+
+**A line number is an address, not an identity.** Insert a paragraph of doc
+comment three hundred lines higher and every entry below it names the wrong
+line, while nothing about any of the mutants has changed. What the comparison
+then does is worse than failing: it reports the same untouched mutant twice
+over, once as a survivor nobody has argued for and once as an argument that no
+longer holds. Both messages are false, and each asks for the opposite of the
+right thing to be done, one for a test to be written and one for the argument to
+be deleted.
+
+**Nine of the twenty entries were in that state when this round read them.**
+Read off `cargo mutants --list` against the same tree the entries sat in:
+
+| the entry said | what is actually on that line | where the mutant is now |
+| --- | --- | --- |
+| `lock.rs:871` `every_copy_current` | `}` | 908 |
+| `lock.rs:888` `open_default`, twice | `fn save(&self) -> Result<bool, Error> {` | 925 |
+| `lock.rs:1072` `portable_dir` | `p` | 1109 |
+| `lock.rs:1127` `is_portable`, twice | `fn choose_base(...)`, a different function | 1164 |
+| `vault.rs:363` `admin_dir`, twice | `///` | 418 |
+| `vault.rs:147` `Vault::at`'s match guard | a comment two lines above the guard | 156 |
+
+`check.py --lint` passed over all nine on every push, because the only thing it
+asked of a line number was whether the file had that many lines. A number in
+range said almost nothing, and said it confidently.
+
+**An entry now names the mutation.** Two lines: the file and what the mutation
+does, then an indented `on:` line carrying the text of the line it does it to.
+None of the three moves when code above it moves, and all of them change when
+the mutated line is edited, which is exactly when the argument above the entry
+needs reading again. `missed.txt` still arrives in cargo-mutants' notation, so
+the line number in it is read once, to look the source line up, and then
+discarded.
+
+**The line text is not decoration, and `KdfParams::checked` is why.** That
+function makes the same comparison three times, once per Argon2 cost, and
+cargo-mutants describes all three identically: `replace > with == in
+KdfParams::checked`. Only the parallelism one is unkillable, and the pair of
+entries for it is F-227's whole subject. Keyed on the file and the description
+alone, an entry for the lane ceiling would match a survivor in the passes
+ceiling and the comparison would pass while the argument above it was false. The
+`on:` line is what tells the three apart.
+
+**Entries are counted rather than matched**, because two mutants can share all
+three parts of the key. `sixbit_encode` has one line with two `|` in it and both
+survive, so that entry appears twice, and killing one of the pair still fails the
+comparison.
+
+**`--lint` has a real job again.** It asks whether the file still contains the
+line the entry is about, which is the question the old check was a weak proxy
+for, and whether the file is one `.github/workflows/mutants.yml` actually
+campaigns. The second is F-227's defect from the other side: a list and a
+campaign that name different files cannot be compared, and nothing noticed for
+two rounds.
+
+**Proved against planted faults rather than asserted.** `check.py --self-test`
+builds nine lists and campaigns, one per fault, and `tools/verify.py` and
+`ci.yml` run it beside the lint. Eight are faults it must object to: an unargued
+survivor, an argument for a mutant that no longer survives, one of a same-line
+pair killed, the same mutation of a sibling line, a mutated line edited out from
+under its argument, an entry for a file the campaign does not run, an entry with
+no `on:` line, and an entry still carrying a line number. The ninth is the one
+it must accept, and it is this finding: a survivor ten lines further down the
+file, which under the old scheme failed twice over.
 
 ## The half that could have damaged a machine
 
@@ -10558,7 +10630,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and forty-nine defects found and fixed (F-1 to F-249), across
+**Two hundred and fifty defects found and fixed (F-1 to F-250), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

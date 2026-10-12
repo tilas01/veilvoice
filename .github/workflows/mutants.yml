@@ -23,8 +23,11 @@
 # a number tells you the number changed; a campaign compared against a
 # committed list of known survivors tells you *which* mutant is new, as a diff
 # somebody reads in a pull request. `tools/mutants/survivors.txt` is that list,
-# and every line in it carries the argument for why that mutant cannot be
-# killed. A new survivor fails this job.
+# and every entry in it carries the argument for why that mutant cannot be
+# killed. An entry names the mutation rather than the line number it was at
+# when a campaign found it, so code moving above a survivor no longer makes
+# this job report the same untouched mutant twice over, once as unargued and
+# once as killed. That is F-250. A new survivor fails this job.
 
 name: mutants
 

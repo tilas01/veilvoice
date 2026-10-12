@@ -23,19 +23,45 @@
 #   3. Reachable only through a self-contradiction. Distinguishing the mutant
 #      needs two things at once that a filesystem will not do together.
 #
-# Format: one cargo-mutants line per entry, exactly as `missed.txt` writes it,
-# with the argument above it.
+# # Format, and why it is not cargo-mutants' own
+#
+# Two lines per entry, with the argument above them:
+#
+#     <path>: <what the mutation does>
+#       on: <the source line it does it to, trimmed>
+#
+# cargo-mutants writes `<path>:<line>:<column>: <what the mutation does>`, and
+# this file used to be copied straight from that. A line number is an address,
+# not an identity: it moves whenever anything above it moves, and nothing in the
+# code has changed when it does. An entry keyed on one is wrong within hours of
+# being written, and wrong in the worst direction, because the comparison then
+# reports the same untouched mutant twice, once as a survivor nobody argued for
+# and once as an argument that no longer holds. Nine of the twenty entries here
+# were pointing at the wrong line, at a closing brace, at a doc comment, at a
+# function three hundred lines from the one named beside it, and the weekly run
+# could not have passed. F-250.
+#
+# So the key is the mutation: the file, what the mutation does, and the line it
+# does it to. All three survive code moving above them and none of them survives
+# the mutated line being edited, which is when the argument needs reading again.
+# The `on:` line is also what a reader wants, since it is the code the argument
+# is about rather than a number to go and look up.
+#
+# Two mutants can share all three, as the six-bit encoder's two below do: one
+# line with two `|` in it. Entries are therefore counted, not merely matched,
+# and killing one of a pair still fails the comparison.
 #
 # **What this list is measured over, and it is every file the campaign runs.**
 # `.github/workflows/mutants.yml` changes ten files a line at a time, and this
 # list has to answer for all ten of them or the weekly run fails on a survivor
-# nobody has argued about. F-186 campaigned four end to end: the app lock 137
-# mutants, the vault 28, the tape 39, and the encodings 463 as six shards of 78.
-# F-180 campaigned four more, the AEAD, the key derivation, the container header
-# and the hybrid combiner, and left the two entries at the end of kind 1 below.
-# The two metadata readers were campaigned to no survivors at all. F-227 is the
-# round that noticed the list held only the first four and that the weekly run
-# therefore could not pass.
+# nobody has argued about. `--lint` checks that every file named here is one of
+# the ten, so the list and the campaign cannot drift apart again. F-186
+# campaigned four end to end: the app lock 137 mutants, the vault 28, the tape
+# 39, and the encodings 463 as six shards of 78. F-180 campaigned four more, the
+# AEAD, the key derivation, the container header and the hybrid combiner, and
+# left the two entries at the end of kind 1 below. The two metadata readers were
+# campaigned to no survivors at all. F-227 is the round that noticed the list
+# held only the first four and that the weekly run therefore could not pass.
 #
 # A single run of the encodings does not finish here, because `cargo mutants`
 # dies on `pthread_create` partway through even at `--jobs 1`; `--shard k/6`
@@ -51,31 +77,41 @@
 
 # The run-length prefix sets the high bit of a length that is at most 127, so
 # the operands have no bit in common and `|` and `^` are the same operation.
-crates/veilvoice-crypto/src/weave.rs:484:39: replace | with ^ in Weave::apply
+crates/veilvoice-crypto/src/weave.rs: replace | with ^ in Weave::apply
+  on: out.push(0x80 | run as u8);
 
 # Both hexadecimal decoders rebuild a byte from two nibbles: the first is
 # shifted into the high four bits, the second occupies the low four, and the
 # two never overlap. `|` and `^` agree on disjoint bits.
-crates/veilvoice-crypto/src/weave.rs:608:54: replace | with ^ in Weave::undo
-crates/veilvoice-crypto/src/weave.rs:631:63: replace | with ^ in Weave::undo
+crates/veilvoice-crypto/src/weave.rs: replace | with ^ in Weave::undo
+  on: out.push((nibble(pair[0])? << 4) | nibble(pair[1])?);
+crates/veilvoice-crypto/src/weave.rs: replace | with ^ in Weave::undo
+  on: out.push((nibble(input[i + 1])? << 4) | nibble(input[i + 2])?);
 
 # The substitution table is built as `((i * 167 + 13) % 256) as u8`. The cast to
 # `u8` already reduces modulo 256, so the `%` is redundant and `+ 256` before a
 # truncating cast changes nothing. Kept in the source because it states the
-# intent; unkillable because the cast does the work either way.
-crates/veilvoice-crypto/src/weave.rs:806:43: replace % with +
+# intent; unkillable because the cast does the work either way. It is the one
+# entry here that cargo-mutants names no function for, because the table is
+# built in a `const` block rather than in a function.
+crates/veilvoice-crypto/src/weave.rs: replace % with +
+  on: table[i] = ((i as u32 * 167 + 13) % 256) as u8;
 
 # The six-bit encoders pack three bytes into one number, each into its own eight
 # bits of a twenty-four bit window. No two of the three share a bit, so `|` and
-# `^` produce the same number.
-crates/veilvoice-crypto/src/weave.rs:1063:41: replace | with ^ in sixbit_encode
-crates/veilvoice-crypto/src/weave.rs:1063:66: replace | with ^ in sixbit_encode
+# `^` produce the same number. Both of the line's two `|` are here, which is why
+# the same entry appears twice.
+crates/veilvoice-crypto/src/weave.rs: replace | with ^ in sixbit_encode
+  on: let n = ((buf[0] as u32) << 16) | ((buf[1] as u32) << 8) | buf[2] as u32;
+crates/veilvoice-crypto/src/weave.rs: replace | with ^ in sixbit_encode
+  on: let n = ((buf[0] as u32) << 16) | ((buf[1] as u32) << 8) | buf[2] as u32;
 
 # The base-91 decoder shifts each new value above whatever is still in the
 # queue, and the queue never holds more than `bits` significant bits: it starts
 # empty, and the loop below shifts eight out at a time until fewer than eight
 # remain. So the two operands are disjoint here as well.
-crates/veilvoice-crypto/src/weave.rs:1051:26: replace | with ^ in base91_decode
+crates/veilvoice-crypto/src/weave.rs: replace | with ^ in base91_decode
+  on: out.push(((queue | (pending as u32) << bits) & 255) as u8);
 
 # Argon2's ceiling on the number of lanes, which can never be the only test in
 # `checked` that fires. The same function enforces Argon2's eight KiB per lane,
@@ -90,8 +126,15 @@ crates/veilvoice-crypto/src/weave.rs:1051:26: replace | with ^ in base91_decode
 # and an overflow. F-180 found these two and wrote the argument into the doc
 # comment above `checked`. F-227 is why they are also here, where the campaign
 # compares against.
-crates/veilvoice-crypto/src/kdf.rs:239:44: replace > with == in KdfParams::checked
-crates/veilvoice-crypto/src/kdf.rs:239:44: replace > with >= in KdfParams::checked
+#
+# `checked` makes the same comparison three times, once per cost, and
+# cargo-mutants describes all three identically. Only the parallelism one is
+# unkillable; tests kill the passes and the memory. The `on:` line is what tells
+# the three apart, and is the reason this file carries one.
+crates/veilvoice-crypto/src/kdf.rs: replace > with == in KdfParams::checked
+  on: if self.p_cost == 0 || self.p_cost > Self::MAX_P_COST {
+crates/veilvoice-crypto/src/kdf.rs: replace > with >= in KdfParams::checked
+  on: if self.p_cost == 0 || self.p_cost > Self::MAX_P_COST {
 
 
 # --- 2. A property of the machine --------------------------------------------
@@ -99,42 +142,52 @@ crates/veilvoice-crypto/src/kdf.rs:239:44: replace > with >= in KdfParams::check
 # `unix_now` negates the duration in the pre-epoch arm, which a machine whose
 # clock reads before 1970 would reach. Deleting the `-` is only observable on
 # such a machine, and a test cannot set the system clock.
-crates/veilvoice-crypto/src/lock.rs:182:19: delete - in unix_now
+crates/veilvoice-crypto/src/lock.rs: delete - in unix_now
+  on: Err(e) => -(e.duration().as_secs().min(i64::MAX as u64) as i64),
 
 # `every_copy_current` answers false only when a vault's administrator-owned
 # spare could not be written, which needs a vault whose spare lives somewhere
 # this process cannot write. Creating that state means either running the test
 # as two users or writing under /etc, and neither belongs in a unit test.
-crates/veilvoice-crypto/src/lock.rs:871:9: replace LockStore::every_copy_current -> bool with true
+crates/veilvoice-crypto/src/lock.rs: replace LockStore::every_copy_current -> bool with true
+  on: self.every_copy_current
 
 # `open_default` reads the real per-user lock location. Distinguishing these
 # means writing a lock into the account's own configuration directory, which is
 # a test with a side effect on the machine that runs it.
-crates/veilvoice-crypto/src/lock.rs:888:5: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, true))
-crates/veilvoice-crypto/src/lock.rs:888:5: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, false))
+crates/veilvoice-crypto/src/lock.rs: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, true))
+  on: let base = default_dir().ok_or(Error::AppLockStore)?;
+crates/veilvoice-crypto/src/lock.rs: replace open_default -> Result<(Option<LockStore>, bool), Error> with Ok((None, false))
+  on: let base = default_dir().ok_or(Error::AppLockStore)?;
 
 # `portable_dir` and `is_portable` answer from a folder beside the running
 # executable. Under `cargo test` that is the test binary in the build
 # directory, so making these answer anything but the default means planting a
 # folder inside `target/`, which a later build removes and which F-185 has just
 # finished arguing should never be written into by hand.
-crates/veilvoice-crypto/src/lock.rs:1072:5: replace portable_dir -> Option<PathBuf> with None
-crates/veilvoice-crypto/src/lock.rs:1127:5: replace is_portable -> bool with true
-crates/veilvoice-crypto/src/lock.rs:1127:5: replace is_portable -> bool with false
+crates/veilvoice-crypto/src/lock.rs: replace portable_dir -> Option<PathBuf> with None
+  on: let beside = std::env::current_exe().ok()?.parent()?.join(PORTABLE_DIR);
+crates/veilvoice-crypto/src/lock.rs: replace is_portable -> bool with true
+  on: portable_dir().is_some()
+crates/veilvoice-crypto/src/lock.rs: replace is_portable -> bool with false
+  on: portable_dir().is_some()
 
 # `admin_dir` tries to create /etc/veilvoice and answers None when it cannot.
 # On a machine where it can, calling it from a test changes that machine; on
 # one where it cannot, the mutant answering None is what the original already
 # does. Either way there is nothing to observe that is worth the side effect.
-crates/veilvoice-crypto/src/vault.rs:363:5: replace admin_dir -> Option<PathBuf> with None
-crates/veilvoice-crypto/src/vault.rs:363:5: replace admin_dir -> Option<PathBuf> with Some(Default::default())
+crates/veilvoice-crypto/src/vault.rs: replace admin_dir -> Option<PathBuf> with None
+  on: if cfg!(windows) {
+crates/veilvoice-crypto/src/vault.rs: replace admin_dir -> Option<PathBuf> with Some(Default::default())
+  on: if cfg!(windows) {
 
 # `fully_locked` asks whether every chunk was locked out of swap. Where the
 # operating system grants every lock, as it does on the machines this runs on,
 # the honest answer is already true and the mutant is indistinguishable. The
 # test beside it asserts the relation between the two chunk counts instead,
 # which holds on a machine that grants none.
-crates/veilvoice-crypto/src/tape.rs:157:9: replace Tape::fully_locked -> bool with true
+crates/veilvoice-crypto/src/tape.rs: replace Tape::fully_locked -> bool with true
+  on: self.chunks.iter().all(|c| c.is_locked())
 
 
 # --- 3. Reachable only through a self-contradiction ---------------------------
@@ -146,4 +199,5 @@ crates/veilvoice-crypto/src/tape.rs:157:9: replace Tape::fully_locked -> bool wi
 # the mutant return the same error and nothing observes the difference. The
 # guard stays because the reasoning it encodes is right, and because a
 # filesystem that did behave that way is exactly what it protects against.
-crates/veilvoice-crypto/src/vault.rs:147:23: replace match guard e.kind() == std::io::ErrorKind::NotFound with true in Vault::at
+crates/veilvoice-crypto/src/vault.rs: replace match guard e.kind() == std::io::ErrorKind::NotFound with true in Vault::at
+  on: Err(e) if e.kind() == std::io::ErrorKind::NotFound => {

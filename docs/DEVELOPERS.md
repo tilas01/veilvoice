@@ -192,7 +192,8 @@ And what it then checks:
 - **every public item is reached by something**: `python tools/audit/reachable.py`
 - **every crate appears in every table that lists the crates**: `python tools/audit/crate_tables.py`
 - **no build output lives outside the one directory at the root**: `python tools/audit/build_output.py`
-- **every argued-for surviving mutant still points at real code**: `python tools/mutants/check.py --lint`
+- **every argued-for surviving mutant is still about the code it names**: `python tools/mutants/check.py --lint`
+- **the comparison against the campaign objects to what it says it does**: `python tools/mutants/check.py --self-test`
 - **every manifest is covered by a Dependabot entry**: `python tools/audit/dependabot.py`
 - **the Dependabot guard notices where a bump would land**: `python tools/audit/dependabot.py --self-test`
 - **every feature selection a release builds is still declared**: `python tools/audit/features.py`
