@@ -211,7 +211,7 @@ scripts than this finding justifies.
 `pace.rs` was written this round with a note at the top saying that `frame`
 runs once per drawn frame and "allocates nothing, locks nothing and prints
 nothing", and that the median "is taken over a copy of it on the stack". Both
-sentences were written by somebody who had just read the rule in `CLAUDE.md`
+sentences were written by somebody who had just read the rule in `docs/CONTRIBUTING.md`
 about realtime paths and meant them.
 
 The median was taken with `slice::sort_by` over a thirty-two element array.
@@ -4767,7 +4767,7 @@ match failed and seven hundred lines of release notes were dropped.
 The workflow then **published anyway**, with a note saying the notes were
 missing. That is the defect. A note saying the notes are missing is not a
 smaller version of the notes; it is a published release whose contents nobody
-can tell, and `CLAUDE.md` says a release's notes live in `CHANGELOG.md` and
+can tell, and `docs/CONTRIBUTING.md` says a release's notes live in `CHANGELOG.md` and
 everything else derives from it. Deriving nothing is a failure and now fails,
 on the path that publishes; a dry run publishes nothing and is still allowed to
 report the gap.
@@ -4883,7 +4883,7 @@ optimisation; and documentation coverage.
 this repository's own drift checks were advisory. Every one has a `--check`,
 every one is run by hand before a release, and none of them failed a build.
 
-`CLAUDE.md` states the rule they exist to enforce: a fact that appears twice is
+`docs/CONTRIBUTING.md` states the rule they exist to enforce: a fact that appears twice is
 derived or checked, and *"anything that cannot be derived is checked in CI, so
 drift fails a build rather than being noticed later by a reader"*. Eleven
 checks were the second half of that sentence and were not wired to it.
@@ -5075,7 +5075,7 @@ no longer match, a version that is no longer current, generated pages for a file
 that no longer exists. None of them is a bug in the ordinary sense. All of them
 would have been read by somebody as a statement of fact.
 
-That is why the standing rule now lives in `CLAUDE.md` rather than in this
+That is why the standing rule now lives in `docs/CONTRIBUTING.md` rather than in this
 document: **a change is not finished until everything that describes it has
 changed with it**, a fact appearing twice is derived or checked rather than
 repeated, and the only exception is a record of the past, which is

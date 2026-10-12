@@ -68,11 +68,6 @@ gpg_secrets/
 __pycache__/
 *.pyc
 
-# `CLAUDE.md` is not in this list, on purpose. It carries the commit rules every
-# session working here has to follow, and while it was ignored every fresh clone
-# started without them, which is where the commits in the wrong name came from
-# (F-235). A rule only a local file knows is a rule the next clone does not.
-#
 # Local development files. These are working notes and editor configuration,
 # not part of what anybody downloads, and a public repository is not the place
 # for either.
@@ -92,6 +87,30 @@ HANDOVER.md
 .aider*
 .vscode/
 .idea/
+
+# Instruction files for AI coding assistants. However they are named, they are
+# working notes for a tool, not part of VeilVoice, and tilas01 wants none of
+# them in the repository on either branch. The rules they would carry live in
+# docs/CONTRIBUTING.md, which is the one copy, and the guard that enforces the
+# commit rules (tools/audit/authorship.py) runs in tools/verify.py and in CI,
+# so a clone without any of these files is still held to them.
+CLAUDE.md
+CLAUDE.local.md
+**/CLAUDE.md
+AGENTS.md
+**/AGENTS.md
+GEMINI.md
+.github/copilot-instructions.md
+.github/instructions/
+.cursorrules
+.windsurfrules
+.windsurf/
+.clinerules
+.clinerules/
+.roo/
+.continue/
+.codex/
+.gemini/
 
 # Agent skills. Installed locally for Rust and security review practice; they
 # are tooling for whoever is working on this, not part of what anybody

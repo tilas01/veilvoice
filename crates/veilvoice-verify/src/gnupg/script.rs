@@ -311,7 +311,7 @@ mod tests {
     /// translate". A table of commands in a document is a copy of what the
     /// program prints, and a copy goes stale: F-167 was two copies of exactly
     /// this answer disagreeing. So the table is checked here against the code
-    /// it describes, which is what `CLAUDE.md` asks for when a fact cannot be
+    /// it describes, which is what `docs/CONTRIBUTING.md` asks for when a fact cannot be
     /// derived.
     ///
     /// Read out of the guide's source. If the table moves, this fails saying

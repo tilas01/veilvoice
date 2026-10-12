@@ -994,7 +994,7 @@ halves)
 
 **Optimisation stops being a pass and becomes how this is written**
 
-- The practices roadmap item 125's reading established are now in `CLAUDE.md` as the
+- The practices roadmap item 125's reading established are now in `docs/CONTRIBUTING.md` as the
   standing way this project is written, and three of the four are enforced by a
   build rather than by somebody remembering.
 - **No audio callback allocates, blocks or prints.** A callback runs on the
@@ -1590,7 +1590,7 @@ written up in `docs/AUDIT.md`.
   so CI had been red on every commit since the recorder was written (F-149).
 - Deleting a source file left seven generated pages behind describing it
   (F-154).
-- `CLAUDE.md` now states the rule these have in common: a change is not
+- `docs/CONTRIBUTING.md` now states the rule these have in common: a change is not
   finished until everything that describes it has changed with it, a fact
   appearing twice is derived or checked rather than repeated, and the only
   exception is a record of the past.

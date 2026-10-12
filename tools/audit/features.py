@@ -23,7 +23,7 @@ expensive way this repository has ever found a compile error.
 
 # Why it reads the workflow
 
-`CLAUDE.md` asks that a fact living in more than one place be derived rather
+`docs/CONTRIBUTING.md` asks that a fact living in more than one place be derived rather
 than repeated. The set of feature selections a release builds lives in
 `release.yml`, and that is the copy that is true: a target added to the matrix
 with a new selection must be built by this check without anybody remembering

@@ -39,7 +39,9 @@ makes a commit on his behalf: an edit in the website, or a merge there. The
 message carries no co-author trailer, no session trailer or link, no
 "generated with" footer, and no assistant or model name anywhere, because
 credit for assistance lives in the README and the website footer and nowhere
-else.
+else. Its tree holds no instruction file for an AI assistant (`CLAUDE.md`,
+`AGENTS.md`, `.claude/` and the rest of `ASSISTANT_FILES`), which `.gitignore`
+keeps out of a plain `git add` and this catches when one is added anyway.
 And its title stands alone: a message longer than one line has a blank line
 after the first, because git takes everything before the first blank line as
 the title, and a body run on beneath it becomes one enormous title (F-248).
@@ -136,6 +138,18 @@ TRAILER = re.compile(
 # names are ordinary words on their own, so a number has to follow.
 ASSISTANT = re.compile(
     r"\bclaude\b|\banthropic\b|\b(?:opus|sonnet|haiku|fable)[ -]?\d",
+    re.IGNORECASE)
+
+
+# Instruction files for AI coding assistants, by the names the common ones
+# use. None belongs in this repository on either branch: `.gitignore` keeps
+# them out of a plain `git add`, and this catches one added with `-f`.
+ASSISTANT_FILES = re.compile(
+    r"(?:^|/)(?:CLAUDE(?:\.local)?\.md|AGENTS\.md|GEMINI\.md|\.cursorrules"
+    r"|\.windsurfrules|\.clinerules)$"
+    r"|^\.github/(?:copilot-instructions\.md$|instructions/)"
+    r"|(?:^|/)\.(?:claude[^/]*|cursor|windsurf|clinerules|roo|continue|codex|gemini"
+    r"|aider[^/]*)/",
     re.IGNORECASE)
 
 
@@ -309,6 +323,9 @@ def commit_faults(cwd, sha, keys=None):
         if found:
             faults.append("message line %d names %r: %s"
                           % (number, found.group(0), line.strip()[:72]))
+    for path in git(["ls-tree", "-r", "--name-only", sha], cwd).split("\n"):
+        if path and ASSISTANT_FILES.search(path):
+            faults.append("tree carries %s, an assistant's instruction file" % path)
     signature = []
     signer = signature_of(raw)
     if signer is None:
@@ -442,7 +459,7 @@ def self_test():
         subprocess.run(["git", "-C", where] + args, check=True, env=env or base,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    def make(message, author=(NAME, EMAIL), committer=(NAME, EMAIL)):
+    def make(message, author=(NAME, EMAIL), committer=(NAME, EMAIL), extra=None):
         env = dict(base)
         env.update({"GIT_AUTHOR_NAME": author[0], "GIT_AUTHOR_EMAIL": author[1],
                     "GIT_COMMITTER_NAME": committer[0],
@@ -450,6 +467,11 @@ def self_test():
         with open(os.path.join(where, "f"), "a") as handle:
             handle.write("x\n")
         run(["add", "f"], env)
+        if extra:
+            os.makedirs(os.path.join(where, os.path.dirname(extra) or "."), exist_ok=True)
+            with open(os.path.join(where, extra), "w") as handle:
+                handle.write("notes\n")
+            run(["add", "-f", extra], env)
         run(["commit", "-q", "--no-gpg-sign", "-m", message], env)
         return git(["rev-parse", "HEAD"], where).strip()
 
@@ -490,6 +512,10 @@ def self_test():
         ("an address that is nobody's",
          dict(message="Fix", author=(NAME, "someone@example.com")),
          "not tilas01"),
+        # Last: every commit after it would carry the file too.
+        ("an assistant's instruction file in the tree",
+         dict(message="Notes", extra="AGENTS.md"),
+         "AGENTS.md, an assistant's instruction file"),
     ]
     failures = 0
     try:
@@ -505,6 +531,8 @@ def self_test():
                 failures += 1
                 print("    MISSED: %s" % name)
                 print("      expected %r in: %s" % (expected, text or "(clean)"))
+
+        run(["rm", "-q", "-f", "AGENTS.md"])
 
         # Words that must pass: "marker" is a real word here, "regenerated
         # with" is not a footer, a model name with no number is a word, and
