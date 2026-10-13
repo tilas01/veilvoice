@@ -95,6 +95,26 @@ function wordsToNumber(words) {
   return saw ? total : null;
 }
 
+/**
+ * Every finding number written up more than once in `text`.
+ *
+ * F-251. The generator gathered the numbers into a set, so two entries under
+ * one number counted once and the check below, which compares the count with
+ * the highest, saw no gap. This reads the document itself, with the
+ * generator's own heading pattern, so a duplicate fails here whether or not
+ * the generator noticed.
+ */
+function usedTwice(text) {
+  const seen = new Map();
+  const heading = /^(?:### F-(\d+)\b|\*\*F-(\d+)(?::| --))/gm;
+  for (const found of text.matchAll(heading)) {
+    const number = Number(found[1] || found[2]);
+    seen.set(number, (seen.get(number) || 0) + 1);
+  }
+  return [...seen].filter(([, count]) => count > 1).map(([number]) => number)
+    .sort((a, b) => a - b);
+}
+
 function run() {
   let failures = 0;
   const fail = (why) => { failures += 1; console.log(`FAIL ${why}`); };
@@ -119,6 +139,24 @@ function run() {
          "the case this checks for: see F-94.");
   } else {
     pass(`every finding from F-1 to F-${highest} has an entry of its own`);
+  }
+
+  // A number used twice. Checked on a planted pair first, so a pattern that
+  // stopped matching cannot pass by finding nothing.
+  const planted = "### F-7: one\n\n### F-8: two\n\n**F-7: and three\n\n" +
+    "**F-7 had**: a sentence\n\n**F-8 -- four\n";
+  const caught = usedTwice(planted).join(",");
+  if (caught !== "7,8") {
+    fail(`the duplicate check read a planted F-7 and F-8 used twice each as ` +
+         `[${caught}], so it cannot be trusted on the real document`);
+  }
+  const twice = usedTwice(read("docs/AUDIT.md"));
+  if (twice.length) {
+    fail(`docs/AUDIT.md writes up ${twice.map((n) => `F-${n}`).join(", ")} ` +
+         "more than once. Two findings under one number read as one, and the " +
+         "count above agrees with the highest when it should not: see F-251.");
+  } else {
+    pass("no finding number is written up twice");
   }
 
   // The README's headline, in digits.

@@ -746,6 +746,35 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-251: a finding number written up twice counted as one, and the numbering check passed it
+
+`tools/measured/generate.py` measures two numbers from this document, how many
+findings have an entry and the highest number used, and
+`tools/site-tests/audit.test.js` fails when they differ, because a difference
+is a number with no write-up (F-94). It gathered the numbers into a set. So a
+number written up twice counted once, the count still equalled the highest,
+and the check passed. That happened: the wiki link fix landed as F-247, the
+authorship guard's title check landed ten hours later as F-247 too, and for
+the ten hours after that `dev` carried both entries under the one number with
+every check green. Nothing in the suite found it; it was renumbered by hand
+as F-248.
+
+A duplicate is the same failure as a gap, seen from the other side: a reader
+sent to F-247 found two defects and could not tell which was meant, and the
+verdict's total was one short of the findings written up.
+
+**The fix.** The generator keeps every entry rather than a set of them and
+stops, naming the number, when one is written up twice. The site test reads
+the document itself with the generator's own heading pattern and fails on a
+duplicate, so the claim is not checked only by the tool that writes it.
+
+**What is checked.** `audit.test.js` first runs its duplicate check on a
+planted pair, two entries each for F-7 and F-8 among a mention shaped like a
+heading, and fails if that does not come back as exactly those two, so a
+pattern that stopped matching cannot pass by finding nothing. Then it reads
+`docs/AUDIT.md`. A second `### F-12` appended to this document made both the
+generator and the suite refuse, naming F-12.
+
 ### F-249: the tour stored a stop it had never shown, so the decoy card would have reached nobody who had already toured
 
 Found while wiring roadmap item 173's window half, by reading what the window
@@ -10630,7 +10659,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and fifty defects found and fixed (F-1 to F-250), across
+**Two hundred and fifty-one defects found and fixed (F-1 to F-251), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

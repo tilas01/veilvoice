@@ -199,15 +199,29 @@ def audit_findings() -> tuple[int, int]:
     highest is the last number handed out. They agree only when no number has
     been skipped, so a reader comparing them can see a gap without reading the
     document, and the suite fails when one opens.
+
+    One number, one entry. F-251: this gathered the numbers into a set, so a
+    number written up twice counted once, and two findings pushed as F-247
+    read as one finding with no gap. The count and the highest agreed, the
+    suite passed, and a reader sent to F-247 found two different defects.
+    A number used twice stops the generator here, naming it, and
+    `tools/site-tests/audit.test.js` reads the document for the same thing on
+    its own, so the claim is not checked only by the tool that writes it.
     """
     text = (ROOT / "docs" / "AUDIT.md").read_text(encoding="utf-8")
-    entries = set()
+    entries = []
     for line in text.split("\n"):
         found = re.match(r"^(?:### F-(\d+)\b|\*\*F-(\d+)(?::| --))", line)
         if found:
-            entries.add(int(found.group(1) or found.group(2)))
+            entries.append(int(found.group(1) or found.group(2)))
     if not entries:
         raise SystemExit("docs/AUDIT.md has no finding entries; the pattern must have moved")
+    twice = sorted({number for number in entries if entries.count(number) > 1})
+    if twice:
+        raise SystemExit(
+            "docs/AUDIT.md writes up %s more than once. Each finding has a number "
+            "of its own: renumber the later one to the next free number, and its "
+            "commit title with it." % ", ".join("F-%d" % number for number in twice))
     return len(entries), max(entries)
 
 
