@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/security.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 3170 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 3174 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs)
 
 ## Contents
 
@@ -80,7 +80,7 @@ disk. Encrypting the recording is what protects the recording.
 
 ## What this file contains
 
-3170 lines defining **54 functions** (29 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+3174 lines defining **54 functions** (29 public), **4 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -281,12 +281,12 @@ flowchart TD
 | `Plan::fmt` <sub>fn</sub> | [1772](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1772) |  |
 | `decoy_store` <sub>fn</sub> | [1786](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1786) | The decoy store that sits beside the lock file at path. |
 | `run_op` <sub>fn</sub> | [1793](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1793) | Run one lock operation, off the UI thread. |
-| `reopen` <sub>fn</sub> | [1908](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1908) | Re-open the lock store from disk, or None when there is nothing to open. |
-| `PASSWORD_LABEL_WIDTH` <sub>const</sub> | [1915](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1915) | The width every passphrase label is given, so every field starts level. |
-| `PASSWORD_FIELD_WIDTH` <sub>const</sub> | [1920](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1920) | How wide every passphrase field is drawn, on this tab and on the lock screen. |
-| `button_column` <sub>fn</sub> | [1954](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1954) | One labelled passphrase field, with the field in the same place every time. |
-| `password_row` <sub>fn</sub> | [1969](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1969) | One passphrase field with its label, at the shared width. |
-| `unlock_row` <sub>fn</sub> | [2014](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L2014) | The password row on the lock screen: the label, the field and the button. |
+| `reopen` <sub>fn</sub> | [1912](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1912) | Re-open the lock store from disk, or None when there is nothing to open. |
+| `PASSWORD_LABEL_WIDTH` <sub>const</sub> | [1919](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1919) | The width every passphrase label is given, so every field starts level. |
+| `PASSWORD_FIELD_WIDTH` <sub>const</sub> | [1924](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1924) | How wide every passphrase field is drawn, on this tab and on the lock screen. |
+| `button_column` <sub>fn</sub> | [1958](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1958) | One labelled passphrase field, with the field in the same place every time. |
+| `password_row` <sub>fn</sub> | [1973](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L1973) | One passphrase field with its label, at the shared width. |
+| `unlock_row` <sub>fn</sub> | [2018](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs#L2018) | The password row on the lock screen: the label, the field and the button. |
 
 ---
 

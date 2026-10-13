@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/security.svg" alt="security.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/security.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 3170 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 3174 lines &middot; <a href="security.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/security.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-passwords-and-why">Two passwords, and why</a>
@@ -103,7 +103,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>3170 lines defining <strong>54 functions</strong> (29 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>3174 lines defining <strong>54 functions</strong> (29 public), <strong>4 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Sealing</code> <span style="color:var(--muted)">line 82</span> &middot; How the recording that comes out of a job is protected.</li>
 <li><code>enum Op</code> <span style="color:var(--muted)">line 107</span> &middot; What a background lock operation was trying to do.</li>
@@ -461,12 +461,12 @@ flowchart TD
 <tr><td><code>Plan::fmt</code> <sub>fn</sub></td><td><a href="security.src.html#fn-plan-fmt">1772</a></td><td></td></tr>
 <tr><td><code>decoy_store</code> <sub>fn</sub></td><td><a href="security.src.html#fn-decoy_store">1786</a></td><td>The decoy store that sits beside the lock file at path.</td></tr>
 <tr><td><code>run_op</code> <sub>fn</sub></td><td><a href="security.src.html#fn-run_op">1793</a></td><td>Run one lock operation, off the UI thread.</td></tr>
-<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">1908</a></td><td>Re-open the lock store from disk, or None when there is nothing to open.</td></tr>
-<tr><td><code>PASSWORD_LABEL_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_label_width">1915</a></td><td>The width every passphrase label is given, so every field starts level.</td></tr>
-<tr><td><code>PASSWORD_FIELD_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_field_width">1920</a></td><td>How wide every passphrase field is drawn, on this tab and on the lock screen.</td></tr>
-<tr><td><code>button_column</code> <sub>fn</sub></td><td><a href="security.src.html#fn-button_column">1954</a></td><td>One labelled passphrase field, with the field in the same place every time.</td></tr>
-<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">1969</a></td><td>One passphrase field with its label, at the shared width.</td></tr>
-<tr><td><code>unlock_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-unlock_row">2014</a></td><td>The password row on the lock screen: the label, the field and the button.</td></tr>
+<tr><td><code>reopen</code> <sub>fn</sub></td><td><a href="security.src.html#fn-reopen">1912</a></td><td>Re-open the lock store from disk, or None when there is nothing to open.</td></tr>
+<tr><td><code>PASSWORD_LABEL_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_label_width">1919</a></td><td>The width every passphrase label is given, so every field starts level.</td></tr>
+<tr><td><code>PASSWORD_FIELD_WIDTH</code> <sub>const</sub></td><td><a href="security.src.html#fn-password_field_width">1924</a></td><td>How wide every passphrase field is drawn, on this tab and on the lock screen.</td></tr>
+<tr><td><code>button_column</code> <sub>fn</sub></td><td><a href="security.src.html#fn-button_column">1958</a></td><td>One labelled passphrase field, with the field in the same place every time.</td></tr>
+<tr><td><code>password_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-password_row">1973</a></td><td>One passphrase field with its label, at the shared width.</td></tr>
+<tr><td><code>unlock_row</code> <sub>fn</sub></td><td><a href="security.src.html#fn-unlock_row">2018</a></td><td>The password row on the lock screen: the label, the field and the button.</td></tr>
 </tbody></table>
 </section>
 </div></div>

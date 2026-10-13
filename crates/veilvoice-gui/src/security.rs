@@ -1877,16 +1877,20 @@ fn run_op(
         // is the same pairing `Op::Change` uses. The store proves the real one
         // before it writes anything, so a window somebody walked away from
         // cannot have a decoy set or taken away at it.
-        (Op::DecoySet, Some(store)) => match decoy_store(path.as_deref()) {
+        //
+        // The store is handed over mutably because proving the real passphrase
+        // is a real unlock: it counts a wrong one and honours the rate limit,
+        // so the panel cannot be used to guess what the lock screen throttles.
+        (Op::DecoySet, Some(mut store)) => match decoy_store(path.as_deref()) {
             Err(e) => (Some(store), Err(e), None),
-            Ok(decoys) => match decoys.set(&store, &password, &replacement) {
+            Ok(decoys) => match decoys.set(&mut store, &password, &replacement) {
                 Ok(()) => (Some(store), Ok(Op::DecoySet), None),
                 Err(e) => (Some(store), Err(e.to_string()), None),
             },
         },
-        (Op::DecoyRemove, Some(store)) => match decoy_store(path.as_deref()) {
+        (Op::DecoyRemove, Some(mut store)) => match decoy_store(path.as_deref()) {
             Err(e) => (Some(store), Err(e), None),
-            Ok(decoys) => match decoys.remove(&store, &password) {
+            Ok(decoys) => match decoys.remove(&mut store, &password) {
                 Ok(()) => (Some(store), Ok(Op::DecoyRemove), None),
                 Err(e) => (Some(store), Err(e.to_string()), None),
             },
@@ -2295,9 +2299,9 @@ mod tests {
     ) -> (tempfile::TempDir, Security, veilvoice_crypto::decoy::Store) {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("applock.bin");
-        let store = LockStore::create(&path, real.as_bytes(), weak_params()).unwrap();
+        let mut store = LockStore::create(&path, real.as_bytes(), weak_params()).unwrap();
         let decoys = decoy::Store::at(dir.path()).unwrap();
-        decoys.set(&store, real, decoyed).unwrap();
+        decoys.set(&mut store, real, decoyed).unwrap();
 
         let mut security = Security::default();
         security.path = Some(path);

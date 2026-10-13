@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/decoy.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 550 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 559 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs)
 
 ## Contents
 
@@ -49,7 +49,7 @@ can do either at a window you left unlocked.
 
 ## What this file contains
 
-550 lines defining **14 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+559 lines defining **14 functions** (2 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -78,16 +78,16 @@ flowchart TD
     n_explain["explain<br/>line 77"]
     n_status["status<br/>line 119"]
     n_set["set<br/>line 219"]
-    n_remove["remove<br/>line 300"]
-    n_allowed["allowed<br/>line 330"]
-    n_lock_or_explain["lock_or_explain<br/>line 351"]
-    n_read_twice["read_twice<br/>line 367"]
-    n_text["text<br/>line 384"]
-    n_print_scope["print_scope<br/>line 390"]
-    n_print_no_destruction["print_no_destruction<br/>line 395"]
-    n_print_wrapped["print_wrapped<br/>line 403"]
-    n_print_pair_rule["print_pair_rule<br/>line 414"]
-    n_paragraphs["paragraphs<br/>line 441"]
+    n_remove["remove<br/>line 309"]
+    n_allowed["allowed<br/>line 339"]
+    n_lock_or_explain["lock_or_explain<br/>line 360"]
+    n_read_twice["read_twice<br/>line 376"]
+    n_text["text<br/>line 393"]
+    n_print_scope["print_scope<br/>line 399"]
+    n_print_no_destruction["print_no_destruction<br/>line 404"]
+    n_print_wrapped["print_wrapped<br/>line 412"]
+    n_print_pair_rule["print_pair_rule<br/>line 423"]
+    n_paragraphs["paragraphs<br/>line 450"]
     n_explain --> n_print_no_destruction
     n_explain --> n_print_pair_rule
     n_explain --> n_print_scope
@@ -112,16 +112,16 @@ flowchart TD
     click n_explain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L77" "open the source"
     click n_status href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L119" "open the source"
     click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L219" "open the source"
-    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L300" "open the source"
-    click n_allowed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L330" "open the source"
-    click n_lock_or_explain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L351" "open the source"
-    click n_read_twice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L367" "open the source"
-    click n_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L384" "open the source"
-    click n_print_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L390" "open the source"
-    click n_print_no_destruction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L395" "open the source"
-    click n_print_wrapped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L403" "open the source"
-    click n_print_pair_rule href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L414" "open the source"
-    click n_paragraphs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L441" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L309" "open the source"
+    click n_allowed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L339" "open the source"
+    click n_lock_or_explain href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L360" "open the source"
+    click n_read_twice href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L376" "open the source"
+    click n_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L393" "open the source"
+    click n_print_scope href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L399" "open the source"
+    click n_print_no_destruction href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L404" "open the source"
+    click n_print_wrapped href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L412" "open the source"
+    click n_print_pair_rule href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L423" "open the source"
+    click n_paragraphs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L450" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -141,13 +141,13 @@ flowchart TD
 | `explain` <sub>pub fn</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L77) | Explain the feature and its limits. |
 | `status` <sub>fn</sub> | [119](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L119) | veilvoice decoy status: whether a decoy is set, and where it lives. |
 | `set` <sub>fn</sub> | [219](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L219) | veilvoice decoy set and veilvoice decoy change, which are one path. |
-| `remove` <sub>fn</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L300) | veilvoice decoy remove: take the decoy off, after proving the real one. |
-| `allowed` <sub>fn</sub> | [330](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L330) | Whether the state on disk allows what was asked, and what to say first. |
-| `lock_or_explain` <sub>fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L351) | The app lock, or a message saying what to do about there not being one. |
-| `read_twice` <sub>fn</sub> | [367](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L367) | Read the decoy twice, without echoing it, and check the two agree. |
-| `text` <sub>fn</sub> | [384](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L384) | A typed passphrase as text. |
-| `print_scope` <sub>fn</sub> | [390](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L390) | What a decoy is worth, wrapped, from the one constant both front ends read. |
-| `print_no_destruction` <sub>fn</sub> | [395](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L395) | Why no passphrase destroys anything, from the same place. |
-| `print_wrapped` <sub>fn</sub> | [403](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L403) | Print an indented, wrapped passage, with the blank lines left blank. |
-| `print_pair_rule` <sub>fn</sub> | [414](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L414) | The rule about the pair, and why there is one. |
-| `paragraphs` <sub>fn</sub> | [441](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L441) | Wrap text that has paragraphs in it, and keep the paragraphs. |
+| `remove` <sub>fn</sub> | [309](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L309) | veilvoice decoy remove: take the decoy off, after proving the real one. |
+| `allowed` <sub>fn</sub> | [339](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L339) | Whether the state on disk allows what was asked, and what to say first. |
+| `lock_or_explain` <sub>fn</sub> | [360](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L360) | The app lock, or a message saying what to do about there not being one. |
+| `read_twice` <sub>fn</sub> | [376](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L376) | Read the decoy twice, without echoing it, and check the two agree. |
+| `text` <sub>fn</sub> | [393](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L393) | A typed passphrase as text. |
+| `print_scope` <sub>fn</sub> | [399](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L399) | What a decoy is worth, wrapped, from the one constant both front ends read. |
+| `print_no_destruction` <sub>fn</sub> | [404](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L404) | Why no passphrase destroys anything, from the same place. |
+| `print_wrapped` <sub>fn</sub> | [412](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L412) | Print an indented, wrapped passage, with the blank lines left blank. |
+| `print_pair_rule` <sub>fn</sub> | [423](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L423) | The rule about the pair, and why there is one. |
+| `paragraphs` <sub>fn</sub> | [450](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/decoy.rs#L450) | Wrap text that has paragraphs in it, and keep the paragraphs. |

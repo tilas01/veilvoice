@@ -121,7 +121,7 @@ flowchart TD
     n_progress["progress.rs<br/>539 lines"]
     n_reduced_motion["reduced_motion.rs<br/>285 lines"]
     n_reset["reset.rs<br/>576 lines"]
-    n_security["security.rs<br/>3170 lines"]
+    n_security["security.rs<br/>3174 lines"]
     n_settings["settings.rs<br/>1686 lines"]
     n_setup["setup.rs<br/>1144 lines"]
     n_soundbar["soundbar.rs<br/>782 lines"]
@@ -349,7 +349,7 @@ flowchart TD
 | [`progress.rs`](../../docs/files/veilvoice-gui/progress.md) | 539 | How far through a job is, in the two cases that exist: the ones that can honestly say, and the ones that cannot. |
 | [`reduced_motion.rs`](../../docs/files/veilvoice-gui/reduced_motion.md) | 285 | Whether the operating system has been asked to reduce motion. |
 | [`reset.rs`](../../docs/files/veilvoice-gui/reset.md) | 576 | Starting again from the window: what would go, then going. |
-| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 3170 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 3174 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1686 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 782 | The animated mark: a row of bars that rise and fall. |
