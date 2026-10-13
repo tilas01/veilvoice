@@ -217,7 +217,7 @@ fn status() -> Result<(), String> {
 /// still matters, because a `set` that silently replaced would take away a
 /// decoy somebody is relying on without saying so.
 fn set(replacing: bool) -> Result<(), String> {
-    let lock = lock_or_explain()?;
+    let mut lock = lock_or_explain()?;
     let store = decoy::Store::here().map_err(|e| e.to_string())?;
     if let Some(note) = allowed(store.state(), replacing)? {
         println!("{}", warn(note));
@@ -246,13 +246,22 @@ fn set(replacing: bool) -> Result<(), String> {
     // the order somebody experiences. Without it, a mistyped app-lock
     // passphrase is reported after they have chosen a decoy and typed it twice,
     // and the reason it failed looks like something they did wrong at the end.
-    if !lock.would_open(real.expose()).map_err(|e| e.to_string())? {
-        return Err(
-            "that is not this machine's app lock passphrase, so nothing \
-                    was changed. A decoy can only be set by whoever can already \
-                    open VeilVoice"
-                .into(),
-        );
+    //
+    // Through `unlock`, not `would_open`: a wrong guess here is counted and the
+    // rate limit applies, because an early check that records nothing turns this
+    // command into an unthrottled way of guessing the app-lock passphrase,
+    // which is the one thing it must not be.
+    match lock.unlock(real.expose()) {
+        Ok(()) => {}
+        Err(veilvoice_crypto::Error::AppLockRejected) => {
+            return Err(
+                "that is not this machine's app lock passphrase, so nothing \
+                        was changed. A decoy can only be set by whoever can already \
+                        open VeilVoice"
+                    .into(),
+            );
+        }
+        Err(e) => return Err(e.to_string()),
     }
     println!(
         "{}",
@@ -270,7 +279,7 @@ fn set(replacing: bool) -> Result<(), String> {
         )
     );
     store
-        .set(&lock, text(&real)?, text(&decoyed)?)
+        .set(&mut lock, text(&real)?, text(&decoyed)?)
         .map_err(|e| e.to_string())?;
 
     println!(
@@ -298,7 +307,7 @@ fn set(replacing: bool) -> Result<(), String> {
 /// anybody could remove is a decoy that can be taken away from the person
 /// relying on it, and they would not find out until they needed it.
 fn remove() -> Result<(), String> {
-    let lock = lock_or_explain()?;
+    let mut lock = lock_or_explain()?;
     let store = decoy::Store::here().map_err(|e| e.to_string())?;
     if store.state() == State::Absent {
         return Err("no decoy is set here, so there is nothing to remove".into());
@@ -307,7 +316,7 @@ fn remove() -> Result<(), String> {
     println!("{}", heading("Decoy passphrase"));
     let real = prompt_secret("App lock passphrase: ")?;
     store
-        .remove(&lock, text(&real)?)
+        .remove(&mut lock, text(&real)?)
         .map_err(|e| e.to_string())?;
     println!("{}", ok("decoy passphrase removed"));
     println!(

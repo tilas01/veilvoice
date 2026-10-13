@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/decoy.svg" alt="decoy.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/decoy.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 907 lines &middot; <a href="decoy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1031 lines &middot; <a href="decoy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for-and-what-it-is-honestly-worth">What this is for, and what it is honestly worth</a>
@@ -95,7 +95,7 @@
 <h2 id="where-it-is-kept-and-what-holds-the-real-passphrase">Where it is kept, and what holds the real passphrase</h2>
 <p><code>Store</code> keeps one file beside the app lock, under a name derived from the vault&#x27;s index like the lock&#x27;s own two copies, so a folder listing does not say which file it is. What is in it is the decoy&#x27;s verifier and nothing else.</p>
 <p><strong>The real passphrase is not in it.</strong> It lives in the app lock, once, and setting or removing a decoy proves it against that. A second copy of it here would be two places that have to agree about the same secret with no way for either to notice the other had changed, which is the shape of F-141.</p>
-<p>A decoy is not a failed attempt at the real passphrase either. Typing it does not count towards the rate limit, because the moment somebody uses this feature is the moment a cooldown would hurt them most.</p>
+<p>A decoy is not a failed attempt at the real passphrase either. Typing it leaves the failure count alone, so using this feature does not start a cooldown. A cooldown already in force is a different matter: it refuses the decoy exactly as it refuses everything else, because a passphrase that still worked during the wait would be announcing itself as the decoy.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>You can set a second passphrase, from Settings or with <code>veilvoice decoy set</code>. Typing it opens VeilVoice normally, except that it is empty: no recordings, no projects, no history. It is there for the situation where somebody is standing over you asking you to unlock your computer.</p>
 <p>It has to be properly different from your real one, and VeilVoice refuses a pair that is nearly the same. Setting or removing it asks for your real passphrase first, so nobody can do either behind your back at a window you left unlocked.</p>
@@ -105,32 +105,32 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>907 lines defining <strong>17 functions</strong> (9 public), <strong>6 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1031 lines defining <strong>17 functions</strong> (9 public), <strong>6 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Opened</code> <span style="color:var(--muted)">line 101</span> &middot; Which passphrase was given.</li>
-<li><code>struct Verifier</code> <span style="color:var(--muted)">line 112</span> &middot; One passphrase&#x27;s stored form.</li>
-<li><code>enum Refused</code> <span style="color:var(--muted)">line 162</span> &middot; Why a pair was refused.</li>
-<li><code>struct Decoy</code> <span style="color:var(--muted)">line 238</span> &middot; A decoy passphrase&#x27;s stored form, on its own.</li>
-<li><code>enum State</code> <span style="color:var(--muted)">line 375</span> &middot; Whether this machine has a decoy passphrase, and whether it can be read.</li>
-<li><code>struct Store</code> <span style="color:var(--muted)">line 395</span> &middot; The decoy passphrase as this machine keeps it.</li>
+<li><code>enum Opened</code> <span style="color:var(--muted)">line 103</span> &middot; Which passphrase was given.</li>
+<li><code>struct Verifier</code> <span style="color:var(--muted)">line 114</span> &middot; One passphrase&#x27;s stored form.</li>
+<li><code>enum Refused</code> <span style="color:var(--muted)">line 164</span> &middot; Why a pair was refused.</li>
+<li><code>struct Decoy</code> <span style="color:var(--muted)">line 248</span> &middot; A decoy passphrase&#x27;s stored form, on its own.</li>
+<li><code>enum State</code> <span style="color:var(--muted)">line 385</span> &middot; Whether this machine has a decoy passphrase, and whether it can be read.</li>
+<li><code>struct Store</code> <span style="color:var(--muted)">line 405</span> &middot; The decoy passphrase as this machine keeps it.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Decoy::to_bytes</code> <span style="color:var(--muted)">line 308</span> &middot; The record, for writing.
+<li><code>Decoy::to_bytes</code> <span style="color:var(--muted)">line 318</span> &middot; The record, for writing.
 </li>
-<li><code>Decoy::parse</code> <span style="color:var(--muted)">line 331</span> &middot; Read a record.
+<li><code>Decoy::parse</code> <span style="color:var(--muted)">line 341</span> &middot; Read a record.
 </li>
-<li><code>Store::here</code> <span style="color:var(--muted)">line 411</span> &middot; The store for this copy of VeilVoice.
+<li><code>Store::here</code> <span style="color:var(--muted)">line 421</span> &middot; The store for this copy of VeilVoice.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>at</code></span>
 </li>
-<li><code>Store::state</code> <span style="color:var(--muted)">line 417</span> &middot; Whether a decoy is set, and whether it reads.
+<li><code>Store::state</code> <span style="color:var(--muted)">line 427</span> &middot; Whether a decoy is set, and whether it reads.
 </li>
-<li><code>Store::set</code> <span style="color:var(--muted)">line 435</span> &middot; Set or replace the decoy passphrase.
+<li><code>Store::set</code> <span style="color:var(--muted)">line 445</span> &middot; Set or replace the decoy passphrase.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>create</code>, <code>prove</code></span>
 </li>
-<li><code>Store::remove</code> <span style="color:var(--muted)">line 453</span> &middot; Remove the decoy passphrase, after proving the real one.
+<li><code>Store::remove</code> <span style="color:var(--muted)">line 463</span> &middot; Remove the decoy passphrase, after proving the real one.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>prove</code></span>
 </li>
-<li><code>Store::judge</code> <span style="color:var(--muted)">line 495</span> &middot; Which passphrase was typed.
+<li><code>Store::judge</code> <span style="color:var(--muted)">line 528</span> &middot; Which passphrase was typed.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>nothing</code></span>
 </li>
 </ul>
@@ -157,87 +157,87 @@
 <a href="decoy.src.html#fn-verifier-create">
 <rect x="321.4" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="387.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verifier::create</text>
-<text x="387.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 125</text>
+<text x="387.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
 </a>
 <a href="decoy.src.html#fn-verifier-matches">
 <rect x="28.0" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="98.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Verifier::matches</text>
-<text x="98.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 135</text>
+<text x="98.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 137</text>
 </a>
 <a href="decoy.src.html#fn-constant_time_eq">
 <rect x="408.8" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="487.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">constant_time_eq</text>
-<text x="487.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 142</text>
+<text x="487.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 144</text>
 </a>
 <a href="decoy.src.html#fn-refused-fmt">
 <rect x="28.0" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="90.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Refused::fmt</text>
-<text x="90.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 181</text>
+<text x="90.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 185</text>
 </a>
 <a href="decoy.src.html#fn-differences">
 <rect x="178.7" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="237.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">differences</text>
-<text x="237.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 213</text>
+<text x="237.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 223</text>
 </a>
 <a href="decoy.src.html#fn-decoy-create">
 <rect x="321.4" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="387.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Decoy::create</text>
-<text x="387.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 263</text>
+<text x="387.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 273</text>
 </a>
 <a href="decoy.src.html#fn-decoy-nothing">
 <rect x="480.2" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="550.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Decoy::nothing</text>
-<text x="550.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 290</text>
+<text x="550.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
 </a>
 <a href="decoy.src.html#fn-decoy-matches">
 <rect x="28.0" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="98.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Decoy::matches</text>
-<text x="98.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 303</text>
+<text x="98.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 313</text>
 </a>
 <a href="decoy.src.html#fn-decoy-to_bytes">
 <rect x="194.8" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="269.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Decoy::to_bytes</text>
-<text x="269.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
+<text x="269.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 318</text>
 </a>
 <a href="decoy.src.html#fn-decoy-parse">
 <rect x="369.7" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="432.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Decoy::parse</text>
-<text x="432.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 331</text>
+<text x="432.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 341</text>
 </a>
 <a href="decoy.src.html#fn-store-at">
 <rect x="520.5" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="570.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Store::at</text>
-<text x="570.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 404</text>
+<text x="570.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 414</text>
 </a>
 <a href="decoy.src.html#fn-store-here">
 <rect x="44.1" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="102.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Store::here</text>
-<text x="102.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 411</text>
+<text x="102.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 421</text>
 </a>
 <a href="decoy.src.html#fn-store-state">
 <rect x="186.8" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="249.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Store::state</text>
-<text x="249.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 417</text>
+<text x="249.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 427</text>
 </a>
 <a href="decoy.src.html#fn-store-set">
 <rect x="337.5" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="391.8" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Store::set</text>
-<text x="391.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 435</text>
+<text x="391.8" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 445</text>
 </a>
 <a href="decoy.src.html#fn-store-remove">
 <rect x="472.1" y="320.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="538.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Store::remove</text>
-<text x="538.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 453</text>
+<text x="538.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 463</text>
 </a>
 <a href="decoy.src.html#fn-store-prove">
 <rect x="262.1" y="520.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="324.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Store::prove</text>
-<text x="324.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 461</text>
+<text x="324.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 480</text>
 </a>
 <a href="decoy.src.html#fn-store-judge">
 <rect x="262.1" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="324.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Store::judge</text>
-<text x="324.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 495</text>
+<text x="324.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 528</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -256,46 +256,46 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_create[&quot;Verifier::create&lt;br/&gt;line 125&quot;]
-    n_matches[&quot;Verifier::matches&lt;br/&gt;line 135&quot;]
-    n_constant_time_eq[&quot;constant_time_eq&lt;br/&gt;line 142&quot;]
-    n_fmt[&quot;Refused::fmt&lt;br/&gt;line 181&quot;]
-    n_differences[&quot;differences&lt;br/&gt;line 213&quot;]
-    n_create[&quot;Decoy::create&lt;br/&gt;line 263&quot;]
-    n_nothing[&quot;Decoy::nothing&lt;br/&gt;line 290&quot;]
-    n_matches[&quot;Decoy::matches&lt;br/&gt;line 303&quot;]
-    n_to_bytes([&quot;Decoy::to_bytes&lt;br/&gt;line 308&quot;])
-    n_parse([&quot;Decoy::parse&lt;br/&gt;line 331&quot;])
-    n_at[&quot;Store::at&lt;br/&gt;line 404&quot;]
-    n_here([&quot;Store::here&lt;br/&gt;line 411&quot;])
-    n_state([&quot;Store::state&lt;br/&gt;line 417&quot;])
-    n_set([&quot;Store::set&lt;br/&gt;line 435&quot;])
-    n_remove([&quot;Store::remove&lt;br/&gt;line 453&quot;])
-    n_prove[&quot;Store::prove&lt;br/&gt;line 461&quot;]
-    n_judge([&quot;Store::judge&lt;br/&gt;line 495&quot;])
+    n_create[&quot;Verifier::create&lt;br/&gt;line 127&quot;]
+    n_matches[&quot;Verifier::matches&lt;br/&gt;line 137&quot;]
+    n_constant_time_eq[&quot;constant_time_eq&lt;br/&gt;line 144&quot;]
+    n_fmt[&quot;Refused::fmt&lt;br/&gt;line 185&quot;]
+    n_differences[&quot;differences&lt;br/&gt;line 223&quot;]
+    n_create[&quot;Decoy::create&lt;br/&gt;line 273&quot;]
+    n_nothing[&quot;Decoy::nothing&lt;br/&gt;line 300&quot;]
+    n_matches[&quot;Decoy::matches&lt;br/&gt;line 313&quot;]
+    n_to_bytes([&quot;Decoy::to_bytes&lt;br/&gt;line 318&quot;])
+    n_parse([&quot;Decoy::parse&lt;br/&gt;line 341&quot;])
+    n_at[&quot;Store::at&lt;br/&gt;line 414&quot;]
+    n_here([&quot;Store::here&lt;br/&gt;line 421&quot;])
+    n_state([&quot;Store::state&lt;br/&gt;line 427&quot;])
+    n_set([&quot;Store::set&lt;br/&gt;line 445&quot;])
+    n_remove([&quot;Store::remove&lt;br/&gt;line 463&quot;])
+    n_prove[&quot;Store::prove&lt;br/&gt;line 480&quot;]
+    n_judge([&quot;Store::judge&lt;br/&gt;line 528&quot;])
     n_here --&gt; n_at
     n_judge --&gt; n_nothing
     n_matches --&gt; n_constant_time_eq
     n_remove --&gt; n_prove
     n_set --&gt; n_create
     n_set --&gt; n_prove
-    click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L125&quot; &quot;open the source&quot;
-    click n_matches href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L135&quot; &quot;open the source&quot;
-    click n_constant_time_eq href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L142&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L181&quot; &quot;open the source&quot;
-    click n_differences href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L213&quot; &quot;open the source&quot;
-    click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L263&quot; &quot;open the source&quot;
-    click n_nothing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L290&quot; &quot;open the source&quot;
-    click n_matches href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L303&quot; &quot;open the source&quot;
-    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L308&quot; &quot;open the source&quot;
-    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L331&quot; &quot;open the source&quot;
-    click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L404&quot; &quot;open the source&quot;
-    click n_here href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L411&quot; &quot;open the source&quot;
-    click n_state href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L417&quot; &quot;open the source&quot;
-    click n_set href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L435&quot; &quot;open the source&quot;
-    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L453&quot; &quot;open the source&quot;
-    click n_prove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L461&quot; &quot;open the source&quot;
-    click n_judge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L495&quot; &quot;open the source&quot;
+    click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L127&quot; &quot;open the source&quot;
+    click n_matches href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L137&quot; &quot;open the source&quot;
+    click n_constant_time_eq href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L144&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L185&quot; &quot;open the source&quot;
+    click n_differences href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L223&quot; &quot;open the source&quot;
+    click n_create href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L273&quot; &quot;open the source&quot;
+    click n_nothing href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L300&quot; &quot;open the source&quot;
+    click n_matches href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L313&quot; &quot;open the source&quot;
+    click n_to_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L318&quot; &quot;open the source&quot;
+    click n_parse href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L341&quot; &quot;open the source&quot;
+    click n_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L414&quot; &quot;open the source&quot;
+    click n_here href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L421&quot; &quot;open the source&quot;
+    click n_state href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L427&quot; &quot;open the source&quot;
+    click n_set href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L445&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L463&quot; &quot;open the source&quot;
+    click n_prove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L480&quot; &quot;open the source&quot;
+    click n_judge href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L528&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_parse,n_here,n_state,n_set,n_remove,n_judge entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -308,35 +308,35 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Opened</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-opened">101</a></td><td>Which passphrase was given.</td></tr>
-<tr><td><code>Verifier</code> <sub>struct</sub></td><td><a href="decoy.src.html#fn-verifier">112</a></td><td>One passphrase&#x27;s stored form.</td></tr>
-<tr><td><code>Verifier::create</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-verifier-create">125</a></td><td>Derive from passphrase once and keep what it produced, with the salt that produced it, so a later attempt can be compared against it.</td></tr>
-<tr><td><code>Verifier::matches</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-verifier-matches">135</a></td><td>Derive and compare.</td></tr>
-<tr><td><code>constant_time_eq</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-constant_time_eq">142</a></td><td>Compare without letting the time taken depend on where they differ.</td></tr>
-<tr><td><code>LEAST_DIFFERENCE</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-least_difference">158</a></td><td>How similar two passphrases may be before the pair is refused.</td></tr>
-<tr><td><code>Refused</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-refused">162</a></td><td>Why a pair was refused.</td></tr>
-<tr><td><code>Refused::fmt</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-refused-fmt">181</a></td><td></td></tr>
-<tr><td><code>differences</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-differences">213</a></td><td>How many positions two passphrases differ in.</td></tr>
-<tr><td><code>Decoy</code> <sub>pub struct</sub></td><td><a href="decoy.src.html#fn-decoy">238</a></td><td>A decoy passphrase&#x27;s stored form, on its own.</td></tr>
-<tr><td><code>MAGIC</code> <sub>const</sub></td><td><a href="decoy.src.html#fn-magic">244</a></td><td>What a decoy record starts with.</td></tr>
-<tr><td><code>FORMAT_VERSION</code> <sub>const</sub></td><td><a href="decoy.src.html#fn-format_version">247</a></td><td>The only format there is so far.</td></tr>
-<tr><td><code>RECORD_LEN</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-record_len">251</a></td><td>Exactly how long a record is: magic, version, three reserved bytes, the three costs, the salt, the derived key.</td></tr>
-<tr><td><code>Decoy::create</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-create">263</a></td><td>Make a decoy from the real passphrase and the decoy one.</td></tr>
-<tr><td><code>Decoy::nothing</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-decoy-nothing">290</a></td><td>A record no passphrase opens, for the sake of taking the same time.</td></tr>
-<tr><td><code>Decoy::matches</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-decoy-matches">303</a></td><td>Derive and compare.</td></tr>
-<tr><td><code>Decoy::to_bytes</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-to_bytes">308</a></td><td>The record, for writing.</td></tr>
-<tr><td><code>Decoy::parse</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-parse">331</a></td><td>Read a record.</td></tr>
-<tr><td><code>State</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-state">375</a></td><td>Whether this machine has a decoy passphrase, and whether it can be read.</td></tr>
-<tr><td><code>Store</code> <sub>pub struct</sub></td><td><a href="decoy.src.html#fn-store">395</a></td><td>The decoy passphrase as this machine keeps it.</td></tr>
-<tr><td><code>Store::at</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-at">404</a></td><td>The store under base, which is the folder the app lock lives in.</td></tr>
-<tr><td><code>Store::here</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-here">411</a></td><td>The store for this copy of VeilVoice.</td></tr>
-<tr><td><code>Store::state</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-state">417</a></td><td>Whether a decoy is set, and whether it reads.</td></tr>
-<tr><td><code>Store::set</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-set">435</a></td><td>Set or replace the decoy passphrase.</td></tr>
-<tr><td><code>Store::remove</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-remove">453</a></td><td>Remove the decoy passphrase, after proving the real one.</td></tr>
-<tr><td><code>Store::prove</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-store-prove">461</a></td><td>That real really is this machine&#x27;s passphrase.</td></tr>
-<tr><td><code>Store::judge</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-judge">495</a></td><td>Which passphrase was typed.</td></tr>
-<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-scope">525</a></td><td>What a decoy is worth, in the words a front end must show.</td></tr>
-<tr><td><code>WHY_NO_DESTRUCTION</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-why_no_destruction">538</a></td><td>Why no passphrase destroys anything, and why that is the honest choice.</td></tr>
+<tr><td><code>Opened</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-opened">103</a></td><td>Which passphrase was given.</td></tr>
+<tr><td><code>Verifier</code> <sub>struct</sub></td><td><a href="decoy.src.html#fn-verifier">114</a></td><td>One passphrase&#x27;s stored form.</td></tr>
+<tr><td><code>Verifier::create</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-verifier-create">127</a></td><td>Derive from passphrase once and keep what it produced, with the salt that produced it, so a later attempt can be compared against it.</td></tr>
+<tr><td><code>Verifier::matches</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-verifier-matches">137</a></td><td>Derive and compare.</td></tr>
+<tr><td><code>constant_time_eq</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-constant_time_eq">144</a></td><td>Compare without letting the time taken depend on where they differ.</td></tr>
+<tr><td><code>LEAST_DIFFERENCE</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-least_difference">160</a></td><td>How similar two passphrases may be before the pair is refused.</td></tr>
+<tr><td><code>Refused</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-refused">164</a></td><td>Why a pair was refused.</td></tr>
+<tr><td><code>Refused::fmt</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-refused-fmt">185</a></td><td></td></tr>
+<tr><td><code>differences</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-differences">223</a></td><td>How many positions two passphrases differ in.</td></tr>
+<tr><td><code>Decoy</code> <sub>pub struct</sub></td><td><a href="decoy.src.html#fn-decoy">248</a></td><td>A decoy passphrase&#x27;s stored form, on its own.</td></tr>
+<tr><td><code>MAGIC</code> <sub>const</sub></td><td><a href="decoy.src.html#fn-magic">254</a></td><td>What a decoy record starts with.</td></tr>
+<tr><td><code>FORMAT_VERSION</code> <sub>const</sub></td><td><a href="decoy.src.html#fn-format_version">257</a></td><td>The only format there is so far.</td></tr>
+<tr><td><code>RECORD_LEN</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-record_len">261</a></td><td>Exactly how long a record is: magic, version, three reserved bytes, the three costs, the salt, the derived key.</td></tr>
+<tr><td><code>Decoy::create</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-create">273</a></td><td>Make a decoy from the real passphrase and the decoy one.</td></tr>
+<tr><td><code>Decoy::nothing</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-decoy-nothing">300</a></td><td>A record no passphrase opens, for the sake of taking the same time.</td></tr>
+<tr><td><code>Decoy::matches</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-decoy-matches">313</a></td><td>Derive and compare.</td></tr>
+<tr><td><code>Decoy::to_bytes</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-to_bytes">318</a></td><td>The record, for writing.</td></tr>
+<tr><td><code>Decoy::parse</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-parse">341</a></td><td>Read a record.</td></tr>
+<tr><td><code>State</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-state">385</a></td><td>Whether this machine has a decoy passphrase, and whether it can be read.</td></tr>
+<tr><td><code>Store</code> <sub>pub struct</sub></td><td><a href="decoy.src.html#fn-store">405</a></td><td>The decoy passphrase as this machine keeps it.</td></tr>
+<tr><td><code>Store::at</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-at">414</a></td><td>The store under base, which is the folder the app lock lives in.</td></tr>
+<tr><td><code>Store::here</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-here">421</a></td><td>The store for this copy of VeilVoice.</td></tr>
+<tr><td><code>Store::state</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-state">427</a></td><td>Whether a decoy is set, and whether it reads.</td></tr>
+<tr><td><code>Store::set</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-set">445</a></td><td>Set or replace the decoy passphrase.</td></tr>
+<tr><td><code>Store::remove</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-remove">463</a></td><td>Remove the decoy passphrase, after proving the real one.</td></tr>
+<tr><td><code>Store::prove</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-store-prove">480</a></td><td>That real really is this machine&#x27;s passphrase.</td></tr>
+<tr><td><code>Store::judge</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-store-judge">528</a></td><td>Which passphrase was typed.</td></tr>
+<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-scope">566</a></td><td>What a decoy is worth, in the words a front end must show.</td></tr>
+<tr><td><code>WHY_NO_DESTRUCTION</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-why_no_destruction">579</a></td><td>Why no passphrase destroys anything, and why that is the honest choice.</td></tr>
 </tbody></table>
 </section>
 </div></div>

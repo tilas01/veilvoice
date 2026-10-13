@@ -67,9 +67,11 @@
 //! would be two places that have to agree about the same secret with no way for
 //! either to notice the other had changed, which is the shape of F-141.
 //!
-//! A decoy is not a failed attempt at the real passphrase either. Typing it does
-//! not count towards the rate limit, because the moment somebody uses this
-//! feature is the moment a cooldown would hurt them most.
+//! A decoy is not a failed attempt at the real passphrase either. Typing it
+//! leaves the failure count alone, so using this feature does not start a
+//! cooldown. A cooldown already in force is a different matter: it refuses the
+//! decoy exactly as it refuses everything else, because a passphrase that still
+//! worked during the wait would be announcing itself as the decoy.
 //!
 //! # In plain words
 //!
@@ -173,6 +175,8 @@ pub enum Refused {
     },
     /// The passphrase given as the real one is not this machine's.
     NotTheRealOne,
+    /// The app lock is rate limiting, so the real passphrase was not tried.
+    Cooldown(u64),
     /// The key derivation failed.
     Crypto(String),
 }
@@ -198,6 +202,12 @@ impl std::fmt::Display for Refused {
                 f,
                 "that is not this machine's passphrase, so there is nothing to set a \
                  decoy beside"
+            ),
+            Self::Cooldown(secs) => write!(
+                f,
+                "too many wrong passphrases: the app lock is not accepting another \
+                 for {secs} more second{}",
+                if *secs == 1 { "" } else { "s" }
             ),
             Self::Crypto(why) => write!(f, "{why}"),
         }
@@ -434,7 +444,7 @@ impl Store {
     /// back by whoever sits down next.
     pub fn set(
         &self,
-        lock: &crate::lock::LockStore,
+        lock: &mut crate::lock::LockStore,
         real: &str,
         decoy: &str,
     ) -> Result<(), Refused> {
@@ -450,7 +460,7 @@ impl Store {
     /// Proving it matters as much here as it does for setting one: a decoy
     /// removed without the real passphrase is a decoy somebody else can take
     /// away, and the person who relies on it would not know until they needed it.
-    pub fn remove(&self, lock: &crate::lock::LockStore, real: &str) -> Result<(), Refused> {
+    pub fn remove(&self, lock: &mut crate::lock::LockStore, real: &str) -> Result<(), Refused> {
         self.prove(lock, real)?;
         self.vault
             .clear_decoy()
@@ -458,10 +468,20 @@ impl Store {
     }
 
     /// That `real` really is this machine's passphrase.
-    fn prove(&self, lock: &crate::lock::LockStore, real: &str) -> Result<(), Refused> {
-        match lock.would_open(real.as_bytes()) {
-            Ok(true) => Ok(()),
-            Ok(false) => Err(Refused::NotTheRealOne),
+    ///
+    /// Through [`crate::lock::LockStore::unlock`], so a wrong guess is counted
+    /// and the rate limit applies. The earlier version asked
+    /// [`crate::lock::LockStore::would_open`], which records nothing, and that
+    /// made `decoy set` and `decoy remove` an unthrottled oracle for the real
+    /// passphrase: a script driving either of them could guess as fast as the
+    /// KDF allows, during a cooldown as freely as outside one, while the lock
+    /// screen beside it was still counting. Setting a decoy is a lock operation
+    /// and is throttled like the rest of them.
+    fn prove(&self, lock: &mut crate::lock::LockStore, real: &str) -> Result<(), Refused> {
+        match lock.unlock(real.as_bytes()) {
+            Ok(()) => Ok(()),
+            Err(Error::AppLockRejected) => Err(Refused::NotTheRealOne),
+            Err(Error::AppLockCooldown(wait)) => Err(Refused::Cooldown(wait)),
             Err(e) => Err(Refused::Crypto(e.to_string())),
         }
     }
@@ -478,20 +498,33 @@ impl Store {
     /// passphrase, and counting it as one would start the rate limit at the
     /// moment a delay is least wanted.
     ///
-    /// The one branch that is not two derivations is the rate limit, which
-    /// answers without deriving anything. That is deliberate and it is not a
-    /// leak: a cooldown announces itself anyway, in words, to whoever is looking
-    /// at the screen.
+    /// The rate limit is the one branch that stops after the first derivation
+    /// rather than doing both: the wait is reported once the decoy has been
+    /// derived and before the real passphrase is consulted. What that tells an
+    /// observer is that there is a cooldown, which the screen says in words
+    /// anyway. It does not tell them which passphrase was typed, because every
+    /// one of them gets the same answer and the same number of seconds.
     ///
-    /// **A decoy opens during a cooldown.** The decoy is derived and compared
-    /// before the real lock is consulted, and the branch that answers
-    /// [`Opened::Decoy`] never reaches [`crate::lock::LockStore::unlock`], so
-    /// the rate limit does not apply to it. That is the right way round. The
-    /// moment somebody needs this feature is the moment they are least able to
-    /// wait out a delay, and a fumbled real passphrase a minute earlier is
-    /// exactly how they would arrive at it. What it costs is that the decoy
-    /// itself is not rate limited, and what that buys an attacker is a full
-    /// Argon2id run per guess at a passphrase that opens nothing.
+    /// **The cooldown applies to the decoy too, and that is the whole point.**
+    /// An earlier version let the decoy through while the rate limit was in
+    /// force, on the reasoning that somebody who needs a decoy is in no
+    /// position to wait out a delay. That reasoning was wrong, and it cost the
+    /// feature everything it exists for: during a cooldown the real passphrase
+    /// is refused and the decoy would have opened, so anybody holding the
+    /// machine could type four wrong passphrases, hand it over, and read the
+    /// answer off which way it went. A decoy that announces itself as the decoy
+    /// is not a decoy. So the wait is reported before either passphrase is
+    /// branched on, and both are refused in the same words.
+    ///
+    /// What this does **not** close is the lock file itself. A decoy that opens
+    /// leaves the failure count where it was and the file unwritten, while the
+    /// real passphrase resets the count and rewrites it, so somebody who can
+    /// read the file before and after can still tell the two apart. Closing
+    /// that would mean rewriting the lock record from a decoy session, which
+    /// needs the real passphrase, which a decoy session does not have. It is
+    /// written down here rather than quietly left out: this feature protects
+    /// against somebody watching the screen, not against somebody holding the
+    /// disk.
     pub fn judge(&self, lock: &mut crate::lock::LockStore, given: &str) -> Result<Opened, Error> {
         let record = match self.vault.load_decoy() {
             Some(record) => record,
@@ -502,6 +535,14 @@ impl Store {
             None => Decoy::nothing(lock.params())?,
         };
         let decoyed = record.matches(given)?;
+
+        // Before either answer, and after both derivations, so the wait costs
+        // the same whichever passphrase was typed. Reporting it here rather
+        // than leaving it to `unlock` is what keeps the decoy from being the
+        // one passphrase that still works during a cooldown.
+        if let Some(wait) = lock.cooldown() {
+            return Err(Error::AppLockCooldown(wait.as_secs()));
+        }
 
         if decoyed {
             // Cannot happen while `set` refuses an identical pair, and handled
@@ -586,7 +627,7 @@ mod tests {
     fn the_decoy_opens_the_empty_one_and_the_real_one_still_works() {
         let (_dir, mut lock, store) = machine("the real one");
         store
-            .set(&lock, "the real one", "a different thing")
+            .set(&mut lock, "the real one", "a different thing")
             .unwrap();
         assert_eq!(store.state(), State::Set);
 
@@ -614,7 +655,7 @@ mod tests {
     fn the_decoy_does_not_count_against_the_real_passphrase() {
         let (_dir, mut lock, store) = machine("the real one");
         store
-            .set(&lock, "the real one", "a different thing")
+            .set(&mut lock, "the real one", "a different thing")
             .unwrap();
 
         for _ in 0..5 {
@@ -643,7 +684,7 @@ mod tests {
     fn a_wrong_one_is_still_counted() {
         let (_dir, mut lock, store) = machine("the real one");
         store
-            .set(&lock, "the real one", "a different thing")
+            .set(&mut lock, "the real one", "a different thing")
             .unwrap();
         assert_eq!(
             store.judge(&mut lock, "not either of them").unwrap(),
@@ -695,25 +736,27 @@ mod tests {
     /// behind their back by whoever sits down next.
     #[test]
     fn a_decoy_cannot_be_set_without_the_real_passphrase() {
-        let (_dir, lock, store) = machine("the real one");
+        let (_dir, mut lock, store) = machine("the real one");
         assert_eq!(
             store
-                .set(&lock, "a guess at the real one", "a decoy entirely")
+                .set(&mut lock, "a guess at the real one", "a decoy entirely")
                 .unwrap_err(),
             Refused::NotTheRealOne
         );
         assert_eq!(store.state(), State::Absent);
 
         store
-            .set(&lock, "the real one", "a decoy entirely")
+            .set(&mut lock, "the real one", "a decoy entirely")
             .unwrap();
         assert_eq!(
-            store.remove(&lock, "a guess at the real one").unwrap_err(),
+            store
+                .remove(&mut lock, "a guess at the real one")
+                .unwrap_err(),
             Refused::NotTheRealOne
         );
         assert_eq!(store.state(), State::Set, "a decoy was removed by a guess");
 
-        store.remove(&lock, "the real one").unwrap();
+        store.remove(&mut lock, "the real one").unwrap();
         assert_eq!(store.state(), State::Absent);
     }
 
@@ -721,9 +764,11 @@ mod tests {
     #[test]
     fn setting_a_second_decoy_replaces_the_first() {
         let (_dir, mut lock, store) = machine("the real one");
-        store.set(&lock, "the real one", "the first decoy").unwrap();
         store
-            .set(&lock, "the real one", "the second decoy")
+            .set(&mut lock, "the real one", "the first decoy")
+            .unwrap();
+        store
+            .set(&mut lock, "the real one", "the second decoy")
             .unwrap();
         assert_eq!(
             store.judge(&mut lock, "the second decoy").unwrap(),
@@ -740,8 +785,8 @@ mod tests {
     #[test]
     fn a_removed_decoy_is_a_wrong_passphrase() {
         let (_dir, mut lock, store) = machine("the real one");
-        store.set(&lock, "the real one", "the decoy").unwrap();
-        store.remove(&lock, "the real one").unwrap();
+        store.set(&mut lock, "the real one", "the decoy").unwrap();
+        store.remove(&mut lock, "the real one").unwrap();
         assert_eq!(store.judge(&mut lock, "the decoy").unwrap(), Opened::Wrong);
         assert_eq!(
             store.judge(&mut lock, "the real one").unwrap(),
@@ -817,7 +862,7 @@ mod tests {
     #[test]
     fn a_damaged_decoy_is_reported_and_does_not_stop_the_real_one() {
         let (dir, mut lock, store) = machine("the real one");
-        store.set(&lock, "the real one", "the decoy").unwrap();
+        store.set(&mut lock, "the real one", "the decoy").unwrap();
         let vault = crate::vault::Vault::at(dir.path(), None).unwrap();
         std::fs::write(vault.decoy(), b"not a decoy record at all").unwrap();
 
@@ -836,8 +881,8 @@ mod tests {
     /// or the feature's existence on this machine is written on the disk.
     #[test]
     fn the_record_is_not_under_a_telling_name() {
-        let (dir, lock, store) = machine("the real one");
-        store.set(&lock, "the real one", "the decoy").unwrap();
+        let (dir, mut lock, store) = machine("the real one");
+        store.set(&mut lock, "the real one", "the decoy").unwrap();
         let vault = crate::vault::Vault::at(dir.path(), None).unwrap();
         let name = vault
             .decoy()
@@ -895,6 +940,85 @@ mod tests {
             "the decoy branch skips the real derivation:\n{}",
             &body[decoy_at..]
         );
+    }
+
+    /// Four wrong attempts, which is what puts the lock into its cooldown.
+    fn into_cooldown(lock: &mut crate::lock::LockStore) {
+        for _ in 0..4 {
+            let _ = lock.unlock(b"not it either");
+        }
+        assert!(
+            lock.cooldown().is_some(),
+            "four wrong passphrases should have started the wait"
+        );
+    }
+
+    /// The whole feature turns on this: during the wait, the decoy must be
+    /// refused exactly as the real passphrase is. If it opened while the real
+    /// one was refused, holding the machine and typing four wrong passphrases
+    /// first would be enough to tell which one you had just been given.
+    #[test]
+    fn a_cooldown_refuses_the_decoy_the_way_it_refuses_the_real_passphrase() {
+        let (_dir, mut lock, store) = machine("the real one");
+        store.set(&mut lock, "the real one", "the decoy").unwrap();
+        into_cooldown(&mut lock);
+
+        let on_decoy = store.judge(&mut lock, "the decoy");
+        let on_real = store.judge(&mut lock, "the real one");
+        let on_wrong = store.judge(&mut lock, "neither of them");
+        for (what, answer) in [
+            ("the decoy", &on_decoy),
+            ("the real one", &on_real),
+            ("a wrong one", &on_wrong),
+        ] {
+            assert!(
+                matches!(answer, Err(Error::AppLockCooldown(_))),
+                "{what} was not refused by the rate limit: {answer:?}"
+            );
+        }
+        // And the wait said is the same wait, not a different number per
+        // passphrase, which would answer the same question more quietly.
+        let said = |r: &Result<Opened, Error>| match r {
+            Err(Error::AppLockCooldown(secs)) => *secs,
+            other => panic!("expected a wait: {other:?}"),
+        };
+        assert_eq!(said(&on_decoy), said(&on_real));
+        assert_eq!(said(&on_decoy), said(&on_wrong));
+
+        // That the wait ends, and the decoy opens again afterwards, is not
+        // asserted by sleeping through it: `lock.rs` makes the same point with
+        // `verify_at` and a chosen clock, for the reason written down there,
+        // that a test which waits out a delay is a test nobody runs.
+    }
+
+    /// Setting a decoy is a lock operation, so a wrong real passphrase at it
+    /// is counted and the wait applies. Asking `would_open` instead recorded
+    /// nothing, which made this an unthrottled way of guessing the passphrase.
+    #[test]
+    fn a_wrong_passphrase_at_the_decoy_store_is_counted_like_any_other() {
+        let (_dir, mut lock, store) = machine("the real one");
+        for _ in 0..4 {
+            assert_eq!(
+                store
+                    .set(&mut lock, "a guess at the real one", "a decoy entirely")
+                    .unwrap_err(),
+                Refused::NotTheRealOne
+            );
+        }
+        // The guesses were counted, so even the right passphrase waits now.
+        assert!(
+            matches!(
+                store.set(&mut lock, "the real one", "a decoy entirely"),
+                Err(Refused::Cooldown(_))
+            ),
+            "the guesses were not counted against the lock"
+        );
+        assert_eq!(store.state(), State::Absent);
+        // Removing one is the same path and the same rule.
+        assert!(matches!(
+            store.remove(&mut lock, "the real one"),
+            Err(Refused::Cooldown(_))
+        ));
     }
 
     /// The scope note says the two things that must not be softened.

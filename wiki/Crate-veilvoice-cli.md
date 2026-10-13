@@ -103,7 +103,7 @@ flowchart TD
     n_atrest["atrest.rs<br/>455 lines"]
     n_capture["capture.rs<br/>339 lines"]
     n_conversation["conversation.rs<br/>1095 lines"]
-    n_decoy["decoy.rs<br/>550 lines"]
+    n_decoy["decoy.rs<br/>559 lines"]
     n_failsafe["failsafe.rs<br/>112 lines"]
     n_guard["guard.rs<br/>369 lines"]
     n_gui["gui.rs<br/>247 lines"]
@@ -195,7 +195,7 @@ flowchart TD
 | [[`atrest.rs`|File-veilvoice-cli-atrest]] | 455 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
 | [[`capture.rs`|File-veilvoice-cli-capture]] | 339 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
 | [[`conversation.rs`|File-veilvoice-cli-conversation]] | 1095 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
-| [[`decoy.rs`|File-veilvoice-cli-decoy]] | 550 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
+| [[`decoy.rs`|File-veilvoice-cli-decoy]] | 559 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
 | [[`failsafe.rs`|File-veilvoice-cli-failsafe]] | 112 | veilvoice failsafe is the safety catch. |
 | [[`guard.rs`|File-veilvoice-cli-guard]] | 369 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
 | [[`gui.rs`|File-veilvoice-cli-gui]] | 247 | veilvoice gui opens the desktop application from the command line. |
@@ -212,7 +212,7 @@ flowchart TD
 | [[`theme.rs`|File-veilvoice-cli-theme]] | 152 | Tokyo Night colouring for the terminal. |
 | [[`update.rs`|File-veilvoice-cli-update]] | 246 | veilvoice update: fetch the new release, check it, and put it in place. |
 
-**7,039 functional lines of Rust** in this crate. A functional line is a line
+**7,043 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

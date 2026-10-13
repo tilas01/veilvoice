@@ -746,6 +746,66 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-253: the app lock's cooldown told the decoy passphrase apart from the real one
+
+Found by the audit of the decoy code, reproduced by a test before it was fixed.
+This one defeated the feature rather than weakening it.
+
+`Store::judge` derived the decoy, compared it, and answered `Opened::Decoy`
+without ever reaching `LockStore::unlock`. The real passphrase did reach it, and
+`verify_at` refuses during the rate limit's wait before it derives anything. So
+in the five seconds after four wrong attempts, the decoy opened and the real
+passphrase was refused. Anybody holding the machine could type four wrong
+passphrases, hand it over, ask for it to be unlocked, and read the answer off
+which way it went: a window that opens during the wait was opened with the
+decoy. A decoy that announces itself is not a decoy, and this is the exact
+situation the feature exists for.
+
+The comment that stood above it argued the other way, that somebody who needs a
+decoy is in no position to wait out a delay. That is true and it is not worth
+the thing it costs. `judge` now reports the wait after the decoy has been
+derived and before either passphrase is acted on, so every passphrase gets the
+same refusal and the same number of seconds.
+
+What this does not close, and what the code now says in as many words, is the
+lock file. A decoy that opens leaves the failure count where it was and the file
+unwritten, while the real passphrase resets the count and rewrites it, so
+somebody who can read the file before and after can still tell the two apart.
+Closing that would mean rewriting the lock record from a decoy session, which
+takes the real passphrase, which a decoy session does not have. The feature
+protects against somebody watching the screen, not against somebody holding the
+disk, and saying so is better than implying otherwise.
+
+`a_cooldown_refuses_the_decoy_the_way_it_refuses_the_real_passphrase` drives all
+three passphrases into a lock that is waiting and checks that the answers and
+the seconds match.
+
+### F-252: setting a decoy passphrase was an unthrottled way of guessing the real one
+
+Found by the audit of the decoy code, confirmed by reading
+`crates/veilvoice-crypto/src/decoy.rs` and the terminal command that drives it.
+
+`Store::set` and `Store::remove` both begin by proving the real passphrase, and
+both proved it with `LockStore::would_open`, which `lock.rs` documents as
+recording nothing: no failure counted, no rate limit consulted, no tamper check.
+`veilvoice decoy set` asked the same question a second time before prompting for
+the decoy, for the same reason and in the same way. So a script driving either
+command on a pseudo-terminal could guess the app-lock passphrase as fast as
+Argon2id allows, as freely during a cooldown as outside one, while the lock
+screen beside it was still counting attempts and making people wait. Every other
+operation that needs the passphrase, `lock change` and `lock remove` among them,
+goes through `LockStore::unlock` and is throttled.
+
+Proving the real passphrase now goes through `unlock`, so a wrong one is counted
+and the wait applies, and the terminal's early check does the same. A cooldown
+reached this way is reported as `Refused::Cooldown`, in seconds, rather than
+being reported as a wrong passphrase, because somebody who has mistyped four
+times and then typed it correctly should be told what is actually happening.
+
+`a_wrong_passphrase_at_the_decoy_store_is_counted_like_any_other` guesses four
+times through `Store::set`, then shows the right passphrase waiting, and shows
+removal on the same rule.
+
 ### F-251: a finding number written up twice counted as one, and the numbering check passed it
 
 `tools/measured/generate.py` measures two numbers from this document, how many
@@ -9011,7 +9071,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1896 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1898 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -10659,7 +10719,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and fifty-one defects found and fixed (F-1 to F-251), across
+**Two hundred and fifty-three defects found and fixed (F-1 to F-253), across
 thirty-three rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
