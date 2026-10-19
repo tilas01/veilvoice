@@ -75,9 +75,13 @@ publishes from `main` only: what is published describes what has been released.
 repository of its own at `<repo>.wiki.git`, and enabling the wiki in Settings
 does not create it. It is created when a first page is saved through the web
 interface. Until somebody does that once, the publish step has nothing to push
-to, and it fails saying so. The workflow tries to create the repository itself
-first, by initialising one and pushing it, so this may never be needed; if
-GitHub refuses that, the one-time step is:
+to. The workflow tries to create the repository itself first, by initialising
+one and pushing it, so this may never be needed. If GitHub refuses that, the
+publish is skipped with a warning and a note in the run's summary rather than
+failed, because a missing wiki is a setting and not a fault in the commit, and
+a red cross on every release merge for it would hide the ones that matter. The
+pages are still checked on every push, and the website's copy of the wiki does
+not depend on this at all. The one-time step is:
 
 1. Open the repository's **Wiki** tab.
 2. Create a page with any content at all, and save it.
@@ -86,7 +90,7 @@ GitHub refuses that, the one-time step is:
 What that first page says does not matter. Everything the wiki holds is
 replaced from `wiki/` on the first successful run. See F-199 in
 [`AUDIT.md`](AUDIT.md), where this went unnoticed for seven consecutive failed
-runs.
+runs, and F-259, where the failure became a skip.
 
 ## The scripts
 

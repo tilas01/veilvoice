@@ -535,6 +535,16 @@ jobs:
       - name: The release step must tag the commit it built
         run: python tools/audit/publishing.py
 
+      # F-259. The wiki is published from `main`, and until a first page is
+      # saved in the Wiki tab there is no wiki repository to publish to. That
+      # used to fail the wiki workflow on every release merge. It skips with a
+      # warning now, and this reads the workflow to keep it that way: the step
+      # that decides must still decide, and every step after it must ask.
+      - name: A wiki that does not exist yet must skip the publish, not fail it
+        run: |
+          python tools/audit/wiki_publish.py
+          python tools/audit/wiki_publish.py --self-test
+
       # F-204. This is the one guard whose answer differs between the machine
       # that wrote a commit and the machine that clones it, which is the whole
       # reason it exists: a fixture an `include_str!` names was excluded by
