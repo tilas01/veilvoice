@@ -33,12 +33,12 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 | `veilvoice-conversation` | Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles. | 2,644 | [`crates/veilvoice-conversation/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/README.md) |
 | `veilvoice-core` | Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility. | 3,141 | [`crates/veilvoice-core/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/README.md) |
 | `veilvoice-crypto` | Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice. | 8,224 | [`crates/veilvoice-crypto/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/README.md) |
-| `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them. | 2,947 | [`crates/veilvoice-guard/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/README.md) |
+| `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them. | 2,955 | [`crates/veilvoice-guard/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/README.md) |
 | `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 24,106 | [`crates/veilvoice-gui/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/README.md) |
 | `veilvoice-meta` | Strip or spoof identifying metadata: audio tags, and image EXIF/GPS. | 696 | [`crates/veilvoice-meta/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/README.md) |
 | `veilvoice-policy` | Settings that can only be tightened, sealed with the project's own post-quantum cryptography. | 1,689 | [`crates/veilvoice-policy/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/README.md) |
-| `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,954 | [`crates/veilvoice-setup/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/README.md) |
-| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 9,642 | [`crates/veilvoice-verify/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/README.md) |
+| `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,955 | [`crates/veilvoice-setup/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/README.md) |
+| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 9,800 | [`crates/veilvoice-verify/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/README.md) |
 | `veilvoice-video` | A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg. | 6,025 | [`crates/veilvoice-video/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/README.md) |
 | `veilvoice-watch` | Detect which applications are currently using the microphone and camera, with alerts on change. | 3,952 | [`crates/veilvoice-watch/README.md`](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/README.md) |
 
@@ -142,6 +142,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/release_targets.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/release_targets.py) | The updater asks for an archive the release workflow actually builds |
 | [`tools/audit/rsa_usage.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/rsa_usage.py) | No crate reaching `pgp` may gain an RSA private-key code path |
 | [`tools/audit/state_paths.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/state_paths.py) | Find state files that one part of VeilVoice writes and another reads |
+| [`tools/audit/wiki_publish.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/wiki_publish.py) | A wiki with no repository behind it skips the publish, and does not fail it |
 
 Every one of them was written after something got through. The reasoning is in [`docs/AUDIT.md`](Doc-AUDIT) under a finding number, which is worth reading before deciding a guard is unnecessary.
 
@@ -207,6 +208,8 @@ And what it then checks:
 - **no PowerShell function keeps a script variable's change to itself**: `python tools/audit/powershell.py`
 - **that guard catches what it claims to, as well**: `python tools/audit/powershell.py --self-test`
 - **the release step tags the commit it built**: `python tools/audit/publishing.py`
+- **a wiki that does not exist yet skips the publish, not fails it**: `python tools/audit/wiki_publish.py`
+- **that guard catches what it claims to, too**: `python tools/audit/wiki_publish.py --self-test`
 - **every file the build reads is in the repository**: `python tools/audit/fixtures.py`
 - **that guard catches what it claims to**: `python tools/audit/fixtures.py --self-test`
 - **every commit to push is tilas01's, and so is the next one**: `python tools/audit/authorship.py`

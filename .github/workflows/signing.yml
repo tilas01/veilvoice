@@ -8,8 +8,8 @@
 # a branch of its own, reads GitHub's verdict on that commit and deletes the
 # branch. When the key has no identity with tilas01's noreply address, the
 # run says how to add one before the public half is registered on his
-# account. The work is in tools/repo/signing_check.sh. Run by hand, or by a push that
-# changes either file.
+# account. The work is in tools/repo/signing_check.sh. Run by hand, or by a
+# push that changes it.
 
 name: signing
 
@@ -20,6 +20,7 @@ on:
     paths:
       - '.github/workflows/signing.yml'
       - 'tools/repo/signing_check.sh'
+      - 'tools/repo/actions_key.sh'
 
 permissions:
   contents: write

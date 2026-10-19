@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-setup/src/update.rs`
 
-[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 892 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs)
+[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 908 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs)
 
 ## Contents
 
@@ -82,7 +82,7 @@ anything.
 
 ## What this file contains
 
-892 lines defining **13 functions** (8 public), **6 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+908 lines defining **13 functions** (8 public), **6 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -191,4 +191,4 @@ flowchart TD
 | `Tool` <sub>struct</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L432) | Where a transfer tool was found, and how to drive it. |
 | `find_tool` <sub>fn</sub> | [438](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L438) | Absolute paths only. |
 | `fetch` <sub>fn</sub> | [479](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L479) | Run the tool and hand back what it printed. |
-| `SCOPE` <sub>pub const</sub> | [557](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L557) | What this crate does and does not do, in one paragraph, for a front end to show beside the button. |
+| `SCOPE` <sub>pub const</sub> | [567](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L567) | What the check does and does not do, in one paragraph, for a front end to show beside the button. |

@@ -23,6 +23,15 @@ Repository-local config, which beats the container's global config:
 key's fingerprint and `commit.gpgsign true`. Nothing global is touched, so a
 second clone on the same machine is not changed behind anybody's back.
 
+The fingerprint it reports, the one to add to `SIGNING_KEYS`, is the key a
+signature will name: the signing subkey when the key has one, the primary key
+otherwise.
+
+When setup cannot finish (no variable, not base64, a key gpg cannot read or
+import, a config write that fails) it sets `commit.gpgsign false` for this
+clone and says why. Leaving it alone would leave the container's own signing
+on, and that key reads Unverified in tilas01's name (F-235).
+
 Four `GIT_AUTHOR_*` and `GIT_COMMITTER_*` variables beat every config file, and
 some containers set them. A program cannot change the shell that ran it, so
 when they are set to anything else this prints the line to export and fails,
@@ -64,32 +73,66 @@ def run(args, cwd=ROOT, stdin=None, env=None):
         done.stderr.decode("utf-8", "replace")
 
 
-def fingerprint(armoured, env=None):
-    """The primary key's fingerprint in an armoured secret key, without importing it."""
+class Failure(Exception):
+    """Setup could not finish; the message says why."""
+
+
+def fingerprints(armoured, env=None):
+    """(primary, signer) fingerprints in an armoured secret key, without importing it.
+
+    The signer is the key a signature will name: a subkey with the signing
+    capability when there is one, since gpg signs with the newest of those, and
+    the primary key otherwise. GitHub and the guard both go by the signer.
+    """
     code, out, err = run(["gpg", "--batch", "--with-colons", "--import-options",
                           "show-only", "--import"], stdin=armoured, env=env)
+    primary, signer, kind = None, None, None
     for line in out.splitlines():
-        if line.startswith("fpr:"):
-            return line.split(":")[9]
-    raise SystemExit("%s does not hold a key gpg can read: %s" % (VARIABLE, err.strip()))
+        fields = line.split(":")
+        if fields[0] in ("sec", "pub", "ssb", "sub"):
+            kind = (fields[0], fields[11] if len(fields) > 11 else "")
+        elif fields[0] == "fpr" and kind:
+            if kind[0] in ("sec", "pub") and primary is None:
+                primary = fields[9]
+                if "s" in kind[1].lower():
+                    signer = signer or fields[9]
+            elif "s" in kind[1].lower():
+                signer = fields[9]
+            kind = None
+    if primary is None:
+        raise Failure("%s does not hold a key gpg can read: %s" % (VARIABLE, err.strip()))
+    if signer is None:
+        raise Failure("the key in %s cannot sign: neither it nor a subkey has the "
+                      "signing capability" % VARIABLE)
+    return primary, signer
+
+
+def set_config(cwd, key, value, env=None):
+    code, _, err = run(["git", "config", "--local", key, value], cwd, env=env)
+    if code != 0:
+        raise Failure("git config %s failed: %s" % (key, err.strip()))
 
 
 def configure(cwd, encoded, env=None):
-    """Import the key and set this clone up. Returns (fingerprint, problems)."""
+    """Import the key and set this clone up. Returns (signer, problems)."""
+    if not encoded:
+        raise Failure("%s is not set in this session. It is added in the project's\n"
+                      "  environment settings, and a session started after that has it."
+                      % VARIABLE)
     try:
         armoured = base64.b64decode("".join(encoded.split()), validate=True)
     except ValueError:
-        raise SystemExit("%s is not base64. It is the output of\n"
-                         "  gpg --armor --export-secret-keys KEY | base64 | tr -d '\\n'"
-                         % VARIABLE)
-    fpr = fingerprint(armoured, env)
+        raise Failure("%s is not base64. It is the output of\n"
+                      "  gpg --armor --export-secret-keys KEY | base64 | tr -d '\\n'"
+                      % VARIABLE)
+    primary, fpr = fingerprints(armoured, env)
     code, _, err = run(["gpg", "--batch", "--import"], cwd, armoured, env)
     if code != 0:
-        raise SystemExit("gpg could not import the key: %s" % err.strip())
+        raise Failure("gpg could not import the key: %s" % err.strip())
     for key, value in (("user.name", authorship.NAME), ("user.email", authorship.EMAIL),
-                       ("gpg.format", "openpgp"), ("user.signingkey", fpr),
+                       ("gpg.format", "openpgp"), ("user.signingkey", primary),
                        ("commit.gpgsign", "true")):
-        run(["git", "config", "--local", key, value], cwd, env=env)
+        set_config(cwd, key, value, env)
 
     problems = []
     if not authorship.accepted("openpgp:" + fpr, authorship.SIGNING_KEYS):
@@ -165,6 +208,51 @@ def self_test():
         else:
             failures += 1
             print("    MISSED: a preset identity variable should be reported")
+
+        # A key whose primary only certifies and whose subkey signs: the
+        # signature names the subkey, so that is what setup must report.
+        code, _, err = run(["gpg", "--batch", "--passphrase", "", "--quick-gen-key",
+                            "tilas01 (subkey test) <%s>" % authorship.EMAIL, "ed25519",
+                            "cert", "1d"], where, env=env)
+        _, listing, _ = run(["gpg", "--batch", "--with-colons", "--list-keys",
+                             "subkey test"], where, env=env)
+        primary = [l.split(":")[9] for l in listing.splitlines() if l.startswith("fpr:")][0]
+        run(["gpg", "--batch", "--passphrase", "", "--quick-add-key", primary, "ed25519",
+             "sign", "1d"], where, env=env)
+        _, secret, _ = run(["gpg", "--batch", "--armor", "--export-secret-keys",
+                            primary], where, env=env)
+        run(["gpgconf", "--kill", "gpg-agent"], where, env=env)
+        shutil.rmtree(home)
+        os.mkdir(home, 0o700)
+        second = os.path.join(where, "second")
+        run(["git", "init", "-q", "-b", "main", second], env=env)
+        fpr, _ = configure(second, base64.b64encode(secret.encode()).decode(), env)
+        with open(os.path.join(second, "f"), "w") as handle:
+            handle.write("x\n")
+        run(["git", "add", "f"], second, env=env)
+        code, _, err = run(["git", "commit", "-q", "-m", "Signed"], second, env=env)
+        _, raw, _ = run(["git", "cat-file", "commit", "HEAD"], second, env=env)
+        signer = authorship.signature_of(raw) if code == 0 else None
+        if fpr != primary and signer == "openpgp:" + fpr:
+            print("    signed: a signing subkey is the key reported, and the one that signs")
+        else:
+            failures += 1
+            print("    MISSED: reported %s, primary %s, signed by %r (%s)"
+                  % (fpr, primary, signer, err.strip()[-200:]))
+
+        # Setup that cannot finish switches signing off, so the machine's own
+        # key does not sign in tilas01's name.
+        for name, encoded in (("no key at all", ""), ("a key that is not base64", "!!")):
+            third = tempfile.mkdtemp(prefix="vvs", dir=where)
+            run(["git", "init", "-q", "-b", "main", third], env=env)
+            run(["git", "config", "commit.gpgsign", "true"], third, env=env)
+            code = setup(third, encoded, env)
+            _, value, _ = run(["git", "config", "--local", "commit.gpgsign"], third, env=env)
+            if code == 1 and value.strip() == "false":
+                print("    off: %s leaves the clone unsigned, not signed by another key" % name)
+            else:
+                failures += 1
+                print("    MISSED: %s left commit.gpgsign %r" % (name, value.strip()))
     finally:
         run(["gpgconf", "--kill", "gpg-agent"], where, env=env)
         shutil.rmtree(home, ignore_errors=True)
@@ -177,20 +265,34 @@ def self_test():
     return 0
 
 
-def main():
-    if "--self-test" in sys.argv:
-        return self_test()
-    encoded = os.environ.get(VARIABLE, "")
-    if not encoded:
-        print("%s is not set in this session. It is added in the project's environment\n"
-              "settings, and a session started after that has it." % VARIABLE)
+def setup(cwd, encoded, env=None):
+    """Configure, or switch signing off for this clone. Returns an exit code.
+
+    Anything short of a working key leaves the clone committing unsigned
+    rather than with whatever the machine's own config signs with: in a cloud
+    container that is a key registered to another account, which reads
+    Unverified in tilas01's name, worse than no badge at all.
+    """
+    try:
+        fpr, problems = configure(cwd, encoded, env)
+    except Failure as failure:
+        code, _, err = run(["git", "config", "--local", "commit.gpgsign", "false"],
+                           cwd, env=env)
+        print("  " + str(failure))
+        print("  signing is off for this clone until this succeeds" if code == 0 else
+              "  and signing could not be switched off either: %s" % err.strip())
         return 1
-    fpr, problems = configure(ROOT, encoded)
     print("  this clone commits as %s <%s> and signs with %s"
           % (authorship.NAME, authorship.EMAIL, fpr))
     for problem in problems:
         print("  " + problem)
     return 1 if problems else 0
+
+
+def main():
+    if "--self-test" in sys.argv:
+        return self_test()
+    return setup(ROOT, os.environ.get(VARIABLE, ""))
 
 
 if __name__ == "__main__":
