@@ -56,8 +56,11 @@ if ! printf '%s\n' "$listing" | grep '^uid:' | grep -q "<$address>"; then
   say ""
   say "The key carries no identity with $address, so GitHub cannot match it to tilas01's commits."
   if "$RUNNER_TEMP/gpg-loopback" --quick-add-uid "$primary" "tilas01 <$address>" 2>/dev/null; then
-    gpg --armor --export "$primary" > "$RUNNER_TEMP/public-key.asc"
-    say "Added that identity here. Its public half, with the identity, is the artifact signing-public-key: add it to GitHub under Settings, SSH and GPG keys, replacing the old copy if there is one."
+    say "Added that identity here. The public half below now carries it: add it to"
+    say "GitHub under Settings, SSH and GPG keys, New GPG key, replacing any older copy."
+    say '```'
+    gpg --armor --export "$primary" | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"
+    say '```'
   else
     say "Could not add one here (the primary key's secret part or its passphrase is missing)."
   fi
