@@ -30,12 +30,17 @@ reads worse than no signature at all. That is F-235.
 **The commit that has not been made yet.** `git var GIT_AUTHOR_IDENT` and
 `GIT_COMMITTER_IDENT` answer what the next commit will say, with the
 environment taken into account, which is the only way to see the variables that
-beat the config. `tools/verify.py` runs before a commit is made, so this is the
+beat the config. The signing config says which key will sign it, and a key not
+in `SIGNING_KEYS` is refused here even while unsigned commits are allowed: a
+container's own key in tilas01's name makes a commit read Unverified, which is
+worse than no badge. `tools/verify.py` runs before a commit is made, so this is the
 half that stops the next one rather than reporting it afterwards.
 
 **Every commit in the range.** Both addresses belong to tilas01's account.
-The committer may also be GitHub itself, which is what GitHub records when it
-makes a commit on his behalf: an edit in the website, or a merge there. The
+The committer may also be GitHub itself, under the name GitHub, which is what
+GitHub records when it makes a commit on his behalf: an edit in the website,
+or a merge there. No name in either field names an assistant, whatever the
+address. The
 message carries no co-author trailer, no session trailer or link, no
 "generated with" footer, and no assistant or model name anywhere, because
 credit for assistance lives in the README and the website footer and nowhere
@@ -56,10 +61,11 @@ unsigned or wrongly signed commit is reported and does not fail.
 # Which commits
 
 By default, the commits this clone would push: reachable from HEAD and from
-no remote-tracking branch. In CI, `--pushed` takes the push event's before and
-after. A new branch or a force push has no meaningful before, so everything
-the pushed branch has and `main` lacks is checked instead, which after a
-rewrite is every rewritten commit.
+no remote-tracking branch, or all of HEAD in a clone with no remote at all. In
+CI, `--pushed` takes the push event's before and after. A new branch has no
+meaningful before, so everything it has and `main` lacks is checked. A force
+push is checked whole: every commit the branch now has, because a rewrite can
+replace commits `main` shares with it, and each needs GitHub's verdict.
 
 # What this deliberately does not do
 
@@ -112,6 +118,11 @@ SIGNING_KEYS = {
     # website. Its signatures carry only the key ID, B5690EEEBB952194, which
     # is what `accepted` matches against the tail of this.
     "openpgp:968479A1AFF927E37D1A566BB5690EEEBB952194": "GitHub, for its website",
+    # OpenPGP, RSA 4096, primary 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A: the
+    # release key, held in the repository's GPG_PRIVATE_KEY secret. This is its
+    # signing subkey, which is the fingerprint a signature carries. Workflows
+    # sign with it; .github/workflows/signing.yml asks GitHub for its verdict.
+    "openpgp:83ABD67A93772B3FA15D2642BD752A144704C231": "tilas01's release key, in Actions",
 }
 
 # The key a cloud container signs with. Registered to a different account, so
@@ -134,10 +145,13 @@ TRAILER = re.compile(
     r"|https?://claude\.ai/",
     re.IGNORECASE)
 
-# An assistant or its maker by name, or a model by name and number. The model
-# names are ordinary words on their own, so a number has to follow.
+# An assistant or its maker by name, or a model by name and version. The model
+# names are ordinary words on their own, so a version has to follow, and only
+# one shaped like a model's: a single digit from 3, with at most one decimal.
+# "Opus" is also the audio codec this program handles, and "Opus 48 kHz" or
+# "Opus 1.5" is about the codec.
 ASSISTANT = re.compile(
-    r"\bclaude\b|\banthropic\b|\b(?:opus|sonnet|haiku|fable)[ -]?\d",
+    r"\bclaude\b|\banthropic\b|\b(?:opus|sonnet|haiku|fable)[ -]?[3-9](?:\.\d)?\b",
     re.IGNORECASE)
 
 
@@ -304,9 +318,14 @@ def commit_faults(cwd, sha, keys=None):
         faults.append("author is %s <%s>, not tilas01" % author)
     if committer[1] not in ACCOUNT_EMAILS and committer[1] != GITHUB_COMMITTER:
         faults.append("committer is %s <%s>, not tilas01" % committer)
-    # A right address under an assistant's name is still an assistant's name.
+    # GitHub's address is GitHub's only under GitHub's name. Anybody can write
+    # it into a commit, so the address alone proves nothing.
+    if committer[1] == GITHUB_COMMITTER and committer[0] != "GitHub":
+        faults.append("committer is %s <%s>, and only GitHub commits under that address"
+                      % committer)
+    # An assistant's name is an assistant's name whatever address it carries.
     for role, (name, email) in (("author", author), ("committer", committer)):
-        if email in ACCOUNT_EMAILS and ASSISTANT.search(name):
+        if ASSISTANT.search(name):
             faults.append("%s name %r names an assistant" % (role, name))
     # git reads everything up to the first blank line as the title, so a body
     # that starts on the line after it becomes part of the title: in
@@ -364,7 +383,46 @@ def next_commit_faults(cwd):
         faults.append("the next commit here would have %s %s <%s>; %s"
                       % (role, name, email, fix))
         break
+    signer = next_signer(cwd)
+    if signer and not accepted(signer, SIGNING_KEYS):
+        what = KNOWN_ELSEWHERE.get(signer, "a key not registered to tilas01's account")
+        faults.append("the next commit here would be signed by %s (%s), which GitHub\n"
+                      "      shows Unverified in tilas01's name. Run\n"
+                      "        python tools/repo/signing.py\n"
+                      "      which signs with the project's key, or, while there is none, turns\n"
+                      "      signing off for this clone" % (what, signer))
     return faults
+
+
+def next_signer(cwd):
+    """The key the next commit here would be signed with, or None if unsigned.
+
+    Read from the config the way git reads it. An SSH key is named by its
+    fingerprint when ssh-keygen can read the key file, and as an unknown SSH
+    key otherwise, which no entry in SIGNING_KEYS matches.
+    """
+    if git(["config", "--bool", "commit.gpgsign"], cwd).strip() != "true":
+        return None
+    form = git(["config", "gpg.format"], cwd).strip() or "openpgp"
+    key = git(["config", "user.signingkey"], cwd).strip()
+    if form == "openpgp":
+        key = key.upper().replace("0X", "").rstrip("!")
+        return "openpgp:" + (key or "the default key")
+    if form == "ssh":
+        # ssh-keygen names a key the way a signature does; without it, or
+        # without a readable key, the key is unknown, which no entry matches.
+        if key.startswith("key::"):
+            args, given = ["ssh-keygen", "-lf", "-"], key[5:].encode()
+        else:
+            args, given = ["ssh-keygen", "-lf", os.path.expanduser(key)], None
+        try:
+            done = subprocess.run(args, input=given, stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE) if key else None
+        except OSError:
+            done = None
+        words = done.stdout.decode().split() if done and done.returncode == 0 else []
+        return "ssh:" + (words[1] if len(words) > 1 else "an SSH key this cannot read")
+    return "%s:%s" % (form, key or "the default key")
 
 
 def unpushed(cwd):
@@ -373,7 +431,9 @@ def unpushed(cwd):
         return []
     remotes = git(["for-each-ref", "--format=%(refname)", "refs/remotes"], cwd).split()
     if not remotes:
-        return []
+        # Nothing here has been pushed anywhere this clone knows of, so all of
+        # it is what a push would send.
+        return git(["rev-list", "--reverse", "HEAD"], cwd).split()
     return git(["rev-list", "--reverse", "HEAD", "--not", "--remotes"], cwd).split()
 
 
@@ -387,9 +447,10 @@ def pushed(cwd, before, after):
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
         if forward:
             return git(["rev-list", "--reverse", "%s..%s" % (before, after)], cwd).split()
-    # A new branch or a force push: everything the pushed commit has that main
-    # lacks. On main itself that is nothing, and a rewrite of main is the one
-    # case this cannot see, which is why it is a decision and not a push.
+        # A force push: every commit the branch now has may be new, including
+        # those main has too when main was rewritten with it, so all of them.
+        return git(["rev-list", "--reverse", after], cwd).split()
+    # A new branch: everything the pushed commit has that main lacks.
     base = "origin/main"
     if not git(["rev-parse", "--verify", "-q", base], cwd).strip():
         return git(["rev-list", "--reverse", after], cwd).split()
@@ -506,6 +567,12 @@ def self_test():
         ("a model by name and number",
          dict(message="Fix\n\nWritten with Opus 5"),
          "names 'Opus 5'"),
+        ("a model by name and decimal version",
+         dict(message="Fix\n\nWritten with Sonnet 4.5"),
+         "names 'Sonnet 4.5'"),
+        ("an assistant's name at GitHub's address",
+         dict(message="Fix", committer=(bot, GITHUB_COMMITTER)),
+         "only GitHub commits under that address"),
         ("a title run straight into its body",
          dict(message="Fix\n- the change"),
          "no blank line"),
@@ -540,6 +607,7 @@ def self_test():
         clean = [
             dict(message="The session marker, regenerated with the new seed"),
             dict(message="A sonnet, an opus and a haiku walk into a changelog"),
+            dict(message="Accept Opus 48 kHz input, as the Opus 1.5 decoder reads it"),
             dict(message="A title\n\n- one change\n- and another"),
             dict(message="Edited on the website",
                  author=("Starlight", "95286414+tilas01@users.noreply.github.com"),
@@ -552,7 +620,7 @@ def self_test():
                 failures += 1
                 print("    MISSED: a sound commit was refused: %s" % "; ".join(faults))
         if not failures:
-            print("    clean: four sound commits, one of them made by GitHub")
+            print("    clean: five sound commits, one of them made by GitHub")
 
         # Unsigned: reported while signatures are optional, failing once not.
         sha = git(["rev-parse", "HEAD"], where).strip()
@@ -566,6 +634,25 @@ def self_test():
             print("    MISSED: an unsigned commit should fail once required")
         else:
             print("    caught: an unsigned commit, once signatures are required")
+
+        # Which commits a push would carry. With no remote at all, every one.
+        everything = git(["rev-list", "--reverse", "HEAD"], where).split()
+        if unpushed(where) == everything:
+            print("    caught: a clone with no remote checks all of its history")
+        else:
+            failures += 1
+            print("    MISSED: a clone with no remote should check every commit")
+        # A force push is checked whole, even where main has the same commits.
+        run(["update-ref", "refs/remotes/origin/main", everything[1]])
+        gone = make("Replaced by the force push")
+        run(["reset", "-q", "--hard", "HEAD~1"])
+        tip = make("What the branch is now")
+        whole = git(["rev-list", "--reverse", tip], where).split()
+        if pushed(where, gone, tip) == whole:
+            print("    caught: a force push is checked commit by commit, all of it")
+        else:
+            failures += 1
+            print("    MISSED: a force push should check every commit the branch has")
 
         # The identity of the next commit, which is what the variables decide.
         env = dict(base)
@@ -586,6 +673,28 @@ def self_test():
         else:
             failures += 1
             print("    MISSED: the environment's identity should be refused")
+
+        # The key the next commit would be signed with: a container's own SSH
+        # key, set the way a container sets it, and then signing switched off.
+        saved = dict(os.environ)
+        os.environ.clear()
+        os.environ.update(base)
+        try:
+            run(["config", "commit.gpgsign", "true"])
+            run(["config", "gpg.format", "ssh"])
+            run(["config", "user.signingkey", os.path.join(where, "missing.pub")])
+            foreign = next_commit_faults(where)
+            run(["config", "commit.gpgsign", "false"])
+            off = next_commit_faults(where)
+        finally:
+            os.environ.clear()
+            os.environ.update(saved)
+        if any("would be signed by" in f for f in foreign) and not off:
+            print("    caught: a signing key GitHub does not know as tilas01's")
+        else:
+            failures += 1
+            print("    MISSED: a foreign signing key should be refused, and none passed "
+                  "(%r, %r)" % (foreign, off))
     finally:
         shutil.rmtree(where, ignore_errors=True)
 

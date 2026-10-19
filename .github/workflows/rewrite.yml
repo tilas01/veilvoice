@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Builds the one-time signed rewrite of dev and main with the key in the
+# repository's secrets, GPG_PRIVATE_KEY and GPG_PASSPHRASE, and hands it over
+# as a bundle in a commit of its own, because the run's token may not push a
+# rewrite of commits that touch workflow files. tools/repo/rewrite_in_actions.sh
+# says how, and tools/repo/rewrite.py what changes and what may not. Nothing
+# here pushes dev or main: a clone with push rights does that, with
+# `rewrite.py --push`, after checking the handover.
+#
+# Runs when this file changes, or by hand; re-run a finished run to build it
+# again from the branches as they are by then.
+
+name: rewrite
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev]
+    paths:
+      - '.github/workflows/rewrite.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Build the signed rewrite and hand it over
+        env:
+          KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: bash tools/repo/rewrite_in_actions.sh
