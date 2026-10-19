@@ -61,6 +61,11 @@ if ! printf '%s\n' "$listing" | grep '^uid:' | grep -q "<$address>"; then
     say '```'
     gpg --armor --export "$primary" | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"
     say '```'
+    # The log masks every line it shares with the secret, and an export
+    # shares the public packet's lines, so the key is also carried in the
+    # check commit, which stays fetchable by its hash after the branch goes.
+    gpg --armor --export "$primary" > signing-public-key.asc
+    git add signing-public-key.asc
   else
     say "Could not add one here (the primary key's secret part or its passphrase is missing)."
   fi
@@ -72,6 +77,7 @@ git config gpg.program "$RUNNER_TEMP/gpg-loopback"
 GIT_COMMITTER_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   git commit --quiet --allow-empty -S"$signer!" \
   -m "Signing check, made by the signing workflow and deleted at once"
+say "check commit $(git rev-parse HEAD)"
 sha=$(git rev-parse HEAD)
 git log -1 --format='local check: %G? %GF' | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"
 
