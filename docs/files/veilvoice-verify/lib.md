@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-verify/src/lib.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 2585 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 2607 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs)
 
 ## Contents
 
@@ -83,17 +83,17 @@ Give it arguments and it does exactly what you asked.
 
 ## What this file contains
 
-2585 lines defining **41 functions** (2 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+2607 lines defining **41 functions** (2 public), **2 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Manifest` (line 1095) -- What the release said is inside its archives, if anything usable.
-- `enum Asked` (line 2284) -- A question about this program, rather than something for it to do.
+- `enum Asked` (line 2306) -- A question about this program, rather than something for it to do.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `help_text` (line 173) -- The verifier's own help, with its verbosity and exit-status tables.
-- `run` (line 2343) -- Run the verifier over args, which are the words after veilvoice verify.
+- `run` (line 2365) -- Run the verifier over args, which are the words after veilvoice verify.
   - reaches: `asked_for`, `command_archive`, `command_auto`, `command_build`, `command_deps`, `command_file_against_hash`, `command_file_against_sums`, `command_gnupg`, `command_hash`, `command_install`, `command_key`, `command_machine`
 
 ## What calls what
@@ -140,7 +140,7 @@ flowchart TD
     n_report_extracted["report_extracted<br/>line 1031"]
     n_manifest["manifest<br/>line 1111"]
     n_report_against_manifest["report_against_manifest<br/>line 1142"]
-    n_run(["run<br/>line 2343"])
+    n_run(["run<br/>line 2365"])
     n_command_auto --> n_command_file_against_sums
     n_command_auto --> n_incomplete_deny
     n_command_auto --> n_manifest
@@ -205,7 +205,7 @@ flowchart TD
     click n_report_extracted href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1031" "open the source"
     click n_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1111" "open the source"
     click n_report_against_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1142" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2343" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2365" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -250,19 +250,19 @@ flowchart TD
 | `report_carried` <sub>fn</sub> | [1385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1385) | Roadmap item 164. |
 | `report_inside` <sub>fn</sub> | [1445](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1445) | Roadmap item 164. |
 | `command_archive` <sub>fn</sub> | [1547](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1547) | Roadmap item 164. |
-| `published_on_this_machine` <sub>fn</sub> | [1648](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1648) | Roadmap item 164. |
-| `command_machine` <sub>fn</sub> | [1675](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1675) | Roadmap item 164. |
-| `report_what_moved` <sub>fn</sub> | [1818](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1818) | Roadmap item 164. |
-| `command_gnupg` <sub>fn</sub> | [1862](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1862) | Roadmap item 91. |
-| `command_deps` <sub>fn</sub> | [1907](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1907) | What this machine needs before it can build VeilVoice. |
-| `command_build` <sub>fn</sub> | [1979](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1979) | Build the workspace from source and hash what came out. |
-| `do_build` <sub>fn</sub> | [1997](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1997) | Everything both build commands do before they differ. |
-| `command_reproduce` <sub>fn</sub> | [2066](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2066) | Build here, and compare against the published hashes for this platform. |
-| `command_install` <sub>fn</sub> | [2175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2175) | Put binaries where a shell will find them. |
-| `asked_for` <sub>fn</sub> | [2264](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2264) | Print something the reader asked for by name, at any level. |
-| `Asked` <sub>enum</sub> | [2284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2284) | A question about this program, rather than something for it to do. |
-| `Asked::in_args` <sub>fn</sub> | [2301](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2301) | Which of these, if any, the arguments ask for. |
-| `run` <sub>pub fn</sub> | [2343](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2343) | Run the verifier over args, which are the words after veilvoice verify. |
+| `published_on_this_machine` <sub>fn</sub> | [1670](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1670) | Roadmap item 164. |
+| `command_machine` <sub>fn</sub> | [1697](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1697) | Roadmap item 164. |
+| `report_what_moved` <sub>fn</sub> | [1840](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1840) | Roadmap item 164. |
+| `command_gnupg` <sub>fn</sub> | [1884](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1884) | Roadmap item 91. |
+| `command_deps` <sub>fn</sub> | [1929](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L1929) | What this machine needs before it can build VeilVoice. |
+| `command_build` <sub>fn</sub> | [2001](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2001) | Build the workspace from source and hash what came out. |
+| `do_build` <sub>fn</sub> | [2019](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2019) | Everything both build commands do before they differ. |
+| `command_reproduce` <sub>fn</sub> | [2088](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2088) | Build here, and compare against the published hashes for this platform. |
+| `command_install` <sub>fn</sub> | [2197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2197) | Put binaries where a shell will find them. |
+| `asked_for` <sub>fn</sub> | [2286](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2286) | Print something the reader asked for by name, at any level. |
+| `Asked` <sub>enum</sub> | [2306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2306) | A question about this program, rather than something for it to do. |
+| `Asked::in_args` <sub>fn</sub> | [2323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2323) | Which of these, if any, the arguments ask for. |
+| `run` <sub>pub fn</sub> | [2365](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/lib.rs#L2365) | Run the verifier over args, which are the words after veilvoice verify. |
 
 ---
 

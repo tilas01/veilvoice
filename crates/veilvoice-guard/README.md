@@ -109,7 +109,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>165 lines"])
     n_blame["blame.rs<br/>433 lines"]
-    n_manifest["manifest.rs<br/>738 lines"]
+    n_manifest["manifest.rs<br/>764 lines"]
     n_record["record.rs<br/>94 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" "open the source"
     click n_blame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" "open the source"
@@ -125,10 +125,10 @@ flowchart TD
 |---|---:|---|
 | [`blame.rs`](../../docs/files/veilvoice-guard/blame.md) | 433 | Best-effort attribution: which program changed a file. |
 | [`lib.rs`](../../docs/files/veilvoice-guard/lib.md) | 165 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
-| [`manifest.rs`](../../docs/files/veilvoice-guard/manifest.md) | 738 | The integrity manifest: what the files were, and what they are now. |
+| [`manifest.rs`](../../docs/files/veilvoice-guard/manifest.md) | 764 | The integrity manifest: what the files were, and what they are now. |
 | [`record.rs`](../../docs/files/veilvoice-guard/record.md) | 94 | Where the integrity record is kept. |
 
-**2,947 functional lines of Rust** in this crate. A functional line is a line
+**2,955 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

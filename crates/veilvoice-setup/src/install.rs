@@ -300,7 +300,12 @@ fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
 /// replaced by the file rather than written through, a hard link is left
 /// holding the old contents, and on Unix a `to` that is running is replaced
 /// rather than refused with "text file busy".
-fn replace_with_copy(from: &Path, to: &Path) -> std::io::Result<()> {
+///
+/// Public because `veilvoice verify install --from` puts binaries in the same
+/// directory and had the same defect, as F-266. One implementation rather than
+/// two, so the next thing learned about replacing a running program is learned
+/// once.
+pub fn replace_with_copy(from: &Path, to: &Path) -> std::io::Result<()> {
     let name = to
         .file_name()
         .ok_or_else(|| std::io::Error::other("the destination names no file"))?;

@@ -1629,7 +1629,29 @@ fn command_archive(archive: &Path) -> ExitCode {
         return Status::Refused.into();
     }
 
-    verdict!("  {name} is the published archive, and so is every file in it.");
+    // Two different sentences, because two different things were established.
+    //
+    // Reaching here at all means the archive's own hash matched a signed list,
+    // so its bytes are the published bytes and everything inside it follows
+    // from that whether or not anything inside was opened. But the release did
+    // not always publish a contents list, and where there is none `report_inside`
+    // compares each member against nothing and returns zero. Saying "and so is
+    // every file in it" after that reads as a per-file check that did not
+    // happen, and a verifier describing a check it did not make is the one
+    // thing this program must never do, even when what it says is true.
+    match published {
+        Some(_) => verdict!(
+            "  {name} is the published archive, and every file in it was checked \
+             one by one against the published list."
+        ),
+        None => {
+            verdict!("  {name} is the published archive, byte for byte.");
+            out!();
+            out!("  That covers what is inside it: the hash that matched is a hash of");
+            out!("  the whole archive. This release published no separate list of its");
+            out!("  contents, so the files were not also checked one at a time.");
+        }
+    }
     out!();
     out!("  {}", check::SCOPE);
     out!();
@@ -2218,7 +2240,7 @@ fn command_install(from: &Path, cli: bool, gui: bool) -> ExitCode {
             );
         }
         let target = destination.join(&file);
-        if let Err(e) = std::fs::copy(&source, &target) {
+        if let Err(e) = veilvoice_setup::install::replace_with_copy(&source, &target) {
             return cannot(
                 "a binary could not be copied",
                 &[&format!(

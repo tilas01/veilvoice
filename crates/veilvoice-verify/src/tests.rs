@@ -1818,3 +1818,43 @@ fn a_question_about_the_program_is_answered_wherever_it_is_asked() {
         );
     }
 }
+
+/// `verify install` puts binaries in place through the one routine that stages.
+///
+/// The case is ordinary rather than adversarial: somebody points
+/// `~/.local/bin/veilvoice` at a portable copy they keep elsewhere, and then
+/// runs `veilvoice verify install`. With `std::fs::copy` the new binary lands
+/// on the portable copy and the link still points at it, so there is one file
+/// where the reader believes there are two, and the "installed" copy and the
+/// "portable" copy can never again differ. **F-266.**
+///
+/// That behaviour is held down where it lives, by
+/// `veilvoice_setup::install`'s own tests of `replace_with_copy`. What this
+/// test holds down is the thing that went wrong: `command_install` writing its
+/// own copy instead of calling it. So it reads the source rather than
+/// installing anything, because installing for real means writing into
+/// `bin_dir()`, which is the tester's own `~/.local/bin`.
+#[test]
+fn verify_install_goes_through_the_one_routine_that_stages_and_renames() {
+    let source = include_str!("lib.rs").replace("\r\n", "\n");
+    let start = source
+        .find("fn command_install(")
+        .expect("command_install exists");
+    let end = source[start..]
+        .find("\n    verdict!(")
+        .map(|at| start + at)
+        .expect("the copying loop ends before the verdict");
+    let body = &source[start..end];
+
+    assert!(
+        body.contains("veilvoice_setup::install::replace_with_copy(&source, &target)"),
+        "command_install no longer installs through install::replace_with_copy, \
+         which is the one place that stages a new file and renames it over the \
+         name people run. That is F-266, and F-237 one command over."
+    );
+    assert!(
+        !body.contains("fs::copy("),
+        "command_install copies straight to the destination again, which follows \
+         a link already at that name and writes wherever it points. That is F-266."
+    );
+}

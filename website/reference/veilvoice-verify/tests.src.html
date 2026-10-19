@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1820 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1860 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1969,6 +1969,48 @@
 <span class="ln" id="L1818">        );</span>
 <span class="ln" id="L1819">    }</span>
 <span class="ln" id="L1820">}</span>
+</span>
+<span class="ln" id="L1821"></span>
+<span class="src-item" id="fn-verify_install_goes_through_the_one_routine_that_stages_and_renames">
+<span class="ln" id="L1822"><span class="tok-com">/// `verify install` puts binaries in place through the one routine that stages.</span></span>
+<span class="ln" id="L1823"><span class="tok-com">///</span></span>
+<span class="ln" id="L1824"><span class="tok-com">/// The case is ordinary rather than adversarial: somebody points</span></span>
+<span class="ln" id="L1825"><span class="tok-com">/// `~/.local/bin/veilvoice` at a portable copy they keep elsewhere, and then</span></span>
+<span class="ln" id="L1826"><span class="tok-com">/// runs `veilvoice verify install`. With `std::fs::copy` the new binary lands</span></span>
+<span class="ln" id="L1827"><span class="tok-com">/// on the portable copy and the link still points at it, so there is one file</span></span>
+<span class="ln" id="L1828"><span class="tok-com">/// where the reader believes there are two, and the &quot;installed&quot; copy and the</span></span>
+<span class="ln" id="L1829"><span class="tok-com">/// &quot;portable&quot; copy can never again differ. **F-266.**</span></span>
+<span class="ln" id="L1830"><span class="tok-com">///</span></span>
+<span class="ln" id="L1831"><span class="tok-com">/// That behaviour is held down where it lives, by</span></span>
+<span class="ln" id="L1832"><span class="tok-com">/// `veilvoice_setup::install`&#x27;s own tests of `replace_with_copy`. What this</span></span>
+<span class="ln" id="L1833"><span class="tok-com">/// test holds down is the thing that went wrong: `command_install` writing its</span></span>
+<span class="ln" id="L1834"><span class="tok-com">/// own copy instead of calling it. So it reads the source rather than</span></span>
+<span class="ln" id="L1835"><span class="tok-com">/// installing anything, because installing for real means writing into</span></span>
+<span class="ln" id="L1836"><span class="tok-com">/// `bin_dir()`, which is the tester&#x27;s own `~/.local/bin`.</span></span>
+<span class="ln" id="L1837"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1838"><span class="tok-kw">fn</span> <span class="tok-fn">verify_install_goes_through_the_one_routine_that_stages_and_renames</span>() {</span>
+<span class="ln" id="L1839">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1840">    <span class="tok-kw">let</span> start = source</span>
+<span class="ln" id="L1841">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn command_install(&quot;</span>)</span>
+<span class="ln" id="L1842">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_install exists&quot;</span>);</span>
+<span class="ln" id="L1843">    <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L1844">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    verdict!(&quot;</span>)</span>
+<span class="ln" id="L1845">        .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L1846">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the copying loop ends before the verdict&quot;</span>);</span>
+<span class="ln" id="L1847">    <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
+<span class="ln" id="L1848"></span>
+<span class="ln" id="L1849">    assert!(</span>
+<span class="ln" id="L1850">        body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice_setup::install::replace_with_copy(&amp;source, &amp;target)&quot;</span>),</span>
+<span class="ln" id="L1851">        <span class="tok-str">&quot;command_install no longer installs through install::replace_with_copy, \</span></span>
+<span class="ln" id="L1852"><span class="tok-str">         which is the one place that stages a new file and renames it over the \</span></span>
+<span class="ln" id="L1853"><span class="tok-str">         name people run. That is F-266, and F-237 one command over.&quot;</span></span>
+<span class="ln" id="L1854">    );</span>
+<span class="ln" id="L1855">    assert!(</span>
+<span class="ln" id="L1856">        !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;fs::copy(&quot;</span>),</span>
+<span class="ln" id="L1857">        <span class="tok-str">&quot;command_install copies straight to the destination again, which follows \</span></span>
+<span class="ln" id="L1858"><span class="tok-str">         a link already at that name and writes wherever it points. That is F-266.&quot;</span></span>
+<span class="ln" id="L1859">    );</span>
+<span class="ln" id="L1860">}</span>
 </span>
 </code></pre>
 </main>
