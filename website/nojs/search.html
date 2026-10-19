@@ -59,7 +59,7 @@ nav.top a{margin-right:14px}
 <a href="https://github.com/tilas01/veilvoice">repository</a>
 </nav>
 <h1>Search index</h1>
-<p class="lead">Every file and every section in VeilVoice, 465 files and 25930 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
+<p class="lead">Every file and every section in VeilVoice, 467 files and 25953 sections, listed in full on this page. There is no JavaScript here and nothing to load: use your browser's own find-in-page (Ctrl+F, or Cmd+F on a Mac) to search it. Section headings and their opening text are included, so searching for a term finds the place it is discussed, not just the file name.</p>
 <p class="lead">The <a href="../search.html">live search</a> on the main site scores and ranks the same index, and adds sorting and filtering. It needs JavaScript. This page does not, and is generated from the same walk of the repository, so the two never disagree.</p>
 <p class="lead">Every entry is expanded rather than folded away, deliberately: text inside a collapsed section is not searchable by find-in-page on every browser, and an index that answers confidently with nothing would be worse than no index. That makes this a long page. The list below jumps to each part of it.</p>
 <h2 id="contents">Contents</h2>
@@ -68,8 +68,8 @@ nav.top a{margin-right:14px}
 <li><a href="#k-rust">Rust source</a> <span class="meta">183 files</span></li>
 <li><a href="#k-test">Tests and fuzzing</a> <span class="meta">13 files</span></li>
 <li><a href="#k-web">Website</a> <span class="meta">52 files</span></li>
-<li><a href="#k-tool">Tools and generators</a> <span class="meta">114 files</span></li>
-<li><a href="#k-build">Build and CI</a> <span class="meta">29 files</span></li>
+<li><a href="#k-tool">Tools and generators</a> <span class="meta">115 files</span></li>
+<li><a href="#k-build">Build and CI</a> <span class="meta">30 files</span></li>
 <li><a href="#k-legal">Licence and legal</a> <span class="meta">4 files</span></li>
 <li><a href="#k-other">Other</a> <span class="meta">27 files</span></li>
 </ul>
@@ -20115,7 +20115,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">3. Getting help, and checking for yourself</span> <span class="meta">line 171</span><br><span class="x">8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A . Written and maintained by tilas01 , who holds the copyright. Every change is reviewed, built and tested before release.</span></li>
 </ul>
 </details>
-<h2 id="k-tool">Tools and generators <span class="meta">(114)</span></h2>
+<h2 id="k-tool">Tools and generators <span class="meta">(115)</span></h2>
 <details open>
 <summary><code>assets/generate.py</code> <span class="meta">&middot; assets, 1330 lines, 217 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/assets/generate.py">open generate.py</a></p>
@@ -23412,6 +23412,27 @@ nav.top a{margin-right:14px}
 </ul>
 </details>
 <details open>
+<summary><code>tools/repo/signing_check.sh</code> <span class="meta">&middot; tools, 89 lines, 15 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/tools/repo/signing_check.sh">open signing_check.sh</a></p>
+<ul>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">#!/usr/bin/env bash # SPDX-License-Identifier: GPL-3.0-or-later # # Run by .github/workflows/signing.yml, where the signing key is a repository # secret. Imports the key, says which key it is and which identities it # carries, signs one</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">commit with it on a branch of its own, asks GitHub whether # that commit reads Verified, and deletes the branch again. # # Nothing secret is printed: a fingerprint, an identity and GitHub&#x27;s verdict # are all public. The key arrives in</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">$KEY, armoured or base64 of either form, # and its passphrase, if it has one, in $PASSPHRASE. set -euo pipefail say() { printf &#x27;%s\n&#x27; &quot;$*&quot; | tee -a &quot;${GITHUB_STEP_SUMMARY:-/dev/null}&quot;; } export GNUPGHOME=&quot;$RUNNER_TEMP/gnupg&quot; mkdir -m 700</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">-p &quot;$GNUPGHOME&quot; material=&quot;$RUNNER_TEMP/key&quot; if printf &#x27;%s&#x27; &quot;$KEY&quot; | grep -q -- &#x27;-----BEGIN PGP&#x27;; then printf &#x27;%s\n&#x27; &quot;$KEY&quot; &gt; &quot;$material&quot; else printf &#x27;%s&#x27; &quot;$KEY&quot; | base64 -d &gt; &quot;$material&quot; fi gpg --batch --quiet --import &quot;$material&quot;</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">2&gt;/dev/null || true rm -f &quot;$material&quot; pp=&quot;$RUNNER_TEMP/pp&quot; printf &#x27;%s&#x27; &quot;${PASSPHRASE:-}&quot; &gt; &quot;$pp&quot; cat &gt; &quot;$RUNNER_TEMP/gpg-loopback&quot; &lt;&lt;EOF #!/bin/sh exec gpg --batch --pinentry-mode loopback --passphrase-file &quot;$pp&quot; &quot;\$@&quot; EOF chmod +x</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">&quot;$RUNNER_TEMP/gpg-loopback&quot; listing=$(gpg --list-secret-keys --with-colons) if [ -z &quot;$listing&quot; ]; then say &quot;No secret key could be imported from the secret.&quot; exit 1 fi say &quot;## The key in the secret&quot;</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">say &#x27;```&#x27; printf &#x27;%s\n&#x27; &quot;$listing&quot; | awk -F: &#x27; $1==&quot;sec&quot;||$1==&quot;ssb&quot; {kind=$1; caps=$12; stub=($15==&quot;#&quot;) ? &quot; (secret part absent)&quot; : &quot;&quot;} $1==&quot;fpr&quot; {print kind, $10, &quot;capabilities &quot; caps stub} $1==&quot;uid&quot; {print &quot;uid&quot;, $10}&#x27; | tee -a</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">&quot;${GITHUB_STEP_SUMMARY:-/dev/null}&quot; say &#x27;```&#x27; primary=$(printf &#x27;%s\n&#x27; &quot;$listing&quot; | awk -F: &#x27;$1==&quot;fpr&quot;{print $10; exit}&#x27;) signer=$(printf &#x27;%s\n&#x27; &quot;$listing&quot; | awk -F: &#x27; $1==&quot;sec&quot;||$1==&quot;ssb&quot; {caps=$12; usable=($15!=&quot;#&quot;)} $1==&quot;fpr&quot; &amp;&amp; caps ~</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">/s/ &amp;&amp; usable {fpr=$10} END {print fpr}&#x27;) address=&quot;tilas01@users.noreply.github.com&quot; if ! printf &#x27;%s\n&#x27; &quot;$listing&quot; | grep &#x27;^uid:&#x27; | grep -q &quot;&lt;$address&gt;&quot;; then say &quot;&quot; say &quot;The key carries no identity with $address, so GitHub cannot match it</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">to tilas01&#x27;s commits.&quot; if &quot;$RUNNER_TEMP/gpg-loopback&quot; --quick-add-uid &quot;$primary&quot; &quot;tilas01 &lt;$address&gt;&quot; 2&gt;/dev/null; then gpg --armor --export &quot;$primary&quot; &gt; &quot;$RUNNER_TEMP/public-key.asc&quot; say &quot;Added that identity here. Its public half, with</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">the identity, is the artifact signing-public-key: add it to GitHub under Settings, SSH and GPG keys, replacing the old copy if there is one.&quot; else say &quot;Could not add one here (the primary key&#x27;s secret part or its passphrase is missing).&quot;</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">fi fi git config user.name tilas01 git config user.email &quot;$address&quot; git config gpg.program &quot;$RUNNER_TEMP/gpg-loopback&quot; GIT_COMMITTER_DATE=&quot;$(date -u +%Y-%m-%dT%H:%M:%SZ)&quot; \ git commit --quiet --allow-empty -S&quot;$signer!&quot; \ -m &quot;Signing check,</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">made by the signing workflow and deleted at once&quot; sha=$(git rev-parse HEAD) git log -1 --format=&#x27;local check: %G? %GF&#x27; | tee -a &quot;${GITHUB_STEP_SUMMARY:-/dev/null}&quot; branch=&quot;signing-check-$GITHUB_RUN_ID-$GITHUB_JOB&quot; git push --quiet origin</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">&quot;HEAD:refs/heads/$branch&quot; sleep 5 verdict=$(gh api &quot;repos/$GITHUB_REPOSITORY/commits/$sha&quot; \ --jq &#x27;.commit.verification | &quot;\(.verified) \(.reason)&quot;&#x27;) git push --quiet origin --delete &quot;$branch&quot;</span></li>
+<li><span class="sec">line 81</span> <span class="meta">line 81</span><br><span class="x">say &quot;&quot; say &quot;GitHub on the signed check commit $sha: $verdict&quot; say &quot;signer $signer&quot; rm -f &quot;$pp&quot; case &quot;$verdict&quot; in &quot;true valid&quot;) ;; *) exit 1 ;; esac</span></li>
+</ul>
+</details>
+<details open>
 <summary><code>tools/repo/tidy.py</code> <span class="meta">&middot; tools, 223 lines, 38 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/tools/repo/tidy.py">open tidy.py</a></p>
 <ul>
@@ -26448,7 +26469,7 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 561</span> <span class="meta">line 561</span><br><span class="x">status` before you push.&quot;) print() if failed: print(&quot;%d check(s) failed: %s&quot; % (len(failed), &quot;, &quot;.join(failed))) return 1 print(&quot;everything regenerated and every check passed&quot;) return 0 if __name__ == &quot;__main__&quot;: sys.exit(main())</span></li>
 </ul>
 </details>
-<h2 id="k-build">Build and CI <span class="meta">(29)</span></h2>
+<h2 id="k-build">Build and CI <span class="meta">(30)</span></h2>
 <details open>
 <summary><code>.cargo/audit.toml</code> <span class="meta">&middot; root, 63 lines, 14 sections</span></summary>
 <p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/.cargo/audit.toml">open audit.toml</a></p>
@@ -27050,6 +27071,20 @@ nav.top a{margin-right:14px}
 <li><span class="sec">line 841</span> <span class="meta">line 841</span><br><span class="x">conclude that the release does not # reproduce. The claim is the product here, so this line is the product. - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3 if: steps.gate.outputs.publish == &#x27;true&#x27; with:</span></li>
 <li><span class="sec">line 841</span> <span class="meta">line 841</span><br><span class="x">tag_name: ${{ env.VERSION_TAG }} target_commitish: ${{ github.sha }} files: staging/* body_path: NOTES.md draft: false prerelease: ${{ contains(env.VERSION_TAG, &#x27;-&#x27;) }} - name: What a dry run produced if: steps.gate.outputs.publish !=</span></li>
 <li><span class="sec">line 841</span> <span class="meta">line 841</span><br><span class="x">&#x27;true&#x27; run: | echo &quot;Dry run for ${{ env.VERSION_TAG }}. Nothing was published.&quot; echo cat staging/SHA256SUMS echo echo &quot;--- release notes ---&quot; cat NOTES.md</span></li>
+</ul>
+</details>
+<details open>
+<summary><code>.github/workflows/signing.yml</code> <span class="meta">&middot; .github, 53 lines, 8 sections</span></summary>
+<p class="meta"><a href="https://github.com/tilas01/veilvoice/blob/main/.github/workflows/signing.yml">open signing.yml</a></p>
+<ul>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x"># SPDX-License-Identifier: GPL-3.0-or-later # # Proves that the signing key held in the repository&#x27;s secrets makes commits # GitHub shows as Verified for tilas01, before any history is signed with it. # # The key is the one release.yml</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">already signs the checksums with, # GPG_PRIVATE_KEY and GPG_PASSPHRASE. The job imports it, signs one commit on # a branch of its own, reads GitHub&#x27;s verdict on that commit and deletes the # branch. The work is in</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">tools/repo/signing_check.sh. Run by hand, or by a # push that changes either file. The second job reads the same two secrets # from the environment named gpg_secrets, for a key kept there instead. name: signing on: workflow_dispatch: push:</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">branches: [dev, main] paths: - &#x27;.github/workflows/signing.yml&#x27; - &#x27;tools/repo/signing_check.sh&#x27; permissions: contents: write jobs: repository: runs-on: ubuntu-latest steps: - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">v7 - name: Sign one commit and ask GitHub whether it verifies env: KEY: ${{ secrets.GPG_PRIVATE_KEY }} PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }} GH_TOKEN: ${{ github.token }} run: | if [ -z &quot;$KEY&quot; ]; then echo &quot;GPG_PRIVATE_KEY is not set</span></li>
+<li><span class="sec">line 1</span> <span class="meta">line 1</span><br><span class="x">for the repository.&quot; | tee -a &quot;$GITHUB_STEP_SUMMARY&quot;; exit 0; fi bash tools/repo/signing_check.sh environment:</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">runs-on: ubuntu-latest environment: gpg_secrets steps: - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7 - name: Sign one commit and ask GitHub whether it verifies env: KEY: ${{ secrets.GPG_PRIVATE_KEY }} PASSPHRASE:</span></li>
+<li><span class="sec">line 41</span> <span class="meta">line 41</span><br><span class="x">${{ secrets.GPG_PASSPHRASE }} GH_TOKEN: ${{ github.token }} run: | if [ -z &quot;$KEY&quot; ]; then echo &quot;GPG_PRIVATE_KEY is not set in the gpg_secrets environment.&quot; | tee -a &quot;$GITHUB_STEP_SUMMARY&quot;; exit 0; fi bash tools/repo/signing_check.sh</span></li>
 </ul>
 </details>
 <details open>

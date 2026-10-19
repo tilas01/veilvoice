@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Proves that the signing key held in the repository's secrets makes commits
+# GitHub shows as Verified for tilas01, before any history is signed with it.
+#
+# The key is the one release.yml already signs the checksums with,
+# GPG_PRIVATE_KEY and GPG_PASSPHRASE. The job imports it, signs one commit on
+# a branch of its own, reads GitHub's verdict on that commit and deletes the
+# branch. The work is in tools/repo/signing_check.sh. Run by hand, or by a
+# push that changes either file. The second job reads the same two secrets
+# from the environment named gpg_secrets, for a key kept there instead.
+
+name: signing
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev, main]
+    paths:
+      - '.github/workflows/signing.yml'
+      - 'tools/repo/signing_check.sh'
+
+permissions:
+  contents: write
+
+jobs:
+  repository:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Sign one commit and ask GitHub whether it verifies
+        env:
+          KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$KEY" ]; then echo "GPG_PRIVATE_KEY is not set for the repository." | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; fi
+          bash tools/repo/signing_check.sh
+
+  environment:
+    runs-on: ubuntu-latest
+    environment: gpg_secrets
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Sign one commit and ask GitHub whether it verifies
+        env:
+          KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$KEY" ]; then echo "GPG_PRIVATE_KEY is not set in the gpg_secrets environment." | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; fi
+          bash tools/repo/signing_check.sh
