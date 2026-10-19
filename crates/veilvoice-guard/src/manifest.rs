@@ -219,6 +219,32 @@ impl Manifest {
         Ok(Self { entries })
     }
 
+    /// The same record, with `paths` measured again and everything else kept.
+    ///
+    /// For an update, which replaces some of the files a record covers and must
+    /// not forget the rest. `of` builds a record from the paths it is handed
+    /// and nothing else, so using it to re-record after an update quietly drops
+    /// every entry that was not replaced: the app lock, the files somebody
+    /// added themselves, anything a future version records. The next check then
+    /// finds them unrecorded rather than unchanged.
+    ///
+    /// Only the named paths are read from disk. That is the point as much as
+    /// the keeping is: a file that was altered while this record was in force
+    /// keeps its recorded digest and is still reported as `Modified` at the
+    /// next check, rather than having the alteration written down as the new
+    /// truth by an update that never looked at it.
+    ///
+    /// A named path not already recorded is added, and a named path that cannot
+    /// be read is left at whatever it was, for the reason [`Self::of`] gives.
+    pub fn refresh<P: AsRef<Path>>(&self, paths: &[P]) -> Result<Self, Error> {
+        let measured = Self::of(paths)?;
+        let mut entries = self.entries.clone();
+        for (key, entry) in measured.entries {
+            entries.insert(key, entry);
+        }
+        Ok(Self { entries })
+    }
+
     /// How many files are recorded.
     pub fn len(&self) -> usize {
         self.entries.len()

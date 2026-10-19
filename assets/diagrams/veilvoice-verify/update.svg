@@ -11,18 +11,19 @@
 <path d="M252.0 574.0 C 252.0 594.0, 292.3 700.0, 292.3 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M556.5 47.0 C 578.5 47.0, 578.5 47.0, 306.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M304.4 374.0 C 304.4 394.0, 252.0 500.0, 252.0 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M379.7 174.0 C 379.7 194.0, 149.6 200.0, 149.6 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M426.0 147.0 C 448.0 147.0, 448.0 147.0, 310.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M426.0 147.0 C 448.0 147.0, 448.0 147.0, 159.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M379.7 174.0 C 379.7 194.0, 355.5 200.0, 355.5 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M379.7 174.0 C 379.7 194.0, 212.9 200.0, 212.9 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M379.7 174.0 C 379.7 194.0, 439.0 200.0, 439.0 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M379.7 174.0 C 379.7 194.0, 296.3 200.0, 296.3 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M141.5 374.0 C 141.5 394.0, 117.4 500.0, 117.4 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M455.1 374.0 C 455.1 394.0, 216.9 600.0, 216.9 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M292.3 474.0 C 292.3 494.0, 407.9 600.0, 407.9 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M355.5 274.0 C 355.5 294.0, 304.4 300.0, 304.4 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M355.5 274.0 C 355.5 294.0, 141.5 300.0, 141.5 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M355.5 274.0 C 355.5 294.0, 455.1 300.0, 455.1 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M355.5 274.0 C 355.5 294.0, 292.3 400.0, 292.3 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M263.1 247.0 C 329.5 247.0, 329.5 147.0, 310.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M439.0 274.0 C 439.0 294.0, 304.4 300.0, 304.4 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M439.0 274.0 C 439.0 294.0, 141.5 300.0, 141.5 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M439.0 274.0 C 439.0 294.0, 455.1 300.0, 455.1 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M439.0 274.0 C 439.0 294.0, 292.3 400.0, 292.3 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M346.6 247.0 C 368.6 247.0, 368.6 147.0, 310.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L162" target="_blank" rel="noopener noreferrer">
 <rect x="28.0" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="94.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">this_platform</text>
@@ -33,95 +34,100 @@
 <text x="245.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">archive_for</text>
 <text x="245.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 204</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L240" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L247" target="_blank" rel="noopener noreferrer">
 <rect x="329.4" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="383.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
-<text x="383.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 240</text>
+<text x="383.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 247</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L287" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L295" target="_blank" rel="noopener noreferrer">
 <rect x="464.0" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="510.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">offered</text>
-<text x="510.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
+<text x="510.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 295</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L315" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L323" target="_blank" rel="noopener noreferrer">
 <rect x="40.1" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="98.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lock_is_set</text>
-<text x="98.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 315</text>
+<text x="98.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 323</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L322" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L330" target="_blank" rel="noopener noreferrer">
 <rect x="182.8" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="245.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">installation</text>
-<text x="245.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 322</text>
+<text x="245.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 330</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L415" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L423" target="_blank" rel="noopener noreferrer">
 <rect x="333.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="379.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">perform</text>
-<text x="379.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
+<text x="379.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L443" target="_blank" rel="noopener noreferrer">
-<rect x="162.6" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="212.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">workspace</text>
-<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 443</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L464" target="_blank" rel="noopener noreferrer">
+<rect x="79.2" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="149.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check_password</text>
+<text x="149.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 464</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L449" target="_blank" rel="noopener noreferrer">
-<rect x="289.1" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="355.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">update_within</text>
-<text x="355.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 449</text>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L492" target="_blank" rel="noopener noreferrer">
+<rect x="246.0" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="296.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">workspace</text>
+<text x="296.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 492</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L522" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L498" target="_blank" rel="noopener noreferrer">
+<rect x="372.6" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="439.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">update_within</text>
+<text x="439.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 498</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L584" target="_blank" rel="noopener noreferrer">
 <rect x="67.1" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="141.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">proved_contents</text>
-<text x="141.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 522</text>
+<text x="141.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 584</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L606" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L668" target="_blank" rel="noopener noreferrer">
 <rect x="55.0" y="520.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="117.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">archive_name</text>
-<text x="117.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 606</text>
+<text x="117.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 668</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L616" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L678" target="_blank" rel="noopener noreferrer">
 <rect x="242.0" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="304.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_archive</text>
-<text x="304.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 616</text>
+<text x="304.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 678</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L690" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L752" target="_blank" rel="noopener noreferrer">
 <rect x="205.7" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="252.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">extract</text>
-<text x="252.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 690</text>
+<text x="252.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 752</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L718" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L780" target="_blank" rel="noopener noreferrer">
 <rect x="233.9" y="720.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="292.3" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tar_program</text>
-<text x="292.3" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 718</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L745" target="_blank" rel="noopener noreferrer">
-<rect x="392.7" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="455.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">put_in_place</text>
-<text x="455.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 745</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L800" target="_blank" rel="noopener noreferrer">
-<rect x="114.2" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="216.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">carry_over_permissions</text>
-<text x="216.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 800</text>
-</a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L810" target="_blank" rel="noopener noreferrer">
-<rect x="114.2" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="216.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">carry_over_permissions</text>
-<text x="216.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 810</text>
+<text x="292.3" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 780</text>
 </a>
 <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L818" target="_blank" rel="noopener noreferrer">
+<rect x="392.7" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="455.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">put_in_place</text>
+<text x="455.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 818</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L900" target="_blank" rel="noopener noreferrer">
+<rect x="114.2" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="216.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">carry_over_permissions</text>
+<text x="216.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 900</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L910" target="_blank" rel="noopener noreferrer">
+<rect x="114.2" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="216.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">carry_over_permissions</text>
+<text x="216.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 910</text>
+</a>
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L918" target="_blank" rel="noopener noreferrer">
 <rect x="225.9" y="420.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="292.3" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">retake_record</text>
-<text x="292.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 818</text>
+<text x="292.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 918</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L856" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L978" target="_blank" rel="noopener noreferrer">
 <rect x="345.6" y="620.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="407.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_beside</text>
-<text x="407.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 856</text>
+<text x="407.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 978</text>
 </a>
-<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L871" target="_blank" rel="noopener noreferrer">
+<a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L993" target="_blank" rel="noopener noreferrer">
 <rect x="452.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="498.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">relaunch</text>
-<text x="498.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 871</text>
+<text x="498.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 993</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>

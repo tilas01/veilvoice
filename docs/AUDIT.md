@@ -3189,6 +3189,201 @@ no `on:` line, and an entry still carrying a line number. The ninth is the one
 it must accept, and it is this finding: a survivor ten lines further down the
 file, which under the old scheme failed twice over.
 
+
+### F-260: an update resealed the integrity record with a passphrase nobody had checked
+
+`update::perform` refused to start when an app lock was set and no passphrase
+was given, which was right, and then never asked whether the passphrase it *was*
+given is the one the lock takes. The record is resealed at the end of the
+update with whatever was typed. So a typo bought a complete update, new binaries
+and all, and an integrity record sealed under a passphrase that does not exist.
+The next launch cannot open it, reports VeilVoice's own files as changed or
+damaged, and reports it again at every launch afterwards, with nothing actually
+wrong and nothing the reader can do about it from the window.
+
+The passphrase is now checked against the app lock in `perform`, before the
+first byte is fetched, by the same `LockStore::unlock` every other unlock in the
+program goes through. Deliberately the same one: a wrong passphrase here counts
+toward the same failure count and waits out the same cooldown as one typed at
+the window, because an updater that could try passphrases without the rate
+limit would be a way around the rate limit.
+
+`Error::WrongPassword` is its own variant beside `Error::Locked`, for the reason
+`Locked` is one: the answer to both is to ask again, and "you did not give one"
+and "that one is not right" are different sentences to somebody who has just
+typed one.
+
+The regression test pins the order rather than the behaviour, because the real
+thing needs an app lock on the machine running the tests: the check has to
+happen before `update_within` is called at all, and a test that only asserted
+the check exists would pass with it at the end, which is the defect.
+
+### F-261: the name people run was briefly missing, and then briefly half a program
+
+`put_in_place` renamed the old program to `<name>.old` and then copied the new
+one to the name it had left. Its doc comment said the opposite, at length: that
+the order "means that at no point is the name missing: a rename within a
+directory is atomic, so somebody starting VeilVoice during an update gets the
+old one or the new one and never a partial file."
+
+Every clause of that is true about a rename and none of it is true about what
+the code did. Between the rename and the copy the name does not exist. For the
+length of the copy it exists and is incomplete. The window is a few milliseconds
+and it is precisely the window somebody hits by double-clicking the application
+they have just told to update itself, which is not an unlikely thing to do.
+
+A failure partway through the copy was handled, and left its own mess: the old
+file was renamed back over a half-written new one, so a second failure there
+left one new program and one old one in a directory that is supposed to hold a
+matched pair.
+
+The new program is now written to `<name>.new` beside the old one, given its
+permissions there, and moved to the real name by a rename, which is the atomic
+operation the comment was already describing. At every instant the name holds
+the old program whole, the new program whole, or nothing yet. Windows still
+moves the old file aside first, because a running program cannot be renamed
+over there, and that step is now explicitly the Windows one rather than
+something Unix pays for as well. On Unix nothing is moved aside at all: renaming
+over a running program is allowed and the running process keeps the inode it
+started from.
+
+The regression test reads the source rather than racing a thread. The window is
+milliseconds wide, so a test that has to catch it is a test that passes on a
+fast machine whatever the code says.
+
+### F-262: an update forgot every recorded file it had not replaced
+
+`retake_record` built the new integrity record with `Manifest::of(&replaced)`,
+which records the paths it is handed and nothing else. The record covers more
+than the two programs an update replaces: the guard records the app lock beside
+them on its first run, and somebody can name files of their own. All of that was
+dropped at the first update, and the next check reported those files as
+unrecorded rather than as unchanged, which is a different and much weaker claim.
+
+`Manifest::refresh` is the operation that was missing, and it is in
+`veilvoice-guard` beside `of` because it belongs to the type rather than to the
+updater: the same record, with the named paths measured again and every other
+entry kept.
+
+Only the named paths are read from disk, and that is as much the point as the
+keeping is. A file altered while the old record was in force keeps its recorded
+digest and is still reported as `Modified` at the next check. Re-hashing
+everything would have written the alteration down as the new truth, on the
+authority of an update that never looked at it.
+
+### F-263: the path to restart was read after the program had been moved
+
+`update_within` finished by asking `std::env::current_exe()` where to restart.
+By then `put_in_place` had already replaced the running program. On Unix
+`current_exe` follows the running process to wherever its file went, so the
+answer was `<name>.old`, or on Linux the literal `<name>.old (deleted)` once
+that file had been tidied up. Either would have failed to start.
+
+Latent: nothing calls `relaunch` yet, so no user has met this. It is the kind of
+defect that is found by reading and not by running, and it would have been found
+by running on the day the window gained its update button.
+
+The running program's path is now read at the top of the update, before
+anything moves, and the restart path is that file's name inside the directory
+the update wrote to. The name is what the caller wants to start again, and the
+name does not move.
+
+### F-264: the archive check claimed a per-file check it had not made
+
+`veilvoice verify archive` ends by printing that the archive "is the published
+archive, and so is every file in it". Where the release published no separate
+contents list, `report_inside` compares each member against nothing and returns
+zero, and that sentence was printed anyway.
+
+**The claim is true, and it was still wrong to print.** Reaching that line means
+the archive's own hash matched a signed list, so its bytes are the published
+bytes and everything inside follows from that whether or not anything inside was
+opened. What the sentence describes, though, is a per-file comparison, and no
+such comparison happened. A verifier describing a check it did not make is the
+one thing this program must never do, and being right by another route does not
+excuse it. This is recorded as a finding rather than as wording because the
+distinction it blurs is the one the whole command exists to draw.
+
+There are two sentences now, one for each case. With a contents list: every
+file in it was checked one by one against the published list. Without one: the
+archive is the published archive byte for byte, that covers what is inside it
+because the hash that matched is a hash of the whole archive, and the files
+were not also checked one at a time.
+
+### F-265: one screen said the update installs nothing and, four lines up, how to install
+
+`veilvoice_setup::update::SCOPE` is the paragraph shown beside a check, and it
+said "It does not download a release, install anything, or restart the program".
+True of the check. The paragraph is also printed by `veilvoice update`, on the
+two paths where nothing is installed, and there the unqualified "it" reads as a
+claim about the command, which does install: that is what the command is for.
+
+`veilvoice update --check` printed both halves of the contradiction on one
+screen, four lines apart: "Run `veilvoice update` to fetch it, check it and
+install it", and then "It does not download a release, install anything".
+
+Fixed in the paragraph rather than by splitting it in two, because there is
+only one set of facts and two copies of them would drift. Every sentence now
+names the check as its subject: "the check itself downloads no release,
+installs nothing and restarts nothing". The test that requires the paragraph to
+state its limits was looking for the old phrase and now looks for the new one,
+with the reason beside it.
+
+
+### F-266: `verify install` wrote through whatever was already at the name
+
+`command_install` copied each binary into place with `std::fs::copy`, which
+opens the destination for writing and follows what is there. If
+`~/.local/bin/veilvoice` is a symbolic link, the bytes go wherever it points. If
+it is a hard link, they go to the shared inode.
+
+The ordinary version of this needs no attacker at all. Somebody keeps a
+portable copy in a folder of their own and points `~/.local/bin/veilvoice` at
+it, which is a reasonable thing to do and is close to what the install
+instructions describe. They then run `veilvoice verify install --from`, which
+reports that it installed the binary, and what actually happened is that their
+portable copy was overwritten and the name still points at it. There is one
+file where they believe there are two, and the installed copy and the portable
+copy can never again differ, which defeats the point of having both.
+
+The version with an attacker is narrower than it looks: writing into that
+directory already needs write access to it. What a link adds is reach *out* of
+it, to a path the person running the install can write and the person who
+planted the link cannot.
+
+This is the same defect as F-237, which another thread found in
+`veilvoice_setup::install` during the same round, in a different command that
+writes to the same directory. That matters more than either finding on its own.
+`veilvoice install` and `veilvoice verify install --from` both put programs in
+`bin_dir()`, by two pieces of code written months apart, and the second one did
+not learn anything the first one had.
+
+So the fix here is not a second staging routine. `install::replace_with_copy`,
+written for F-237, is now public and `command_install` calls it. It writes to
+`.<name>.installing`, created with `create_new` so that nothing already at that
+name is followed, syncs it, carries the source's permissions over before the
+rename rather than after, and renames it over the destination, which replaces a
+link instead of writing through it. A first draft of this fix added a `place`
+function next to `command_install` that did the same thing slightly differently,
+including a staged name without the leading dot. It was deleted: two
+implementations of this is how the defect got here.
+
+`update::put_in_place` (F-261) is the third place that replaces a program
+somebody may be about to run, and it is still its own code, because it also
+moves the running program aside first on Windows, where a running file cannot be
+renamed over. Folding that one in means pushing the Windows branch down into
+`replace_with_copy`, which is worth doing and is not worth doing inside a
+finding about `verify install`. It is written down here instead.
+
+The regression test is the ordinary case rather than the adversarial one: a
+link pointing at a file elsewhere, an install over it, and an assertion that the
+file elsewhere is untouched, that the binary landed at the name, and that the
+name is no longer a link. It was run against `std::fs::copy` first and fails
+there, naming the overwritten file. It lives in the verifier's tests rather
+than beside `replace_with_copy`'s own, because what it is holding down is that
+`command_install` calls it at all.
+
+
 ## The half that could have damaged a machine
 
 `uninstall()` ended with `std::fs::remove_dir_all(prefix)`.

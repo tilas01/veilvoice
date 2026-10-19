@@ -230,6 +230,13 @@ pub enum Error {
     /// here that a front end should answer by asking a question rather than by
     /// printing a complaint.
     Locked,
+    /// A passphrase was given and the app lock did not accept it.
+    ///
+    /// Also its own variant, and for the same reason: the answer is to ask
+    /// again. Separate from [`Self::Locked`] so a front end can say which of
+    /// the two happened, because "you did not give one" and "that one is not
+    /// right" are different sentences to a person who has just typed one.
+    WrongPassword(String),
     /// The replacement itself failed, and what state it left behind.
     Replace(String),
     /// Something else went wrong with the disk.
@@ -260,6 +267,7 @@ impl std::fmt::Display for Error {
                  own files should look like is sealed with that passphrase and has \
                  to be rewritten by an update, so the update needs it too."
             ),
+            Self::WrongPassword(why) => write!(f, "{why}"),
             Self::Replace(why) => write!(f, "{why}"),
             Self::Io(why) => write!(f, "{why}"),
         }
@@ -423,6 +431,14 @@ pub fn perform(
     if lock_is_set() && password.is_none() {
         return Err(Error::Locked);
     }
+    // And the passphrase itself, still before anything is fetched. Holding a
+    // passphrase is not the same as holding the right one, and the record is
+    // resealed with whatever was typed: a typo used to buy new binaries and a
+    // record sealed under a passphrase nobody knows, which the next launch
+    // reports as "changed or damaged", every launch, with nothing wrong.
+    if let Some(pw) = password {
+        check_password(pw)?;
+    }
 
     let into = installation()?;
     let workspace = workspace()?;
@@ -432,6 +448,39 @@ pub fn perform(
     // next attempt makes its own.
     let _ = std::fs::remove_dir_all(&workspace);
     outcome
+}
+
+/// Refuse a passphrase the app lock does not accept, before anything is done.
+///
+/// Asked of the lock itself rather than of the sealed record, because the lock
+/// is what the passphrase is *for*: a machine whose record has never been
+/// sealed still has a lock, and the reseal at the end of an update would be the
+/// first place a wrong passphrase showed up, which is far too late.
+///
+/// This is an unlock like any other and is counted like any other. A wrong
+/// passphrase here adds to the same failure count and waits out the same
+/// cooldown as one typed at the window, which is right: an updater that could
+/// try passphrases without the rate limit would be a way around it.
+fn check_password(password: &[u8]) -> Result<(), Error> {
+    let Some(path) = veilvoice_crypto::lock::default_path() else {
+        return Ok(()); // nowhere for a lock to be, so there is none to satisfy
+    };
+    match veilvoice_crypto::lock::LockStore::open(&path) {
+        // No lock on this machine. A passphrase was offered and nothing needs
+        // it, which is not an error: the record is written unsealed and the
+        // caller is told so by `Record::Plain`.
+        Ok(None) => Ok(()),
+        Ok(Some(mut store)) => store
+            .unlock(password)
+            .map_err(|why| Error::WrongPassword(format!("{why}"))),
+        // The lock is there and cannot be read. Refusing is the safe answer:
+        // the alternative is replacing the binaries and then discovering the
+        // record cannot be resealed.
+        Err(why) => Err(Error::WrongPassword(format!(
+            "the app lock could not be read, so this update stopped before \
+             changing anything: {why}"
+        ))),
+    }
 }
 
 /// Where an update does its work: beside the copy being replaced.
@@ -469,6 +518,15 @@ fn update_within(
         ))
     })?;
 
+    // Where this program lives, asked now rather than at the end. On Unix
+    // `current_exe` follows the running process to wherever its file went, so
+    // asking after the replacement gives `<name>.old`, or on Linux the literal
+    // `<name>.old (deleted)` once that has been tidied up, and a relaunch of
+    // that path cannot work. The name is what the caller wants to start again,
+    // and the name does not move.
+    let running = std::env::current_exe()
+        .map_err(|e| Error::Io(format!("cannot find this program on disk: {e}")))?;
+
     // 2. Fetch. Nothing is opened and nothing is run.
     let mut fetched = Vec::new();
     for name in [
@@ -502,8 +560,12 @@ fn update_within(
     say(Step::Recording);
     let record = retake_record(into, &replaced, password);
 
-    let restart = std::env::current_exe()
-        .map_err(|e| Error::Io(format!("cannot find this program on disk: {e}")))?;
+    let restart = match running.file_name() {
+        Some(name) => into.join(name),
+        // A program whose path ends in no file name is not one this could have
+        // replaced, and the path it started from is the best answer left.
+        None => running,
+    };
     Ok(Done {
         tag: offer.tag.clone(),
         into: into.to_path_buf(),
@@ -730,14 +792,25 @@ fn tar_program() -> Option<PathBuf> {
     candidates.into_iter().find(|p| p.is_file())
 }
 
-/// Move the old binaries aside and put the new ones in their place.
+/// Write the new binaries beside the old ones and rename them into place.
 ///
-/// The old copy is **moved, not deleted**, and moved first. A running program
-/// cannot be overwritten on Windows and cannot be deleted at all, but it can be
-/// renamed, and renaming it frees the name for the new one. On Unix the same
-/// order costs nothing and means that at no point is the name missing: a rename
-/// within a directory is atomic, so somebody starting VeilVoice during an
-/// update gets the old one or the new one and never a partial file.
+/// **The new file is written under a temporary name first, and only a rename
+/// puts it at the name people run.** A rename within a directory is atomic, so
+/// somebody starting VeilVoice during an update gets the old program or the new
+/// one, never a half-written file and never nothing at all.
+///
+/// The order this had before F-261 was the other way round: the old file was
+/// renamed aside and the new one was then copied to the name it had left. That
+/// leaves the name absent for the length of a copy and then present but
+/// incomplete for the rest of it, which is exactly the window the doc comment
+/// claimed did not exist. It is a small window and it is the one a person hits
+/// by double-clicking the thing they just told to update itself.
+///
+/// The old copy is still **moved, not deleted**, on Windows, and there it still
+/// has to move first: a running program cannot be overwritten or renamed over
+/// there, but it can be renamed away, which frees the name. On Unix nothing
+/// needs to move at all, because renaming over a running program is allowed and
+/// the running process keeps the inode it started from.
 ///
 /// Anything that could not be cleaned up afterwards is returned rather than
 /// ignored, because a `veilvoice.old` nobody was told about is a file somebody
@@ -757,24 +830,51 @@ fn put_in_place(root: &Path, into: &Path) -> Result<(Vec<String>, Vec<PathBuf>),
         }
         let target = into.join(&name);
         let aside = into.join(format!("{name}.old"));
-        if target.exists() {
-            let _ = std::fs::remove_file(&aside);
-            std::fs::rename(&target, &aside).map_err(|e| {
-                Error::Replace(format!(
-                    "could not move the old {name} aside, so nothing was replaced: {e}"
-                ))
-            })?;
-        }
-        if let Err(e) = std::fs::copy(&from, &target) {
-            // Put it back. Failing halfway through an update and leaving no
-            // program at all is much worse than failing.
-            let _ = std::fs::rename(&aside, &target);
+        let staged = into.join(format!("{name}.new"));
+
+        // The new program, whole, beside the old one. Nothing anybody runs is
+        // touched yet, so a failure here changes nothing at all.
+        let _ = std::fs::remove_file(&staged);
+        if let Err(e) = std::fs::copy(&from, &staged) {
+            let _ = std::fs::remove_file(&staged);
             return Err(Error::Replace(format!(
-                "could not write the new {name}: {e}. The copy you had has been put back."
+                "could not write the new {name} beside the old one: {e}. Nothing \
+                 has been replaced."
             )));
         }
-        carry_over_permissions(&from, &target);
-        if aside.exists() && std::fs::remove_file(&aside).is_err() {
+        // Before it is anybody's program rather than after, so it is never
+        // reachable under its real name without the bit that makes it runnable.
+        carry_over_permissions(&from, &staged);
+
+        // Windows will not let a running program be renamed over, so there the
+        // old one moves away first and the name is briefly free. On Unix the
+        // rename below replaces it in one step and this does nothing.
+        let moved_aside = if cfg!(windows) && target.exists() {
+            let _ = std::fs::remove_file(&aside);
+            if let Err(e) = std::fs::rename(&target, &aside) {
+                let _ = std::fs::remove_file(&staged);
+                return Err(Error::Replace(format!(
+                    "could not move the old {name} aside, so nothing was replaced: {e}"
+                )));
+            }
+            true
+        } else {
+            false
+        };
+
+        if let Err(e) = std::fs::rename(&staged, &target) {
+            // Put it back. Failing halfway through an update and leaving no
+            // program at all is much worse than failing.
+            if moved_aside {
+                let _ = std::fs::rename(&aside, &target);
+            }
+            let _ = std::fs::remove_file(&staged);
+            return Err(Error::Replace(format!(
+                "could not put the new {name} in place: {e}. The copy you had is \
+                 still there."
+            )));
+        }
+        if moved_aside && aside.exists() && std::fs::remove_file(&aside).is_err() {
             left_behind.push(aside);
         }
         replaced.push(name);
@@ -826,9 +926,31 @@ fn retake_record(into: &Path, replaced: &[String], password: Option<&[u8]>) -> R
     let sealed = veilvoice_guard::sealed_record_path(&plain);
     let files: Vec<PathBuf> = replaced.iter().map(|name| into.join(name)).collect();
 
-    let manifest = match veilvoice_guard::Manifest::of(&files) {
-        Ok(manifest) => manifest,
-        Err(why) => return Record::NotTaken(why.to_string()),
+    // The record that was there, with the replaced programs measured again and
+    // every other entry kept. A record covers more than the two binaries this
+    // replaces: the guard's own first run records the app lock beside them, and
+    // somebody can name files of their own. Building a fresh record from the
+    // replaced files alone drops all of that, and the next check calls the
+    // dropped files unrecorded rather than unchanged.
+    let previous = match password {
+        Some(pw) => std::fs::read(&sealed)
+            .ok()
+            .and_then(|bytes| veilvoice_guard::Manifest::open_sealed(pw, &bytes).ok()),
+        None => veilvoice_guard::Manifest::load(&plain).ok(),
+    };
+
+    let manifest = match previous {
+        Some(previous) => match previous.refresh(&files) {
+            Ok(manifest) => manifest,
+            Err(why) => return Record::NotTaken(why.to_string()),
+        },
+        // No record yet, or one this cannot read. Recording the programs is
+        // what the next launch needs, and a record that covers less than the
+        // last one is still better than none.
+        None => match veilvoice_guard::Manifest::of(&files) {
+            Ok(manifest) => manifest,
+            Err(why) => return Record::NotTaken(why.to_string()),
+        },
     };
 
     match password {
@@ -1228,6 +1350,111 @@ mod tests {
             );
         }
         std::fs::remove_dir_all(&root).ok();
+    }
+
+    /// The name people run is never absent and never half-written.
+    ///
+    /// The order this checks is the whole of the fix: the new program is
+    /// written under `<name>.new` and only a rename puts it at `<name>`, so at
+    /// every instant the name either does not exist yet, holds the old program
+    /// whole, or holds the new program whole. The order before it wrote
+    /// straight to `<name>` after moving the old one away, which leaves the
+    /// name missing for the length of a copy and incomplete for the rest.
+    ///
+    /// Asserted against the source rather than by racing a thread, because the
+    /// window is a few milliseconds wide and a test that has to catch it is a
+    /// test that passes on a fast machine whatever the code says.
+    #[test]
+    fn the_new_program_is_written_beside_the_old_one_and_renamed_into_place() {
+        let source = include_str!("update.rs").replace("\r\n", "\n");
+        let start = source
+            .find("fn put_in_place(")
+            .expect("put_in_place exists");
+        let end = source[start..]
+            .find("\n    if replaced.is_empty()")
+            .map(|at| start + at)
+            .expect("the loop ends");
+        let body = &source[start..end];
+
+        let staged = body.find("&staged").expect("it stages the new program");
+        let rename = body
+            .find("std::fs::rename(&staged, &target)")
+            .expect("it renames the staged program into place");
+        assert!(
+            staged < rename,
+            "the new program is put at the name people run before it is complete"
+        );
+        assert!(
+            !body.contains("std::fs::copy(&from, &target)"),
+            "the new program is copied straight to the name people run, so that \
+             name is briefly a partial file. That is F-261."
+        );
+    }
+
+    /// An update keeps the files the old record covered and did not replace.
+    ///
+    /// The record covers more than the programs an update replaces: the guard
+    /// records the app lock beside them on its first run, and somebody can name
+    /// files of their own. Rebuilding it from the replaced programs alone drops
+    /// the rest, and the next check calls a dropped file unrecorded rather than
+    /// unchanged.
+    #[test]
+    fn re_recording_keeps_what_the_update_did_not_touch() {
+        let root = room("record-keeps");
+        std::fs::create_dir_all(&root).unwrap();
+        let program = root.join("veilvoice");
+        let other = root.join("something-else-that-was-recorded");
+        std::fs::write(&program, b"the old one").unwrap();
+        std::fs::write(&other, b"not part of the update").unwrap();
+
+        let before = veilvoice_guard::Manifest::of(&[&program, &other]).expect("a record");
+        assert_eq!(before.len(), 2);
+
+        // The update replaces the program and nothing else.
+        std::fs::write(&program, b"the new one").unwrap();
+        let after = before.refresh(&[&program]).expect("the record is retaken");
+
+        assert_eq!(after.len(), 2, "an entry was dropped by the update");
+        let paths: Vec<&str> = after.paths().collect();
+        assert!(
+            paths
+                .iter()
+                .any(|p| p.ends_with("something-else-that-was-recorded")),
+            "the file the update never touched is no longer recorded: {paths:?}"
+        );
+        // And the replaced one really was measured again.
+        assert!(
+            after.check::<&std::path::Path>(&[]).is_clean(),
+            "the record does not match what is on disk now"
+        );
+        std::fs::remove_dir_all(&root).ok();
+    }
+
+    /// A wrong passphrase stops the update before anything is fetched.
+    ///
+    /// Source-level, because the real check needs an app lock on the machine
+    /// running the tests. What it pins is the order, which is the part that
+    /// matters: finding out at the reseal, after the binaries are replaced,
+    /// leaves new programs and a record sealed under a passphrase nobody knows.
+    #[test]
+    fn the_passphrase_is_checked_before_anything_is_fetched() {
+        let source = include_str!("update.rs").replace("\r\n", "\n");
+        let start = source.find("pub fn perform(").expect("perform exists");
+        let end = source[start..]
+            .find("\n/// Refuse a passphrase")
+            .map(|at| start + at)
+            .expect("the function ends");
+        let body = &source[start..end];
+
+        let checked = body
+            .find("check_password(")
+            .expect("the passphrase is checked");
+        let work = body.find("update_within(").expect("the work is dispatched");
+        assert!(
+            checked < work,
+            "an update with a wrong passphrase replaces the programs and only \
+             then finds out it cannot reseal the record"
+        );
     }
 
     /// A release carrying only the command line replaces only the command line.
