@@ -55,20 +55,9 @@ address="tilas01@users.noreply.github.com"
 if ! printf '%s\n' "$listing" | grep '^uid:' | grep -q "<$address>"; then
   say ""
   say "The key carries no identity with $address, so GitHub cannot match it to tilas01's commits."
-  if "$RUNNER_TEMP/gpg-loopback" --quick-add-uid "$primary" "tilas01 <$address>" 2>/dev/null; then
-    say "Added that identity here. The public half below now carries it: add it to"
-    say "GitHub under Settings, SSH and GPG keys, New GPG key, replacing any older copy."
-    say '```'
-    gpg --armor --export "$primary" | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"
-    say '```'
-    # The log masks every line it shares with the secret, and an export
-    # shares the public packet's lines, so the key is also carried in the
-    # check commit, which stays fetchable by its hash after the branch goes.
-    gpg --armor --export "$primary" > signing-public-key.asc
-    git add signing-public-key.asc
-  else
-    say "Could not add one here (the primary key's secret part or its passphrase is missing)."
-  fi
+  say "On the computer that holds the key, add the address and register the result:"
+  say "gpg --quick-add-uid $primary 'tilas01 <$address>'"
+  say "gpg --armor --export $primary   (paste into GitHub, Settings, SSH and GPG keys)"
 fi
 
 git config user.name tilas01
