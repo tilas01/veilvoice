@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/update.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1333 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1560 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs)
 
 ## Contents
 
@@ -135,23 +135,23 @@ that record is locked with the same passphrase.
 
 ## What this file contains
 
-1333 lines defining **20 functions** (7 public), **5 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1560 lines defining **21 functions** (7 public), **5 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Error` (line 216) -- Everything that can stop an update, in the words the reader is given.
-- `struct Offer` (line 273) -- A newer release, and the file to fetch for it.
-- `enum Step` (line 337) -- What the update is doing, reported as it happens.
-- `enum Record` (line 352) -- What became of the integrity record.
-- `struct Done` (line 363) -- A finished update.
+- `struct Offer` (line 281) -- A newer release, and the file to fetch for it.
+- `enum Step` (line 345) -- What the update is doing, reported as it happens.
+- `enum Record` (line 360) -- What became of the integrity record.
+- `struct Done` (line 371) -- A finished update.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `offered` (line 287) -- Ask what is published, and offer it if it is newer.
+- `offered` (line 295) -- Ask what is published, and offer it if it is newer.
   - reaches: `archive_for`
-- `perform` (line 415) -- The whole update, in the one order that is safe.
-  - reaches: `installation`, `lock_is_set`, `update_within`, `workspace`, `open_archive`, `proved_contents`, `put_in_place`, `retake_record`, `extract`, `archive_name`, `carry_over_permissions`, `write_beside`
-- `relaunch` (line 871) -- Start the updated program and return.
+- `perform` (line 423) -- The whole update, in the one order that is safe.
+  - reaches: `check_password`, `installation`, `lock_is_set`, `update_within`, `workspace`, `open_archive`, `proved_contents`, `put_in_place`, `retake_record`, `extract`, `archive_name`, `carry_over_permissions`
+- `relaunch` (line 993) -- Start the updated program and return.
 
 ## What calls what
 
@@ -169,27 +169,29 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 flowchart TD
     n_this_platform["this_platform<br/>line 162"]
     n_archive_for["archive_for<br/>line 204"]
-    n_fmt["Error::fmt<br/>line 240"]
-    n_offered(["offered<br/>line 287"])
-    n_lock_is_set["lock_is_set<br/>line 315"]
-    n_installation["installation<br/>line 322"]
-    n_perform(["perform<br/>line 415"])
-    n_workspace["workspace<br/>line 443"]
-    n_update_within["update_within<br/>line 449"]
-    n_proved_contents["proved_contents<br/>line 522"]
-    n_archive_name["archive_name<br/>line 606"]
-    n_open_archive["open_archive<br/>line 616"]
-    n_extract["extract<br/>line 690"]
-    n_tar_program["tar_program<br/>line 718"]
-    n_put_in_place["put_in_place<br/>line 745"]
-    n_carry_over_permissions["carry_over_permissions<br/>line 800"]
-    n_carry_over_permissions["carry_over_permissions<br/>line 810"]
-    n_retake_record["retake_record<br/>line 818"]
-    n_write_beside["write_beside<br/>line 856"]
-    n_relaunch(["relaunch<br/>line 871"])
+    n_fmt["Error::fmt<br/>line 247"]
+    n_offered(["offered<br/>line 295"])
+    n_lock_is_set["lock_is_set<br/>line 323"]
+    n_installation["installation<br/>line 330"]
+    n_perform(["perform<br/>line 423"])
+    n_check_password["check_password<br/>line 464"]
+    n_workspace["workspace<br/>line 492"]
+    n_update_within["update_within<br/>line 498"]
+    n_proved_contents["proved_contents<br/>line 584"]
+    n_archive_name["archive_name<br/>line 668"]
+    n_open_archive["open_archive<br/>line 678"]
+    n_extract["extract<br/>line 752"]
+    n_tar_program["tar_program<br/>line 780"]
+    n_put_in_place["put_in_place<br/>line 818"]
+    n_carry_over_permissions["carry_over_permissions<br/>line 900"]
+    n_carry_over_permissions["carry_over_permissions<br/>line 910"]
+    n_retake_record["retake_record<br/>line 918"]
+    n_write_beside["write_beside<br/>line 978"]
+    n_relaunch(["relaunch<br/>line 993"])
     n_extract --> n_tar_program
     n_offered --> n_archive_for
     n_open_archive --> n_extract
+    n_perform --> n_check_password
     n_perform --> n_installation
     n_perform --> n_lock_is_set
     n_perform --> n_update_within
@@ -204,30 +206,31 @@ flowchart TD
     n_workspace --> n_installation
     click n_this_platform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L162" "open the source"
     click n_archive_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L204" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L240" "open the source"
-    click n_offered href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L287" "open the source"
-    click n_lock_is_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L315" "open the source"
-    click n_installation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L322" "open the source"
-    click n_perform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L415" "open the source"
-    click n_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L443" "open the source"
-    click n_update_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L449" "open the source"
-    click n_proved_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L522" "open the source"
-    click n_archive_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L606" "open the source"
-    click n_open_archive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L616" "open the source"
-    click n_extract href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L690" "open the source"
-    click n_tar_program href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L718" "open the source"
-    click n_put_in_place href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L745" "open the source"
-    click n_carry_over_permissions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L800" "open the source"
-    click n_carry_over_permissions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L810" "open the source"
-    click n_retake_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L818" "open the source"
-    click n_write_beside href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L856" "open the source"
-    click n_relaunch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L871" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L247" "open the source"
+    click n_offered href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L295" "open the source"
+    click n_lock_is_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L323" "open the source"
+    click n_installation href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L330" "open the source"
+    click n_perform href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L423" "open the source"
+    click n_check_password href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L464" "open the source"
+    click n_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L492" "open the source"
+    click n_update_within href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L498" "open the source"
+    click n_proved_contents href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L584" "open the source"
+    click n_archive_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L668" "open the source"
+    click n_open_archive href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L678" "open the source"
+    click n_extract href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L752" "open the source"
+    click n_tar_program href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L780" "open the source"
+    click n_put_in_place href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L818" "open the source"
+    click n_carry_over_permissions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L900" "open the source"
+    click n_carry_over_permissions href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L910" "open the source"
+    click n_retake_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L918" "open the source"
+    click n_write_beside href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L978" "open the source"
+    click n_relaunch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L993" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_offered,n_perform,n_relaunch entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_archive_for,n_lock_is_set,n_installation,n_workspace api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_this_platform,n_fmt,n_update_within,n_proved_contents,n_archive_name,n_open_archive,n_extract,n_tar_program,n_put_in_place,n_carry_over_permissions,n_carry_over_permissions,n_retake_record,n_write_beside helper
+    class n_this_platform,n_fmt,n_check_password,n_update_within,n_proved_contents,n_archive_name,n_open_archive,n_extract,n_tar_program,n_put_in_place,n_carry_over_permissions,n_carry_over_permissions,n_retake_record,n_write_beside helper
 ```
 
 </details>
@@ -241,25 +244,26 @@ flowchart TD
 | `this_platform` <sub>fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L162) | The label picked apart by target, as the workflow's matrix picks it. |
 | `archive_for` <sub>pub fn</sub> | [204](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L204) | The archive this platform's release is published under. |
 | `Error` <sub>pub enum</sub> | [216](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L216) | Everything that can stop an update, in the words the reader is given. |
-| `Error::fmt` <sub>fn</sub> | [240](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L240) |  |
-| `Offer` <sub>pub struct</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L273) | A newer release, and the file to fetch for it. |
-| `offered` <sub>pub fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L287) | Ask what is published, and offer it if it is newer. |
-| `lock_is_set` <sub>pub fn</sub> | [315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L315) | Whether this machine has an app lock set. |
-| `installation` <sub>pub fn</sub> | [322](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L322) | Where the running copy of VeilVoice lives. |
-| `Step` <sub>pub enum</sub> | [337](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L337) | What the update is doing, reported as it happens. |
-| `Record` <sub>pub enum</sub> | [352](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L352) | What became of the integrity record. |
-| `Done` <sub>pub struct</sub> | [363](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L363) | A finished update. |
-| `perform` <sub>pub fn</sub> | [415](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L415) | The whole update, in the one order that is safe. |
-| `workspace` <sub>pub fn</sub> | [443](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L443) | Where an update does its work: beside the copy being replaced. |
-| `update_within` <sub>fn</sub> | [449](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L449) | The update itself, with the workspace's lifetime handled by the caller above. |
-| `proved_contents` <sub>fn</sub> | [522](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L522) | The signature, the hash list, the contents list and every member, in that order, all of it crate::check. |
-| `archive_name` <sub>fn</sub> | [606](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L606) | The archive's own file name, which is the key into the contents list. |
-| `open_archive` <sub>fn</sub> | [616](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L616) | Unpack into an empty directory, then hash what landed. |
-| `extract` <sub>fn</sub> | [690](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L690) | Unpack with the tool the operating system already ships. |
-| `tar_program` <sub>fn</sub> | [718](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L718) | tar, by absolute path. |
-| `put_in_place` <sub>fn</sub> | [745](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L745) | Move the old binaries aside and put the new ones in their place. |
-| `carry_over_permissions` <sub>fn</sub> | [800](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L800) | Give the new file the mode the archive published for it. |
-| `carry_over_permissions` <sub>fn</sub> | [810](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L810) | The everywhere-else half: there is no execute bit to carry over. |
-| `retake_record` <sub>fn</sub> | [818](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L818) | Re-take the integrity record over the files that were just replaced. |
-| `write_beside` <sub>fn</sub> | [856](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L856) | Write the sealed record, owner-readable, making its directory if needed. |
-| `relaunch` <sub>pub fn</sub> | [871](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L871) | Start the updated program and return. |
+| `Error::fmt` <sub>fn</sub> | [247](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L247) |  |
+| `Offer` <sub>pub struct</sub> | [281](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L281) | A newer release, and the file to fetch for it. |
+| `offered` <sub>pub fn</sub> | [295](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L295) | Ask what is published, and offer it if it is newer. |
+| `lock_is_set` <sub>pub fn</sub> | [323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L323) | Whether this machine has an app lock set. |
+| `installation` <sub>pub fn</sub> | [330](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L330) | Where the running copy of VeilVoice lives. |
+| `Step` <sub>pub enum</sub> | [345](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L345) | What the update is doing, reported as it happens. |
+| `Record` <sub>pub enum</sub> | [360](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L360) | What became of the integrity record. |
+| `Done` <sub>pub struct</sub> | [371](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L371) | A finished update. |
+| `perform` <sub>pub fn</sub> | [423](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L423) | The whole update, in the one order that is safe. |
+| `check_password` <sub>fn</sub> | [464](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L464) | Refuse a passphrase the app lock does not accept, before anything is done. |
+| `workspace` <sub>pub fn</sub> | [492](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L492) | Where an update does its work: beside the copy being replaced. |
+| `update_within` <sub>fn</sub> | [498](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L498) | The update itself, with the workspace's lifetime handled by the caller above. |
+| `proved_contents` <sub>fn</sub> | [584](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L584) | The signature, the hash list, the contents list and every member, in that order, all of it crate::check. |
+| `archive_name` <sub>fn</sub> | [668](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L668) | The archive's own file name, which is the key into the contents list. |
+| `open_archive` <sub>fn</sub> | [678](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L678) | Unpack into an empty directory, then hash what landed. |
+| `extract` <sub>fn</sub> | [752](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L752) | Unpack with the tool the operating system already ships. |
+| `tar_program` <sub>fn</sub> | [780](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L780) | tar, by absolute path. |
+| `put_in_place` <sub>fn</sub> | [818](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L818) | Write the new binaries beside the old ones and rename them into place. |
+| `carry_over_permissions` <sub>fn</sub> | [900](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L900) | Give the new file the mode the archive published for it. |
+| `carry_over_permissions` <sub>fn</sub> | [910](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L910) | The everywhere-else half: there is no execute bit to carry over. |
+| `retake_record` <sub>fn</sub> | [918](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L918) | Re-take the integrity record over the files that were just replaced. |
+| `write_beside` <sub>fn</sub> | [978](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L978) | Write the sealed record, owner-readable, making its directory if needed. |
+| `relaunch` <sub>pub fn</sub> | [993](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L993) | Start the updated program and return. |

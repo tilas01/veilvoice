@@ -1148,6 +1148,49 @@ if any step after it runs without asking. The last is the one an edit loses
 most easily: a step added at the end runs on the skipped path and fails on a
 directory that is not there. `--self-test` makes each of those five edits to the
 real workflow and shows that each one is caught.
+### F-267: the authorship guard, the signing setup and the rewrite each trusted something they had not checked
+
+Ten defects in the three tools that keep the history in tilas01's name, found
+by the audit of new code and each confirmed against the tree before it was
+fixed. They are one finding because they are one shape: a tool that reported
+success about a thing it had not looked at.
+
+- **K.** `tools/repo/signing.py` failed on an empty, unreadable or
+  unimportable key and left the clone signing with whatever it signed with
+  before, which in a cloud container is a key registered to another account.
+  1664daa7 is a commit signed that way. Every failure now turns signing off in
+  the clone and says why, and the guard refuses a commit the clone would sign
+  with a key not in `SIGNING_KEYS`, before it is made.
+- **L.** The committer address `noreply@github.com` passed under any name.
+  It is GitHub's own, used when it commits for him in the website, so it now
+  passes only under the name GitHub.
+- **M.** A force push was checked from the old tip to the new one, which after
+  a rewrite is a range that names none of the replaced commits. A force push is
+  now checked whole.
+- **N.** `rewrite.py --no-sign` decided which commits needed rewriting by
+  identity alone, so three commits whose messages named an assistant
+  (07119185, 83f27154, 15f27cf7) would have been left as they were.
+- **O.** The model-name check matched "Opus" followed by any number, so a
+  sentence about the Opus codec at 48 kHz failed. It now matches a model's
+  version, not a sample rate.
+- **P.** `signing.py` set the primary key's fingerprint and never looked for a
+  signing subkey, which is the key that actually signs when there is one.
+- **Q.** `rewrite.py --push` built the rewrite again from whatever dev was at
+  the moment, so what was pushed was never what the dry run had shown. It now
+  pushes exactly the result the dry run stored, after proving it again, and
+  refuses if either branch has moved since.
+- **R.** `signing.py` did not check the exit status of the `git config` calls
+  it made, so a failed one still printed success.
+- **S.** `tools/repo/message_filter.py` told whoever read it to run
+  filter-branch over `--all`, which rewrites `dev` and `main` as well as the
+  tags, and signs each new commit with the clone's key. It now says
+  `--tags`, with signing off.
+- **T.** In a clone with no remote, the guard found no commits to check and
+  passed. It now checks the whole of HEAD there.
+
+Each has a case in `python tools/audit/authorship.py --self-test` or
+`python tools/repo/signing.py --self-test`, and both run in `tools/verify.py`.
+
 ### F-253: the app lock's cooldown told the decoy passphrase apart from the real one
 
 Found by the audit of the decoy code, reproduced by a test before it was fixed.
@@ -9668,7 +9711,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1901 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1905 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -11316,7 +11359,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and fifty-eight defects found and fixed (F-1 to F-258), across
+**Two hundred and sixty-seven defects found and fixed (F-1 to F-267), across
 thirty-four rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
