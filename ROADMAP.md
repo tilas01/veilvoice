@@ -427,6 +427,47 @@ not claim to beat an adversary who already owns the machine.
 | 107 | **VeilVoice on a phone**: an Android package a person installs without developer tools, signed, published beside the desktop archives and verifiable the same way. Roadmap item 52 established that the code compiles for Android; what is missing is the NDK in the release build, a capture path that uses the platform's own audio rather than ALSA, a window that works at a phone's size, and a signing key that does not require a legal identity, all four set out in *VeilVoice on a phone* above along with why iOS is a separate question. It sits last because it is worth more once there is a Studio to put on the phone, and because none of the desktop work is waiting on it | **planned** | 10 |
 
 
+## Calls, and sharing them
+
+Asked for on 9 October 2026: record a phone call, iPhone or Android, with each
+person on it veiled or left as they are and recorded or not, set up the way
+group mode sets up speakers, all of it behind the app lock; and share the
+recording peer to peer, end-to-end encrypted, with an optional password.
+
+What was found before anything was built, so the items below promise only what
+can be delivered. Plugging a phone into a computer does not give the computer
+the call. Android has refused call audio to ordinary apps since Android 9 and
+dropped its USB audio accessory mode in Android 8, and iOS has never offered
+call audio to an app at all. What does work is the call running through the
+computer: Phone Link on Windows takes calls from Android and from an iPhone,
+a Mac takes calls from an iPhone, Linux can act as a Bluetooth hands-free
+headset, and any calling program on the desktop is already there. In every one
+of those, the other side comes out of the computer's speakers and you go into
+its microphone, and `cpal` 0.18, which VeilVoice already uses, can record the
+computer's own output on Windows, on macOS from 14.6 and on Linux through
+PipeWire. So the two sides arrive as two separate tracks, which is what makes a
+choice per person exact rather than a guess. A headset splitter cable from the
+phone into an audio interface gives the same two tracks for any phone, and the
+call recorders built into iOS 18.1 and some Android diallers give one mixed
+track that VeilVoice can already import.
+
+A link that opens anywhere on the internet and fetches the file straight from
+your machine is not possible without somebody else's server: two computers
+behind home routers cannot find each other unaided, so WebRTC needs a server
+to introduce them and often another to relay the data. Either one breaks
+*Offline by construction*, so the sharing item offers what keeps that promise.
+
+Three choices went to the maintainer. The first is made: all three routes, in
+the order the call is most useful in, so the two-track recorder first, then
+the splitter cable, then the import. How consent to recording is handled and
+how a recording is shared are still open, and the rows are rewritten to the
+answer when it comes.
+
+| # | Item | Status | Estimate |
+|---:|---|---|---|
+| 188 | **Recording a phone call, one track per side**: the call runs through the computer (Phone Link, an iPhone call on a Mac, Bluetooth hands-free on Linux, or a calling program), and VeilVoice records you from the microphone and the other side from the computer's own output, as separate tracks. Each person is a speaker in the sense group mode means, with a name and a colour, and each can be veiled or left as they are, and recorded or not recorded at all; a person who is not recorded is never written anywhere. Everybody starts veiled and recorded. Several people on the far end arrive as one track and are told apart with the speaker plan conversation mode already uses. Built in this order: the recorder; then a guide to the splitter cable, which is the same recorder pointed at an audio interface and works for any phone and any call; then an import view, where a call the phone recorded itself is brought in and its people are marked by hand. The recording goes only into the encrypted vault, the view needs an app lock and asks for one when there is none, and it locks with the rest of the window. A notice the first time it is switched on says that the law on recording calls differs by country and by state | **next** | 8 |
+| 189 | **Sharing a call, end-to-end encrypted**: a recording written for one recipient, encrypted under an optional password or sealed to their public key with the hybrid scheme `veilvoice keygen` already makes, alongside a single page that opens it in any browser with no network. It is carried however the reader likes: a messenger, an email, a USB stick. A link that works on the same network only, served once and then closed, is the peer-to-peer variant, and is the first listening socket this project would have, so it is off unless asked for. A link across the internet is not offered, for the reason above | **planned** | 6 |
+
 ---
 
 ## The things that are not just work
@@ -1623,6 +1664,10 @@ Roadmap item 107, VeilVoice on a phone, needs an NDK in the release build and a 
 key; roadmap item 146 is the audited release itself, which is the process above rather
 than a separate piece of work. Both are named in *The things that are not just
 work* below.
+
+Roadmap item 189, sharing a call, waits on a choice put to the maintainer, and
+so does the consent notice in roadmap item 188; both are set out in *Calls,
+and sharing them* above. The rest of roadmap item 188 is being built.
 
 ## How to read the estimates
 
