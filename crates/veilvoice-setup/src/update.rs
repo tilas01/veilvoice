@@ -552,15 +552,25 @@ fn fetch(tool: &Tool, url: &str) -> Result<String, Error> {
     Ok(String::from_utf8_lossy(body).into_owned())
 }
 
-/// What this crate does and does not do, in one paragraph, for a front end to
-/// show beside the button.
+/// What **the check** does and does not do, in one paragraph, for a front end
+/// to show beside the button.
+///
+/// Every sentence names the check as its subject, and that is deliberate. This
+/// paragraph is shown by `veilvoice update` as well, on the two paths where
+/// nothing will be installed, and an unqualified "it does not install
+/// anything" read there is a claim about the command rather than about the
+/// check. The command does install; that is what it is for. `veilvoice update
+/// --check` used to print "Run `veilvoice update` to fetch it, check it and
+/// install it" and then, four lines lower, "It does not download a release,
+/// install anything". Both sentences were true of different things and the
+/// screen contradicted itself.
 pub const SCOPE: &str = "\
 This check happens because you pressed the button, and at no other time. There \
 is no timer, no check at startup, and nothing runs in the background. VeilVoice \
 contains no HTTP client: this borrows the transfer tool your operating system \
 already ships and reads a public page anybody can open. It sends nothing about \
-you or this machine. It does not download a release, install anything, or \
-restart the program -- it reports a version number, and every decision after \
+you or this machine. The check itself downloads no release, installs nothing \
+and restarts nothing: it reports a version number, and every decision after \
 that is yours. A version number on a page is not a signature: check a download \
 with `veilvoice verify` before running it.";
 
@@ -854,7 +864,13 @@ mod tests {
             "no timer",
             "no http client",
             "sends nothing about you",
-            "does not download",
+            // The subject of this sentence is the check, not the command that
+            // shows it. `veilvoice update` prints this paragraph on the paths
+            // where nothing is installed, and an unqualified "it installs
+            // nothing" read there is a claim about the command, which does
+            // install. See the note on `SCOPE`.
+            "the check itself downloads no release",
+            "installs nothing",
             "not a signature",
         ] {
             assert!(scope.contains(phrase), "the scope note must say {phrase:?}");

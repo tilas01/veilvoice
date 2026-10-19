@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/update.svg" alt="update.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/update.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1333 lines &middot; <a href="update.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1560 lines &middot; <a href="update.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-stance-this-changes-and-the-sentence-that-survives-it">The stance this changes, and the sentence that survives it</a>
@@ -116,22 +116,22 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1333 lines defining <strong>20 functions</strong> (7 public), <strong>5 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1560 lines defining <strong>21 functions</strong> (7 public), <strong>5 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Error</code> <span style="color:var(--muted)">line 216</span> &middot; Everything that can stop an update, in the words the reader is given.</li>
-<li><code>struct Offer</code> <span style="color:var(--muted)">line 273</span> &middot; A newer release, and the file to fetch for it.</li>
-<li><code>enum Step</code> <span style="color:var(--muted)">line 337</span> &middot; What the update is doing, reported as it happens.</li>
-<li><code>enum Record</code> <span style="color:var(--muted)">line 352</span> &middot; What became of the integrity record.</li>
-<li><code>struct Done</code> <span style="color:var(--muted)">line 363</span> &middot; A finished update.</li>
+<li><code>struct Offer</code> <span style="color:var(--muted)">line 281</span> &middot; A newer release, and the file to fetch for it.</li>
+<li><code>enum Step</code> <span style="color:var(--muted)">line 345</span> &middot; What the update is doing, reported as it happens.</li>
+<li><code>enum Record</code> <span style="color:var(--muted)">line 360</span> &middot; What became of the integrity record.</li>
+<li><code>struct Done</code> <span style="color:var(--muted)">line 371</span> &middot; A finished update.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>offered</code> <span style="color:var(--muted)">line 287</span> &middot; Ask what is published, and offer it if it is newer.
+<li><code>offered</code> <span style="color:var(--muted)">line 295</span> &middot; Ask what is published, and offer it if it is newer.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>archive_for</code></span>
 </li>
-<li><code>perform</code> <span style="color:var(--muted)">line 415</span> &middot; The whole update, in the one order that is safe.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>installation</code>, <code>lock_is_set</code>, <code>update_within</code>, <code>workspace</code>, <code>open_archive</code>, <code>proved_contents</code>, <code>put_in_place</code>, <code>retake_record</code>, <code>extract</code>, <code>archive_name</code>, <code>carry_over_permissions</code>, <code>write_beside</code></span>
+<li><code>perform</code> <span style="color:var(--muted)">line 423</span> &middot; The whole update, in the one order that is safe.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>check_password</code>, <code>installation</code>, <code>lock_is_set</code>, <code>update_within</code>, <code>workspace</code>, <code>open_archive</code>, <code>proved_contents</code>, <code>put_in_place</code>, <code>retake_record</code>, <code>extract</code>, <code>archive_name</code>, <code>carry_over_permissions</code></span>
 </li>
-<li><code>relaunch</code> <span style="color:var(--muted)">line 871</span> &middot; Start the updated program and return.
+<li><code>relaunch</code> <span style="color:var(--muted)">line 993</span> &middot; Start the updated program and return.
 </li>
 </ul>
 </section>
@@ -151,18 +151,19 @@
 <path d="M252.0 574.0 C 252.0 594.0, 292.3 700.0, 292.3 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M556.5 47.0 C 578.5 47.0, 578.5 47.0, 306.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M304.4 374.0 C 304.4 394.0, 252.0 500.0, 252.0 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M379.7 174.0 C 379.7 194.0, 149.6 200.0, 149.6 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M426.0 147.0 C 448.0 147.0, 448.0 147.0, 310.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M426.0 147.0 C 448.0 147.0, 448.0 147.0, 159.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M379.7 174.0 C 379.7 194.0, 355.5 200.0, 355.5 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M379.7 174.0 C 379.7 194.0, 212.9 200.0, 212.9 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M379.7 174.0 C 379.7 194.0, 439.0 200.0, 439.0 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M379.7 174.0 C 379.7 194.0, 296.3 200.0, 296.3 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M141.5 374.0 C 141.5 394.0, 117.4 500.0, 117.4 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M455.1 374.0 C 455.1 394.0, 216.9 600.0, 216.9 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M292.3 474.0 C 292.3 494.0, 407.9 600.0, 407.9 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M355.5 274.0 C 355.5 294.0, 304.4 300.0, 304.4 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M355.5 274.0 C 355.5 294.0, 141.5 300.0, 141.5 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M355.5 274.0 C 355.5 294.0, 455.1 300.0, 455.1 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M355.5 274.0 C 355.5 294.0, 292.3 400.0, 292.3 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M263.1 247.0 C 329.5 247.0, 329.5 147.0, 310.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M439.0 274.0 C 439.0 294.0, 304.4 300.0, 304.4 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M439.0 274.0 C 439.0 294.0, 141.5 300.0, 141.5 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M439.0 274.0 C 439.0 294.0, 455.1 300.0, 455.1 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M439.0 274.0 C 439.0 294.0, 292.3 400.0, 292.3 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M346.6 247.0 C 368.6 247.0, 368.6 147.0, 310.5 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <a href="update.src.html#fn-this_platform">
 <rect x="28.0" y="20.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="94.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">this_platform</text>
@@ -176,92 +177,97 @@
 <a href="update.src.html#fn-error-fmt">
 <rect x="329.4" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="383.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Error::fmt</text>
-<text x="383.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 240</text>
+<text x="383.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 247</text>
 </a>
 <a href="update.src.html#fn-offered">
 <rect x="464.0" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="510.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">offered</text>
-<text x="510.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 287</text>
+<text x="510.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 295</text>
 </a>
 <a href="update.src.html#fn-lock_is_set">
 <rect x="40.1" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="98.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">lock_is_set</text>
-<text x="98.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 315</text>
+<text x="98.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 323</text>
 </a>
 <a href="update.src.html#fn-installation">
 <rect x="182.8" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="245.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">installation</text>
-<text x="245.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 322</text>
+<text x="245.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 330</text>
 </a>
 <a href="update.src.html#fn-perform">
 <rect x="333.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="379.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">perform</text>
-<text x="379.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
+<text x="379.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 423</text>
+</a>
+<a href="update.src.html#fn-check_password">
+<rect x="79.2" y="220.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="149.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">check_password</text>
+<text x="149.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 464</text>
 </a>
 <a href="update.src.html#fn-workspace">
-<rect x="162.6" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="212.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">workspace</text>
-<text x="212.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 443</text>
+<rect x="246.0" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="296.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">workspace</text>
+<text x="296.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 492</text>
 </a>
 <a href="update.src.html#fn-update_within">
-<rect x="289.1" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="355.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">update_within</text>
-<text x="355.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 449</text>
+<rect x="372.6" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="439.0" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">update_within</text>
+<text x="439.0" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 498</text>
 </a>
 <a href="update.src.html#fn-proved_contents">
 <rect x="67.1" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="141.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">proved_contents</text>
-<text x="141.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 522</text>
+<text x="141.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 584</text>
 </a>
 <a href="update.src.html#fn-archive_name">
 <rect x="55.0" y="520.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="117.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">archive_name</text>
-<text x="117.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 606</text>
+<text x="117.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 668</text>
 </a>
 <a href="update.src.html#fn-open_archive">
 <rect x="242.0" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="304.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">open_archive</text>
-<text x="304.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 616</text>
+<text x="304.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 678</text>
 </a>
 <a href="update.src.html#fn-extract">
 <rect x="205.7" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="252.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">extract</text>
-<text x="252.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 690</text>
+<text x="252.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 752</text>
 </a>
 <a href="update.src.html#fn-tar_program">
 <rect x="233.9" y="720.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="292.3" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tar_program</text>
-<text x="292.3" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 718</text>
+<text x="292.3" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 780</text>
 </a>
 <a href="update.src.html#fn-put_in_place">
 <rect x="392.7" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="455.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">put_in_place</text>
-<text x="455.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 745</text>
+<text x="455.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 818</text>
 </a>
 <a href="update.src.html#fn-carry_over_permissions">
 <rect x="114.2" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="216.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">carry_over_permissions</text>
-<text x="216.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 800</text>
+<text x="216.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 900</text>
 </a>
 <a href="update.src.html#fn-carry_over_permissions-2">
 <rect x="114.2" y="620.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="216.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">carry_over_permissions</text>
-<text x="216.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 810</text>
+<text x="216.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 910</text>
 </a>
 <a href="update.src.html#fn-retake_record">
 <rect x="225.9" y="420.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="292.3" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">retake_record</text>
-<text x="292.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 818</text>
+<text x="292.3" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 918</text>
 </a>
 <a href="update.src.html#fn-write_beside">
 <rect x="345.6" y="620.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="407.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_beside</text>
-<text x="407.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 856</text>
+<text x="407.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 978</text>
 </a>
 <a href="update.src.html#fn-relaunch">
 <rect x="452.0" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="498.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">relaunch</text>
-<text x="498.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 871</text>
+<text x="498.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 993</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -282,27 +288,29 @@
 flowchart TD
     n_this_platform[&quot;this_platform&lt;br/&gt;line 162&quot;]
     n_archive_for[&quot;archive_for&lt;br/&gt;line 204&quot;]
-    n_fmt[&quot;Error::fmt&lt;br/&gt;line 240&quot;]
-    n_offered([&quot;offered&lt;br/&gt;line 287&quot;])
-    n_lock_is_set[&quot;lock_is_set&lt;br/&gt;line 315&quot;]
-    n_installation[&quot;installation&lt;br/&gt;line 322&quot;]
-    n_perform([&quot;perform&lt;br/&gt;line 415&quot;])
-    n_workspace[&quot;workspace&lt;br/&gt;line 443&quot;]
-    n_update_within[&quot;update_within&lt;br/&gt;line 449&quot;]
-    n_proved_contents[&quot;proved_contents&lt;br/&gt;line 522&quot;]
-    n_archive_name[&quot;archive_name&lt;br/&gt;line 606&quot;]
-    n_open_archive[&quot;open_archive&lt;br/&gt;line 616&quot;]
-    n_extract[&quot;extract&lt;br/&gt;line 690&quot;]
-    n_tar_program[&quot;tar_program&lt;br/&gt;line 718&quot;]
-    n_put_in_place[&quot;put_in_place&lt;br/&gt;line 745&quot;]
-    n_carry_over_permissions[&quot;carry_over_permissions&lt;br/&gt;line 800&quot;]
-    n_carry_over_permissions[&quot;carry_over_permissions&lt;br/&gt;line 810&quot;]
-    n_retake_record[&quot;retake_record&lt;br/&gt;line 818&quot;]
-    n_write_beside[&quot;write_beside&lt;br/&gt;line 856&quot;]
-    n_relaunch([&quot;relaunch&lt;br/&gt;line 871&quot;])
+    n_fmt[&quot;Error::fmt&lt;br/&gt;line 247&quot;]
+    n_offered([&quot;offered&lt;br/&gt;line 295&quot;])
+    n_lock_is_set[&quot;lock_is_set&lt;br/&gt;line 323&quot;]
+    n_installation[&quot;installation&lt;br/&gt;line 330&quot;]
+    n_perform([&quot;perform&lt;br/&gt;line 423&quot;])
+    n_check_password[&quot;check_password&lt;br/&gt;line 464&quot;]
+    n_workspace[&quot;workspace&lt;br/&gt;line 492&quot;]
+    n_update_within[&quot;update_within&lt;br/&gt;line 498&quot;]
+    n_proved_contents[&quot;proved_contents&lt;br/&gt;line 584&quot;]
+    n_archive_name[&quot;archive_name&lt;br/&gt;line 668&quot;]
+    n_open_archive[&quot;open_archive&lt;br/&gt;line 678&quot;]
+    n_extract[&quot;extract&lt;br/&gt;line 752&quot;]
+    n_tar_program[&quot;tar_program&lt;br/&gt;line 780&quot;]
+    n_put_in_place[&quot;put_in_place&lt;br/&gt;line 818&quot;]
+    n_carry_over_permissions[&quot;carry_over_permissions&lt;br/&gt;line 900&quot;]
+    n_carry_over_permissions[&quot;carry_over_permissions&lt;br/&gt;line 910&quot;]
+    n_retake_record[&quot;retake_record&lt;br/&gt;line 918&quot;]
+    n_write_beside[&quot;write_beside&lt;br/&gt;line 978&quot;]
+    n_relaunch([&quot;relaunch&lt;br/&gt;line 993&quot;])
     n_extract --&gt; n_tar_program
     n_offered --&gt; n_archive_for
     n_open_archive --&gt; n_extract
+    n_perform --&gt; n_check_password
     n_perform --&gt; n_installation
     n_perform --&gt; n_lock_is_set
     n_perform --&gt; n_update_within
@@ -317,30 +325,31 @@ flowchart TD
     n_workspace --&gt; n_installation
     click n_this_platform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L162&quot; &quot;open the source&quot;
     click n_archive_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L204&quot; &quot;open the source&quot;
-    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L240&quot; &quot;open the source&quot;
-    click n_offered href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L287&quot; &quot;open the source&quot;
-    click n_lock_is_set href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L315&quot; &quot;open the source&quot;
-    click n_installation href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L322&quot; &quot;open the source&quot;
-    click n_perform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L415&quot; &quot;open the source&quot;
-    click n_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L443&quot; &quot;open the source&quot;
-    click n_update_within href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L449&quot; &quot;open the source&quot;
-    click n_proved_contents href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L522&quot; &quot;open the source&quot;
-    click n_archive_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L606&quot; &quot;open the source&quot;
-    click n_open_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L616&quot; &quot;open the source&quot;
-    click n_extract href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L690&quot; &quot;open the source&quot;
-    click n_tar_program href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L718&quot; &quot;open the source&quot;
-    click n_put_in_place href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L745&quot; &quot;open the source&quot;
-    click n_carry_over_permissions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L800&quot; &quot;open the source&quot;
-    click n_carry_over_permissions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L810&quot; &quot;open the source&quot;
-    click n_retake_record href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L818&quot; &quot;open the source&quot;
-    click n_write_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L856&quot; &quot;open the source&quot;
-    click n_relaunch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L871&quot; &quot;open the source&quot;
+    click n_fmt href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L247&quot; &quot;open the source&quot;
+    click n_offered href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L295&quot; &quot;open the source&quot;
+    click n_lock_is_set href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L323&quot; &quot;open the source&quot;
+    click n_installation href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L330&quot; &quot;open the source&quot;
+    click n_perform href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L423&quot; &quot;open the source&quot;
+    click n_check_password href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L464&quot; &quot;open the source&quot;
+    click n_workspace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L492&quot; &quot;open the source&quot;
+    click n_update_within href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L498&quot; &quot;open the source&quot;
+    click n_proved_contents href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L584&quot; &quot;open the source&quot;
+    click n_archive_name href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L668&quot; &quot;open the source&quot;
+    click n_open_archive href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L678&quot; &quot;open the source&quot;
+    click n_extract href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L752&quot; &quot;open the source&quot;
+    click n_tar_program href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L780&quot; &quot;open the source&quot;
+    click n_put_in_place href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L818&quot; &quot;open the source&quot;
+    click n_carry_over_permissions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L900&quot; &quot;open the source&quot;
+    click n_carry_over_permissions href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L910&quot; &quot;open the source&quot;
+    click n_retake_record href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L918&quot; &quot;open the source&quot;
+    click n_write_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L978&quot; &quot;open the source&quot;
+    click n_relaunch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L993&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_offered,n_perform,n_relaunch entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_archive_for,n_lock_is_set,n_installation,n_workspace api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_this_platform,n_fmt,n_update_within,n_proved_contents,n_archive_name,n_open_archive,n_extract,n_tar_program,n_put_in_place,n_carry_over_permissions,n_carry_over_permissions,n_retake_record,n_write_beside helper</code></pre>
+    class n_this_platform,n_fmt,n_check_password,n_update_within,n_proved_contents,n_archive_name,n_open_archive,n_extract,n_tar_program,n_put_in_place,n_carry_over_permissions,n_carry_over_permissions,n_retake_record,n_write_beside helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -352,28 +361,29 @@ flowchart TD
 <tr><td><code>this_platform</code> <sub>fn</sub></td><td><a href="update.src.html#fn-this_platform">162</a></td><td>The label picked apart by target, as the workflow&#x27;s matrix picks it.</td></tr>
 <tr><td><code>archive_for</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-archive_for">204</a></td><td>The archive this platform&#x27;s release is published under.</td></tr>
 <tr><td><code>Error</code> <sub>pub enum</sub></td><td><a href="update.src.html#fn-error">216</a></td><td>Everything that can stop an update, in the words the reader is given.</td></tr>
-<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="update.src.html#fn-error-fmt">240</a></td><td></td></tr>
-<tr><td><code>Offer</code> <sub>pub struct</sub></td><td><a href="update.src.html#fn-offer">273</a></td><td>A newer release, and the file to fetch for it.</td></tr>
-<tr><td><code>offered</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-offered">287</a></td><td>Ask what is published, and offer it if it is newer.</td></tr>
-<tr><td><code>lock_is_set</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-lock_is_set">315</a></td><td>Whether this machine has an app lock set.</td></tr>
-<tr><td><code>installation</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-installation">322</a></td><td>Where the running copy of VeilVoice lives.</td></tr>
-<tr><td><code>Step</code> <sub>pub enum</sub></td><td><a href="update.src.html#fn-step">337</a></td><td>What the update is doing, reported as it happens.</td></tr>
-<tr><td><code>Record</code> <sub>pub enum</sub></td><td><a href="update.src.html#fn-record">352</a></td><td>What became of the integrity record.</td></tr>
-<tr><td><code>Done</code> <sub>pub struct</sub></td><td><a href="update.src.html#fn-done">363</a></td><td>A finished update.</td></tr>
-<tr><td><code>perform</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-perform">415</a></td><td>The whole update, in the one order that is safe.</td></tr>
-<tr><td><code>workspace</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-workspace">443</a></td><td>Where an update does its work: beside the copy being replaced.</td></tr>
-<tr><td><code>update_within</code> <sub>fn</sub></td><td><a href="update.src.html#fn-update_within">449</a></td><td>The update itself, with the workspace&#x27;s lifetime handled by the caller above.</td></tr>
-<tr><td><code>proved_contents</code> <sub>fn</sub></td><td><a href="update.src.html#fn-proved_contents">522</a></td><td>The signature, the hash list, the contents list and every member, in that order, all of it crate::check.</td></tr>
-<tr><td><code>archive_name</code> <sub>fn</sub></td><td><a href="update.src.html#fn-archive_name">606</a></td><td>The archive&#x27;s own file name, which is the key into the contents list.</td></tr>
-<tr><td><code>open_archive</code> <sub>fn</sub></td><td><a href="update.src.html#fn-open_archive">616</a></td><td>Unpack into an empty directory, then hash what landed.</td></tr>
-<tr><td><code>extract</code> <sub>fn</sub></td><td><a href="update.src.html#fn-extract">690</a></td><td>Unpack with the tool the operating system already ships.</td></tr>
-<tr><td><code>tar_program</code> <sub>fn</sub></td><td><a href="update.src.html#fn-tar_program">718</a></td><td>tar, by absolute path.</td></tr>
-<tr><td><code>put_in_place</code> <sub>fn</sub></td><td><a href="update.src.html#fn-put_in_place">745</a></td><td>Move the old binaries aside and put the new ones in their place.</td></tr>
-<tr><td><code>carry_over_permissions</code> <sub>fn</sub></td><td><a href="update.src.html#fn-carry_over_permissions">800</a></td><td>Give the new file the mode the archive published for it.</td></tr>
-<tr><td><code>carry_over_permissions</code> <sub>fn</sub></td><td><a href="update.src.html#fn-carry_over_permissions-2">810</a></td><td>The everywhere-else half: there is no execute bit to carry over.</td></tr>
-<tr><td><code>retake_record</code> <sub>fn</sub></td><td><a href="update.src.html#fn-retake_record">818</a></td><td>Re-take the integrity record over the files that were just replaced.</td></tr>
-<tr><td><code>write_beside</code> <sub>fn</sub></td><td><a href="update.src.html#fn-write_beside">856</a></td><td>Write the sealed record, owner-readable, making its directory if needed.</td></tr>
-<tr><td><code>relaunch</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-relaunch">871</a></td><td>Start the updated program and return.</td></tr>
+<tr><td><code>Error::fmt</code> <sub>fn</sub></td><td><a href="update.src.html#fn-error-fmt">247</a></td><td></td></tr>
+<tr><td><code>Offer</code> <sub>pub struct</sub></td><td><a href="update.src.html#fn-offer">281</a></td><td>A newer release, and the file to fetch for it.</td></tr>
+<tr><td><code>offered</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-offered">295</a></td><td>Ask what is published, and offer it if it is newer.</td></tr>
+<tr><td><code>lock_is_set</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-lock_is_set">323</a></td><td>Whether this machine has an app lock set.</td></tr>
+<tr><td><code>installation</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-installation">330</a></td><td>Where the running copy of VeilVoice lives.</td></tr>
+<tr><td><code>Step</code> <sub>pub enum</sub></td><td><a href="update.src.html#fn-step">345</a></td><td>What the update is doing, reported as it happens.</td></tr>
+<tr><td><code>Record</code> <sub>pub enum</sub></td><td><a href="update.src.html#fn-record">360</a></td><td>What became of the integrity record.</td></tr>
+<tr><td><code>Done</code> <sub>pub struct</sub></td><td><a href="update.src.html#fn-done">371</a></td><td>A finished update.</td></tr>
+<tr><td><code>perform</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-perform">423</a></td><td>The whole update, in the one order that is safe.</td></tr>
+<tr><td><code>check_password</code> <sub>fn</sub></td><td><a href="update.src.html#fn-check_password">464</a></td><td>Refuse a passphrase the app lock does not accept, before anything is done.</td></tr>
+<tr><td><code>workspace</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-workspace">492</a></td><td>Where an update does its work: beside the copy being replaced.</td></tr>
+<tr><td><code>update_within</code> <sub>fn</sub></td><td><a href="update.src.html#fn-update_within">498</a></td><td>The update itself, with the workspace&#x27;s lifetime handled by the caller above.</td></tr>
+<tr><td><code>proved_contents</code> <sub>fn</sub></td><td><a href="update.src.html#fn-proved_contents">584</a></td><td>The signature, the hash list, the contents list and every member, in that order, all of it crate::check.</td></tr>
+<tr><td><code>archive_name</code> <sub>fn</sub></td><td><a href="update.src.html#fn-archive_name">668</a></td><td>The archive&#x27;s own file name, which is the key into the contents list.</td></tr>
+<tr><td><code>open_archive</code> <sub>fn</sub></td><td><a href="update.src.html#fn-open_archive">678</a></td><td>Unpack into an empty directory, then hash what landed.</td></tr>
+<tr><td><code>extract</code> <sub>fn</sub></td><td><a href="update.src.html#fn-extract">752</a></td><td>Unpack with the tool the operating system already ships.</td></tr>
+<tr><td><code>tar_program</code> <sub>fn</sub></td><td><a href="update.src.html#fn-tar_program">780</a></td><td>tar, by absolute path.</td></tr>
+<tr><td><code>put_in_place</code> <sub>fn</sub></td><td><a href="update.src.html#fn-put_in_place">818</a></td><td>Write the new binaries beside the old ones and rename them into place.</td></tr>
+<tr><td><code>carry_over_permissions</code> <sub>fn</sub></td><td><a href="update.src.html#fn-carry_over_permissions">900</a></td><td>Give the new file the mode the archive published for it.</td></tr>
+<tr><td><code>carry_over_permissions</code> <sub>fn</sub></td><td><a href="update.src.html#fn-carry_over_permissions-2">910</a></td><td>The everywhere-else half: there is no execute bit to carry over.</td></tr>
+<tr><td><code>retake_record</code> <sub>fn</sub></td><td><a href="update.src.html#fn-retake_record">918</a></td><td>Re-take the integrity record over the files that were just replaced.</td></tr>
+<tr><td><code>write_beside</code> <sub>fn</sub></td><td><a href="update.src.html#fn-write_beside">978</a></td><td>Write the sealed record, owner-readable, making its directory if needed.</td></tr>
+<tr><td><code>relaunch</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-relaunch">993</a></td><td>Start the updated program and return.</td></tr>
 </tbody></table>
 </section>
 </div></div>

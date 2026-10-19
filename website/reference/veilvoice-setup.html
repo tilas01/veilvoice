@@ -122,7 +122,7 @@
 <a href="veilvoice-setup/install.src.html">
 <rect x="313.3" y="20.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="367.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">install.rs</text>
-<text x="367.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1101 lines</text>
+<text x="367.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">1106 lines</text>
 </a>
 <a href="veilvoice-setup/needs.src.html">
 <rect x="447.9" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -137,7 +137,7 @@
 <a href="veilvoice-setup/update.src.html">
 <rect x="233.9" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="284.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">update.rs</text>
-<text x="284.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">892 lines</text>
+<text x="284.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">908 lines</text>
 </a>
 <a href="veilvoice-setup/volumes.src.html">
 <rect x="360.5" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -154,10 +154,10 @@
 flowchart TD
     n_lib([&quot;lib.rs&lt;br/&gt;226 lines&quot;])
     n_companions[&quot;companions.rs&lt;br/&gt;1100 lines&quot;]
-    n_install[&quot;install.rs&lt;br/&gt;1101 lines&quot;]
+    n_install[&quot;install.rs&lt;br/&gt;1106 lines&quot;]
     n_needs[&quot;needs.rs&lt;br/&gt;565 lines&quot;]
     n_space[&quot;space.rs&lt;br/&gt;170 lines&quot;]
-    n_update[&quot;update.rs&lt;br/&gt;892 lines&quot;]
+    n_update[&quot;update.rs&lt;br/&gt;908 lines&quot;]
     n_volumes[&quot;volumes.rs&lt;br/&gt;580 lines&quot;]
     n_needs --&gt; n_companions
     n_needs --&gt; n_install
@@ -176,11 +176,11 @@ flowchart TD
 <h2 id="the-files">THE FILES</h2>
 <table><thead><tr><th>File</th><th>Lines</th><th>What it is</th></tr></thead><tbody>
 <tr><td><a href="veilvoice-setup/companions.html"><code>companions.rs</code></a></td><td>1100</td><td>Optional third-party software, detected rather than assumed.</td></tr>
-<tr><td><a href="veilvoice-setup/install.html"><code>install.rs</code></a></td><td>1101</td><td>Put this program somewhere the system can find it.</td></tr>
+<tr><td><a href="veilvoice-setup/install.html"><code>install.rs</code></a></td><td>1106</td><td>Put this program somewhere the system can find it.</td></tr>
 <tr><td><a href="veilvoice-setup/lib.html"><code>lib.rs</code></a></td><td>226</td><td>Everything that puts VeilVoice on a machine, and everything that reports what is already on it.</td></tr>
 <tr><td><a href="veilvoice-setup/needs.html"><code>needs.rs</code></a></td><td>565</td><td>What this machine is missing, asked once and at the right moment.</td></tr>
 <tr><td><a href="veilvoice-setup/space.html"><code>space.rs</code></a></td><td>170</td><td>How much room is actually free where VeilVoice keeps things.</td></tr>
-<tr><td><a href="veilvoice-setup/update.html"><code>update.rs</code></a></td><td>892</td><td>Ask, only when told to, whether a newer VeilVoice release exists.</td></tr>
+<tr><td><a href="veilvoice-setup/update.html"><code>update.rs</code></a></td><td>908</td><td>Ask, only when told to, whether a newer VeilVoice release exists.</td></tr>
 <tr><td><a href="veilvoice-setup/volumes.html"><code>volumes.rs</code></a></td><td>580</td><td>Encrypted volumes this machine already has: Cryptomator and VeraCrypt.</td></tr>
 </tbody></table>
 </section>
