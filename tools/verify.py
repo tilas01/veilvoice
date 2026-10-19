@@ -346,6 +346,14 @@ CHECKS = [
     # about a different tree than the one somebody would check out.
     ("the release step tags the commit it built",
      [sys.executable, "tools/audit/publishing.py"]),
+    # F-259. A wiki with no repository behind it is a setting, not a fault in
+    # the commit, so publishing to it is skipped with a warning rather than
+    # failed. The skip is one step's answer that every later step must read,
+    # and losing that in an edit shows only on the next release merge.
+    ("a wiki that does not exist yet skips the publish, not fails it",
+     [sys.executable, "tools/audit/wiki_publish.py"]),
+    ("that guard catches what it claims to, too",
+     [sys.executable, "tools/audit/wiki_publish.py", "--self-test"]),
     # F-204. Every other check in this file reads the working tree, and the
     # working tree is not what anybody else clones. A file that is present and
     # untracked reads exactly like a file that is committed, which is how an
