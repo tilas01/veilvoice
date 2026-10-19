@@ -311,10 +311,9 @@ def main():
     if subprocess.run(["git", "merge-base", "--is-ancestor", old_main, old_dev],
                       cwd=ROOT).returncode != 0:
         raise SystemExit("main has commits dev does not; merge those into dev first")
-    if git(["rev-list", "--merges", "--count", old_dev]) != "0":
-        raise SystemExit("dev has merge commits, which this does not rewrite")
-
-    history = git(["rev-list", "--reverse", old_dev]).split()
+    # Parents before children, which a merge (81316420, in August) needs:
+    # each commit is made from the rewritten form of every parent it has.
+    history = git(["rev-list", "--reverse", "--topo-order", old_dev]).split()
     if not any(wrong(sha, signing) for sha in history):
         # Including from the root: a second signed rewrite of a history that
         # is already right would force-push every commit again for nothing.

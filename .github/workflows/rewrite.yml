@@ -8,7 +8,7 @@
 # here pushes dev or main: a clone with push rights does that, with
 # `rewrite.py --push`, after checking the handover.
 #
-# Runs when this file changes, or by hand; re-run a finished run to build it
+# Runs when this file or either script changes, or by hand; re-run a finished run to build it
 # again from the branches as they are by then.
 
 name: rewrite
@@ -19,6 +19,8 @@ on:
     branches: [dev]
     paths:
       - '.github/workflows/rewrite.yml'
+      - 'tools/repo/rewrite.py'
+      - 'tools/repo/rewrite_in_actions.sh'
 
 permissions:
   contents: write
