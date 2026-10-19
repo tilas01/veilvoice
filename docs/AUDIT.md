@@ -1114,6 +1114,40 @@ be corrected: five threads are working from
 would save. So the pointer is here instead, going the other way. The commit
 named F-203; the finding is this one.
 
+### F-259: the wiki workflow failed `main` on every release merge for a setting
+
+`.github/workflows/wiki.yml` publishes `wiki/` to the repository's GitHub wiki
+from `main`. A GitHub wiki repository does not exist until a first page is
+saved through the Wiki tab. F-199 taught the workflow to try creating it by
+pushing one, and to fail with instructions where GitHub refuses. GitHub does
+refuse: a wiki that has never had a page cannot be pushed to. So every release
+merge would have put a red cross on `main` for something no change to the code
+could fix, and a branch that is always red on one workflow is a branch where
+the next red cross that matters reads as that one.
+
+The pages themselves were never the problem. The `check` job regenerates them,
+walks every link and refuses anything a flat wiki cannot hold, on every branch
+and every pull request, and it still fails on all of that.
+
+#### The fix
+
+The step that clones the wiki now answers a question, `ready`, in its
+outputs. It is `true` when there is a wiki to push to, cloned or just created.
+It is `false` when the clone answered "not found" and creating one was
+refused, and then the run raises a warning and writes the one-time step into
+its summary, and exits 0. The copy and the push both run only on `true`. Any
+other clone failure, a network error or a token without access, still fails,
+because the wiki exists then and not publishing to it is a fault.
+
+#### What stops it returning
+
+`tools/audit/wiki_publish.py` reads the workflow, in `tools/verify.py` and in
+CI. It fails if the step loses its `id`, if either answer stops being written,
+if the refusal path exits non-zero or reports an error rather than a warning, or
+if any step after it runs without asking. The last is the one an edit loses
+most easily: a step added at the end runs on the skipped path and fails on a
+directory that is not there. `--self-test` makes each of those five edits to the
+real workflow and shows that each one is caught.
 ### F-253: the app lock's cooldown told the decoy passphrase apart from the real one
 
 Found by the audit of the decoy code, reproduced by a test before it was fixed.

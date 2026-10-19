@@ -231,13 +231,14 @@ because an ignored file is never a candidate to report, `tools/verify.py
 check run where the author is standing can see that, because the file is
 there. The gate runs where a reader stands.
 
-**One gate on that list may still need a person, once.** The `wiki` workflow
-publishes from `main`, so a release merge is when it runs, and it has something
-to push to only if the wiki repository exists. It tries to create that
-repository itself, and where GitHub refuses, the one-time step in the web
-interface is written out in [`WEBSITE.md`](WEBSITE.md) under *The wiki, in two
-places, from one source*. It is named here so a release merge is not where it
-is discovered.
+**One step after a release may still need a person, once.** The `wiki`
+workflow publishes from `main`, so a release merge is when it runs, and it has
+something to push to only if the wiki repository exists. It tries to create that
+repository itself. Where GitHub refuses, the publish is skipped with a warning
+rather than failed, so `main` stays green, and the GitHub wiki stays on whatever
+it last held until the one-time step in the web interface is done. That step is
+written out in [`WEBSITE.md`](WEBSITE.md) under *The wiki, in two places, from
+one source*. It is named here so the warning is not where it is discovered.
 
 ## Commits
 

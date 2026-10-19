@@ -115,23 +115,38 @@ jobs:
       # error it printed was right about the cause.
       #
       # So it tries to create the repository itself before asking a person to.
-      # A push to a wiki that has never been initialised may be refused, in
-      # which case nothing is lost and the message below is what a reader
-      # gets; where it is accepted, the manual step disappears for good. The
-      # attempt is cheap and it is the difference between a workflow that
-      # fixes itself and one that waits.
+      # A push to a wiki that has never been initialised may be refused. Where
+      # it is accepted, the manual step disappears for good.
+      #
+      # Where it is refused, this job is skipped rather than failed (F-259).
+      # A missing wiki is a one-time setting for the maintainer, not a fault in
+      # the commit being published, and failing here put a red cross on every
+      # release merge into `main` for something no change to the code could
+      # fix. The check job above still fails on anything wrong with the pages
+      # themselves, so what is skipped is only the copy, and the run says so
+      # in a warning and in its summary rather than passing in silence. Any
+      # other clone failure, a network error or a refused token, still fails:
+      # the wiki exists then, and not publishing to it is a fault.
+      #
+      # `ready` is this step's answer, and every step after it reads it.
       - name: Clone the wiki repository, creating it if it does not exist
+        id: wiki
         run: |
           set -euo pipefail
           remote="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
 
           if git clone "$remote" wiki-repo 2>/tmp/clone.log; then
             echo "cloned the existing wiki"
+            echo "ready=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           cat /tmp/clone.log
-          echo "the wiki repository could not be cloned; trying to create it"
+          if ! grep -qi "not found" /tmp/clone.log; then
+            echo "::error::The wiki for ${{ github.repository }} exists but could not be cloned; see the output above."
+            exit 1
+          fi
+          echo "the wiki repository does not exist yet; trying to create it"
 
           # An empty repository with one real page. `Home` is the page GitHub
           # opens a wiki on, so if this succeeds a reader arriving before the
@@ -149,22 +164,33 @@ jobs:
           if git push "$remote" master 2>/tmp/create.log; then
             echo "created the wiki repository"
             git remote add origin "$remote" || git remote set-url origin "$remote"
+            echo "ready=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           cat /tmp/create.log
-          echo "::error::The wiki for ${{ github.repository }} has no repository behind it yet."
-          echo "A GitHub wiki repository is not created when the wiki is"
-          echo "enabled in Settings, and this workflow's attempt to create it"
-          echo "by pushing was refused. It is created when the first page is"
-          echo "saved through the web interface. Open the repository's Wiki"
-          echo "tab, create a page with any content, save it, and re-run this"
-          echo "workflow: everything the wiki holds is overwritten from wiki/"
-          echo "on the first successful run, so what that first page says does"
-          echo "not matter. This is a one-time step for the maintainer."
-          exit 1
+          echo "ready=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::The wiki was not published: ${{ github.repository }} has no wiki repository yet. Save any first page in the Wiki tab and re-run this workflow."
+          {
+            echo "### The wiki was not published"
+            echo
+            echo "The pages were checked and are ready, but this repository has"
+            echo "no wiki repository behind it yet, and GitHub refused this"
+            echo "workflow's attempt to create one. A GitHub wiki repository is"
+            echo "created when the first page is saved through the web interface:"
+            echo
+            echo "1. Open the repository's **Wiki** tab."
+            echo "2. Create a page with any content, and save it."
+            echo "3. Re-run this workflow."
+            echo
+            echo "Everything the wiki holds is replaced from \`wiki/\` on the first"
+            echo "successful run, so what that first page says does not matter."
+            echo "The website's copy of the wiki is published by \`pages.yml\` and"
+            echo "does not depend on this."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Copy the generated pages in
+        if: steps.wiki.outputs.ready == 'true'
         run: |
           set -euo pipefail
           # Every page in the wiki is generated, so the wiki is replaced rather
@@ -176,6 +202,7 @@ jobs:
           echo "pages now in the wiki: $(ls wiki-repo/*.md | wc -l)"
 
       - name: Commit and push, if anything changed
+        if: steps.wiki.outputs.ready == 'true'
         working-directory: wiki-repo
         run: |
           set -euo pipefail
