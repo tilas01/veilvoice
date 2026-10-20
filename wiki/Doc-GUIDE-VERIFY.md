@@ -179,7 +179,7 @@ two, and they are the same program built the same way:
 | | Stable | Early |
 |---|---|---|
 | Version looks like | `0.1.23` | `0.1.23-beta.1` |
-| Cut from | `main` | `dev` |
+| Cut from | `main`, as a release | `main`, between releases |
 | On the releases page | a release | marked a prerelease |
 | Offered by the download page | yes | no, deliberately |
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Is `dev` ready to become `main`, and is that version coherent?
+"""Is the tip of `main` ready to be released, and is that version coherent?
 
     python tools/release/readiness.py            # ask about the workspace version
     python tools/release/readiness.py v0.1.23    # ask about a named version
@@ -21,14 +21,11 @@ to publish a release whose `## v<version>` section is missing from
 
 The trouble with the second one is *when* it fires. It is the last step of a
 twelve-job build, so a release missing its notes is discovered after every
-binary has been compiled twice and compared, and after `main` has already
-moved. `main` moving is the part that is awkward to undo: it is the released
-branch, the website and the wiki publish from it, and a reader who fetches
-between the merge and the repair gets a `main` that claims to be a release
-nobody can read the notes of.
+binary has been compiled twice and compared.
 
-So this asks the whole question **before** anything moves, from a checkout of
-`dev`, and it is the gate `promote.yml` runs first.
+So this asks the whole question **before** anything is built, from a checkout
+of `main`, and it is the gate `promote.yml` runs first. There is one branch,
+so the tree being asked about is the commit that would be released.
 
 # What it checks, and why each one
 
@@ -65,15 +62,13 @@ So this asks the whole question **before** anything moves, from a checkout of
    already there either fails late or, worse, succeeds against the older
    commit and publishes binaries that do not match it.
 
-6. **Nothing has landed on `main` that `dev` has not got.** The release merge
-   takes `dev` into `main`, so `main` always carries merge commits `dev` does
-   not, and asking whether it is an ancestor would fail on a healthy
-   repository. What would be wrong is a *non-merge* commit reachable from
-   `main` and not from here, because that is work put on the released branch
-   directly, which is F-200's shape: the next release merge either loses it or
-   stops on a conflict, and neither announces itself at the time.
+There was a sixth while development happened on a branch of its own and a
+release merged it into `main`: that nothing had landed on `main` the
+development branch lacked. With one branch there is nothing for `main` to have
+that the tree being released has not, so the question is gone rather than
+skipped.
 
-Checks 4, 5 and 6 need the repository's history, so they say so and are skipped
+Checks 4 and 5 need the repository's history, so they say so and are skipped
 rather than guessed at when this runs somewhere without it.
 
 Pure standard library, like everything in `tools/`.
@@ -187,7 +182,7 @@ def release_point(root: Path, tag: str):
 
     This exists because the tag cannot be trusted to be on the branch, and
     that is not hypothetical: every one of this repository's twenty-three
-    release tags points at a commit reachable from neither `main` nor `dev`.
+    release tags pointed at a commit reachable from no branch.
     The history was rewritten at some point and the tags were left behind on
     the pre-rewrite objects. The trees are identical, so what was published is
     what the branch has, but the commits are a parallel line. That is F-254.
@@ -310,8 +305,8 @@ def check(root: Path, tag: str) -> list:
     ok, _ = git(root, "rev-parse", "--git-dir")
     if not ok:
         gaps.append(
-            "not a git checkout, so the audit round, the tag and the branch "
-            "ancestry were not checked"
+            "not a git checkout, so the audit round and the tag were not "
+            "checked"
         )
         return gaps
 
@@ -344,28 +339,6 @@ def check(root: Path, tag: str) -> list:
                     "round has been written up for anything in this release."
                     % (previous, how)
                 )
-
-    # And the same asymmetry one more time, for the same reason.
-    #
-    # `main` is never an ancestor of `dev`, because every release merge puts a
-    # commit on `main` that `dev` has not got. Asking whether it is would fail
-    # on a perfectly healthy repository. What can go wrong is work landing on
-    # the released branch directly, and that work is a commit rather than a
-    # merge, so the question is whether any non-merge commit is reachable from
-    # `main` and not from here.
-    ok, _ = git(root, "rev-parse", "--verify", "--quiet", "refs/remotes/origin/main")
-    if ok:
-        ok, stray = git(
-            root, "log", "--oneline", "--no-merges", "origin/main", "^HEAD"
-        )
-        if ok and stray:
-            first = stray.splitlines()[0]
-            gaps.append(
-                "origin/main carries %d commit(s) this branch has not, the newest "
-                "being '%s'. Something landed on the released branch directly, so "
-                "the release merge would either lose it or stop on a conflict. "
-                "Merge origin/main into dev first." % (len(stray.splitlines()), first)
-            )
 
     return gaps
 
@@ -415,7 +388,7 @@ def release_point_self_test() -> list:
             run("add", "-A")
             run("commit", "-m", message)
 
-        run("init", "-q", "-b", "dev")
+        run("init", "-q", "-b", "main")
         commit("# Changelog\n", "first")
         commit("# Changelog\n\n## v1.0.0\n\n- a thing\n", "Cut 1.0.0")
         commit("# Changelog\n\n## v1.0.0\n\n- a thing\n- and another\n", "the rest of it")
@@ -475,6 +448,81 @@ def release_point_self_test() -> list:
     return problems
 
 
+def check_self_test() -> list:
+    """The whole gate, over a repository with one branch that is ready.
+
+    The readers above are tested on text and `release_point` on a fixture, and
+    neither says whether `check` itself passes a release it should pass. That
+    is the half a gate can be wrong about without anybody noticing, because a
+    gate that refuses everything is fixed by hand on release morning and a
+    gate that refuses one healthy layout looks like a release problem.
+
+    The layout here is this repository's: one branch, a previous release
+    tagged on it, `docs/AUDIT.md` written in since, and a remote-tracking
+    `origin/main` holding a commit this checkout lacks, which is a clone that
+    has simply not pulled. The gate used to fail exactly that, when a second
+    branch existed and such a commit meant work put on the released branch
+    directly; with one branch it is not a gap, and asking about it would
+    refuse a ready release.
+    """
+    import shutil
+    import tempfile
+
+    if shutil.which("git") is None:
+        return ["check: no git on this machine, so it went unchecked"]
+
+    problems = []
+    work = Path(tempfile.mkdtemp(prefix="veilvoice-readiness-"))
+    try:
+        env = dict(os.environ)
+        env.update(
+            GIT_AUTHOR_NAME="t",
+            GIT_AUTHOR_EMAIL="t@example.invalid",
+            GIT_COMMITTER_NAME="t",
+            GIT_COMMITTER_EMAIL="t@example.invalid",
+        )
+
+        def run(*args):
+            return subprocess.run(
+                ("git",) + args, cwd=str(work), env=env,
+                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=True,
+            ).stdout.decode().strip()
+
+        def write(version, notes, audit):
+            (work / "docs").mkdir(exist_ok=True)
+            (work / "Cargo.toml").write_text(
+                '[workspace.package]\nversion = "%s"\n' % version, encoding="utf-8")
+            (work / "CHANGELOG.md").write_text(
+                "# Changelog\n\n" + notes, encoding="utf-8")
+            (work / "ROADMAP.md").write_text(
+                "| 1 | **A thing** | **done** | - |\n"
+                "\n### Next: v1.0.1, the thing\n\n**1**.\n", encoding="utf-8")
+            (work / "docs" / "AUDIT.md").write_text(audit, encoding="utf-8")
+            run("add", "-A")
+            run("commit", "-q", "-m", "version %s" % version)
+
+        run("init", "-q", "-b", "main")
+        write("1.0.0", "## v1.0.0\n\n- the first\n", "# Audit\n")
+        run("tag", "v1.0.0")
+        write("1.0.1", "## v1.0.1\n\n- the second\n\n## v1.0.0\n\n- the first\n",
+              "# Audit\n\nF-1, read since v1.0.0.\n")
+        here = run("rev-parse", "HEAD")
+        run("commit", "-q", "--allow-empty", "-m", "pushed by somebody else")
+        run("update-ref", "refs/remotes/origin/main", "HEAD")
+        run("reset", "-q", "--hard", here)
+
+        gaps = check(work, "v1.0.1")
+        if gaps:
+            problems.append("check: a ready release on one branch was refused: %r" % (gaps,))
+
+        run("tag", "v1.0.1")
+        if not any("already exists" in gap for gap in check(work, "v1.0.1")):
+            problems.append("check: a release whose tag exists was not refused")
+    finally:
+        shutil.rmtree(str(work), ignore_errors=True)
+    return problems
+
+
 def self_test() -> int:
     failures = []
 
@@ -519,6 +567,7 @@ def self_test() -> int:
     expect("no such row", item_status(roadmap, "999"), None)
 
     failures.extend(release_point_self_test())
+    failures.extend(check_self_test())
 
     for line in failures:
         print("  " + line)

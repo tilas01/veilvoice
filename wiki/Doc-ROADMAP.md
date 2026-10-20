@@ -1459,8 +1459,8 @@ That means the items in the group are done, `tools/verify.py` passes whole
 rather than `--quick`, the screenshots and the recorded sessions have been
 retaken if the interface moved, `CHANGELOG.md` has the notes, and an audit
 round has read what changed and written itself up in `docs/AUDIT.md`. Then
-`dev` merges into `main`, the tag is made at that commit, and the release
-workflow builds it.
+the `promote` workflow checks the tip of `main` from a fresh checkout and
+starts the release workflow, which builds that commit and makes the tag there.
 
 ### Next: v0.1.23, the window that never freezes
 
@@ -1503,7 +1503,7 @@ rest are built on before the rest.
    the headings is read from the menu's own list, so Storage is named there
    without anybody adding it.
 
-**182 and 186 have landed already**, on `dev` and therefore in this release:
+**182 and 186 have landed already**, and are therefore in this release:
 both were broken or absent machinery rather than features, nothing in the list
 above was waiting on either, and neither is a thing to leave standing for the
 length of a release. A wiki that has never once published is one. The other is
@@ -1512,7 +1512,7 @@ be cut by.
 
 Then cut v0.1.23 once the audit round over everything since v0.1.22 is written
 up. That release is the one that carries the alignment work, the channels and
-the documentation pair already on `dev`.
+the documentation pair already committed.
 
 ### After that: v0.1.24, the parts that touch a file
 
@@ -1547,7 +1547,7 @@ one.
 same `CHANGELOG.md` sections that rewrite reads, so drawing it first would mean
 drawing from a layout about to be replaced.
 
-**178, 180 and 183 have landed early**, on `dev` and therefore in v0.1.23. All
+**178, 180 and 183 have landed early**, and are therefore in v0.1.23. All
 three are prose and generators rather than window work, so none was waiting on
 anything ahead of it, and holding them back would have left the manual
 incomplete and the release notes unreadable for a release longer. **183**

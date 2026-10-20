@@ -65,8 +65,8 @@ page yourself and look.
 
 | Stream | Cut from | What it is |
 |---|---|---|
-| stable | the released branch | What the download page offers. |
-| early | the development branch, under a prerelease tag | Newer, and checkable in exactly the same way. |
+| stable | `main`, under a release tag | What the download page offers. |
+| early | `main` between releases, under a prerelease tag | Newer, and checkable in exactly the same way. |
 
 Which one a build belongs to is read from its own version string: a prerelease
 version *is* a prerelease. Nothing is compiled in to say so, which is what keeps

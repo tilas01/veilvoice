@@ -10,29 +10,31 @@
 name: pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'website/**'
-      - 'assets/**'
-      - 'README.md'
-      - '.github/workflows/pages.yml'
-  # After a release, always.
+  # When a release finishes, and on nothing else that happens by itself.
   #
   # The site is not only documentation: the download page names the current
   # version, the releases page is generated from CHANGELOG.md, and the verify
-  # page describes files that a release publishes. Cutting a release changed
-  # all of that and deployed none of it, because a tag push touches no path in
-  # the list above. The site stayed on the previous release until somebody
-  # happened to edit a file under `website/`, which could be days.
+  # page describes files that a release publishes. So what is published has to
+  # describe what has been released, and nothing else.
   #
-  # So the release workflow finishing is a reason to publish, on the same
-  # footing as somebody editing a page. Success only: a release that failed
-  # halfway is not something to redeploy the site for.
+  # This used to deploy on a push to `main` as well, which was right while
+  # `main` moved only when a release was cut. There is one branch now and work
+  # is committed to it every day, so a push trigger would publish a version
+  # bump before its release existed, and a download page offering a version
+  # nobody can download. The site is published from the commit a release was
+  # built from, when that release succeeds; an edit under `website/` reaches
+  # the site with the next release.
+  #
+  # Success only: a release that failed halfway is not something to redeploy
+  # the site for. And a release run that published nothing, a dry run, leaves
+  # no tag behind, which is how the job below tells the two apart.
   workflow_run:
     workflows: [release]
     types: [completed]
 
+  # Publish the newest release again, by hand: after a failed deploy, or once
+  # Pages has been set up. It publishes what was released, like the trigger
+  # above, never the tip of `main`.
   workflow_dispatch:
 
 permissions:
@@ -46,21 +48,60 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  release:
+    name: which release to publish
     runs-on: ubuntu-latest
-    # A failed release is not a reason to publish. Every other trigger is: a
-    # push to main, or somebody pressing the button.
+    # A failed release is not a reason to publish. Pressing the button is.
     if: >-
       github.event_name != 'workflow_run' ||
       github.event.workflow_run.conclusion == 'success'
+    outputs:
+      tag: ${{ steps.which.outputs.tag }}
     steps:
-      # The default branch explicitly. On a `workflow_run` the checkout would
-      # otherwise be the commit that triggered the release, which is a tag; the
-      # site is published from `main`, and for a release those are the same
-      # commit until they are not.
+      # The whole history, for the tags. Release tags are made by the
+      # publishing step of `release.yml`, at the commit it built.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+
+      # After a release run, the tag at the commit it built: that is the
+      # release, and no tag there means the run was a dry run. By hand, the
+      # newest release. A prerelease is never the answer either way, because
+      # the download page offers releases and an early build is not one.
+      - name: Find the release
+        id: which
+        env:
+          BUILT: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          if [ -n "$BUILT" ]; then
+            tag="$(git tag --points-at "$BUILT" --list 'v*' --sort=-v:refname | grep -v -- '-' | head -1 || true)"
+            if [ -z "$tag" ]; then
+              echo "no release tag names $BUILT: that run was a dry run or a prerelease, so the site stays as it is" \
+                | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            tag="$(git tag --list 'v*' --sort=-v:refname | grep -v -- '-' | head -1 || true)"
+            if [ -z "$tag" ]; then
+              echo "::error::there is no release tag, so there is nothing to publish"
+              exit 1
+            fi
+          fi
+          echo "publishing the site from $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: release
+    if: needs.release.outputs.tag != ''
+    runs-on: ubuntu-latest
+    steps:
+      # The release, by its tag. On a `workflow_run` the default checkout is
+      # the tip of `main`, which is the released commit only until the next
+      # push, and that is usually minutes.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ needs.release.outputs.tag }}
 
       # The banner and icons are generated, and the site is the most visible
       # place a stale copy would show. Regenerating and diffing here keeps the

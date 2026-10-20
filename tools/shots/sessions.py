@@ -393,7 +393,7 @@ def check_witnessed(name, transcript):
         #
         # That window used to be harmless because `tools/verify.py` was the
         # only thing that ran this, and it is run by a person. CI runs the
-        # re-runnable sessions now (F-207), which would otherwise mean `dev`
+        # re-runnable sessions now (F-207), which would otherwise mean `main`
         # goes red for the days between a bump and a publication, for a state
         # this very message calls expected. So CI passes `--rerun-only` and
         # skips this one: a check that fires on something legitimate is a

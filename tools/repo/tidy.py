@@ -39,9 +39,11 @@ import subprocess
 import sys
 
 # Branches that are never candidates for deletion whatever their state. `main`
-# is the published history; `dev` is where work happens and is routinely ahead
-# of `main` rather than contained in it.
-PROTECTED = {"main", "dev", "HEAD"}
+# is the one branch this repository keeps: work is committed to it and
+# releases are cut from it. Every other branch is a candidate, including one
+# named `dev`, which held the work while there were two and is deleted like
+# any other once everything on it is in `main`.
+PROTECTED = {"main", "HEAD"}
 
 
 def git(*args, check=True, cwd=None):
@@ -208,11 +210,12 @@ def self_test():
                   % listing)
             return 1
         found = remote_branches("origin", cwd=clone)
-    if found != ["finished"]:
-        print("a fresh clone's branches read as %r, not ['finished']" % (found,))
+    if found != ["dev", "finished"]:
+        print("a fresh clone's branches read as %r, not ['dev', 'finished']"
+              % (found,))
         return 1
     print("  a fresh clone's branches read as its branches, origin/HEAD and "
-          "the protected ones left out")
+          "main left out and every other branch a candidate")
     return 0
 
 

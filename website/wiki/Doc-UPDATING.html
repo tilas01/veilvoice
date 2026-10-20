@@ -96,7 +96,7 @@
 <p>Whatever it says, it is a version number read off a public page. <strong>It is not a signature, and nothing in the check has verified anything.</strong> The window prints that sentence beside the answer rather than leaving it to this document.</p>
 <p>If the check fails, it will say why: your system ships no transfer tool it knows how to drive, the tool ran and failed, or the reply held no version it could find. In all three cases the answer is the same, which is to open the releases page yourself and look.</p>
 <h2 id="two-streams-and-which-one-you-are-on">Two streams, and which one you are on</h2>
-<table><thead><tr><th>Stream</th><th>Cut from</th><th>What it is</th></tr></thead><tbody><tr><td>stable</td><td>the released branch</td><td>What the download page offers.</td></tr><tr><td>early</td><td>the development branch, under a prerelease tag</td><td>Newer, and checkable in exactly the same way.</td></tr></tbody></table>
+<table><thead><tr><th>Stream</th><th>Cut from</th><th>What it is</th></tr></thead><tbody><tr><td>stable</td><td><code>main</code>, under a release tag</td><td>What the download page offers.</td></tr><tr><td>early</td><td><code>main</code> between releases, under a prerelease tag</td><td>Newer, and checkable in exactly the same way.</td></tr></tbody></table>
 <p>Which one a build belongs to is read from its own version string: a prerelease version <em>is</em> a prerelease. Nothing is compiled in to say so, which is what keeps a binary a pure function of its source. A check made by an early build reads the page for early builds, so it does not tell you that you are behind when you are ahead.</p>
 <h2 id="doing-the-update">Doing the update</h2>
 <pre><code>veilvoice update</code></pre>

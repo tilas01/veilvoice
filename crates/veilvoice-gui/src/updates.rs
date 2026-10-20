@@ -195,7 +195,7 @@ impl Updates {
                                     download page offers."
                 }
                 Channel::Early => {
-                    "Along the early channel: builds from dev, \
+                    "Along the early channel: builds between releases, \
                                    marked prereleases, signed and checkable the \
                                    same way."
                 }

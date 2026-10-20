@@ -28,7 +28,7 @@ Two of them had gone stale and were found by hand:
     the Verify tab taller. `fit.py` fits every capture to one height, so that
     is the whole set out of date, not one of them.
 
-Both landed on `dev` and neither failed anything.
+Both were pushed and neither failed anything.
 
 # Why the check is a version and not a comparison
 

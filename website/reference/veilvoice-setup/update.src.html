@@ -166,12 +166,12 @@
 <span class="src-item" id="fn-channel">
 <span class="ln" id="L90"><span class="tok-com">/// Which stream of releases a build came from.</span></span>
 <span class="ln" id="L91"><span class="tok-com">///</span></span>
-<span class="ln" id="L92"><span class="tok-com">/// **Roadmap item 165.** Releases are cut from `main` and development happens on</span></span>
-<span class="ln" id="L93"><span class="tok-com">/// `dev`, which used to leave somebody who wanted the newest work either</span></span>
-<span class="ln" id="L94"><span class="tok-com">/// building it themselves or waiting. An early build is the same reproducible,</span></span>
-<span class="ln" id="L95"><span class="tok-com">/// signed archive published from `dev` under a tag that says so, marked a</span></span>
-<span class="ln" id="L96"><span class="tok-com">/// prerelease on GitHub so it is never what the download page offers by</span></span>
-<span class="ln" id="L97"><span class="tok-com">/// default.</span></span>
+<span class="ln" id="L92"><span class="tok-com">/// **Roadmap item 165.** A release is cut when a group of work is finished, which</span></span>
+<span class="ln" id="L93"><span class="tok-com">/// used to leave somebody who wanted the newest work either building it</span></span>
+<span class="ln" id="L94"><span class="tok-com">/// themselves or waiting. An early build is the same reproducible, signed</span></span>
+<span class="ln" id="L95"><span class="tok-com">/// archive published from `main` between releases under a tag that says so,</span></span>
+<span class="ln" id="L96"><span class="tok-com">/// marked a prerelease on GitHub so it is never what the download page offers</span></span>
+<span class="ln" id="L97"><span class="tok-com">/// by default.</span></span>
 <span class="ln" id="L98"><span class="tok-com">///</span></span>
 <span class="ln" id="L99"><span class="tok-com">/// The channel is read from the version the build carries rather than from</span></span>
 <span class="ln" id="L100"><span class="tok-com">/// anything baked in at compile time, and that is the whole design: a</span></span>
@@ -182,8 +182,8 @@
 <span class="ln" id="L105"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Channel {</span>
 <span class="ln" id="L106">    <span class="tok-com">/// Cut from `main`. What the download page offers.</span></span>
 <span class="ln" id="L107">    Stable,</span>
-<span class="ln" id="L108">    <span class="tok-com">/// Cut from `dev` under a prerelease tag. Newer, and checkable in exactly</span></span>
-<span class="ln" id="L109">    <span class="tok-com">/// the same way.</span></span>
+<span class="ln" id="L108">    <span class="tok-com">/// Cut from `main` between releases, under a prerelease tag. Newer, and</span></span>
+<span class="ln" id="L109">    <span class="tok-com">/// checkable in exactly the same way.</span></span>
 <span class="ln" id="L110">    Early,</span>
 <span class="ln" id="L111">}</span>
 </span>
@@ -218,7 +218,7 @@
 <span class="ln" id="L135"><span class="tok-str">                                page offers&quot;</span></span>
 <span class="ln" id="L136">            }</span>
 <span class="ln" id="L137">            Channel::Early =&gt; {</span>
-<span class="ln" id="L138">                <span class="tok-str">&quot;cut from dev under a prerelease tag: the same \</span></span>
+<span class="ln" id="L138">                <span class="tok-str">&quot;cut between releases under a prerelease tag: the same \</span></span>
 <span class="ln" id="L139"><span class="tok-str">                               build, the same signing and the same hash \</span></span>
 <span class="ln" id="L140"><span class="tok-str">                               lists, newer and less used&quot;</span></span>
 <span class="ln" id="L141">            }</span>

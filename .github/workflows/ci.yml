@@ -7,16 +7,16 @@ name: ci
 
 on:
   push:
-    # Both branches, and `dev` is the one that matters day to day.
+    # `main`, the one branch this repository has. Work is committed to it and
+    # releases are cut from it, so every push is checked here.
     #
-    # Development moved off `main` (roadmap item 125) and this list did not move
-    # with it, so for as long as that was true every push of actual work ran
-    # **no CI at all**: the only things checked were a pull request and the
-    # merge that cuts a release, which is the last moment anybody wants to
-    # discover that Windows does not build. A branch policy that turns the
-    # checks off is not a branch policy, and nothing reported it because a
-    # workflow that does not run produces no failure.
-    branches: [main, dev]
+    # This list is the thing to keep true when the branch layout changes.
+    # Development once moved off `main` (roadmap item 125) and this list did
+    # not move with it, so for as long as that was true every push of actual
+    # work ran **no CI at all**, and nothing reported it because a workflow
+    # that does not run produces no failure. `tools/audit/dependabot.py` reads
+    # this trigger and fails the build if it stops naming `main`.
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -114,7 +114,7 @@ jobs:
       # is why they were left out, and leaving them out meant the whole of CI
       # could be green over a tree `tools/verify.py` fails on. That is what
       # happened: F-201 was a recorded session that had disagreed with the
-      # program it records for two commits, on `dev`, with nothing red, until
+      # program it records for two commits, pushed, with nothing red, until
       # somebody ran the verification pass by hand before a push.
       #
       # Linux only, because both are questions about the source rather than
@@ -124,7 +124,7 @@ jobs:
       # verifier checking a *published* release and so cannot be re-made until
       # that release exists. Between a version bump and its publication it
       # legitimately names the previous version, which `sessions.py` itself
-      # calls an expected state. Asking that question here would put `dev` red
+      # calls an expected state. Asking that question here would put `main` red
       # for the length of every release for no defect. `promote.yml` runs
       # `tools/verify.py` whole, which does ask it, at the point where the
       # answer can be known.
@@ -535,9 +535,9 @@ jobs:
       - name: The release step must tag the commit it built
         run: python tools/audit/publishing.py
 
-      # F-259. The wiki is published from `main`, and until a first page is
-      # saved in the Wiki tab there is no wiki repository to publish to. That
-      # used to fail the wiki workflow on every release merge. It skips with a
+      # F-259. The wiki is published when a release is, and until a first page
+      # is saved in the Wiki tab there is no wiki repository to publish to.
+      # That used to fail the wiki workflow on every release. It skips with a
       # warning now, and this reads the workflow to keep it that way: the step
       # that decides must still decide, and every step after it must ask.
       - name: A wiki that does not exist yet must skip the publish, not fail it
@@ -649,7 +649,7 @@ jobs:
       - name: The app-manifest generator must still verify what it writes
         run: python tools/sign/selftest.py
 
-      # The gate `promote.yml` runs before `main` moves, asked of itself.
+      # The gate `promote.yml` runs before a release is built, asked of itself.
       #
       # It is not in this job's list of `--check` runs above, because it is not
       # a question about this commit: it asks whether a named version is ready
@@ -1035,13 +1035,13 @@ jobs:
       - name: Fail if any crate reaching pgp gains a private-key code path
         run: python tools/audit/rsa_usage.py
 
-  # F-235. Fifteen commits reached `dev` naming an assistant as author or
+  # F-235. Fifteen commits were pushed naming an assistant as author or
   # committer, and twenty-five in tilas01's name showed Unverified because a
   # cloud container signed them with a key registered to another account.
   # `tools/verify.py` stops the next one before it is made; this reads what a
   # push actually carried, in both fields, and asks GitHub whether it shows
-  # each commit Verified. A force push has no meaningful `before`, so it checks
-  # everything the branch has that `main` lacks.
+  # each commit Verified. A force push is checked whole, every commit the
+  # branch now has, because a rewrite can replace any of them.
   authorship:
     name: every commit is tilas01's and signed
     if: github.event_name == 'push'

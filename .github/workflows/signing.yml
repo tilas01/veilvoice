@@ -16,7 +16,7 @@ name: signing
 on:
   workflow_dispatch:
   push:
-    branches: [dev, main]
+    branches: [main]
     paths:
       - '.github/workflows/signing.yml'
       - 'tools/repo/signing_check.sh'

@@ -7,8 +7,8 @@ Rewrite one commit message: roadmap "markers" become "roadmap items".
         --msg-filter 'python3 tools/repo/message_filter.py' \
         --tag-name-filter cat -- --tags
 
-Over the tags only. `--all` would also rewrite `dev` and `main`, which only
-`tools/repo/rewrite.py` rewrites, and every remote-tracking ref with them, and
+Over the tags only. `--all` would also rewrite `main`, which only
+`tools/repo/rewrite.py` rewrites, and every remote-tracking ref with it, and
 `commit.gpgsign=false` because filter-branch would otherwise sign each new
 commit with whatever key this clone signs with, which is not a key GitHub
 verifies here.

@@ -299,7 +299,7 @@ CHECKS = [
      [sys.executable, "tools/audit/dependabot.py"]),
     # And the half of that guard which cannot be proved by running it here: a
     # check that reads only the file it guards is a check nobody has seen fail.
-    # F-200 was an entry aimed at the released branch, and the reader in place
+    # F-200 was an entry aimed at the wrong branch, and the reader in place
     # at the time stopped looking before `target-branch` and would have passed
     # either way. These cases are text, so the failing shapes are exercised.
     ("the Dependabot guard notices where a bump would land",
@@ -349,7 +349,7 @@ CHECKS = [
     # F-259. A wiki with no repository behind it is a setting, not a fault in
     # the commit, so publishing to it is skipped with a warning rather than
     # failed. The skip is one step's answer that every later step must read,
-    # and losing that in an edit shows only on the next release merge.
+    # and losing that in an edit shows only on the next release.
     ("a wiki that does not exist yet skips the publish, not fails it",
      [sys.executable, "tools/audit/wiki_publish.py"]),
     ("that guard catches what it claims to, too",
@@ -365,7 +365,7 @@ CHECKS = [
      [sys.executable, "tools/audit/fixtures.py"]),
     ("that guard catches what it claims to",
      [sys.executable, "tools/audit/fixtures.py", "--self-test"]),
-    # F-235. The other git-reading check. Fifteen commits reached `dev` naming
+    # F-235. The other git-reading check. Fifteen commits were pushed naming
     # an assistant as author or committer, because a cloud container presets
     # its own identity and some set it in variables that beat every config
     # file. This runs before the commit it protects is made, so it asks git

@@ -22,6 +22,13 @@ on:
       tag:
         description: Version to publish, e.g. v0.1.15 (leave empty for a dry run)
         required: false
+      # What `promote.yml` passes: the commit its checks passed. A dispatch
+      # names a branch, and the branch can move between that workflow reading
+      # it and this one starting, so a publish from any other commit is
+      # refused below rather than releasing work nothing checked. F-230.
+      commit:
+        description: The commit this run must build; it refuses to publish from any other (optional)
+        required: false
 
 permissions:
   contents: write
@@ -800,23 +807,26 @@ jobs:
             --out NOTES.md \
             $allow
 
-      # **What decides whether this publishes, and the two things checked
-      # before it does.**
+      # **What decides whether this publishes, and the things checked before
+      # it does.**
       #
       # A tag push publishes, as it always has. A manual run publishes only
       # when it was given a version, and then only if that version survives
-      # both checks below; a manual run with no version is a dry run and
+      # the checks below; a manual run with no version is a dry run and
       # reaches the summary at the end instead.
       #
       # The checks matter because a release cut from a branch has none of the
       # protection a tag gives. A tag is a commit somebody chose; a branch moves.
-      # So the shape of the version is checked, because `softprops` would
-      # cheerfully create a tag called `main`, and the version is checked
+      # So the commit built is checked against the one the dispatch named, when
+      # it named one, the shape of the version is checked, because `softprops`
+      # would cheerfully create a tag called `main`, and the version is checked
       # against the workspace, because publishing `v0.1.16` from a tree that
       # says `0.1.15` produces a release whose own binaries disagree with its
       # name.
       - name: Is this a release, and is it a coherent one
         id: gate
+        env:
+          CHECKED: ${{ github.event.inputs.commit }}
         run: |
           tag="${{ env.VERSION_TAG }}"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] \
@@ -829,6 +839,10 @@ jobs:
             v[0-9]*.[0-9]*.[0-9]*) ;;
             *) echo "::error::'$tag' is not a version like v0.1.15"; exit 1 ;;
           esac
+          if [ -n "$CHECKED" ] && [ "$CHECKED" != "$GITHUB_SHA" ]; then
+            echo "::error::asked to publish $CHECKED, and this run built $GITHUB_SHA: the branch moved after the checks. Run promote again."
+            exit 1
+          fi
           want="${tag#v}"
           have="$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1)"
           if [ "$want" != "$have" ]; then

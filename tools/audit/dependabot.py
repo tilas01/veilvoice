@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Every manifest in this tree is covered by a Dependabot entry, aimed at `dev`.
+"""Every manifest in this tree is covered by a Dependabot entry, aimed at `main`.
 
     python tools/audit/dependabot.py     # report, and fail on any gap
     python tools/audit/dependabot.py --self-test   # prove the checks catch it
@@ -20,20 +20,23 @@ with a known problem, but one nothing is looking at.
 
 # And where the pull requests point
 
-An entry with no `target-branch` opens against the repository's default
-branch, which here is `main`. `main` is the released program and moves only
-when a release is cut, by merging `dev` into it. A bump merged into `main` any
-other way is a commit `dev` does not have, so `dev` falls behind on it and the
-next release merge either loses the change or conflicts with it, and nothing
-says so: the pull request looks entirely ordinary.
+This repository has one branch, `main`. Work is committed to it, releases are
+cut from it, and it is the default branch, which is where Dependabot opens a
+pull request for an entry with no `target-branch`. So an entry may leave the
+key out or name `main`, and nothing else: any other branch is one no work
+happens on, and a bump aimed there is a bump nobody applies.
 
-That is F-200, and it is the fourth time a branch policy changed without the
+The rule used to be the opposite, and how that went wrong is why this is
+checked at all. While development happened on a branch of its own and `main`
+moved only when a release was cut, every entry had to name the development
+branch, because a bump merged into `main` was a change that branch lacked.
+That is F-200, and it was the fourth time a branch policy changed without the
 file reading it changing too. F-197 was `ci.yml`, still running on `main` only
-after development moved to `dev`, so every push of real work ran no CI. The
-shape is the same both times, which is why the branch is now **derived rather
-than named here**: the target of every entry has to be a branch `ci.yml`
-actually builds on a push, and must not be the release branch. Writing `dev`
-into a third file is how this happens a third time.
+after development moved elsewhere, so every push of real work ran no CI.
+
+So this also reads `ci.yml`'s push trigger and fails unless it builds `main`:
+the branch a bump lands on has to be one CI checks, and a branch layout changed
+in one file and not the other is the shape both findings had.
 
 `docs/CONTRIBUTING.md` asks that a fact existing in more than one place be derived or
 checked rather than repeated. The list of directories to monitor exists in the
@@ -62,12 +65,12 @@ ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 CONFIG = os.path.join(ROOT, ".github", "dependabot.yml")
 CI = os.path.join(ROOT, ".github", "workflows", "ci.yml")
 
-# The branch a release is cut from, and therefore the one a dependency bump
-# must not arrive on directly. This is the single name this file spells out,
-# and it is the one that cannot be derived: `main` is the default branch, which
-# is a repository setting rather than a file in the tree, so a tool reading
-# only the tree would be guessing at it.
-RELEASE_BRANCH = "main"
+# The one branch: where work is committed, where releases are cut, and where
+# a dependency bump lands. This is the single name this file spells out, and
+# it is the one that cannot be derived: `main` is the default branch, which is
+# a repository setting rather than a file in the tree, so a tool reading only
+# the tree would be guessing at it.
+BRANCH = "main"
 
 # The manifest each ecosystem is recognised by. Only the ones this repository
 # can actually grow are listed: adding every ecosystem GitHub supports would be
@@ -108,7 +111,8 @@ def read_entries(text):
 
     `target-branch` is `None` when the entry does not say, which is not the
     same as an entry naming a branch. Dependabot's default in that case is the
-    repository's default branch, and that default is the whole of F-200.
+    repository's default branch, which is `main`, and that is the answer this
+    repository wants.
     """
     found = []
     current = None
@@ -159,16 +163,15 @@ def read_ci_push_branches(text):
 
     Derived rather than written down here, because the last two findings in
     this area were both a branch policy changed in one file and not in the
-    other. If `ci.yml` is the file that says which branches are built, then it
-    is also the file that says which branch a dependency bump may be aimed at:
-    a bump opened against a branch nothing builds is a bump nobody can judge.
+    other. A bump lands on `main`, so `ci.yml` has to build `main`: a bump
+    opened against a branch nothing builds is a bump nobody can judge.
 
     Only the `push:` trigger under `on:` counts. `pull_request:` has one here
     with no branches at all, and reading a `branches:` from anywhere in the
     file would take whichever came first.
 
-    F-243. This read only the one-line form, `branches: [main, dev]`. The block
-    form, one `- dev` per line, is the other way YAML writes a list and the one
+    F-243. This read only the one-line form, `branches: [main]`. The block
+    form, one `- main` per line, is the other way YAML writes a list and the one
     GitHub's own examples use; it read as no branches, and no branches made
     the check below pass every entry unread. So both forms are read now, a
     push with no filter is `[EVERY_BRANCH]`, and an empty answer means "could
@@ -237,7 +240,7 @@ def ci_push_branches():
 
 
 def branch_gaps(declared, built):
-    """Where each entry points, and whether that is somewhere work belongs.
+    """Where each entry points, and whether `ci.yml` checks it there.
 
     Separate from `main` so the self-test can drive it on text rather than on
     this repository, which is the only way to prove a guard notices the thing
@@ -245,38 +248,30 @@ def branch_gaps(declared, built):
     """
     gaps = []
     if not built:
-        # F-243. This used to be silence: with no branches read, the last test
-        # below was skipped for every entry, so the check passed an entry
-        # aimed anywhere at all.
+        # F-243. This used to be silence: with no branches read, the test
+        # below was skipped, so the check passed whatever ci.yml said.
         gaps.append(
             "no branch ci.yml builds on a push could be read, so nothing here "
             "can say whether a bump would be checked. Name them in its push "
             "trigger's branches, as a list"
         )
+    elif EVERY_BRANCH not in built and BRANCH not in built:
+        # Against `built` itself. A `ci.yml` building some other branch, which
+        # is F-197's shape, would leave every bump and every commit unchecked.
+        gaps.append(
+            "ci.yml does not build %s on a push (it builds %s), so nothing "
+            "would check a bump applied there, or any other commit"
+            % (BRANCH, ", ".join(built))
+        )
     for entry in declared:
-        where = "%s in %s" % (entry["ecosystem"], entry["directory"])
         target = entry["target_branch"]
-        if target is None:
+        if target is not None and target != BRANCH:
             gaps.append(
-                "%s has no target-branch, so its pull requests open against "
-                "the default branch. A bump merged there is a change `dev` "
-                "does not have, and the release merge that follows either "
-                "loses it or conflicts with it" % where
-            )
-        elif target == RELEASE_BRANCH:
-            gaps.append(
-                "%s targets %s, which is the released branch: it moves only "
-                "when a release is cut, by merging the development branch "
-                "into it" % (where, RELEASE_BRANCH)
-            )
-        elif built and EVERY_BRANCH not in built and target not in built:
-            # Against `built` itself. A `ci.yml` building only the released
-            # branch, which is F-197, used to leave nothing to compare with,
-            # and every target passed.
-            gaps.append(
-                "%s targets %s, which is not a branch ci.yml builds on a "
-                "push (%s), so nothing would check the bump"
-                % (where, target, ", ".join(built))
+                "%s in %s targets %s. This repository has one branch, %s, "
+                "which is the default and needs no target-branch; a pull "
+                "request aimed anywhere else is aimed at a branch no work "
+                "happens on" % (entry["ecosystem"], entry["directory"],
+                                target, BRANCH)
             )
     return gaps
 
@@ -435,9 +430,9 @@ def main():
                 "%s names %s, which is not in this tree any more" % (ecosystem, where)
             )
 
-    # And where each entry's pull requests land, which is F-200. The branches
-    # come from `ci.yml` rather than from a name written here: see the note at
-    # the top about why this is derived.
+    # And where each entry's pull requests land, and whether `ci.yml` builds
+    # that branch, which it reads rather than takes from a name written here:
+    # see the note at the top about why.
     gaps.extend(branch_gaps(declared, ci_push_branches()))
 
     # And the `ignore` list, which is the part of this file that can quietly
@@ -472,13 +467,13 @@ def main():
             "Fix .github/dependabot.yml. Add an entry for a manifest nothing "
             "covers, take out one naming a directory that has gone, drop an "
             "ignore for a dependency this tree no longer asks for, give a "
-            "bare ignore its update-types, or point an entry at the branch "
-            "development happens on. A manifest nothing watches is worse "
-            "than one with a known problem, because nobody is looking; an "
-            "ignore with no update-types is worse still, because it looks "
-            "like a held-back major and silences the advisory as well; and a "
-            "bump aimed at the released branch is a change that never passes "
-            "through development at all."
+            "bare ignore its update-types, take out a target-branch that "
+            "names anything but main, or have ci.yml build main on a push. A "
+            "manifest nothing watches is worse than one with a known problem, "
+            "because nobody is looking; an ignore with no update-types is "
+            "worse still, because it looks like a held-back major and "
+            "silences the advisory as well; and a bump aimed at a branch no "
+            "work happens on is a bump nobody applies."
         )
         return 1
 
@@ -489,7 +484,8 @@ def main():
     )
     for entry in declared:
         print("    %-16s %-8s -> %s"
-              % (entry["ecosystem"], entry["directory"], entry["target_branch"]))
+              % (entry["ecosystem"], entry["directory"],
+                 entry["target_branch"] or "%s, the default" % BRANCH))
     return 0
 
 
@@ -498,12 +494,12 @@ def main():
 # repository it guards is a guard proved against one case, which is the case
 # that already passes.
 #
-# `ci.yml` builds `main` and `dev`, so `dev` is the one branch a bump may be
-# aimed at. Every case below is read against that.
+# `ci.yml` builds `main`, the one branch, and every case below is read against
+# that.
 CI_SAMPLE = """
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
   pull_request:
 """
 
@@ -512,19 +508,10 @@ CASES = [
 updates:
   - package-ecosystem: cargo
     directory: "/"
-    target-branch: dev
     schedule:
       interval: weekly
-""", 0, "an entry aimed at the development branch is what this file should say"),
-
-    ("""
-updates:
-  - package-ecosystem: cargo
-    directory: "/"
-    schedule:
-      interval: weekly
-""", 1, "no target-branch at all, which is F-200 itself: it opens against the "
-        "default branch and nothing in the file says so"),
+""", 0, "no target-branch, so it opens against the default branch, main, "
+        "which is what this file should say"),
 
     ("""
 updates:
@@ -533,7 +520,17 @@ updates:
     target-branch: main
     schedule:
       interval: weekly
-""", 1, "aimed at the released branch, which moves only on a release merge"),
+""", 0, "main named outright, which says the same thing at more length"),
+
+    ("""
+updates:
+  - package-ecosystem: cargo
+    directory: "/"
+    target-branch: dev
+    schedule:
+      interval: weekly
+""", 1, "aimed at the development branch this repository used to have, which "
+        "is what every entry said before there was one branch"),
 
     ("""
 updates:
@@ -542,63 +539,66 @@ updates:
     target-branch: develop
     schedule:
       interval: weekly
-""", 1, "aimed at a branch ci.yml does not build, so nothing would check it"),
+""", 1, "aimed at a branch that does not exist, so no work happens there"),
 
     ("""
 updates:
   - package-ecosystem: cargo
     directory: "/"
-    target-branch: dev
     schedule:
       interval: weekly
   - package-ecosystem: github-actions
     directory: "/"
+    target-branch: dev
     schedule:
       interval: weekly
-""", 1, "one entry right and one silently wrong, which is the state this "
-        "repository was actually in for three ecosystems"),
+""", 1, "one entry right and one left behind, which is the state a branch "
+        "change leaves a file in when only some of it is edited"),
 
     ("""
 updates:
   - package-ecosystem: cargo
     directory: "/"
-    target-branch: dev
     schedule:
       interval: weekly
     ignore:
       - dependency-name: "region"
         update-types: ["version-update:semver-major"]
-""", 0, "an ignore list is nested deeper than the entry's own keys, so its "
-        "`- dependency-name:` must not read as a second entry"),
+  - package-ecosystem: cargo
+    directory: "/fuzz"
+    target-branch: dev
+""", 1, "an ignore list is nested deeper than the entry's own keys, so its "
+        "`- dependency-name:` must not read as a second entry and hide the "
+        "target-branch of the real one after it"),
 ]
 
 
 # How `ci.yml` might say which branches it builds on a push, and what each
 # must read as. F-243 was the block form reading as nothing at all.
 CI_READINGS = [
-    ("on:\n  push:\n    branches:\n      - main\n      - dev\n  pull_request:\n",
-     ["main", "dev"], "the block form, the other way YAML writes a list"),
-    ("on:\n  push:\n    branches:\n    - dev\n  workflow_dispatch:\n",
-     ["dev"], "the block form with its dashes level with the key"),
-    ("on:\n  push:\n    branches: [ \"dev\" ]  # the working branch\n",
-     ["dev"], "quoted, spaced and commented"),
+    ("on:\n  push:\n    branches:\n      - main\n      - next\n  pull_request:\n",
+     ["main", "next"], "the block form, the other way YAML writes a list"),
+    ("on:\n  push:\n    branches:\n    - main\n  workflow_dispatch:\n",
+     ["main"], "the block form with its dashes level with the key"),
+    ("on:\n  push:\n    branches: [ \"main\" ]  # the one branch\n",
+     ["main"], "quoted, spaced and commented"),
     ("on:\n  push:\n  pull_request:\n", [EVERY_BRANCH],
      "a push with no filter builds every branch"),
     ("on: [push, pull_request]\n", [EVERY_BRANCH], "the one-line trigger list"),
-    ("on:\n  pull_request:\n    branches: [dev]\njobs:\n  x:\n    steps:\n"
+    ("on:\n  pull_request:\n    branches: [main]\njobs:\n  x:\n    steps:\n"
      "      - uses: some/action\n        with:\n          push:\n",
      [], "no push trigger, and a push key further down that is not one"),
     ("on:\n  push:\n    branches-ignore: [main]\n", [],
      "an ignore list, which this does not read as a list of what is built"),
 ]
 
-# Which branches `ci.yml` builds, and whether an entry aimed at `dev` should
-# be complained about. The first two passed every entry before F-243.
+# Which branches `ci.yml` builds, and whether that should be complained about
+# for an entry that is itself right. The first passed everything before F-243.
 BUILT_CASES = [
     ([], 1, "nothing could be read, which must not read as nothing wrong"),
-    (["main"], 1, "CI on the released branch alone, which is F-197"),
-    ([EVERY_BRANCH], 0, "a push builds every branch, dev among them"),
-    (["main", "dev"], 0, "this repository"),
+    (["dev"], 1, "CI on some branch other than main, which is F-197's shape"),
+    ([EVERY_BRANCH], 0, "a push builds every branch, main among them"),
+    (["main"], 0, "this repository"),
 ]
 
 
@@ -611,7 +611,7 @@ def self_test():
     `directory:`, and nothing would have said so.
     """
     built = read_ci_push_branches(CI_SAMPLE)
-    if sorted(built) != ["dev", "main"]:
+    if built != [BRANCH]:
         print("the ci.yml reader is wrong about the sample: %r" % (built,))
         return 1
     misread = [
@@ -624,12 +624,12 @@ def self_test():
         print("the ci.yml reader is wrong on %d form(s):" % len(misread))
         print("\n".join(misread))
         return 1
-    aimed_at_dev = read_entries(CASES[0][0])
+    right = read_entries(CASES[0][0])
     for triggers, expected, why in BUILT_CASES:
-        got = len(branch_gaps(aimed_at_dev, triggers))
+        got = len(branch_gaps(right, triggers))
         if (got > 0) != (expected > 0):
-            print("  building %r, an entry aimed at dev gave %d complaint(s)  (%s)"
-                  % (triggers, got, why))
+            print("  building %r, an entry with no target-branch gave %d "
+                  "complaint(s)  (%s)" % (triggers, got, why))
             return 1
 
     wrong = []

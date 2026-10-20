@@ -374,8 +374,8 @@ fi
 #
 # `tools/shots/taken.py --check` fails a build when that is not the version in
 # Cargo.toml, which is what stops a release publishing pictures of an older
-# window. Two captures had gone stale on `dev` before this existed and nothing
-# failed, because every check around them is about the pictures as pictures.
+# window. Two captures had gone stale before this existed and nothing failed,
+# because every check around them is about the pictures as pictures.
 #
 # It is written at the end of a run that took every capture and reported no
 # problem, so the only way to move the version forward is to take them again.
