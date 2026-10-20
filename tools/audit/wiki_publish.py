@@ -11,9 +11,9 @@ so reporting and checking are one run.
 # What this is for
 
 `.github/workflows/wiki.yml` publishes `wiki/` to the repository's GitHub wiki
-from `main`. A GitHub wiki repository does not exist until somebody saves a
-first page through the web interface, and until then the publish job could
-only fail. It did, on every release merge, with a red cross on `main` for a
+when a release is published. A GitHub wiki repository does not exist until
+somebody saves a first page through the web interface, and until then the
+publish job could only fail. It did, on every release, with a red cross for a
 setting no change to the code could fix. That is F-259.
 
 The job now answers the question in one step, `id: wiki`, which writes
@@ -23,8 +23,8 @@ and a summary, when there is not. Every step after it reads that answer.
 The shape is easy to lose in an edit: a new step added without the condition
 runs on the skipped path and fails on a directory that is not there, and an
 `exit 1` restored to the refusal puts the red cross back. Neither shows until a
-release merge, which is the worst moment to find out, so this reads the
-workflow and says so before then.
+release, which is the worst moment to find out, so this reads the workflow and
+says so before then.
 
 Pure standard library, like everything in `tools/`.
 """
@@ -111,7 +111,7 @@ def gaps(text):
     tail = body.rsplit("ready=false", 1)[-1] if "ready=false" in body else ""
     if re.search(r"^\s*exit\s+[1-9]", tail, re.M):
         problems.append("the path with no wiki repository still exits non-zero, "
-                        "which fails `main` on every release merge")
+                        "which fails the wiki workflow on every release")
     if "::error::" in tail:
         problems.append("the path with no wiki repository reports an error, "
                         "not a warning")

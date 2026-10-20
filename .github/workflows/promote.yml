@@ -1,30 +1,36 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Cut a release: prove `dev` is ready, move `main` to it, and start the build.
+# Cut a release: prove the tip of `main` is ready, and start the build.
 #
 # This is the one step of the path from a commit to a published release that
 # had nothing behind it. Everything else was already automated:
 #
-#   * `ci.yml` builds and tests every push to `dev` on three platforms, plus
+#   * `ci.yml` builds and tests every push to `main` on three platforms, plus
 #     two 32-bit targets, and runs the drift checks.
 #   * `release.yml` builds every target twice, compares the bytes, signs the
 #     hash list and publishes, given a tag or a version to dispatch.
-#   * `pages.yml` redeploys the website when a release finishes.
+#   * `pages.yml` and `wiki.yml` publish the website and the wiki when a
+#     release finishes.
 #
 # Between them sat a procedure written in `docs/CONTRIBUTING.md` and performed
 # by hand: check the version, check the notes, check the items are done, check
-# the audit round happened, merge, tag, dispatch. Every clause of it was
-# enforced by somebody remembering it, and the two things that would notice a
-# mistake both fire too late to help. `release.yml` refuses to publish without
-# a `## v<version>` section in `CHANGELOG.md`, but only after twelve build jobs
-# have run and `main` has already moved; and `main` moving is the awkward half,
-# because the website and the wiki publish from it.
+# the audit round happened, tag, dispatch. Every clause of it was enforced by
+# somebody remembering it, and the one thing that would notice a mistake fires
+# too late to help: `release.yml` refuses to publish without a `## v<version>`
+# section in `CHANGELOG.md`, but only after twelve build jobs have run.
 #
 # So the order here is the opposite one. Everything that can be checked is
 # checked first, from a **fresh checkout** rather than from anybody's working
-# tree, and `main` moves only once all of it has passed.
+# tree, and the release build starts only once all of it has passed.
 #
-# The fresh checkout is not incidental. A commit landed on `dev` referencing a
+# There is one branch, `main`, and work is committed to it directly, so there
+# is nothing to merge: a release is the commit at the tip of `main` that these
+# checks passed, built by `release.yml` and tagged there by its publishing
+# step. This workflow used to end by merging a development branch into `main`;
+# with one branch that merge has nothing to do, and so has the check that
+# nothing had landed on `main` the other branch lacked.
+#
+# The fresh checkout is not incidental. A commit was pushed referencing a
 # test fixture that `.gitignore` had kept out of the repository: `git add`
 # skipped it in silence, `git status` was clean because an ignored file is
 # never a candidate to report, `tools/verify.py --quick` passed, and the tree
@@ -35,7 +41,7 @@
 # Starting it is a person's decision and stays one. `docs/CONTRIBUTING.md`:
 # a version is cut when a group of changes is finished and audited, not on a
 # date. There is no schedule here and no trigger on a push, because "every
-# green commit on `dev` becomes a release" is a different policy from the one
+# green commit on `main` becomes a release" is a different policy from the one
 # this project has written down.
 
 name: promote
@@ -46,14 +52,14 @@ on:
       version:
         description: The version to cut, e.g. v0.1.23
         required: true
-      move_main:
-        description: Move main and start the release. Left off, this only reports.
+      publish:
+        description: Start the release build. Left off, this only reports.
         type: boolean
         default: false
 
 # Nothing above job level. `check` only reads, and says so by taking the
-# default; the job that pushes a branch and starts a workflow asks for what it
-# needs where it needs it.
+# default; the job that starts a workflow asks for what it needs where it
+# needs it.
 permissions:
   contents: read
 
@@ -64,7 +70,7 @@ env:
 
 jobs:
   check:
-    name: is dev ready for ${{ github.event.inputs.version }}
+    name: is main ready for ${{ github.event.inputs.version }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -74,23 +80,22 @@ jobs:
       # after the half-hour verification pass above it, which is the most
       # expensive possible place to discover a missing permission.
       actions: read
-    # The commit every step below was run against, handed to `promote` so that
-    # it merges that commit and not whatever `dev` has become since. F-230.
+    # The commit every step below was run against, handed to `release` so that
+    # it releases that commit and not whatever `main` has become since. F-230.
     outputs:
       sha: ${{ steps.ci.outputs.sha }}
     steps:
-      # `ref: dev` explicitly. A dispatch runs from the branch it was
-      # dispatched on, and dispatching this from anywhere else would otherwise
-      # gate one tree and promote another.
+      # `ref: main` explicitly. A dispatch runs from the ref it was dispatched
+      # on, which can be a tag, and dispatching this from one would otherwise
+      # gate one tree and release another.
       #
-      # `fetch-depth: 0` and the tags, because three of the gates are questions
-      # about history: whether this tag already exists, whether `docs/AUDIT.md`
-      # has been written in since the last release, and whether anything landed
-      # on `main` that `dev` has not got. A shallow clone answers all three
-      # wrongly and confidently.
+      # `fetch-depth: 0` and the tags, because two of the gates are questions
+      # about history: whether this tag already exists, and whether
+      # `docs/AUDIT.md` has been written in since the last release. A shallow
+      # clone answers both wrongly and confidently.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: dev
+          ref: main
           fetch-depth: 0
           fetch-tags: true
 
@@ -130,7 +135,7 @@ jobs:
       # `--quick` skips the three cargo steps, and the two checks that CI could
       # not run until now, `sessions.py` and `measured/generate.py`, are the
       # ones that need a compiled program. F-201 was a recorded session that
-      # had disagreed with the program for two commits, on `dev`, with
+      # had disagreed with the program for two commits, pushed, with
       # everything green.
       #
       # `--check` rather than a bare run, and that matters here specifically.
@@ -154,7 +159,7 @@ jobs:
       # definition.
       #
       # Here it means something else entirely. This is a fresh clone of a
-      # commit that is about to become `main`, and nothing has been
+      # commit that is about to be released, and nothing has been
       # regenerated on it. Anything changed after the pass is committed output
       # that does not match the source it derives from, on the tree a release
       # would be built from. The step above runs `--check`, which writes
@@ -174,13 +179,13 @@ jobs:
       # did CI pass on it? `ci.yml` runs the platform matrix and the 32-bit
       # targets, none of which this job repeats, and a release built from a
       # commit whose Windows build failed is a release nobody can run.
-      - name: CI is green on the commit being promoted
+      - name: CI is green on the commit being released
         id: ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           sha="$(git rev-parse HEAD)"
-          echo "dev is at $sha"
+          echo "main is at $sha"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           runs="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/ci.yml/runs?head_sha=${sha}&per_page=100" \
                     --jq '[.workflow_runs[] | select(.status == "completed")] | map(.conclusion) | unique | join(",")')"
@@ -197,73 +202,41 @@ jobs:
       - name: Say so
         run: |
           {
-            echo "### \`dev\` is ready for \`$VERSION_TAG\`"
+            echo "### \`main\` is ready for \`$VERSION_TAG\`"
             echo
             echo "- the version, the notes, the roadmap items and the audit round agree"
             echo "- \`tools/verify.py\` passes whole, from a fresh checkout"
             echo "- \`ci.yml\` is green on \`$(git rev-parse --short HEAD)\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
-  promote:
-    name: move main to dev and start the release
+  release:
+    name: start the release build of ${{ github.event.inputs.version }}
     needs: check
-    if: github.event.inputs.move_main == 'true'
+    if: github.event.inputs.publish == 'true'
     runs-on: ubuntu-latest
     permissions:
-      # To push the merge to `main`.
-      contents: write
+      # To read where `main` is now.
+      contents: read
       # To dispatch `release.yml`. A workflow's own token cannot start a run
       # through a push, which is what stops a workflow triggering itself; a
       # `workflow_dispatch` is the documented exception, and this is the
       # permission that exception needs.
       actions: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          ref: main
-          fetch-depth: 0
-
-      # One author, as `docs/CONTRIBUTING.md` requires, and a merge commit is a
-      # commit. A runner's default identity is github-actions[bot], which would
-      # make every release the one non-tilas01 commit in the history.
+      # The commit released is the one `check` passed, by hash, and not
+      # whatever `main` has become since. The gate above takes the better part
+      # of an hour and work is pushed to `main` in that time. A dispatch names
+      # a branch rather than a commit, and `release.yml` builds wherever that
+      # branch is when it starts, so starting it after `main` had moved would
+      # release commits no step of the gate ever saw, which is the one thing
+      # the gate exists to prevent. F-230.
       #
-      # The commit merged is the one `check` passed, by hash, and not the tip
-      # of `dev`. The gate above takes the better part of an hour, several
-      # threads push to `dev` in that time, and merging `origin/dev` here would
-      # put commits on `main` that no step of the gate ever saw, which is the
-      # one thing the gate exists to prevent. F-230.
-      - name: Merge dev into main
-        env:
-          GIT_AUTHOR_NAME: tilas01
-          GIT_AUTHOR_EMAIL: tilas01@users.noreply.github.com
-          GIT_COMMITTER_NAME: tilas01
-          GIT_COMMITTER_EMAIL: tilas01@users.noreply.github.com
-          CHECKED: ${{ needs.check.outputs.sha }}
-        run: |
-          set -euo pipefail
-          if ! [[ "$CHECKED" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "::error::the check job handed over no commit to merge ('$CHECKED')"
-            exit 1
-          fi
-          git fetch origin dev
-          # Still on `dev`. A commit the gate passed that `dev` no longer
-          # carries was rewritten away after the check, and is not a release.
-          if ! git merge-base --is-ancestor "$CHECKED" origin/dev; then
-            echo "::error::$CHECKED was checked and is no longer on dev. Run promote again."
-            exit 1
-          fi
-          echo "merging $CHECKED; dev is now at $(git rev-parse origin/dev)"
-          # --no-ff on purpose. The release is tagged at the merge, and a
-          # fast-forward would leave nothing to tag that says a release
-          # happened here. Plain text, one line per line, like every other
-          # commit message in this repository.
-          git merge --no-ff "$CHECKED" -m "Release $VERSION_TAG
-
-          Merging dev into main to cut $VERSION_TAG. The release workflow
-          builds this commit, and the tag is made at it.
-          "
-          git push origin main
-
+      # So `main` is read again here, and a `main` that has moved stops the
+      # release rather than releasing something else; run this workflow again
+      # and it checks the new tip. The commit is also handed to `release.yml`,
+      # which refuses to publish from any other, so the seconds between this
+      # reading and that run starting cannot let a push through either.
+      #
       # The tag is not pushed from here, and that is deliberate rather than a
       # gap. `release.yml` publishes with `target_commitish` set to the commit
       # it built, so creating the release creates the tag at exactly the tree
@@ -272,28 +245,30 @@ jobs:
       # repository. `tools/audit/publishing.py` fails the build if that step
       # ever stops naming the commit.
       #
-      # A push made with this token starts no workflow, which is what stops a
-      # workflow from triggering itself. `workflow_dispatch` is the documented
-      # exception, so this is also the only way the release could be started
-      # from here at all.
-      #
-      # The same is true of `wiki.yml`, which publishes the wiki on a push to
-      # `main` and on nothing else that happens here. Without its own dispatch
-      # the push above, the only way `main` now moves, would publish the
-      # release and leave the wiki on the previous one. F-230.
-      - name: Start the release build and publish the wiki
+      # Nothing else is dispatched. The website and the wiki both publish when
+      # `release.yml` finishes successfully, from the commit it released, so a
+      # release that fails halfway publishes neither.
+      - name: Start the release build of the commit the checks passed
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHECKED: ${{ needs.check.outputs.sha }}
         run: |
-          gh workflow run release.yml --ref main -f tag="$VERSION_TAG"
-          gh workflow run wiki.yml --ref main
+          set -euo pipefail
+          if ! [[ "$CHECKED" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::the check job handed over no commit to release ('$CHECKED')"
+            exit 1
+          fi
+          tip="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          if [ "$tip" != "$CHECKED" ]; then
+            echo "::error::main moved from $CHECKED to $tip while the checks ran, so the release would build commits nothing here checked. Run promote again."
+            exit 1
+          fi
+          gh workflow run release.yml --repo "$GITHUB_REPOSITORY" --ref main \
+            -f tag="$VERSION_TAG" -f commit="$CHECKED"
           {
-            echo "### \`main\` is at \`$VERSION_TAG\`"
+            echo "### \`$VERSION_TAG\` is being built"
             echo
-            echo "- merged \`${CHECKED:0:12}\`, the commit the checks passed, into \`main\` as $(git rev-parse --short HEAD)"
-            echo "- dispatched \`release.yml\` against \`main\` for \`$VERSION_TAG\`"
-            echo "- dispatched \`wiki.yml\` against \`main\`"
+            echo "- dispatched \`release.yml\` against \`main\` at \`${CHECKED:0:12}\`, the commit the checks passed"
             echo "- the tag is created by the publishing step, at the commit it built"
-            echo "- the website redeploys when that run finishes"
+            echo "- the website and the wiki publish when that run succeeds"
           } >> "$GITHUB_STEP_SUMMARY"

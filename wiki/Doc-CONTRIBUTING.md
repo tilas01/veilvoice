@@ -133,39 +133,41 @@ is written as a habit and the others are guards.
 
 ## Branches, and when a version is cut
 
-**Two branches, and there is never a third.** `dev` is where development
-happens; `main` is what has been released.
+**One branch, `main`, and there is never a second.** Work is committed and
+pushed to `main`, CI runs on every push, and a release is cut from it.
 
-| | `dev` | `main` |
+| | A push to `main` | A release |
 |---|---|---|
-| What it holds | every change, as it is made | the released program |
-| Who pushes to it | anybody working on VeilVoice | only a release merge |
-| CI | runs on every push | runs on every push |
-| The website and the wiki | not published from here | published from here |
-| Tags | `v0.1.23-beta.1`, marked prerelease | `v0.1.23`, made by the release workflow at the commit it built |
+| CI | runs on every push | runs again, whole, on the commit being released |
+| The website and the wiki | checked, not published | published, from the commit that was released |
+| Tags | none | `v0.1.23`, made by the release workflow at the commit it built |
 
-Work is committed and pushed to `dev`. `main` moves when a release is cut, by
-merging `dev` into it and tagging that merge; the release workflow builds the
-commit, and the site redeploys when it finishes. The `promote` workflow does
-all of that, and the gates it runs first are below.
+A release is the commit at the tip of `main` that the `promote` workflow
+checked. Nothing is merged to cut one: the workflow starts the release build,
+the build creates the tag at the commit it built, and the website and the wiki
+publish from that commit when it finishes. An edit to the website or to the
+documentation therefore reaches the site and the wiki with the next release;
+running `pages` or `wiki` by hand publishes the newest release again, never the
+tip of `main`.
+The gates `promote` runs first are below.
 
-The one exception to "never a third" is a `dependabot/*` branch. Dependabot
+The one exception to "never a second" is a `dependabot/*` branch. Dependabot
 pushes one per pull request it opens, and it goes away when that pull request
 is merged or closed, so it is a temporary branch belonging to a bot rather than
-a place anybody works. Those pull requests target `dev`, like every other
-change: `.github/dependabot.yml` says `target-branch: dev` on each ecosystem
-and `tools/audit/dependabot.py` fails the build if one stops saying it, because
-a bump merged straight into `main` is a change `dev` does not have and the next
-release merge either loses it or conflicts with it.
+a place anybody works. Those pull requests target `main`, the default branch:
+`.github/dependabot.yml` names no `target-branch`, and
+`tools/audit/dependabot.py` fails the build if an entry names any other branch
+or if `ci.yml` stops building `main` on a push.
 
-A bump is applied to `dev` by hand, in tilas01's name, and its pull request is
+A bump is applied to `main` by hand, in tilas01's name, and its pull request is
 closed rather than merged: a merge would make the bot an author of the history,
 which the rule under Commits does not allow.
 
-An early build is a tag rather than a branch: the same source, the same
-workflow, the same signing and the same hash lists, published as a prerelease
-so the download page never offers it by default. Roadmap item 165 is the rest
-of that work.
+An early build is a tag rather than a branch: the same source, cut from `main`
+between releases, with the same workflow, the same signing and the same hash
+lists, published as a prerelease (`v0.1.23-beta.1`) so the download page never
+offers it by default. The website and the wiki are not published for one.
+Roadmap item 165 is the rest of that work.
 
 **A version is cut when a group of changes is finished and audited**, not on a
 date. In practice that means: the roadmap items in the group are done, a
@@ -176,36 +178,28 @@ records that round; the release notes are derived from `CHANGELOG.md` and
 nothing hand-copies them anywhere.
 
 **That list is a workflow now rather than a habit.** Run `promote` from the
-Actions tab, give it the version, and leave *Move main* off the first time: it
-reports what stands between `dev` and that release and changes nothing. Run it
-again with *Move main* on and it merges into `main` the exact commit it
-checked, not whatever `dev` has become while the checks ran, pushes it, and
-starts the release build, which creates the tag at the commit it built and
-redeploys the website when it finishes. It dispatches the `wiki` workflow as
-well, because a push made by a workflow starts no other workflow. No tag is
-pushed by hand at any point.
+Actions tab, give it the version, and leave *Publish* off the first time: it
+reports what stands between the tip of `main` and that release and changes
+nothing. Run it again with *Publish* on and it starts the release build of the
+exact commit it checked. Work is pushed to `main` while the checks run, so if
+`main` has moved by the time they finish it stops and says so rather than
+releasing commits nothing checked; run it again and it checks the new tip. The
+release build creates the tag at the commit it built, and the website and the
+wiki publish from that commit when it finishes. No tag is pushed by hand at any
+point.
 
-**It cannot run until it is on `main`, which is once.** GitHub registers a
-`workflow_dispatch` workflow only from the repository's default branch, so a
-workflow that exists on `dev` alone is not listed and not dispatchable: the API
-answers 404. `promote.yml` arrives on `main` with the first release merge, so
-that merge is the one this workflow cannot perform. Cut it the old way, by
-merging `dev` into `main` and dispatching `release` with the version, or push
-`promote.yml` to `main` on its own first. From the release after it, the
-workflow does all of it.
-
-What it asks before anything moves:
+What it asks before anything is built:
 
 - the version a person typed is the version `Cargo.toml` declares
 - `CHANGELOG.md` has a `## v<version>` section and it is the newest one
 - every roadmap item that release's section names is marked done
 - `docs/AUDIT.md` has been written in since the previous release
-- the tag does not exist, and nothing has landed on `main` that `dev` lacks
+- the tag does not exist
 - `tools/verify.py` passes whole, from a fresh checkout rather than a
   working tree
-- `ci.yml` is green on the exact commit being promoted
+- `ci.yml` is green on the exact commit being released
 
-The first six are [`tools/release/readiness.py`](https://github.com/tilas01/veilvoice/blob/main/tools/release/readiness.py),
+The first five are [`tools/release/readiness.py`](https://github.com/tilas01/veilvoice/blob/main/tools/release/readiness.py),
 which runs anywhere: `python tools/release/readiness.py v0.1.23` answers the
 same question from a laptop, and is the quickest way to see what a release is
 still waiting on.
@@ -227,7 +221,7 @@ commit on this branch carrying **the tag's tree**, which is the same content
 under a different parent. Do not reach for the tag directly in a new script.
 
 **The fresh checkout is the part that is easy to skip and should not be.** A
-commit reached `dev` referencing a test fixture that `.gitignore` had kept out
+commit was pushed referencing a test fixture that `.gitignore` had kept out
 of the repository. `git add` skipped it without a word, `git status` was clean
 because an ignored file is never a candidate to report, `tools/verify.py
 --quick` passed, and the tree did not compile for anybody who cloned it. No
@@ -235,13 +229,13 @@ check run where the author is standing can see that, because the file is
 there. The gate runs where a reader stands.
 
 **One step after a release may still need a person, once.** The `wiki`
-workflow publishes from `main`, so a release merge is when it runs, and it has
-something to push to only if the wiki repository exists. It tries to create that
-repository itself. Where GitHub refuses, the publish is skipped with a warning
-rather than failed, so `main` stays green, and the GitHub wiki stays on whatever
-it last held until the one-time step in the web interface is done. That step is
-written out in [`WEBSITE.md`](Doc-WEBSITE) under *The wiki, in two places, from
-one source*. It is named here so the warning is not where it is discovered.
+workflow publishes when a release finishes, and it has something to push to
+only if the wiki repository exists. It tries to create that repository itself.
+Where GitHub refuses, the publish is skipped with a warning rather than failed,
+so the run stays green, and the GitHub wiki stays on whatever it last held
+until the one-time step in the web interface is done. That step is written out
+in [`WEBSITE.md`](Doc-WEBSITE) under *The wiki, in two places, from one source*.
+It is named here so the warning is not where it is discovered.
 
 ## Commits
 
@@ -328,7 +322,7 @@ the guard accepts, or when the identity variables above would still win. A
 container's own signing key is never used in his name.
 
 **A pushed commit is not rewritten.** Several sessions can be working from
-`dev` at once, and a force push moves the ground under every one of them. The
+`main` at once, and a force push moves the ground under every one of them. The
 rewrite that corrects the fifteen is `tools/repo/rewrite.py`, which keeps every
 tree and every date and refuses to push anything the guard would refuse. It is
 the one exception, not a precedent.

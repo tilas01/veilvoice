@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Check `wiki/`, on both branches, and publish it to the repository's GitHub
-# wiki from `main`.
+# Check `wiki/` on every push, and publish it to the repository's GitHub wiki
+# when a release is published.
 #
 # A GitHub wiki is a git repository of its own, at `<repo>.wiki.git`, holding
 # flat Markdown pages and nothing else. The pages in `wiki/` are generated into
@@ -12,30 +12,36 @@
 # Why a copy rather than a symlink or a submodule: the wiki repository cannot
 # contain either. It is flat Markdown, so the pages are written into it.
 #
-# # Why there are two jobs, and why one of them runs on `dev`
+# # Why checking and publishing happen at different times
 #
-# Publishing stays on `main`, deliberately and for the same reason `pages.yml`
-# does: what is published describes what has been released.
+# Publishing waits for a release, deliberately and for the same reason
+# `pages.yml` does: what is published describes what has been released. There
+# is one branch, `main`, and work is committed to it every day, so publishing
+# on a push would put pages describing unreleased work in front of readers.
+# It used to publish on a push to `main`, which was right while `main` moved
+# only when a release was cut. Now it publishes when `release.yml` succeeds,
+# from the commit that release was built from, or by hand, from the newest
+# release.
 #
-# Checking must not. Until this job existed, this workflow did not run on `dev`
-# at all, so a change that would fail to publish failed on `main`, after the
-# merge that cuts a release, which is the worst moment to find out. Worse, it
-# looked fine: a workflow that does not run shows no red cross, and a branch
-# with no result beside it reads exactly like a branch that passed. That is
+# Checking must not wait. A change that would fail to publish has to fail on
+# the push that made it, not on the release, which is the worst moment to find
+# out. Worse, a workflow that does not run shows no red cross, and a commit
+# with no result beside it reads exactly like a commit that passed. That is
 # F-197's shape, and it is written up four times in `docs/AUDIT.md` now.
 #
-# So `check` runs everywhere and asserts what `publish` needs before `publish`
-# is the thing that finds out: the pages match their sources, every `[[link]]`
-# in them resolves, and every one of them is something a wiki can actually
-# hold. `tools/docs/wiki.py --check` is also run by `ci.yml` and by
-# `tools/verify.py`; running it here as well is what makes this workflow's own
-# result mean something on a branch it does not publish from.
+# So `check` runs on every push and pull request, and asserts what `publish`
+# needs before `publish` is the thing that finds out: the pages match their
+# sources, every `[[link]]` in them resolves, and every one of them is
+# something a wiki can actually hold. `tools/docs/wiki.py --check` is also run
+# by `ci.yml` and by `tools/verify.py`; running it here as well is what makes
+# this workflow's own result mean something on a push it does not publish.
+# `publish` runs it once more, on the release it is about to copy.
 
 name: wiki
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
     paths:
       - 'wiki/**'
       - 'docs/**'
@@ -55,6 +61,12 @@ on:
       - 'tools/docs/**'
       - 'tools/site/wiki_site.py'
       - '.github/workflows/wiki.yml'
+  # When a release finishes. Success only, and a run that published nothing
+  # leaves no tag, which is how `release` below tells a dry run apart.
+  workflow_run:
+    workflows: [release]
+    types: [completed]
+  # Publish the newest release's wiki again, by hand.
   workflow_dispatch:
 
 # Pushing to the wiki is a write to this repository's content. The check job
@@ -65,6 +77,7 @@ permissions:
 jobs:
   check:
     name: check the wiki
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -89,10 +102,50 @@ jobs:
         run: |
           python tools/site/wiki_site.py --check
 
+  # The same question `pages.yml` asks, answered the same way: after a
+  # release run, the release tag at the commit it built, and none for a dry
+  # run; by hand, the newest release. Never a prerelease, which is an early
+  # build rather than what has been released.
+  release:
+    name: which release to publish
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.which.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Find the release
+        id: which
+        env:
+          BUILT: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          if [ -n "$BUILT" ]; then
+            tag="$(git tag --points-at "$BUILT" --list 'v*' --sort=-v:refname | grep -v -- '-' | head -1 || true)"
+            if [ -z "$tag" ]; then
+              echo "no release tag names $BUILT: that run was a dry run or a prerelease, so the wiki stays as it is" \
+                | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            tag="$(git tag --list 'v*' --sort=-v:refname | grep -v -- '-' | head -1 || true)"
+            if [ -z "$tag" ]; then
+              echo "::error::there is no release tag, so there is nothing to publish"
+              exit 1
+            fi
+          fi
+          echo "publishing the wiki from $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
   publish:
     name: publish the wiki
-    needs: check
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: release
+    if: needs.release.outputs.tag != ''
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -100,12 +153,26 @@ jobs:
     # racing to push to the same wiki repository is a rejected push and a red
     # workflow for no reason anybody can act on. The check job has no such
     # problem and must not queue behind a publish: it is the one that has to
-    # answer quickly, on every branch and every pull request.
+    # answer quickly, on every push and every pull request.
     concurrency:
       group: wiki-publish
       cancel-in-progress: false
     steps:
+      # The release, by its tag, rather than the tip of `main`, which has
+      # usually moved on by the time a release finishes.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+
+      # What `check` asks on a push, asked of the tree being published. It
+      # passed when that commit was pushed, so this is cheap insurance rather
+      # than a new question.
+      - name: The pages must match their sources, and be publishable
+        run: python tools/docs/wiki.py --check
 
       # The wiki repository does not exist until the wiki has a first page.
       # Enabling the wiki in Settings is not enough: the repository behind it
@@ -121,8 +188,7 @@ jobs:
       # Where it is refused, this job is skipped rather than failed (F-259).
       # A missing wiki is a one-time setting for the maintainer, not a fault in
       # the commit being published, and failing here put a red cross on every
-      # release merge into `main` for something no change to the code could
-      # fix. The check job above still fails on anything wrong with the pages
+      # release for something no change to the code could fix. The check job above still fails on anything wrong with the pages
       # themselves, so what is skipped is only the copy, and the run says so
       # in a warning and in its summary rather than passing in silence. Any
       # other clone failure, a network error or a refused token, still fails:
@@ -219,7 +285,7 @@ jobs:
             echo "the wiki already matches the repository, nothing to push"
             exit 0
           fi
-          git commit -m "Publish the wiki from ${{ github.sha }}
+          git commit -m "Publish the wiki from ${{ needs.release.outputs.tag }}
 
           Generated in the main repository and copied here. Every page has a
           source file there, and CI fails if the two disagree, so editing a
