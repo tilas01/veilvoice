@@ -96,7 +96,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>1814 lines"])
     n_main(["main.rs<br/>269 lines"])
-    n_app["app.rs<br/>3685 lines"]
+    n_app["app.rs<br/>3697 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>305 lines"]
     n_crashlog["crashlog.rs<br/>450 lines"]
@@ -130,7 +130,7 @@ flowchart TD
     n_theme["theme.rs<br/>813 lines"]
     n_tour["tour.rs<br/>1321 lines"]
     n_updates["updates.rs<br/>276 lines"]
-    n_vault_store["vault_store.rs<br/>807 lines"]
+    n_vault_store["vault_store.rs<br/>943 lines"]
     n_verify["verify.rs<br/>1836 lines"]
     n_watchfeed["watchfeed.rs<br/>412 lines"]
     n_window["window.rs<br/>249 lines"]
@@ -323,7 +323,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3685 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3697 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 305 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 450 | Make a failure that produces no output produce some. |
@@ -359,12 +359,12 @@ flowchart TD
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 813 | Colour schemes for the desktop app. |
 | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 1321 | The short walkthrough on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 276 | The manual update check, as the window shows it. |
-| [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | 807 | Where the desktop application keeps its own files, and what the app lock buys for them. |
+| [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | 943 | Where the desktop application keeps its own files, and what the app lock buys for them. |
 | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | 1836 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 249 | How big the window opens, and why it is not a constant. |
 
-**24,106 functional lines of Rust** in this crate. A functional line is a line
+**24,174 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -546,6 +546,7 @@ counts blank lines and comments too. Both are produced by
 | `enum Outcome` | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | What the window should do once the tour is out of the way. |
 | `struct Updates` | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | The panel's state. |
 | `mod records` | [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | The logical names of every record the application keeps. |
+| `enum Plain` | [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | Whether an unlock moves the plain records in, or leaves them alone. |
 | `struct VaultStore` | [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | The application's own storage, locked or not. |
 | `struct Measured` | [`vault_store.rs`](../../docs/files/veilvoice-gui/vault_store.md) | What the application measured about its own running, kept between sessions. |
 | `struct Report` | [`verify.rs`](../../docs/files/veilvoice-gui/verify.md) | Everything one press of check found out. |

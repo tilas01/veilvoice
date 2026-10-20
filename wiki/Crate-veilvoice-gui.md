@@ -83,7 +83,7 @@ another thread, so the window keeps answering while it is busy.
 flowchart TD
     n_lib(["lib.rs<br/>1814 lines"])
     n_main(["main.rs<br/>269 lines"])
-    n_app["app.rs<br/>3685 lines"]
+    n_app["app.rs<br/>3697 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>305 lines"]
     n_crashlog["crashlog.rs<br/>450 lines"]
@@ -117,7 +117,7 @@ flowchart TD
     n_theme["theme.rs<br/>813 lines"]
     n_tour["tour.rs<br/>1321 lines"]
     n_updates["updates.rs<br/>276 lines"]
-    n_vault_store["vault_store.rs<br/>807 lines"]
+    n_vault_store["vault_store.rs<br/>943 lines"]
     n_verify["verify.rs<br/>1836 lines"]
     n_watchfeed["watchfeed.rs<br/>412 lines"]
     n_window["window.rs<br/>249 lines"]
@@ -310,7 +310,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`app.rs`|File-veilvoice-gui-app]] | 3685 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [[`app.rs`|File-veilvoice-gui-app]] | 3697 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [[`autolock.rs`|File-veilvoice-gui-autolock]] | 369 | Locking the window again after a period of no use. |
 | [[`avnotice.rs`|File-veilvoice-gui-avnotice]] | 305 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [[`crashlog.rs`|File-veilvoice-gui-crashlog]] | 450 | Make a failure that produces no output produce some. |
@@ -346,12 +346,12 @@ flowchart TD
 | [[`theme.rs`|File-veilvoice-gui-theme]] | 813 | Colour schemes for the desktop app. |
 | [[`tour.rs`|File-veilvoice-gui-tour]] | 1321 | The short walkthrough on a first run, and after an upgrade. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 276 | The manual update check, as the window shows it. |
-| [[`vault_store.rs`|File-veilvoice-gui-vault_store]] | 807 | Where the desktop application keeps its own files, and what the app lock buys for them. |
+| [[`vault_store.rs`|File-veilvoice-gui-vault_store]] | 943 | Where the desktop application keeps its own files, and what the app lock buys for them. |
 | [[`verify.rs`|File-veilvoice-gui-verify]] | 1836 | The verify tab: drop a download on the window and be told what it is. |
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 412 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 249 | How big the window opens, and why it is not a constant. |
 
-**24,106 functional lines of Rust** in this crate. A functional line is a line
+**24,174 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
