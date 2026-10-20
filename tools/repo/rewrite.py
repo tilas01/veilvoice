@@ -91,6 +91,13 @@ REWORD = [
      "the local working-notes file added to NOT_A_WIKI_PAGE"),
     # "one per Claude Code session", "the git proxy in a Claude Code container"
     ("Claude Code", "cloud"),
+    # Older messages named the assistant's rules file and settings folder. The
+    # rules now live in docs/CONTRIBUTING.md, the human copy they always had.
+    ("HANDOFF.md, .claude/ and CLAUDE.md already follow.",
+     "HANDOFF.md and the local working notes already follow."),
+    ("Also: .claude/launch.json and a documented one-liner",
+     "Also: a local launch configuration and a documented one-liner"),
+    ("`CLAUDE.md`", "`docs/CONTRIBUTING.md`"),
 ]
 
 # Titles that name the wrong finding: each commit was pushed while another
