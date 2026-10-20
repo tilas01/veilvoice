@@ -24,7 +24,7 @@ use crate::atrest::{prompt_secret, read_new_password};
 use crate::theme::{colour, field, heading, ok, paint, warn};
 use clap::Subcommand;
 use std::path::PathBuf;
-use veilvoice_crypto::{kdf, lock, LockStore};
+use veilvoice_crypto::{kdf, lock, reseal, LockStore};
 
 /// What `veilvoice lock` can be asked to do.
 ///
@@ -199,6 +199,15 @@ fn status(site: &Site) -> Result<(), String> {
                     "{}",
                     warn("this lock reports interference; open the app to read it")
                 );
+            }
+            // Somebody with an app lock is exactly who the empty-passphrase
+            // seal could have reached, and this is where they look. A pointer
+            // rather than the check itself: the check costs an Argon2id
+            // derivation per sealed file, which is not what a status command
+            // should spend somebody's wait on. **F-NNN.**
+            println!();
+            for line in wrap(reseal::NOTICE, 66) {
+                println!("{}", warn(&line));
             }
         }
     }

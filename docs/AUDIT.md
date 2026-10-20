@@ -1821,11 +1821,35 @@ with the plan's passphrase empty, `left: []`, which is the defect in one line.
 **What it leaves for people who used the mode.** A recording the window sealed
 with the app lock under any release from v0.1.15 to v0.1.22 was sealed under
 the empty passphrase. It is not protected, and it will not open with the app
-lock passphrase. `veilvoice` refuses an empty passphrase when asked for one,
-so it cannot be opened with the tools as they stand either. That needs a
-decision rather than a guess: whether to offer a one-time way to open and
-re-seal those files, or to say plainly in the release notes that they should
-be treated as unencrypted.
+lock passphrase. That needed a decision rather than a guess, and the decision
+taken for v0.1.23 was to ship the repair rather than only the warning:
+`veilvoice_crypto::reseal` and `veilvoice reseal`.
+
+The repair is the only part of this that could make things worse, so what it
+will not do is where the care went. It finds an affected file the only way
+there is, by trying the empty passphrase and seeing whether the tag verifies,
+and it rewrites a file **only** when that succeeded. A file that does not open
+with an empty passphrase is reported and left, which is what makes the tool
+safe to point at a folder of recordings, safe to run twice, and incapable of
+destroying the files that were never affected. The new container is opened
+again with the new passphrase and compared against what came out of the old one
+before anything is written, and the write goes through
+`privatefile::replace_owner_only`, so an interrupted repair leaves the original
+rather than half of a replacement. The passphrase is proved against the app
+lock before any file is touched, because resealing under a mistyped passphrase
+is the one outcome worse than the fault: unlike this, it has no repair.
+
+The sweep is capped at `UNATTENDED_MAX_M_COST`, since it is handed whatever is
+in the folder rather than a file somebody chose, and a container declaring an
+absurd memory cost is reported rather than obeyed. Judging a file costs one
+Argon2id derivation, but only for files that really are password containers:
+anything else is refused by the header parse, before any memory is asked for.
+
+What it cannot do is said in the same words everywhere, from one constant:
+resealing protects a file from now on, and it cannot undo a copy somebody
+already has. `veilvoice lock status` carries the short form of that, since
+somebody with an app lock is exactly who this could have reached and checking
+the lock is where they look.
 
 ### F-230: the release gate checked one commit and merged another
 
@@ -9766,7 +9790,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1907 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1924 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |

@@ -49,6 +49,7 @@ Command-line interface for VeilVoice: anonymise files, scramble a microphone liv
 - [[`policy.rs`|File-veilvoice-cli-policy]] &middot; veilvoice policy -- settings that can only be tightened.
 - [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] &middot; veilvoice privilege shows what VeilVoice runs with, and what it can see.
 - [[`record.rs`|File-veilvoice-cli-record]] &middot; veilvoice record -- capture the veiled voice straight into an encrypted file.
+- [[`reseal.rs`|File-veilvoice-cli-reseal]] &middot; veilvoice reseal: repairing files that were sealed under no passphrase.
 - [[`reset.rs`|File-veilvoice-cli-reset]] &middot; veilvoice reset: putting this machine back to a new install.
 - [[`sentry.rs`|File-veilvoice-cli-sentry]] &middot; veilvoice sentry -- canaries, baselines, and what changed since.
 - [[`theme.rs`|File-veilvoice-cli-theme]] &middot; Tokyo Night colouring for the terminal.
@@ -98,6 +99,7 @@ Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryptio
 - [[`lib.rs`|File-veilvoice-crypto-lib]] &middot; Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice.
 - [[`lock.rs`|File-veilvoice-crypto-lock]] &middot; The application lock: an Argon2id password verifier with a rate limit.
 - [[`privatefile.rs`|File-veilvoice-crypto-privatefile]] &middot; Writing a file that only its owner can read.
+- [[`reseal.rs`|File-veilvoice-crypto-reseal]] &middot; Finding files that were sealed under no passphrase at all, and sealing them again under a real one.
 - [[`reset.rs`|File-veilvoice-crypto-reset]] &middot; Putting this machine back to a new install.
 - [[`shred.rs`|File-veilvoice-crypto-shred]] &middot; Secure erasure, the self-destruct.
 - [[`studio.rs`|File-veilvoice-crypto-studio]] &middot; The studio vault: a key that exists only when both locks have been opened.

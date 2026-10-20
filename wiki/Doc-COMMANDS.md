@@ -38,6 +38,7 @@ This page is the whole of the command line, in the program's own order, with wha
 | [`veilvoice install`](#veilvoice-install) | Copy VeilVoice somewhere the system can find it, and add it to PATH | **Install** tab |
 | [`veilvoice update`](#veilvoice-update) | Fetch the newest release, check it, and put it in place | **About** tab |
 | [`veilvoice uninstall`](#veilvoice-uninstall) | Undo what `install` did: the PATH entry, the uninstall entry, and the installed copy | command line only |
+| [`veilvoice reseal`](#veilvoice-reseal) | Find recordings sealed under an empty passphrase, and seal them again under your app-lock passphrase | command line only |
 | [`veilvoice reset`](#veilvoice-reset) | Put this machine back to a new install: settings, policies, the mandate, the vaults and the app lock | **Settings** tab |
 | [`veilvoice policy`](#veilvoice-policy) | Settings fixed so the interface cannot turn them off | command line only |
 | [`veilvoice mandate`](#veilvoice-mandate) | The two things VeilVoice insists on, unless you say otherwise | command line only |
@@ -271,6 +272,18 @@ Undoes exactly what `install` did: the copy, the PATH entry and the uninstall en
 
 ```bash
 veilvoice uninstall
+```
+
+## `veilvoice reseal`
+
+> Find recordings sealed under an empty passphrase, and seal them again under your app-lock passphrase
+
+Finds recordings that were sealed under an empty passphrase and seals them again under your app-lock passphrase. Releases 0.1.15 to 0.1.22 could seal a recording under nothing while reporting that it had been sealed with the app lock, and a file in that state looks like any other sealed file and opens for anybody who has it. What was found is printed before a passphrase is asked for, and a file that does not open with an empty passphrase is never rewritten, so this is safe to point at a folder and safe to run twice.
+
+**In the window:** nothing, and that is deliberate: the window has no button for this yet. It is a repair for a fault in releases that are already out, and the command line is where it can be pointed at a folder of recordings that were saved outside the usual one.
+
+```bash
+veilvoice reseal --dry-run
 ```
 
 ## `veilvoice reset`
