@@ -236,17 +236,23 @@ def take_handover(options, signing):
     """Take a rewrite built by .github/workflows/rewrite.yml as this clone's dry run.
 
     The run leaves one commit, fetchable by its hash, holding the bundle of
-    rewritten commits, the map and the four tips. They are fetched, checked
+    rewritten commits in numbered parts, the map and the four tips. They are fetched, checked
     against each other and proved exactly as a dry run here would be, and
     stored where `--push` looks for a dry run's result.
     """
     sha = options.handover
     git(["fetch", "-q", options.remote, "dev", "main", sha])
     tips = dict(line.split() for line in git(["show", sha + ":tips.txt"]).splitlines())
+    # The bundle comes in numbered parts, each under GitHub's limit on one file.
+    parts = sorted(name for name in git(["ls-tree", "--name-only", sha]).splitlines()
+                   if name.startswith("rewrite.bundle.part-"))
+    if not parts:
+        raise SystemExit("the handover %s holds no bundle" % sha)
     bundle = os.path.join(ROOT, ".git", "rewrite.bundle")
     with open(bundle, "wb") as handle:
-        handle.write(subprocess.run(["git", "show", sha + ":rewrite.bundle"], cwd=ROOT,
-                                    check=True, stdout=subprocess.PIPE).stdout)
+        for part in parts:
+            handle.write(subprocess.run(["git", "show", sha + ":" + part], cwd=ROOT,
+                                        check=True, stdout=subprocess.PIPE).stdout)
     git(["bundle", "verify", "-q", bundle])
     git(["fetch", "-q", bundle, "+refs/rewrite/dev:refs/rewrite/dev",
          "+refs/rewrite/main:refs/rewrite/main"])
