@@ -11,7 +11,7 @@ Every commit is tilas01's in both of its fields, names no assistant, and is sign
 
 # The defect this exists to stop coming back
 
-Fifteen commits reached `dev` between 21 and 26 September naming an assistant
+Fifteen commits were pushed between 21 and 26 September naming an assistant
 rather than tilas01: eleven as author and committer, four as committer only.
 A cloud container presets its own name and address for git, in a config file
 and in some containers in four `GIT_*` environment variables as well, and the

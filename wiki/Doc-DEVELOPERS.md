@@ -127,7 +127,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/build_output.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/build_output.py) | No build output lives inside this repository except where it is expected |
 | [`tools/audit/build_prerequisites.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/build_prerequisites.py) | What a fresh machine needs before it can build this, said once |
 | [`tools/audit/crate_tables.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/crate_tables.py) | Every crate in the workspace appears in every table that lists the crates |
-| [`tools/audit/dependabot.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/dependabot.py) | Every manifest in this tree is covered by a Dependabot entry, aimed at `dev` |
+| [`tools/audit/dependabot.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/dependabot.py) | Every manifest in this tree is covered by a Dependabot entry, aimed at `main` |
 | [`tools/audit/dependencies.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/dependencies.py) | Every dependency says what it is for, where it is declared |
 | [`tools/audit/documented.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/documented.py) | Every item on a generated page has something written under it |
 | [`tools/audit/features.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/features.py) | Every feature selection a release builds is built here too |

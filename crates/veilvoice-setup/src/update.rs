@@ -89,12 +89,12 @@ pub const TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Which stream of releases a build came from.
 ///
-/// **Roadmap item 165.** Releases are cut from `main` and development happens on
-/// `dev`, which used to leave somebody who wanted the newest work either
-/// building it themselves or waiting. An early build is the same reproducible,
-/// signed archive published from `dev` under a tag that says so, marked a
-/// prerelease on GitHub so it is never what the download page offers by
-/// default.
+/// **Roadmap item 165.** A release is cut when a group of work is finished, which
+/// used to leave somebody who wanted the newest work either building it
+/// themselves or waiting. An early build is the same reproducible, signed
+/// archive published from `main` between releases under a tag that says so,
+/// marked a prerelease on GitHub so it is never what the download page offers
+/// by default.
 ///
 /// The channel is read from the version the build carries rather than from
 /// anything baked in at compile time, and that is the whole design: a
@@ -105,8 +105,8 @@ pub const TIMEOUT: Duration = Duration::from_secs(10);
 pub enum Channel {
     /// Cut from `main`. What the download page offers.
     Stable,
-    /// Cut from `dev` under a prerelease tag. Newer, and checkable in exactly
-    /// the same way.
+    /// Cut from `main` between releases, under a prerelease tag. Newer, and
+    /// checkable in exactly the same way.
     Early,
 }
 
@@ -135,7 +135,7 @@ impl Channel {
                                 page offers"
             }
             Channel::Early => {
-                "cut from dev under a prerelease tag: the same \
+                "cut between releases under a prerelease tag: the same \
                                build, the same signing and the same hash \
                                lists, newer and less used"
             }

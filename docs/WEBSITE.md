@@ -68,8 +68,12 @@ site's style rather than GitHub's, through the renderer the front page already
 uses.
 
 `.github/workflows/wiki.yml` copies `wiki/` into the wiki repository. It checks
-on both branches and publishes from `main` only, for the reason `pages.yml`
-publishes from `main` only: what is published describes what has been released.
+on every push and publishes only when a release is published, from the commit
+that release was built from, for the reason `pages.yml` deploys the site only
+then: what is published describes what has been released. Work is committed to
+`main` every day, so publishing on a push would describe work nobody can
+download yet. Either workflow can be run by hand from the Actions tab, and then
+publishes the newest release again.
 
 **One step in this is not automatic and cannot be.** A GitHub wiki is a git
 repository of its own at `<repo>.wiki.git`, and enabling the wiki in Settings
@@ -79,7 +83,7 @@ to. The workflow tries to create the repository itself first, by initialising
 one and pushing it, so this may never be needed. If GitHub refuses that, the
 publish is skipped with a warning and a note in the run's summary rather than
 failed, because a missing wiki is a setting and not a fault in the commit, and
-a red cross on every release merge for it would hide the ones that matter. The
+a red cross on every release for it would hide the ones that matter. The
 pages are still checked on every push, and the website's copy of the wiki does
 not depend on this at all. The one-time step is:
 
