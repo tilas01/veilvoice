@@ -10,7 +10,9 @@
 # So the rewritten commits go into a git bundle, holding only what the
 # current branches lack, and the bundle into one commit of its own on a
 # branch of its own. The run prints that commit's hash and deletes the branch;
-# the commit stays fetchable by its hash. A clone with ordinary push rights
+# the commit stays fetchable by its hash. The bundle goes in as numbered parts,
+# because GitHub refuses any single file over 100 MB and the whole history is
+# about that size. A clone with ordinary push rights
 # then fetches it, checks the bundle against the branches as they are, and
 # pushes with `tools/repo/rewrite.py --push`, which refuses if either branch
 # has moved since. Nothing secret is in the bundle: signatures are public.
@@ -39,8 +41,11 @@ cp .git/rewrite-map.txt "$out/rewrite-map.txt"
 git bundle create "$out/rewrite.bundle" refs/rewrite/dev refs/rewrite/main \
   --not origin/dev origin/main
 
+split -b 90m -d -a 2 "$out/rewrite.bundle" "$out/rewrite.bundle.part-"
+rm "$out/rewrite.bundle"
+
 tree=$(
-  for file in rewrite.bundle rewrite-map.txt tips.txt; do
+  for file in $(cd "$out" && ls rewrite.bundle.part-* rewrite-map.txt tips.txt); do
     printf '100644 blob %s\t%s\n' "$(git hash-object -w "$out/$file")" "$file"
   done | git mktree
 )
