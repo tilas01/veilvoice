@@ -83,6 +83,7 @@ mod mandate;
 mod priv_mode;
 #[cfg(feature = "live")]
 mod record;
+mod reseal;
 mod reset;
 // Only the live path draws a meter, and the crate builds without that path on
 // the BSDs, where `cpal` has no backend.
@@ -446,6 +447,29 @@ enum Command {
         /// Do not ask for confirmation.
         #[arg(long)]
         yes: bool,
+    },
+
+    /// Find recordings sealed under an empty passphrase, and seal them again
+    /// under your app-lock passphrase.
+    ///
+    /// Releases 0.1.15 to 0.1.22 could seal a recording under nothing while
+    /// reporting that it had been sealed with the app lock. Such a file looks
+    /// like any other sealed file and opens for anybody who has it.
+    ///
+    /// What was found is printed before a passphrase is asked for, the files
+    /// that were sealed properly included, so the number checked is next to the
+    /// number that need repairing. A file that does not open with an empty
+    /// passphrase is never rewritten, so this is safe to point at a folder and
+    /// safe to run twice.
+    Reseal {
+        /// Folders to check. Defaults to the folder VeilVoice keeps its own
+        /// files in, which is where the Studio's vaults and the integrity
+        /// record are. Recordings saved anywhere else need that folder naming.
+        #[arg(value_name = "FOLDER")]
+        folders: Vec<PathBuf>,
+        /// Print what would be resealed and stop.
+        #[arg(long)]
+        dry_run: bool,
     },
 
     /// Put this machine back to a new install: settings, policies, the mandate,
@@ -1690,6 +1714,8 @@ fn run(command: Command) -> Result<(), String> {
                 }
             }
         }
+
+        Command::Reseal { folders, dry_run } => reseal::run(folders, dry_run),
 
         Command::Reset {
             keep_keys,

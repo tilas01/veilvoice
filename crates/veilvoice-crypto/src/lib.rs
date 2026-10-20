@@ -80,6 +80,7 @@ pub mod kdf;
 pub mod layout;
 pub mod lock;
 pub mod privatefile;
+pub mod reseal;
 pub mod reset;
 pub mod shred;
 pub mod studio;
@@ -181,6 +182,25 @@ pub enum Error {
     /// recording that is not there has the wrong identifier, and being told so
     /// is more use than appearing to succeed.
     NoSuchTake,
+    /// A file put forward for resealing does not open with an empty
+    /// passphrase, so nothing was done to it. See [`reseal::reseal`]: a
+    /// repair that rewrote a file sealed under a real passphrase would be
+    /// destroying what it was asked to protect.
+    NotSealedUnderNothing,
+    /// The path named for resealing is a symbolic link. The repair replaces a
+    /// file in place, and doing that to a link would either follow it out of
+    /// the folder being repaired or replace the link itself, so it is reported
+    /// instead.
+    ResealSymlink,
+    /// A file put forward for resealing could not be read, or the resealed
+    /// file could not be written in place of the original. Either way the
+    /// original is untouched and still opens, which is why this is reported
+    /// rather than retried.
+    ResealStore,
+    /// Resealing was asked to use an empty passphrase, which is the fault it
+    /// exists to repair. Refused rather than performed: it would have reported
+    /// success over a file that still opens for anybody.
+    ResealEmptyPassphrase,
 }
 
 impl std::fmt::Display for Error {
@@ -208,6 +228,22 @@ impl std::fmt::Display for Error {
             Self::UnsupportedVersion(v) => return write!(f, "unsupported container version {v}"),
             Self::UnsupportedMode(m) => return write!(f, "unsupported container mode {m}"),
             Self::WrongMode => "container is locked with a different method",
+            Self::NotSealedUnderNothing => {
+                "this file does not open with an empty passphrase, so it is \
+                 already sealed under one and was left alone"
+            }
+            Self::ResealSymlink => {
+                "this path is a symbolic link, and repairing it in place would \
+                 reach outside the folder being repaired"
+            }
+            Self::ResealStore => {
+                "the repaired file could not be read or written; the original \
+                 is unchanged"
+            }
+            Self::ResealEmptyPassphrase => {
+                "resealing needs a real passphrase; an empty one is the fault \
+                 being repaired"
+            }
             Self::Shred => "could not securely erase the file",
             Self::ShredSymlink => {
                 "that path is a symbolic link, so erasing it would destroy whatever it \
