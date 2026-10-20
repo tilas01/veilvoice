@@ -120,6 +120,36 @@ pub mod records {
 /// time avoiding.
 const DECOYS: usize = 24;
 
+/// Whether an unlock moves the plain records in, or leaves them alone.
+///
+/// # Why this is a choice and not always the first
+///
+/// F-269. An unlock used to mean one thing, and the decoy passphrase made it
+/// two. A decoy session derives a store key of its own, and handing that key to
+/// an unlock that migrates would read every plain record, write it back under
+/// the decoy's key, and **shred the original**: the settings, the policies and
+/// the integrity record, gone, where the real passphrase can no longer reach
+/// them. `veilvoice_crypto::decoy::SCOPE` is shown to the person setting the
+/// decoy up and promises the opposite, that typing it by mistake "costs you a
+/// relaunch and nothing else", and that promise is the whole of what a decoy
+/// is for.
+///
+/// So the caller says which kind of unlock this is, at the call site, in a word
+/// a reader of that line can check against the session it is in.
+pub enum Plain {
+    /// Move each plain record into the hoard and shred the original.
+    ///
+    /// What a real unlock does, and the only way a record ever becomes
+    /// encrypted at rest.
+    MoveIn,
+    /// Leave every plain record exactly where it is.
+    ///
+    /// A decoy session. It still opens the hoard, so what it writes goes in
+    /// under its own key and is invisible to the real session, which is what a
+    /// decoy is; it changes nothing that was already there.
+    Leave,
+}
+
 /// The application's own storage, locked or not.
 #[derive(Default)]
 pub struct VaultStore {
@@ -173,14 +203,14 @@ impl VaultStore {
     /// Starting a second unlock while one is running replaces it. That cannot
     /// happen from the window, which produces a key only from an accepted
     /// passphrase, and if it ever does then the newer key is the right one.
-    pub fn start_unlocking(&mut self, ctx: &egui::Context, key: StoreKey) {
+    pub fn start_unlocking(&mut self, ctx: &egui::Context, key: StoreKey, plain: Plain) {
         let dir = self.dir.clone();
         let (tx, rx) = mpsc::channel();
         self.opening = Some(rx);
         let ctx = ctx.clone();
         std::thread::spawn(move || {
             let answer = match dir {
-                Some(dir) => open_with(&dir, key),
+                Some(dir) => open_with(&dir, key, plain),
                 None => Err("this system has no program folder".to_string()),
             };
             // The receiver is gone if the window locked or shut while this ran,
@@ -232,12 +262,12 @@ impl VaultStore {
     /// hoard does with the files, not about which thread does it, and spinning
     /// a worker in each of them would test the channel twenty times over.
     #[cfg(test)]
-    pub fn unlocked(&mut self, key: StoreKey) -> Result<Audit, String> {
+    pub fn unlocked(&mut self, key: StoreKey, plain: Plain) -> Result<Audit, String> {
         let dir = self
             .dir
             .clone()
             .ok_or_else(|| "this system has no program folder".to_string())?;
-        let (hoard, audit) = open_with(&dir, key)?;
+        let (hoard, audit) = open_with(&dir, key, plain)?;
         self.hoard = Some(hoard);
         Ok(audit)
     }
@@ -313,8 +343,23 @@ impl VaultStore {
 ///
 /// Three passes of overwriting per migrated record, two full reads of the
 /// folder, and a write per decoy. None of it belongs in a frame. See F-218.
-fn open_with(dir: &Path, key: StoreKey) -> Result<(Hoard, Audit), String> {
+///
+/// # What a decoy session does instead
+///
+/// All three steps are skipped for [`Plain::Leave`], and the audit with them.
+/// The first two would destroy records the real passphrase owns, which is
+/// F-269 and the reason the argument exists. The audit is left out for a
+/// quieter reason: under a decoy's key not one real record authenticates, so
+/// an audit would report every one of them as tampered with, and the window
+/// would greet somebody who had just typed the decoy with a warning that their
+/// files had been changed while VeilVoice was shut. A decoy session has nothing
+/// true to say about a folder it cannot read, so it says nothing.
+fn open_with(dir: &Path, key: StoreKey, plain: Plain) -> Result<(Hoard, Audit), String> {
     let hoard = Hoard::open(dir, key);
+
+    if matches!(plain, Plain::Leave) {
+        return Ok((hoard, Audit::default()));
+    }
 
     for (logical, plain) in records::ALL {
         let path = dir.join(plain);
@@ -365,6 +410,62 @@ mod tests {
         );
     }
 
+    /// A decoy session leaves the real session's records where they are.
+    ///
+    /// **F-269.** This is the whole of the defect: a decoy unlock derived a key
+    /// of its own and was handed to the same migration a real one was, which
+    /// read every plain record, wrote it back under the decoy's key and
+    /// **shredded** the original. The real passphrase then opened a folder with
+    /// nothing of its own in it, and three overwriting passes had been made
+    /// over the file that used to hold it.
+    ///
+    /// Driven through the records rather than read out of the source, because
+    /// the claim is about what is on the disk afterwards. The second unlock is
+    /// the half that matters: a test that only checked the plain file still
+    /// existed would pass against a decoy session that had encrypted it in
+    /// place under its own key.
+    #[test]
+    fn a_decoy_unlock_leaves_the_real_records_readable() {
+        let dir = tempfile::tempdir().unwrap();
+        let plain_path = dir.path().join("measured.dat");
+
+        // Written with no lock set, which is how a record comes to be plain:
+        // `Op::Set` writes it, and it stays that way until the next unlock.
+        let store = VaultStore::new(Some(dir.path().to_path_buf()));
+        store.write(records::MEASURED, b"theme=dark").unwrap();
+        assert!(plain_path.exists());
+
+        // The decoy. A different key, because that is what a second passphrase
+        // derives, and the only thing that distinguishes the two sessions here.
+        let mut decoy_session = VaultStore::new(Some(dir.path().to_path_buf()));
+        let audit = decoy_session.unlocked(key(9), Plain::Leave).unwrap();
+        assert!(
+            plain_path.exists(),
+            "the decoy session moved the real session's record in and shredded \
+             the original, so the real passphrase has lost it"
+        );
+        assert!(
+            audit.is_clean() && audit.tampered.is_empty(),
+            "the decoy session audited a folder it cannot read, so it will tell \
+             whoever typed the decoy that their files were changed while \
+             VeilVoice was shut"
+        );
+        assert!(
+            decoy_session.read(records::MEASURED).unwrap().is_none(),
+            "the decoy session can read the real session's record, which is \
+             the opposite of what a decoy is"
+        );
+
+        // And the real passphrase, afterwards, on the same folder.
+        let mut real = VaultStore::new(Some(dir.path().to_path_buf()));
+        real.unlocked(key(7), Plain::MoveIn).unwrap();
+        assert_eq!(
+            real.read(records::MEASURED).unwrap().unwrap(),
+            b"theme=dark",
+            "the record did not survive the decoy session"
+        );
+    }
+
     #[test]
     fn unlocking_moves_the_plain_files_in_and_removes_them() {
         let dir = tempfile::tempdir().unwrap();
@@ -372,7 +473,7 @@ mod tests {
         store.write(records::MEASURED, b"theme=dark").unwrap();
         assert!(dir.path().join("measured.dat").exists());
 
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
         assert!(store.is_obfuscated());
         assert!(
             !dir.path().join("measured.dat").exists(),
@@ -390,7 +491,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
         store.write(records::MEASURED, b"theme=dark").unwrap();
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
         store.write(records::MEASURED, b"4 runs").unwrap();
 
         for entry in std::fs::read_dir(dir.path()).unwrap() {
@@ -406,7 +507,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
         store.write(records::MEASURED, b"x").unwrap();
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
         let files = std::fs::read_dir(dir.path()).unwrap().count();
         assert!(
             files >= DECOYS,
@@ -418,10 +519,10 @@ mod tests {
     fn a_second_unlock_does_not_keep_adding_decoys() {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
         let first = std::fs::read_dir(dir.path()).unwrap().count();
         store.locked();
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
         let second = std::fs::read_dir(dir.path()).unwrap().count();
         assert_eq!(
             first, second,
@@ -434,14 +535,49 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
         store.write(records::MEASURED, b"theme=dark").unwrap();
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
 
         let mut other = VaultStore::new(Some(dir.path().to_path_buf()));
-        other.unlocked(key(9)).unwrap();
+        other.unlocked(key(9), Plain::MoveIn).unwrap();
         assert_eq!(
             other.read(records::MEASURED).unwrap(),
             None,
             "a different key derives names nothing is stored under"
+        );
+    }
+
+    /// The window asks which kind of unlock this is, rather than always the
+    /// first.
+    ///
+    /// **F-268.** `a_decoy_unlock_leaves_the_real_records_readable` proves what
+    /// `Plain::Leave` does, and proves nothing about whether the window ever
+    /// passes it: that test reaches `open_with` directly, so a window that had
+    /// gone back to migrating under whichever key it was handed would leave it
+    /// passing. This reads the one line that decides, in the file that decides
+    /// it. The defect was exactly a missing branch here.
+    #[test]
+    fn the_window_does_not_migrate_under_a_decoy_s_key() {
+        let app = include_str!("app.rs").replace("\r\n", "\n");
+        let at = app
+            .find("take_unlock_store_key()")
+            .expect("the window takes the store key somewhere");
+        // To the end of that block, so a mention of the decoy anywhere else in
+        // this file cannot stand in for the branch.
+        let block = &app[at..];
+        let block = &block[..block
+            .find("start_unlocking(")
+            .expect("and hands it to the unlock")];
+        assert!(
+            block.contains("opened_with_decoy()"),
+            "the window hands the store key to the unlock without asking which \
+             passphrase derived it, so a decoy session migrates the real \
+             session's records in under the decoy's key and shreds the \
+             originals"
+        );
+        assert!(
+            block.contains("Plain::Leave"),
+            "the decoy branch is there but does not ask the unlock to leave \
+             the plain records alone"
         );
     }
 
@@ -460,7 +596,7 @@ mod tests {
         store.write(records::MEASURED, b"theme=dark").unwrap();
 
         let ctx = egui::Context::default();
-        store.start_unlocking(&ctx, key(7));
+        store.start_unlocking(&ctx, key(7), Plain::MoveIn);
         assert!(store.is_opening(), "nothing is being opened");
         assert!(
             !store.is_obfuscated(),
@@ -506,7 +642,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
         let ctx = egui::Context::default();
-        store.start_unlocking(&ctx, key(7));
+        store.start_unlocking(&ctx, key(7), Plain::MoveIn);
         store.locked();
         assert!(!store.is_opening(), "the abandoned unlock is still awaited");
 
@@ -564,7 +700,7 @@ mod tests {
     fn locking_forgets_the_key() {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
         assert!(store.is_obfuscated());
         store.locked();
         assert!(!store.is_obfuscated());
@@ -575,7 +711,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
         store.write(records::MEASURED, b"theme=dark").unwrap();
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
 
         let hoard = Hoard::open(dir.path(), key(7));
         let path = hoard.path_for(records::MEASURED).unwrap();
@@ -585,7 +721,7 @@ mod tests {
         std::fs::write(&path, &bytes).unwrap();
 
         store.locked();
-        let audit = store.unlocked(key(7)).unwrap();
+        let audit = store.unlocked(key(7), Plain::MoveIn).unwrap();
         assert!(!audit.is_clean());
         assert!(audit.tampered.contains(&records::MEASURED.to_string()));
     }
@@ -746,7 +882,7 @@ mod measured_tests {
     fn it_round_trips_through_an_obfuscated_one() {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
         let m = Measured {
             frame_ms: 4.25,
             speed: 98.5,
@@ -760,7 +896,7 @@ mod measured_tests {
     fn the_numbers_do_not_appear_in_the_file_once_locked() {
         let dir = tempfile::tempdir().unwrap();
         let mut store = VaultStore::new(Some(dir.path().to_path_buf()));
-        store.unlocked(key(7)).unwrap();
+        store.unlocked(key(7), Plain::MoveIn).unwrap();
         Measured {
             frame_ms: 4.25,
             speed: 98.5,

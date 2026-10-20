@@ -1191,6 +1191,61 @@ success about a thing it had not looked at.
 Each has a case in `python tools/audit/authorship.py --self-test` or
 `python tools/repo/signing.py --self-test`, and both run in `tools/verify.py`.
 
+### F-268: typing the decoy passphrase destroyed the records the real one owns
+
+Found by the audit of the decoy code landed in c8ea762f, reproduced by a test
+before it was fixed, and the most serious thing this round found: the decoy
+feature's one promise, made in the words the window itself shows, was false in
+the ordinary case.
+
+**Where:** `crates/veilvoice-gui/src/app.rs`, the call to
+`VaultStore::start_unlocking`, and `vault_store.rs`'s `open_with`.
+
+**What happened:** a decoy unlock derives a store key of its own, which is the
+whole point of it: the folder it opens is a different folder from the real one,
+under the same files. `app.rs` then handed that key to the same unlock a real
+passphrase gets, and an unlock is not only an opening. It reads every plain
+record, writes it back into the hoard under the key it was given, and
+**shreds** the original with three overwriting passes, because a settings file
+naming your vault should not be recoverable from free space after VeilVoice has
+said it is now encrypted.
+
+Under a decoy's key that is destruction. The settings, the policies and the
+integrity record were moved somewhere the real passphrase cannot reach and the
+originals were overwritten.
+
+Records are plain whenever one was written with the hoard shut, which is every
+`Op::Set` until the next unlock, so this was not a corner. Set a lock, set a
+decoy, quit, and unlock once with the decoy: the real passphrase now opens a
+folder with nothing of its own in it.
+
+`veilvoice_crypto::decoy::SCOPE` is shown to whoever sets a decoy up and is
+careful about what the feature does not do. It ends "Nothing is destroyed, and
+nothing can be. Typing the decoy by mistake costs you a relaunch and nothing
+else." A decoy is handed over to somebody standing over you, so it is typed
+under exactly the conditions in which a mistake is likeliest, and the promise
+that a mistake is cheap is what makes it usable at all.
+
+**Fix:** the caller says which kind of unlock this is, with
+`vault_store::Plain`, and a decoy session passes `Plain::Leave`: the hoard is
+opened, so what that session writes goes in under its own key and stays
+invisible to the real one, and nothing already in the folder is read, moved,
+shredded or added to. `Security::opened_with_decoy` had no reader outside its
+own tests before this; it has one now, which is the second half of the lesson.
+
+The audit is skipped for a decoy session too. Not one real record authenticates
+under a decoy's key, so an audit would have reported every one of them as
+tampered with, and the window would have greeted somebody who had just typed
+the decoy with a warning that their files had been changed while VeilVoice was
+shut. A session that cannot read the folder has nothing true to say about it.
+
+**Regression test:** a plain record is written, a decoy session unlocks, and
+then the real key unlocks the same folder and must still read the record. The
+second unlock is the half that matters: a test that only checked the plain file
+still existed would pass against a decoy session that had encrypted it in place
+under its own key. The same test asserts the decoy session cannot read the
+record and that its audit is clean.
+
 ### F-253: the app lock's cooldown told the decoy passphrase apart from the real one
 
 Found by the audit of the decoy code, reproduced by a test before it was fixed.
@@ -9711,7 +9766,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1905 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1907 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -11359,7 +11414,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and sixty-seven defects found and fixed (F-1 to F-267), across
+**Two hundred and sixty-eight defects found and fixed (F-1 to F-268), across
 thirty-four rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
