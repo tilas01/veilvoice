@@ -256,6 +256,23 @@ NOTES = {
                    "Windows the platform's own entry is where people look"),
         "example": "veilvoice uninstall",
     },
+    "reseal": {
+        "use": "Finds recordings that were sealed under an empty passphrase "
+               "and seals them again under your app-lock passphrase. "
+               "Releases 0.1.15 to 0.1.22 could seal a recording under "
+               "nothing while reporting that it had been sealed with the app "
+               "lock, and a file in that state looks like any other sealed "
+               "file and opens for anybody who has it. What was found is "
+               "printed before a passphrase is asked for, and a file that "
+               "does not open with an empty passphrase is never rewritten, so "
+               "this is safe to point at a folder and safe to run twice.",
+        "window": (None, "the window has no button for this yet. It is a "
+                   "repair for a fault in releases that are already out, "
+                   "and the command line is where it can be pointed at a "
+                   "folder of recordings that were saved outside the usual "
+                   "one"),
+        "example": "veilvoice reseal --dry-run",
+    },
     "reset": {
         "use": "Puts this machine back to a new install: settings, policies, "
                "the mandate, the vaults and the app lock. What would go is "

@@ -95,6 +95,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/priv_mode.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/record.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/record.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/reseal.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/reseal.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/reset.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/reset.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-cli/sentry.html</loc></url>
@@ -168,6 +170,8 @@
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/lock.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/privatefile.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/privatefile.src.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/reseal.html</loc></url>
+  <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/reseal.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/reset.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/reset.src.html</loc></url>
   <url><loc>https://tilas01.github.io/veilvoice/reference/veilvoice-crypto/shred.html</loc></url>
