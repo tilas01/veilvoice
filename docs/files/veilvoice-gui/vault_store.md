@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/vault_store.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 807 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 943 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs)
 
 ## Contents
 
@@ -73,32 +73,33 @@ loud rather than burying it.
 
 ## What this file contains
 
-807 lines defining **15 functions** (13 public), **2 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+943 lines defining **15 functions** (13 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct VaultStore` (line 125) -- The application's own storage, locked or not.
-- `struct Measured` (line 658) -- What the application measured about its own running, kept between sessions.
+- `enum Plain` (line 139) -- Whether an unlock moves the plain records in, or leaves them alone.
+- `struct VaultStore` (line 155) -- The application's own storage, locked or not.
+- `struct Measured` (line 794) -- What the application measured about its own running, kept between sessions.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `VaultStore::new` (line 143) -- Point at the program folder.
-- `VaultStore::dir` (line 152) -- The program folder, if this platform has one.
-- `VaultStore::is_obfuscated` (line 161) -- Whether records are currently obfuscated.
-- `VaultStore::start_unlocking` (line 176) -- Take the key from an unlock and start opening the hoard with it.
+- `VaultStore::new` (line 173) -- Point at the program folder.
+- `VaultStore::dir` (line 182) -- The program folder, if this platform has one.
+- `VaultStore::is_obfuscated` (line 191) -- Whether records are currently obfuscated.
+- `VaultStore::start_unlocking` (line 206) -- Take the key from an unlock and start opening the hoard with it.
   - reaches: `open_with`
-- `VaultStore::is_opening` (line 195) -- Whether an unlock is still being carried out.
-- `VaultStore::poll` (line 203) -- Collect a finished unlock, installing the key.
-- `VaultStore::unlocked` (line 235) -- Open the hoard here and now, for tests only.
+- `VaultStore::is_opening` (line 225) -- Whether an unlock is still being carried out.
+- `VaultStore::poll` (line 233) -- Collect a finished unlock, installing the key.
+- `VaultStore::unlocked` (line 265) -- Open the hoard here and now, for tests only.
   - reaches: `open_with`
-- `VaultStore::locked` (line 252) -- Forget the key.
-- `VaultStore::read` (line 259) -- Read a record, from the hoard if it is open and from the plain file if it is not.
+- `VaultStore::locked` (line 282) -- Forget the key.
+- `VaultStore::read` (line 289) -- Read a record, from the hoard if it is open and from the plain file if it is not.
   - reaches: `plain_path`
-- `VaultStore::write` (line 274) -- Write a record, obfuscated if there is a key and plain if there is not.
+- `VaultStore::write` (line 304) -- Write a record, obfuscated if there is a key and plain if there is not.
   - reaches: `plain_path`
-- `Measured::load` (line 675) -- Read it back, or the defaults if nothing has been recorded.
-- `Measured::save` (line 698) -- Write it, obfuscated when there is a key and plain when there is not.
-- `Measured::record` (line 712) -- Fold this session's numbers in.
+- `Measured::load` (line 811) -- Read it back, or the defaults if nothing has been recorded.
+- `Measured::save` (line 834) -- Write it, obfuscated when there is a key and plain when there is not.
+- `Measured::record` (line 848) -- Fold this session's numbers in.
 
 ## What calls what
 
@@ -120,40 +121,40 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_new(["VaultStore::new<br/>line 143"])
-    n_dir(["VaultStore::dir<br/>line 152"])
-    n_is_obfuscated(["VaultStore::is_obfuscated<br/>line 161"])
-    n_start_unlocking(["VaultStore::start_unlocking<br/>line 176"])
-    n_is_opening(["VaultStore::is_opening<br/>line 195"])
-    n_poll(["VaultStore::poll<br/>line 203"])
-    n_unlocked(["VaultStore::unlocked<br/>line 235"])
-    n_locked(["VaultStore::locked<br/>line 252"])
-    n_read(["VaultStore::read<br/>line 259"])
-    n_write(["VaultStore::write<br/>line 274"])
-    n_plain_path["VaultStore::plain_path<br/>line 288"]
-    n_open_with["open_with<br/>line 316"]
-    n_load(["Measured::load<br/>line 675"])
-    n_save(["Measured::save<br/>line 698"])
-    n_record(["Measured::record<br/>line 712"])
+    n_new(["VaultStore::new<br/>line 173"])
+    n_dir(["VaultStore::dir<br/>line 182"])
+    n_is_obfuscated(["VaultStore::is_obfuscated<br/>line 191"])
+    n_start_unlocking(["VaultStore::start_unlocking<br/>line 206"])
+    n_is_opening(["VaultStore::is_opening<br/>line 225"])
+    n_poll(["VaultStore::poll<br/>line 233"])
+    n_unlocked(["VaultStore::unlocked<br/>line 265"])
+    n_locked(["VaultStore::locked<br/>line 282"])
+    n_read(["VaultStore::read<br/>line 289"])
+    n_write(["VaultStore::write<br/>line 304"])
+    n_plain_path["VaultStore::plain_path<br/>line 318"]
+    n_open_with["open_with<br/>line 357"]
+    n_load(["Measured::load<br/>line 811"])
+    n_save(["Measured::save<br/>line 834"])
+    n_record(["Measured::record<br/>line 848"])
     n_read --> n_plain_path
     n_start_unlocking --> n_open_with
     n_unlocked --> n_open_with
     n_write --> n_plain_path
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L143" "open the source"
-    click n_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L152" "open the source"
-    click n_is_obfuscated href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L161" "open the source"
-    click n_start_unlocking href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L176" "open the source"
-    click n_is_opening href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L195" "open the source"
-    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L203" "open the source"
-    click n_unlocked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L235" "open the source"
-    click n_locked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L252" "open the source"
-    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L259" "open the source"
-    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L274" "open the source"
-    click n_plain_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L288" "open the source"
-    click n_open_with href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L316" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L675" "open the source"
-    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L698" "open the source"
-    click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L712" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L173" "open the source"
+    click n_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L182" "open the source"
+    click n_is_obfuscated href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L191" "open the source"
+    click n_start_unlocking href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L206" "open the source"
+    click n_is_opening href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L225" "open the source"
+    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L233" "open the source"
+    click n_unlocked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L265" "open the source"
+    click n_locked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L282" "open the source"
+    click n_read href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L289" "open the source"
+    click n_write href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L304" "open the source"
+    click n_plain_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L318" "open the source"
+    click n_open_with href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L357" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L811" "open the source"
+    click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L834" "open the source"
+    click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L848" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_dir,n_is_obfuscated,n_start_unlocking,n_is_opening,n_poll,n_unlocked,n_locked,n_read,n_write,n_load,n_save,n_record entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -168,24 +169,25 @@ flowchart TD
 |---|---:|---|
 | `records` <sub>pub mod</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L86) | The logical names of every record the application keeps. |
 | `DECOYS` <sub>const</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L121) | How many decoys a folder is kept stocked with. |
-| `VaultStore` <sub>pub struct</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L125) | The application's own storage, locked or not. |
-| `VaultStore::new` <sub>pub fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L143) | Point at the program folder. |
-| `VaultStore::dir` <sub>pub fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L152) | The program folder, if this platform has one. |
-| `VaultStore::is_obfuscated` <sub>pub fn</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L161) | Whether records are currently obfuscated. |
-| `VaultStore::start_unlocking` <sub>pub fn</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L176) | Take the key from an unlock and start opening the hoard with it. |
-| `VaultStore::is_opening` <sub>pub fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L195) | Whether an unlock is still being carried out. |
-| `VaultStore::poll` <sub>pub fn</sub> | [203](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L203) | Collect a finished unlock, installing the key. |
-| `VaultStore::unlocked` <sub>pub fn</sub> | [235](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L235) | Open the hoard here and now, for tests only. |
-| `VaultStore::locked` <sub>pub fn</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L252) | Forget the key. |
-| `VaultStore::read` <sub>pub fn</sub> | [259](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L259) | Read a record, from the hoard if it is open and from the plain file if it is not. |
-| `VaultStore::write` <sub>pub fn</sub> | [274](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L274) | Write a record, obfuscated if there is a key and plain if there is not. |
-| `VaultStore::plain_path` <sub>fn</sub> | [288](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L288) | Where a record sits when nothing is obfuscating it. |
-| `open_with` <sub>fn</sub> | [316](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L316) | Open the hoard in dir with key, migrating and auditing. |
-| `Measured` <sub>pub struct</sub> | [658](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L658) | What the application measured about its own running, kept between sessions. |
-| `Measured::load` <sub>pub fn</sub> | [675](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L675) | Read it back, or the defaults if nothing has been recorded. |
-| `Measured::save` <sub>pub fn</sub> | [698](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L698) | Write it, obfuscated when there is a key and plain when there is not. |
-| `Measured::record` <sub>pub fn</sub> | [712](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L712) | Fold this session's numbers in. |
-| `measured_tests` <sub>mod</sub> | [723](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L723) |  |
+| `Plain` <sub>pub enum</sub> | [139](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L139) | Whether an unlock moves the plain records in, or leaves them alone. |
+| `VaultStore` <sub>pub struct</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L155) | The application's own storage, locked or not. |
+| `VaultStore::new` <sub>pub fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L173) | Point at the program folder. |
+| `VaultStore::dir` <sub>pub fn</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L182) | The program folder, if this platform has one. |
+| `VaultStore::is_obfuscated` <sub>pub fn</sub> | [191](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L191) | Whether records are currently obfuscated. |
+| `VaultStore::start_unlocking` <sub>pub fn</sub> | [206](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L206) | Take the key from an unlock and start opening the hoard with it. |
+| `VaultStore::is_opening` <sub>pub fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L225) | Whether an unlock is still being carried out. |
+| `VaultStore::poll` <sub>pub fn</sub> | [233](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L233) | Collect a finished unlock, installing the key. |
+| `VaultStore::unlocked` <sub>pub fn</sub> | [265](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L265) | Open the hoard here and now, for tests only. |
+| `VaultStore::locked` <sub>pub fn</sub> | [282](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L282) | Forget the key. |
+| `VaultStore::read` <sub>pub fn</sub> | [289](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L289) | Read a record, from the hoard if it is open and from the plain file if it is not. |
+| `VaultStore::write` <sub>pub fn</sub> | [304](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L304) | Write a record, obfuscated if there is a key and plain if there is not. |
+| `VaultStore::plain_path` <sub>fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L318) | Where a record sits when nothing is obfuscating it. |
+| `open_with` <sub>fn</sub> | [357](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L357) | Open the hoard in dir with key, migrating and auditing. |
+| `Measured` <sub>pub struct</sub> | [794](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L794) | What the application measured about its own running, kept between sessions. |
+| `Measured::load` <sub>pub fn</sub> | [811](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L811) | Read it back, or the defaults if nothing has been recorded. |
+| `Measured::save` <sub>pub fn</sub> | [834](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L834) | Write it, obfuscated when there is a key and plain when there is not. |
+| `Measured::record` <sub>pub fn</sub> | [848](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L848) | Fold this session's numbers in. |
+| `measured_tests` <sub>mod</sub> | [859](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/vault_store.rs#L859) |  |
 
 ---
 

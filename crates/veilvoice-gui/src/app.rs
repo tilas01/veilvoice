@@ -1069,7 +1069,19 @@ impl eframe::App for VeilVoiceApp {
         // shut. See `crate::vault_store` for what that is worth and, just as
         // importantly, what it is not.
         if let Some(key) = self.security.take_unlock_store_key() {
-            self.files.start_unlocking(ctx, key);
+            // A decoy session leaves the folder as it found it. F-269: the
+            // migration reads every plain record, writes it back under the key
+            // of whichever passphrase was typed, and shreds the original, so
+            // handing it a decoy's key destroyed the real session's records.
+            // `decoy::SCOPE`, which is shown to whoever sets a decoy up,
+            // promises that typing it by mistake costs a relaunch and nothing
+            // else, and that promise is the feature.
+            let plain = if self.security.opened_with_decoy() {
+                crate::vault_store::Plain::Leave
+            } else {
+                crate::vault_store::Plain::MoveIn
+            };
+            self.files.start_unlocking(ctx, key, plain);
         }
         // And its answer, on whichever later frame it arrives. Opening the
         // folder reads every record, writes each one back encrypted, shreds the
