@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-video/src/motion.rs`
 
-[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 1116 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs)
+[`veilvoice-video`](../../../crates/veilvoice-video/README.md) &middot; 1162 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs)
 
 ## Contents
 
@@ -81,7 +81,7 @@ people never need to change anything.
 
 ## What this file contains
 
-1116 lines defining **27 functions** (18 public), **9 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1162 lines defining **27 functions** (18 public), **9 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -91,9 +91,9 @@ people never need to change anything.
 - `enum Style` (line 160) -- The shape the wave is drawn as.
 - `struct Motion` (line 193) -- The whole look of a video.
 - `struct Template` (line 249) -- A named starting point.
-- `struct Levels` (line 444) -- How loud the recording is, every five milliseconds, already settled.
-- `struct Layout` (line 512) -- Where everything on a frame goes.
-- `struct Renderer` (line 558) -- Draws the frames of one export.
+- `struct Levels` (line 448) -- How loud the recording is, about every five milliseconds, already settled.
+- `struct Layout` (line 527) -- Where everything on a frame goes.
+- `struct Renderer` (line 573) -- Draws the frames of one export.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -105,17 +105,17 @@ people never need to change anything.
 - `Motion::checked` (line 225) -- Refuse settings outside the ranges the controls offer.
 - `template` (line 435) -- The template with this identifier.
   - reaches: `templates`, `from_palette`
-- `Levels::duration_secs` (line 451) -- How long the recording is.
-- `Levels::peak` (line 459) -- The loudest settled level between two moments, from 0.0 to 1.0.
-- `levels` (line 478) -- Reduce a recording to the timeline a picture is drawn from.
-- `Renderer::new` (line 573) -- A renderer for levels at size, fps frames a second, with title lettered at the top unless the face is Face::None.
+- `Levels::duration_secs` (line 464) -- How long the recording is.
+- `Levels::peak` (line 472) -- The loudest settled level between two moments, from 0.0 to 1.0.
+- `levels` (line 491) -- Reduce a recording to the timeline a picture is drawn from.
+- `Renderer::new` (line 588) -- A renderer for levels at size, fps frames a second, with title lettered at the top unless the face is Face::None.
   - reaches: `layout`, `letter`
-- `Renderer::frames` (line 628) -- How many frames the video has: the length times the rate, rounded up so the last partial frame is still shown.
-- `Renderer::undrawable` (line 634) -- Text that came out as boxes, so a front end can say so before the render rather than after.
-- `Renderer::frame_bytes` (line 639) -- The size of one frame in bytes, as rgb24.
-- `Renderer::frame` (line 644) -- Draw frame index into out, which is resized to fit.
+- `Renderer::frames` (line 643) -- How many frames the video has: the length times the rate, rounded up so the last partial frame is still shown.
+- `Renderer::undrawable` (line 649) -- Text that came out as boxes, so a front end can say so before the render rather than after.
+- `Renderer::frame_bytes` (line 654) -- The size of one frame in bytes, as rgb24.
+- `Renderer::frame` (line 659) -- Draw frame index into out, which is resized to fit.
   - reaches: `still`, `draw_foot`, `draw_wave`, `clock`, `letter`, `mix`, `paint`
-- `thumbnail` (line 810) -- A picture of a whole recording, for a list of them.
+- `thumbnail` (line 825) -- A picture of a whole recording, for a list of them.
 
 ## What calls what
 
@@ -150,18 +150,18 @@ flowchart TD
     n_from_palette["from_palette<br/>line 260"]
     n_templates["templates<br/>line 417"]
     n_template(["template<br/>line 435"])
-    n_duration_secs(["Levels::duration_secs<br/>line 451"])
-    n_peak(["Levels::peak<br/>line 459"])
-    n_layout["layout<br/>line 526"]
-    n_new(["Renderer::new<br/>line 573"])
-    n_frame(["Renderer::frame<br/>line 644"])
-    n_still["Renderer::still<br/>line 651"]
-    n_draw_wave["Renderer::draw_wave<br/>line 660"]
-    n_draw_foot["Renderer::draw_foot<br/>line 716"]
-    n_paint["Renderer::paint<br/>line 755"]
-    n_letter["letter<br/>line 781"]
-    n_clock["clock<br/>line 845"]
-    n_mix["mix<br/>line 856"]
+    n_duration_secs(["Levels::duration_secs<br/>line 464"])
+    n_peak(["Levels::peak<br/>line 472"])
+    n_layout["layout<br/>line 541"]
+    n_new(["Renderer::new<br/>line 588"])
+    n_frame(["Renderer::frame<br/>line 659"])
+    n_still["Renderer::still<br/>line 666"]
+    n_draw_wave["Renderer::draw_wave<br/>line 675"]
+    n_draw_foot["Renderer::draw_foot<br/>line 731"]
+    n_paint["Renderer::paint<br/>line 770"]
+    n_letter["letter<br/>line 796"]
+    n_clock["clock<br/>line 860"]
+    n_mix["mix<br/>line 871"]
     n_at --> n_mix
     n_default --> n_from_palette
     n_draw_foot --> n_clock
@@ -188,18 +188,18 @@ flowchart TD
     click n_from_palette href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L260" "open the source"
     click n_templates href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L417" "open the source"
     click n_template href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L435" "open the source"
-    click n_duration_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L451" "open the source"
-    click n_peak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L459" "open the source"
-    click n_layout href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L526" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L573" "open the source"
-    click n_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L644" "open the source"
-    click n_still href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L651" "open the source"
-    click n_draw_wave href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L660" "open the source"
-    click n_draw_foot href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L716" "open the source"
-    click n_paint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L755" "open the source"
-    click n_letter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L781" "open the source"
-    click n_clock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L845" "open the source"
-    click n_mix href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L856" "open the source"
+    click n_duration_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L464" "open the source"
+    click n_peak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L472" "open the source"
+    click n_layout href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L541" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L588" "open the source"
+    click n_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L659" "open the source"
+    click n_still href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L666" "open the source"
+    click n_draw_wave href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L675" "open the source"
+    click n_draw_foot href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L731" "open the source"
+    click n_paint href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L770" "open the source"
+    click n_letter href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L796" "open the source"
+    click n_clock href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L860" "open the source"
+    click n_mix href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L871" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_label,n_middle,n_label,n_checked,n_template,n_duration_secs,n_peak,n_new,n_frame entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -237,27 +237,27 @@ flowchart TD
 | `EXTRAS` <sub>const</sub> | [283](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L283) | The templates that are not a theme, chosen for how they look moving. |
 | `templates` <sub>pub fn</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L417) | Every template: one per theme, in the themes' own order, then the extras. |
 | `template` <sub>pub fn</sub> | [435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L435) | The template with this identifier. |
-| `HOP_SECS` <sub>pub const</sub> | [440](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L440) | Seconds between two entries of a Levels timeline. |
-| `Levels` <sub>pub struct</sub> | [444](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L444) | How loud the recording is, every five milliseconds, already settled. |
-| `Levels::duration_secs` <sub>pub fn</sub> | [451](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L451) | How long the recording is. |
-| `Levels::peak` <sub>pub fn</sub> | [459](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L459) | The loudest settled level between two moments, from 0.0 to 1.0. |
-| `levels` <sub>pub fn</sub> | [478](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L478) | Reduce a recording to the timeline a picture is drawn from. |
-| `Layout` <sub>struct</sub> | [512](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L512) | Where everything on a frame goes. |
-| `layout` <sub>fn</sub> | [526](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L526) | Where the wave, the title and the progress line go on a frame of this size. |
-| `Renderer` <sub>pub struct</sub> | [558](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L558) | Draws the frames of one export. |
-| `Renderer::new` <sub>pub fn</sub> | [573](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L573) | A renderer for levels at size, fps frames a second, with title lettered at the top unless the face is Face::None. |
-| `Renderer::frames` <sub>pub fn</sub> | [628](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L628) | How many frames the video has: the length times the rate, rounded up so the last partial frame is still shown. |
-| `Renderer::undrawable` <sub>pub fn</sub> | [634](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L634) | Text that came out as boxes, so a front end can say so before the render rather than after. |
-| `Renderer::frame_bytes` <sub>pub fn</sub> | [639](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L639) | The size of one frame in bytes, as rgb24. |
-| `Renderer::frame` <sub>pub fn</sub> | [644](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L644) | Draw frame index into out, which is resized to fit. |
-| `Renderer::still` <sub>pub fn</sub> | [651](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L651) | Draw frame index as a canvas, for a still or a test. |
-| `Renderer::draw_wave` <sub>fn</sub> | [660](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L660) | The wave as it stands at at_secs, newest sound at the right. |
-| `Renderer::draw_foot` <sub>fn</sub> | [716](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L716) | The elapsed time, the length, and a progress line under them. |
-| `Renderer::paint` <sub>fn</sub> | [755](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L755) | Fill a rectangle with the wave's colours, with soft edges where it falls between pixels. |
-| `letter` <sub>fn</sub> | [781](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L781) | Letter text centred on centre_x, heavier for Face::Bold. |
-| `thumbnail` <sub>pub fn</sub> | [810](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L810) | A picture of a whole recording, for a list of them. |
-| `clock` <sub>fn</sub> | [845](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L845) | m:ss, or h:mm:ss past an hour. |
-| `mix` <sub>fn</sub> | [856](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L856) | Mix from a towards b by t. |
+| `HOP_SECS` <sub>pub const</sub> | [444](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L444) | Seconds between two entries of a Levels timeline, as asked for. |
+| `Levels` <sub>pub struct</sub> | [448](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L448) | How loud the recording is, about every five milliseconds, already settled. |
+| `Levels::duration_secs` <sub>pub fn</sub> | [464](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L464) | How long the recording is. |
+| `Levels::peak` <sub>pub fn</sub> | [472](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L472) | The loudest settled level between two moments, from 0.0 to 1.0. |
+| `levels` <sub>pub fn</sub> | [491](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L491) | Reduce a recording to the timeline a picture is drawn from. |
+| `Layout` <sub>struct</sub> | [527](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L527) | Where everything on a frame goes. |
+| `layout` <sub>fn</sub> | [541](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L541) | Where the wave, the title and the progress line go on a frame of this size. |
+| `Renderer` <sub>pub struct</sub> | [573](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L573) | Draws the frames of one export. |
+| `Renderer::new` <sub>pub fn</sub> | [588](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L588) | A renderer for levels at size, fps frames a second, with title lettered at the top unless the face is Face::None. |
+| `Renderer::frames` <sub>pub fn</sub> | [643](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L643) | How many frames the video has: the length times the rate, rounded up so the last partial frame is still shown. |
+| `Renderer::undrawable` <sub>pub fn</sub> | [649](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L649) | Text that came out as boxes, so a front end can say so before the render rather than after. |
+| `Renderer::frame_bytes` <sub>pub fn</sub> | [654](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L654) | The size of one frame in bytes, as rgb24. |
+| `Renderer::frame` <sub>pub fn</sub> | [659](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L659) | Draw frame index into out, which is resized to fit. |
+| `Renderer::still` <sub>pub fn</sub> | [666](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L666) | Draw frame index as a canvas, for a still or a test. |
+| `Renderer::draw_wave` <sub>fn</sub> | [675](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L675) | The wave as it stands at at_secs, newest sound at the right. |
+| `Renderer::draw_foot` <sub>fn</sub> | [731](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L731) | The elapsed time, the length, and a progress line under them. |
+| `Renderer::paint` <sub>fn</sub> | [770](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L770) | Fill a rectangle with the wave's colours, with soft edges where it falls between pixels. |
+| `letter` <sub>fn</sub> | [796](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L796) | Letter text centred on centre_x, heavier for Face::Bold. |
+| `thumbnail` <sub>pub fn</sub> | [825](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L825) | A picture of a whole recording, for a list of them. |
+| `clock` <sub>fn</sub> | [860](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L860) | m:ss, or h:mm:ss past an hour. |
+| `mix` <sub>fn</sub> | [871](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L871) | Mix from a towards b by t. |
 
 ---
 

@@ -38,6 +38,129 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirty-fifth round: the whole project, after the signed history
+
+Run on `main` at 5a808308, the first commit after the history was rewritten,
+signed and made the only branch. Every crate, the website, the wiki tools and
+the workflows were read again for anything from a syntax slip to a security
+hole. Five findings are fixed here. The rest are smaller or belong to work that
+is already in hand, and are listed in the project's audit notes rather than
+written up before they are fixed.
+
+Three of the five are in the decoy passphrase and the lock around it, which is
+where the last two rounds found their worst defects too. That is not a
+coincidence: the decoy is the newest code that makes a promise about what an
+observer cannot learn, and a promise of that kind is broken by any difference at
+all.
+
+### F-271: the updater never saw an app lock kept in the vault
+
+**Where:** `crates/veilvoice-verify/src/update.rs`, `lock_is_set` and
+`check_password`.
+
+**What happened:** the updater asks for the app-lock passphrase before it
+replaces a program, so that somebody at an unlocked desktop cannot swap the
+binary that holds the lock. It decided whether a lock was set by looking for
+`applock.bin`. Since the lock moved into the vault, that file exists only until
+the first unlock, which adopts it and deletes it. So on every machine where the
+lock had been used once, the updater found no lock and asked for nothing, and
+the V1 check written for exactly this case never ran. It then wrote a plain
+integrity record beside the sealed one and reported no app lock on the machine,
+and since the window reads the sealed record first, every launch after that
+reported the new programs as changed.
+
+**Fix:** both functions now ask `lock::kept_in` whether a lock is there, in
+the vault or the legacy file, without writing anything, and open it through
+`lock::open_in`. A lock that is there but will
+not read stops the update rather than reading as no lock.
+
+**Regression test:** `a_lock_kept_in_the_vault_is_seen_and_its_passphrase_is_checked`
+creates a lock in a temporary folder, confirms `applock.bin` is not there, and
+then requires the lock to be found, the wrong passphrase refused and the right
+one accepted.
+
+### F-272: the real passphrase took one Argon2id run longer than the decoy
+
+**Where:** `crates/veilvoice-crypto/src/lock.rs`, `LockStore::unlock`, and
+`decoy::Store::judge`.
+
+**What happened:** `judge` derives the decoy, then either asks the real lock
+whether it would open (the decoy route) or unlocks it (the real route). Each of
+those was meant to be one derivation. The unlock was two: `verify` derived the
+verifier and the tag key, threw the tag key away, and `retag` derived both again
+to re-tag the record. At the default cost of 256 MiB that is a difference
+somebody standing over the screen can count, and telling the two passphrases
+apart is the whole of what the decoy exists to prevent.
+
+The test that was supposed to guard this, `every_branch_does_the_same_amount_of_work`,
+read the source of `judge` for its shape. The extra run was inside `unlock`,
+which it never looked at, so it passed. F-88's test of `acknowledge` had the same
+blind spot and was passing while acknowledging cost two runs, not the one its
+documentation promised.
+
+**Fix:** the verification hands back the tag key it derived, and `unlock` and
+`acknowledge` re-tag with it. A real unlock, a decoy unlock and a wrong
+passphrase now each cost exactly two derivations in `judge`.
+
+**Regression test:** both source checks are replaced by counts. A test-only
+counter in `kdf::derive_key` records every Argon2id run, and
+`every_branch_does_the_same_amount_of_work` requires the real, decoy and wrong
+answers, with and without a decoy set, to cost the same number.
+`an_unlock_derives_the_key_once` and `acknowledging_a_report_derives_the_key_once`
+pin the lock's own costs.
+
+### F-273: the real passphrase could be changed to the decoy
+
+**Where:** `crates/veilvoice-crypto/src/lock.rs`, `LockStore::change_password`.
+
+**What happened:** setting a decoy refuses one identical to the real
+passphrase. Changing the real passphrase did not check the other way, so it
+could be changed to the decoy. `judge` answers a passphrase that both would
+open with the real program, so from then on the passphrase recorded as the
+decoy opened everything.
+
+**Fix:** the change is refused with `Error::AppLockIsTheDecoy` when the decoy
+set on this machine matches the new passphrase, and the lock is left as it was.
+
+**Regression test:** `the_real_passphrase_cannot_be_changed_to_the_decoy` sets a
+decoy, tries the change, and requires the refusal, the decoy still opening the
+decoy session, and an ordinary change still being accepted.
+
+### F-274: a vault still opening when the window locked was handed to the next session
+
+**Where:** `crates/veilvoice-gui/src/studio.rs`, `Studio::close`.
+
+**What happened:** opening a studio vault runs on a thread. `close`, which runs
+when the window locks, shut the vault and wiped the entries but left the
+thread's receiver in place. When the window opened again, the next frame
+collected the result and installed the vault, whichever passphrase had opened
+the window. A decoy session could be handed the real recordings without either
+of the vault's passphrases being typed in it.
+
+**Fix:** `close` drops the receiver. The thread's send fails and the key it
+derived is dropped with it.
+
+**Regression test:** `an_unlock_still_running_when_the_window_locks_is_not_installed_after`
+sends an opened vault after `close` and requires the next poll to leave the
+Studio shut.
+
+### F-275: the wave drifted away from the sound at 44.1 kHz
+
+**Where:** `crates/veilvoice-video/src/motion.rs`, `Levels::peak`.
+
+**What happened:** `levels()` steps through the audio by a whole number of
+samples, which at 44.1 kHz is 221, or 5.011 ms. `peak()` found the entry for a
+moment by dividing by exactly 5 ms. The picture ran ahead of the sound by about
+0.14 seconds a minute, which is eight seconds by the end of an hour. 22.05 and
+11.025 kHz drift the same way.
+
+**Fix:** `Levels` keeps the hop it actually used and `peak()` divides by that.
+
+**Regression test:** `the_wave_is_where_the_sound_is_an_hour_in_at_a_rate_five_milliseconds_does_not_divide`
+places a short burst a minute into a 44.1 kHz recording and requires the wave
+to peak where the burst is and to be silent just before it, where the old
+reading drew it.
+
 ## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
 
 The round before 0.1.23, and it is a different kind of round from the three
@@ -9924,7 +10047,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1925 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1930 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -11594,8 +11717,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and seventy defects found and fixed (F-1 to F-270), across
-thirty-four rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Two hundred and seventy-five defects found and fixed (F-1 to F-275), across
+thirty-five rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

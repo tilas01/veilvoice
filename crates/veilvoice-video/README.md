@@ -107,7 +107,7 @@ flowchart TD
     n_ffmpeg["ffmpeg.rs<br/>718 lines"]
     n_font["font.rs<br/>418 lines"]
     n_frames["frames.rs<br/>695 lines"]
-    n_motion["motion.rs<br/>1116 lines"]
+    n_motion["motion.rs<br/>1162 lines"]
     n_page["page.rs<br/>1610 lines"]
     n_palette["palette.rs<br/>747 lines"]
     n_raster["raster.rs<br/>621 lines"]
@@ -155,14 +155,14 @@ flowchart TD
 | [`font.rs`](../../docs/files/veilvoice-video/font.md) | 418 | A monospace face, five pixels by seven, drawn here. |
 | [`frames.rs`](../../docs/files/veilvoice-video/frames.md) | 695 | The video's pictures, and how many of them there really are. |
 | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 180 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
-| [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | 1116 | The moving picture an export draws, and the templates it starts from. |
+| [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | 1162 | The moving picture an export draws, and the templates it starts from. |
 | [`page.rs`](../../docs/files/veilvoice-video/page.md) | 1610 | The picture: one still for a preview, and one page that plays. |
 | [`palette.rs`](../../docs/files/veilvoice-video/palette.md) | 747 | Colours: the site's own tokens, and one per speaker. |
 | [`raster.rs`](../../docs/files/veilvoice-video/raster.md) | 621 | Pixels, and a PNG to put them in. |
 | [`size.rs`](../../docs/files/veilvoice-video/size.md) | 732 | The size and frame rate a video is rendered at. |
 | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 298 | The shape of the audio, reduced to something a page can draw. |
 
-**6,025 functional lines of Rust** in this crate. A functional line is a line
+**6,054 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -227,8 +227,8 @@ counts blank lines and comments too. Both are produced by
 | `struct Template` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | A named starting point. |
 | `fn templates` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Every template: one per theme, in the themes' own order, then the extras. |
 | `fn template` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | The template with this identifier. |
-| `const HOP_SECS` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Seconds between two entries of a Levels timeline. |
-| `struct Levels` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | How loud the recording is, every five milliseconds, already settled. |
+| `const HOP_SECS` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Seconds between two entries of a Levels timeline, as asked for. |
+| `struct Levels` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | How loud the recording is, about every five milliseconds, already settled. |
 | `fn levels` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Reduce a recording to the timeline a picture is drawn from. |
 | `struct Renderer` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | Draws the frames of one export. |
 | `fn thumbnail` | [`motion.rs`](../../docs/files/veilvoice-video/motion.md) | A picture of a whole recording, for a list of them. |
