@@ -271,11 +271,27 @@ pub const SALT_LEN: usize = 16;
 /// Length of a derived symmetric key.
 pub const KEY_LEN: usize = 32;
 
+#[cfg(test)]
+thread_local! {
+    /// How many times [`derive_key`] has run on this thread. Tests that must
+    /// prove two routes cost the same count derivations rather than time them,
+    /// because a timing test measures the machine's load.
+    static DERIVATIONS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// The number of derivations this thread has run so far.
+#[cfg(test)]
+pub(crate) fn derivations() -> u64 {
+    DERIVATIONS.with(std::cell::Cell::get)
+}
+
 /// Derive a 32-byte key from `password` and `salt`.
 ///
 /// The result lands directly in page-locked, zeroizing storage; it is never
 /// held in an ordinary `Vec` along the way.
 pub fn derive_key(password: &[u8], salt: &[u8], params: KdfParams) -> Result<Secret, Error> {
+    #[cfg(test)]
+    DERIVATIONS.with(|count| count.set(count.get() + 1));
     if salt.len() < 8 {
         return Err(Error::KdfParams);
     }

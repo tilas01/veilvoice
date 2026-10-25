@@ -318,12 +318,43 @@ pub fn offered(current: &str) -> Result<Option<Offer>, Error> {
 
 /// Whether this machine has an app lock set.
 ///
-/// Read as "is there a lock file", which is the same question the window asks
-/// before it puts up an unlock screen. It says nothing about the passphrase.
+/// The question the window asks before it puts up an unlock screen, asked the
+/// way the window asks it: of the vault the lock lives in. It says nothing
+/// about the passphrase. A lock that is there and will not read counts as set,
+/// so that the passphrase is asked for and [`check_password`] refuses it,
+/// rather than the update going ahead as though there were no lock.
 pub fn lock_is_set() -> bool {
-    veilvoice_crypto::lock::default_path()
-        .map(|p| p.exists())
+    veilvoice_crypto::lock::default_dir()
+        .map(|base| !matches!(lock_in(&base), Ok(None)))
         .unwrap_or(false)
+}
+
+/// The lock kept under `base`, without creating anything if there is none.
+///
+/// **F-271.** This used to look for `applock.bin` alone, the one file the lock
+/// was before it moved into the vault, and moving it there deletes that file.
+/// So on every machine whose lock had been opened since 0.1.18 the updater saw
+/// no lock: it never asked for the passphrase, wrote a plain record beside the
+/// sealed one, which is the downgrade [`retake_record`] warns about, and said
+/// there was no app lock on this machine. The window reads the sealed record
+/// first, so every launch after that reported the new programs as changed.
+///
+/// [`veilvoice_crypto::lock::open_in`] answers the question, and adopts an
+/// old `applock.bin` the way the window does, but it writes the vault's index
+/// when there is none. A machine with neither the index nor the old file has
+/// no lock, and is told so without anything being written.
+fn lock_in(base: &Path) -> Result<Option<veilvoice_crypto::lock::LockStore>, Error> {
+    if !veilvoice_crypto::lock::kept_in(base) {
+        return Ok(None);
+    }
+    veilvoice_crypto::lock::open_in(base)
+        .map(|(store, _)| store)
+        .map_err(|why| {
+            Error::WrongPassword(format!(
+                "the app lock could not be read, so this update stopped before \
+                 changing anything: {why}"
+            ))
+        })
 }
 
 /// Where the running copy of VeilVoice lives.
@@ -462,24 +493,25 @@ pub fn perform(
 /// cooldown as one typed at the window, which is right: an updater that could
 /// try passphrases without the rate limit would be a way around it.
 fn check_password(password: &[u8]) -> Result<(), Error> {
-    let Some(path) = veilvoice_crypto::lock::default_path() else {
+    let Some(base) = veilvoice_crypto::lock::default_dir() else {
         return Ok(()); // nowhere for a lock to be, so there is none to satisfy
     };
-    match veilvoice_crypto::lock::LockStore::open(&path) {
+    check_password_in(&base, password)
+}
+
+/// [`check_password`] against the lock under `base`, so a test can give it one.
+fn check_password_in(base: &Path, password: &[u8]) -> Result<(), Error> {
+    match lock_in(base)? {
         // No lock on this machine. A passphrase was offered and nothing needs
         // it, which is not an error: the record is written unsealed and the
         // caller is told so by `Record::Plain`.
-        Ok(None) => Ok(()),
-        Ok(Some(mut store)) => store
+        None => Ok(()),
+        // The lock is there and cannot be read: `lock_in` has already refused,
+        // because the alternative is replacing the binaries and then
+        // discovering the record cannot be resealed.
+        Some(mut store) => store
             .unlock(password)
             .map_err(|why| Error::WrongPassword(format!("{why}"))),
-        // The lock is there and cannot be read. Refusing is the safe answer:
-        // the alternative is replacing the binaries and then discovering the
-        // record cannot be resealed.
-        Err(why) => Err(Error::WrongPassword(format!(
-            "the app lock could not be read, so this update stopped before \
-             changing anything: {why}"
-        ))),
     }
 }
 
@@ -1428,6 +1460,34 @@ mod tests {
             "the record does not match what is on disk now"
         );
         std::fs::remove_dir_all(&root).ok();
+    }
+
+    /// F-271. A lock kept in the vault is found, its passphrase is checked,
+    /// and asking whether there is one writes nothing.
+    #[test]
+    fn a_lock_kept_in_the_vault_is_seen_and_its_passphrase_is_checked() {
+        // F-271. The lock lives in the vault, and opening it there deletes
+        // `applock.bin`, which is the file this used to look for.
+        let dir = tempfile::tempdir().unwrap();
+        assert!(matches!(lock_in(dir.path()), Ok(None)));
+        assert!(
+            std::fs::read_dir(dir.path()).unwrap().next().is_none(),
+            "asking whether there is a lock wrote something"
+        );
+        assert!(check_password_in(dir.path(), b"anything").is_ok());
+
+        veilvoice_crypto::lock::create_in(
+            dir.path(),
+            b"the right one",
+            veilvoice_crypto::kdf::KdfParams::weak_for_tests(),
+        )
+        .unwrap();
+        assert!(matches!(lock_in(dir.path()), Ok(Some(_))));
+        assert!(matches!(
+            check_password_in(dir.path(), b"the wrong one"),
+            Err(Error::WrongPassword(_))
+        ));
+        assert!(check_password_in(dir.path(), b"the right one").is_ok());
     }
 
     /// A wrong passphrase stops the update before anything is fetched.

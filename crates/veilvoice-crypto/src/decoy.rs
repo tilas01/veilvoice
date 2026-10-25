@@ -134,7 +134,7 @@ impl Verifier {
     }
 
     /// Derive and compare. Always does the full derivation.
-    fn matches(&self, passphrase: &[u8], params: kdf::KdfParams) -> Result<bool, Error> {
+    pub(crate) fn matches(&self, passphrase: &[u8], params: kdf::KdfParams) -> Result<bool, Error> {
         let key = kdf::derive_key(passphrase, &self.salt, params)?;
         Ok(constant_time_eq(key.expose(), &self.expected))
     }
@@ -310,7 +310,7 @@ impl Decoy {
     }
 
     /// Derive and compare. Always does the full derivation.
-    fn matches(&self, given: &str) -> Result<bool, Error> {
+    pub(crate) fn matches(&self, given: &str) -> Result<bool, Error> {
         self.verifier.matches(given.as_bytes(), self.params)
     }
 
@@ -906,40 +906,74 @@ mod tests {
         );
     }
 
-    /// **Both are always derived.** Returning as soon as the decoy matches, or
-    /// skipping the decoy when none is set, would make one answer measurably
-    /// faster than another, and Argon2id takes long enough for somebody with a
-    /// stopwatch to see it.
+    /// **Every answer costs the same number of derivations.** Returning as
+    /// soon as the decoy matches, skipping the decoy when none is set, or
+    /// deriving once more on one route than another would make that answer
+    /// measurably slower or faster, and Argon2id takes long enough for
+    /// somebody with a stopwatch to see it.
     ///
-    /// Read from the source, because what is asserted is that a statement is
-    /// *not* there. A timing test would measure this machine's load.
+    /// Counted rather than timed, because a timing test measures this
+    /// machine's load. This replaced a test that read the source for the
+    /// shape of `judge` and passed while the real route derived three times
+    /// and the decoy twice (F-272): the extra run was inside
+    /// `LockStore::unlock`, which the source check never looked at.
     #[test]
     fn every_branch_does_the_same_amount_of_work() {
-        let source = include_str!("decoy.rs").replace("\r\n", "\n");
-        let start = source.find("pub fn judge(").expect("the function");
-        let end = source[start..].find("\n    }\n").expect("its end") + start;
-        let body = &source[start..end];
+        let cost = |store: &Store, lock: &mut crate::lock::LockStore, given: &str| {
+            let before = crate::kdf::derivations();
+            let answer = store.judge(lock, given).unwrap();
+            (answer, crate::kdf::derivations() - before)
+        };
 
-        // No decoy set, and the work is done anyway.
-        assert!(
-            body.contains("Decoy::nothing(lock.params())"),
-            "the no-decoy case must still derive:\n{body}"
+        let (_dir, mut lock, store) = machine("the real one");
+        let (answer, unset_real) = cost(&store, &mut lock, "the real one");
+        assert_eq!(answer, Opened::Real);
+        let (answer, unset_wrong) = cost(&store, &mut lock, "neither of them");
+        assert_eq!(answer, Opened::Wrong);
+
+        store.set(&mut lock, "the real one", "the decoy").unwrap();
+        let (answer, real) = cost(&store, &mut lock, "the real one");
+        assert_eq!(answer, Opened::Real);
+        let (answer, decoy) = cost(&store, &mut lock, "the decoy");
+        assert_eq!(answer, Opened::Decoy);
+        let (answer, wrong) = cost(&store, &mut lock, "neither of them");
+        assert_eq!(answer, Opened::Wrong);
+
+        assert_eq!(
+            [unset_real, unset_wrong, real, decoy, wrong],
+            [decoy; 5],
+            "derivations for: real and wrong with no decoy set, then real, \
+             decoy and wrong with one; any difference is a difference in time"
         );
-        // The decoy derivation happens before anything can return.
-        let derive_at = body.find("record.matches(given)").expect("the derivation");
-        assert!(
-            !body[..derive_at].contains("return"),
-            "something returns before the decoy is derived, which tells an \
-             observer which branch they are in:\n{}",
-            &body[..derive_at]
+        assert_eq!(decoy, 2, "one for the decoy, one for the real lock");
+    }
+
+    /// F-273. Changing the real passphrase to the decoy is refused, and the
+    /// lock is left as it was. Before, the change went through and `judge`
+    /// opened the real program for the passphrase recorded as the decoy.
+    #[test]
+    fn the_real_passphrase_cannot_be_changed_to_the_decoy() {
+        let (_dir, mut lock, store) = machine("the real one");
+        store.set(&mut lock, "the real one", "the decoy").unwrap();
+
+        assert_eq!(
+            lock.change_password(b"the real one", b"the decoy"),
+            Err(Error::AppLockIsTheDecoy)
         );
-        // And the decoy branch still proves the real passphrase.
-        let decoy_at = body.find("if decoyed {").expect("the decoy branch");
-        assert!(
-            body[decoy_at..].contains("lock.would_open(given.as_bytes())"),
-            "the decoy branch skips the real derivation:\n{}",
-            &body[decoy_at..]
+        assert_eq!(store.judge(&mut lock, "the decoy").unwrap(), Opened::Decoy);
+        assert_eq!(
+            store.judge(&mut lock, "the real one").unwrap(),
+            Opened::Real
         );
+
+        // Any other new passphrase is still accepted.
+        lock.change_password(b"the real one", b"a new real one")
+            .unwrap();
+        assert_eq!(
+            store.judge(&mut lock, "a new real one").unwrap(),
+            Opened::Real
+        );
+        assert_eq!(store.judge(&mut lock, "the decoy").unwrap(), Opened::Decoy);
     }
 
     /// Four wrong attempts, which is what puts the lock into its cooldown.
