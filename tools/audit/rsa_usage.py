@@ -12,6 +12,11 @@ advisory on one specific ground, that the advisory is about RSA *private key*
 operations and VeilVoice only ever verifies a signature against a public key
 compiled into it. There is no secret for a timing oracle to leak.
 
+The second advisory accepted on the same ground is RUSTSEC-2026-0387, timing
+variability in `crypto-bigint` 0.5.5, which reaches the verifier through the
+elliptic-curve arithmetic `pgp` uses for ECDSA and its kin. A timing leak there
+also needs a secret integer, and verifying a signature has none.
+
 That is an argument about how the crate is used rather than about the crate, so
 it is enforced here rather than believed. If a secret-key or decryption path
 ever appears, this fails and the acceptance has to be re-argued.

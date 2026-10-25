@@ -10927,6 +10927,28 @@ the one tool whose entire job is not to silently accept. A widely used
 implementation that many people read is the better risk, and the size of it is
 the price.
 
+**A-7 -- `crypto-bigint` carries RUSTSEC-2026-0387, and it is accepted on the
+same ground as A-6.**
+
+The advisory, published on 23 October 2026, says several operations in
+`crypto-bigint` that were meant to run in constant time could branch on the
+values they were given, so a timing side channel could reveal a secret integer.
+The fix is in 0.7.6. The 0.5 line has no fixed release, and the version this
+project reaches, 0.5.5, comes in through the elliptic-curve arithmetic that
+`pgp` uses for ECDSA, Ed448 and the NIST curves. `pgp` 0.21, the newest
+release, still depends on it, so updating `pgp` does not remove it. That was
+tried before this was written.
+
+The ground is A-6's. A timing leak matters when the number being worked on is
+a secret. Checking a signature works on a public key and a public signature,
+and the verifier does nothing else, so nothing on this path is secret. The same
+guard enforces it: `tools/audit/rsa_usage.py` fails the build if any crate
+reaching `pgp` gains a secret-key, signing or decryption path, which is the only
+way a secret could arrive at this arithmetic. The exception is in both
+`.cargo/audit.toml` and `deny.toml`, and `tools/audit/dependencies.py` fails if
+the two stop agreeing. It is reviewed at each release, and it goes when `pgp`
+moves to `crypto-bigint` 0.7.
+
 ## 3. Cryptography
 
 ### 3.1 Primitives
