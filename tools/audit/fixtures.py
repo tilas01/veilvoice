@@ -341,7 +341,8 @@ def self_test():
 
     def commit(where):
         subprocess.run(["git", "-C", where, "add", "-A"], check=True)
-        subprocess.run(["git", "-C", where, "commit", "-qm", "x"], check=True)
+        subprocess.run(["git", "-C", where, "-c", "commit.gpgsign=false",
+                        "commit", "-qm", "x"], check=True)
 
     cases = []
 
@@ -404,7 +405,8 @@ def self_test():
         write(where, "src/lib.rs", 'const K: &str = include_str!("../keys/ours.asc");\n')
         write(where, "keys/ours.asc", "key\n")
         subprocess.run(["git", "-C", where, "add", "-A"], check=True)
-        subprocess.run(["git", "-C", where, "commit", "-qm", "x"], check=True)
+        subprocess.run(["git", "-C", where, "-c", "commit.gpgsign=false",
+                        "commit", "-qm", "x"], check=True)
         found, _, _ = audit(where)
         if found:
             failures += 1
