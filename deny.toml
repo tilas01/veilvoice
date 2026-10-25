@@ -10,8 +10,9 @@
 #
 # The advisory list is repeated here because cargo-deny reads its own file and
 # not cargo-audit's. The arguments live in `.cargo/audit.toml`; this is the
-# same identifiers and nothing else, and `tools/audit/dependencies.py`
-# fails the build if the two lists drift apart.
+# same identifiers and nothing else. `osv-scanner.toml` repeats them a third
+# time for osv-scanner and the OpenSSF Scorecard, and
+# `tools/audit/dependencies.py` fails the build if the lists drift apart.
 
 [graph]
 all-features = false
