@@ -333,6 +333,13 @@ CHECKS = [
     # and a token.
     ("every action a workflow runs is pinned to a commit",
      [sys.executable, "tools/audit/actions.py"]),
+    # And the token on that runner. `actions/checkout` leaves it in the
+    # checkout's git configuration by default, where every later step can read
+    # it, including the build scripts of every crate compiled after it.
+    ("a checkout that never pushes does not keep the token",
+     [sys.executable, "tools/audit/checkout_tokens.py"]),
+    ("the checkout guard reads the shapes it is meant to",
+     [sys.executable, "tools/audit/checkout_tokens.py", "--self-test"]),
     # F-241. A PowerShell function that adds to a script's variable adds to a
     # copy of its own. The screenshot script found four kinds of broken capture
     # that way and forgot every one, then exited 0. Running that script needs
