@@ -1,0 +1,71 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Static analysis of everything in this repository that runs.
+#
+# Clippy reads the Rust and nothing else, and it reads it as a linter: it says
+# when code is unidiomatic, not when a value from outside reaches somewhere it
+# should not. CodeQL asks that second question, and it asks it of four things
+# this project ships or runs:
+#
+#   - the Rust workspace, which is the program;
+#   - the Python under `tools/` and `assets/`, which generates the documentation
+#     and checks the release;
+#   - the website's JavaScript;
+#   - these workflows themselves, which hold the token that writes to this
+#     repository and the key that signs a release. A script injection in a
+#     workflow is the most direct route into either, so the workflows are
+#     analysed as code rather than trusted as configuration.
+#
+# `build-mode: none` for all four. Rust is analysed from source without a
+# compile, so this needs neither the toolchain nor the GUI's system libraries
+# and finishes in minutes.
+#
+# Findings go to the repository's Security tab. GitHub's default CodeQL setup
+# must be switched off in Settings, Code security, while this file exists:
+# the two refuse to run side by side.
+
+name: codeql
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Weekly as well, because the queries improve between releases of CodeQL and
+  # a week with no push is a week nobody would otherwise look.
+  schedule:
+    - cron: '41 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyse:
+    name: analyse ${{ matrix.language }}
+    runs-on: ubuntu-latest
+    # Writing findings to the Security tab is the only write this needs.
+    # `actions: read` lets CodeQL see which workflow run it belongs to.
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [rust, python, javascript-typescript, actions]
+    steps:
+      # Nothing here pushes, so the token is not left behind in `.git/config`
+      # for the analysis to find.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - uses: github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+
+      - uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        with:
+          category: /language:${{ matrix.language }}

@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# The OpenSSF Scorecard, run here rather than remembered.
+#
+# Scorecard grades the things around the code that decide whether a release
+# can be trusted: whether actions are pinned, whether tokens are scoped,
+# whether releases are signed, whether known advisories are open. Most of
+# those this repository already checks for itself, one script at a time under
+# `tools/audit/`. This is the outside view of the same ground, run by a tool
+# that does not share our assumptions, so a gap our own checks were written
+# around still shows up.
+#
+# Results go to the Security tab and to the public Scorecard API, which is
+# what the badge reads. Publishing is the reason for the narrow shape below:
+# the Scorecard API only accepts results from a workflow whose top-level
+# token is read-only and which runs nothing but the steps here.
+
+name: scorecard
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 2 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analysis:
+    name: scorecard analysis
+    runs-on: ubuntu-latest
+    # `security-events` writes the findings to the Security tab. `id-token`
+    # proves to the Scorecard API that this workflow, in this repository,
+    # produced the results it is publishing.
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc # v2.4.4
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          publish_results: true
+
+      # Kept for five days, so a change in the score can be read in full
+      # without rerunning anything.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: scorecard-sarif
+          path: results.sarif
+          retention-days: 5
+
+      - uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+        with:
+          sarif_file: results.sarif
