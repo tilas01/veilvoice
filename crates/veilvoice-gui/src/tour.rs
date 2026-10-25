@@ -889,6 +889,32 @@ enum Press {
 mod tests {
     use super::*;
 
+    /// `tools/shots/gui.sh` marks every stop as seen so the tour stays shut
+    /// while it takes its pictures. It used to mark the tabs alone, and once
+    /// the setup stops came first the app lock card opened over every capture.
+    #[test]
+    fn the_capture_script_marks_the_setup_stops_seen_too() {
+        let stops = crate::tour_stops();
+        for stage in [
+            Stage::AppLock,
+            Stage::AtRest,
+            Stage::Decoy,
+            Stage::Install,
+            Stage::SettingsHeadings,
+        ] {
+            assert!(
+                stops.contains(&stage.key()),
+                "--tour-stops leaves out {}, so the tour opens over the captures",
+                stage.key()
+            );
+        }
+        let script = include_str!("../../../tools/shots/gui.sh");
+        assert!(
+            script.contains("\"$exe\" --tour-stops"),
+            "gui.sh must take the stops it marks as seen from --tour-stops"
+        );
+    }
+
     /// The lock card says the integrity record is taken for you, and the
     /// window is what takes it.
     ///

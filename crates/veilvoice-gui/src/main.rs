@@ -97,6 +97,9 @@ Options:
   --settings-pages
                 List the settings page names, one per line, and exit.
                 The same thing, one level down.
+  --tour-stops  List the name of every stop on the first-run tour, one per
+                line, and exit. The Linux screenshot script marks them all
+                as seen, so the tour does not open over a capture.
   --typeface    Say which face the window would draw with, and exit.
                 `JetBrains Mono` and its path, or `built-in monospace`.
                 The screenshot scripts check this before capturing.
@@ -156,6 +159,15 @@ fn answered_without_a_window() -> bool {
         if arg == "--settings-pages" {
             for page in veilvoice_gui::settings_pages() {
                 println!("{page}");
+            }
+            return true;
+        }
+        // Every stop on the tour, setup stops included, for the same scripts:
+        // they mark each one as seen so the tour stays shut while they take
+        // their pictures, and a list of tabs alone left the setup stops out.
+        if arg == "--tour-stops" {
+            for stop in veilvoice_gui::tour_stops() {
+                println!("{stop}");
             }
             return true;
         }
