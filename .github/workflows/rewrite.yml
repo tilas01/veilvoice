@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Builds the one-time signed rewrite of dev and main with the key in the
+# Builds the signed rewrite of main with the key in the
 # repository's secrets, GPG_PRIVATE_KEY and GPG_PASSPHRASE, and hands it over
 # as a bundle in a commit of its own, because the run's token may not push a
 # rewrite of commits that touch workflow files. tools/repo/rewrite_in_actions.sh
 # says how, and tools/repo/rewrite.py what changes and what may not. Nothing
-# here pushes dev or main: a clone with push rights does that, with
+# here pushes main: a clone with push rights does that, with
 # `rewrite.py --push`, after checking the handover.
 #
 # Runs when this file or either script changes, or by hand; re-run a finished run to build it
