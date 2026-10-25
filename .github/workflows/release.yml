@@ -30,8 +30,13 @@ on:
         description: The commit this run must build; it refuses to publish from any other (optional)
         required: false
 
+# Read only by default. The build jobs compile every dependency and run its
+# build script, so they get a token that cannot push or move a tag, and no
+# checkout keeps a token behind in `.git/config` for one to find. Only
+# `publish` can write, because creating the release is the one thing that
+# needs it.
 permissions:
-  contents: write
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -119,6 +124,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       # Only the GUI needs the windowing stack. A CLI-only target does not, and
       # on a cross target these packages would be for the wrong architecture.
@@ -348,6 +355,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       # The VM has no git, and a build whose timestamp comes from the clock
       # is a build that never reproduces. Written out here, where git
       # exists, and read inside the VM.
@@ -468,6 +477,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       # The VM has no git, and a build whose timestamp comes from the clock
       # is a build that never reproduces. Written out here, where git
       # exists, and read inside the VM.
@@ -563,6 +574,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       # The VM has no git, and a build whose timestamp comes from the clock
       # is a build that never reproduces. Written out here, where git
       # exists, and read inside the VM.
@@ -655,6 +668,8 @@ jobs:
     # release, so this runs as long as the matrix itself did.
     if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     # Evaluated at job level on purpose. A step's own `env:` block is not in
     # scope for that step's `if:`, so gating on it there silently disables the
     # step forever, which is exactly what v0.1.0 and v0.1.1 did.
@@ -662,6 +677,8 @@ jobs:
       HAS_SIGNING_KEY: ${{ secrets.GPG_PRIVATE_KEY != '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
@@ -851,6 +868,40 @@ jobs:
           fi
           echo "publishing $tag from a workspace at $have"
           echo "publish=true" >> "$GITHUB_OUTPUT"
+
+      # **The tag is signed with the same key as the checksums.** Left to
+      # itself, publishing a release for a tag that does not exist makes GitHub
+      # create a plain tag with no signature, so every tag cut from a dispatch
+      # read as Unverified. The tag is made here instead, annotated and signed
+      # by the release key as tilas01, checked, and pushed before the release
+      # is created, which then finds it rather than making its own. A tag that
+      # already exists was pushed by hand and is published as it is.
+      - name: Sign the tag
+        if: steps.gate.outputs.publish == 'true' && steps.sign.outputs.signed == 'true'
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${{ env.VERSION_TAG }}"
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --tags "$remote" "refs/tags/$tag" >/dev/null; then
+            echo "$tag already exists, so it is published as it is"
+            exit 0
+          fi
+          pp="$(mktemp)"
+          printf '%s' "$GPG_PASSPHRASE" > "$pp"
+          wrapper="$RUNNER_TEMP/gpg-loopback"
+          printf '#!/bin/sh\nexec gpg --batch --pinentry-mode loopback --passphrase-file "%s" "$@"\n' "$pp" > "$wrapper"
+          chmod +x "$wrapper"
+          key="$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}')"
+          git -c user.name=tilas01 -c user.email=tilas01@users.noreply.github.com \
+              -c gpg.program="$wrapper" -c user.signingkey="$key" \
+              tag -s "$tag" -m "VeilVoice $tag" "$GITHUB_SHA"
+          shred -u "$pp" 2>/dev/null || rm -f "$pp"
+          rm -f "$wrapper"
+          git verify-tag "$tag"
+          git push "$remote" "refs/tags/$tag"
 
       # **`target_commitish` is what makes the tag name the commit that was
       # built**, and it was missing. Creating a release for a tag that does not
