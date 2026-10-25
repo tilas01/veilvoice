@@ -506,7 +506,10 @@ def wiki_index(files):
         technical, _ = split_plain(header_comment(text, kind_of(rel)))
         summary = (paragraphs(technical) or [""])[0].split(". ")[0].rstrip(".")
         out.append(
-            "| [[`%s`|%s]] | %d | %s |"
+            # An ordinary link, not `[[name|Page]]`: in a table the pipe
+            # inside a wiki link ends the cell. See the same table in
+            # tools/docs/generate.py.
+            "| [`%s`](%s) | %d | %s |"
             % (rel, wiki_page_name(rel), text.count("\n") + 1, summary.replace("|", "\\|"))
         )
     out.append("")

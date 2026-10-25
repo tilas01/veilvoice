@@ -107,10 +107,10 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`lib.rs`|File-veilvoice-policy-lib]] | 168 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
-| [[`mandate.rs`|File-veilvoice-policy-mandate]] | 539 | The two things VeilVoice insists on unless you say otherwise. |
-| [[`policy.rs`|File-veilvoice-policy-policy]] | 991 | The policy itself: what can be required, and what requiring it does. |
-| [[`workspace.rs`|File-veilvoice-policy-workspace]] | 817 | Named profiles and saved projects. |
+| [`lib.rs`](File-veilvoice-policy-lib) | 168 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
+| [`mandate.rs`](File-veilvoice-policy-mandate) | 539 | The two things VeilVoice insists on unless you say otherwise. |
+| [`policy.rs`](File-veilvoice-policy-policy) | 991 | The policy itself: what can be required, and what requiring it does. |
+| [`workspace.rs`](File-veilvoice-policy-workspace) | 817 | Named profiles and saved projects. |
 
 **1,689 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

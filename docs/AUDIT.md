@@ -1191,6 +1191,140 @@ success about a thing it had not looked at.
 Each has a case in `python tools/audit/authorship.py --self-test` or
 `python tools/repo/signing.py --self-test`, and both run in `tools/verify.py`.
 
+### F-270: every file table in the wiki showed the brackets of its own links
+
+Ryder read `wiki/Crate-veilvoice-conversation.md` and saw its six files listed
+like this:
+
+```text
+[[edit.rs    File-veilvoice-conversation-edit]]    649
+```
+
+A GitHub wiki link is `[[text|Page]]`. In a table the pipe is the column
+separator, and nothing in Markdown says a link is special, so that row was
+never one cell holding a link. The opening brackets and the file name made one
+cell, the page name and the closing brackets made another, and the length and
+the description shifted one column left into the heading's three. Fifteen crate
+pages and `Source-index`, a hundred and eighty-four rows, on the pages whose
+whole job is to show what a crate is made of.
+
+The two generators that write that table, `tools/docs/generate.py` and
+`tools/docs/sources.py`, each escape the pipes in the summary cell beside it,
+and have done since the table was written:
+
+```python
+summary = (entry["summary"] or "...").replace("|", "\\|")
+out.append("| [[`%s`|%s]] | %d | %s |" % (...))
+```
+
+So the escaping was not missing. It was put on the cell whose text arrives from
+a doc comment, where a pipe would be somebody else's fault, and left off the
+cell the same line writes itself. That is worth stating plainly because it is
+the shape of the mistake rather than the mistake: the author of a table escapes
+the part they are thinking about, and the part they are typing is not it.
+
+Both now write an ordinary `[name](Page)` link. A wiki resolves a relative link
+to the page of that name, which is the same resolution `[[name|Page]]` was
+asking for and the same one every cross-document link in the wiki already uses,
+so nothing about the destination changes. It simply has no pipe in it, and
+cannot be broken again by the thing that broke it.
+
+#### Why nothing noticed
+
+Every check this repository has over the wiki reads links, and by the time this
+row was written there was no link to read. The dangling-link check walks each
+`[[link]]` and fails on one naming a page that does not exist; the
+rewritten-twice check looks for a repository URL ending in a page name. A `[[`
+with its closing half three cells away matches neither, because it is not a
+link, it is four cells of text.
+
+The rendering did not give it away either, which is the part worth keeping. A
+row with one cell too many still renders as a table: the browser draws the
+extra cell and carries on. Nothing is misaligned, nothing overflows, no
+validator complains. It takes a reader looking at the words, which is what
+happened.
+
+#### The guard
+
+`tools/audit/tables.py` reads every Markdown table in the repository and fails
+on a row whose cell count differs from its heading's. It runs in
+`tools/verify.py` and in `ci.yml`, with its `--self-test` beside it in both.
+
+Counting cells rather than looking for a visible `[[` is deliberate. A bracket
+check would have found this and nothing else. A row that does not fit its
+heading is the fault itself, whatever put it there: a pipe in a path, a pipe in
+a quoted regular expression, a hand-drawn table a column short. And it can be
+reported in terms a reader can act on, that this row has one cell too many,
+rather than naming a symptom and leaving the cause to be worked out.
+
+Its self-test builds six files: the row as it was published, the same row
+written the new way, a cell with a properly escaped pipe, a row missing its
+last cell, a broken row quoted inside a fenced block, and two tables of
+different widths in one file. It fails if either fault goes uncaught or any of
+the four innocent shapes is reported. The fenced case earns its place in that
+list: the guard's own documentation shows the broken row on purpose, and a
+guard that fails on the description of a defect is a guard that teaches people
+to stop describing defects.
+
+A sweep for the neighbouring shapes found nothing else: no unbalanced `[[` and
+no empty link target anywhere in `wiki/`, and no other generator writes a wiki
+link into a table row.
+
+### F-269: the check on the reference pages read two rows in five
+
+`tools/site-tests/source.test.js` has a check from F-215, where the generator
+read `const fn rgb` as a constant named `fn` and published two rows whose name
+was a keyword. The check asserts the general rule rather than those two rows:
+no Rust keyword is the name of anything, so a keyword in the name column means
+a modifier was read as the item.
+
+It matched rows with this pattern:
+
+```text
+<td><code>([^<]+)</code>\s*<sub>([a-z]+)</sub></td>
+```
+
+`[a-z]+` is one word. Every kind that reaches a reader with a visibility on it
+is two: `pub fn`, `pub const`, `pub struct`, `pub(crate) fn`. So the check read
+1,044 of the item rows on the site and the other 1,538 went past it unlooked
+at. Those 1,538 are every public item the reference pages document, which is
+both the part a reader is most likely to look up and the part where the F-215
+misreading was likeliest to land, since `pub const fn rgb` is the same trap as
+`const fn rgb` with a word in front of it.
+
+It then printed the figure it had reached as though it were coverage: "none of
+the 1044 items listed on a reference page is a keyword". A count of what a
+check looked at reads exactly like a count of what there was to look at.
+
+No row was wrong, so this is a defect in the check and not in the pages. It is
+written up because a check that silently sees two rows in five is worse than no
+check, for the reason given in F-228: it is counted.
+
+#### The fix
+
+The rows are counted off the table now rather than off the row pattern. Tables
+are found by the heading the generator writes, `Item | Line | Documentation`,
+and every row inside one must be readable by the item pattern; a row that is
+not is itself a failure, naming the row. So the next change to that markup
+cannot quietly take the check's sight away again, which is the thing that
+happened here. The kind is matched as any text, and the whole of every item
+table, all 2,621 rows, is now checked.
+
+The name's last path segment is checked as well, because a modifier read as the
+item on a method lands there rather than on its own: `Tab::fn` is the same
+defect as `fn`. Not against the whole keyword list though. `default` and
+`union` are weak keywords, which means Rust accepts them as names, and
+`Type::default` is the commonest method there is. The first run of the widened
+check reported thirty misread rows and twenty-nine of them were `::default`,
+which was the check being wrong rather than the pages, so the two nameable
+words are allowed in a path and still reported as a whole item name, where the
+generator has no business producing them.
+
+Confirmed by injecting both faults into a published page and seeing each
+reported by name: `Tab::fn` of kind `pub const`, which the old pattern could
+not have seen, and a row whose kind was wrapped in `<em>` rather than `<sub>`,
+which is the markup change the coverage assertion exists for.
+
 ### F-268: typing the decoy passphrase destroyed the records the real one owns
 
 Found by the audit of the decoy code landed in c8ea762f, reproduced by a test
@@ -11460,7 +11594,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and sixty-eight defects found and fixed (F-1 to F-268), across
+**Two hundred and seventy defects found and fixed (F-1 to F-270), across
 thirty-four rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

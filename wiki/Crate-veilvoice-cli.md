@@ -195,28 +195,28 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`accel.rs`|File-veilvoice-cli-accel]] | 90 | veilvoice accel reports the graphics hardware here, and what it is good for. |
-| [[`appctl.rs`|File-veilvoice-cli-appctl]] | 295 | veilvoice appctl learns what normally runs, so it can notice what does not. |
-| [[`atrest.rs`|File-veilvoice-cli-atrest]] | 455 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
-| [[`capture.rs`|File-veilvoice-cli-capture]] | 339 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
-| [[`conversation.rs`|File-veilvoice-cli-conversation]] | 1095 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
-| [[`decoy.rs`|File-veilvoice-cli-decoy]] | 559 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
-| [[`failsafe.rs`|File-veilvoice-cli-failsafe]] | 112 | veilvoice failsafe is the safety catch. |
-| [[`guard.rs`|File-veilvoice-cli-guard]] | 369 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
-| [[`gui.rs`|File-veilvoice-cli-gui]] | 247 | veilvoice gui opens the desktop application from the command line. |
-| [[`input.rs`|File-veilvoice-cli-input]] | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
-| [[`lock.rs`|File-veilvoice-cli-lock]] | 363 | veilvoice lock manages the application lock from the command line. |
-| [[`main.rs`|File-veilvoice-cli-main]] | 3783 | veilvoice, the command-line interface. |
-| [[`mandate.rs`|File-veilvoice-cli-mandate]] | 339 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
-| [[`meter.rs`|File-veilvoice-cli-meter]] | 259 | Level meters for veilvoice live, on a scale that means something. |
-| [[`policy.rs`|File-veilvoice-cli-policy]] | 249 | veilvoice policy -- settings that can only be tightened. |
-| [[`priv_mode.rs`|File-veilvoice-cli-priv_mode]] | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |
-| [[`record.rs`|File-veilvoice-cli-record]] | 406 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
-| [[`reseal.rs`|File-veilvoice-cli-reseal]] | 261 | veilvoice reseal: repairing files that were sealed under no passphrase. |
-| [[`reset.rs`|File-veilvoice-cli-reset]] | 405 | veilvoice reset: putting this machine back to a new install. |
-| [[`sentry.rs`|File-veilvoice-cli-sentry]] | 392 | veilvoice sentry -- canaries, baselines, and what changed since. |
-| [[`theme.rs`|File-veilvoice-cli-theme]] | 152 | Tokyo Night colouring for the terminal. |
-| [[`update.rs`|File-veilvoice-cli-update]] | 246 | veilvoice update: fetch the new release, check it, and put it in place. |
+| [`accel.rs`](File-veilvoice-cli-accel) | 90 | veilvoice accel reports the graphics hardware here, and what it is good for. |
+| [`appctl.rs`](File-veilvoice-cli-appctl) | 295 | veilvoice appctl learns what normally runs, so it can notice what does not. |
+| [`atrest.rs`](File-veilvoice-cli-atrest) | 455 | Encryption at rest for the recordings VeilVoice writes, and the passphrase prompts that feed it. |
+| [`capture.rs`](File-veilvoice-cli-capture) | 339 | veilvoice capture -- which screen recorders are running, and which of them you have said you meant to run. |
+| [`conversation.rs`](File-veilvoice-cli-conversation) | 1095 | veilvoice conversation -- several speakers, a voice each, and subtitles. |
+| [`decoy.rs`](File-veilvoice-cli-decoy) | 559 | veilvoice decoy, and what a second passphrase is worth and what it is not. |
+| [`failsafe.rs`](File-veilvoice-cli-failsafe) | 112 | veilvoice failsafe is the safety catch. |
+| [`guard.rs`](File-veilvoice-cli-guard) | 369 | veilvoice guard -- record what VeilVoice's files should be, and check them. |
+| [`gui.rs`](File-veilvoice-cli-gui) | 247 | veilvoice gui opens the desktop application from the command line. |
+| [`input.rs`](File-veilvoice-cli-input) | 120 | veilvoice input shows which running programs can see your keyboard and mouse. |
+| [`lock.rs`](File-veilvoice-cli-lock) | 363 | veilvoice lock manages the application lock from the command line. |
+| [`main.rs`](File-veilvoice-cli-main) | 3783 | veilvoice, the command-line interface. |
+| [`mandate.rs`](File-veilvoice-cli-mandate) | 339 | veilvoice mandate -- the two things VeilVoice insists on, and how to stop. |
+| [`meter.rs`](File-veilvoice-cli-meter) | 259 | Level meters for veilvoice live, on a scale that means something. |
+| [`policy.rs`](File-veilvoice-cli-policy) | 249 | veilvoice policy -- settings that can only be tightened. |
+| [`priv_mode.rs`](File-veilvoice-cli-priv_mode) | 46 | veilvoice privilege shows what VeilVoice runs with, and what it can see. |
+| [`record.rs`](File-veilvoice-cli-record) | 406 | veilvoice record -- capture the veiled voice straight into an encrypted file. |
+| [`reseal.rs`](File-veilvoice-cli-reseal) | 261 | veilvoice reseal: repairing files that were sealed under no passphrase. |
+| [`reset.rs`](File-veilvoice-cli-reset) | 405 | veilvoice reset: putting this machine back to a new install. |
+| [`sentry.rs`](File-veilvoice-cli-sentry) | 392 | veilvoice sentry -- canaries, baselines, and what changed since. |
+| [`theme.rs`](File-veilvoice-cli-theme) | 152 | Tokyo Night colouring for the terminal. |
+| [`update.rs`](File-veilvoice-cli-update) | 246 | veilvoice update: fetch the new release, check it, and put it in place. |
 
 **7,236 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

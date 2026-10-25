@@ -110,10 +110,10 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`blame.rs`|File-veilvoice-guard-blame]] | 433 | Best-effort attribution: which program changed a file. |
-| [[`lib.rs`|File-veilvoice-guard-lib]] | 165 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
-| [[`manifest.rs`|File-veilvoice-guard-manifest]] | 764 | The integrity manifest: what the files were, and what they are now. |
-| [[`record.rs`|File-veilvoice-guard-record]] | 94 | Where the integrity record is kept. |
+| [`blame.rs`](File-veilvoice-guard-blame) | 433 | Best-effort attribution: which program changed a file. |
+| [`lib.rs`](File-veilvoice-guard-lib) | 165 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
+| [`manifest.rs`](File-veilvoice-guard-manifest) | 764 | The integrity manifest: what the files were, and what they are now. |
+| [`record.rs`](File-veilvoice-guard-record) | 94 | Where the integrity record is kept. |
 
 **2,955 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

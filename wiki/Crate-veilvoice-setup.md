@@ -120,13 +120,13 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`companions.rs`|File-veilvoice-setup-companions]] | 1100 | Optional third-party software, detected rather than assumed. |
-| [[`install.rs`|File-veilvoice-setup-install]] | 1106 | Put this program somewhere the system can find it. |
-| [[`lib.rs`|File-veilvoice-setup-lib]] | 226 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
-| [[`needs.rs`|File-veilvoice-setup-needs]] | 565 | What this machine is missing, asked once and at the right moment. |
-| [[`space.rs`|File-veilvoice-setup-space]] | 170 | How much room is actually free where VeilVoice keeps things. |
-| [[`update.rs`|File-veilvoice-setup-update]] | 908 | Ask, only when told to, whether a newer VeilVoice release exists. |
-| [[`volumes.rs`|File-veilvoice-setup-volumes]] | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
+| [`companions.rs`](File-veilvoice-setup-companions) | 1100 | Optional third-party software, detected rather than assumed. |
+| [`install.rs`](File-veilvoice-setup-install) | 1106 | Put this program somewhere the system can find it. |
+| [`lib.rs`](File-veilvoice-setup-lib) | 226 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
+| [`needs.rs`](File-veilvoice-setup-needs) | 565 | What this machine is missing, asked once and at the right moment. |
+| [`space.rs`](File-veilvoice-setup-space) | 170 | How much room is actually free where VeilVoice keeps things. |
+| [`update.rs`](File-veilvoice-setup-update) | 908 | Ask, only when told to, whether a newer VeilVoice release exists. |
+| [`volumes.rs`](File-veilvoice-setup-volumes) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
 **2,955 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

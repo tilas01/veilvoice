@@ -30,13 +30,13 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`container_header.rs`|File-fuzz-fuzz_targets-container_header]] | 52 | The .veil container header, coverage-guided. |
-| [[`guard_manifest.rs`|File-fuzz-fuzz_targets-guard_manifest]] | 53 | The integrity manifest parser, coverage-guided. |
-| [[`hybrid_keys.rs`|File-fuzz-fuzz_targets-hybrid_keys]] | 36 | Key and encapsulation decoding, coverage-guided. |
-| [[`lock_file.rs`|File-fuzz-fuzz_targets-lock_file]] | 37 | The app-lock file, coverage-guided. |
-| [[`release_contents.rs`|File-fuzz-fuzz_targets-release_contents]] | 86 | The release contents list parser, coverage-guided. |
-| [[`wav_chunks.rs`|File-fuzz-fuzz_targets-wav_chunks]] | 46 | The RIFF chunk walker in veilvoice-meta, coverage-guided. |
-| [[`wav_preflight.rs`|File-fuzz-fuzz_targets-wav_preflight]] | 35 | The WAV pre-flight in veilvoice-audio, coverage-guided. |
+| [`container_header.rs`](File-fuzz-fuzz_targets-container_header) | 52 | The .veil container header, coverage-guided. |
+| [`guard_manifest.rs`](File-fuzz-fuzz_targets-guard_manifest) | 53 | The integrity manifest parser, coverage-guided. |
+| [`hybrid_keys.rs`](File-fuzz-fuzz_targets-hybrid_keys) | 36 | Key and encapsulation decoding, coverage-guided. |
+| [`lock_file.rs`](File-fuzz-fuzz_targets-lock_file) | 37 | The app-lock file, coverage-guided. |
+| [`release_contents.rs`](File-fuzz-fuzz_targets-release_contents) | 86 | The release contents list parser, coverage-guided. |
+| [`wav_chunks.rs`](File-fuzz-fuzz_targets-wav_chunks) | 46 | The RIFF chunk walker in veilvoice-meta, coverage-guided. |
+| [`wav_preflight.rs`](File-fuzz-fuzz_targets-wav_preflight) | 35 | The WAV pre-flight in veilvoice-audio, coverage-guided. |
 
 **165 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

@@ -91,14 +91,14 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`appctl.rs`|File-veilvoice-watch-appctl]] | 798 | Learn what normally runs on this machine, then notice what does not. |
-| [[`input.rs`|File-veilvoice-watch-input]] | 605 | What on this machine could be watching the keyboard and the mouse. |
-| [[`lib.rs`|File-veilvoice-watch-lib]] | 423 | Find out which applications are using your microphone and camera, right now. |
-| [[`linux.rs`|File-veilvoice-watch-linux]] | 218 | Linux detection, via open file handles in /proc. |
-| [[`privilege.rs`|File-veilvoice-watch-privilege]] | 404 | What privilege VeilVoice is running with, and what each level can actually see. |
-| [[`proc.rs`|File-veilvoice-watch-proc]] | 274 | Which processes are running, per platform, and what that cannot tell you. |
-| [[`windows.rs`|File-veilvoice-watch-windows]] | 622 | Windows detection, via the Capability Access Manager. |
-| [[`scan_once.rs`|File-veilvoice-watch-examples-scan_once]] | 30 | Print what is using the microphone and camera right now. |
+| [`appctl.rs`](File-veilvoice-watch-appctl) | 798 | Learn what normally runs on this machine, then notice what does not. |
+| [`input.rs`](File-veilvoice-watch-input) | 605 | What on this machine could be watching the keyboard and the mouse. |
+| [`lib.rs`](File-veilvoice-watch-lib) | 423 | Find out which applications are using your microphone and camera, right now. |
+| [`linux.rs`](File-veilvoice-watch-linux) | 218 | Linux detection, via open file handles in /proc. |
+| [`privilege.rs`](File-veilvoice-watch-privilege) | 404 | What privilege VeilVoice is running with, and what each level can actually see. |
+| [`proc.rs`](File-veilvoice-watch-proc) | 274 | Which processes are running, per platform, and what that cannot tell you. |
+| [`windows.rs`](File-veilvoice-watch-windows) | 622 | Windows detection, via the Capability Access Manager. |
+| [`scan_once.rs`](File-veilvoice-watch-examples-scan_once) | 30 | Print what is using the microphone and camera right now. |
 
 **3,952 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

@@ -131,19 +131,19 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`accent.rs`|File-veilvoice-core-accent]] | 701 | Accent and speaker-trait neutralisation. |
-| [[`chain.rs`|File-veilvoice-core-chain]] | 1741 | The assembled de-identification chain and its live performance statistics. |
-| [[`effects.rs`|File-veilvoice-core-effects]] | 245 | Light time-domain effects applied after resynthesis. |
-| [[`lib.rs`|File-veilvoice-core-lib]] | 89 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
-| [[`modulation.rs`|File-veilvoice-core-modulation]] | 323 | Cryptographically-seeded modulation of the effect parameters. |
-| [[`pitch.rs`|File-veilvoice-core-pitch]] | 286 | Monophonic fundamental-frequency tracker (decimated YIN). |
-| [[`spectral.rs`|File-veilvoice-core-spectral]] | 442 | Frequency-domain de-identification transform. |
-| [[`stft.rs`|File-veilvoice-core-stft]] | 264 | Streaming short-time Fourier transform with overlap-add resynthesis. |
-| [[`voices.rs`|File-veilvoice-core-voices]] | 872 | Destination voices: several canonical registers instead of one. |
-| [[`window.rs`|File-veilvoice-core-window]] | 101 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
-| [[`spectrum_report.rs`|File-veilvoice-core-examples-spectrum_report]] | 107 | Where do the output partials actually land? |
-| [[`veil_a_buffer.rs`|File-veilvoice-core-examples-veil_a_buffer]] | 54 | _no module documentation yet_ |
-| [[`hostile_audio.rs`|File-veilvoice-core-tests-hostile_audio]] | 389 | The engine against input that is not well-behaved audio. |
+| [`accent.rs`](File-veilvoice-core-accent) | 701 | Accent and speaker-trait neutralisation. |
+| [`chain.rs`](File-veilvoice-core-chain) | 1741 | The assembled de-identification chain and its live performance statistics. |
+| [`effects.rs`](File-veilvoice-core-effects) | 245 | Light time-domain effects applied after resynthesis. |
+| [`lib.rs`](File-veilvoice-core-lib) | 89 | The security-critical heart of VeilVoice: an irreversible, cryptographically modulated voice de-identification engine. |
+| [`modulation.rs`](File-veilvoice-core-modulation) | 323 | Cryptographically-seeded modulation of the effect parameters. |
+| [`pitch.rs`](File-veilvoice-core-pitch) | 286 | Monophonic fundamental-frequency tracker (decimated YIN). |
+| [`spectral.rs`](File-veilvoice-core-spectral) | 442 | Frequency-domain de-identification transform. |
+| [`stft.rs`](File-veilvoice-core-stft) | 264 | Streaming short-time Fourier transform with overlap-add resynthesis. |
+| [`voices.rs`](File-veilvoice-core-voices) | 872 | Destination voices: several canonical registers instead of one. |
+| [`window.rs`](File-veilvoice-core-window) | 101 | Analysis and synthesis windowing, and the one constant that keeps overlap-add honest. |
+| [`spectrum_report.rs`](File-veilvoice-core-examples-spectrum_report) | 107 | Where do the output partials actually land? |
+| [`veil_a_buffer.rs`](File-veilvoice-core-examples-veil_a_buffer) | 54 | _no module documentation yet_ |
+| [`hostile_audio.rs`](File-veilvoice-core-tests-hostile_audio) | 389 | The engine against input that is not well-behaved audio. |
 
 **3,141 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

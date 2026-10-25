@@ -164,27 +164,71 @@ function run() {
     "self", "static", "struct", "super", "trait", "true", "type", "union",
     "unsafe", "use", "where", "while"
   ]);
+
+  // The two words above that Rust will accept as an identifier. A bare one of
+  // them as a whole item name is still reported, because that is the shape
+  // F-215 produced and the generator has no business emitting it; it is only
+  // the last segment of a path that has to allow them.
+  const NAMEABLE = new Set(["default", "union"]);
+
+  // Which tables hold items, read from the heading the generator writes rather
+  // than from the shape of a row. That is the whole of what went wrong here:
+  // the kind used to be matched as `[a-z]+`, and every kind that reaches a
+  // reader with a visibility on it is two words. So the check read 1,044 of
+  // the 2,582 rows and the other 1,538, every public item on the site, went
+  // past it unlooked at, which is the half the misreading in F-215 was
+  // likeliest to land in: `pub const fn rgb` is the same trap as `const fn
+  // rgb` with a word in front. It then printed the 1,044 as though that were
+  // the coverage. A count is not coverage, so the rows are counted off the
+  // table now: a row of an item table the row pattern cannot read is itself a
+  // failure, naming the row, so a change to the markup cannot quietly take the
+  // check's sight away again.
+  const ITEM_TABLE =
+    /<table><thead><tr><th>Item<\/th><th>Line<\/th><th>Documentation<\/th><\/tr><\/thead><tbody>([\s\S]*?)<\/tbody><\/table>/g;
+  const ROW = /<tr>([\s\S]*?)<\/tr>/g;
+  const ITEM = /^<td><code>([^<]+)<\/code>\s*<sub>([^<]+)<\/sub><\/td>/;
+
   const keyworded = [];
+  const unreadable = [];
   let named = 0;
   for (const page of walk(REFERENCE)) {
     if (page.endsWith(".src.html")) continue;
+    const rel = path.relative(ROOT, page).replace(/\\/g, "/");
     const html = fs.readFileSync(page, "utf8");
-    for (const m of html.matchAll(/<td><code>([^<]+)<\/code>\s*<sub>([a-z]+)<\/sub><\/td>/g)) {
-      named++;
-      if (KEYWORDS.has(m[1])) {
-        keyworded.push(
-          `${path.relative(ROOT, page).replace(/\\/g, "/")} lists an item called ` +
-          `"${m[1]}" of kind ${m[2]}, which is a keyword and not a name`);
+    for (const table of html.matchAll(ITEM_TABLE)) {
+      for (const row of table[1].matchAll(ROW)) {
+        const item = ITEM.exec(row[1]);
+        if (!item) {
+          unreadable.push(
+            `${rel} has an item row this check cannot read, so its name is ` +
+            `unchecked: ${row[1].slice(0, 90)}`);
+          continue;
+        }
+        named++;
+        // A method is written `Type::name`, and a modifier read as the item
+        // there lands in the last segment rather than on its own, so the last
+        // segment is checked as well. Not against the whole list though: two
+        // of those words are weak keywords, which means Rust accepts them as
+        // names, and `Type::default` is the commonest method there is.
+        const last = item[1].split("::").pop();
+        if (KEYWORDS.has(item[1]) ||
+            (KEYWORDS.has(last) && !NAMEABLE.has(last))) {
+          keyworded.push(
+            `${rel} lists an item called "${item[1]}" of kind ${item[2]}, ` +
+            `which is a keyword and not a name`);
+        }
       }
     }
   }
-  if (keyworded.length) {
-    keyworded.slice(0, 10).forEach(fail);
-    if (keyworded.length > 10) fail(`and ${keyworded.length - 10} more`);
+  const misread = unreadable.concat(keyworded);
+  if (misread.length) {
+    misread.slice(0, 10).forEach(fail);
+    if (misread.length > 10) fail(`and ${misread.length - 10} more`);
   } else if (named === 0) {
     fail("no reference page lists a single named item");
   } else {
-    pass(`none of the ${named} items listed on a reference page is a keyword`);
+    pass(`none of the ${named} items on a reference page, which is every row ` +
+         `of every item table, is named after a keyword`);
   }
 
   // ---- 5. the mark is in the stylesheet, and needs no script --------------

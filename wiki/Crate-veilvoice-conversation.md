@@ -114,12 +114,12 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`edit.rs`|File-veilvoice-conversation-edit]] | 649 | Correcting a plan: who is speaking when, what they are called, and in what colour. |
-| [[`lib.rs`|File-veilvoice-conversation-lib]] | 182 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
-| [[`mode.rs`|File-veilvoice-conversation-mode]] | 592 | How many voices a group gets, and the trade between the two answers. |
-| [[`plan.rs`|File-veilvoice-conversation-plan]] | 1201 | Who is in the recording, and who is speaking when. |
-| [[`render.rs`|File-veilvoice-conversation-render]] | 1111 | Turning a plan and a recording into veiled audio, one engine per speaker. |
-| [[`subtitles.rs`|File-veilvoice-conversation-subtitles]] | 276 | Subtitles, from the same plan the audio is rendered from. |
+| [`edit.rs`](File-veilvoice-conversation-edit) | 649 | Correcting a plan: who is speaking when, what they are called, and in what colour. |
+| [`lib.rs`](File-veilvoice-conversation-lib) | 182 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
+| [`mode.rs`](File-veilvoice-conversation-mode) | 592 | How many voices a group gets, and the trade between the two answers. |
+| [`plan.rs`](File-veilvoice-conversation-plan) | 1201 | Who is in the recording, and who is speaking when. |
+| [`render.rs`](File-veilvoice-conversation-render) | 1111 | Turning a plan and a recording into veiled audio, one engine per speaker. |
+| [`subtitles.rs`](File-veilvoice-conversation-subtitles) | 276 | Subtitles, from the same plan the audio is rendered from. |
 
 **2,644 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
