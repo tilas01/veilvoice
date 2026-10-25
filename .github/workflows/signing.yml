@@ -7,9 +7,9 @@
 # GPG_PRIVATE_KEY and GPG_PASSPHRASE. The job imports it, signs one commit on
 # a branch of its own, reads GitHub's verdict on that commit and deletes the
 # branch. When the key has no identity with tilas01's noreply address, the
-# run says how to add one before the public half is registered on his
-# account. The work is in tools/repo/signing_check.sh. Run by hand, or by a
-# push that changes it.
+# run adds one to its own copy and hands over the public half with it, as
+# the artifact signing-public-key, to be registered on his account. The work
+# is in tools/repo/signing_check.sh. Run by hand, or by a push that changes it.
 
 name: signing
 
@@ -38,3 +38,10 @@ jobs:
         run: |
           if [ -z "$KEY" ]; then echo "GPG_PRIVATE_KEY is not set for the repository." | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; fi
           bash tools/repo/signing_check.sh
+      - name: Hand over the public half, with tilas01's address on it
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: signing-public-key
+          path: ${{ runner.temp }}/public/veilvoice-signing-key.asc
+          if-no-files-found: ignore
