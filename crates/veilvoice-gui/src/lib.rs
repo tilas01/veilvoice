@@ -85,6 +85,16 @@ pub fn settings_pages() -> impl Iterator<Item = &'static str> {
     settings::Page::ALL.iter().map(|(_, key, _, _)| *key)
 }
 
+/// The name of every stop on the walkthrough, the setup stops and the tabs.
+///
+/// Exported for `veilvoice-gui --tour-stops`, which `tools/shots/gui.sh` writes
+/// into its settings as already seen. It used to write the tab names alone,
+/// which was every stop until the setup stops came first, and from then on
+/// the first of them opened over every capture.
+pub fn tour_stops() -> Vec<String> {
+    tour::all_keys()
+}
+
 /// Spawn a subprocess without a console window.
 ///
 /// Every `Command` this crate creates goes through here, and a test asserts

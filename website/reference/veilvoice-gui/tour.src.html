@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/tour.rs</code></h1>
-<p style="color:var(--muted)"><a href="tour.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1321 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tour.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1347 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1017,436 +1017,462 @@
 <span class="ln" id="L889"><span class="tok-kw">mod</span> tests {</span>
 <span class="ln" id="L890">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
 <span class="ln" id="L891"></span>
-<span class="ln" id="L892">    <span class="tok-com">/// The lock card says the integrity record is taken for you, and the</span></span>
-<span class="ln" id="L893">    <span class="tok-com">/// window is what takes it.</span></span>
-<span class="ln" id="L894">    <span class="tok-com">///</span></span>
-<span class="ln" id="L895">    <span class="tok-com">/// Both halves, because a sentence in a tour is a promise about behaviour</span></span>
-<span class="ln" id="L896">    <span class="tok-com">/// and this one was written the day the behaviour it describes had been</span></span>
-<span class="ln" id="L897">    <span class="tok-com">/// there for four releases with nothing telling anybody. If the start in</span></span>
-<span class="ln" id="L898">    <span class="tok-com">/// `app.rs` is ever removed, the card is left claiming something untrue to</span></span>
-<span class="ln" id="L899">    <span class="tok-com">/// every new reader, which is the failure this checks for.</span></span>
-<span class="ln" id="L900">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L901">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_card_promises_what_the_window_actually_does</span>() {</span>
-<span class="ln" id="L902">        <span class="tok-kw">let</span> card = CARDS</span>
-<span class="ln" id="L903">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L904">            .<span class="tok-fn">find</span>(|(tab, _, _)| *tab == <span class="tok-str">&quot;lock&quot;</span>)</span>
-<span class="ln" id="L905">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a card for the lock tab&quot;</span>);</span>
-<span class="ln" id="L906">        assert!(</span>
-<span class="ln" id="L907">            card.<span class="tok-num">2</span>.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;record&quot;</span>),</span>
-<span class="ln" id="L908">            <span class="tok-str">&quot;the lock card no longer mentions the integrity record: {}&quot;</span>,</span>
-<span class="ln" id="L909">            card.<span class="tok-num">2</span></span>
-<span class="ln" id="L910">        );</span>
-<span class="ln" id="L911">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>);</span>
+<span class="ln" id="L892">    <span class="tok-com">/// `tools/shots/gui.sh` marks every stop as seen so the tour stays shut</span></span>
+<span class="ln" id="L893">    <span class="tok-com">/// while it takes its pictures. It used to mark the tabs alone, and once</span></span>
+<span class="ln" id="L894">    <span class="tok-com">/// the setup stops came first the app lock card opened over every capture.</span></span>
+<span class="ln" id="L895">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L896">    <span class="tok-kw">fn</span> <span class="tok-fn">the_capture_script_marks_the_setup_stops_seen_too</span>() {</span>
+<span class="ln" id="L897">        <span class="tok-kw">let</span> stops = <span class="tok-kw">crate</span>::<span class="tok-fn">tour_stops</span>();</span>
+<span class="ln" id="L898">        <span class="tok-kw">for</span> stage <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L899">            Stage::AppLock,</span>
+<span class="ln" id="L900">            Stage::AtRest,</span>
+<span class="ln" id="L901">            Stage::Decoy,</span>
+<span class="ln" id="L902">            Stage::Install,</span>
+<span class="ln" id="L903">            Stage::SettingsHeadings,</span>
+<span class="ln" id="L904">        ] {</span>
+<span class="ln" id="L905">            assert!(</span>
+<span class="ln" id="L906">                stops.<span class="tok-fn">contains</span>(&amp;stage.<span class="tok-fn">key</span>()),</span>
+<span class="ln" id="L907">                <span class="tok-str">&quot;--tour-stops leaves out {}, so the tour opens over the captures&quot;</span>,</span>
+<span class="ln" id="L908">                stage.<span class="tok-fn">key</span>()</span>
+<span class="ln" id="L909">            );</span>
+<span class="ln" id="L910">        }</span>
+<span class="ln" id="L911">        <span class="tok-kw">let</span> script = include_str!(<span class="tok-str">&quot;../../../tools/shots/gui.sh&quot;</span>);</span>
 <span class="ln" id="L912">        assert!(</span>
-<span class="ln" id="L913">            app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;app.integrity.start(None)&quot;</span>),</span>
-<span class="ln" id="L914">            <span class="tok-str">&quot;nothing starts the integrity record at launch any more, and the \</span></span>
-<span class="ln" id="L915"><span class="tok-str">             tour still tells every new reader that one was taken&quot;</span></span>
-<span class="ln" id="L916">        );</span>
-<span class="ln" id="L917">    }</span>
-<span class="ln" id="L918"></span>
-<span class="ln" id="L919">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L920">    <span class="tok-kw">fn</span> <span class="tok-fn">every_card_has_a_sentence_and_no_two_share_a_tab</span>() {</span>
-<span class="ln" id="L921">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| *key).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L922">        <span class="tok-kw">let</span> before = keys.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L923">        keys.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L924">        keys.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L925">        assert_eq!(keys.<span class="tok-fn">len</span>(), before, <span class="tok-str">&quot;two cards claim the same tab&quot;</span>);</span>
-<span class="ln" id="L926">        <span class="tok-kw">for</span> (key, title, body) <span class="tok-kw">in</span> CARDS {</span>
-<span class="ln" id="L927">            assert!(!key.<span class="tok-fn">is_empty</span>() &amp;&amp; !title.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L928">            assert!(</span>
-<span class="ln" id="L929">                body.<span class="tok-fn">len</span>() &gt; <span class="tok-num">60</span>,</span>
-<span class="ln" id="L930">                <span class="tok-str">&quot;{key} has a sentence too short to explain anything&quot;</span></span>
-<span class="ln" id="L931">            );</span>
-<span class="ln" id="L932">        }</span>
-<span class="ln" id="L933">    }</span>
-<span class="ln" id="L934"></span>
-<span class="ln" id="L935">    <span class="tok-com">/// Nothing is shown twice, and nothing is remembered under two names.</span></span>
-<span class="ln" id="L936">    <span class="tok-com">///</span></span>
-<span class="ln" id="L937">    <span class="tok-com">/// The keys go into somebody&#x27;s settings file and are answered against on</span></span>
-<span class="ln" id="L938">    <span class="tok-com">/// every later launch, so a collision does not show up as a wrong pixel:</span></span>
-<span class="ln" id="L939">    <span class="tok-com">/// it shows up as a stop that never runs again, or one that runs for ever.</span></span>
-<span class="ln" id="L940">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L941">    <span class="tok-kw">fn</span> <span class="tok-fn">every_stop_is_remembered_under_a_name_of_its_own</span>() {</span>
-<span class="ln" id="L942">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;String&gt; = <span class="tok-fn">all_keys</span>();</span>
-<span class="ln" id="L943">        <span class="tok-kw">let</span> before = keys.<span class="tok-fn">len</span>();</span>
-<span class="ln" id="L944">        assert_eq!(before, <span class="tok-fn">stages</span>().<span class="tok-fn">len</span>(), <span class="tok-str">&quot;a stop is not in the stored list&quot;</span>);</span>
-<span class="ln" id="L945">        keys.<span class="tok-fn">sort_unstable</span>();</span>
-<span class="ln" id="L946">        keys.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L947">        assert_eq!(keys.<span class="tok-fn">len</span>(), before, <span class="tok-str">&quot;two stops share a name&quot;</span>);</span>
-<span class="ln" id="L948">        <span class="tok-kw">for</span> (tab, _, _) <span class="tok-kw">in</span> CARDS {</span>
-<span class="ln" id="L949">            assert!(</span>
-<span class="ln" id="L950">                keys.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|key| key == tab),</span>
-<span class="ln" id="L951">                <span class="tok-str">&quot;the {tab} tab is not in the stored list, so its card comes \</span></span>
-<span class="ln" id="L952"><span class="tok-str">                 back on every launch&quot;</span></span>
-<span class="ln" id="L953">            );</span>
-<span class="ln" id="L954">        }</span>
-<span class="ln" id="L955">    }</span>
-<span class="ln" id="L956"></span>
-<span class="ln" id="L957">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L958">    <span class="tok-kw">fn</span> <span class="tok-fn">a_first_run_sees_everything_there_is_to_see</span>() {</span>
-<span class="ln" id="L959">        <span class="tok-kw">let</span> already = Already::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L960">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L961">        assert!(!tour.<span class="tok-fn">running</span>());</span>
-<span class="ln" id="L962">        tour.<span class="tok-fn">start</span>(&amp;already);</span>
-<span class="ln" id="L963">        assert!(tour.<span class="tok-fn">running</span>());</span>
-<span class="ln" id="L964">        assert_eq!(</span>
-<span class="ln" id="L965">            tour.showing.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L966">            <span class="tok-fn">stages</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|s| s.<span class="tok-fn">applies</span>(&amp;already)).<span class="tok-fn">count</span>()</span>
-<span class="ln" id="L967">        );</span>
-<span class="ln" id="L968">        assert!(</span>
-<span class="ln" id="L969">            tour.showing.<span class="tok-fn">len</span>() &gt; CARDS.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L970">            <span class="tok-str">&quot;roadmap item 171: a first run is offered the setup as well as the \</span></span>
-<span class="ln" id="L971"><span class="tok-str">             description of the tabs&quot;</span></span>
-<span class="ln" id="L972">        );</span>
-<span class="ln" id="L973">    }</span>
-<span class="ln" id="L974"></span>
-<span class="ln" id="L975">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L976">    <span class="tok-kw">fn</span> <span class="tok-fn">an_upgrade_shows_only_what_is_new</span>() {</span>
-<span class="ln" id="L977">        <span class="tok-com">// Somebody who has toured everything there was, and then two tabs</span></span>
-<span class="ln" id="L978">        <span class="tok-com">// arrived.</span></span>
-<span class="ln" id="L979">        <span class="tok-kw">let</span> known: Vec&lt;String&gt; = <span class="tok-fn">all_keys</span>()</span>
-<span class="ln" id="L980">            .<span class="tok-fn">into_iter</span>()</span>
-<span class="ln" id="L981">            .<span class="tok-fn">filter</span>(|key| !CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">rev</span>().<span class="tok-fn">take</span>(<span class="tok-num">2</span>).<span class="tok-fn">any</span>(|(tab, _, _)| *tab == *key))</span>
-<span class="ln" id="L982">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L983">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L984">        tour.<span class="tok-fn">start_new_only</span>(&amp;known, &amp;Already::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L985">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;two new tabs should start a tour&quot;</span>);</span>
-<span class="ln" id="L986">        assert_eq!(tour.showing.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L987">    }</span>
-<span class="ln" id="L988"></span>
-<span class="ln" id="L989">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L990">    <span class="tok-kw">fn</span> <span class="tok-fn">an_upgrade_that_adds_nothing_shows_nothing</span>() {</span>
-<span class="ln" id="L991">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L992">        tour.<span class="tok-fn">start_new_only</span>(&amp;<span class="tok-fn">all_keys</span>(), &amp;Already::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L993">        assert!(</span>
-<span class="ln" id="L994">            !tour.<span class="tok-fn">running</span>(),</span>
-<span class="ln" id="L995">            <span class="tok-str">&quot;a tour with nothing new to say must not run&quot;</span></span>
-<span class="ln" id="L996">        );</span>
-<span class="ln" id="L997">    }</span>
-<span class="ln" id="L998"></span>
-<span class="ln" id="L999">    <span class="tok-com">/// **Roadmap item 171, the part that reaches the people who need it.**</span></span>
-<span class="ln" id="L1000">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1001">    <span class="tok-com">/// Somebody who installed this a year ago has every tab key stored and</span></span>
-<span class="ln" id="L1002">    <span class="tok-com">/// none of the setup ones, because the setup stops did not exist. They are</span></span>
-<span class="ln" id="L1003">    <span class="tok-com">/// exactly who has never been offered an app lock, so the next launch</span></span>
-<span class="ln" id="L1004">    <span class="tok-com">/// offers them the setup and not one word about the tabs they have been</span></span>
-<span class="ln" id="L1005">    <span class="tok-com">/// using all year.</span></span>
-<span class="ln" id="L1006">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1007">    <span class="tok-kw">fn</span> <span class="tok-fn">a_long_standing_reader_is_offered_the_setup_and_nothing_else</span>() {</span>
-<span class="ln" id="L1008">        <span class="tok-kw">let</span> known: Vec&lt;String&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(tab, _, _)| (*tab).<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1009">        <span class="tok-kw">let</span> already = Already::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1010">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1011">        tour.<span class="tok-fn">start_new_only</span>(&amp;known, &amp;already);</span>
-<span class="ln" id="L1012">        assert!(tour.<span class="tok-fn">running</span>());</span>
-<span class="ln" id="L1013">        assert!(</span>
-<span class="ln" id="L1014">            tour.showing</span>
-<span class="ln" id="L1015">                .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L1016">                .<span class="tok-fn">all</span>(|stage| !matches!(stage, Stage::<span class="tok-fn">Tab</span>(_))),</span>
-<span class="ln" id="L1017">            <span class="tok-str">&quot;a reader who has seen every tab was shown the tab cards again&quot;</span></span>
-<span class="ln" id="L1018">        );</span>
+<span class="ln" id="L913">            script.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;\&quot;$exe\&quot; --tour-stops&quot;</span>),</span>
+<span class="ln" id="L914">            <span class="tok-str">&quot;gui.sh must take the stops it marks as seen from --tour-stops&quot;</span></span>
+<span class="ln" id="L915">        );</span>
+<span class="ln" id="L916">    }</span>
+<span class="ln" id="L917"></span>
+<span class="ln" id="L918">    <span class="tok-com">/// The lock card says the integrity record is taken for you, and the</span></span>
+<span class="ln" id="L919">    <span class="tok-com">/// window is what takes it.</span></span>
+<span class="ln" id="L920">    <span class="tok-com">///</span></span>
+<span class="ln" id="L921">    <span class="tok-com">/// Both halves, because a sentence in a tour is a promise about behaviour</span></span>
+<span class="ln" id="L922">    <span class="tok-com">/// and this one was written the day the behaviour it describes had been</span></span>
+<span class="ln" id="L923">    <span class="tok-com">/// there for four releases with nothing telling anybody. If the start in</span></span>
+<span class="ln" id="L924">    <span class="tok-com">/// `app.rs` is ever removed, the card is left claiming something untrue to</span></span>
+<span class="ln" id="L925">    <span class="tok-com">/// every new reader, which is the failure this checks for.</span></span>
+<span class="ln" id="L926">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L927">    <span class="tok-kw">fn</span> <span class="tok-fn">the_lock_card_promises_what_the_window_actually_does</span>() {</span>
+<span class="ln" id="L928">        <span class="tok-kw">let</span> card = CARDS</span>
+<span class="ln" id="L929">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L930">            .<span class="tok-fn">find</span>(|(tab, _, _)| *tab == <span class="tok-str">&quot;lock&quot;</span>)</span>
+<span class="ln" id="L931">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a card for the lock tab&quot;</span>);</span>
+<span class="ln" id="L932">        assert!(</span>
+<span class="ln" id="L933">            card.<span class="tok-num">2</span>.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;record&quot;</span>),</span>
+<span class="ln" id="L934">            <span class="tok-str">&quot;the lock card no longer mentions the integrity record: {}&quot;</span>,</span>
+<span class="ln" id="L935">            card.<span class="tok-num">2</span></span>
+<span class="ln" id="L936">        );</span>
+<span class="ln" id="L937">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>);</span>
+<span class="ln" id="L938">        assert!(</span>
+<span class="ln" id="L939">            app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;app.integrity.start(None)&quot;</span>),</span>
+<span class="ln" id="L940">            <span class="tok-str">&quot;nothing starts the integrity record at launch any more, and the \</span></span>
+<span class="ln" id="L941"><span class="tok-str">             tour still tells every new reader that one was taken&quot;</span></span>
+<span class="ln" id="L942">        );</span>
+<span class="ln" id="L943">    }</span>
+<span class="ln" id="L944"></span>
+<span class="ln" id="L945">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L946">    <span class="tok-kw">fn</span> <span class="tok-fn">every_card_has_a_sentence_and_no_two_share_a_tab</span>() {</span>
+<span class="ln" id="L947">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;&amp;str&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(key, _, _)| *key).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L948">        <span class="tok-kw">let</span> before = keys.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L949">        keys.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L950">        keys.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L951">        assert_eq!(keys.<span class="tok-fn">len</span>(), before, <span class="tok-str">&quot;two cards claim the same tab&quot;</span>);</span>
+<span class="ln" id="L952">        <span class="tok-kw">for</span> (key, title, body) <span class="tok-kw">in</span> CARDS {</span>
+<span class="ln" id="L953">            assert!(!key.<span class="tok-fn">is_empty</span>() &amp;&amp; !title.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L954">            assert!(</span>
+<span class="ln" id="L955">                body.<span class="tok-fn">len</span>() &gt; <span class="tok-num">60</span>,</span>
+<span class="ln" id="L956">                <span class="tok-str">&quot;{key} has a sentence too short to explain anything&quot;</span></span>
+<span class="ln" id="L957">            );</span>
+<span class="ln" id="L958">        }</span>
+<span class="ln" id="L959">    }</span>
+<span class="ln" id="L960"></span>
+<span class="ln" id="L961">    <span class="tok-com">/// Nothing is shown twice, and nothing is remembered under two names.</span></span>
+<span class="ln" id="L962">    <span class="tok-com">///</span></span>
+<span class="ln" id="L963">    <span class="tok-com">/// The keys go into somebody&#x27;s settings file and are answered against on</span></span>
+<span class="ln" id="L964">    <span class="tok-com">/// every later launch, so a collision does not show up as a wrong pixel:</span></span>
+<span class="ln" id="L965">    <span class="tok-com">/// it shows up as a stop that never runs again, or one that runs for ever.</span></span>
+<span class="ln" id="L966">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L967">    <span class="tok-kw">fn</span> <span class="tok-fn">every_stop_is_remembered_under_a_name_of_its_own</span>() {</span>
+<span class="ln" id="L968">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> keys: Vec&lt;String&gt; = <span class="tok-fn">all_keys</span>();</span>
+<span class="ln" id="L969">        <span class="tok-kw">let</span> before = keys.<span class="tok-fn">len</span>();</span>
+<span class="ln" id="L970">        assert_eq!(before, <span class="tok-fn">stages</span>().<span class="tok-fn">len</span>(), <span class="tok-str">&quot;a stop is not in the stored list&quot;</span>);</span>
+<span class="ln" id="L971">        keys.<span class="tok-fn">sort_unstable</span>();</span>
+<span class="ln" id="L972">        keys.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L973">        assert_eq!(keys.<span class="tok-fn">len</span>(), before, <span class="tok-str">&quot;two stops share a name&quot;</span>);</span>
+<span class="ln" id="L974">        <span class="tok-kw">for</span> (tab, _, _) <span class="tok-kw">in</span> CARDS {</span>
+<span class="ln" id="L975">            assert!(</span>
+<span class="ln" id="L976">                keys.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|key| key == tab),</span>
+<span class="ln" id="L977">                <span class="tok-str">&quot;the {tab} tab is not in the stored list, so its card comes \</span></span>
+<span class="ln" id="L978"><span class="tok-str">                 back on every launch&quot;</span></span>
+<span class="ln" id="L979">            );</span>
+<span class="ln" id="L980">        }</span>
+<span class="ln" id="L981">    }</span>
+<span class="ln" id="L982"></span>
+<span class="ln" id="L983">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L984">    <span class="tok-kw">fn</span> <span class="tok-fn">a_first_run_sees_everything_there_is_to_see</span>() {</span>
+<span class="ln" id="L985">        <span class="tok-kw">let</span> already = Already::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L986">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L987">        assert!(!tour.<span class="tok-fn">running</span>());</span>
+<span class="ln" id="L988">        tour.<span class="tok-fn">start</span>(&amp;already);</span>
+<span class="ln" id="L989">        assert!(tour.<span class="tok-fn">running</span>());</span>
+<span class="ln" id="L990">        assert_eq!(</span>
+<span class="ln" id="L991">            tour.showing.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L992">            <span class="tok-fn">stages</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|s| s.<span class="tok-fn">applies</span>(&amp;already)).<span class="tok-fn">count</span>()</span>
+<span class="ln" id="L993">        );</span>
+<span class="ln" id="L994">        assert!(</span>
+<span class="ln" id="L995">            tour.showing.<span class="tok-fn">len</span>() &gt; CARDS.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L996">            <span class="tok-str">&quot;roadmap item 171: a first run is offered the setup as well as the \</span></span>
+<span class="ln" id="L997"><span class="tok-str">             description of the tabs&quot;</span></span>
+<span class="ln" id="L998">        );</span>
+<span class="ln" id="L999">    }</span>
+<span class="ln" id="L1000"></span>
+<span class="ln" id="L1001">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1002">    <span class="tok-kw">fn</span> <span class="tok-fn">an_upgrade_shows_only_what_is_new</span>() {</span>
+<span class="ln" id="L1003">        <span class="tok-com">// Somebody who has toured everything there was, and then two tabs</span></span>
+<span class="ln" id="L1004">        <span class="tok-com">// arrived.</span></span>
+<span class="ln" id="L1005">        <span class="tok-kw">let</span> known: Vec&lt;String&gt; = <span class="tok-fn">all_keys</span>()</span>
+<span class="ln" id="L1006">            .<span class="tok-fn">into_iter</span>()</span>
+<span class="ln" id="L1007">            .<span class="tok-fn">filter</span>(|key| !CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">rev</span>().<span class="tok-fn">take</span>(<span class="tok-num">2</span>).<span class="tok-fn">any</span>(|(tab, _, _)| *tab == *key))</span>
+<span class="ln" id="L1008">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1009">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1010">        tour.<span class="tok-fn">start_new_only</span>(&amp;known, &amp;Already::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L1011">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;two new tabs should start a tour&quot;</span>);</span>
+<span class="ln" id="L1012">        assert_eq!(tour.showing.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L1013">    }</span>
+<span class="ln" id="L1014"></span>
+<span class="ln" id="L1015">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1016">    <span class="tok-kw">fn</span> <span class="tok-fn">an_upgrade_that_adds_nothing_shows_nothing</span>() {</span>
+<span class="ln" id="L1017">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1018">        tour.<span class="tok-fn">start_new_only</span>(&amp;<span class="tok-fn">all_keys</span>(), &amp;Already::<span class="tok-fn">default</span>());</span>
 <span class="ln" id="L1019">        assert!(</span>
-<span class="ln" id="L1020">            tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::AppLock),</span>
-<span class="ln" id="L1021">            <span class="tok-str">&quot;the one stop that is worth interrupting somebody for was left out&quot;</span></span>
+<span class="ln" id="L1020">            !tour.<span class="tok-fn">running</span>(),</span>
+<span class="ln" id="L1021">            <span class="tok-str">&quot;a tour with nothing new to say must not run&quot;</span></span>
 <span class="ln" id="L1022">        );</span>
 <span class="ln" id="L1023">    }</span>
 <span class="ln" id="L1024"></span>
-<span class="ln" id="L1025">    <span class="tok-com">/// A question already answered is not asked again. The same rule the</span></span>
-<span class="ln" id="L1026">    <span class="tok-com">/// first-run cards keep, for the same reason.</span></span>
-<span class="ln" id="L1027">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1028">    <span class="tok-kw">fn</span> <span class="tok-fn">what_is_already_set_is_not_offered_again</span>() {</span>
-<span class="ln" id="L1029">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1030">        tour.<span class="tok-fn">start</span>(&amp;Already {</span>
-<span class="ln" id="L1031">            app_lock: true,</span>
-<span class="ln" id="L1032">            installed: true,</span>
-<span class="ln" id="L1033">            decoy_can_be_set: false,</span>
-<span class="ln" id="L1034">        });</span>
-<span class="ln" id="L1035">        assert!(</span>
-<span class="ln" id="L1036">            !tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::AppLock),</span>
-<span class="ln" id="L1037">            <span class="tok-str">&quot;somebody with a password on VeilVoice was asked to set one&quot;</span></span>
-<span class="ln" id="L1038">        );</span>
+<span class="ln" id="L1025">    <span class="tok-com">/// **Roadmap item 171, the part that reaches the people who need it.**</span></span>
+<span class="ln" id="L1026">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1027">    <span class="tok-com">/// Somebody who installed this a year ago has every tab key stored and</span></span>
+<span class="ln" id="L1028">    <span class="tok-com">/// none of the setup ones, because the setup stops did not exist. They are</span></span>
+<span class="ln" id="L1029">    <span class="tok-com">/// exactly who has never been offered an app lock, so the next launch</span></span>
+<span class="ln" id="L1030">    <span class="tok-com">/// offers them the setup and not one word about the tabs they have been</span></span>
+<span class="ln" id="L1031">    <span class="tok-com">/// using all year.</span></span>
+<span class="ln" id="L1032">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1033">    <span class="tok-kw">fn</span> <span class="tok-fn">a_long_standing_reader_is_offered_the_setup_and_nothing_else</span>() {</span>
+<span class="ln" id="L1034">        <span class="tok-kw">let</span> known: Vec&lt;String&gt; = CARDS.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|(tab, _, _)| (*tab).<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1035">        <span class="tok-kw">let</span> already = Already::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1036">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1037">        tour.<span class="tok-fn">start_new_only</span>(&amp;known, &amp;already);</span>
+<span class="ln" id="L1038">        assert!(tour.<span class="tok-fn">running</span>());</span>
 <span class="ln" id="L1039">        assert!(</span>
-<span class="ln" id="L1040">            tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::Install),</span>
-<span class="ln" id="L1041">            <span class="tok-str">&quot;the stop that says which copy this is has something to say either \</span></span>
-<span class="ln" id="L1042"><span class="tok-str">             way&quot;</span></span>
-<span class="ln" id="L1043">        );</span>
-<span class="ln" id="L1044">    }</span>
-<span class="ln" id="L1045"></span>
-<span class="ln" id="L1046">    <span class="tok-com">/// The decoy stop is written and waits for something that can set one.</span></span>
-<span class="ln" id="L1047">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1048">    <span class="tok-com">/// `veilvoice_crypto::decoy` is written and tested and nothing stores a</span></span>
-<span class="ln" id="L1049">    <span class="tok-com">/// pair, which is roadmap item 173. Showing the stop now would describe a</span></span>
-<span class="ln" id="L1050">    <span class="tok-com">/// control that is not there, so it is gated rather than half-drawn, and</span></span>
-<span class="ln" id="L1051">    <span class="tok-com">/// this is what fails the day the gate is turned on without the wiring.</span></span>
-<span class="ln" id="L1052">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1053">    <span class="tok-kw">fn</span> <span class="tok-fn">the_decoy_stop_waits_until_a_decoy_can_be_set</span>() {</span>
-<span class="ln" id="L1054">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1055">        tour.<span class="tok-fn">start</span>(&amp;Already::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L1056">        assert!(!tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::Decoy));</span>
-<span class="ln" id="L1057"></span>
-<span class="ln" id="L1058">        tour.<span class="tok-fn">start</span>(&amp;Already {</span>
-<span class="ln" id="L1059">            decoy_can_be_set: true,</span>
-<span class="ln" id="L1060">            ..Already::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1061">        });</span>
-<span class="ln" id="L1062">        assert!(tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::Decoy));</span>
-<span class="ln" id="L1063">    }</span>
-<span class="ln" id="L1064"></span>
-<span class="ln" id="L1065">    <span class="tok-com">/// Roadmap item 171. Asking for it is not a question about what is new, so</span></span>
-<span class="ln" id="L1066">    <span class="tok-com">/// it shows every stop that applies whatever is stored.</span></span>
-<span class="ln" id="L1067">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1068">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_for_it_again_shows_the_whole_thing</span>() {</span>
-<span class="ln" id="L1069">        <span class="tok-kw">let</span> already = Already::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1070">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1071">        <span class="tok-com">// The state somebody in this position is actually in: they have seen</span></span>
-<span class="ln" id="L1072">        <span class="tok-com">// the whole thing, so `start_new_only` would show them nothing.</span></span>
-<span class="ln" id="L1073">        tour.<span class="tok-fn">start_new_only</span>(&amp;<span class="tok-fn">all_keys</span>(), &amp;already);</span>
-<span class="ln" id="L1074">        assert!(!tour.<span class="tok-fn">running</span>());</span>
-<span class="ln" id="L1075"></span>
-<span class="ln" id="L1076">        tour.<span class="tok-fn">restart</span>(&amp;already);</span>
-<span class="ln" id="L1077">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;asking for it must start it&quot;</span>);</span>
-<span class="ln" id="L1078">        assert_eq!(</span>
-<span class="ln" id="L1079">            tour.showing.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L1080">            <span class="tok-fn">stages</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|s| s.<span class="tok-fn">applies</span>(&amp;already)).<span class="tok-fn">count</span>(),</span>
-<span class="ln" id="L1081">            <span class="tok-str">&quot;a reader who asked to see it again was shown a subset&quot;</span></span>
-<span class="ln" id="L1082">        );</span>
-<span class="ln" id="L1083">    }</span>
-<span class="ln" id="L1084"></span>
-<span class="ln" id="L1085">    <span class="tok-com">/// Every stop draws, with nothing set up and with everything set up.</span></span>
-<span class="ln" id="L1086">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1087">    <span class="tok-com">/// A walkthrough is the one screen whose every branch a new reader meets</span></span>
-<span class="ln" id="L1088">    <span class="tok-com">/// and an existing one never sees again, so a panic in a stop somebody</span></span>
-<span class="ln" id="L1089">    <span class="tok-com">/// reaches on their fourth press is a panic nobody here would find by</span></span>
-<span class="ln" id="L1090">    <span class="tok-com">/// using the application.</span></span>
-<span class="ln" id="L1091">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1092">    <span class="tok-kw">fn</span> <span class="tok-fn">every_stop_draws</span>() {</span>
-<span class="ln" id="L1093">        <span class="tok-kw">for</span> already <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1094">            Already::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1095">            Already {</span>
-<span class="ln" id="L1096">                app_lock: true,</span>
-<span class="ln" id="L1097">                installed: true,</span>
-<span class="ln" id="L1098">                decoy_can_be_set: true,</span>
-<span class="ln" id="L1099">            },</span>
-<span class="ln" id="L1100">        ] {</span>
-<span class="ln" id="L1101">            <span class="tok-kw">for</span> stage <span class="tok-kw">in</span> <span class="tok-fn">stages</span>() {</span>
-<span class="ln" id="L1102">                <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1103">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1104">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> prefs = <span class="tok-kw">crate</span>::settings::Settings::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1105">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1106">                <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, Default::<span class="tok-fn">default</span>(), |ui| {</span>
-<span class="ln" id="L1107">                    <span class="tok-kw">let</span> press = tour.<span class="tok-fn">body</span>(ui, stage, &amp;<span class="tok-kw">mut</span> prefs, &amp;<span class="tok-kw">mut</span> security, &amp;already);</span>
-<span class="ln" id="L1108">                    assert!(</span>
-<span class="ln" id="L1109">                        press == Press::Stay,</span>
-<span class="ln" id="L1110">                        <span class="tok-str">&quot;{:?} acted on a frame nobody pressed anything in&quot;</span>,</span>
-<span class="ln" id="L1111">                        stage</span>
-<span class="ln" id="L1112">                    );</span>
-<span class="ln" id="L1113">                });</span>
-<span class="ln" id="L1114">            }</span>
-<span class="ln" id="L1115">        }</span>
-<span class="ln" id="L1116">    }</span>
-<span class="ln" id="L1117"></span>
-<span class="ln" id="L1118">    <span class="tok-com">/// The passphrase fields are cleared on every way out, not only on the one</span></span>
-<span class="ln" id="L1119">    <span class="tok-com">/// that uses them.</span></span>
-<span class="ln" id="L1120">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1121">    <span class="tok-com">/// Somebody who types a password into the tour and then closes it has left</span></span>
-<span class="ln" id="L1122">    <span class="tok-com">/// it in memory, and &quot;they did not press the button&quot; is not a reason for it</span></span>
-<span class="ln" id="L1123">    <span class="tok-com">/// to still be there.</span></span>
-<span class="ln" id="L1124">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1125">    <span class="tok-kw">fn</span> <span class="tok-fn">what_was_typed_does_not_outlive_the_tour</span>() {</span>
-<span class="ln" id="L1126">        <span class="tok-kw">let</span> already = Already::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1127">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1128">        tour.<span class="tok-fn">start</span>(&amp;already);</span>
-<span class="ln" id="L1129">        tour.lock_entry.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;a password&quot;</span>);</span>
-<span class="ln" id="L1130">        tour.lock_repeat.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;a password&quot;</span>);</span>
-<span class="ln" id="L1131">        tour.<span class="tok-fn">stop</span>();</span>
-<span class="ln" id="L1132">        assert!(tour.lock_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; tour.lock_repeat.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L1133"></span>
-<span class="ln" id="L1134">        tour.<span class="tok-fn">start</span>(&amp;already);</span>
-<span class="ln" id="L1135">        tour.lock_entry.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;a password&quot;</span>);</span>
-<span class="ln" id="L1136">        tour.<span class="tok-fn">wipe</span>();</span>
-<span class="ln" id="L1137">        assert!(</span>
-<span class="ln" id="L1138">            tour.lock_entry.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1139">            <span class="tok-str">&quot;stepping to the next stop left the last one&#x27;s password behind&quot;</span></span>
-<span class="ln" id="L1140">        );</span>
-<span class="ln" id="L1141">    }</span>
-<span class="ln" id="L1142"></span>
-<span class="ln" id="L1143">    <span class="tok-com">/// The app lock is offered once per reader, not once per screen that could</span></span>
-<span class="ln" id="L1144">    <span class="tok-com">/// offer it.</span></span>
-<span class="ln" id="L1145">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1146">    <span class="tok-com">/// The first-run cards ask for it and the walkthrough starts the moment</span></span>
-<span class="ln" id="L1147">    <span class="tok-com">/// they are answered, so without this somebody who skipped that card is</span></span>
-<span class="ln" id="L1148">    <span class="tok-com">/// asked the same question again thirty seconds later, which reads as a</span></span>
-<span class="ln" id="L1149">    <span class="tok-com">/// program that was not listening. Both halves are checked: that the</span></span>
-<span class="ln" id="L1150">    <span class="tok-com">/// window marks the stop when the cards finish, and that a marked stop is</span></span>
-<span class="ln" id="L1151">    <span class="tok-com">/// then left out.</span></span>
-<span class="ln" id="L1152">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1153">    <span class="tok-kw">fn</span> <span class="tok-fn">the_app_lock_is_not_asked_for_twice_in_one_launch</span>() {</span>
-<span class="ln" id="L1154">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1155">        <span class="tok-kw">let</span> at = app</span>
-<span class="ln" id="L1156">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;mark_toured(&amp;[crate::tour::Stage::AppLock.key()])&quot;</span>)</span>
-<span class="ln" id="L1157">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the first-run cards do not record that they asked&quot;</span>);</span>
-<span class="ln" id="L1158">        <span class="tok-kw">let</span> finished = app</span>
-<span class="ln" id="L1159">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;self.preferences.finish_first_run();&quot;</span>)</span>
-<span class="ln" id="L1160">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the first-run cards are finished somewhere&quot;</span>);</span>
-<span class="ln" id="L1161">        assert!(</span>
-<span class="ln" id="L1162">            at &gt; finished,</span>
-<span class="ln" id="L1163">            <span class="tok-str">&quot;the stop is marked somewhere other than where the cards finish&quot;</span></span>
-<span class="ln" id="L1164">        );</span>
-<span class="ln" id="L1165"></span>
-<span class="ln" id="L1166">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1167">        tour.<span class="tok-fn">start_new_only</span>(&amp;[Stage::AppLock.<span class="tok-fn">key</span>()], &amp;Already::<span class="tok-fn">default</span>());</span>
-<span class="ln" id="L1168">        assert!(</span>
-<span class="ln" id="L1169">            !tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::AppLock),</span>
-<span class="ln" id="L1170">            <span class="tok-str">&quot;the stop the first-run cards just offered was offered again&quot;</span></span>
-<span class="ln" id="L1171">        );</span>
-<span class="ln" id="L1172">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;the rest of the walkthrough still runs&quot;</span>);</span>
-<span class="ln" id="L1173">    }</span>
-<span class="ln" id="L1174"></span>
-<span class="ln" id="L1175">    <span class="tok-com">/// The two kinds of skip, told apart.</span></span>
-<span class="ln" id="L1176">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1177">    <span class="tok-com">/// A stop skipped because what it offers is already done is settled, and a</span></span>
-<span class="ln" id="L1178">    <span class="tok-com">/// stop skipped because it cannot be offered yet is not. Storing the second</span></span>
-<span class="ln" id="L1179">    <span class="tok-com">/// is how the decoy card went unshown to everybody who had toured before</span></span>
-<span class="ln" id="L1180">    <span class="tok-com">/// roadmap item 173 turned it on.</span></span>
-<span class="ln" id="L1181">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1182">    <span class="tok-kw">fn</span> <span class="tok-fn">the_decoy_stop_is_not_stored_when_it_could_not_be_offered</span>() {</span>
-<span class="ln" id="L1183">        <span class="tok-kw">let</span> nothing_set = Already::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1184">        <span class="tok-kw">let</span> settled = <span class="tok-fn">keys_settled</span>(&amp;nothing_set);</span>
-<span class="ln" id="L1185">        assert!(</span>
-<span class="ln" id="L1186">            !settled.<span class="tok-fn">contains</span>(&amp;Stage::Decoy.<span class="tok-fn">key</span>()),</span>
-<span class="ln" id="L1187">            <span class="tok-str">&quot;a stop that could not be offered was stored as though it had been&quot;</span></span>
-<span class="ln" id="L1188">        );</span>
-<span class="ln" id="L1189">        <span class="tok-com">// Everything else was either shown or already answered.</span></span>
-<span class="ln" id="L1190">        <span class="tok-kw">for</span> stage <span class="tok-kw">in</span> <span class="tok-fn">stages</span>() {</span>
-<span class="ln" id="L1191">            <span class="tok-kw">if</span> stage == Stage::Decoy {</span>
-<span class="ln" id="L1192">                continue;</span>
-<span class="ln" id="L1193">            }</span>
-<span class="ln" id="L1194">            assert!(</span>
-<span class="ln" id="L1195">                settled.<span class="tok-fn">contains</span>(&amp;stage.<span class="tok-fn">key</span>()),</span>
-<span class="ln" id="L1196">                <span class="tok-str">&quot;{stage:?} was left out, so it will be offered again next launch&quot;</span></span>
-<span class="ln" id="L1197">            );</span>
-<span class="ln" id="L1198">        }</span>
-<span class="ln" id="L1199"></span>
-<span class="ln" id="L1200">        <span class="tok-kw">let</span> with_a_lock = Already {</span>
-<span class="ln" id="L1201">            app_lock: true,</span>
-<span class="ln" id="L1202">            decoy_can_be_set: true,</span>
-<span class="ln" id="L1203">            ..Already::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L1204">        };</span>
-<span class="ln" id="L1205">        assert_eq!(</span>
-<span class="ln" id="L1206">            <span class="tok-fn">keys_settled</span>(&amp;with_a_lock),</span>
-<span class="ln" id="L1207">            <span class="tok-fn">all_keys</span>(),</span>
-<span class="ln" id="L1208">            <span class="tok-str">&quot;with a lock set, every stop is either shown or answered&quot;</span></span>
-<span class="ln" id="L1209">        );</span>
-<span class="ln" id="L1210">    }</span>
-<span class="ln" id="L1211"></span>
-<span class="ln" id="L1212">    <span class="tok-com">/// Roadmap item 171. The window stores the stops this run settled, not the</span></span>
-<span class="ln" id="L1213">    <span class="tok-com">/// ones it happened to show.</span></span>
-<span class="ln" id="L1214">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1215">    <span class="tok-com">/// A stop left out because it was already answered has nothing left to</span></span>
-<span class="ln" id="L1216">    <span class="tok-com">/// say, and storing it is what stops the next launch offering it. Storing</span></span>
-<span class="ln" id="L1217">    <span class="tok-com">/// only what was shown means somebody who set a password before their</span></span>
-<span class="ln" id="L1218">    <span class="tok-com">/// first tour is asked to set one on every launch after it.</span></span>
-<span class="ln" id="L1219">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1220">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_stores_every_stop_it_settled_rather_than_the_ones_it_showed</span>() {</span>
-<span class="ln" id="L1221">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1222">        assert!(</span>
-<span class="ln" id="L1223">            app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;mark_toured(&amp;crate::tour::keys_settled(&amp;already))&quot;</span>),</span>
-<span class="ln" id="L1224">            <span class="tok-str">&quot;the window stores something other than the settled list&quot;</span></span>
-<span class="ln" id="L1225">        );</span>
-<span class="ln" id="L1226">        assert!(</span>
-<span class="ln" id="L1227">            app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;show.and_then(Tab::from_key)&quot;</span>),</span>
-<span class="ln" id="L1228">            <span class="tok-str">&quot;the window ignores the tab the tour was asked to open&quot;</span></span>
-<span class="ln" id="L1229">        );</span>
-<span class="ln" id="L1230">    }</span>
-<span class="ln" id="L1231"></span>
-<span class="ln" id="L1232">    <span class="tok-com">/// Roadmap item 171. The tour is drawn over the window rather than instead of</span></span>
-<span class="ln" id="L1233">    <span class="tok-com">/// it, and that is a claim about `app.rs` as much as about this file: the</span></span>
-<span class="ln" id="L1234">    <span class="tok-com">/// whole point is lost if the window returns before it draws the tabs the</span></span>
-<span class="ln" id="L1235">    <span class="tok-com">/// cards are describing.</span></span>
-<span class="ln" id="L1236">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1237">    <span class="tok-com">/// Read from the source, because what is asserted is that a statement is</span></span>
-<span class="ln" id="L1238">    <span class="tok-com">/// *not reachable*. A rendering test would prove it for one frame.</span></span>
-<span class="ln" id="L1239">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1240">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_still_draws_underneath_the_tour</span>() {</span>
-<span class="ln" id="L1241">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1242">        <span class="tok-com">// Anchored on the outcome rather than on the call: rustfmt breaks a</span></span>
-<span class="ln" id="L1243">        <span class="tok-com">// long call across lines, and a test that fails because an argument</span></span>
-<span class="ln" id="L1244">        <span class="tok-com">// was added is a test that tells you nothing about what it guards.</span></span>
-<span class="ln" id="L1245">        <span class="tok-kw">let</span> at = app</span>
-<span class="ln" id="L1246">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;crate::tour::Outcome::Finished&quot;</span>)</span>
-<span class="ln" id="L1247">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the window draws the tour as an overlay&quot;</span>);</span>
-<span class="ln" id="L1248">        <span class="tok-kw">let</span> central = app</span>
-<span class="ln" id="L1249">            .<span class="tok-fn">rfind</span>(<span class="tok-str">&quot;egui::CentralPanel::default().show(root, |ui| {&quot;</span>)</span>
-<span class="ln" id="L1250">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the window has a central panel&quot;</span>);</span>
-<span class="ln" id="L1251">        assert!(</span>
-<span class="ln" id="L1252">            at &gt; central,</span>
-<span class="ln" id="L1253">            <span class="tok-str">&quot;the tour is drawn inside the central panel again, so it replaces \</span></span>
-<span class="ln" id="L1254"><span class="tok-str">             the tabs it is describing rather than sitting over them&quot;</span></span>
+<span class="ln" id="L1040">            tour.showing</span>
+<span class="ln" id="L1041">                .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L1042">                .<span class="tok-fn">all</span>(|stage| !matches!(stage, Stage::<span class="tok-fn">Tab</span>(_))),</span>
+<span class="ln" id="L1043">            <span class="tok-str">&quot;a reader who has seen every tab was shown the tab cards again&quot;</span></span>
+<span class="ln" id="L1044">        );</span>
+<span class="ln" id="L1045">        assert!(</span>
+<span class="ln" id="L1046">            tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::AppLock),</span>
+<span class="ln" id="L1047">            <span class="tok-str">&quot;the one stop that is worth interrupting somebody for was left out&quot;</span></span>
+<span class="ln" id="L1048">        );</span>
+<span class="ln" id="L1049">    }</span>
+<span class="ln" id="L1050"></span>
+<span class="ln" id="L1051">    <span class="tok-com">/// A question already answered is not asked again. The same rule the</span></span>
+<span class="ln" id="L1052">    <span class="tok-com">/// first-run cards keep, for the same reason.</span></span>
+<span class="ln" id="L1053">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1054">    <span class="tok-kw">fn</span> <span class="tok-fn">what_is_already_set_is_not_offered_again</span>() {</span>
+<span class="ln" id="L1055">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1056">        tour.<span class="tok-fn">start</span>(&amp;Already {</span>
+<span class="ln" id="L1057">            app_lock: true,</span>
+<span class="ln" id="L1058">            installed: true,</span>
+<span class="ln" id="L1059">            decoy_can_be_set: false,</span>
+<span class="ln" id="L1060">        });</span>
+<span class="ln" id="L1061">        assert!(</span>
+<span class="ln" id="L1062">            !tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::AppLock),</span>
+<span class="ln" id="L1063">            <span class="tok-str">&quot;somebody with a password on VeilVoice was asked to set one&quot;</span></span>
+<span class="ln" id="L1064">        );</span>
+<span class="ln" id="L1065">        assert!(</span>
+<span class="ln" id="L1066">            tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::Install),</span>
+<span class="ln" id="L1067">            <span class="tok-str">&quot;the stop that says which copy this is has something to say either \</span></span>
+<span class="ln" id="L1068"><span class="tok-str">             way&quot;</span></span>
+<span class="ln" id="L1069">        );</span>
+<span class="ln" id="L1070">    }</span>
+<span class="ln" id="L1071"></span>
+<span class="ln" id="L1072">    <span class="tok-com">/// The decoy stop is written and waits for something that can set one.</span></span>
+<span class="ln" id="L1073">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1074">    <span class="tok-com">/// `veilvoice_crypto::decoy` is written and tested and nothing stores a</span></span>
+<span class="ln" id="L1075">    <span class="tok-com">/// pair, which is roadmap item 173. Showing the stop now would describe a</span></span>
+<span class="ln" id="L1076">    <span class="tok-com">/// control that is not there, so it is gated rather than half-drawn, and</span></span>
+<span class="ln" id="L1077">    <span class="tok-com">/// this is what fails the day the gate is turned on without the wiring.</span></span>
+<span class="ln" id="L1078">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1079">    <span class="tok-kw">fn</span> <span class="tok-fn">the_decoy_stop_waits_until_a_decoy_can_be_set</span>() {</span>
+<span class="ln" id="L1080">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1081">        tour.<span class="tok-fn">start</span>(&amp;Already::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L1082">        assert!(!tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::Decoy));</span>
+<span class="ln" id="L1083"></span>
+<span class="ln" id="L1084">        tour.<span class="tok-fn">start</span>(&amp;Already {</span>
+<span class="ln" id="L1085">            decoy_can_be_set: true,</span>
+<span class="ln" id="L1086">            ..Already::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1087">        });</span>
+<span class="ln" id="L1088">        assert!(tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::Decoy));</span>
+<span class="ln" id="L1089">    }</span>
+<span class="ln" id="L1090"></span>
+<span class="ln" id="L1091">    <span class="tok-com">/// Roadmap item 171. Asking for it is not a question about what is new, so</span></span>
+<span class="ln" id="L1092">    <span class="tok-com">/// it shows every stop that applies whatever is stored.</span></span>
+<span class="ln" id="L1093">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1094">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_for_it_again_shows_the_whole_thing</span>() {</span>
+<span class="ln" id="L1095">        <span class="tok-kw">let</span> already = Already::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1096">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1097">        <span class="tok-com">// The state somebody in this position is actually in: they have seen</span></span>
+<span class="ln" id="L1098">        <span class="tok-com">// the whole thing, so `start_new_only` would show them nothing.</span></span>
+<span class="ln" id="L1099">        tour.<span class="tok-fn">start_new_only</span>(&amp;<span class="tok-fn">all_keys</span>(), &amp;already);</span>
+<span class="ln" id="L1100">        assert!(!tour.<span class="tok-fn">running</span>());</span>
+<span class="ln" id="L1101"></span>
+<span class="ln" id="L1102">        tour.<span class="tok-fn">restart</span>(&amp;already);</span>
+<span class="ln" id="L1103">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;asking for it must start it&quot;</span>);</span>
+<span class="ln" id="L1104">        assert_eq!(</span>
+<span class="ln" id="L1105">            tour.showing.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L1106">            <span class="tok-fn">stages</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">filter</span>(|s| s.<span class="tok-fn">applies</span>(&amp;already)).<span class="tok-fn">count</span>(),</span>
+<span class="ln" id="L1107">            <span class="tok-str">&quot;a reader who asked to see it again was shown a subset&quot;</span></span>
+<span class="ln" id="L1108">        );</span>
+<span class="ln" id="L1109">    }</span>
+<span class="ln" id="L1110"></span>
+<span class="ln" id="L1111">    <span class="tok-com">/// Every stop draws, with nothing set up and with everything set up.</span></span>
+<span class="ln" id="L1112">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1113">    <span class="tok-com">/// A walkthrough is the one screen whose every branch a new reader meets</span></span>
+<span class="ln" id="L1114">    <span class="tok-com">/// and an existing one never sees again, so a panic in a stop somebody</span></span>
+<span class="ln" id="L1115">    <span class="tok-com">/// reaches on their fourth press is a panic nobody here would find by</span></span>
+<span class="ln" id="L1116">    <span class="tok-com">/// using the application.</span></span>
+<span class="ln" id="L1117">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1118">    <span class="tok-kw">fn</span> <span class="tok-fn">every_stop_draws</span>() {</span>
+<span class="ln" id="L1119">        <span class="tok-kw">for</span> already <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1120">            Already::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1121">            Already {</span>
+<span class="ln" id="L1122">                app_lock: true,</span>
+<span class="ln" id="L1123">                installed: true,</span>
+<span class="ln" id="L1124">                decoy_can_be_set: true,</span>
+<span class="ln" id="L1125">            },</span>
+<span class="ln" id="L1126">        ] {</span>
+<span class="ln" id="L1127">            <span class="tok-kw">for</span> stage <span class="tok-kw">in</span> <span class="tok-fn">stages</span>() {</span>
+<span class="ln" id="L1128">                <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1129">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1130">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> prefs = <span class="tok-kw">crate</span>::settings::Settings::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1131">                <span class="tok-kw">let</span> <span class="tok-kw">mut</span> security = <span class="tok-kw">crate</span>::security::Security::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1132">                <span class="tok-kw">let</span> _ = <span class="tok-kw">crate</span>::<span class="tok-fn">headless_frame</span>(&amp;ctx, Default::<span class="tok-fn">default</span>(), |ui| {</span>
+<span class="ln" id="L1133">                    <span class="tok-kw">let</span> press = tour.<span class="tok-fn">body</span>(ui, stage, &amp;<span class="tok-kw">mut</span> prefs, &amp;<span class="tok-kw">mut</span> security, &amp;already);</span>
+<span class="ln" id="L1134">                    assert!(</span>
+<span class="ln" id="L1135">                        press == Press::Stay,</span>
+<span class="ln" id="L1136">                        <span class="tok-str">&quot;{:?} acted on a frame nobody pressed anything in&quot;</span>,</span>
+<span class="ln" id="L1137">                        stage</span>
+<span class="ln" id="L1138">                    );</span>
+<span class="ln" id="L1139">                });</span>
+<span class="ln" id="L1140">            }</span>
+<span class="ln" id="L1141">        }</span>
+<span class="ln" id="L1142">    }</span>
+<span class="ln" id="L1143"></span>
+<span class="ln" id="L1144">    <span class="tok-com">/// The passphrase fields are cleared on every way out, not only on the one</span></span>
+<span class="ln" id="L1145">    <span class="tok-com">/// that uses them.</span></span>
+<span class="ln" id="L1146">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1147">    <span class="tok-com">/// Somebody who types a password into the tour and then closes it has left</span></span>
+<span class="ln" id="L1148">    <span class="tok-com">/// it in memory, and &quot;they did not press the button&quot; is not a reason for it</span></span>
+<span class="ln" id="L1149">    <span class="tok-com">/// to still be there.</span></span>
+<span class="ln" id="L1150">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1151">    <span class="tok-kw">fn</span> <span class="tok-fn">what_was_typed_does_not_outlive_the_tour</span>() {</span>
+<span class="ln" id="L1152">        <span class="tok-kw">let</span> already = Already::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1153">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1154">        tour.<span class="tok-fn">start</span>(&amp;already);</span>
+<span class="ln" id="L1155">        tour.lock_entry.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;a password&quot;</span>);</span>
+<span class="ln" id="L1156">        tour.lock_repeat.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;a password&quot;</span>);</span>
+<span class="ln" id="L1157">        tour.<span class="tok-fn">stop</span>();</span>
+<span class="ln" id="L1158">        assert!(tour.lock_entry.<span class="tok-fn">is_empty</span>() &amp;&amp; tour.lock_repeat.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L1159"></span>
+<span class="ln" id="L1160">        tour.<span class="tok-fn">start</span>(&amp;already);</span>
+<span class="ln" id="L1161">        tour.lock_entry.<span class="tok-fn">push_str</span>(<span class="tok-str">&quot;a password&quot;</span>);</span>
+<span class="ln" id="L1162">        tour.<span class="tok-fn">wipe</span>();</span>
+<span class="ln" id="L1163">        assert!(</span>
+<span class="ln" id="L1164">            tour.lock_entry.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1165">            <span class="tok-str">&quot;stepping to the next stop left the last one&#x27;s password behind&quot;</span></span>
+<span class="ln" id="L1166">        );</span>
+<span class="ln" id="L1167">    }</span>
+<span class="ln" id="L1168"></span>
+<span class="ln" id="L1169">    <span class="tok-com">/// The app lock is offered once per reader, not once per screen that could</span></span>
+<span class="ln" id="L1170">    <span class="tok-com">/// offer it.</span></span>
+<span class="ln" id="L1171">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1172">    <span class="tok-com">/// The first-run cards ask for it and the walkthrough starts the moment</span></span>
+<span class="ln" id="L1173">    <span class="tok-com">/// they are answered, so without this somebody who skipped that card is</span></span>
+<span class="ln" id="L1174">    <span class="tok-com">/// asked the same question again thirty seconds later, which reads as a</span></span>
+<span class="ln" id="L1175">    <span class="tok-com">/// program that was not listening. Both halves are checked: that the</span></span>
+<span class="ln" id="L1176">    <span class="tok-com">/// window marks the stop when the cards finish, and that a marked stop is</span></span>
+<span class="ln" id="L1177">    <span class="tok-com">/// then left out.</span></span>
+<span class="ln" id="L1178">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1179">    <span class="tok-kw">fn</span> <span class="tok-fn">the_app_lock_is_not_asked_for_twice_in_one_launch</span>() {</span>
+<span class="ln" id="L1180">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1181">        <span class="tok-kw">let</span> at = app</span>
+<span class="ln" id="L1182">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;mark_toured(&amp;[crate::tour::Stage::AppLock.key()])&quot;</span>)</span>
+<span class="ln" id="L1183">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the first-run cards do not record that they asked&quot;</span>);</span>
+<span class="ln" id="L1184">        <span class="tok-kw">let</span> finished = app</span>
+<span class="ln" id="L1185">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;self.preferences.finish_first_run();&quot;</span>)</span>
+<span class="ln" id="L1186">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the first-run cards are finished somewhere&quot;</span>);</span>
+<span class="ln" id="L1187">        assert!(</span>
+<span class="ln" id="L1188">            at &gt; finished,</span>
+<span class="ln" id="L1189">            <span class="tok-str">&quot;the stop is marked somewhere other than where the cards finish&quot;</span></span>
+<span class="ln" id="L1190">        );</span>
+<span class="ln" id="L1191"></span>
+<span class="ln" id="L1192">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> tour = Tour::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1193">        tour.<span class="tok-fn">start_new_only</span>(&amp;[Stage::AppLock.<span class="tok-fn">key</span>()], &amp;Already::<span class="tok-fn">default</span>());</span>
+<span class="ln" id="L1194">        assert!(</span>
+<span class="ln" id="L1195">            !tour.showing.<span class="tok-fn">contains</span>(&amp;Stage::AppLock),</span>
+<span class="ln" id="L1196">            <span class="tok-str">&quot;the stop the first-run cards just offered was offered again&quot;</span></span>
+<span class="ln" id="L1197">        );</span>
+<span class="ln" id="L1198">        assert!(tour.<span class="tok-fn">running</span>(), <span class="tok-str">&quot;the rest of the walkthrough still runs&quot;</span>);</span>
+<span class="ln" id="L1199">    }</span>
+<span class="ln" id="L1200"></span>
+<span class="ln" id="L1201">    <span class="tok-com">/// The two kinds of skip, told apart.</span></span>
+<span class="ln" id="L1202">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1203">    <span class="tok-com">/// A stop skipped because what it offers is already done is settled, and a</span></span>
+<span class="ln" id="L1204">    <span class="tok-com">/// stop skipped because it cannot be offered yet is not. Storing the second</span></span>
+<span class="ln" id="L1205">    <span class="tok-com">/// is how the decoy card went unshown to everybody who had toured before</span></span>
+<span class="ln" id="L1206">    <span class="tok-com">/// roadmap item 173 turned it on.</span></span>
+<span class="ln" id="L1207">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1208">    <span class="tok-kw">fn</span> <span class="tok-fn">the_decoy_stop_is_not_stored_when_it_could_not_be_offered</span>() {</span>
+<span class="ln" id="L1209">        <span class="tok-kw">let</span> nothing_set = Already::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1210">        <span class="tok-kw">let</span> settled = <span class="tok-fn">keys_settled</span>(&amp;nothing_set);</span>
+<span class="ln" id="L1211">        assert!(</span>
+<span class="ln" id="L1212">            !settled.<span class="tok-fn">contains</span>(&amp;Stage::Decoy.<span class="tok-fn">key</span>()),</span>
+<span class="ln" id="L1213">            <span class="tok-str">&quot;a stop that could not be offered was stored as though it had been&quot;</span></span>
+<span class="ln" id="L1214">        );</span>
+<span class="ln" id="L1215">        <span class="tok-com">// Everything else was either shown or already answered.</span></span>
+<span class="ln" id="L1216">        <span class="tok-kw">for</span> stage <span class="tok-kw">in</span> <span class="tok-fn">stages</span>() {</span>
+<span class="ln" id="L1217">            <span class="tok-kw">if</span> stage == Stage::Decoy {</span>
+<span class="ln" id="L1218">                continue;</span>
+<span class="ln" id="L1219">            }</span>
+<span class="ln" id="L1220">            assert!(</span>
+<span class="ln" id="L1221">                settled.<span class="tok-fn">contains</span>(&amp;stage.<span class="tok-fn">key</span>()),</span>
+<span class="ln" id="L1222">                <span class="tok-str">&quot;{stage:?} was left out, so it will be offered again next launch&quot;</span></span>
+<span class="ln" id="L1223">            );</span>
+<span class="ln" id="L1224">        }</span>
+<span class="ln" id="L1225"></span>
+<span class="ln" id="L1226">        <span class="tok-kw">let</span> with_a_lock = Already {</span>
+<span class="ln" id="L1227">            app_lock: true,</span>
+<span class="ln" id="L1228">            decoy_can_be_set: true,</span>
+<span class="ln" id="L1229">            ..Already::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L1230">        };</span>
+<span class="ln" id="L1231">        assert_eq!(</span>
+<span class="ln" id="L1232">            <span class="tok-fn">keys_settled</span>(&amp;with_a_lock),</span>
+<span class="ln" id="L1233">            <span class="tok-fn">all_keys</span>(),</span>
+<span class="ln" id="L1234">            <span class="tok-str">&quot;with a lock set, every stop is either shown or answered&quot;</span></span>
+<span class="ln" id="L1235">        );</span>
+<span class="ln" id="L1236">    }</span>
+<span class="ln" id="L1237"></span>
+<span class="ln" id="L1238">    <span class="tok-com">/// Roadmap item 171. The window stores the stops this run settled, not the</span></span>
+<span class="ln" id="L1239">    <span class="tok-com">/// ones it happened to show.</span></span>
+<span class="ln" id="L1240">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1241">    <span class="tok-com">/// A stop left out because it was already answered has nothing left to</span></span>
+<span class="ln" id="L1242">    <span class="tok-com">/// say, and storing it is what stops the next launch offering it. Storing</span></span>
+<span class="ln" id="L1243">    <span class="tok-com">/// only what was shown means somebody who set a password before their</span></span>
+<span class="ln" id="L1244">    <span class="tok-com">/// first tour is asked to set one on every launch after it.</span></span>
+<span class="ln" id="L1245">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1246">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_stores_every_stop_it_settled_rather_than_the_ones_it_showed</span>() {</span>
+<span class="ln" id="L1247">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1248">        assert!(</span>
+<span class="ln" id="L1249">            app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;mark_toured(&amp;crate::tour::keys_settled(&amp;already))&quot;</span>),</span>
+<span class="ln" id="L1250">            <span class="tok-str">&quot;the window stores something other than the settled list&quot;</span></span>
+<span class="ln" id="L1251">        );</span>
+<span class="ln" id="L1252">        assert!(</span>
+<span class="ln" id="L1253">            app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;show.and_then(Tab::from_key)&quot;</span>),</span>
+<span class="ln" id="L1254">            <span class="tok-str">&quot;the window ignores the tab the tour was asked to open&quot;</span></span>
 <span class="ln" id="L1255">        );</span>
-<span class="ln" id="L1256">        assert!(</span>
-<span class="ln" id="L1257">            !app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.tour.panel(&quot;</span>),</span>
-<span class="ln" id="L1258">            <span class="tok-str">&quot;the old panel that returned instead of drawing the window is back&quot;</span></span>
-<span class="ln" id="L1259">        );</span>
-<span class="ln" id="L1260">    }</span>
-<span class="ln" id="L1261"></span>
-<span class="ln" id="L1262">    <span class="tok-com">/// The card has to fit in the window it is drawn over, and its buttons have</span></span>
-<span class="ln" id="L1263">    <span class="tok-com">/// to stay reachable. Both are properties of the numbers rather than of a</span></span>
-<span class="ln" id="L1264">    <span class="tok-com">/// frame, so both are checked here.</span></span>
+<span class="ln" id="L1256">    }</span>
+<span class="ln" id="L1257"></span>
+<span class="ln" id="L1258">    <span class="tok-com">/// Roadmap item 171. The tour is drawn over the window rather than instead of</span></span>
+<span class="ln" id="L1259">    <span class="tok-com">/// it, and that is a claim about `app.rs` as much as about this file: the</span></span>
+<span class="ln" id="L1260">    <span class="tok-com">/// whole point is lost if the window returns before it draws the tabs the</span></span>
+<span class="ln" id="L1261">    <span class="tok-com">/// cards are describing.</span></span>
+<span class="ln" id="L1262">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1263">    <span class="tok-com">/// Read from the source, because what is asserted is that a statement is</span></span>
+<span class="ln" id="L1264">    <span class="tok-com">/// *not reachable*. A rendering test would prove it for one frame.</span></span>
 <span class="ln" id="L1265">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1266">    <span class="tok-kw">fn</span> <span class="tok-fn">the_card_leaves_the_window_visible_around_it</span>() {</span>
-<span class="ln" id="L1267">        <span class="tok-com">// Against the real window sizes rather than against the share on its</span></span>
-<span class="ln" id="L1268">        <span class="tok-com">// own: what has to hold is that there is window left around the card,</span></span>
-<span class="ln" id="L1269">        <span class="tok-com">// and on the shortest window this application will open at, which is</span></span>
-<span class="ln" id="L1270">        <span class="tok-com">// where it is tightest.</span></span>
-<span class="ln" id="L1271">        <span class="tok-kw">for</span> height <span class="tok-kw">in</span> [<span class="tok-kw">crate</span>::window::MINIMUM[<span class="tok-num">1</span>], <span class="tok-num">900.0</span>, <span class="tok-num">1440.0</span>] {</span>
-<span class="ln" id="L1272">            <span class="tok-kw">let</span> card = height * CARD_HEIGHT_SHARE;</span>
-<span class="ln" id="L1273">            <span class="tok-kw">let</span> shade = height - card;</span>
-<span class="ln" id="L1274">            assert!(</span>
-<span class="ln" id="L1275">                shade &gt;= <span class="tok-num">48.0</span>,</span>
-<span class="ln" id="L1276">                <span class="tok-str">&quot;at {height} the shade around the card is {shade} pixels, too \</span></span>
-<span class="ln" id="L1277"><span class="tok-str">                 thin to read as an overlay rather than as a replacement&quot;</span></span>
-<span class="ln" id="L1278">            );</span>
-<span class="ln" id="L1279">            assert!(</span>
-<span class="ln" id="L1280">                card &gt; <span class="tok-num">200.0</span>,</span>
-<span class="ln" id="L1281">                <span class="tok-str">&quot;at {height} the card is {card} pixels and a sentence does not \</span></span>
-<span class="ln" id="L1282"><span class="tok-str">                 fit in it&quot;</span></span>
-<span class="ln" id="L1283">            );</span>
-<span class="ln" id="L1284">        }</span>
-<span class="ln" id="L1285">        <span class="tok-kw">for</span> width <span class="tok-kw">in</span> [<span class="tok-kw">crate</span>::window::MINIMUM[<span class="tok-num">0</span>], <span class="tok-num">1100.0</span>, <span class="tok-num">1920.0</span>] {</span>
-<span class="ln" id="L1286">            assert!(</span>
-<span class="ln" id="L1287">                CARD_WIDTH &lt;= width,</span>
-<span class="ln" id="L1288">                <span class="tok-str">&quot;at {width} across, the card is wider than the window and \</span></span>
-<span class="ln" id="L1289"><span class="tok-str">                 would be cut off&quot;</span></span>
-<span class="ln" id="L1290">            );</span>
-<span class="ln" id="L1291">        }</span>
-<span class="ln" id="L1292">    }</span>
-<span class="ln" id="L1293"></span>
-<span class="ln" id="L1294">    <span class="tok-com">/// Escape is handled and a click on the shade is deliberately not.</span></span>
-<span class="ln" id="L1295">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1296">    <span class="tok-com">/// `ModalResponse::should_close` treats the two as one gesture. Using it</span></span>
-<span class="ln" id="L1297">    <span class="tok-com">/// would mean a misjudged click halfway through the tour threw away the</span></span>
-<span class="ln" id="L1298">    <span class="tok-com">/// half the reader had not seen, so this asserts the code does not call it.</span></span>
-<span class="ln" id="L1299">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1300">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stray_click_outside_the_card_does_not_end_the_tour</span>() {</span>
-<span class="ln" id="L1301">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;tour.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1302">        <span class="tok-kw">let</span> overlay = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn overlay(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the overlay exists&quot;</span>);</span>
-<span class="ln" id="L1303">        <span class="tok-com">// Bounded at the end of the function. Unbounded, this reads its own</span></span>
-<span class="ln" id="L1304">        <span class="tok-com">// test as part of the code it is checking and fails on the string it</span></span>
-<span class="ln" id="L1305">        <span class="tok-com">// is looking for, which is a guard that can only ever fail.</span></span>
-<span class="ln" id="L1306">        <span class="tok-kw">let</span> end = source[overlay..]</span>
-<span class="ln" id="L1307">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\nenum Press {&quot;</span>)</span>
-<span class="ln" id="L1308">            .<span class="tok-fn">map</span>(|at| overlay + at)</span>
-<span class="ln" id="L1309">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the press enum follows the overlay&quot;</span>);</span>
-<span class="ln" id="L1310">        <span class="tok-kw">let</span> body = &amp;source[overlay..end];</span>
-<span class="ln" id="L1311">        assert!(</span>
-<span class="ln" id="L1312">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Key::Escape&quot;</span>),</span>
-<span class="ln" id="L1313">            <span class="tok-str">&quot;nothing reads Escape, so the overlay has no keyboard way out&quot;</span></span>
-<span class="ln" id="L1314">        );</span>
-<span class="ln" id="L1315">        assert!(</span>
-<span class="ln" id="L1316">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;should_close()&quot;</span>),</span>
-<span class="ln" id="L1317">            <span class="tok-str">&quot;should_close() closes on a backdrop click as well, which ends the \</span></span>
-<span class="ln" id="L1318"><span class="tok-str">             tour on a stray press&quot;</span></span>
-<span class="ln" id="L1319">        );</span>
-<span class="ln" id="L1320">    }</span>
-<span class="ln" id="L1321">}</span>
+<span class="ln" id="L1266">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_still_draws_underneath_the_tour</span>() {</span>
+<span class="ln" id="L1267">        <span class="tok-kw">let</span> app = include_str!(<span class="tok-str">&quot;app.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1268">        <span class="tok-com">// Anchored on the outcome rather than on the call: rustfmt breaks a</span></span>
+<span class="ln" id="L1269">        <span class="tok-com">// long call across lines, and a test that fails because an argument</span></span>
+<span class="ln" id="L1270">        <span class="tok-com">// was added is a test that tells you nothing about what it guards.</span></span>
+<span class="ln" id="L1271">        <span class="tok-kw">let</span> at = app</span>
+<span class="ln" id="L1272">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;crate::tour::Outcome::Finished&quot;</span>)</span>
+<span class="ln" id="L1273">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the window draws the tour as an overlay&quot;</span>);</span>
+<span class="ln" id="L1274">        <span class="tok-kw">let</span> central = app</span>
+<span class="ln" id="L1275">            .<span class="tok-fn">rfind</span>(<span class="tok-str">&quot;egui::CentralPanel::default().show(root, |ui| {&quot;</span>)</span>
+<span class="ln" id="L1276">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the window has a central panel&quot;</span>);</span>
+<span class="ln" id="L1277">        assert!(</span>
+<span class="ln" id="L1278">            at &gt; central,</span>
+<span class="ln" id="L1279">            <span class="tok-str">&quot;the tour is drawn inside the central panel again, so it replaces \</span></span>
+<span class="ln" id="L1280"><span class="tok-str">             the tabs it is describing rather than sitting over them&quot;</span></span>
+<span class="ln" id="L1281">        );</span>
+<span class="ln" id="L1282">        assert!(</span>
+<span class="ln" id="L1283">            !app.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;self.tour.panel(&quot;</span>),</span>
+<span class="ln" id="L1284">            <span class="tok-str">&quot;the old panel that returned instead of drawing the window is back&quot;</span></span>
+<span class="ln" id="L1285">        );</span>
+<span class="ln" id="L1286">    }</span>
+<span class="ln" id="L1287"></span>
+<span class="ln" id="L1288">    <span class="tok-com">/// The card has to fit in the window it is drawn over, and its buttons have</span></span>
+<span class="ln" id="L1289">    <span class="tok-com">/// to stay reachable. Both are properties of the numbers rather than of a</span></span>
+<span class="ln" id="L1290">    <span class="tok-com">/// frame, so both are checked here.</span></span>
+<span class="ln" id="L1291">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1292">    <span class="tok-kw">fn</span> <span class="tok-fn">the_card_leaves_the_window_visible_around_it</span>() {</span>
+<span class="ln" id="L1293">        <span class="tok-com">// Against the real window sizes rather than against the share on its</span></span>
+<span class="ln" id="L1294">        <span class="tok-com">// own: what has to hold is that there is window left around the card,</span></span>
+<span class="ln" id="L1295">        <span class="tok-com">// and on the shortest window this application will open at, which is</span></span>
+<span class="ln" id="L1296">        <span class="tok-com">// where it is tightest.</span></span>
+<span class="ln" id="L1297">        <span class="tok-kw">for</span> height <span class="tok-kw">in</span> [<span class="tok-kw">crate</span>::window::MINIMUM[<span class="tok-num">1</span>], <span class="tok-num">900.0</span>, <span class="tok-num">1440.0</span>] {</span>
+<span class="ln" id="L1298">            <span class="tok-kw">let</span> card = height * CARD_HEIGHT_SHARE;</span>
+<span class="ln" id="L1299">            <span class="tok-kw">let</span> shade = height - card;</span>
+<span class="ln" id="L1300">            assert!(</span>
+<span class="ln" id="L1301">                shade &gt;= <span class="tok-num">48.0</span>,</span>
+<span class="ln" id="L1302">                <span class="tok-str">&quot;at {height} the shade around the card is {shade} pixels, too \</span></span>
+<span class="ln" id="L1303"><span class="tok-str">                 thin to read as an overlay rather than as a replacement&quot;</span></span>
+<span class="ln" id="L1304">            );</span>
+<span class="ln" id="L1305">            assert!(</span>
+<span class="ln" id="L1306">                card &gt; <span class="tok-num">200.0</span>,</span>
+<span class="ln" id="L1307">                <span class="tok-str">&quot;at {height} the card is {card} pixels and a sentence does not \</span></span>
+<span class="ln" id="L1308"><span class="tok-str">                 fit in it&quot;</span></span>
+<span class="ln" id="L1309">            );</span>
+<span class="ln" id="L1310">        }</span>
+<span class="ln" id="L1311">        <span class="tok-kw">for</span> width <span class="tok-kw">in</span> [<span class="tok-kw">crate</span>::window::MINIMUM[<span class="tok-num">0</span>], <span class="tok-num">1100.0</span>, <span class="tok-num">1920.0</span>] {</span>
+<span class="ln" id="L1312">            assert!(</span>
+<span class="ln" id="L1313">                CARD_WIDTH &lt;= width,</span>
+<span class="ln" id="L1314">                <span class="tok-str">&quot;at {width} across, the card is wider than the window and \</span></span>
+<span class="ln" id="L1315"><span class="tok-str">                 would be cut off&quot;</span></span>
+<span class="ln" id="L1316">            );</span>
+<span class="ln" id="L1317">        }</span>
+<span class="ln" id="L1318">    }</span>
+<span class="ln" id="L1319"></span>
+<span class="ln" id="L1320">    <span class="tok-com">/// Escape is handled and a click on the shade is deliberately not.</span></span>
+<span class="ln" id="L1321">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1322">    <span class="tok-com">/// `ModalResponse::should_close` treats the two as one gesture. Using it</span></span>
+<span class="ln" id="L1323">    <span class="tok-com">/// would mean a misjudged click halfway through the tour threw away the</span></span>
+<span class="ln" id="L1324">    <span class="tok-com">/// half the reader had not seen, so this asserts the code does not call it.</span></span>
+<span class="ln" id="L1325">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1326">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stray_click_outside_the_card_does_not_end_the_tour</span>() {</span>
+<span class="ln" id="L1327">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;tour.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1328">        <span class="tok-kw">let</span> overlay = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn overlay(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the overlay exists&quot;</span>);</span>
+<span class="ln" id="L1329">        <span class="tok-com">// Bounded at the end of the function. Unbounded, this reads its own</span></span>
+<span class="ln" id="L1330">        <span class="tok-com">// test as part of the code it is checking and fails on the string it</span></span>
+<span class="ln" id="L1331">        <span class="tok-com">// is looking for, which is a guard that can only ever fail.</span></span>
+<span class="ln" id="L1332">        <span class="tok-kw">let</span> end = source[overlay..]</span>
+<span class="ln" id="L1333">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\nenum Press {&quot;</span>)</span>
+<span class="ln" id="L1334">            .<span class="tok-fn">map</span>(|at| overlay + at)</span>
+<span class="ln" id="L1335">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the press enum follows the overlay&quot;</span>);</span>
+<span class="ln" id="L1336">        <span class="tok-kw">let</span> body = &amp;source[overlay..end];</span>
+<span class="ln" id="L1337">        assert!(</span>
+<span class="ln" id="L1338">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Key::Escape&quot;</span>),</span>
+<span class="ln" id="L1339">            <span class="tok-str">&quot;nothing reads Escape, so the overlay has no keyboard way out&quot;</span></span>
+<span class="ln" id="L1340">        );</span>
+<span class="ln" id="L1341">        assert!(</span>
+<span class="ln" id="L1342">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;should_close()&quot;</span>),</span>
+<span class="ln" id="L1343">            <span class="tok-str">&quot;should_close() closes on a backdrop click as well, which ends the \</span></span>
+<span class="ln" id="L1344"><span class="tok-str">             tour on a stray press&quot;</span></span>
+<span class="ln" id="L1345">        );</span>
+<span class="ln" id="L1346">    }</span>
+<span class="ln" id="L1347">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

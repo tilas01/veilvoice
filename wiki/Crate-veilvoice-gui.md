@@ -81,8 +81,8 @@ another thread, so the window keeps answering while it is busy.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>1814 lines"])
-    n_main(["main.rs<br/>269 lines"])
+    n_lib(["lib.rs<br/>1824 lines"])
+    n_main(["main.rs<br/>281 lines"])
     n_app["app.rs<br/>3697 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>305 lines"]
@@ -115,7 +115,7 @@ flowchart TD
     n_storage["storage.rs<br/>661 lines"]
     n_studio["studio.rs<br/>2844 lines"]
     n_theme["theme.rs<br/>813 lines"]
-    n_tour["tour.rs<br/>1321 lines"]
+    n_tour["tour.rs<br/>1347 lines"]
     n_updates["updates.rs<br/>276 lines"]
     n_vault_store["vault_store.rs<br/>943 lines"]
     n_verify["verify.rs<br/>1836 lines"]
@@ -323,8 +323,8 @@ flowchart TD
 | [[`group.rs`|File-veilvoice-gui-group]] | 2128 | Group mode: several people in one recording, each with a name and a colour. |
 | [[`integrity.rs`|File-veilvoice-gui-integrity]] | 397 | The integrity record, taken and checked by the window rather than by hand. |
 | [[`layout.rs`|File-veilvoice-gui-layout]] | 629 | Centring a row of widgets, which egui does not do by nesting. |
-| [[`lib.rs`|File-veilvoice-gui-lib]] | 1814 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
-| [[`main.rs`|File-veilvoice-gui-main]] | 269 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
+| [[`lib.rs`|File-veilvoice-gui-lib]] | 1824 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
+| [[`main.rs`|File-veilvoice-gui-main]] | 281 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [[`monitor.rs`|File-veilvoice-gui-monitor]] | 579 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [[`notify.rs`|File-veilvoice-gui-notify]] | 460 | How the application tells you something, and the three ways to be told. |
 | [[`offthread.rs`|File-veilvoice-gui-offthread]] | 280 | One answer, worked out somewhere that is not the thread drawing the window. |
@@ -344,14 +344,14 @@ flowchart TD
 | [[`storage.rs`|File-veilvoice-gui-storage]] | 661 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [[`studio.rs`|File-veilvoice-gui-studio]] | 2844 | The Recording Studio and the Recording Browser. |
 | [[`theme.rs`|File-veilvoice-gui-theme]] | 813 | Colour schemes for the desktop app. |
-| [[`tour.rs`|File-veilvoice-gui-tour]] | 1321 | The short walkthrough on a first run, and after an upgrade. |
+| [[`tour.rs`|File-veilvoice-gui-tour]] | 1347 | The short walkthrough on a first run, and after an upgrade. |
 | [[`updates.rs`|File-veilvoice-gui-updates]] | 276 | The manual update check, as the window shows it. |
 | [[`vault_store.rs`|File-veilvoice-gui-vault_store]] | 943 | Where the desktop application keeps its own files, and what the app lock buys for them. |
 | [[`verify.rs`|File-veilvoice-gui-verify]] | 1836 | The verify tab: drop a download on the window and be told what it is. |
 | [[`watchfeed.rs`|File-veilvoice-gui-watchfeed]] | 412 | The device monitor, moved off the thread that paints. |
 | [[`window.rs`|File-veilvoice-gui-window]] | 249 | How big the window opens, and why it is not a constant. |
 
-**24,174 functional lines of Rust** in this crate. A functional line is a line
+**24,208 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

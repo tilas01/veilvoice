@@ -208,12 +208,13 @@ done
 #                   tab differ. Stilled here, which is a setting the
 #                   application already has for people who want it.
 #   animated_icon   the same, for the window icon.
-#   toured_tabs     every tab, so the first-run tour does not open over the
-#                   panel being photographed. Built from the same `--tabs`
-#                   list, so a tab added tomorrow is covered without anybody
-#                   remembering to add it: a hand-written list here would
-#                   leave the tour open on exactly the new tab whose picture
-#                   was the reason for running this.
+#   toured_tabs     every stop on the tour, so it does not open over the
+#                   panel being photographed. Asked of the application with
+#                   `--tour-stops`, so a stop added tomorrow is covered without
+#                   anybody remembering to add it. It used to be the `--tabs`
+#                   list, which stopped being every stop when the setup stops
+#                   were put first: the app lock card then opened over every
+#                   picture this took.
 # The tab names, asked of the application rather than written down here.
 #
 # This was a hand-written list, and a hand-written list of another list is a
@@ -226,8 +227,13 @@ if [ "${#tabs[@]}" -eq 0 ]; then
   exit 1
 fi
 
-# Every tab, comma separated, for `toured_tabs` below.
-toured="$(IFS=,; echo "${tabs[*]}")"
+# Every stop on the tour, comma separated, for `toured_tabs` below.
+mapfile -t stops < <("$exe" --tour-stops)
+if [ "${#stops[@]}" -eq 0 ]; then
+  echo "the application listed no tour stops, so the tour would open over every capture" >&2
+  exit 1
+fi
+toured="$(IFS=,; echo "${stops[*]}")"
 
 mkdir -p "$work/config/veilvoice"
 cat > "$work/config/veilvoice/settings.conf" <<CONF

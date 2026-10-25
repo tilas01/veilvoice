@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/tour.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1321 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 1347 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/tour.rs)
 
 ## Contents
 
@@ -130,7 +130,7 @@ seen, because "show me that again" is not a question about what is new.
 
 ## What this file contains
 
-1321 lines defining **22 functions** (10 public), **5 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1347 lines defining **22 functions** (10 public), **5 types** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
