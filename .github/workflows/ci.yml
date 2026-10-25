@@ -44,6 +44,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       # cpal needs ALSA headers, and eframe needs the X11/Wayland stack.
       - name: Install Linux audio and windowing headers
@@ -202,6 +204,8 @@ jobs:
       QEMU_LD_PREFIX: /usr/arm-linux-gnueabihf
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Install the cross toolchain for ${{ matrix.target }}
         run: |
@@ -276,6 +280,8 @@ jobs:
       RUSTFLAGS: -D warnings
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Install the pinned toolchain
         run: rustup show
@@ -312,6 +318,8 @@ jobs:
         python: ['3.11', '3.13']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: ${{ matrix.python }}
@@ -508,6 +516,15 @@ jobs:
       - name: Every action a workflow runs must be pinned to a commit
         run: python tools/audit/actions.py
 
+      # The same runner, and the token on it. A checkout leaves the token in
+      # `.git/config` unless told not to, where any build script that runs
+      # afterwards can read it. Only the workflows that push through origin
+      # may keep it, and each says why.
+      - name: A checkout that never pushes must not keep the token
+        run: |
+          python tools/audit/checkout_tokens.py
+          python tools/audit/checkout_tokens.py --self-test
+
       # F-241. PowerShell scopes a variable to the function that assigns it, so
       # `$problems +=` inside a function appends to a copy that is discarded
       # when the function returns. The screenshot script lost every problem it
@@ -698,6 +715,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '22'
@@ -730,6 +749,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - run: rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
       # Debug, not release: the release profile disables overflow checks, and
@@ -755,6 +776,8 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998 # v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -777,6 +800,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - run: rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
       - name: Fail if a networking crate appears in the tree
@@ -881,6 +906,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - run: rustup show
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
       - name: Install the windowing headers and the tracers
@@ -1041,6 +1068,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: Fail if any crate reaching pgp gains a private-key code path
         run: python tools/audit/rsa_usage.py
 
@@ -1058,6 +1087,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           fetch-depth: 0
       - name: Read every pushed commit, and GitHub's verdict on its signature
         env:

@@ -123,6 +123,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/authorship.py`](../tools/audit/authorship.py) | Every commit is tilas01's in both of its fields, names no assistant, and is signed |
 | [`tools/audit/build_output.py`](../tools/audit/build_output.py) | No build output lives inside this repository except where it is expected |
 | [`tools/audit/build_prerequisites.py`](../tools/audit/build_prerequisites.py) | What a fresh machine needs before it can build this, said once |
+| [`tools/audit/checkout_tokens.py`](../tools/audit/checkout_tokens.py) | A checkout that never pushes does not keep the token |
 | [`tools/audit/crate_tables.py`](../tools/audit/crate_tables.py) | Every crate in the workspace appears in every table that lists the crates |
 | [`tools/audit/dependabot.py`](../tools/audit/dependabot.py) | Every manifest in this tree is covered by a Dependabot entry, aimed at `main` |
 | [`tools/audit/dependencies.py`](../tools/audit/dependencies.py) | Every dependency says what it is for, where it is declared |
@@ -203,6 +204,8 @@ And what it then checks:
 - **no crate reaching pgp performs a private-key operation**: `python tools/audit/rsa_usage.py`
 - **every random draw comes from the OS CSPRNG**: `python tools/audit/randomness.py`
 - **every action a workflow runs is pinned to a commit**: `python tools/audit/actions.py`
+- **a checkout that never pushes does not keep the token**: `python tools/audit/checkout_tokens.py`
+- **the checkout guard reads the shapes it is meant to**: `python tools/audit/checkout_tokens.py --self-test`
 - **no PowerShell function keeps a script variable's change to itself**: `python tools/audit/powershell.py`
 - **that guard catches what it claims to, as well**: `python tools/audit/powershell.py --self-test`
 - **the release step tags the commit it built**: `python tools/audit/publishing.py`

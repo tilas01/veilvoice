@@ -81,6 +81,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
@@ -118,6 +120,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           fetch-depth: 0
           fetch-tags: true
       - name: Find the release
@@ -162,6 +165,7 @@ jobs:
       # usually moved on by the time a release finishes.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           ref: ${{ needs.release.outputs.tag }}
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
@@ -197,9 +201,13 @@ jobs:
       # `ready` is this step's answer, and every step after it reads it.
       - name: Clone the wiki repository, creating it if it does not exist
         id: wiki
+        # The token reaches the script as a variable, not pasted into its
+        # text, so it never appears in the script file the runner writes.
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          remote="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+          remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git"
 
           if git clone "$remote" wiki-repo 2>/tmp/clone.log; then
             echo "cloned the existing wiki"
@@ -209,7 +217,7 @@ jobs:
 
           cat /tmp/clone.log
           if ! grep -qi "not found" /tmp/clone.log; then
-            echo "::error::The wiki for ${{ github.repository }} exists but could not be cloned; see the output above."
+            echo "::error::The wiki for ${GITHUB_REPOSITORY} exists but could not be cloned; see the output above."
             exit 1
           fi
           echo "the wiki repository does not exist yet; trying to create it"
@@ -236,7 +244,7 @@ jobs:
 
           cat /tmp/create.log
           echo "ready=false" >> "$GITHUB_OUTPUT"
-          echo "::warning::The wiki was not published: ${{ github.repository }} has no wiki repository yet. Save any first page in the Wiki tab and re-run this workflow."
+          echo "::warning::The wiki was not published: ${GITHUB_REPOSITORY} has no wiki repository yet. Save any first page in the Wiki tab and re-run this workflow."
           {
             echo "### The wiki was not published"
             echo
@@ -270,6 +278,12 @@ jobs:
       - name: Commit and push, if anything changed
         if: steps.wiki.outputs.ready == 'true'
         working-directory: wiki-repo
+        # Both as variables rather than pasted into the script, for the reason
+        # given on the clone step. A tag name is text the shell then reads, so
+        # it stays a value instead of becoming part of the command.
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.release.outputs.tag }}
         run: |
           set -euo pipefail
           git config user.name  "tilas01"
@@ -277,7 +291,7 @@ jobs:
           # The clone path already has an `origin`; the create path above made
           # this repository locally, so it may not. Set it either way rather
           # than assuming which path ran.
-          remote="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+          remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git"
           git remote set-url origin "$remote" 2>/dev/null \
             || git remote add origin "$remote"
           git add -A
@@ -285,7 +299,7 @@ jobs:
             echo "the wiki already matches the repository, nothing to push"
             exit 0
           fi
-          git commit -m "Publish the wiki from ${{ needs.release.outputs.tag }}
+          git commit -m "Publish the wiki from ${TAG}
 
           Generated in the main repository and copied here. Every page has a
           source file there, and CI fails if the two disagree, so editing a
