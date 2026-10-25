@@ -41,7 +41,7 @@ veilvoice-setup = { path = "../veilvoice-setup" }
 # a feature.
 # Reading the signed public key and checking a detached signature with no
 # GnuPG installed, which is the whole point of this verifier.
-pgp = { version = "0.20", default-features = false }
+pgp = { version = "0.21", default-features = false }
 # The SHA-256 in `check::sha256_file`, which is the hash every published
 # list is written in.
 sha2 = "0.10"

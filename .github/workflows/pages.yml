@@ -106,7 +106,7 @@ jobs:
       # The banner and icons are generated, and the site is the most visible
       # place a stale copy would show. Regenerating and diffing here keeps the
       # published artwork honest to the script that claims to produce it.
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: '3.12'
       - name: Artwork must match the generator

@@ -474,7 +474,7 @@ jobs:
       - name: Pin the build timestamp for the VM
         run: git log -1 --pretty=%ct > .source-date-epoch
       - name: Build the CLI in a Openbsd VM
-        uses: vmactions/openbsd-vm@5f7b2c933b8846a138361d6843c52af4bef5d945 # v1
+        uses: vmactions/openbsd-vm@f1ca8bc8ecc5b6ef7218e5b914836e067e1546d3 # v1
         with:
           usesh: true
           prepare: pkg_add rust
@@ -690,7 +690,7 @@ jobs:
       # `crates/veilvoice-verify/tests/release_manifest.rs` builds a synthetic
       # release, runs this script, and reads the result back with the parser
       # that will read it for real.
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: '3.12'
       - name: List what is inside each archive
