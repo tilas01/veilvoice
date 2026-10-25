@@ -1298,3 +1298,34 @@ fn a_build_without_capture_says_so_before_anything_is_pressed() {
         "a build that can capture was shown a notice"
     );
 }
+
+/// F-274. A vault that finishes opening after the window has locked is not
+/// installed when the window opens again. Before, `close` left the unlock's
+/// receiver in place and the next poll put the vault back, into whichever
+/// session came next, a decoy one included.
+#[test]
+fn an_unlock_still_running_when_the_window_locks_is_not_installed_after() {
+    let (_dir, mut opened, _) = studio_with_a_take("from before the lock");
+    let vault = std::sync::Arc::try_unwrap(opened.vault.take().unwrap())
+        .unwrap_or_else(|_| panic!("the only reference to the vault"));
+    let entries = std::mem::take(&mut opened.entries);
+
+    let mut studio = Studio::default();
+    let (tx, rx) = std::sync::mpsc::channel();
+    studio.unlocking = Some(rx);
+    studio.close();
+    // The worker finishes after the lock, as a slow derivation would.
+    let _ = tx.send(Ok(Opened {
+        vault,
+        entries,
+        free: None,
+        vaults: 1,
+    }));
+    studio.poll_unlock();
+
+    assert!(
+        studio.vault.is_none(),
+        "the vault from before the lock was installed"
+    );
+    assert!(studio.entries.is_empty(), "its recordings are listed");
+}
