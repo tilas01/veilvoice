@@ -74,7 +74,7 @@ def labels_in_workflow(text):
     # archive step is `tar -czf` in every case, and that is asserted below
     # rather than parsed, because these three jobs have no `archive:` key to
     # read.
-    for out in re.findall(r'out="veilvoice-\$\{\{\s*env\.VERSION_TAG\s*\}\}-([A-Za-z0-9_.-]+)"', text):
+    for out in re.findall(r'out="veilvoice-(?:\$\{\{\s*env\.VERSION_TAG\s*\}\}|\$VERSION_TAG|\$\{VERSION_TAG\})-([A-Za-z0-9_.-]+)"', text):
         found.setdefault(out, "tar.gz")
 
     return found

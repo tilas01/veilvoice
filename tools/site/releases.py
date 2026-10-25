@@ -564,7 +564,7 @@ def archives():
 
     # The BSD jobs, which are not in that matrix and name their archive in the
     # staging step. Always a tarball; there is no BSD zip.
-    for match in re.finditer(r'out="veilvoice-\$\{\{[^}]*\}\}-(\S+?)"', text):
+    for match in re.finditer(r'out="veilvoice-(?:\$\{\{[^}]*\}\}|\$VERSION_TAG|\$\{VERSION_TAG\})-([^"\s$]+)"', text):
         found.append((match.group(1), "tar.gz"))
 
     if len(found) < 5:
