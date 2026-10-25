@@ -136,7 +136,7 @@ fn window_is_settled(ctx: &egui::Context) -> bool {
         return false;
     }
 
-    let id = egui::Id::new("veilvoice-soundbar-window-rect");
+    let id = egui::Id::unique("veilvoice-soundbar-window-rect");
     let (rect, now) = ctx.input(|i| (i.viewport().outer_rect, i.time));
     let Some(rect) = rect else {
         // A platform that does not report the window rectangle cannot be
@@ -169,7 +169,7 @@ fn window_is_settled(ctx: &egui::Context) -> bool {
 /// loses focus. Clicking away from the window and back should not make the
 /// logo jump.
 fn animation_clock(ctx: &egui::Context, moving: bool, time: f32) -> f32 {
-    let id = egui::Id::new("veilvoice-soundbar-clock");
+    let id = egui::Id::unique("veilvoice-soundbar-clock");
     if moving {
         ctx.memory_mut(|m| m.data.insert_temp(id, time));
         time
@@ -711,7 +711,7 @@ mod tests {
                 step as f32 * 0.2,
             );
         }
-        let requested = std::time::Duration::from_millis(1000 / 30);
+        let requested = std::time::Duration::from_secs_f64(1.0 / 30.0);
         let one_frame = std::time::Duration::from_millis(17);
         assert!(
             delay <= requested,

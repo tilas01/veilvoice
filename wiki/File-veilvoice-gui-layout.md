@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/layout.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 629 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 632 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs)
 
 ## Contents
 
@@ -64,7 +64,7 @@ like permanently.
 
 ## What this file contains
 
-629 lines defining **9 functions** (9 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+632 lines defining **9 functions** (9 public), **0 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
