@@ -829,6 +829,13 @@ impl Studio {
         // be shown beside the next vault as though they described it.
         self.free = None;
         self.vaults = 0;
+        // **F-274.** An unlock still on its thread belongs to the session that
+        // is ending. Kept, its answer was collected by the next frame after
+        // the window opened again, whoever opened it, and a decoy session was
+        // handed the real vault without either passphrase being typed in it.
+        // Dropping the receiver lets the thread's send fail and the key it
+        // derived go with it.
+        self.unlocking = None;
         self.app_entry.zeroize();
         self.rest_entry.zeroize();
     }
