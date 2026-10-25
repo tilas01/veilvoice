@@ -436,14 +436,27 @@ pub fn template(id: &str) -> Option<Template> {
     templates().into_iter().find(|template| template.id == id)
 }
 
-/// Seconds between two entries of a [`Levels`] timeline.
+/// Seconds between two entries of a [`Levels`] timeline, as asked for.
+///
+/// What a timeline actually steps by is a whole number of samples, so at a
+/// rate this does not divide it is a little more or less: 221 samples at
+/// 44.1 kHz is 5.011 ms. [`Levels`] keeps the step it really took.
 pub const HOP_SECS: f64 = 0.005;
 
-/// How loud the recording is, every five milliseconds, already settled.
+/// How loud the recording is, about every five milliseconds, already settled.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Levels {
     values: Vec<f32>,
     duration_secs: f64,
+    /// The seconds each entry covers: a whole number of samples, which is
+    /// [`HOP_SECS`] only at a rate that divides it.
+    ///
+    /// **F-275.** [`Levels::peak`] used to find an entry by dividing by
+    /// [`HOP_SECS`] while [`levels`] stepped by the rounded hop, so at
+    /// 44.1 kHz each entry was 11 microseconds longer than it was read as and
+    /// the picture ran ahead of the sound by 0.14 s a minute: eight seconds
+    /// by the end of an hour, and a flat wave over the last 0.2% of it.
+    hop_secs: f64,
 }
 
 impl Levels {
@@ -460,8 +473,8 @@ impl Levels {
         if self.values.is_empty() || to_secs <= 0.0 || from_secs >= self.duration_secs {
             return 0.0;
         }
-        let first = (from_secs.max(0.0) / HOP_SECS).floor() as usize;
-        let last = ((to_secs / HOP_SECS).ceil() as usize).min(self.values.len());
+        let first = (from_secs.max(0.0) / self.hop_secs).floor() as usize;
+        let last = ((to_secs / self.hop_secs).ceil() as usize).min(self.values.len());
         self.values
             .get(first..last.max(first + 1).min(self.values.len()))
             .map(|run| run.iter().copied().fold(0.0f32, f32::max))
@@ -471,7 +484,7 @@ impl Levels {
 
 /// Reduce a recording to the timeline a picture is drawn from.
 ///
-/// Each entry is the loudest sample in its five milliseconds, scaled by the
+/// Each entry is the loudest sample in its five milliseconds or so, scaled by the
 /// response and put through a curve so that a quiet voice still moves the
 /// picture, then settled: it rises at once and falls back over
 /// [`Motion::settle_secs`].
@@ -479,8 +492,9 @@ pub fn levels(samples: &[f32], sample_rate: u32, motion: &Motion) -> Levels {
     let rate = sample_rate.max(1) as f64;
     let duration_secs = samples.len() as f64 / rate;
     let hop = ((rate * HOP_SECS).round() as usize).max(1);
+    let hop_secs = hop as f64 / rate;
     let fall = if motion.settle_secs > 0.0 {
-        (-(HOP_SECS as f32) / motion.settle_secs).exp()
+        (-(hop_secs as f32) / motion.settle_secs).exp()
     } else {
         0.0
     };
@@ -504,6 +518,7 @@ pub fn levels(samples: &[f32], sample_rate: u32, motion: &Motion) -> Levels {
     Levels {
         values,
         duration_secs,
+        hop_secs,
     }
 }
 
@@ -920,6 +935,37 @@ mod tests {
             assert!(bad.checked().is_err());
             assert!(Renderer::new(&bad, small(), 30, levels(&[], 48_000, &bad), None).is_err());
         }
+    }
+
+    #[test]
+    fn the_wave_is_where_the_sound_is_an_hour_in_at_a_rate_five_milliseconds_does_not_divide() {
+        // F-275. 44.1 kHz steps by 221 samples, which is 5.011 ms, and the
+        // timeline was read as though it stepped by 5. A burst a minute in
+        // was drawn 0.14 s late, so a window on the burst saw silence and a
+        // window on the silence before it saw the burst.
+        let rate = 44_100;
+        let samples = tone(60.5, rate, |t| {
+            if (60.0..60.02).contains(&t) {
+                0.8
+            } else {
+                0.0
+            }
+        });
+        let snap = Motion {
+            settle_secs: 0.0,
+            ..Motion::default()
+        };
+        let timeline = levels(&samples, rate, &snap);
+        assert!(
+            timeline.peak(60.0, 60.02) > 0.5,
+            "the burst is not where it was played"
+        );
+        assert_eq!(
+            timeline.peak(59.85, 59.88),
+            0.0,
+            "the burst is drawn before it was played"
+        );
+        assert_eq!(timeline.peak(60.2, 60.4), 0.0);
     }
 
     #[test]
