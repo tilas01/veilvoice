@@ -6,9 +6,9 @@
 # decision:
 #
 #   1. *Unmaintained* advisories -- a maintenance signal, not a known exploit.
-#   2. A *vulnerability* judged unreachable in this tree. There is exactly one,
-#      it is argued in full below, and it is guarded mechanically in CI so that
-#      the argument cannot quietly stop being true.
+#   2. A *vulnerability* judged unreachable in this tree. There are two, on
+#      the same ground, each argued in full below, and that ground is guarded
+#      mechanically in CI so that the argument cannot quietly stop being true.
 #
 # The second category is a weakening of the rule this file used to state --
 # "vulnerabilities always fail the build" -- and it is written out rather than
@@ -49,6 +49,25 @@ ignore = [
     # decryption API appears in the verifier. If that argument ever stops being
     # true, the build stops with it rather than this comment quietly ageing.
     "RUSTSEC-2023-0071",
+
+    # crypto-bigint 0.5.5 -- RUSTSEC-2026-0387: several operations meant to
+    # run in constant time could branch on the values they were given, so a
+    # timing side channel could leak a secret integer. The fix is in 0.7.6 and
+    # nothing on this path can take it yet: the 0.5 line has no fixed release,
+    # and pgp 0.21, the newest, still depends on 0.5.5.
+    #
+    # It arrives only through the elliptic-curve half of the same verifier:
+    #
+    #     crypto-bigint <- elliptic-curve, cx448 <- ecdsa, p256, p384, p521,
+    #                      k256 <- pgp <- veilvoice-verify
+    #
+    # The ground is the one given for rsa above. A timing leak matters when
+    # the integer is a secret. Checking a signature works on a public key and
+    # a public signature, so there is no secret on this path to leak. The same
+    # guard holds it: tools/audit/rsa_usage.py fails the build if any crate
+    # reaching pgp gains a secret-key, signing or decryption path, which is
+    # the only way a secret could reach this arithmetic.
+    "RUSTSEC-2026-0387",
 ]
 
 # `ttf-parser` was the third entry here, accepted on the ground that no

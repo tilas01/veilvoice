@@ -313,9 +313,10 @@ CHECKS = [
     # build rather than in a pass somebody runs before every commit.
     ("every feature selection a release builds is still declared",
      [sys.executable, "tools/audit/features.py"]),
-    # The check that lets an accepted advisory stay accepted: RUSTSEC-2023-0071
-    # is about RSA private-key operations, and this crate only ever verifies a
-    # signature against a public key. It ran only in CI until now, which meant
+    # The check that lets two accepted advisories stay accepted:
+    # RUSTSEC-2023-0071 is about RSA private-key operations and
+    # RUSTSEC-2026-0387 about timing leaks of secret integers, and this crate
+    # only ever verifies a signature against a public key. It ran only in CI until now, which meant
     # the one guard behind a security argument was the one nobody could run
     # before pushing.
     ("no crate reaching pgp performs a private-key operation",
