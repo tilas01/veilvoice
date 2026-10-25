@@ -10,7 +10,7 @@
 #
 # The advisory list is repeated here because cargo-deny reads its own file and
 # not cargo-audit's. The arguments live in `.cargo/audit.toml`; this is the
-# same three identifiers and nothing else, and `tools/audit/dependencies.py`
+# same identifiers and nothing else, and `tools/audit/dependencies.py`
 # fails the build if the two lists drift apart.
 
 [graph]
@@ -21,6 +21,9 @@ no-default-features = false
 ignore = [
     "RUSTSEC-2024-0436", # paste: unmaintained, compile-time only
     "RUSTSEC-2023-0071", # rsa: Marvin needs a private key; there is none here
+    "RUSTSEC-2026-0370", # zvariant: unmaintained, merged into zbus 6; Linux file dialog only
+    "RUSTSEC-2026-0371", # zbus_names: unmaintained, merged into zbus 6; Linux file dialog only
+    "RUSTSEC-2026-0372", # zvariant_derive: unmaintained, merged into zbus 6; compile-time only
     "RUSTSEC-2026-0387", # crypto-bigint: a timing leak needs a secret; verifying has none
 ]
 

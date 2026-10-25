@@ -24,6 +24,23 @@ ignore = [
     # away. Drops out when upstream crates migrate.
     "RUSTSEC-2024-0436",
 
+    # zvariant 5.15.0, zvariant_derive 5.15.0 and zbus_names 4.3.4, the D-Bus
+    # serialisation half of zbus 5. The zbus project merged all three into zbus
+    # 6 and stopped maintaining them as separate crates. No known
+    # vulnerability. They arrive through one path, used only on Linux and the
+    # BSDs to ask the desktop's own portal for a file dialog:
+    #
+    #     zvariant, zbus_names <- zbus 5 <- ashpd 0.11 <- rfd 0.16 <- veilvoice-gui
+    #
+    # Nothing VeilVoice reads from a recording or a vault passes through them.
+    # rfd 0.17 drops zbus altogether, but it does so by opening libdbus at run
+    # time through its own C bindings, which is a change of backend to weigh
+    # on its own rather than a version bump. They drop out when that is done or
+    # when ashpd moves to zbus 6.
+    "RUSTSEC-2026-0370",
+    "RUSTSEC-2026-0371",
+    "RUSTSEC-2026-0372",
+
     # --- category 2: a vulnerability, judged unreachable -------------------
     #
     # rsa 0.9.10 -- RUSTSEC-2023-0071, the Marvin attack: key recovery through

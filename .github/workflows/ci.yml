@@ -752,7 +752,7 @@ jobs:
       # The three questions cargo-audit does not ask: whether every licence in
       # the graph can ship under GPL-3.0-or-later, whether every crate comes
       # from crates.io, and whether one crate is compiled at two versions.
-      # `deny.toml` is the policy; its advisory exceptions are the same three
+      # `deny.toml` is the policy; its advisory exceptions are the same
       # as `.cargo/audit.toml`'s, and `tools/audit/dependencies.py` fails if
       # the two files stop agreeing.
       - name: Licences, sources and duplicate versions
