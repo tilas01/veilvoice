@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
 """
-Rewrite `dev`, and `main` where it is inside the range, so every commit is tilas01's.
+Rewrite `main` so every commit is tilas01's.
 
     python tools/repo/rewrite.py --sign KEYID          # build it, check it, say what it did
     python tools/repo/rewrite.py --sign KEYID --push   # force-push exactly that, with a lease
@@ -31,14 +31,14 @@ unsigned.
 The tree of every commit is byte for byte what it was, except that an
 instruction file for an AI assistant (`authorship.ASSISTANT_FILES`: the rules
 file at the root, `.claude/` and the like) is taken out of every commit that
-carried one, so neither branch ever has. That is checked, commit by commit,
+carried one, so the branch never has. That is checked, commit by commit,
 before anything is pushed: the only paths that may differ are those. Neither is
 read by any build, so a build of any rewritten commit is identical to a build
 of the original: the release builds take `SOURCE_DATE_EPOCH` from the committer
 date, and that is kept too.
 
 No tag is touched. Every published release tag points at a commit outside the
-history of both branches, so a rewrite of them moves no release.
+history of the branch, so a rewrite of it moves no release.
 
 # The range
 
@@ -48,19 +48,19 @@ message, or a signature that is not one of the accepted keys. With `--no-sign`
 a missing signature is not counted as wrong, because an unsigned rewrite would
 only strip signatures GitHub already verifies. `--from <commit>` starts there.
 
-`main` is rewritten only as far as it is already an ancestor of `dev`, and ends
-at the rewrite of the commit it was at. If `main` is before the range it is left
-exactly where it is.
+`main` is the only branch. It used to be rewritten together with `dev`, and
+only as far as it was an ancestor of it; `dev` was merged into `main` and
+deleted on 25 October 2026, so `main` is the whole of it now.
 
 # After it
 
 The map of old to new commits is written to `.git/rewrite-map.txt`. A clone
-with work on top of the old `dev` moves it across with:
+with work on top of the old `main` moves it across with:
 
     git fetch origin
-    git rebase --onto origin/dev OLD_DEV_TIP
+    git rebase --onto origin/main OLD_MAIN_TIP
 
-where OLD_DEV_TIP is the first line this prints. Nothing else is needed: the
+where OLD_MAIN_TIP is the first line this prints. Nothing else is needed: the
 trees differ only by the instruction files, which nobody's work touches, so the
 rebase has nothing to resolve.
 
@@ -241,7 +241,7 @@ def take_handover(options, signing):
     stored where `--push` looks for a dry run's result.
     """
     sha = options.handover
-    git(["fetch", "-q", options.remote, "dev", "main", sha])
+    git(["fetch", "-q", options.remote, "main", sha])
     tips = dict(line.split() for line in git(["show", sha + ":tips.txt"]).splitlines())
     # The bundle comes in numbered parts, each under GitHub's limit on one file.
     parts = sorted(name for name in git(["ls-tree", "--name-only", sha]).splitlines()
@@ -254,49 +254,43 @@ def take_handover(options, signing):
             handle.write(subprocess.run(["git", "show", sha + ":" + part], cwd=ROOT,
                                         check=True, stdout=subprocess.PIPE).stdout)
     git(["bundle", "verify", "-q", bundle])
-    git(["fetch", "-q", bundle, "+refs/rewrite/dev:refs/rewrite/dev",
-         "+refs/rewrite/main:refs/rewrite/main"])
-    for name in ("dev", "main"):
+    git(["fetch", "-q", bundle, "+refs/rewrite/main:refs/rewrite/main"])
+    for name in ("main",):
         if git(["rev-parse", "refs/rewrite/" + name]) != tips[name]:
             raise SystemExit("the handover's %s is not the tip it names" % name)
         git(["update-ref", "refs/rewrite/old-" + name, tips["old-" + name]])
     mapping_text = git(["show", sha + ":rewrite-map.txt"])
     mapping = dict(line.split() for line in mapping_text.splitlines() if line.strip())
-    proven(mapping, [tips["dev"], tips["main"]], signing)
+    proven(mapping, [tips["main"]], signing)
     with open(os.path.join(ROOT, ".git", "rewrite-map.txt"), "w") as handle:
         handle.write(mapping_text + "\n")
-    print("old dev tip   %s" % tips["old-dev"])
-    print("dev   %s -> %s" % (tips["old-dev"][:10], tips["dev"][:10]))
+    print("old main tip  %s" % tips["old-main"])
     print("main  %s -> %s" % (tips["old-main"][:10], tips["main"][:10]))
     print("%d commit(s) in the handover, proved here; --push sends exactly that, "
-          "if neither branch has moved since" % len(mapping))
+          "if main has not moved since" % len(mapping))
     return 0
 
 
 def push_built(options, signing):
     """Push exactly what the dry run built, if nothing has moved since."""
     built = {}
-    for name in ("dev", "main", "old-dev", "old-main"):
+    for name in ("main", "old-main"):
         built[name] = git(["rev-parse", "-q", "--verify", "refs/rewrite/" + name], check=False)
         if not built[name]:
             raise SystemExit("no dry run to push: run this without --push first")
-    git(["fetch", "-q", options.remote, "dev", "main"])
-    for branch in ("dev", "main"):
+    git(["fetch", "-q", options.remote, "main"])
+    for branch in ("main",):
         now = git(["rev-parse", "%s/%s" % (options.remote, branch)])
         if now != built["old-" + branch]:
             raise SystemExit("%s has moved since the dry run (%s, not %s); run the dry run "
                              "again, then push" % (branch, now[:10], built["old-" + branch][:10]))
     with open(os.path.join(ROOT, ".git", "rewrite-map.txt")) as handle:
         mapping = dict(line.split() for line in handle if line.strip())
-    proven(mapping, [built["dev"], built["main"]], signing)
-    leases = ["--force-with-lease=dev:%s" % built["old-dev"]]
-    specs = ["%s:refs/heads/dev" % built["dev"]]
-    if built["main"] != built["old-main"]:
-        leases.append("--force-with-lease=main:%s" % built["old-main"])
-        specs.append("%s:refs/heads/main" % built["main"])
-    git(["push", "--atomic"] + leases + [options.remote] + specs)
-    print("old dev tip   %s" % built["old-dev"])
-    print("pushed: dev %s, main %s" % (built["dev"][:10], built["main"][:10]))
+    proven(mapping, [built["main"]], signing)
+    git(["push", "--force-with-lease=main:%s" % built["old-main"], options.remote,
+         "%s:refs/heads/main" % built["main"]])
+    print("old main tip  %s" % built["old-main"])
+    print("pushed: main %s" % built["main"][:10])
     return 0
 
 
@@ -318,19 +312,15 @@ def main():
     if options.handover:
         return take_handover(options, signing)
 
-    git(["fetch", "-q", options.remote, "dev", "main"])
-    old_dev = git(["rev-parse", "%s/dev" % options.remote])
+    git(["fetch", "-q", options.remote, "main"])
     old_main = git(["rev-parse", "%s/main" % options.remote])
-    if subprocess.run(["git", "merge-base", "--is-ancestor", old_main, old_dev],
-                      cwd=ROOT).returncode != 0:
-        raise SystemExit("main has commits dev does not; merge those into dev first")
     # Parents before children, which a merge (81316420, in August) needs:
     # each commit is made from the rewritten form of every parent it has.
-    history = git(["rev-list", "--reverse", "--topo-order", old_dev]).split()
+    history = git(["rev-list", "--reverse", "--topo-order", old_main]).split()
     if not any(wrong(sha, signing) for sha in history):
         # Including from the root: a second signed rewrite of a history that
         # is already right would force-push every commit again for nothing.
-        print("nothing on dev needs rewriting")
+        print("nothing on main needs rewriting")
         return 0
     if options.start is None:
         options.start = "root" if signing else "auto"
@@ -361,34 +351,29 @@ def main():
         mapping[sha] = git(args, env=step,
                            stdin=reword(message, mapping, sha).encode("utf-8"))
 
-    new_dev = mapping[old_dev]
-    new_main = mapping.get(old_main, old_main)
+    new_main = mapping[old_main]
 
     # Proof before anything leaves this machine.
-    proven(mapping, [new_dev, new_main], signing)
+    proven(mapping, [new_main], signing)
     _, notes = authorship.audit(ROOT, [mapping[s] for s in history[first:]],
                                 required=signing, look_ahead=False)
 
     with open(os.path.join(ROOT, ".git", "rewrite-map.txt"), "w") as handle:
         for old, new in mapping.items():
             handle.write("%s %s\n" % (old, new))
-    git(["update-ref", "refs/rewrite/dev", new_dev])
     git(["update-ref", "refs/rewrite/main", new_main])
-    git(["update-ref", "refs/rewrite/old-dev", old_dev])
     git(["update-ref", "refs/rewrite/old-main", old_main])
 
-    print("old dev tip   %s" % old_dev)
-    print("dev   %s -> %s" % (old_dev[:10], new_dev[:10]))
-    print("main  %s -> %s%s" % (old_main[:10], new_main[:10],
-                                 "" if new_main != old_main else "  (unchanged)"))
+    print("old main tip  %s" % old_main)
+    print("main  %s -> %s" % (old_main[:10], new_main[:10]))
     print("%d commit(s) rewritten from %s, every tree identical but for instruction files, %s"
           % (len(mapping), history[first][:10],
              "every one signed with %s" % options.sign if signing else "unsigned"))
     if notes and signing:
         print("\n".join(notes))
 
-    print("dry run: the result is at refs/rewrite/dev and refs/rewrite/main, and\n"
-          "--push sends exactly that, if neither branch has moved since")
+    print("dry run: the result is at refs/rewrite/main, and --push sends exactly\n"
+          "that, if main has not moved since")
     return 0
 
 
