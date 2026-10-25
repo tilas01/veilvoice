@@ -136,18 +136,18 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`accel.rs`|File-veilvoice-video-accel]] | 652 | What hardware this machine has, and the one place VeilVoice can use it. |
-| [[`export.rs`|File-veilvoice-video-export]] | 911 | What an export asks, and the ffmpeg command each answer turns into. |
-| [[`ffmpeg.rs`|File-veilvoice-video-ffmpeg]] | 718 | The video file, which needs a codec this project does not ship. |
-| [[`font.rs`|File-veilvoice-video-font]] | 418 | A monospace face, five pixels by seven, drawn here. |
-| [[`frames.rs`|File-veilvoice-video-frames]] | 695 | The video's pictures, and how many of them there really are. |
-| [[`lib.rs`|File-veilvoice-video-lib]] | 180 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
-| [[`motion.rs`|File-veilvoice-video-motion]] | 1162 | The moving picture an export draws, and the templates it starts from. |
-| [[`page.rs`|File-veilvoice-video-page]] | 1610 | The picture: one still for a preview, and one page that plays. |
-| [[`palette.rs`|File-veilvoice-video-palette]] | 747 | Colours: the site's own tokens, and one per speaker. |
-| [[`raster.rs`|File-veilvoice-video-raster]] | 621 | Pixels, and a PNG to put them in. |
-| [[`size.rs`|File-veilvoice-video-size]] | 732 | The size and frame rate a video is rendered at. |
-| [[`waveform.rs`|File-veilvoice-video-waveform]] | 298 | The shape of the audio, reduced to something a page can draw. |
+| [`accel.rs`](File-veilvoice-video-accel) | 652 | What hardware this machine has, and the one place VeilVoice can use it. |
+| [`export.rs`](File-veilvoice-video-export) | 911 | What an export asks, and the ffmpeg command each answer turns into. |
+| [`ffmpeg.rs`](File-veilvoice-video-ffmpeg) | 718 | The video file, which needs a codec this project does not ship. |
+| [`font.rs`](File-veilvoice-video-font) | 418 | A monospace face, five pixels by seven, drawn here. |
+| [`frames.rs`](File-veilvoice-video-frames) | 695 | The video's pictures, and how many of them there really are. |
+| [`lib.rs`](File-veilvoice-video-lib) | 180 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
+| [`motion.rs`](File-veilvoice-video-motion) | 1162 | The moving picture an export draws, and the templates it starts from. |
+| [`page.rs`](File-veilvoice-video-page) | 1610 | The picture: one still for a preview, and one page that plays. |
+| [`palette.rs`](File-veilvoice-video-palette) | 747 | Colours: the site's own tokens, and one per speaker. |
+| [`raster.rs`](File-veilvoice-video-raster) | 621 | Pixels, and a PNG to put them in. |
+| [`size.rs`](File-veilvoice-video-size) | 732 | The size and frame rate a video is rendered at. |
+| [`waveform.rs`](File-veilvoice-video-waveform) | 298 | The shape of the audio, reduced to something a page can draw. |
 
 **6,054 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
