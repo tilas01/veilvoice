@@ -13,13 +13,24 @@ set -euo pipefail
 
 . "$(dirname "$0")/actions_key.sh"
 
+# GitHub matches a signature to an account by an identity on the registered
+# public key whose address is the committer's. When the key in the secret has
+# none, the run adds one to its own copy, which the primary key can certify
+# here, and hands over the public half with it as the artifact
+# signing-public-key. That file is what to paste into GitHub, under Settings,
+# SSH and GPG keys. Nothing secret is in it, and the secret is not changed:
+# signing needs no identity, only the registered public key does.
 if ! printf '%s\n' "$listing" | grep '^uid:' | grep -q "<$address>"; then
+  "$RUNNER_TEMP/gpg-loopback" --quiet --quick-add-uid "$primary" "tilas01 <$address>"
   say ""
-  say "The key carries no identity with $address, so GitHub cannot match it to tilas01's commits."
-  say "On the computer that holds the key, add the address and register the result:"
-  say "gpg --quick-add-uid $primary 'tilas01 <$address>'"
-  say "gpg --armor --export $primary   (paste into GitHub, Settings, SSH and GPG keys)"
+  say "The key carried no identity with $address, so GitHub could not match it to tilas01's commits."
+  say "This run added one. Download the artifact signing-public-key from this run and paste the"
+  say "file's contents at https://github.com/settings/gpg/new"
 fi
+mkdir -p "$RUNNER_TEMP/public"
+gpg --armor --export "$primary" > "$RUNNER_TEMP/public/veilvoice-signing-key.asc"
+gpg --show-keys --with-colons "$RUNNER_TEMP/public/veilvoice-signing-key.asc" \
+  | awk -F: '$1=="uid" {print "public key identity:", $10}' | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"
 
 git config user.name tilas01
 git config user.email "$address"
