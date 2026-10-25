@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-crypto/src/decoy.rs</code></h1>
-<p style="color:var(--muted)"><a href="decoy.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1031 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="decoy.html">what this file is for</a> &middot; <a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1065 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -209,7 +209,7 @@
 <span class="ln" id="L135"></span>
 <span class="src-item" id="fn-verifier-matches">
 <span class="ln" id="L136">    <span class="tok-com">/// Derive and compare. Always does the full derivation.</span></span>
-<span class="ln" id="L137">    <span class="tok-kw">fn</span> <span class="tok-fn">matches</span>(&amp;<span class="tok-kw">self</span>, passphrase: &amp;[u8], params: kdf::KdfParams) -&gt; Result&lt;bool, Error&gt; {</span>
+<span class="ln" id="L137">    <span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">matches</span>(&amp;<span class="tok-kw">self</span>, passphrase: &amp;[u8], params: kdf::KdfParams) -&gt; Result&lt;bool, Error&gt; {</span>
 <span class="ln" id="L138">        <span class="tok-kw">let</span> key = kdf::<span class="tok-fn">derive_key</span>(passphrase, &amp;<span class="tok-kw">self</span>.salt, params)?;</span>
 <span class="ln" id="L139">        <span class="tok-fn">Ok</span>(<span class="tok-fn">constant_time_eq</span>(key.<span class="tok-fn">expose</span>(), &amp;<span class="tok-kw">self</span>.expected))</span>
 <span class="ln" id="L140">    }</span>
@@ -409,7 +409,7 @@
 <span class="ln" id="L311"></span>
 <span class="src-item" id="fn-decoy-matches">
 <span class="ln" id="L312">    <span class="tok-com">/// Derive and compare. Always does the full derivation.</span></span>
-<span class="ln" id="L313">    <span class="tok-kw">fn</span> <span class="tok-fn">matches</span>(&amp;<span class="tok-kw">self</span>, given: &amp;str) -&gt; Result&lt;bool, Error&gt; {</span>
+<span class="ln" id="L313">    <span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">matches</span>(&amp;<span class="tok-kw">self</span>, given: &amp;str) -&gt; Result&lt;bool, Error&gt; {</span>
 <span class="ln" id="L314">        <span class="tok-kw">self</span>.verifier.<span class="tok-fn">matches</span>(given.<span class="tok-fn">as_bytes</span>(), <span class="tok-kw">self</span>.params)</span>
 <span class="ln" id="L315">    }</span>
 </span>
@@ -1032,129 +1032,163 @@
 <span class="ln" id="L906">        );</span>
 <span class="ln" id="L907">    }</span>
 <span class="ln" id="L908"></span>
-<span class="ln" id="L909">    <span class="tok-com">/// **Both are always derived.** Returning as soon as the decoy matches, or</span></span>
-<span class="ln" id="L910">    <span class="tok-com">/// skipping the decoy when none is set, would make one answer measurably</span></span>
-<span class="ln" id="L911">    <span class="tok-com">/// faster than another, and Argon2id takes long enough for somebody with a</span></span>
-<span class="ln" id="L912">    <span class="tok-com">/// stopwatch to see it.</span></span>
-<span class="ln" id="L913">    <span class="tok-com">///</span></span>
-<span class="ln" id="L914">    <span class="tok-com">/// Read from the source, because what is asserted is that a statement is</span></span>
-<span class="ln" id="L915">    <span class="tok-com">/// *not* there. A timing test would measure this machine&#x27;s load.</span></span>
-<span class="ln" id="L916">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L917">    <span class="tok-kw">fn</span> <span class="tok-fn">every_branch_does_the_same_amount_of_work</span>() {</span>
-<span class="ln" id="L918">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;decoy.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L919">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn judge(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function&quot;</span>);</span>
-<span class="ln" id="L920">        <span class="tok-kw">let</span> end = source[start..].<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    }\n&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its end&quot;</span>) + start;</span>
-<span class="ln" id="L921">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
-<span class="ln" id="L922"></span>
-<span class="ln" id="L923">        <span class="tok-com">// No decoy set, and the work is done anyway.</span></span>
-<span class="ln" id="L924">        assert!(</span>
-<span class="ln" id="L925">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Decoy::nothing(lock.params())&quot;</span>),</span>
-<span class="ln" id="L926">            <span class="tok-str">&quot;the no-decoy case must still derive:\n{body}&quot;</span></span>
-<span class="ln" id="L927">        );</span>
-<span class="ln" id="L928">        <span class="tok-com">// The decoy derivation happens before anything can return.</span></span>
-<span class="ln" id="L929">        <span class="tok-kw">let</span> derive_at = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;record.matches(given)&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the derivation&quot;</span>);</span>
-<span class="ln" id="L930">        assert!(</span>
-<span class="ln" id="L931">            !body[..derive_at].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;return&quot;</span>),</span>
-<span class="ln" id="L932">            <span class="tok-str">&quot;something returns before the decoy is derived, which tells an \</span></span>
-<span class="ln" id="L933"><span class="tok-str">             observer which branch they are in:\n{}&quot;</span>,</span>
-<span class="ln" id="L934">            &amp;body[..derive_at]</span>
-<span class="ln" id="L935">        );</span>
-<span class="ln" id="L936">        <span class="tok-com">// And the decoy branch still proves the real passphrase.</span></span>
-<span class="ln" id="L937">        <span class="tok-kw">let</span> decoy_at = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;if decoyed {&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the decoy branch&quot;</span>);</span>
-<span class="ln" id="L938">        assert!(</span>
-<span class="ln" id="L939">            body[decoy_at..].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;lock.would_open(given.as_bytes())&quot;</span>),</span>
-<span class="ln" id="L940">            <span class="tok-str">&quot;the decoy branch skips the real derivation:\n{}&quot;</span>,</span>
-<span class="ln" id="L941">            &amp;body[decoy_at..]</span>
-<span class="ln" id="L942">        );</span>
-<span class="ln" id="L943">    }</span>
-<span class="ln" id="L944"></span>
-<span class="ln" id="L945">    <span class="tok-com">/// Four wrong attempts, which is what puts the lock into its cooldown.</span></span>
-<span class="ln" id="L946">    <span class="tok-kw">fn</span> <span class="tok-fn">into_cooldown</span>(lock: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::lock::LockStore) {</span>
-<span class="ln" id="L947">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
-<span class="ln" id="L948">            <span class="tok-kw">let</span> _ = lock.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;not it either&quot;</span>);</span>
-<span class="ln" id="L949">        }</span>
-<span class="ln" id="L950">        assert!(</span>
-<span class="ln" id="L951">            lock.<span class="tok-fn">cooldown</span>().<span class="tok-fn">is_some</span>(),</span>
-<span class="ln" id="L952">            <span class="tok-str">&quot;four wrong passphrases should have started the wait&quot;</span></span>
-<span class="ln" id="L953">        );</span>
-<span class="ln" id="L954">    }</span>
-<span class="ln" id="L955"></span>
-<span class="ln" id="L956">    <span class="tok-com">/// The whole feature turns on this: during the wait, the decoy must be</span></span>
-<span class="ln" id="L957">    <span class="tok-com">/// refused exactly as the real passphrase is. If it opened while the real</span></span>
-<span class="ln" id="L958">    <span class="tok-com">/// one was refused, holding the machine and typing four wrong passphrases</span></span>
-<span class="ln" id="L959">    <span class="tok-com">/// first would be enough to tell which one you had just been given.</span></span>
-<span class="ln" id="L960">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L961">    <span class="tok-kw">fn</span> <span class="tok-fn">a_cooldown_refuses_the_decoy_the_way_it_refuses_the_real_passphrase</span>() {</span>
-<span class="ln" id="L962">        <span class="tok-kw">let</span> (_dir, <span class="tok-kw">mut</span> lock, store) = <span class="tok-fn">machine</span>(<span class="tok-str">&quot;the real one&quot;</span>);</span>
-<span class="ln" id="L963">        store.<span class="tok-fn">set</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>, <span class="tok-str">&quot;the decoy&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L964">        <span class="tok-fn">into_cooldown</span>(&amp;<span class="tok-kw">mut</span> lock);</span>
-<span class="ln" id="L965"></span>
-<span class="ln" id="L966">        <span class="tok-kw">let</span> on_decoy = store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the decoy&quot;</span>);</span>
-<span class="ln" id="L967">        <span class="tok-kw">let</span> on_real = store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>);</span>
-<span class="ln" id="L968">        <span class="tok-kw">let</span> on_wrong = store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;neither of them&quot;</span>);</span>
-<span class="ln" id="L969">        <span class="tok-kw">for</span> (what, answer) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L970">            (<span class="tok-str">&quot;the decoy&quot;</span>, &amp;on_decoy),</span>
-<span class="ln" id="L971">            (<span class="tok-str">&quot;the real one&quot;</span>, &amp;on_real),</span>
-<span class="ln" id="L972">            (<span class="tok-str">&quot;a wrong one&quot;</span>, &amp;on_wrong),</span>
-<span class="ln" id="L973">        ] {</span>
-<span class="ln" id="L974">            assert!(</span>
-<span class="ln" id="L975">                matches!(answer, <span class="tok-fn">Err</span>(Error::<span class="tok-fn">AppLockCooldown</span>(_))),</span>
-<span class="ln" id="L976">                <span class="tok-str">&quot;{what} was not refused by the rate limit: {answer:?}&quot;</span></span>
-<span class="ln" id="L977">            );</span>
-<span class="ln" id="L978">        }</span>
-<span class="ln" id="L979">        <span class="tok-com">// And the wait said is the same wait, not a different number per</span></span>
-<span class="ln" id="L980">        <span class="tok-com">// passphrase, which would answer the same question more quietly.</span></span>
-<span class="ln" id="L981">        <span class="tok-kw">let</span> said = |r: &amp;Result&lt;Opened, Error&gt;| <span class="tok-kw">match</span> r {</span>
-<span class="ln" id="L982">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">AppLockCooldown</span>(secs)) =&gt; *secs,</span>
-<span class="ln" id="L983">            other =&gt; panic!(<span class="tok-str">&quot;expected a wait: {other:?}&quot;</span>),</span>
-<span class="ln" id="L984">        };</span>
-<span class="ln" id="L985">        assert_eq!(<span class="tok-fn">said</span>(&amp;on_decoy), <span class="tok-fn">said</span>(&amp;on_real));</span>
-<span class="ln" id="L986">        assert_eq!(<span class="tok-fn">said</span>(&amp;on_decoy), <span class="tok-fn">said</span>(&amp;on_wrong));</span>
-<span class="ln" id="L987"></span>
-<span class="ln" id="L988">        <span class="tok-com">// That the wait ends, and the decoy opens again afterwards, is not</span></span>
-<span class="ln" id="L989">        <span class="tok-com">// asserted by sleeping through it: `lock.rs` makes the same point with</span></span>
-<span class="ln" id="L990">        <span class="tok-com">// `verify_at` and a chosen clock, for the reason written down there,</span></span>
-<span class="ln" id="L991">        <span class="tok-com">// that a test which waits out a delay is a test nobody runs.</span></span>
-<span class="ln" id="L992">    }</span>
-<span class="ln" id="L993"></span>
-<span class="ln" id="L994">    <span class="tok-com">/// Setting a decoy is a lock operation, so a wrong real passphrase at it</span></span>
-<span class="ln" id="L995">    <span class="tok-com">/// is counted and the wait applies. Asking `would_open` instead recorded</span></span>
-<span class="ln" id="L996">    <span class="tok-com">/// nothing, which made this an unthrottled way of guessing the passphrase.</span></span>
-<span class="ln" id="L997">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L998">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wrong_passphrase_at_the_decoy_store_is_counted_like_any_other</span>() {</span>
-<span class="ln" id="L999">        <span class="tok-kw">let</span> (_dir, <span class="tok-kw">mut</span> lock, store) = <span class="tok-fn">machine</span>(<span class="tok-str">&quot;the real one&quot;</span>);</span>
-<span class="ln" id="L1000">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
-<span class="ln" id="L1001">            assert_eq!(</span>
-<span class="ln" id="L1002">                store</span>
-<span class="ln" id="L1003">                    .<span class="tok-fn">set</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;a guess at the real one&quot;</span>, <span class="tok-str">&quot;a decoy entirely&quot;</span>)</span>
-<span class="ln" id="L1004">                    .<span class="tok-fn">unwrap_err</span>(),</span>
-<span class="ln" id="L1005">                Refused::NotTheRealOne</span>
-<span class="ln" id="L1006">            );</span>
-<span class="ln" id="L1007">        }</span>
-<span class="ln" id="L1008">        <span class="tok-com">// The guesses were counted, so even the right passphrase waits now.</span></span>
-<span class="ln" id="L1009">        assert!(</span>
-<span class="ln" id="L1010">            matches!(</span>
-<span class="ln" id="L1011">                store.<span class="tok-fn">set</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>, <span class="tok-str">&quot;a decoy entirely&quot;</span>),</span>
-<span class="ln" id="L1012">                <span class="tok-fn">Err</span>(Refused::<span class="tok-fn">Cooldown</span>(_))</span>
-<span class="ln" id="L1013">            ),</span>
-<span class="ln" id="L1014">            <span class="tok-str">&quot;the guesses were not counted against the lock&quot;</span></span>
-<span class="ln" id="L1015">        );</span>
-<span class="ln" id="L1016">        assert_eq!(store.<span class="tok-fn">state</span>(), State::Absent);</span>
-<span class="ln" id="L1017">        <span class="tok-com">// Removing one is the same path and the same rule.</span></span>
-<span class="ln" id="L1018">        assert!(matches!(</span>
-<span class="ln" id="L1019">            store.<span class="tok-fn">remove</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>),</span>
-<span class="ln" id="L1020">            <span class="tok-fn">Err</span>(Refused::<span class="tok-fn">Cooldown</span>(_))</span>
-<span class="ln" id="L1021">        ));</span>
-<span class="ln" id="L1022">    }</span>
-<span class="ln" id="L1023"></span>
-<span class="ln" id="L1024">    <span class="tok-com">/// The scope note says the two things that must not be softened.</span></span>
-<span class="ln" id="L1025">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1026">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_still_says_the_uncomfortable_part</span>() {</span>
-<span class="ln" id="L1027">        assert!(SCOPE.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does NOT hide&quot;</span>), <span class="tok-str">&quot;{SCOPE}&quot;</span>);</span>
-<span class="ln" id="L1028">        assert!(SCOPE.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;open source&quot;</span>), <span class="tok-str">&quot;{SCOPE}&quot;</span>);</span>
-<span class="ln" id="L1029">        assert!(WHY_NO_DESTRUCTION.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;worse than no control&quot;</span>));</span>
-<span class="ln" id="L1030">    }</span>
-<span class="ln" id="L1031">}</span>
+<span class="ln" id="L909">    <span class="tok-com">/// **Every answer costs the same number of derivations.** Returning as</span></span>
+<span class="ln" id="L910">    <span class="tok-com">/// soon as the decoy matches, skipping the decoy when none is set, or</span></span>
+<span class="ln" id="L911">    <span class="tok-com">/// deriving once more on one route than another would make that answer</span></span>
+<span class="ln" id="L912">    <span class="tok-com">/// measurably slower or faster, and Argon2id takes long enough for</span></span>
+<span class="ln" id="L913">    <span class="tok-com">/// somebody with a stopwatch to see it.</span></span>
+<span class="ln" id="L914">    <span class="tok-com">///</span></span>
+<span class="ln" id="L915">    <span class="tok-com">/// Counted rather than timed, because a timing test measures this</span></span>
+<span class="ln" id="L916">    <span class="tok-com">/// machine&#x27;s load. This replaced a test that read the source for the</span></span>
+<span class="ln" id="L917">    <span class="tok-com">/// shape of `judge` and passed while the real route derived three times</span></span>
+<span class="ln" id="L918">    <span class="tok-com">/// and the decoy twice (F-272): the extra run was inside</span></span>
+<span class="ln" id="L919">    <span class="tok-com">/// `LockStore::unlock`, which the source check never looked at.</span></span>
+<span class="ln" id="L920">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L921">    <span class="tok-kw">fn</span> <span class="tok-fn">every_branch_does_the_same_amount_of_work</span>() {</span>
+<span class="ln" id="L922">        <span class="tok-kw">let</span> cost = |store: &amp;Store, lock: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::lock::LockStore, given: &amp;str| {</span>
+<span class="ln" id="L923">            <span class="tok-kw">let</span> before = <span class="tok-kw">crate</span>::kdf::<span class="tok-fn">derivations</span>();</span>
+<span class="ln" id="L924">            <span class="tok-kw">let</span> answer = store.<span class="tok-fn">judge</span>(lock, given).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L925">            (answer, <span class="tok-kw">crate</span>::kdf::<span class="tok-fn">derivations</span>() - before)</span>
+<span class="ln" id="L926">        };</span>
+<span class="ln" id="L927"></span>
+<span class="ln" id="L928">        <span class="tok-kw">let</span> (_dir, <span class="tok-kw">mut</span> lock, store) = <span class="tok-fn">machine</span>(<span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L929">        <span class="tok-kw">let</span> (answer, unset_real) = <span class="tok-fn">cost</span>(&amp;store, &amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L930">        assert_eq!(answer, Opened::Real);</span>
+<span class="ln" id="L931">        <span class="tok-kw">let</span> (answer, unset_wrong) = <span class="tok-fn">cost</span>(&amp;store, &amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;neither of them&quot;</span>);</span>
+<span class="ln" id="L932">        assert_eq!(answer, Opened::Wrong);</span>
+<span class="ln" id="L933"></span>
+<span class="ln" id="L934">        store.<span class="tok-fn">set</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>, <span class="tok-str">&quot;the decoy&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L935">        <span class="tok-kw">let</span> (answer, real) = <span class="tok-fn">cost</span>(&amp;store, &amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L936">        assert_eq!(answer, Opened::Real);</span>
+<span class="ln" id="L937">        <span class="tok-kw">let</span> (answer, decoy) = <span class="tok-fn">cost</span>(&amp;store, &amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the decoy&quot;</span>);</span>
+<span class="ln" id="L938">        assert_eq!(answer, Opened::Decoy);</span>
+<span class="ln" id="L939">        <span class="tok-kw">let</span> (answer, wrong) = <span class="tok-fn">cost</span>(&amp;store, &amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;neither of them&quot;</span>);</span>
+<span class="ln" id="L940">        assert_eq!(answer, Opened::Wrong);</span>
+<span class="ln" id="L941"></span>
+<span class="ln" id="L942">        assert_eq!(</span>
+<span class="ln" id="L943">            [unset_real, unset_wrong, real, decoy, wrong],</span>
+<span class="ln" id="L944">            [decoy; <span class="tok-num">5</span>],</span>
+<span class="ln" id="L945">            <span class="tok-str">&quot;derivations for: real and wrong with no decoy set, then real, \</span></span>
+<span class="ln" id="L946"><span class="tok-str">             decoy and wrong with one; any difference is a difference in time&quot;</span></span>
+<span class="ln" id="L947">        );</span>
+<span class="ln" id="L948">        assert_eq!(decoy, <span class="tok-num">2</span>, <span class="tok-str">&quot;one for the decoy, one for the real lock&quot;</span>);</span>
+<span class="ln" id="L949">    }</span>
+<span class="ln" id="L950"></span>
+<span class="ln" id="L951">    <span class="tok-com">/// F-273. Changing the real passphrase to the decoy is refused, and the</span></span>
+<span class="ln" id="L952">    <span class="tok-com">/// lock is left as it was. Before, the change went through and `judge`</span></span>
+<span class="ln" id="L953">    <span class="tok-com">/// opened the real program for the passphrase recorded as the decoy.</span></span>
+<span class="ln" id="L954">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L955">    <span class="tok-kw">fn</span> <span class="tok-fn">the_real_passphrase_cannot_be_changed_to_the_decoy</span>() {</span>
+<span class="ln" id="L956">        <span class="tok-kw">let</span> (_dir, <span class="tok-kw">mut</span> lock, store) = <span class="tok-fn">machine</span>(<span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L957">        store.<span class="tok-fn">set</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>, <span class="tok-str">&quot;the decoy&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L958"></span>
+<span class="ln" id="L959">        assert_eq!(</span>
+<span class="ln" id="L960">            lock.<span class="tok-fn">change_password</span>(b<span class="tok-str">&quot;the real one&quot;</span>, b<span class="tok-str">&quot;the decoy&quot;</span>),</span>
+<span class="ln" id="L961">            <span class="tok-fn">Err</span>(Error::AppLockIsTheDecoy)</span>
+<span class="ln" id="L962">        );</span>
+<span class="ln" id="L963">        assert_eq!(store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the decoy&quot;</span>).<span class="tok-fn">unwrap</span>(), Opened::Decoy);</span>
+<span class="ln" id="L964">        assert_eq!(</span>
+<span class="ln" id="L965">            store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L966">            Opened::Real</span>
+<span class="ln" id="L967">        );</span>
+<span class="ln" id="L968"></span>
+<span class="ln" id="L969">        <span class="tok-com">// Any other new passphrase is still accepted.</span></span>
+<span class="ln" id="L970">        lock.<span class="tok-fn">change_password</span>(b<span class="tok-str">&quot;the real one&quot;</span>, b<span class="tok-str">&quot;a new real one&quot;</span>)</span>
+<span class="ln" id="L971">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L972">        assert_eq!(</span>
+<span class="ln" id="L973">            store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;a new real one&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L974">            Opened::Real</span>
+<span class="ln" id="L975">        );</span>
+<span class="ln" id="L976">        assert_eq!(store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the decoy&quot;</span>).<span class="tok-fn">unwrap</span>(), Opened::Decoy);</span>
+<span class="ln" id="L977">    }</span>
+<span class="ln" id="L978"></span>
+<span class="ln" id="L979">    <span class="tok-com">/// Four wrong attempts, which is what puts the lock into its cooldown.</span></span>
+<span class="ln" id="L980">    <span class="tok-kw">fn</span> <span class="tok-fn">into_cooldown</span>(lock: &amp;<span class="tok-kw">mut</span> <span class="tok-kw">crate</span>::lock::LockStore) {</span>
+<span class="ln" id="L981">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
+<span class="ln" id="L982">            <span class="tok-kw">let</span> _ = lock.<span class="tok-fn">unlock</span>(b<span class="tok-str">&quot;not it either&quot;</span>);</span>
+<span class="ln" id="L983">        }</span>
+<span class="ln" id="L984">        assert!(</span>
+<span class="ln" id="L985">            lock.<span class="tok-fn">cooldown</span>().<span class="tok-fn">is_some</span>(),</span>
+<span class="ln" id="L986">            <span class="tok-str">&quot;four wrong passphrases should have started the wait&quot;</span></span>
+<span class="ln" id="L987">        );</span>
+<span class="ln" id="L988">    }</span>
+<span class="ln" id="L989"></span>
+<span class="ln" id="L990">    <span class="tok-com">/// The whole feature turns on this: during the wait, the decoy must be</span></span>
+<span class="ln" id="L991">    <span class="tok-com">/// refused exactly as the real passphrase is. If it opened while the real</span></span>
+<span class="ln" id="L992">    <span class="tok-com">/// one was refused, holding the machine and typing four wrong passphrases</span></span>
+<span class="ln" id="L993">    <span class="tok-com">/// first would be enough to tell which one you had just been given.</span></span>
+<span class="ln" id="L994">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L995">    <span class="tok-kw">fn</span> <span class="tok-fn">a_cooldown_refuses_the_decoy_the_way_it_refuses_the_real_passphrase</span>() {</span>
+<span class="ln" id="L996">        <span class="tok-kw">let</span> (_dir, <span class="tok-kw">mut</span> lock, store) = <span class="tok-fn">machine</span>(<span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L997">        store.<span class="tok-fn">set</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>, <span class="tok-str">&quot;the decoy&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L998">        <span class="tok-fn">into_cooldown</span>(&amp;<span class="tok-kw">mut</span> lock);</span>
+<span class="ln" id="L999"></span>
+<span class="ln" id="L1000">        <span class="tok-kw">let</span> on_decoy = store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the decoy&quot;</span>);</span>
+<span class="ln" id="L1001">        <span class="tok-kw">let</span> on_real = store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L1002">        <span class="tok-kw">let</span> on_wrong = store.<span class="tok-fn">judge</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;neither of them&quot;</span>);</span>
+<span class="ln" id="L1003">        <span class="tok-kw">for</span> (what, answer) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1004">            (<span class="tok-str">&quot;the decoy&quot;</span>, &amp;on_decoy),</span>
+<span class="ln" id="L1005">            (<span class="tok-str">&quot;the real one&quot;</span>, &amp;on_real),</span>
+<span class="ln" id="L1006">            (<span class="tok-str">&quot;a wrong one&quot;</span>, &amp;on_wrong),</span>
+<span class="ln" id="L1007">        ] {</span>
+<span class="ln" id="L1008">            assert!(</span>
+<span class="ln" id="L1009">                matches!(answer, <span class="tok-fn">Err</span>(Error::<span class="tok-fn">AppLockCooldown</span>(_))),</span>
+<span class="ln" id="L1010">                <span class="tok-str">&quot;{what} was not refused by the rate limit: {answer:?}&quot;</span></span>
+<span class="ln" id="L1011">            );</span>
+<span class="ln" id="L1012">        }</span>
+<span class="ln" id="L1013">        <span class="tok-com">// And the wait said is the same wait, not a different number per</span></span>
+<span class="ln" id="L1014">        <span class="tok-com">// passphrase, which would answer the same question more quietly.</span></span>
+<span class="ln" id="L1015">        <span class="tok-kw">let</span> said = |r: &amp;Result&lt;Opened, Error&gt;| <span class="tok-kw">match</span> r {</span>
+<span class="ln" id="L1016">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">AppLockCooldown</span>(secs)) =&gt; *secs,</span>
+<span class="ln" id="L1017">            other =&gt; panic!(<span class="tok-str">&quot;expected a wait: {other:?}&quot;</span>),</span>
+<span class="ln" id="L1018">        };</span>
+<span class="ln" id="L1019">        assert_eq!(<span class="tok-fn">said</span>(&amp;on_decoy), <span class="tok-fn">said</span>(&amp;on_real));</span>
+<span class="ln" id="L1020">        assert_eq!(<span class="tok-fn">said</span>(&amp;on_decoy), <span class="tok-fn">said</span>(&amp;on_wrong));</span>
+<span class="ln" id="L1021"></span>
+<span class="ln" id="L1022">        <span class="tok-com">// That the wait ends, and the decoy opens again afterwards, is not</span></span>
+<span class="ln" id="L1023">        <span class="tok-com">// asserted by sleeping through it: `lock.rs` makes the same point with</span></span>
+<span class="ln" id="L1024">        <span class="tok-com">// `verify_at` and a chosen clock, for the reason written down there,</span></span>
+<span class="ln" id="L1025">        <span class="tok-com">// that a test which waits out a delay is a test nobody runs.</span></span>
+<span class="ln" id="L1026">    }</span>
+<span class="ln" id="L1027"></span>
+<span class="ln" id="L1028">    <span class="tok-com">/// Setting a decoy is a lock operation, so a wrong real passphrase at it</span></span>
+<span class="ln" id="L1029">    <span class="tok-com">/// is counted and the wait applies. Asking `would_open` instead recorded</span></span>
+<span class="ln" id="L1030">    <span class="tok-com">/// nothing, which made this an unthrottled way of guessing the passphrase.</span></span>
+<span class="ln" id="L1031">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1032">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wrong_passphrase_at_the_decoy_store_is_counted_like_any_other</span>() {</span>
+<span class="ln" id="L1033">        <span class="tok-kw">let</span> (_dir, <span class="tok-kw">mut</span> lock, store) = <span class="tok-fn">machine</span>(<span class="tok-str">&quot;the real one&quot;</span>);</span>
+<span class="ln" id="L1034">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">4</span> {</span>
+<span class="ln" id="L1035">            assert_eq!(</span>
+<span class="ln" id="L1036">                store</span>
+<span class="ln" id="L1037">                    .<span class="tok-fn">set</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;a guess at the real one&quot;</span>, <span class="tok-str">&quot;a decoy entirely&quot;</span>)</span>
+<span class="ln" id="L1038">                    .<span class="tok-fn">unwrap_err</span>(),</span>
+<span class="ln" id="L1039">                Refused::NotTheRealOne</span>
+<span class="ln" id="L1040">            );</span>
+<span class="ln" id="L1041">        }</span>
+<span class="ln" id="L1042">        <span class="tok-com">// The guesses were counted, so even the right passphrase waits now.</span></span>
+<span class="ln" id="L1043">        assert!(</span>
+<span class="ln" id="L1044">            matches!(</span>
+<span class="ln" id="L1045">                store.<span class="tok-fn">set</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>, <span class="tok-str">&quot;a decoy entirely&quot;</span>),</span>
+<span class="ln" id="L1046">                <span class="tok-fn">Err</span>(Refused::<span class="tok-fn">Cooldown</span>(_))</span>
+<span class="ln" id="L1047">            ),</span>
+<span class="ln" id="L1048">            <span class="tok-str">&quot;the guesses were not counted against the lock&quot;</span></span>
+<span class="ln" id="L1049">        );</span>
+<span class="ln" id="L1050">        assert_eq!(store.<span class="tok-fn">state</span>(), State::Absent);</span>
+<span class="ln" id="L1051">        <span class="tok-com">// Removing one is the same path and the same rule.</span></span>
+<span class="ln" id="L1052">        assert!(matches!(</span>
+<span class="ln" id="L1053">            store.<span class="tok-fn">remove</span>(&amp;<span class="tok-kw">mut</span> lock, <span class="tok-str">&quot;the real one&quot;</span>),</span>
+<span class="ln" id="L1054">            <span class="tok-fn">Err</span>(Refused::<span class="tok-fn">Cooldown</span>(_))</span>
+<span class="ln" id="L1055">        ));</span>
+<span class="ln" id="L1056">    }</span>
+<span class="ln" id="L1057"></span>
+<span class="ln" id="L1058">    <span class="tok-com">/// The scope note says the two things that must not be softened.</span></span>
+<span class="ln" id="L1059">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1060">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_still_says_the_uncomfortable_part</span>() {</span>
+<span class="ln" id="L1061">        assert!(SCOPE.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does NOT hide&quot;</span>), <span class="tok-str">&quot;{SCOPE}&quot;</span>);</span>
+<span class="ln" id="L1062">        assert!(SCOPE.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;open source&quot;</span>), <span class="tok-str">&quot;{SCOPE}&quot;</span>);</span>
+<span class="ln" id="L1063">        assert!(WHY_NO_DESTRUCTION.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;worse than no control&quot;</span>));</span>
+<span class="ln" id="L1064">    }</span>
+<span class="ln" id="L1065">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

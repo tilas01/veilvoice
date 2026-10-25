@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/motion.svg" alt="motion.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/motion.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1116 lines &middot; <a href="motion.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 1162 lines &middot; <a href="motion.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-whole-look-is-a-setting">The whole look is a setting</a>
@@ -101,7 +101,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1116 lines defining <strong>27 functions</strong> (18 public), <strong>9 types</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1162 lines defining <strong>27 functions</strong> (18 public), <strong>9 types</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Face</code> <span style="color:var(--muted)">line 65</span> &middot; How the title and the times are lettered.</li>
 <li><code>enum Direction</code> <span style="color:var(--muted)">line 91</span> &middot; Which way a gradient runs.</li>
@@ -109,9 +109,9 @@
 <li><code>enum Style</code> <span style="color:var(--muted)">line 160</span> &middot; The shape the wave is drawn as.</li>
 <li><code>struct Motion</code> <span style="color:var(--muted)">line 193</span> &middot; The whole look of a video.</li>
 <li><code>struct Template</code> <span style="color:var(--muted)">line 249</span> &middot; A named starting point.</li>
-<li><code>struct Levels</code> <span style="color:var(--muted)">line 444</span> &middot; How loud the recording is, every five milliseconds, already settled.</li>
-<li><code>struct Layout</code> <span style="color:var(--muted)">line 512</span> &middot; Where everything on a frame goes.</li>
-<li><code>struct Renderer</code> <span style="color:var(--muted)">line 558</span> &middot; Draws the frames of one export.</li>
+<li><code>struct Levels</code> <span style="color:var(--muted)">line 448</span> &middot; How loud the recording is, about every five milliseconds, already settled.</li>
+<li><code>struct Layout</code> <span style="color:var(--muted)">line 527</span> &middot; Where everything on a frame goes.</li>
+<li><code>struct Renderer</code> <span style="color:var(--muted)">line 573</span> &middot; Draws the frames of one export.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Face::label</code> <span style="color:var(--muted)">line 80</span> &middot; What this is called where it is chosen.
@@ -128,25 +128,25 @@
 <li><code>template</code> <span style="color:var(--muted)">line 435</span> &middot; The template with this identifier.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>templates</code>, <code>from_palette</code></span>
 </li>
-<li><code>Levels::duration_secs</code> <span style="color:var(--muted)">line 451</span> &middot; How long the recording is.
+<li><code>Levels::duration_secs</code> <span style="color:var(--muted)">line 464</span> &middot; How long the recording is.
 </li>
-<li><code>Levels::peak</code> <span style="color:var(--muted)">line 459</span> &middot; The loudest settled level between two moments, from 0.0 to 1.0.
+<li><code>Levels::peak</code> <span style="color:var(--muted)">line 472</span> &middot; The loudest settled level between two moments, from 0.0 to 1.0.
 </li>
-<li><code>levels</code> <span style="color:var(--muted)">line 478</span> &middot; Reduce a recording to the timeline a picture is drawn from.
+<li><code>levels</code> <span style="color:var(--muted)">line 491</span> &middot; Reduce a recording to the timeline a picture is drawn from.
 </li>
-<li><code>Renderer::new</code> <span style="color:var(--muted)">line 573</span> &middot; A renderer for levels at size, fps frames a second, with title lettered at the top unless the face is Face::None.
+<li><code>Renderer::new</code> <span style="color:var(--muted)">line 588</span> &middot; A renderer for levels at size, fps frames a second, with title lettered at the top unless the face is Face::None.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>layout</code>, <code>letter</code></span>
 </li>
-<li><code>Renderer::frames</code> <span style="color:var(--muted)">line 628</span> &middot; How many frames the video has: the length times the rate, rounded up so the last partial frame is still shown.
+<li><code>Renderer::frames</code> <span style="color:var(--muted)">line 643</span> &middot; How many frames the video has: the length times the rate, rounded up so the last partial frame is still shown.
 </li>
-<li><code>Renderer::undrawable</code> <span style="color:var(--muted)">line 634</span> &middot; Text that came out as boxes, so a front end can say so before the render rather than after.
+<li><code>Renderer::undrawable</code> <span style="color:var(--muted)">line 649</span> &middot; Text that came out as boxes, so a front end can say so before the render rather than after.
 </li>
-<li><code>Renderer::frame_bytes</code> <span style="color:var(--muted)">line 639</span> &middot; The size of one frame in bytes, as rgb24.
+<li><code>Renderer::frame_bytes</code> <span style="color:var(--muted)">line 654</span> &middot; The size of one frame in bytes, as rgb24.
 </li>
-<li><code>Renderer::frame</code> <span style="color:var(--muted)">line 644</span> &middot; Draw frame index into out, which is resized to fit.
+<li><code>Renderer::frame</code> <span style="color:var(--muted)">line 659</span> &middot; Draw frame index into out, which is resized to fit.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>still</code>, <code>draw_foot</code>, <code>draw_wave</code>, <code>clock</code>, <code>letter</code>, <code>mix</code>, <code>paint</code></span>
 </li>
-<li><code>thumbnail</code> <span style="color:var(--muted)">line 810</span> &middot; A picture of a whole recording, for a list of them.
+<li><code>thumbnail</code> <span style="color:var(--muted)">line 825</span> &middot; A picture of a whole recording, for a list of them.
 </li>
 </ul>
 </section>
@@ -232,62 +232,62 @@
 <a href="motion.src.html#fn-levels-duration_secs">
 <rect x="265.0" y="220.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="363.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Levels::duration_secs</text>
-<text x="363.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 451</text>
+<text x="363.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 464</text>
 </a>
 <a href="motion.src.html#fn-levels-peak">
 <rect x="488.3" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="550.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Levels::peak</text>
-<text x="550.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 459</text>
+<text x="550.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 472</text>
 </a>
 <a href="motion.src.html#fn-layout-2">
 <rect x="103.4" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="149.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">layout</text>
-<text x="149.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 526</text>
+<text x="149.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 541</text>
 </a>
 <a href="motion.src.html#fn-renderer-new">
 <rect x="221.9" y="320.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="288.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Renderer::new</text>
-<text x="288.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 573</text>
+<text x="288.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 588</text>
 </a>
 <a href="motion.src.html#fn-renderer-frame">
 <rect x="380.7" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="455.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Renderer::frame</text>
-<text x="455.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 644</text>
+<text x="455.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 659</text>
 </a>
 <a href="motion.src.html#fn-renderer-still">
 <rect x="317.4" y="420.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="391.9" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Renderer::still</text>
-<text x="391.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 651</text>
+<text x="391.9" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 666</text>
 </a>
 <a href="motion.src.html#fn-renderer-draw_wave">
 <rect x="122.4" y="520.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="212.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Renderer::draw_wave</text>
-<text x="212.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 660</text>
+<text x="212.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 675</text>
 </a>
 <a href="motion.src.html#fn-renderer-draw_foot">
 <rect x="329.5" y="520.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="420.1" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Renderer::draw_foot</text>
-<text x="420.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 716</text>
+<text x="420.1" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 731</text>
 </a>
 <a href="motion.src.html#fn-renderer-paint">
 <rect x="123.6" y="620.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="198.0" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Renderer::paint</text>
-<text x="198.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 755</text>
+<text x="198.0" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 770</text>
 </a>
 <a href="motion.src.html#fn-letter">
 <rect x="298.5" y="620.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="344.7" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">letter</text>
-<text x="344.7" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 781</text>
+<text x="344.7" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 796</text>
 </a>
 <a href="motion.src.html#fn-clock">
 <rect x="417.0" y="620.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="463.2" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clock</text>
-<text x="463.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 845</text>
+<text x="463.2" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 860</text>
 </a>
 <a href="motion.src.html#fn-mix">
 <rect x="270.3" y="720.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="316.5" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">mix</text>
-<text x="316.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 856</text>
+<text x="316.5" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 871</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -317,18 +317,18 @@ flowchart TD
     n_from_palette[&quot;from_palette&lt;br/&gt;line 260&quot;]
     n_templates[&quot;templates&lt;br/&gt;line 417&quot;]
     n_template([&quot;template&lt;br/&gt;line 435&quot;])
-    n_duration_secs([&quot;Levels::duration_secs&lt;br/&gt;line 451&quot;])
-    n_peak([&quot;Levels::peak&lt;br/&gt;line 459&quot;])
-    n_layout[&quot;layout&lt;br/&gt;line 526&quot;]
-    n_new([&quot;Renderer::new&lt;br/&gt;line 573&quot;])
-    n_frame([&quot;Renderer::frame&lt;br/&gt;line 644&quot;])
-    n_still[&quot;Renderer::still&lt;br/&gt;line 651&quot;]
-    n_draw_wave[&quot;Renderer::draw_wave&lt;br/&gt;line 660&quot;]
-    n_draw_foot[&quot;Renderer::draw_foot&lt;br/&gt;line 716&quot;]
-    n_paint[&quot;Renderer::paint&lt;br/&gt;line 755&quot;]
-    n_letter[&quot;letter&lt;br/&gt;line 781&quot;]
-    n_clock[&quot;clock&lt;br/&gt;line 845&quot;]
-    n_mix[&quot;mix&lt;br/&gt;line 856&quot;]
+    n_duration_secs([&quot;Levels::duration_secs&lt;br/&gt;line 464&quot;])
+    n_peak([&quot;Levels::peak&lt;br/&gt;line 472&quot;])
+    n_layout[&quot;layout&lt;br/&gt;line 541&quot;]
+    n_new([&quot;Renderer::new&lt;br/&gt;line 588&quot;])
+    n_frame([&quot;Renderer::frame&lt;br/&gt;line 659&quot;])
+    n_still[&quot;Renderer::still&lt;br/&gt;line 666&quot;]
+    n_draw_wave[&quot;Renderer::draw_wave&lt;br/&gt;line 675&quot;]
+    n_draw_foot[&quot;Renderer::draw_foot&lt;br/&gt;line 731&quot;]
+    n_paint[&quot;Renderer::paint&lt;br/&gt;line 770&quot;]
+    n_letter[&quot;letter&lt;br/&gt;line 796&quot;]
+    n_clock[&quot;clock&lt;br/&gt;line 860&quot;]
+    n_mix[&quot;mix&lt;br/&gt;line 871&quot;]
     n_at --&gt; n_mix
     n_default --&gt; n_from_palette
     n_draw_foot --&gt; n_clock
@@ -355,18 +355,18 @@ flowchart TD
     click n_from_palette href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L260&quot; &quot;open the source&quot;
     click n_templates href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L417&quot; &quot;open the source&quot;
     click n_template href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L435&quot; &quot;open the source&quot;
-    click n_duration_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L451&quot; &quot;open the source&quot;
-    click n_peak href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L459&quot; &quot;open the source&quot;
-    click n_layout href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L526&quot; &quot;open the source&quot;
-    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L573&quot; &quot;open the source&quot;
-    click n_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L644&quot; &quot;open the source&quot;
-    click n_still href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L651&quot; &quot;open the source&quot;
-    click n_draw_wave href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L660&quot; &quot;open the source&quot;
-    click n_draw_foot href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L716&quot; &quot;open the source&quot;
-    click n_paint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L755&quot; &quot;open the source&quot;
-    click n_letter href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L781&quot; &quot;open the source&quot;
-    click n_clock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L845&quot; &quot;open the source&quot;
-    click n_mix href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L856&quot; &quot;open the source&quot;
+    click n_duration_secs href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L464&quot; &quot;open the source&quot;
+    click n_peak href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L472&quot; &quot;open the source&quot;
+    click n_layout href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L541&quot; &quot;open the source&quot;
+    click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L588&quot; &quot;open the source&quot;
+    click n_frame href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L659&quot; &quot;open the source&quot;
+    click n_still href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L666&quot; &quot;open the source&quot;
+    click n_draw_wave href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L675&quot; &quot;open the source&quot;
+    click n_draw_foot href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L731&quot; &quot;open the source&quot;
+    click n_paint href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L770&quot; &quot;open the source&quot;
+    click n_letter href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L796&quot; &quot;open the source&quot;
+    click n_clock href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L860&quot; &quot;open the source&quot;
+    click n_mix href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs#L871&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_label,n_middle,n_label,n_checked,n_template,n_duration_secs,n_peak,n_new,n_frame entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -402,27 +402,27 @@ flowchart TD
 <tr><td><code>EXTRAS</code> <sub>const</sub></td><td><a href="motion.src.html#fn-extras">283</a></td><td>The templates that are not a theme, chosen for how they look moving.</td></tr>
 <tr><td><code>templates</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-templates">417</a></td><td>Every template: one per theme, in the themes&#x27; own order, then the extras.</td></tr>
 <tr><td><code>template</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-template-2">435</a></td><td>The template with this identifier.</td></tr>
-<tr><td><code>HOP_SECS</code> <sub>pub const</sub></td><td><a href="motion.src.html#fn-hop_secs">440</a></td><td>Seconds between two entries of a Levels timeline.</td></tr>
-<tr><td><code>Levels</code> <sub>pub struct</sub></td><td><a href="motion.src.html#fn-levels">444</a></td><td>How loud the recording is, every five milliseconds, already settled.</td></tr>
-<tr><td><code>Levels::duration_secs</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-levels-duration_secs">451</a></td><td>How long the recording is.</td></tr>
-<tr><td><code>Levels::peak</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-levels-peak">459</a></td><td>The loudest settled level between two moments, from 0.0 to 1.0.</td></tr>
-<tr><td><code>levels</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-levels-2">478</a></td><td>Reduce a recording to the timeline a picture is drawn from.</td></tr>
-<tr><td><code>Layout</code> <sub>struct</sub></td><td><a href="motion.src.html#fn-layout">512</a></td><td>Where everything on a frame goes.</td></tr>
-<tr><td><code>layout</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-layout-2">526</a></td><td>Where the wave, the title and the progress line go on a frame of this size.</td></tr>
-<tr><td><code>Renderer</code> <sub>pub struct</sub></td><td><a href="motion.src.html#fn-renderer">558</a></td><td>Draws the frames of one export.</td></tr>
-<tr><td><code>Renderer::new</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-new">573</a></td><td>A renderer for levels at size, fps frames a second, with title lettered at the top unless the face is Face::None.</td></tr>
-<tr><td><code>Renderer::frames</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-frames">628</a></td><td>How many frames the video has: the length times the rate, rounded up so the last partial frame is still shown.</td></tr>
-<tr><td><code>Renderer::undrawable</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-undrawable">634</a></td><td>Text that came out as boxes, so a front end can say so before the render rather than after.</td></tr>
-<tr><td><code>Renderer::frame_bytes</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-frame_bytes">639</a></td><td>The size of one frame in bytes, as rgb24.</td></tr>
-<tr><td><code>Renderer::frame</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-frame">644</a></td><td>Draw frame index into out, which is resized to fit.</td></tr>
-<tr><td><code>Renderer::still</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-still">651</a></td><td>Draw frame index as a canvas, for a still or a test.</td></tr>
-<tr><td><code>Renderer::draw_wave</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-renderer-draw_wave">660</a></td><td>The wave as it stands at at_secs, newest sound at the right.</td></tr>
-<tr><td><code>Renderer::draw_foot</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-renderer-draw_foot">716</a></td><td>The elapsed time, the length, and a progress line under them.</td></tr>
-<tr><td><code>Renderer::paint</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-renderer-paint">755</a></td><td>Fill a rectangle with the wave&#x27;s colours, with soft edges where it falls between pixels.</td></tr>
-<tr><td><code>letter</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-letter">781</a></td><td>Letter text centred on centre_x, heavier for Face::Bold.</td></tr>
-<tr><td><code>thumbnail</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-thumbnail">810</a></td><td>A picture of a whole recording, for a list of them.</td></tr>
-<tr><td><code>clock</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-clock">845</a></td><td>m:ss, or h:mm:ss past an hour.</td></tr>
-<tr><td><code>mix</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-mix">856</a></td><td>Mix from a towards b by t.</td></tr>
+<tr><td><code>HOP_SECS</code> <sub>pub const</sub></td><td><a href="motion.src.html#fn-hop_secs">444</a></td><td>Seconds between two entries of a Levels timeline, as asked for.</td></tr>
+<tr><td><code>Levels</code> <sub>pub struct</sub></td><td><a href="motion.src.html#fn-levels">448</a></td><td>How loud the recording is, about every five milliseconds, already settled.</td></tr>
+<tr><td><code>Levels::duration_secs</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-levels-duration_secs">464</a></td><td>How long the recording is.</td></tr>
+<tr><td><code>Levels::peak</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-levels-peak">472</a></td><td>The loudest settled level between two moments, from 0.0 to 1.0.</td></tr>
+<tr><td><code>levels</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-levels-2">491</a></td><td>Reduce a recording to the timeline a picture is drawn from.</td></tr>
+<tr><td><code>Layout</code> <sub>struct</sub></td><td><a href="motion.src.html#fn-layout">527</a></td><td>Where everything on a frame goes.</td></tr>
+<tr><td><code>layout</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-layout-2">541</a></td><td>Where the wave, the title and the progress line go on a frame of this size.</td></tr>
+<tr><td><code>Renderer</code> <sub>pub struct</sub></td><td><a href="motion.src.html#fn-renderer">573</a></td><td>Draws the frames of one export.</td></tr>
+<tr><td><code>Renderer::new</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-new">588</a></td><td>A renderer for levels at size, fps frames a second, with title lettered at the top unless the face is Face::None.</td></tr>
+<tr><td><code>Renderer::frames</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-frames">643</a></td><td>How many frames the video has: the length times the rate, rounded up so the last partial frame is still shown.</td></tr>
+<tr><td><code>Renderer::undrawable</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-undrawable">649</a></td><td>Text that came out as boxes, so a front end can say so before the render rather than after.</td></tr>
+<tr><td><code>Renderer::frame_bytes</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-frame_bytes">654</a></td><td>The size of one frame in bytes, as rgb24.</td></tr>
+<tr><td><code>Renderer::frame</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-frame">659</a></td><td>Draw frame index into out, which is resized to fit.</td></tr>
+<tr><td><code>Renderer::still</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-renderer-still">666</a></td><td>Draw frame index as a canvas, for a still or a test.</td></tr>
+<tr><td><code>Renderer::draw_wave</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-renderer-draw_wave">675</a></td><td>The wave as it stands at at_secs, newest sound at the right.</td></tr>
+<tr><td><code>Renderer::draw_foot</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-renderer-draw_foot">731</a></td><td>The elapsed time, the length, and a progress line under them.</td></tr>
+<tr><td><code>Renderer::paint</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-renderer-paint">770</a></td><td>Fill a rectangle with the wave&#x27;s colours, with soft edges where it falls between pixels.</td></tr>
+<tr><td><code>letter</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-letter">796</a></td><td>Letter text centred on centre_x, heavier for Face::Bold.</td></tr>
+<tr><td><code>thumbnail</code> <sub>pub fn</sub></td><td><a href="motion.src.html#fn-thumbnail">825</a></td><td>A picture of a whole recording, for a list of them.</td></tr>
+<tr><td><code>clock</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-clock">860</a></td><td>m:ss, or h:mm:ss past an hour.</td></tr>
+<tr><td><code>mix</code> <sub>fn</sub></td><td><a href="motion.src.html#fn-mix">871</a></td><td>Mix from a towards b by t.</td></tr>
 </tbody></table>
 </section>
 </div></div>

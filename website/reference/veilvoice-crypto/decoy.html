@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/decoy.svg" alt="decoy.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/decoy.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1031 lines &middot; <a href="decoy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1065 lines &middot; <a href="decoy.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for-and-what-it-is-honestly-worth">What this is for, and what it is honestly worth</a>
@@ -105,7 +105,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1031 lines defining <strong>17 functions</strong> (9 public), <strong>6 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1065 lines defining <strong>17 functions</strong> (9 public), <strong>6 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Opened</code> <span style="color:var(--muted)">line 103</span> &middot; Which passphrase was given.</li>
 <li><code>struct Verifier</code> <span style="color:var(--muted)">line 114</span> &middot; One passphrase&#x27;s stored form.</li>
@@ -311,7 +311,7 @@ flowchart TD
 <tr><td><code>Opened</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-opened">103</a></td><td>Which passphrase was given.</td></tr>
 <tr><td><code>Verifier</code> <sub>struct</sub></td><td><a href="decoy.src.html#fn-verifier">114</a></td><td>One passphrase&#x27;s stored form.</td></tr>
 <tr><td><code>Verifier::create</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-verifier-create">127</a></td><td>Derive from passphrase once and keep what it produced, with the salt that produced it, so a later attempt can be compared against it.</td></tr>
-<tr><td><code>Verifier::matches</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-verifier-matches">137</a></td><td>Derive and compare.</td></tr>
+<tr><td><code>Verifier::matches</code> <sub>pub(crate) fn</sub></td><td><a href="decoy.src.html#fn-verifier-matches">137</a></td><td>Derive and compare.</td></tr>
 <tr><td><code>constant_time_eq</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-constant_time_eq">144</a></td><td>Compare without letting the time taken depend on where they differ.</td></tr>
 <tr><td><code>LEAST_DIFFERENCE</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-least_difference">160</a></td><td>How similar two passphrases may be before the pair is refused.</td></tr>
 <tr><td><code>Refused</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-refused">164</a></td><td>Why a pair was refused.</td></tr>
@@ -323,7 +323,7 @@ flowchart TD
 <tr><td><code>RECORD_LEN</code> <sub>pub const</sub></td><td><a href="decoy.src.html#fn-record_len">261</a></td><td>Exactly how long a record is: magic, version, three reserved bytes, the three costs, the salt, the derived key.</td></tr>
 <tr><td><code>Decoy::create</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-create">273</a></td><td>Make a decoy from the real passphrase and the decoy one.</td></tr>
 <tr><td><code>Decoy::nothing</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-decoy-nothing">300</a></td><td>A record no passphrase opens, for the sake of taking the same time.</td></tr>
-<tr><td><code>Decoy::matches</code> <sub>fn</sub></td><td><a href="decoy.src.html#fn-decoy-matches">313</a></td><td>Derive and compare.</td></tr>
+<tr><td><code>Decoy::matches</code> <sub>pub(crate) fn</sub></td><td><a href="decoy.src.html#fn-decoy-matches">313</a></td><td>Derive and compare.</td></tr>
 <tr><td><code>Decoy::to_bytes</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-to_bytes">318</a></td><td>The record, for writing.</td></tr>
 <tr><td><code>Decoy::parse</code> <sub>pub fn</sub></td><td><a href="decoy.src.html#fn-decoy-parse">341</a></td><td>Read a record.</td></tr>
 <tr><td><code>State</code> <sub>pub enum</sub></td><td><a href="decoy.src.html#fn-state">385</a></td><td>Whether this machine has a decoy passphrase, and whether it can be read.</td></tr>

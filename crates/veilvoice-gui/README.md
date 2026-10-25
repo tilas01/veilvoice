@@ -126,7 +126,7 @@ flowchart TD
     n_setup["setup.rs<br/>1144 lines"]
     n_soundbar["soundbar.rs<br/>782 lines"]
     n_storage["storage.rs<br/>661 lines"]
-    n_studio["studio.rs<br/>2844 lines"]
+    n_studio["studio.rs<br/>2851 lines"]
     n_theme["theme.rs<br/>813 lines"]
     n_tour["tour.rs<br/>1347 lines"]
     n_updates["updates.rs<br/>276 lines"]
@@ -355,7 +355,7 @@ flowchart TD
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 782 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 661 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2844 | The Recording Studio and the Recording Browser. |
+| [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2851 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 813 | Colour schemes for the desktop app. |
 | [`tour.rs`](../../docs/files/veilvoice-gui/tour.md) | 1347 | The short walkthrough on a first run, and after an upgrade. |
 | [`updates.rs`](../../docs/files/veilvoice-gui/updates.md) | 276 | The manual update check, as the window shows it. |
@@ -364,7 +364,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 249 | How big the window opens, and why it is not a constant. |
 
-**24,208 functional lines of Rust** in this crate. A functional line is a line
+**24,232 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

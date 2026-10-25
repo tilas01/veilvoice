@@ -108,16 +108,16 @@ file is written.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>279 lines"])
+    n_lib(["lib.rs<br/>289 lines"])
     n_aead["aead.rs<br/>280 lines"]
     n_amnesia["amnesia.rs<br/>472 lines"]
     n_container["container.rs<br/>627 lines"]
-    n_decoy["decoy.rs<br/>1031 lines"]
+    n_decoy["decoy.rs<br/>1065 lines"]
     n_hoard["hoard.rs<br/>1099 lines"]
     n_hybrid["hybrid.rs<br/>531 lines"]
-    n_kdf["kdf.rs<br/>633 lines"]
+    n_kdf["kdf.rs<br/>649 lines"]
     n_layout["layout.rs<br/>331 lines"]
-    n_lock["lock.rs<br/>2301 lines"]
+    n_lock["lock.rs<br/>2378 lines"]
     n_privatefile["privatefile.rs<br/>313 lines"]
     n_reseal["reseal.rs<br/>538 lines"]
     n_reset["reset.rs<br/>612 lines"]
@@ -126,6 +126,7 @@ flowchart TD
     n_tape["tape.rs<br/>391 lines"]
     n_vault["vault.rs<br/>769 lines"]
     n_weave["weave.rs<br/>1811 lines"]
+    n_decoy --> n_kdf
     n_decoy --> n_lock
     n_decoy --> n_vault
     n_hoard --> n_amnesia
@@ -134,6 +135,7 @@ flowchart TD
     n_layout --> n_lock
     n_lock --> n_aead
     n_lock --> n_hoard
+    n_lock --> n_layout
     n_lock --> n_privatefile
     n_lock --> n_vault
     n_reseal --> n_hybrid
@@ -172,13 +174,13 @@ flowchart TD
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 280 | Authenticated encryption with XChaCha20-Poly1305. |
 | [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 472 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 627 | The .veil encrypted container format. |
-| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 1031 | A second passphrase that opens a different, empty VeilVoice. |
+| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 1065 | A second passphrase that opens a different, empty VeilVoice. |
 | [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 531 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
-| [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 633 | Password-based key derivation with Argon2id. |
+| [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 649 | Password-based key derivation with Argon2id. |
 | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | 331 | Everything VeilVoice keeps between runs, in one list. |
-| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 279 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2301 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 289 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2378 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 313 | Writing a file that only its owner can read. |
 | [`reseal.rs`](../../docs/files/veilvoice-crypto/reseal.md) | 538 | Finding files that were sealed under no passphrase at all, and sealing them again under a real one. |
 | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | 612 | Putting this machine back to a new install. |
@@ -191,7 +193,7 @@ flowchart TD
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**8,556 functional lines of Rust** in this crate. A functional line is a line
+**8,628 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -265,6 +267,7 @@ counts blank lines and comments too. Both are produced by
 | `struct AppLock` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | A password verifier plus its attempt history. |
 | `struct LockStore` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | An AppLock bound to a file, which is persisted after every attempt. |
 | `fn open_default` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Open the lock at the default location, wherever this platform keeps it. |
+| `fn kept_in` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Whether a lock is kept under base, in the vault or as the old single file, found without opening it or writing anything. |
 | `fn open_in` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Open a vault-backed lock under base, adopting a pre-vault file if one is there. |
 | `fn create_default` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Create a lock at the default location, refusing to replace one already there. |
 | `fn create_in` | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | Create a vault-backed lock under base. |

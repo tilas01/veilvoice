@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/decoy.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 1031 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 1065 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs)
 
 ## Contents
 
@@ -124,7 +124,7 @@ that claimed to would be lying to you at the worst possible moment.
 
 ## What this file contains
 
-1031 lines defining **17 functions** (9 public), **6 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1065 lines defining **17 functions** (9 public), **6 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -226,7 +226,7 @@ flowchart TD
 | `Opened` <sub>pub enum</sub> | [103](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L103) | Which passphrase was given. |
 | `Verifier` <sub>struct</sub> | [114](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L114) | One passphrase's stored form. |
 | `Verifier::create` <sub>fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L127) | Derive from passphrase once and keep what it produced, with the salt that produced it, so a later attempt can be compared against it. |
-| `Verifier::matches` <sub>fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L137) | Derive and compare. |
+| `Verifier::matches` <sub>pub(crate) fn</sub> | [137](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L137) | Derive and compare. |
 | `constant_time_eq` <sub>fn</sub> | [144](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L144) | Compare without letting the time taken depend on where they differ. |
 | `LEAST_DIFFERENCE` <sub>pub const</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L160) | How similar two passphrases may be before the pair is refused. |
 | `Refused` <sub>pub enum</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L164) | Why a pair was refused. |
@@ -238,7 +238,7 @@ flowchart TD
 | `RECORD_LEN` <sub>pub const</sub> | [261](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L261) | Exactly how long a record is: magic, version, three reserved bytes, the three costs, the salt, the derived key. |
 | `Decoy::create` <sub>pub fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L273) | Make a decoy from the real passphrase and the decoy one. |
 | `Decoy::nothing` <sub>fn</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L300) | A record no passphrase opens, for the sake of taking the same time. |
-| `Decoy::matches` <sub>fn</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L313) | Derive and compare. |
+| `Decoy::matches` <sub>pub(crate) fn</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L313) | Derive and compare. |
 | `Decoy::to_bytes` <sub>pub fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L318) | The record, for writing. |
 | `Decoy::parse` <sub>pub fn</sub> | [341](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L341) | Read a record. |
 | `State` <sub>pub enum</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L385) | Whether this machine has a decoy passphrase, and whether it can be read. |
