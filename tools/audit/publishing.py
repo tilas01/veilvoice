@@ -146,7 +146,14 @@ def main():
         # `--allow-missing` would turn the refusal off for every release.
         waiver = re.search(
             r"allow=\"\"\n(.*?)--allow-missing", body, re.S)
-        if not waiver or "github.event.inputs.tag" not in waiver.group(1):
+        # The version reaches the script either pasted in as an expression or,
+        # since the injection fix, through INPUT_TAG, which only counts when
+        # the workflow binds it to the dispatch's own input.
+        bound = re.search(
+            r"INPUT_TAG:\s*\$\{\{\s*github\.event\.inputs\.tag\s*\}\}", body)
+        tied = waiver and ("github.event.inputs.tag" in waiver.group(1)
+                           or (bound and "$INPUT_TAG" in waiver.group(1)))
+        if not tied:
             gaps.append(
                 "release.yml passes --allow-missing to the notes tool without "
                 "tying it to the dry run, so a publishing release could go "

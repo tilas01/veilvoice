@@ -56,6 +56,10 @@ env:
   #
   # Empty on a tag push, so this is the version either way.
   VERSION_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+  # The version as typed into a dispatch, empty on a tag push. Both reach the
+  # scripts below as environment variables and never as text pasted into
+  # them, so a version that is not a version cannot become a command.
+  INPUT_TAG: ${{ github.event.inputs.tag }}
 
 jobs:
   build:
@@ -269,7 +273,7 @@ jobs:
       - name: Stage the archive
         shell: bash
         run: |
-          out="veilvoice-${{ env.VERSION_TAG }}-${{ matrix.label }}"
+          out="veilvoice-$VERSION_TAG-${{ matrix.label }}"
           mkdir -p "dist/$out"
           bin="target/${{ matrix.target }}/release"
           for name in $BINARIES; do
@@ -428,7 +432,7 @@ jobs:
             cd "$src_a"
       - name: Stage the archive
         run: |
-          out="veilvoice-${{ env.VERSION_TAG }}-freebsd-x86_64"
+          out="veilvoice-$VERSION_TAG-freebsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
           if [ -f target/release/veilvoice-gui ]; then
@@ -527,7 +531,7 @@ jobs:
             cd "$src_a"
       - name: Stage the archive
         run: |
-          out="veilvoice-${{ env.VERSION_TAG }}-openbsd-x86_64"
+          out="veilvoice-$VERSION_TAG-openbsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
           cp README.md LICENSE "dist/$out/"
@@ -624,7 +628,7 @@ jobs:
             cd "$src_a"
       - name: Stage the archive
         run: |
-          out="veilvoice-${{ env.VERSION_TAG }}-netbsd-x86_64"
+          out="veilvoice-$VERSION_TAG-netbsd-x86_64"
           mkdir -p "dist/$out"
           cp target/release/veilvoice "dist/$out/"
           cp README.md LICENSE "dist/$out/"
@@ -729,7 +733,7 @@ jobs:
         run: |
           set -euo pipefail
           python tools/release/notes.py \
-            --tag "${{ env.VERSION_TAG }}" \
+            --tag "$VERSION_TAG" \
             --repro staging \
             --built-on "${{ runner.os }}" \
             --technical staging/TECHNICAL.md
@@ -794,7 +798,7 @@ jobs:
       - name: Release notes
         run: |
           set -euo pipefail
-          tag="${{ env.VERSION_TAG }}"
+          tag="$VERSION_TAG"
 
           # A dry run publishes nothing, so it is allowed to report a missing
           # changelog entry rather than stopping. A tag push always publishes,
@@ -802,7 +806,7 @@ jobs:
           # same condition the gate below uses, written the same way.
           allow=""
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] \
-             && [ -z "${{ github.event.inputs.tag }}" ]; then
+             && [ -z "$INPUT_TAG" ]; then
             allow="--allow-missing"
           fi
 
@@ -845,9 +849,9 @@ jobs:
         env:
           CHECKED: ${{ github.event.inputs.commit }}
         run: |
-          tag="${{ env.VERSION_TAG }}"
+          tag="$VERSION_TAG"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] \
-             && [ -z "${{ github.event.inputs.tag }}" ]; then
+             && [ -z "$INPUT_TAG" ]; then
             echo "no version given: this is a dry run and nothing will be published"
             echo "publish=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -883,7 +887,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag="${{ env.VERSION_TAG }}"
+          tag="$VERSION_TAG"
           remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           if git ls-remote --exit-code --tags "$remote" "refs/tags/$tag" >/dev/null; then
             echo "$tag already exists, so it is published as it is"
@@ -933,7 +937,7 @@ jobs:
       - name: What a dry run produced
         if: steps.gate.outputs.publish != 'true'
         run: |
-          echo "Dry run for ${{ env.VERSION_TAG }}. Nothing was published."
+          echo "Dry run for $VERSION_TAG. Nothing was published."
           echo
           cat staging/SHA256SUMS
           echo
