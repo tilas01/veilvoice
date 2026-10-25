@@ -168,6 +168,12 @@ pub enum Error {
     /// The password was changed, but the second copy of the lock could not be
     /// updated, so it still holds the previous one.
     AppLockSpareStale,
+    /// The new app-lock password is the decoy passphrase set on this machine.
+    ///
+    /// Accepting it would leave one passphrase that both opens the real
+    /// program and is recorded as the decoy, so whoever was given "the decoy"
+    /// would be given everything (F-273).
+    AppLockIsTheDecoy,
     /// A [`tape::Tape`] was asked to copy itself into a buffer that is not its
     /// own length. Refused rather than part-filled: a recording written into a
     /// buffer sized for a different one is a truncated file nothing would flag.
@@ -262,6 +268,10 @@ impl std::fmt::Display for Error {
                 "the password was changed here, but the administrator-owned copy of the lock \
                  still holds the previous one. Run VeilVoice as an administrator once to \
                  finish the change."
+            }
+            Self::AppLockIsTheDecoy => {
+                "that is the decoy passphrase set on this machine, so it cannot also be \
+                 the real one. Choose a different password, or remove the decoy first"
             }
             Self::TapeLength => {
                 "the buffer offered for the recording is not the length of the recording"

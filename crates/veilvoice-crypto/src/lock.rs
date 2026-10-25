@@ -272,6 +272,23 @@ impl AppLock {
     /// the cooldown be tested at all: a test that had to wait out the delay would
     /// not be run.
     fn verify_at(&mut self, password: &[u8], now: i64) -> Result<(), Error> {
+        self.verify_keeping_at(password, now).map(drop)
+    }
+
+    /// As [`verify`](Self::verify), handing back the tag key it derived.
+    ///
+    /// **F-272.** An unlock used to verify and then call
+    /// [`retag`](Self::retag), which ran Argon2id a second time to get a key
+    /// the verification had just derived and thrown away. That made the real
+    /// passphrase one full derivation slower than the decoy, which is the one
+    /// difference [`crate::decoy::Store::judge`] exists to hide. Keeping the
+    /// key lets [`LockStore::unlock`] re-tag with it instead.
+    fn verify_keeping(&mut self, password: &[u8]) -> Result<Secret, Error> {
+        self.verify_keeping_at(password, unix_now())
+    }
+
+    /// As [`verify_at`](Self::verify_at), handing back the tag key.
+    fn verify_keeping_at(&mut self, password: &[u8], now: i64) -> Result<Secret, Error> {
         if let Some(wait) = self.cooldown_at(now) {
             return Err(Error::AppLockCooldown(wait));
         }
@@ -296,7 +313,7 @@ impl AppLock {
 
         self.failures = 0;
         self.last_failure = 0;
-        Ok(())
+        Ok(tag_key)
     }
 
     /// Whether `password` is this lock's, recording nothing.
@@ -454,9 +471,15 @@ impl AppLock {
     /// which is the whole of the upgrade path.
     pub fn retag(&mut self, password: &[u8]) -> Result<(), Error> {
         let (_, tag_key) = derive_pair(password, &self.salt, self.params)?;
+        self.retag_with(&tag_key)
+    }
+
+    /// As [`retag`](Self::retag), with a tag key already derived from the
+    /// passphrase, so the caller pays for one Argon2id run rather than two.
+    fn retag_with(&mut self, tag_key: &Secret) -> Result<(), Error> {
         self.tag_nonce = crate::aead::random_nonce()?;
         self.version = FORMAT_VERSION;
-        self.tag = Some(self.tag(&tag_key)?);
+        self.tag = Some(self.tag(tag_key)?);
         Ok(())
     }
 
@@ -758,13 +781,21 @@ impl LockStore {
     /// here. The consequence of losing it is a rate limit that resets, which is
     /// already true of anyone who can delete the file.
     pub fn unlock(&mut self, password: &[u8]) -> Result<(), Error> {
-        let result = self.lock.verify(password);
-        if result.is_ok() {
+        self.unlock_keeping(password).map(drop)
+    }
+
+    /// As [`unlock`](Self::unlock), handing back the tag key the check derived.
+    ///
+    /// One Argon2id run in all, which is what the decoy route costs too
+    /// (F-272): `judge` must take as long whichever passphrase was typed.
+    fn unlock_keeping(&mut self, password: &[u8]) -> Result<Secret, Error> {
+        let result = self.lock.verify_keeping(password);
+        if let Ok(tag_key) = &result {
             // The passphrase is in hand, so this is the moment to draw a fresh
             // nonce, re-tag, and move a version 1 record forward. It is also
             // the only moment a raised tamper flag can be written with a tag
             // that will stand up to the next check.
-            let _ = self.lock.retag(password);
+            let _ = self.lock.retag_with(tag_key);
         }
         // Nothing to persist if we never got as far as an attempt.
         if !matches!(result, Err(Error::AppLockCooldown(_))) {
@@ -805,9 +836,9 @@ impl LockStore {
     /// wait for is a control nobody uses. `unlock` has already proved the
     /// passphrase by the time the flag is cleared.
     pub fn acknowledge(&mut self, password: &[u8]) -> Result<(), Error> {
-        self.unlock(password)?;
+        let tag_key = self.unlock_keeping(password)?;
         self.lock.tampered = false;
-        self.lock.retag(password)?;
+        self.lock.retag_with(&tag_key)?;
         self.every_copy_current = self.save()?;
         Ok(())
     }
@@ -824,8 +855,25 @@ impl LockStore {
     }
 
     /// Replace the password, after proving the current one.
+    ///
+    /// **F-273.** A new password that is the decoy passphrase is refused.
+    /// [`crate::decoy::Store::set`] refuses a decoy identical to the real
+    /// passphrase, but this is the other way to reach the same pair, and
+    /// `judge` answers a passphrase both would open with the real program.
+    /// Somebody made to type "the decoy" would then hand over everything.
     pub fn change_password(&mut self, current: &[u8], new: &[u8]) -> Result<(), Error> {
         self.unlock(current)?;
+        if let Backing::Vault(vault) = &self.backing {
+            if let Some(decoy) = vault.load_decoy() {
+                // The decoy is compared as text, the way `judge` reads it, so
+                // a new password that is not UTF-8 cannot be the decoy.
+                if let Ok(new) = std::str::from_utf8(new) {
+                    if decoy.matches(new)? {
+                        return Err(Error::AppLockIsTheDecoy);
+                    }
+                }
+            }
+        }
         let carried = self.lock.tampered;
         self.lock = AppLock::create(new, self.lock.params)?;
         // A new passphrase is not an acknowledgement. Somebody who changes the
@@ -928,6 +976,17 @@ pub fn open_default() -> Result<(Option<LockStore>, bool), Error> {
 
 /// The name the lock had before the vault: one file, under the obvious name.
 const LEGACY_NAME: &str = "applock.bin";
+
+/// Whether a lock is kept under `base`, in the vault or as the old single
+/// file, found without opening it or writing anything.
+///
+/// [`open_in`] writes the vault's index when there is none, so a caller that
+/// only wants to know, like the updater (F-271), asks this first.
+pub fn kept_in(base: &Path) -> bool {
+    base.join(crate::layout::entry(crate::layout::Item::AppLock).name)
+        .is_file()
+        || base.join(LEGACY_NAME).is_file()
+}
 
 /// Open a vault-backed lock under `base`, adopting a pre-vault file if one is
 /// there.
@@ -2231,27 +2290,45 @@ mod tests {
     }
 
     /// F-88. Acknowledging a report must cost one key derivation, not three.
-    /// Counted in the source rather than timed, because a timing test on a
-    /// deliberately slow function is a flaky test.
+    ///
+    /// Counted rather than timed, because a timing test on a deliberately slow
+    /// function is a flaky test. This used to read the source for one call to
+    /// `self.unlock` and passed while acknowledging cost two runs, because the
+    /// second was the `retag` that both `unlock` and `acknowledge` called
+    /// (F-272).
     #[test]
     fn acknowledging_a_report_derives_the_key_once() {
-        let source = include_str!("lock.rs").replace("\r\n", "\n");
-        let start = source
-            .find("pub fn acknowledge(&mut self, password: &[u8]) -> Result<(), Error> {\n        self.unlock")
-            .expect("the store's acknowledge has to exist");
-        let body = &source[start..];
-        let end = body.find("\n    }").unwrap_or(body.len());
-        let body = &body[..end];
-        assert!(
-            !body.contains("self.lock.acknowledge"),
-            "the store verifies once through `unlock`; calling the record's own \
-             acknowledge verifies a second and a third time"
-        );
-        assert_eq!(
-            body.matches("self.unlock").count(),
-            1,
-            "one proof of the passphrase is enough to clear a report"
-        );
+        let dir = tempfile::tempdir().unwrap();
+        let mut store = create_in(dir.path(), b"pw", weak()).unwrap();
+        store.report_tamper();
+        let before = kdf::derivations();
+        store.acknowledge(b"pw").unwrap();
+        assert_eq!(kdf::derivations() - before, 1);
+        assert!(!store.tampered(), "the report was not cleared");
+
+        // And the record it wrote stands up to the next check, which is what
+        // re-tagging with a key kept from the verification has to get right.
+        let (mut back, _) = open_in(dir.path()).unwrap();
+        let back = back.as_mut().expect("the lock is still there");
+        back.unlock(b"pw").unwrap();
+        assert!(!back.tampered(), "the re-tagged record read as edited");
+    }
+
+    /// F-272. An unlock costs one derivation, the same as asking whether a
+    /// passphrase would open the lock, so the decoy route and the real one in
+    /// `decoy::Store::judge` take the same time.
+    #[test]
+    fn an_unlock_derives_the_key_once() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut store = create_in(dir.path(), b"pw", weak()).unwrap();
+        for given in [b"pw".as_slice(), b"not it"] {
+            let before = kdf::derivations();
+            let _ = store.unlock(given);
+            assert_eq!(kdf::derivations() - before, 1);
+        }
+        let before = kdf::derivations();
+        store.would_open(b"pw").unwrap();
+        assert_eq!(kdf::derivations() - before, 1);
     }
 
     /// F-86. A password change that could not reach the spare has left the
