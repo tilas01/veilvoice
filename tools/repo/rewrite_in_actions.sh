@@ -25,7 +25,7 @@ git config user.email "$address"
 git config gpg.program "$RUNNER_TEMP/gpg-loopback"
 git fetch --quiet origin dev main
 
-python3 tools/repo/rewrite.py --sign "$signer!" | tee -a "$GITHUB_STEP_SUMMARY"
+python3 tools/repo/rewrite.py --sign "$signer!" --from "${FROM:-auto}" | tee -a "$GITHUB_STEP_SUMMARY"
 
 # rewrite.py says so and stores nothing when no commit needs rewriting.
 if ! git rev-parse -q --verify refs/rewrite/dev >/dev/null; then

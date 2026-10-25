@@ -9,14 +9,21 @@
 # `rewrite.py --push`, after checking the handover.
 #
 # Runs when this file or either script changes, or by hand; re-run a finished run to build it
-# again from the branches as they are by then.
+# again from the branches as they are by then. By hand it starts where the
+# history first goes wrong, `from: auto`, so commits that already verify keep
+# their hashes and only the ones after them are signed anew. `from: root`
+# signs all of it again.
 
 name: rewrite
 
 on:
   workflow_dispatch:
+    inputs:
+      from:
+        description: 'Where to start: auto (the first commit that is wrong) or root (all of it)'
+        default: auto
   push:
-    branches: [dev]
+    branches: [main]
     paths:
       - '.github/workflows/rewrite.yml'
       - 'tools/repo/rewrite.py'
@@ -36,4 +43,5 @@ jobs:
         env:
           KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          FROM: ${{ inputs.from || 'auto' }}
         run: bash tools/repo/rewrite_in_actions.sh
