@@ -762,8 +762,8 @@ jobs:
       # the graph can ship under GPL-3.0-or-later, whether every crate comes
       # from crates.io, and whether one crate is compiled at two versions.
       # `deny.toml` is the policy; its advisory exceptions are the same
-      # as `.cargo/audit.toml`'s, and `tools/audit/dependencies.py` fails if
-      # the two files stop agreeing.
+      # as `.cargo/audit.toml`'s and `osv-scanner.toml`'s, and
+      # `tools/audit/dependencies.py` fails if the three files stop agreeing.
       - name: Licences, sources and duplicate versions
         uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2
         with:

@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# osv-scanner policy: the advisories this project has already weighed.
+#
+# osv-scanner reads `Cargo.lock` against the OSV database, which carries every
+# RustSec advisory under the same identifier. The OpenSSF Scorecard does the
+# same for its Vulnerabilities check. Neither reads `.cargo/audit.toml` or
+# `deny.toml`, so without this file the exceptions argued there look like
+# advisories nobody has looked at.
+#
+# The arguments live in `.cargo/audit.toml`. Each entry here gives the
+# identifier and a one-line reason for whoever reads a scan, and
+# `tools/audit/dependencies.py` fails the build if this list, `deny.toml` and
+# `.cargo/audit.toml` stop naming the same advisories.
+#
+# This file applies to the directory it sits in. `fuzz/` has no lockfile of its
+# own committed, so there is nothing below this one for a copy to cover.
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0436"
+reason = "paste: unmaintained, compile-time only. See .cargo/audit.toml."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2023-0071"
+reason = "rsa: Marvin needs a private key and there is none here; guarded in CI. See .cargo/audit.toml."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0370"
+reason = "zvariant: unmaintained, merged into zbus 6; Linux file dialog only. See .cargo/audit.toml."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0371"
+reason = "zbus_names: unmaintained, merged into zbus 6; Linux file dialog only. See .cargo/audit.toml."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0372"
+reason = "zvariant_derive: unmaintained, merged into zbus 6; compile-time only. See .cargo/audit.toml."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0387"
+reason = "crypto-bigint: a timing leak needs a secret and verifying has none; guarded in CI. See .cargo/audit.toml."

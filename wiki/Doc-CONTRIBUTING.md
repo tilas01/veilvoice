@@ -100,6 +100,16 @@ declared. `tools/audit/dependabot.py` fails the build if one of those holds
 names a dependency the tree no longer uses, or if one is missing its
 `update-types` and would therefore silence an advisory.
 
+**An advisory accepted once is accepted in every tool that reads it.** The
+argument for each exception is written in `.cargo/audit.toml`. `deny.toml` and
+`osv-scanner.toml` repeat the identifier, because cargo-deny, osv-scanner and
+the OpenSSF Scorecard each read only their own file, and
+`tools/audit/dependencies.py` fails the build if the three lists differ.
+Beyond our own checks, `.github/workflows/codeql.yml` analyses the Rust, the
+Python, the website's JavaScript and the workflows themselves, and
+`.github/workflows/scorecard.yml` grades the repository from the outside every
+week.
+
 **Work that can be done once is done once, and a comment says what made it
 constant.** A value computed per frame or per sample that does not change per
 frame or per sample is a defect.

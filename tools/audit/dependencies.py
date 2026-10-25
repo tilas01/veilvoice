@@ -129,47 +129,70 @@ def counted(path):
 
 
 def advisory_ids(path):
-    """The RUSTSEC identifiers a policy file ignores, in the order written."""
+    """The RUSTSEC identifiers a policy file ignores, in the order written.
+
+    cargo-audit and cargo-deny write them as entries in an `ignore` list;
+    osv-scanner writes each as `id = "..."` in its own table. Both shapes are
+    read here.
+    """
     found = []
     with open(path, "r", encoding="utf-8") as handle:
         for line in handle:
             stripped = line.split("#", 1)[0].strip()
+            if stripped.startswith("id") and "=" in stripped:
+                stripped = stripped.split("=", 1)[1].strip()
             if stripped.startswith('"RUSTSEC-'):
                 found.append(stripped.strip('",'))
     return found
 
 
-def policies_disagree():
-    """Where `.cargo/audit.toml` and `deny.toml` ignore different advisories.
+# Every file that lists the advisories this project has weighed. The arguments
+# are written once, in the first; the others repeat the identifiers because
+# each tool reads its own file and no other.
+POLICIES = [
+    os.path.join(".cargo", "audit.toml"),
+    "deny.toml",
+    "osv-scanner.toml",
+]
 
-    cargo-audit and cargo-deny each read their own file and neither reads the
-    other's, so the same three exceptions are written twice. The arguments
-    live in `.cargo/audit.toml`; `deny.toml` carries the identifiers and a
-    pointer. Two lists that are meant to be one list drift the first time
-    somebody edits one of them, so this says which identifiers are on one side
-    only. Both are read as text rather than parsed, because the standard
-    library gained a TOML reader in 3.11 and this runs on 3.10 too.
+
+def policies_disagree():
+    """Where the advisory policies ignore different advisories.
+
+    cargo-audit, cargo-deny and osv-scanner each read their own file and none
+    reads another's, so the same exceptions are written three times. The
+    arguments live in `.cargo/audit.toml`; `deny.toml` and `osv-scanner.toml`
+    carry the identifiers and a pointer. Lists that are meant to be one list
+    drift the first time somebody edits one of them, so this says which
+    identifiers each file is missing. All three are read as text rather than
+    parsed, because the standard library gained a TOML reader in 3.11 and this
+    runs on 3.10 too.
     """
-    audit = set(advisory_ids(os.path.join(ROOT, ".cargo", "audit.toml")))
-    deny = set(advisory_ids(os.path.join(ROOT, "deny.toml")))
+    lists = {name: set(advisory_ids(os.path.join(ROOT, name))) for name in POLICIES}
+    everywhere = set().union(*lists.values())
     problems = []
-    for ident in sorted(audit - deny):
-        problems.append("%s is ignored in .cargo/audit.toml and not in deny.toml" % ident)
-    for ident in sorted(deny - audit):
-        problems.append("%s is ignored in deny.toml and not in .cargo/audit.toml" % ident)
+    for ident in sorted(everywhere):
+        holding = [name for name in POLICIES if ident in lists[name]]
+        missing = [name for name in POLICIES if ident not in lists[name]]
+        if missing:
+            problems.append(
+                "%s is ignored in %s but missing from %s"
+                % (ident, " and ".join(holding), " and ".join(missing))
+            )
     return problems
 
 
 def main():
     disagreements = policies_disagree()
     if disagreements:
-        print("the two advisory policies do not ignore the same advisories:")
+        print("the advisory policies do not ignore the same advisories:")
         for problem in disagreements:
             print("  %s" % problem)
         print()
         print(
             "The argument for an exception is written once, in .cargo/audit.toml; "
-            "deny.toml repeats the identifier and nothing else. Make the lists match."
+            "deny.toml and osv-scanner.toml repeat the identifier and a pointer. "
+            "Make the lists match."
         )
         return 1
 
@@ -194,7 +217,7 @@ def main():
         return 1
 
     print("  %d dependencies, every one of them explained where it is declared" % total)
-    print("  %d advisory exceptions, the same in both policy files" % len(advisory_ids(
+    print("  %d advisory exceptions, the same in all three policy files" % len(advisory_ids(
         os.path.join(ROOT, "deny.toml"))))
     return 0
 
