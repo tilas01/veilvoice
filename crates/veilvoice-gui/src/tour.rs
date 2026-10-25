@@ -481,7 +481,7 @@ impl Tour {
         // what the card has to fit inside.
         let height = ctx.content_rect().height() * CARD_HEIGHT_SHARE;
 
-        let modal = egui::Modal::new(egui::Id::new("veilvoice-tour"))
+        let modal = egui::Modal::new(egui::Id::unique("veilvoice-tour"))
             .frame(
                 egui::Frame::new()
                     .fill(p::surface())

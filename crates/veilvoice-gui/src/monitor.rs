@@ -351,7 +351,7 @@ pub fn show(
             });
         }
         Style::Overlay => {
-            egui::Area::new(egui::Id::new("live_monitor_overlay"))
+            egui::Area::new(egui::Id::unique("live_monitor_overlay"))
                 .anchor(egui::Align2::RIGHT_BOTTOM, egui::vec2(-16.0, -16.0))
                 .order(egui::Order::Foreground)
                 .show(root.ctx(), |ui| {

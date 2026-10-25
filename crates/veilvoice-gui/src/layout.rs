@@ -533,7 +533,7 @@ mod tests {
                                 .password(true)
                                 .desired_width(260.0)
                                 .min_size(egui::vec2(260.0, row))
-                                .vertical_align(egui::Align::Center),
+                                .align(egui::Align2::LEFT_CENTER),
                         )
                         .rect;
                     unlock = ui
@@ -564,7 +564,7 @@ mod tests {
         // of one height whose centres differ still read as out of place.
         for (what, button, beside) in [("lock", lock, picker), ("unlock", unlock, field)] {
             assert!(
-                (button.height() - beside.height()).abs() < 0.5,
+                (button.height() - beside.height()).abs() < 0.1,
                 "the {what} button is {:.1} tall beside a control {:.1} tall",
                 button.height(),
                 beside.height()
@@ -611,8 +611,11 @@ mod tests {
                 });
             });
         });
+        // Since egui 0.37 the two are only an eighth of a point apart on their
+        // own, so the height check above is held to a tenth of a point rather
+        // than half of one, or it would pass with nothing making them match.
         assert!(
-            (unlock.height() - field.height()).abs() >= 0.5,
+            (unlock.height() - field.height()).abs() >= 0.1,
             "a button and a password field are the same height with nothing \
              making them match, so the test above would pass either way: \
              {:.1} against {:.1}",

@@ -446,7 +446,7 @@
 <span class="ln" id="L351">            });</span>
 <span class="ln" id="L352">        }</span>
 <span class="ln" id="L353">        Style::Overlay =&gt; {</span>
-<span class="ln" id="L354">            egui::Area::<span class="tok-fn">new</span>(egui::Id::<span class="tok-fn">new</span>(<span class="tok-str">&quot;live_monitor_overlay&quot;</span>))</span>
+<span class="ln" id="L354">            egui::Area::<span class="tok-fn">new</span>(egui::Id::<span class="tok-fn">unique</span>(<span class="tok-str">&quot;live_monitor_overlay&quot;</span>))</span>
 <span class="ln" id="L355">                .<span class="tok-fn">anchor</span>(egui::Align2::RIGHT_BOTTOM, egui::<span class="tok-fn">vec2</span>(-<span class="tok-num">16.0</span>, -<span class="tok-num">16.0</span>))</span>
 <span class="ln" id="L356">                .<span class="tok-fn">order</span>(egui::Order::Foreground)</span>
 <span class="ln" id="L357">                .<span class="tok-fn">show</span>(root.<span class="tok-fn">ctx</span>(), |ui| {</span>

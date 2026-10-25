@@ -217,7 +217,7 @@
 <span class="ln" id="L136">        <span class="tok-kw">return</span> false;</span>
 <span class="ln" id="L137">    }</span>
 <span class="ln" id="L138"></span>
-<span class="ln" id="L139">    <span class="tok-kw">let</span> id = egui::Id::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-soundbar-window-rect&quot;</span>);</span>
+<span class="ln" id="L139">    <span class="tok-kw">let</span> id = egui::Id::<span class="tok-fn">unique</span>(<span class="tok-str">&quot;veilvoice-soundbar-window-rect&quot;</span>);</span>
 <span class="ln" id="L140">    <span class="tok-kw">let</span> (rect, now) = ctx.<span class="tok-fn">input</span>(|i| (i.<span class="tok-fn">viewport</span>().outer_rect, i.time));</span>
 <span class="ln" id="L141">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rect) = rect <span class="tok-kw">else</span> {</span>
 <span class="ln" id="L142">        <span class="tok-com">// A platform that does not report the window rectangle cannot be</span></span>
@@ -252,7 +252,7 @@
 <span class="ln" id="L169"><span class="tok-com">/// loses focus. Clicking away from the window and back should not make the</span></span>
 <span class="ln" id="L170"><span class="tok-com">/// logo jump.</span></span>
 <span class="ln" id="L171"><span class="tok-kw">fn</span> <span class="tok-fn">animation_clock</span>(ctx: &amp;egui::Context, moving: bool, time: f32) -&gt; f32 {</span>
-<span class="ln" id="L172">    <span class="tok-kw">let</span> id = egui::Id::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-soundbar-clock&quot;</span>);</span>
+<span class="ln" id="L172">    <span class="tok-kw">let</span> id = egui::Id::<span class="tok-fn">unique</span>(<span class="tok-str">&quot;veilvoice-soundbar-clock&quot;</span>);</span>
 <span class="ln" id="L173">    <span class="tok-kw">if</span> moving {</span>
 <span class="ln" id="L174">        ctx.<span class="tok-fn">memory_mut</span>(|m| m.data.<span class="tok-fn">insert_temp</span>(id, time));</span>
 <span class="ln" id="L175">        time</span>
@@ -801,7 +801,7 @@
 <span class="ln" id="L711">                step <span class="tok-kw">as</span> f32 * <span class="tok-num">0.2</span>,</span>
 <span class="ln" id="L712">            );</span>
 <span class="ln" id="L713">        }</span>
-<span class="ln" id="L714">        <span class="tok-kw">let</span> requested = std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">1000</span> / <span class="tok-num">30</span>);</span>
+<span class="ln" id="L714">        <span class="tok-kw">let</span> requested = std::time::Duration::<span class="tok-fn">from_secs_f64</span>(<span class="tok-num">1.0</span> / <span class="tok-num">30.0</span>);</span>
 <span class="ln" id="L715">        <span class="tok-kw">let</span> one_frame = std::time::Duration::<span class="tok-fn">from_millis</span>(<span class="tok-num">17</span>);</span>
 <span class="ln" id="L716">        assert!(</span>
 <span class="ln" id="L717">            delay &lt;= requested,</span>

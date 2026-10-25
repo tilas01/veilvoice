@@ -586,7 +586,7 @@
 <span class="ln" id="L481">        <span class="tok-com">// what the card has to fit inside.</span></span>
 <span class="ln" id="L482">        <span class="tok-kw">let</span> height = ctx.<span class="tok-fn">content_rect</span>().<span class="tok-fn">height</span>() * CARD_HEIGHT_SHARE;</span>
 <span class="ln" id="L483"></span>
-<span class="ln" id="L484">        <span class="tok-kw">let</span> modal = egui::Modal::<span class="tok-fn">new</span>(egui::Id::<span class="tok-fn">new</span>(<span class="tok-str">&quot;veilvoice-tour&quot;</span>))</span>
+<span class="ln" id="L484">        <span class="tok-kw">let</span> modal = egui::Modal::<span class="tok-fn">new</span>(egui::Id::<span class="tok-fn">unique</span>(<span class="tok-str">&quot;veilvoice-tour&quot;</span>))</span>
 <span class="ln" id="L485">            .<span class="tok-fn">frame</span>(</span>
 <span class="ln" id="L486">                egui::Frame::<span class="tok-fn">new</span>()</span>
 <span class="ln" id="L487">                    .<span class="tok-fn">fill</span>(p::<span class="tok-fn">surface</span>())</span>

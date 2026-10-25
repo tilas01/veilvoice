@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/layout.rs</code></h1>
-<p style="color:var(--muted)"><a href="layout.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 629 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="layout.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 632 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/layout.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -623,7 +623,7 @@
 <span class="ln" id="L533">                                .<span class="tok-fn">password</span>(true)</span>
 <span class="ln" id="L534">                                .<span class="tok-fn">desired_width</span>(<span class="tok-num">260.0</span>)</span>
 <span class="ln" id="L535">                                .<span class="tok-fn">min_size</span>(egui::<span class="tok-fn">vec2</span>(<span class="tok-num">260.0</span>, row))</span>
-<span class="ln" id="L536">                                .<span class="tok-fn">vertical_align</span>(egui::Align::Center),</span>
+<span class="ln" id="L536">                                .<span class="tok-fn">align</span>(egui::Align2::LEFT_CENTER),</span>
 <span class="ln" id="L537">                        )</span>
 <span class="ln" id="L538">                        .rect;</span>
 <span class="ln" id="L539">                    unlock = ui</span>
@@ -654,7 +654,7 @@
 <span class="ln" id="L564">        <span class="tok-com">// of one height whose centres differ still read as out of place.</span></span>
 <span class="ln" id="L565">        <span class="tok-kw">for</span> (what, button, beside) <span class="tok-kw">in</span> [(<span class="tok-str">&quot;lock&quot;</span>, lock, picker), (<span class="tok-str">&quot;unlock&quot;</span>, unlock, field)] {</span>
 <span class="ln" id="L566">            assert!(</span>
-<span class="ln" id="L567">                (button.<span class="tok-fn">height</span>() - beside.<span class="tok-fn">height</span>()).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L567">                (button.<span class="tok-fn">height</span>() - beside.<span class="tok-fn">height</span>()).<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.1</span>,</span>
 <span class="ln" id="L568">                <span class="tok-str">&quot;the {what} button is {:.1} tall beside a control {:.1} tall&quot;</span>,</span>
 <span class="ln" id="L569">                button.<span class="tok-fn">height</span>(),</span>
 <span class="ln" id="L570">                beside.<span class="tok-fn">height</span>()</span>
@@ -701,22 +701,25 @@
 <span class="ln" id="L611">                });</span>
 <span class="ln" id="L612">            });</span>
 <span class="ln" id="L613">        });</span>
-<span class="ln" id="L614">        assert!(</span>
-<span class="ln" id="L615">            (unlock.<span class="tok-fn">height</span>() - field.<span class="tok-fn">height</span>()).<span class="tok-fn">abs</span>() &gt;= <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L616">            <span class="tok-str">&quot;a button and a password field are the same height with nothing \</span></span>
-<span class="ln" id="L617"><span class="tok-str">             making them match, so the test above would pass either way: \</span></span>
-<span class="ln" id="L618"><span class="tok-str">             {:.1} against {:.1}&quot;</span>,</span>
-<span class="ln" id="L619">            unlock.<span class="tok-fn">height</span>(),</span>
-<span class="ln" id="L620">            field.<span class="tok-fn">height</span>()</span>
-<span class="ln" id="L621">        );</span>
-<span class="ln" id="L622">        assert!(</span>
-<span class="ln" id="L623">            (unlock.<span class="tok-fn">width</span>() - lock.<span class="tok-fn">width</span>()).<span class="tok-fn">abs</span>() &gt;= <span class="tok-num">0.5</span>,</span>
-<span class="ln" id="L624">            <span class="tok-str">&quot;the two buttons are already one width: {:.1} against {:.1}&quot;</span>,</span>
-<span class="ln" id="L625">            unlock.<span class="tok-fn">width</span>(),</span>
-<span class="ln" id="L626">            lock.<span class="tok-fn">width</span>()</span>
-<span class="ln" id="L627">        );</span>
-<span class="ln" id="L628">    }</span>
-<span class="ln" id="L629">}</span>
+<span class="ln" id="L614">        <span class="tok-com">// Since egui 0.37 the two are only an eighth of a point apart on their</span></span>
+<span class="ln" id="L615">        <span class="tok-com">// own, so the height check above is held to a tenth of a point rather</span></span>
+<span class="ln" id="L616">        <span class="tok-com">// than half of one, or it would pass with nothing making them match.</span></span>
+<span class="ln" id="L617">        assert!(</span>
+<span class="ln" id="L618">            (unlock.<span class="tok-fn">height</span>() - field.<span class="tok-fn">height</span>()).<span class="tok-fn">abs</span>() &gt;= <span class="tok-num">0.1</span>,</span>
+<span class="ln" id="L619">            <span class="tok-str">&quot;a button and a password field are the same height with nothing \</span></span>
+<span class="ln" id="L620"><span class="tok-str">             making them match, so the test above would pass either way: \</span></span>
+<span class="ln" id="L621"><span class="tok-str">             {:.1} against {:.1}&quot;</span>,</span>
+<span class="ln" id="L622">            unlock.<span class="tok-fn">height</span>(),</span>
+<span class="ln" id="L623">            field.<span class="tok-fn">height</span>()</span>
+<span class="ln" id="L624">        );</span>
+<span class="ln" id="L625">        assert!(</span>
+<span class="ln" id="L626">            (unlock.<span class="tok-fn">width</span>() - lock.<span class="tok-fn">width</span>()).<span class="tok-fn">abs</span>() &gt;= <span class="tok-num">0.5</span>,</span>
+<span class="ln" id="L627">            <span class="tok-str">&quot;the two buttons are already one width: {:.1} against {:.1}&quot;</span>,</span>
+<span class="ln" id="L628">            unlock.<span class="tok-fn">width</span>(),</span>
+<span class="ln" id="L629">            lock.<span class="tok-fn">width</span>()</span>
+<span class="ln" id="L630">        );</span>
+<span class="ln" id="L631">    }</span>
+<span class="ln" id="L632">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

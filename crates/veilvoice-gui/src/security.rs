@@ -2058,7 +2058,7 @@ fn unlock_row(
             // Which leaves the text at the top of a frame that is now taller
             // than the text. Centred, or the field is the button's height and
             // still looks wrong.
-            .vertical_align(egui::Align::Center),
+            .align(egui::Align2::LEFT_CENTER),
     );
     let button = ui.add_enabled(
         pressable,

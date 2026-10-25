@@ -135,7 +135,7 @@ BACKENDS = [
      "libgtk-3-dev",
      "the file panel would be GTK's again rather than the desktop portal's"),
     ("crates/veilvoice-gui/Cargo.toml",
-     'eframe = { version = "0.36", default-features = false',
+     'eframe = { version = "0.37", default-features = false',
      "libgtk-3-dev and the xkbcommon headers",
      "eframe's default features pull in backends this list does not cover"),
 ]
@@ -448,7 +448,7 @@ cargo build --workspace
 PIN = '[toolchain]\nchannel = "1.96.0"\n'
 
 MANIFEST = """[dependencies]
-eframe = { version = "0.36", default-features = false, features = ["glow"] }
+eframe = { version = "0.37", default-features = false, features = ["glow"] }
 rfd = { version = "0.16", default-features = false, features = ["xdg-portal", "tokio"] }
 """
 
@@ -559,8 +559,8 @@ def self_test():
 
     one("and so does eframe getting its default features back",
         tree(**{"crates/veilvoice-gui/Cargo.toml": MANIFEST.replace(
-            'eframe = { version = "0.36", default-features = false',
-            'eframe = { version = "0.36"')}),
+            'eframe = { version = "0.37", default-features = false',
+            'eframe = { version = "0.37"')}),
         "measured")
 
     # A cross-compilation step installs a list this file cannot read, and must
