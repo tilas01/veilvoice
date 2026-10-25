@@ -43,11 +43,11 @@ longer offered as the explanation for anything.
 Run on `main` at 5a808308, the first commit after the history was rewritten,
 signed and made the only branch. Every crate, the website, the wiki tools and
 the workflows were read again for anything from a syntax slip to a security
-hole. Five findings are fixed here. The rest are smaller or belong to work that
+hole. Six findings are fixed here. The rest are smaller or belong to work that
 is already in hand, and are listed in the project's audit notes rather than
 written up before they are fixed.
 
-Three of the five are in the decoy passphrase and the lock around it, which is
+Three of the six are in the decoy passphrase and the lock around it, which is
 where the last two rounds found their worst defects too. That is not a
 coincidence: the decoy is the newest code that makes a promise about what an
 observer cannot learn, and a promise of that kind is broken by any difference at
@@ -160,6 +160,33 @@ moment by dividing by exactly 5 ms. The picture ran ahead of the sound by about
 places a short burst a minute into a 44.1 kHz recording and requires the wave
 to peak where the burst is and to be silent just before it, where the old
 reading drew it.
+
+### F-276: the release build jobs held a token that could push to the repository
+
+**Where:** `.github/workflows/release.yml`, and the checkouts in every other
+workflow.
+
+**What happened:** `release.yml` granted `contents: write` to the whole
+workflow, and none of its five checkouts set `persist-credentials: false`, so
+the token stayed in `.git/config` for every later step. The build jobs compile
+every dependency and run its build script, so a compromised crate's `build.rs`
+could have read a token able to push to `main` or move a tag. The same
+persisted token sat in nineteen checkouts elsewhere, and the version typed into
+a release dispatch was pasted straight into two shell scripts, where a crafted
+value would have run as a command.
+
+**Fix:** The workflow is read only by default and only the publishing job can
+write. Every checkout drops its token unless its workflow pushes through
+`origin` and says why: only `rewrite.yml` and `signing.yml` do. The version
+reaches the scripts as the environment variables `INPUT_TAG` and
+`VERSION_TAG`. The publishing job now creates the release tag itself, signed
+with the release key, instead of letting GitHub create an unsigned one.
+
+**Regression test:** `tools/audit/checkout_tokens.py` fails CI on any checkout
+that keeps its token without a stated reason, and on a reason that no longer
+applies, and its `--self-test` covers the shapes it must tell apart.
+`tools/audit/publishing.py` still requires the notes waiver to be tied to the
+dry run in the new form.
 
 ## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
 
@@ -11717,7 +11744,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and seventy-five defects found and fixed (F-1 to F-275), across
+**Two hundred and seventy-six defects found and fixed (F-1 to F-276), across
 thirty-five rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
