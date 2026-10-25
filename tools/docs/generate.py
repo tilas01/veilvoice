@@ -2984,7 +2984,16 @@ def wiki_crate(colours, model, links):
     out.append("|---|---:|---|")
     for entry in model["files"]:
         summary = (entry["summary"] or "_no module documentation yet_").replace("|", "\\|")
-        out.append("| [[`%s`|%s]] | %d | %s |"
+        # An ordinary link rather than `[[name|Page]]`. In a table the pipe
+        # inside a wiki link is read as the next column, so the cell ended at
+        # the pipe and the reader saw `[[edit.rs` in one column and
+        # `File-veilvoice-conversation-edit]]` in the next. The summary on the
+        # line above has been escaped against exactly that since this table was
+        # written, which is the whole of what went wrong: the escaping was put
+        # on the cell whose text comes from a doc comment and not on the one
+        # this line writes itself. A wiki resolves a relative link to the page
+        # of that name, so this needs no escaping and cannot break again.
+        out.append("| [`%s`](%s) | %d | %s |"
                    % (entry["name"], wiki_file_page(crate, entry["stem"]),
                       entry["lines"], summary))
     out.append("")

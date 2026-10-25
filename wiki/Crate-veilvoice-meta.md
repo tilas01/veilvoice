@@ -87,11 +87,11 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [[`audio.rs`|File-veilvoice-meta-audio]] | 278 | Audio tag removal and replacement. |
-| [[`image.rs`|File-veilvoice-meta-image]] | 210 | Image EXIF/GPS removal. |
-| [[`lib.rs`|File-veilvoice-meta-lib]] | 127 | Strip or spoof the identifying metadata that rides along with media files. |
-| [[`wav.rs`|File-veilvoice-meta-wav]] | 432 | Chunk-level RIFF/WAVE metadata removal. |
-| [[`wav_fuzz.rs`|File-veilvoice-meta-tests-wav_fuzz]] | 299 | Randomised robustness testing for the RIFF chunk walker. |
+| [`audio.rs`](File-veilvoice-meta-audio) | 278 | Audio tag removal and replacement. |
+| [`image.rs`](File-veilvoice-meta-image) | 210 | Image EXIF/GPS removal. |
+| [`lib.rs`](File-veilvoice-meta-lib) | 127 | Strip or spoof the identifying metadata that rides along with media files. |
+| [`wav.rs`](File-veilvoice-meta-wav) | 432 | Chunk-level RIFF/WAVE metadata removal. |
+| [`wav_fuzz.rs`](File-veilvoice-meta-tests-wav_fuzz) | 299 | Randomised robustness testing for the RIFF chunk walker. |
 
 **696 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

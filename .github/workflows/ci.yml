@@ -557,6 +557,15 @@ jobs:
           python tools/audit/fixtures.py
           python tools/audit/fixtures.py --self-test
 
+      # A wiki link is `[[text|Page]]` and a table cell ends at a pipe, so the
+      # crate pages' file tables published a hundred and eighty-four rows with
+      # the brackets showing and every cell shifted a column. The row still
+      # renders as a table, which is why nobody saw it from the markup.
+      - name: Every Markdown table row must fit its heading
+        run: |
+          python tools/audit/tables.py
+          python tools/audit/tables.py --self-test
+
       # F-242. The branch tidier is run by hand, rarely, and failed on every
       # fresh clone because of the `origin/HEAD` every clone has. This makes a
       # clone and reads its branches the way the tool does.

@@ -366,6 +366,17 @@ CHECKS = [
      [sys.executable, "tools/audit/fixtures.py"]),
     ("that guard catches what it claims to",
      [sys.executable, "tools/audit/fixtures.py", "--self-test"]),
+    # A hundred and eighty-four rows of the crate pages reached readers with
+    # the brackets of a wiki link showing and every cell one column to the
+    # left, because `[[text|Page]]` in a table cell ends that cell at the pipe.
+    # Both generators escaped the pipes in the summary cell beside it and wrote
+    # an unescaped one into the link themselves, so the escaping was there and
+    # on the wrong cell. Counting cells against the heading finds the fault
+    # rather than that one symptom.
+    ("every table row fits its heading",
+     [sys.executable, "tools/audit/tables.py"]),
+    ("that guard catches what it claims to",
+     [sys.executable, "tools/audit/tables.py", "--self-test"]),
     # F-235. The other git-reading check. Fifteen commits were pushed naming
     # an assistant as author or committer, because a cloud container presets
     # its own identity and some set it in variables that beat every config

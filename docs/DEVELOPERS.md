@@ -139,6 +139,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/release_targets.py`](../tools/audit/release_targets.py) | The updater asks for an archive the release workflow actually builds |
 | [`tools/audit/rsa_usage.py`](../tools/audit/rsa_usage.py) | No crate reaching `pgp` may gain an RSA private-key code path |
 | [`tools/audit/state_paths.py`](../tools/audit/state_paths.py) | Find state files that one part of VeilVoice writes and another reads |
+| [`tools/audit/tables.py`](../tools/audit/tables.py) | Every row of a Markdown table has as many cells as its heading says |
 | [`tools/audit/wiki_publish.py`](../tools/audit/wiki_publish.py) | A wiki with no repository behind it skips the publish, and does not fail it |
 
 Every one of them was written after something got through. The reasoning is in [`docs/AUDIT.md`](AUDIT.md) under a finding number, which is worth reading before deciding a guard is unnecessary.
@@ -209,6 +210,8 @@ And what it then checks:
 - **that guard catches what it claims to, too**: `python tools/audit/wiki_publish.py --self-test`
 - **every file the build reads is in the repository**: `python tools/audit/fixtures.py`
 - **that guard catches what it claims to**: `python tools/audit/fixtures.py --self-test`
+- **every table row fits its heading**: `python tools/audit/tables.py`
+- **that guard catches what it claims to**: `python tools/audit/tables.py --self-test`
 - **every commit to push is tilas01's, and so is the next one**: `python tools/audit/authorship.py`
 - **the authorship guard catches what it claims to**: `python tools/audit/authorship.py --self-test`
 - **a signing key from the environment signs the next commit**: `python tools/repo/signing.py --self-test`
