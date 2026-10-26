@@ -44,6 +44,7 @@ jobs:
   analyse:
     name: analyse ${{ matrix.language }}
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     # Writing findings to the Security tab is the only write this needs.
     # `actions: read` lets CodeQL see which workflow run it belongs to.
     permissions:

@@ -65,6 +65,7 @@ jobs:
   build:
     name: ${{ matrix.label }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
@@ -356,6 +357,7 @@ jobs:
   freebsd:
     name: freebsd-x86_64
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     continue-on-error: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -474,6 +476,7 @@ jobs:
   openbsd:
     name: openbsd-x86_64
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     # Allowed to fail without stopping a release, exactly like FreeBSD. These
     # run in an emulated VM on a Linux runner and are the most fragile jobs
     # here; a release should not be blocked because somebody else's VM image
@@ -571,6 +574,7 @@ jobs:
   netbsd:
     name: netbsd-x86_64
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     # Allowed to fail without stopping a release, exactly like FreeBSD. These
     # run in an emulated VM on a Linux runner and are the most fragile jobs
     # here; a release should not be blocked because somebody else's VM image
@@ -672,6 +676,7 @@ jobs:
     # release, so this runs as long as the matrix itself did.
     if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
     # Evaluated at job level on purpose. A step's own `env:` block is not in

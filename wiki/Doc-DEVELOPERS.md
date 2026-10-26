@@ -133,6 +133,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/documented.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/documented.py) | Every item on a generated page has something written under it |
 | [`tools/audit/features.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/features.py) | Every feature selection a release builds is built here too |
 | [`tools/audit/fixtures.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/fixtures.py) | A file the build needs is in the commit, not merely on the machine that wrote it |
+| [`tools/audit/job_limits.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/job_limits.py) | Every job in every workflow says how long it is allowed to take |
 | [`tools/audit/network_claims.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/network_claims.py) | The manual names every command that reaches the network |
 | [`tools/audit/network_wording.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/network_wording.py) | No sentence a reader sees may claim more about the network than is true |
 | [`tools/audit/platform_table.py`](https://github.com/tilas01/veilvoice/blob/main/tools/audit/platform_table.py) | The table of what runs where says what the release workflow actually builds |
@@ -207,6 +208,8 @@ And what it then checks:
 - **no crate reaching pgp performs a private-key operation**: `python tools/audit/rsa_usage.py`
 - **every random draw comes from the OS CSPRNG**: `python tools/audit/randomness.py`
 - **every action a workflow runs is pinned to a commit**: `python tools/audit/actions.py`
+- **every workflow job says how long it may take**: `python tools/audit/job_limits.py`
+- **that guard catches a job with no limit**: `python tools/audit/job_limits.py --self-test`
 - **a checkout that never pushes does not keep the token**: `python tools/audit/checkout_tokens.py`
 - **the checkout guard reads the shapes it is meant to**: `python tools/audit/checkout_tokens.py --self-test`
 - **no PowerShell function keeps a script variable's change to itself**: `python tools/audit/powershell.py`

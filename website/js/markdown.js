@@ -386,7 +386,12 @@ window.MD = (function () {
       }
 
       // headings -- h1 is skipped because the page supplies its own title
-      var heading = line.match(/^(#{1,6})\s+(.*)$/);
+      //
+      // `[^\n]` rather than `.`, because `.` does not match U+2028 or U+2029.
+      // The source has already been split on newlines, so a line separator
+      // inside a heading is a character of its text like any other, and the
+      // pattern that could not see it read the whole line as prose.
+      var heading = line.match(/^(#{1,6})\s+([^\n]*)$/);
       if (heading) {
         var level = heading[1].length;
         html.push("<h" + level + ">" + inline(heading[2]) + "</h" + level + ">");
@@ -488,6 +493,19 @@ window.MD = (function () {
       // safe to do.
       var summary = /^<summary>([^<>]{0,512}|(?:<\/?b>|[^<>]){0,512})<\/summary>$/
         .exec(line.trim());
+      // `<details><summary>x</summary>` on one line is the same block written
+      // the other legal way, and the shape a person typing one by hand reaches
+      // for. Read as the two lines it means, so that it opens a block rather
+      // than reaching the reader as the literal text of a tag.
+      var opened = /^<details>\s*(<summary>(?:[^<>]{0,512}|(?:<\/?b>|[^<>]){0,512})<\/summary>)$/
+        .exec(line.trim());
+      if (opened) {
+        open += 1;
+        html.push("<details>");
+        line = opened[1];
+        summary = /^<summary>([^<>]{0,512}|(?:<\/?b>|[^<>]){0,512})<\/summary>$/
+          .exec(line);
+      }
       //
       // Balanced here rather than trusted to be balanced. This renderer also
       // draws the README *as fetched from GitHub over the network*, and a
@@ -534,7 +552,27 @@ window.MD = (function () {
         para.push(lines[i]);
         i++;
       }
-      if (para.length) { html.push("<p>" + inline(para.join(" ")) + "</p>"); }
+      if (para.length) {
+        html.push("<p>" + inline(para.join(" ")) + "</p>");
+        continue;
+      }
+
+      // Nothing above consumed this line, and the paragraph collector would
+      // not take it either, so `i` has not moved. Before this, that was an
+      // infinite loop: `<details><summary>x</summary>` on one line, a
+      // `<summary>` with no close, anything after a closing `</details>`, and
+      // a heading holding U+2028, which `.` does not match, each froze the tab
+      // on the spot. `js/repo.js` renders README.md *as fetched from GitHub*,
+      // so that is a denial of service against the reader from text this page
+      // went and asked for, and `tools/site/wiki_site.py` renders the same
+      // documents in CI, where it was six hours of a hung job.
+      //
+      // The guarantee is therefore structural rather than a list of the four
+      // shapes: a pass that consumed nothing emits the line as the text it is,
+      // escaped, and moves on. Every pass of this loop now advances `i`, so no
+      // document can stop it, including the one nobody has thought of.
+      html.push("<p>" + inline(line) + "</p>");
+      i++;
     }
 
     while (open > 0) {
