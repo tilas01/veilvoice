@@ -95,7 +95,7 @@ pub fn clean_image_file(path: &Path, policy: Policy) -> Result<Report, Error> {
     let bytes = std::fs::read(path)?;
     let (cleaned, report) = clean_image_bytes(&bytes, policy)?;
     if report.changed {
-        std::fs::write(path, cleaned)?;
+        crate::replace_with(path, |fresh| Ok(std::fs::write(fresh, &cleaned)?))?;
     }
     Ok(report)
 }
