@@ -107,7 +107,7 @@ flowchart TD
     n_lib(["lib.rs<br/>182 lines"])
     n_edit["edit.rs<br/>649 lines"]
     n_mode["mode.rs<br/>592 lines"]
-    n_plan["plan.rs<br/>1201 lines"]
+    n_plan["plan.rs<br/>1244 lines"]
     n_render["render.rs<br/>1111 lines"]
     n_subtitles["subtitles.rs<br/>276 lines"]
     n_edit --> n_plan
@@ -130,11 +130,11 @@ flowchart TD
 | [`edit.rs`](../../docs/files/veilvoice-conversation/edit.md) | 649 | Correcting a plan: who is speaking when, what they are called, and in what colour. |
 | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | 182 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
 | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | 592 | How many voices a group gets, and the trade between the two answers. |
-| [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 1201 | Who is in the recording, and who is speaking when. |
+| [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 1244 | Who is in the recording, and who is speaking when. |
 | [`render.rs`](../../docs/files/veilvoice-conversation/render.md) | 1111 | Turning a plan and a recording into veiled audio, one engine per speaker. |
 | [`subtitles.rs`](../../docs/files/veilvoice-conversation/subtitles.md) | 276 | Subtitles, from the same plan the audio is rendered from. |
 
-**2,644 functional lines of Rust** in this crate. A functional line is a line
+**2,676 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -155,6 +155,7 @@ counts blank lines and comments too. Both are produced by
 | `fn check` | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | Whether this many speakers can be rendered in this mode. |
 | `struct Speaker` | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | One person in the recording. |
 | `struct Turn` | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | A span of the recording belonging to one speaker. |
+| `const LATEST_END_SECS` | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | The latest a turn may end, in seconds: twelve hours. |
 | `struct Conversation` | [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | The whole plan: who is in the recording, and when each of them speaks. |
 | `struct Settings` | [`render.rs`](../../docs/files/veilvoice-conversation/render.md) | How to render. |
 | `struct Progress` | [`render.rs`](../../docs/files/veilvoice-conversation/render.md) | What a render has done so far, readable while it is still running. |

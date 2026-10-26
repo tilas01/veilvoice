@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-meta/src/lib.rs</code></h1>
-<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 127 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="lib.html">what this file is for</a> &middot; <a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 230 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -165,50 +165,155 @@
 </span>
 <span class="ln" id="L90">}</span>
 <span class="ln" id="L91"></span>
+<span class="ln" id="L92"><span class="tok-kw">use</span> std::path::Path;</span>
+<span class="ln" id="L93"></span>
+<span class="src-item" id="fn-replace_with">
+<span class="ln" id="L94"><span class="tok-com">/// Replace the file at `path` with one that `fill` makes beside it.</span></span>
+<span class="ln" id="L95"><span class="tok-com">///</span></span>
+<span class="ln" id="L96"><span class="tok-com">/// **F-281.** Cleaning used to rewrite the file where it stood: `fs::write`</span></span>
+<span class="ln" id="L97"><span class="tok-com">/// truncates first and writes after, and the tag path ran several separate</span></span>
+<span class="ln" id="L98"><span class="tok-com">/// edits over the original. A crash, a full disk or a power cut part way</span></span>
+<span class="ln" id="L99"><span class="tok-com">/// through left a truncated file, and the file being cleaned is usually the</span></span>
+<span class="ln" id="L100"><span class="tok-com">/// only copy of a recording somebody cares about.</span></span>
+<span class="ln" id="L101"><span class="tok-com">///</span></span>
+<span class="ln" id="L102"><span class="tok-com">/// Now the new contents go into a fresh file in the same folder, made with</span></span>
+<span class="ln" id="L103"><span class="tok-com">/// `create_new` so nothing already there is followed or overwritten, and</span></span>
+<span class="ln" id="L104"><span class="tok-com">/// that file is renamed over the original only once it is complete. A rename</span></span>
+<span class="ln" id="L105"><span class="tok-com">/// within one folder is all or nothing, so the original is either untouched</span></span>
+<span class="ln" id="L106"><span class="tok-com">/// or fully replaced. `fill` is handed the fresh file&#x27;s path, empty, and the</span></span>
+<span class="ln" id="L107"><span class="tok-com">/// original keeps its permissions. The fresh name ends with the original&#x27;s,</span></span>
+<span class="ln" id="L108"><span class="tok-com">/// extension included, because the tag library recognises a format partly by</span></span>
+<span class="ln" id="L109"><span class="tok-com">/// its extension.</span></span>
+<span class="ln" id="L110"><span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">replace_with</span>(</span>
+<span class="ln" id="L111">    path: &amp;Path,</span>
+<span class="ln" id="L112">    fill: <span class="tok-kw">impl</span> <span class="tok-fn">FnOnce</span>(&amp;Path) -&gt; Result&lt;(), Error&gt;,</span>
+<span class="ln" id="L113">) -&gt; Result&lt;(), Error&gt; {</span>
+<span class="ln" id="L114">    <span class="tok-kw">let</span> folder = <span class="tok-kw">match</span> path.<span class="tok-fn">parent</span>() {</span>
+<span class="ln" id="L115">        <span class="tok-fn">Some</span>(parent) <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() =&gt; parent,</span>
+<span class="ln" id="L116">        _ =&gt; Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;.&quot;</span>),</span>
+<span class="ln" id="L117">    };</span>
+<span class="ln" id="L118">    <span class="tok-kw">let</span> name = path</span>
+<span class="ln" id="L119">        .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L120">        .<span class="tok-fn">map</span>(|name| name.<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>())</span>
+<span class="ln" id="L121">        .<span class="tok-fn">unwrap_or_default</span>();</span>
+<span class="ln" id="L122">    <span class="tok-kw">let</span> permissions = std::fs::<span class="tok-fn">metadata</span>(path)?.<span class="tok-fn">permissions</span>();</span>
+<span class="ln" id="L123">    <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L124">        .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L125">        .<span class="tok-fn">map</span>(|since| since.<span class="tok-fn">as_nanos</span>())</span>
+<span class="ln" id="L126">        .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L127"></span>
+<span class="ln" id="L128">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> attempt = 0u32;</span>
+<span class="ln" id="L129">    <span class="tok-kw">let</span> fresh = loop {</span>
+<span class="ln" id="L130">        <span class="tok-kw">let</span> candidate = folder.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;.{}-{stamp}-{attempt}.{name}&quot;</span>, std::process::<span class="tok-fn">id</span>()));</span>
+<span class="ln" id="L131">        <span class="tok-kw">match</span> std::fs::OpenOptions::<span class="tok-fn">new</span>()</span>
+<span class="ln" id="L132">            .<span class="tok-fn">write</span>(true)</span>
+<span class="ln" id="L133">            .<span class="tok-fn">create_new</span>(true)</span>
+<span class="ln" id="L134">            .<span class="tok-fn">open</span>(&amp;candidate)</span>
+<span class="ln" id="L135">        {</span>
+<span class="ln" id="L136">            <span class="tok-fn">Ok</span>(_) =&gt; break candidate,</span>
+<span class="ln" id="L137">            <span class="tok-fn">Err</span>(e) <span class="tok-kw">if</span> e.<span class="tok-fn">kind</span>() == std::io::ErrorKind::AlreadyExists &amp;&amp; attempt &lt; <span class="tok-num">16</span> =&gt; {</span>
+<span class="ln" id="L138">                attempt += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L139">            }</span>
+<span class="ln" id="L140">            <span class="tok-fn">Err</span>(e) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(e.<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L141">        }</span>
+<span class="ln" id="L142">    };</span>
+<span class="ln" id="L143"></span>
+<span class="ln" id="L144">    <span class="tok-kw">let</span> made = <span class="tok-fn">fill</span>(&amp;fresh)</span>
+<span class="ln" id="L145">        .<span class="tok-fn">and_then</span>(|()| <span class="tok-fn">Ok</span>(std::fs::<span class="tok-fn">set_permissions</span>(&amp;fresh, permissions)?))</span>
+<span class="ln" id="L146">        .<span class="tok-fn">and_then</span>(|()| <span class="tok-fn">Ok</span>(std::fs::<span class="tok-fn">rename</span>(&amp;fresh, path)?));</span>
+<span class="ln" id="L147">    <span class="tok-kw">if</span> made.<span class="tok-fn">is_err</span>() {</span>
+<span class="ln" id="L148">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;fresh);</span>
+<span class="ln" id="L149">    }</span>
+<span class="ln" id="L150">    made</span>
+<span class="ln" id="L151">}</span>
+</span>
+<span class="ln" id="L152"></span>
 <span class="src-item" id="fn-error">
-<span class="ln" id="L92"><span class="tok-com">/// Everything that can go wrong in this crate.</span></span>
-<span class="ln" id="L93"><span class="tok-attr">#[derive</span>(Debug)]</span>
-<span class="ln" id="L94"><span class="tok-attr">#[non_exhaustive</span>]</span>
-<span class="ln" id="L95"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Error {</span>
-<span class="ln" id="L96">    <span class="tok-com">/// The file could not be read or written.</span></span>
-<span class="ln" id="L97">    <span class="tok-fn">Io</span>(std::io::Error),</span>
-<span class="ln" id="L98">    <span class="tok-com">/// The file is not a format this crate understands.</span></span>
-<span class="ln" id="L99">    UnsupportedFormat,</span>
-<span class="ln" id="L100">    <span class="tok-com">/// The file is structurally malformed.</span></span>
-<span class="ln" id="L101">    <span class="tok-fn">Malformed</span>(String),</span>
-<span class="ln" id="L102">}</span>
+<span class="ln" id="L153"><span class="tok-com">/// Everything that can go wrong in this crate.</span></span>
+<span class="ln" id="L154"><span class="tok-attr">#[derive</span>(Debug)]</span>
+<span class="ln" id="L155"><span class="tok-attr">#[non_exhaustive</span>]</span>
+<span class="ln" id="L156"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Error {</span>
+<span class="ln" id="L157">    <span class="tok-com">/// The file could not be read or written.</span></span>
+<span class="ln" id="L158">    <span class="tok-fn">Io</span>(std::io::Error),</span>
+<span class="ln" id="L159">    <span class="tok-com">/// The file is not a format this crate understands.</span></span>
+<span class="ln" id="L160">    UnsupportedFormat,</span>
+<span class="ln" id="L161">    <span class="tok-com">/// The file is structurally malformed.</span></span>
+<span class="ln" id="L162">    <span class="tok-fn">Malformed</span>(String),</span>
+<span class="ln" id="L163">}</span>
 </span>
-<span class="ln" id="L103"></span>
-<span class="ln" id="L104"><span class="tok-kw">impl</span> From&lt;std::io::Error&gt; <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L164"></span>
+<span class="ln" id="L165"><span class="tok-kw">impl</span> From&lt;std::io::Error&gt; <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-from">
-<span class="ln" id="L105">    <span class="tok-kw">fn</span> <span class="tok-fn">from</span>(e: std::io::Error) -&gt; Self {</span>
-<span class="ln" id="L106">        Self::<span class="tok-fn">Io</span>(e)</span>
-<span class="ln" id="L107">    }</span>
+<span class="ln" id="L166">    <span class="tok-kw">fn</span> <span class="tok-fn">from</span>(e: std::io::Error) -&gt; Self {</span>
+<span class="ln" id="L167">        Self::<span class="tok-fn">Io</span>(e)</span>
+<span class="ln" id="L168">    }</span>
 </span>
-<span class="ln" id="L108">}</span>
-<span class="ln" id="L109"></span>
-<span class="ln" id="L110"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L169">}</span>
+<span class="ln" id="L170"></span>
+<span class="ln" id="L171"><span class="tok-kw">impl</span> std::fmt::Display <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-fmt">
-<span class="ln" id="L111">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
-<span class="ln" id="L112">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L113">            Self::<span class="tok-fn">Io</span>(e) =&gt; write!(f, <span class="tok-str">&quot;input/output error: {e}&quot;</span>),</span>
-<span class="ln" id="L114">            Self::UnsupportedFormat =&gt; f.<span class="tok-fn">write_str</span>(<span class="tok-str">&quot;unsupported media format&quot;</span>),</span>
-<span class="ln" id="L115">            Self::<span class="tok-fn">Malformed</span>(m) =&gt; write!(f, <span class="tok-str">&quot;malformed file: {m}&quot;</span>),</span>
-<span class="ln" id="L116">        }</span>
-<span class="ln" id="L117">    }</span>
+<span class="ln" id="L172">    <span class="tok-kw">fn</span> <span class="tok-fn">fmt</span>(&amp;<span class="tok-kw">self</span>, f: &amp;<span class="tok-kw">mut</span> std::fmt::Formatter&lt;&#x27;_&gt;) -&gt; std::fmt::Result {</span>
+<span class="ln" id="L173">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L174">            Self::<span class="tok-fn">Io</span>(e) =&gt; write!(f, <span class="tok-str">&quot;input/output error: {e}&quot;</span>),</span>
+<span class="ln" id="L175">            Self::UnsupportedFormat =&gt; f.<span class="tok-fn">write_str</span>(<span class="tok-str">&quot;unsupported media format&quot;</span>),</span>
+<span class="ln" id="L176">            Self::<span class="tok-fn">Malformed</span>(m) =&gt; write!(f, <span class="tok-str">&quot;malformed file: {m}&quot;</span>),</span>
+<span class="ln" id="L177">        }</span>
+<span class="ln" id="L178">    }</span>
 </span>
-<span class="ln" id="L118">}</span>
-<span class="ln" id="L119"></span>
-<span class="ln" id="L120"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {</span>
+<span class="ln" id="L179">}</span>
+<span class="ln" id="L180"></span>
+<span class="ln" id="L181"><span class="tok-kw">impl</span> std::error::Error <span class="tok-kw">for</span> Error {</span>
 <span class="src-item" id="fn-error-source">
-<span class="ln" id="L121">    <span class="tok-kw">fn</span> <span class="tok-fn">source</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;(<span class="tok-kw">dyn</span> std::error::Error + &#x27;<span class="tok-kw">static</span>)&gt; {</span>
-<span class="ln" id="L122">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
-<span class="ln" id="L123">            Self::<span class="tok-fn">Io</span>(e) =&gt; <span class="tok-fn">Some</span>(e),</span>
-<span class="ln" id="L124">            _ =&gt; None,</span>
-<span class="ln" id="L125">        }</span>
-<span class="ln" id="L126">    }</span>
+<span class="ln" id="L182">    <span class="tok-kw">fn</span> <span class="tok-fn">source</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;&amp;(<span class="tok-kw">dyn</span> std::error::Error + &#x27;<span class="tok-kw">static</span>)&gt; {</span>
+<span class="ln" id="L183">        <span class="tok-kw">match</span> <span class="tok-kw">self</span> {</span>
+<span class="ln" id="L184">            Self::<span class="tok-fn">Io</span>(e) =&gt; <span class="tok-fn">Some</span>(e),</span>
+<span class="ln" id="L185">            _ =&gt; None,</span>
+<span class="ln" id="L186">        }</span>
+<span class="ln" id="L187">    }</span>
 </span>
-<span class="ln" id="L127">}</span>
+<span class="ln" id="L188">}</span>
+<span class="ln" id="L189"></span>
+<span class="ln" id="L190"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L191"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L192">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L193"></span>
+<span class="ln" id="L194">    <span class="tok-com">/// F-281. A replacement that fails part way leaves the original exactly as</span></span>
+<span class="ln" id="L195">    <span class="tok-com">/// it was and nothing beside it, and one that succeeds keeps its</span></span>
+<span class="ln" id="L196">    <span class="tok-com">/// permissions.</span></span>
+<span class="ln" id="L197">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L198">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_clean_leaves_the_original_whole</span>() {</span>
+<span class="ln" id="L199">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L200">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;only copy.wav&quot;</span>);</span>
+<span class="ln" id="L201">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;the recording&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L202"></span>
+<span class="ln" id="L203">        <span class="tok-kw">let</span> failed = <span class="tok-fn">replace_with</span>(&amp;path, |fresh| {</span>
+<span class="ln" id="L204">            std::fs::<span class="tok-fn">write</span>(fresh, b<span class="tok-str">&quot;the rec&quot;</span>)?;</span>
+<span class="ln" id="L205">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(<span class="tok-str">&quot;the disk filled up&quot;</span>.<span class="tok-fn">into</span>()))</span>
+<span class="ln" id="L206">        });</span>
+<span class="ln" id="L207">        assert!(failed.<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L208">        assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;the recording&quot;</span>);</span>
+<span class="ln" id="L209">        assert_eq!(</span>
+<span class="ln" id="L210">            std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">count</span>(),</span>
+<span class="ln" id="L211">            <span class="tok-num">1</span>,</span>
+<span class="ln" id="L212">            <span class="tok-str">&quot;a part-written file was left beside the original&quot;</span></span>
+<span class="ln" id="L213">        );</span>
+<span class="ln" id="L214"></span>
+<span class="ln" id="L215">        <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L216">        {</span>
+<span class="ln" id="L217">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L218">            std::fs::<span class="tok-fn">set_permissions</span>(&amp;path, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o600)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L219">        }</span>
+<span class="ln" id="L220">        <span class="tok-fn">replace_with</span>(&amp;path, |fresh| <span class="tok-fn">Ok</span>(std::fs::<span class="tok-fn">write</span>(fresh, b<span class="tok-str">&quot;cleaned&quot;</span>)?)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L221">        assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;cleaned&quot;</span>);</span>
+<span class="ln" id="L222">        assert_eq!(std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">count</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L223">        <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L224">        {</span>
+<span class="ln" id="L225">            <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L226">            <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>();</span>
+<span class="ln" id="L227">            assert_eq!(mode &amp; 0o777, 0o600, <span class="tok-str">&quot;the original&#x27;s permissions were lost&quot;</span>);</span>
+<span class="ln" id="L228">        }</span>
+<span class="ln" id="L229">    }</span>
+<span class="ln" id="L230">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">
