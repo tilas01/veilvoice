@@ -131,6 +131,15 @@ impl Turn {
     }
 }
 
+/// The latest a turn may end, in seconds: twelve hours.
+///
+/// The same twelve hours `veilvoice_audio::io::MAX_DECODED_SAMPLES` allows a
+/// recording, so a plan cannot describe speech after the end of any recording
+/// VeilVoice will open. **F-279.** Before this, a plan whose last turn ended
+/// at 1e300 seconds was accepted, and the video planner then stepped towards
+/// that end one frame at a time, which does not finish.
+pub const LATEST_END_SECS: f64 = 12.0 * 60.0 * 60.0;
+
 /// The whole plan: who is in the recording, and when each of them speaks.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Conversation {
@@ -209,6 +218,13 @@ impl Conversation {
             return Err(Error::Malformed(format!(
                 "a turn cannot start at {} seconds",
                 turn.start
+            )));
+        }
+        if turn.end > LATEST_END_SECS {
+            return Err(Error::Malformed(format!(
+                "a turn ending at {} seconds is past twelve hours, which is longer \
+                 than any recording VeilVoice will open",
+                turn.end
             )));
         }
         if turn.end <= turn.start {
@@ -695,6 +711,33 @@ mod tests {
             })
             .unwrap();
         conversation
+    }
+
+    /// F-279. A turn that ends past twelve hours is refused, so nothing
+    /// downstream is asked to step through a duration that never ends.
+    #[test]
+    fn a_turn_cannot_end_past_twelve_hours() {
+        let mut conversation = two_people();
+        for end in [LATEST_END_SECS + 1.0, 1e300] {
+            let refused = conversation.add_turn(Turn {
+                start: 10.0,
+                end,
+                speaker: 0,
+                text: None,
+            });
+            assert!(
+                matches!(refused, Err(Error::Malformed(_))),
+                "{end}: {refused:?}"
+            );
+        }
+        conversation
+            .add_turn(Turn {
+                start: LATEST_END_SECS - 1.0,
+                end: LATEST_END_SECS,
+                speaker: 0,
+                text: None,
+            })
+            .expect("a turn ending exactly at twelve hours is allowed");
     }
 
     #[test]
