@@ -75,6 +75,24 @@ use symphonia::core::meta::MetadataOptions;
 /// that quietly lost its second half is worse than one that would not open.
 pub const MAX_DECODED_SAMPLES: usize = 48_000 * 60 * 60 * 12;
 
+/// Ask for room for `more` samples, and say so if the machine has none.
+///
+/// **F-280.** [`MAX_DECODED_SAMPLES`] bounds the count, but the vector still
+/// grows by doubling, and near the bound one doubling asks for several
+/// gigabytes on top of the several already held. On a machine with less than
+/// that free the allocation fails, and in Rust a failed allocation aborts the
+/// process, which is what the bound was written to prevent. `try_reserve`
+/// asks first and turns the same failure into an error the caller can show.
+fn room_for(samples: &mut Vec<f32>, more: usize) -> Result<(), Error> {
+    samples.try_reserve(more).map_err(|_| {
+        Error::Decode(format!(
+            "this file decodes to more audio than this machine has memory for \
+             (it had reached {} samples); nothing was changed",
+            samples.len()
+        ))
+    })
+}
+
 /// Reject a file whose own header carries a value that will crash the decoder,
 /// before the decoder is given the file.
 ///
@@ -249,6 +267,7 @@ pub fn load(path: &Path) -> Result<Audio, Error> {
                 sample_rate = spec.rate();
                 let channels = spec.channels().count().max(1);
                 decoded.copy_to_vec_interleaved(&mut interleaved);
+                room_for(&mut samples, interleaved.len() / channels)?;
                 for frame in interleaved.chunks(channels) {
                     // Bounded so a compressed file cannot expand into an
                     // allocation failure, which aborts rather than errors.
@@ -553,6 +572,21 @@ mod tests {
         MAX_DECODED_SAMPLES >= 48_000 * 60 * 60,
         "an hour at 48 kHz must fit comfortably inside the decode ceiling"
     );
+
+    /// F-280. Room the machine cannot give is an error, not an abort. Asked
+    /// for with a count no allocator can meet, so the test does not depend on
+    /// how much memory the machine running it has.
+    #[test]
+    fn room_the_machine_cannot_give_is_an_error_not_an_abort() {
+        let mut samples = vec![0.0f32; 4];
+        assert!(matches!(
+            room_for(&mut samples, usize::MAX),
+            Err(Error::Decode(_))
+        ));
+        assert_eq!(samples.len(), 4, "the samples already decoded are kept");
+        room_for(&mut samples, 1024).expect("ordinary room is given");
+        assert!(samples.capacity() >= 4 + 1024);
+    }
 
     #[test]
     fn a_non_audio_file_is_rejected() {
