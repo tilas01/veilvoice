@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-meta/src/lib.rs`
 
-[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 127 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs)
+[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 230 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs)
 
 ## Contents
 
@@ -58,13 +58,13 @@ removing the parts of the file that hold them.
 
 ## What this file contains
 
-127 lines defining **4 functions** (0 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+230 lines defining **5 functions** (0 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
 - `enum Policy` (line 61) -- How aggressively to rewrite metadata.
 - `struct Report` (line 72) -- What changed in a single file.
-- `enum Error` (line 95) -- Everything that can go wrong in this crate.
+- `enum Error` (line 156) -- Everything that can go wrong in this crate.
 
 ## What calls what
 
@@ -81,15 +81,17 @@ _Colour key: **helper** -- private to this file._
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_note["Report::note<br/>line 86"]
-    n_from["Error::from<br/>line 105"]
-    n_fmt["Error::fmt<br/>line 111"]
-    n_source["Error::source<br/>line 121"]
+    n_replace_with["replace_with<br/>line 110"]
+    n_from["Error::from<br/>line 166"]
+    n_fmt["Error::fmt<br/>line 172"]
+    n_source["Error::source<br/>line 182"]
     click n_note href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L86" "open the source"
-    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L105" "open the source"
-    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L111" "open the source"
-    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L121" "open the source"
+    click n_replace_with href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L110" "open the source"
+    click n_from href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L166" "open the source"
+    click n_fmt href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L172" "open the source"
+    click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L182" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_note,n_from,n_fmt,n_source helper
+    class n_note,n_replace_with,n_from,n_fmt,n_source helper
 ```
 
 </details>
@@ -102,7 +104,8 @@ flowchart TD
 | `Policy` <sub>pub enum</sub> | [61](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L61) | How aggressively to rewrite metadata. |
 | `Report` <sub>pub struct</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L72) | What changed in a single file. |
 | `Report::note` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L86) | Record that what was taken out, and that the file therefore changed. |
-| `Error` <sub>pub enum</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L95) | Everything that can go wrong in this crate. |
-| `Error::from` <sub>fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L105) |  |
-| `Error::fmt` <sub>fn</sub> | [111](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L111) |  |
-| `Error::source` <sub>fn</sub> | [121](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L121) |  |
+| `replace_with` <sub>pub(crate) fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L110) | Replace the file at path with one that fill makes beside it. |
+| `Error` <sub>pub enum</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L156) | Everything that can go wrong in this crate. |
+| `Error::from` <sub>fn</sub> | [166](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L166) |  |
+| `Error::fmt` <sub>fn</sub> | [172](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L172) |  |
+| `Error::source` <sub>fn</sub> | [182](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs#L182) |  |

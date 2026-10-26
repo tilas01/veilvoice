@@ -43,11 +43,11 @@ longer offered as the explanation for anything.
 Run on `main` at 5a808308, the first commit after the history was rewritten,
 signed and made the only branch. Every crate, the website, the wiki tools and
 the workflows were read again for anything from a syntax slip to a security
-hole. Eight findings are fixed here. The rest are smaller or belong to work
-that is already in hand, and are listed in the project's audit notes rather
-than written up before they are fixed.
+hole. Thirteen findings are fixed here. The rest are smaller or belong to work
+that is already in hand, and are listed in the project's audit notes rather than
+written up before they are fixed.
 
-Three of the eight are in the decoy passphrase and the lock around it, which is
+Three of the thirteen are in the decoy passphrase and the lock around it, which is
 where the last two rounds found their worst defects too. That is not a
 coincidence: the decoy is the newest code that makes a promise about what an
 observer cannot learn, and a promise of that kind is broken by any difference at
@@ -304,6 +304,104 @@ layout, a network claim against the call. "Deleting this is harmless" has no
 such counterpart in the source. What stands in a guard's place here is that
 `reset.rs` had the correct sentence in its module note all along, where anybody
 writing about the lock would find it.
+
+### F-279: a plan whose last turn ended at 1e300 seconds hung the video render
+
+**Where:** `crates/veilvoice-conversation/src/plan.rs`, `Conversation::add_turn`,
+and the frame planner in `crates/veilvoice-video/src/frames.rs` that reads it.
+
+**What happened:** a turn's times had to be finite, ordered and not negative,
+and nothing more. A plan file could say a turn ended at 1e300 seconds, and the
+frame planner then stepped from zero towards that end one frame at a time,
+which does not finish. The window or the command line stopped responding with
+nothing said.
+
+**Fix:** a turn may not end past twelve hours, the same limit the decoder puts
+on a recording, so a plan cannot describe speech after the end of any
+recording VeilVoice will open. The refusal says so.
+
+**Regression test:** `a_turn_cannot_end_past_twelve_hours` refuses an end one
+second past the limit and one at 1e300, and accepts a turn ending exactly at
+it.
+
+### F-280: a file near the decode limit could still abort the program
+
+**Where:** `crates/veilvoice-audio/src/io.rs`, the decode loop in `load`.
+
+**What happened:** `MAX_DECODED_SAMPLES` stops a compressed file expanding
+without bound, and its comment gives the reason: in Rust a failed allocation
+aborts the process. But the samples went into a vector that grows by doubling,
+and near the twelve-hour limit one doubling asks for several gigabytes on top
+of the several already held. On an ordinary machine that allocation fails
+first, so the abort the limit was written to prevent still happened, just
+below the limit.
+
+**Fix:** each packet's room is asked for with `try_reserve` before the
+samples are added. Room the machine cannot give is an error saying so, and
+nothing is changed.
+
+**Regression test:** `room_the_machine_cannot_give_is_an_error_not_an_abort`
+asks for more room than any allocator can give and requires an error, with
+the samples already decoded kept.
+
+### F-281: cleaning a file's metadata could leave it truncated
+
+**Where:** `crates/veilvoice-meta/src/audio.rs` and `image.rs`, the
+`clean_*_file` functions.
+
+**What happened:** cleaning rewrote the file where it stood. `fs::write`
+truncates first and writes after, and the tag path made several separate
+edits to the original. A crash, a full disk or a power cut part way through
+left a truncated file, and the file being cleaned is usually the only copy.
+
+**Fix:** the new contents are written to a fresh file in the same folder,
+made with `create_new` so nothing already there is followed or overwritten,
+and renamed over the original once complete. The original is either untouched
+or fully replaced, and keeps its permissions.
+
+**Regression test:** `a_failed_clean_leaves_the_original_whole` fails a
+replacement part way and requires the original unchanged with nothing left
+beside it, then requires a successful one to keep owner-only permissions.
+
+### F-282: no audio file other than a WAV could be cleaned at all
+
+**Where:** `crates/veilvoice-meta/src/audio.rs`, `clean_audio_file`.
+
+**What happened:** found while testing F-281. Tags were removed with the tag
+library's `TagType::remove_from_path`, which opens the file read-only and then
+writes to it. Every removal failed with "failed to write to file", so
+`veilvoice clean` refused every MP3, FLAC, Ogg and M4A it was given. Only WAV,
+which has its own cleaner, ever worked. Every test used a WAV, so nothing
+noticed. It failed loudly rather than leaving tags behind, which is the one
+mercy in it.
+
+**Fix:** the tags are removed through a handle opened for reading and
+writing.
+
+**Regression test:** `an_mp3_is_cleaned_through_a_copy_and_nothing_is_left_beside_it`
+builds an MP3 with an ID3v2 tag naming somebody, cleans it, and requires the
+name gone from the bytes, then cleans it again with the realistic policy.
+
+### F-283: a path could reach ffmpeg as an option or a protocol
+
+**Where:** `crates/veilvoice-video/src/ffmpeg.rs` and `export.rs`, every
+command built for ffmpeg.
+
+**What happened:** paths went to ffmpeg as `display().to_string()`. A relative
+path starting with `-` was read as an option, and one with a colon in it, such
+as `concat:a|b` or `rtmp:x`, as a protocol, so a different file, or no file,
+was read or written. A name that is not UTF-8 was quietly altered. The window
+passes absolute paths, but the command line passes what it is given.
+
+**Fix:** every path is passed with the `file:` prefix, which makes ffmpeg
+treat the rest as a file name whatever it looks like. A name that cannot be
+passed exactly is refused. ffmpeg 7.0 was run with the prefix on a file named
+`-y.wav`, an output named `concat:a|b.flac`, a frame pattern and a concat list,
+and read and wrote each as a file.
+
+**Regression test:** `every_path_reaches_ffmpeg_as_a_file`, in both modules,
+builds every command with those names and requires each to arrive prefixed,
+and a name that is not UTF-8 to be refused.
 
 ## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
 
@@ -10191,7 +10289,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1930 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1936 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -11861,7 +11959,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and seventy-eight defects found and fixed (F-1 to F-278), across
+**Two hundred and eighty-three defects found and fixed (F-1 to F-283), across
 thirty-five rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

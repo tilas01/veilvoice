@@ -93,7 +93,7 @@ flowchart TD
     n_exporting["exporting.rs<br/>859 lines"]
     n_firstrun["firstrun.rs<br/>871 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
-    n_group["group.rs<br/>2128 lines"]
+    n_group["group.rs<br/>2129 lines"]
     n_integrity["integrity.rs<br/>397 lines"]
     n_layout["layout.rs<br/>632 lines"]
     n_monitor["monitor.rs<br/>579 lines"]
@@ -320,7 +320,7 @@ flowchart TD
 | [`exporting.rs`](File-veilvoice-gui-exporting) | 859 | The Browser's export, the way a recording tool does it, and its thumbnails. |
 | [`firstrun.rs`](File-veilvoice-gui-firstrun) | 871 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](File-veilvoice-gui-graphics) | 214 | What the window is drawn with, asked for explicitly and then reported. |
-| [`group.rs`](File-veilvoice-gui-group) | 2128 | Group mode: several people in one recording, each with a name and a colour. |
+| [`group.rs`](File-veilvoice-gui-group) | 2129 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](File-veilvoice-gui-integrity) | 397 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](File-veilvoice-gui-layout) | 632 | Centring a row of widgets, which egui does not do by nesting. |
 | [`lib.rs`](File-veilvoice-gui-lib) | 1824 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
@@ -351,7 +351,7 @@ flowchart TD
 | [`watchfeed.rs`](File-veilvoice-gui-watchfeed) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](File-veilvoice-gui-window) | 249 | How big the window opens, and why it is not a constant. |
 
-**24,232 functional lines of Rust** in this crate. A functional line is a line
+**24,233 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

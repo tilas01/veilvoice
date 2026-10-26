@@ -106,7 +106,7 @@ flowchart TD
     n_exporting["exporting.rs<br/>859 lines"]
     n_firstrun["firstrun.rs<br/>871 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
-    n_group["group.rs<br/>2128 lines"]
+    n_group["group.rs<br/>2129 lines"]
     n_integrity["integrity.rs<br/>397 lines"]
     n_layout["layout.rs<br/>632 lines"]
     n_monitor["monitor.rs<br/>579 lines"]
@@ -333,7 +333,7 @@ flowchart TD
 | [`exporting.rs`](../../docs/files/veilvoice-gui/exporting.md) | 859 | The Browser's export, the way a recording tool does it, and its thumbnails. |
 | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 871 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 214 | What the window is drawn with, asked for explicitly and then reported. |
-| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 2128 | Group mode: several people in one recording, each with a name and a colour. |
+| [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 2129 | Group mode: several people in one recording, each with a name and a colour. |
 | [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 397 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 632 | Centring a row of widgets, which egui does not do by nesting. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 1824 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
@@ -364,7 +364,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 249 | How big the window opens, and why it is not a constant. |
 
-**24,232 functional lines of Rust** in this crate. A functional line is a line
+**24,233 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

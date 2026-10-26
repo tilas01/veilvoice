@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-video/src/ffmpeg.rs</code></h1>
-<p style="color:var(--muted)"><a href="ffmpeg.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 718 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="ffmpeg.html">what this file is for</a> &middot; <a href="../veilvoice-video.html">veilvoice-video</a> &middot; 792 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -205,9 +205,9 @@
 <span class="ln" id="L130">    audio: &amp;Path,</span>
 <span class="ln" id="L131">    output: &amp;Path,</span>
 <span class="ln" id="L132">    encoding: Encoding,</span>
-<span class="ln" id="L133">) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L133">) -&gt; Result&lt;Vec&lt;String&gt;, <span class="tok-kw">crate</span>::Error&gt; {</span>
 <span class="ln" id="L134">    <span class="tok-kw">let</span> input = frames.<span class="tok-fn">join</span>(pattern);</span>
-<span class="ln" id="L135">    vec![</span>
+<span class="ln" id="L135">    <span class="tok-fn">Ok</span>(vec![</span>
 <span class="ln" id="L136">        <span class="tok-str">&quot;ffmpeg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
 <span class="ln" id="L137">        <span class="tok-com">// Never overwrite without being asked. `-n` fails instead, which is the</span></span>
 <span class="ln" id="L138">        <span class="tok-com">// right way round for a tool a person is running by hand over a</span></span>
@@ -216,9 +216,9 @@
 <span class="ln" id="L141">        <span class="tok-str">&quot;-framerate&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
 <span class="ln" id="L142">        encoding.plan.fps.<span class="tok-fn">get</span>().<span class="tok-fn">to_string</span>(),</span>
 <span class="ln" id="L143">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L144">        input.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L144">        <span class="tok-fn">file_arg</span>(&amp;input)?,</span>
 <span class="ln" id="L145">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L146">        audio.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L146">        <span class="tok-fn">file_arg</span>(audio)?,</span>
 <span class="ln" id="L147">        <span class="tok-str">&quot;-c:v&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
 <span class="ln" id="L148">        encoding</span>
 <span class="ln" id="L149">            .encoder</span>
@@ -257,8 +257,8 @@
 <span class="ln" id="L182">        <span class="tok-com">// Stop at whichever of the two runs out first, so a rounding error in</span></span>
 <span class="ln" id="L183">        <span class="tok-com">// the frame count cannot leave a second of frozen picture on the end.</span></span>
 <span class="ln" id="L184">        <span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L185">        output.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L186">    ]</span>
+<span class="ln" id="L185">        <span class="tok-fn">file_arg</span>(output)?,</span>
+<span class="ln" id="L186">    ])</span>
 <span class="ln" id="L187">}</span>
 </span>
 <span class="ln" id="L188"></span>
@@ -285,527 +285,603 @@
 <span class="ln" id="L208"><span class="tok-com">/// ffmpeg refuses relative paths in a concat list without it. The names are</span></span>
 <span class="ln" id="L209"><span class="tok-com">/// ones this program wrote into a directory this program made, which is the</span></span>
 <span class="ln" id="L210"><span class="tok-com">/// case the switch exists for.</span></span>
-<span class="ln" id="L211"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">concat_command</span>(list: &amp;Path, audio: &amp;Path, output: &amp;Path, encoding: Encoding) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L212">    vec![</span>
-<span class="ln" id="L213">        <span class="tok-str">&quot;ffmpeg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L214">        <span class="tok-com">// Never overwrite without being asked, the same as `command`.</span></span>
-<span class="ln" id="L215">        <span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L216">        <span class="tok-str">&quot;-f&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L217">        <span class="tok-str">&quot;concat&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L218">        <span class="tok-str">&quot;-safe&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L219">        <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L220">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L221">        list.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L222">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L223">        audio.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L224">        <span class="tok-str">&quot;-c:v&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L225">        encoding</span>
-<span class="ln" id="L226">            .encoder</span>
-<span class="ln" id="L227">            .<span class="tok-fn">clone</span>()</span>
-<span class="ln" id="L228">            .<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;libx264&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L229">        <span class="tok-kw">if</span> encoding.encoder.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L230">            <span class="tok-str">&quot;-cq&quot;</span>.<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L231">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L232">            <span class="tok-str">&quot;-crf&quot;</span>.<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L233">        },</span>
-<span class="ln" id="L234">        encoding.crf.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L235">        <span class="tok-com">// The output frame rate. The concat demuxer&#x27;s durations say when each</span></span>
-<span class="ln" id="L236">        <span class="tok-com">// picture changes; this says how often the encoder samples that, and</span></span>
-<span class="ln" id="L237">        <span class="tok-com">// without it a held picture becomes one very long frame that seeking</span></span>
-<span class="ln" id="L238">        <span class="tok-com">// in a player lands badly on.</span></span>
-<span class="ln" id="L239">        <span class="tok-str">&quot;-r&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L240">        encoding.plan.fps.<span class="tok-fn">get</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L241">        <span class="tok-str">&quot;-vf&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L242">        format!(</span>
-<span class="ln" id="L243">            <span class="tok-str">&quot;scale={}:{}:flags=lanczos&quot;</span>,</span>
-<span class="ln" id="L244">            encoding.plan.size.<span class="tok-fn">width</span>(),</span>
-<span class="ln" id="L245">            encoding.plan.size.<span class="tok-fn">height</span>()</span>
-<span class="ln" id="L246">        ),</span>
-<span class="ln" id="L247">        <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L248">        <span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L249">        <span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L250">        <span class="tok-str">&quot;aac&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L251">        <span class="tok-str">&quot;-b:a&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L252">        <span class="tok-str">&quot;192k&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L253">        <span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L254">        output.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L255">    ]</span>
-<span class="ln" id="L256">}</span>
+<span class="ln" id="L211"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">concat_command</span>(</span>
+<span class="ln" id="L212">    list: &amp;Path,</span>
+<span class="ln" id="L213">    audio: &amp;Path,</span>
+<span class="ln" id="L214">    output: &amp;Path,</span>
+<span class="ln" id="L215">    encoding: Encoding,</span>
+<span class="ln" id="L216">) -&gt; Result&lt;Vec&lt;String&gt;, <span class="tok-kw">crate</span>::Error&gt; {</span>
+<span class="ln" id="L217">    <span class="tok-fn">Ok</span>(vec![</span>
+<span class="ln" id="L218">        <span class="tok-str">&quot;ffmpeg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L219">        <span class="tok-com">// Never overwrite without being asked, the same as `command`.</span></span>
+<span class="ln" id="L220">        <span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L221">        <span class="tok-str">&quot;-f&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L222">        <span class="tok-str">&quot;concat&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L223">        <span class="tok-str">&quot;-safe&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L224">        <span class="tok-str">&quot;0&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L225">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L226">        <span class="tok-fn">file_arg</span>(list)?,</span>
+<span class="ln" id="L227">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L228">        <span class="tok-fn">file_arg</span>(audio)?,</span>
+<span class="ln" id="L229">        <span class="tok-str">&quot;-c:v&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L230">        encoding</span>
+<span class="ln" id="L231">            .encoder</span>
+<span class="ln" id="L232">            .<span class="tok-fn">clone</span>()</span>
+<span class="ln" id="L233">            .<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;libx264&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L234">        <span class="tok-kw">if</span> encoding.encoder.<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L235">            <span class="tok-str">&quot;-cq&quot;</span>.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L236">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L237">            <span class="tok-str">&quot;-crf&quot;</span>.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L238">        },</span>
+<span class="ln" id="L239">        encoding.crf.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L240">        <span class="tok-com">// The output frame rate. The concat demuxer&#x27;s durations say when each</span></span>
+<span class="ln" id="L241">        <span class="tok-com">// picture changes; this says how often the encoder samples that, and</span></span>
+<span class="ln" id="L242">        <span class="tok-com">// without it a held picture becomes one very long frame that seeking</span></span>
+<span class="ln" id="L243">        <span class="tok-com">// in a player lands badly on.</span></span>
+<span class="ln" id="L244">        <span class="tok-str">&quot;-r&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L245">        encoding.plan.fps.<span class="tok-fn">get</span>().<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L246">        <span class="tok-str">&quot;-vf&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L247">        format!(</span>
+<span class="ln" id="L248">            <span class="tok-str">&quot;scale={}:{}:flags=lanczos&quot;</span>,</span>
+<span class="ln" id="L249">            encoding.plan.size.<span class="tok-fn">width</span>(),</span>
+<span class="ln" id="L250">            encoding.plan.size.<span class="tok-fn">height</span>()</span>
+<span class="ln" id="L251">        ),</span>
+<span class="ln" id="L252">        <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L253">        <span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L254">        <span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L255">        <span class="tok-str">&quot;aac&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L256">        <span class="tok-str">&quot;-b:a&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L257">        <span class="tok-str">&quot;192k&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L258">        <span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L259">        <span class="tok-fn">file_arg</span>(output)?,</span>
+<span class="ln" id="L260">    ])</span>
+<span class="ln" id="L261">}</span>
 </span>
-<span class="ln" id="L257"></span>
+<span class="ln" id="L262"></span>
 <span class="src-item" id="fn-black_command">
-<span class="ln" id="L258"><span class="tok-com">/// The command that turns a veiled recording into a video with a black frame.</span></span>
-<span class="ln" id="L259"><span class="tok-com">///</span></span>
-<span class="ln" id="L260"><span class="tok-com">/// **Roadmap item 87.** Somewhere that accepts only video is a common place to need</span></span>
-<span class="ln" id="L261"><span class="tok-com">/// to put a recording: a message that will not take an audio file, a platform</span></span>
-<span class="ln" id="L262"><span class="tok-com">/// that wants something to show. The picture is not the point and does not need</span></span>
-<span class="ln" id="L263"><span class="tok-com">/// to be, so this is a black frame for the length of the audio and nothing</span></span>
-<span class="ln" id="L264"><span class="tok-com">/// else.</span></span>
-<span class="ln" id="L265"><span class="tok-com">///</span></span>
-<span class="ln" id="L266"><span class="tok-com">/// No frame sequence, which is what makes this different from [`command`].</span></span>
-<span class="ln" id="L267"><span class="tok-com">/// ffmpeg can synthesise a colour source, so there is nothing to render, no</span></span>
-<span class="ln" id="L268"><span class="tok-com">/// temporary directory holding thousands of PNGs, and no wait proportional to</span></span>
-<span class="ln" id="L269"><span class="tok-com">/// the length of the recording beyond the encode itself.</span></span>
+<span class="ln" id="L263"><span class="tok-com">/// The command that turns a veiled recording into a video with a black frame.</span></span>
+<span class="ln" id="L264"><span class="tok-com">///</span></span>
+<span class="ln" id="L265"><span class="tok-com">/// **Roadmap item 87.** Somewhere that accepts only video is a common place to need</span></span>
+<span class="ln" id="L266"><span class="tok-com">/// to put a recording: a message that will not take an audio file, a platform</span></span>
+<span class="ln" id="L267"><span class="tok-com">/// that wants something to show. The picture is not the point and does not need</span></span>
+<span class="ln" id="L268"><span class="tok-com">/// to be, so this is a black frame for the length of the audio and nothing</span></span>
+<span class="ln" id="L269"><span class="tok-com">/// else.</span></span>
 <span class="ln" id="L270"><span class="tok-com">///</span></span>
-<span class="ln" id="L271"><span class="tok-com">/// The size comes from `encoding` like every other render. A frame of solid</span></span>
-<span class="ln" id="L272"><span class="tok-com">/// black costs almost nothing at any size, so there is no reason for this one</span></span>
-<span class="ln" id="L273"><span class="tok-com">/// to disagree with the rest of the settings: it used to be pinned at 720p,</span></span>
-<span class="ln" id="L274"><span class="tok-com">/// which meant asking for 4K and getting 720p with no mention of it.</span></span>
-<span class="ln" id="L275"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">black_command</span>(audio: &amp;Path, output: &amp;Path, encoding: Encoding) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L276">    vec![</span>
-<span class="ln" id="L277">        <span class="tok-str">&quot;ffmpeg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L278">        <span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L279">        <span class="tok-com">// A synthesised source rather than a file. `-f lavfi` is ffmpeg&#x27;s own</span></span>
-<span class="ln" id="L280">        <span class="tok-com">// filter input; nothing on disk is read for the picture.</span></span>
-<span class="ln" id="L281">        <span class="tok-str">&quot;-f&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L282">        <span class="tok-str">&quot;lavfi&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L283">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L284">        format!(</span>
-<span class="ln" id="L285">            <span class="tok-str">&quot;color=c=black:s={}:r={}&quot;</span>,</span>
-<span class="ln" id="L286">            encoding.plan.size.<span class="tok-fn">geometry</span>(),</span>
-<span class="ln" id="L287">            encoding.plan.fps.<span class="tok-fn">get</span>()</span>
-<span class="ln" id="L288">        ),</span>
-<span class="ln" id="L289">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L290">        audio.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L291">        <span class="tok-str">&quot;-c:v&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L292">        encoding</span>
-<span class="ln" id="L293">            .encoder</span>
-<span class="ln" id="L294">            .<span class="tok-fn">clone</span>()</span>
-<span class="ln" id="L295">            .<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;libx264&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L296">        <span class="tok-kw">if</span> encoding.encoder.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L297">            <span class="tok-str">&quot;-cq&quot;</span>.<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L298">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L299">            <span class="tok-str">&quot;-crf&quot;</span>.<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L300">        },</span>
-<span class="ln" id="L301">        encoding.crf.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L302">        <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L303">        <span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L304">        <span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L305">        <span class="tok-str">&quot;aac&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L306">        <span class="tok-str">&quot;-b:a&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L307">        <span class="tok-str">&quot;192k&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L308">        <span class="tok-com">// Without this the synthesised colour source never ends and ffmpeg</span></span>
-<span class="ln" id="L309">        <span class="tok-com">// encodes black for ever. `-shortest` stops at the audio, which is the</span></span>
-<span class="ln" id="L310">        <span class="tok-com">// only thing here with a length.</span></span>
-<span class="ln" id="L311">        <span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L312">        output.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L313">    ]</span>
-<span class="ln" id="L314">}</span>
+<span class="ln" id="L271"><span class="tok-com">/// No frame sequence, which is what makes this different from [`command`].</span></span>
+<span class="ln" id="L272"><span class="tok-com">/// ffmpeg can synthesise a colour source, so there is nothing to render, no</span></span>
+<span class="ln" id="L273"><span class="tok-com">/// temporary directory holding thousands of PNGs, and no wait proportional to</span></span>
+<span class="ln" id="L274"><span class="tok-com">/// the length of the recording beyond the encode itself.</span></span>
+<span class="ln" id="L275"><span class="tok-com">///</span></span>
+<span class="ln" id="L276"><span class="tok-com">/// The size comes from `encoding` like every other render. A frame of solid</span></span>
+<span class="ln" id="L277"><span class="tok-com">/// black costs almost nothing at any size, so there is no reason for this one</span></span>
+<span class="ln" id="L278"><span class="tok-com">/// to disagree with the rest of the settings: it used to be pinned at 720p,</span></span>
+<span class="ln" id="L279"><span class="tok-com">/// which meant asking for 4K and getting 720p with no mention of it.</span></span>
+<span class="ln" id="L280"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">black_command</span>(</span>
+<span class="ln" id="L281">    audio: &amp;Path,</span>
+<span class="ln" id="L282">    output: &amp;Path,</span>
+<span class="ln" id="L283">    encoding: Encoding,</span>
+<span class="ln" id="L284">) -&gt; Result&lt;Vec&lt;String&gt;, <span class="tok-kw">crate</span>::Error&gt; {</span>
+<span class="ln" id="L285">    <span class="tok-fn">Ok</span>(vec![</span>
+<span class="ln" id="L286">        <span class="tok-str">&quot;ffmpeg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L287">        <span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L288">        <span class="tok-com">// A synthesised source rather than a file. `-f lavfi` is ffmpeg&#x27;s own</span></span>
+<span class="ln" id="L289">        <span class="tok-com">// filter input; nothing on disk is read for the picture.</span></span>
+<span class="ln" id="L290">        <span class="tok-str">&quot;-f&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L291">        <span class="tok-str">&quot;lavfi&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L292">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L293">        format!(</span>
+<span class="ln" id="L294">            <span class="tok-str">&quot;color=c=black:s={}:r={}&quot;</span>,</span>
+<span class="ln" id="L295">            encoding.plan.size.<span class="tok-fn">geometry</span>(),</span>
+<span class="ln" id="L296">            encoding.plan.fps.<span class="tok-fn">get</span>()</span>
+<span class="ln" id="L297">        ),</span>
+<span class="ln" id="L298">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L299">        <span class="tok-fn">file_arg</span>(audio)?,</span>
+<span class="ln" id="L300">        <span class="tok-str">&quot;-c:v&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L301">        encoding</span>
+<span class="ln" id="L302">            .encoder</span>
+<span class="ln" id="L303">            .<span class="tok-fn">clone</span>()</span>
+<span class="ln" id="L304">            .<span class="tok-fn">unwrap_or_else</span>(|| <span class="tok-str">&quot;libx264&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L305">        <span class="tok-kw">if</span> encoding.encoder.<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L306">            <span class="tok-str">&quot;-cq&quot;</span>.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L307">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L308">            <span class="tok-str">&quot;-crf&quot;</span>.<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L309">        },</span>
+<span class="ln" id="L310">        encoding.crf.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L311">        <span class="tok-str">&quot;-pix_fmt&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L312">        <span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L313">        <span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L314">        <span class="tok-str">&quot;aac&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L315">        <span class="tok-str">&quot;-b:a&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L316">        <span class="tok-str">&quot;192k&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L317">        <span class="tok-com">// Without this the synthesised colour source never ends and ffmpeg</span></span>
+<span class="ln" id="L318">        <span class="tok-com">// encodes black for ever. `-shortest` stops at the audio, which is the</span></span>
+<span class="ln" id="L319">        <span class="tok-com">// only thing here with a length.</span></span>
+<span class="ln" id="L320">        <span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L321">        <span class="tok-fn">file_arg</span>(output)?,</span>
+<span class="ln" id="L322">    ])</span>
+<span class="ln" id="L323">}</span>
 </span>
-<span class="ln" id="L315"></span>
+<span class="ln" id="L324"></span>
 <span class="src-item" id="fn-extract_command">
-<span class="ln" id="L316"><span class="tok-com">/// The command that takes the sound out of a recording made somewhere else.</span></span>
-<span class="ln" id="L317"><span class="tok-com">///</span></span>
-<span class="ln" id="L318"><span class="tok-com">/// **Roadmap item 88.** OBS writes `.mkv`, `.mp4`, `.mov`, `.flv` and `.ts`, and</span></span>
-<span class="ln" id="L319"><span class="tok-com">/// VeilVoice reads none of them: they are containers holding a video stream and</span></span>
-<span class="ln" id="L320"><span class="tok-com">/// an audio stream, and demuxing one means a demuxer this project does not</span></span>
-<span class="ln" id="L321"><span class="tok-com">/// ship, for the same reason it ships no encoder.</span></span>
-<span class="ln" id="L322"><span class="tok-com">///</span></span>
-<span class="ln" id="L323"><span class="tok-com">/// So this prepares the one command that produces something VeilVoice can read:</span></span>
-<span class="ln" id="L324"><span class="tok-com">/// a WAV, at the sample rate and depth the engine works in, with the video</span></span>
-<span class="ln" id="L325"><span class="tok-com">/// discarded. From there it is an ordinary input file.</span></span>
+<span class="ln" id="L325"><span class="tok-com">/// The command that takes the sound out of a recording made somewhere else.</span></span>
 <span class="ln" id="L326"><span class="tok-com">///</span></span>
-<span class="ln" id="L327"><span class="tok-com">/// `-vn` rather than a stream selector, so a file with two video tracks and one</span></span>
-<span class="ln" id="L328"><span class="tok-com">/// audio track does the obvious thing instead of failing on a mapping the user</span></span>
-<span class="ln" id="L329"><span class="tok-com">/// never wrote.</span></span>
-<span class="ln" id="L330"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">extract_command</span>(source: &amp;Path, output: &amp;Path) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L331">    vec![</span>
-<span class="ln" id="L332">        <span class="tok-str">&quot;ffmpeg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L333">        <span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L334">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L335">        source.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L336">        <span class="tok-com">// No video at all, whatever the container holds.</span></span>
-<span class="ln" id="L337">        <span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L338">        <span class="tok-com">// Signed 16-bit little-endian, 48 kHz. What the engine works in, so</span></span>
-<span class="ln" id="L339">        <span class="tok-com">// nothing is resampled twice.</span></span>
-<span class="ln" id="L340">        <span class="tok-str">&quot;-acodec&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L341">        <span class="tok-str">&quot;pcm_s16le&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L342">        <span class="tok-str">&quot;-ar&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L343">        <span class="tok-str">&quot;48000&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L344">        output.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L345">    ]</span>
-<span class="ln" id="L346">}</span>
+<span class="ln" id="L327"><span class="tok-com">/// **Roadmap item 88.** OBS writes `.mkv`, `.mp4`, `.mov`, `.flv` and `.ts`, and</span></span>
+<span class="ln" id="L328"><span class="tok-com">/// VeilVoice reads none of them: they are containers holding a video stream and</span></span>
+<span class="ln" id="L329"><span class="tok-com">/// an audio stream, and demuxing one means a demuxer this project does not</span></span>
+<span class="ln" id="L330"><span class="tok-com">/// ship, for the same reason it ships no encoder.</span></span>
+<span class="ln" id="L331"><span class="tok-com">///</span></span>
+<span class="ln" id="L332"><span class="tok-com">/// So this prepares the one command that produces something VeilVoice can read:</span></span>
+<span class="ln" id="L333"><span class="tok-com">/// a WAV, at the sample rate and depth the engine works in, with the video</span></span>
+<span class="ln" id="L334"><span class="tok-com">/// discarded. From there it is an ordinary input file.</span></span>
+<span class="ln" id="L335"><span class="tok-com">///</span></span>
+<span class="ln" id="L336"><span class="tok-com">/// `-vn` rather than a stream selector, so a file with two video tracks and one</span></span>
+<span class="ln" id="L337"><span class="tok-com">/// audio track does the obvious thing instead of failing on a mapping the user</span></span>
+<span class="ln" id="L338"><span class="tok-com">/// never wrote.</span></span>
+<span class="ln" id="L339"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">extract_command</span>(source: &amp;Path, output: &amp;Path) -&gt; Result&lt;Vec&lt;String&gt;, <span class="tok-kw">crate</span>::Error&gt; {</span>
+<span class="ln" id="L340">    <span class="tok-fn">Ok</span>(vec![</span>
+<span class="ln" id="L341">        <span class="tok-str">&quot;ffmpeg&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L342">        <span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L343">        <span class="tok-str">&quot;-i&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L344">        <span class="tok-fn">file_arg</span>(source)?,</span>
+<span class="ln" id="L345">        <span class="tok-com">// No video at all, whatever the container holds.</span></span>
+<span class="ln" id="L346">        <span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L347">        <span class="tok-com">// Signed 16-bit little-endian, 48 kHz. What the engine works in, so</span></span>
+<span class="ln" id="L348">        <span class="tok-com">// nothing is resampled twice.</span></span>
+<span class="ln" id="L349">        <span class="tok-str">&quot;-acodec&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L350">        <span class="tok-str">&quot;pcm_s16le&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L351">        <span class="tok-str">&quot;-ar&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L352">        <span class="tok-str">&quot;48000&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L353">        <span class="tok-fn">file_arg</span>(output)?,</span>
+<span class="ln" id="L354">    ])</span>
+<span class="ln" id="L355">}</span>
 </span>
-<span class="ln" id="L347"></span>
+<span class="ln" id="L356"></span>
 <span class="src-item" id="fn-obs_containers">
-<span class="ln" id="L348"><span class="tok-com">/// Containers OBS writes, which [`extract_command`] can take the sound out of.</span></span>
-<span class="ln" id="L349"><span class="tok-com">///</span></span>
-<span class="ln" id="L350"><span class="tok-com">/// Named rather than &quot;any file ffmpeg reads&quot;, which is true and useless: a</span></span>
-<span class="ln" id="L351"><span class="tok-com">/// person wants to know whether their recording will work, and the answer is a</span></span>
-<span class="ln" id="L352"><span class="tok-com">/// list they can check their own file against. Anything else ffmpeg supports</span></span>
-<span class="ln" id="L353"><span class="tok-com">/// still works; this is what is promised.</span></span>
-<span class="ln" id="L354"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> OBS_CONTAINERS: &amp;[&amp;str] = &amp;[</span>
-<span class="ln" id="L355">    <span class="tok-str">&quot;mkv&quot;</span>, <span class="tok-str">&quot;mp4&quot;</span>, <span class="tok-str">&quot;mov&quot;</span>, <span class="tok-str">&quot;flv&quot;</span>, <span class="tok-str">&quot;ts&quot;</span>, <span class="tok-str">&quot;m4a&quot;</span>, <span class="tok-str">&quot;webm&quot;</span>, <span class="tok-str">&quot;avi&quot;</span>, <span class="tok-str">&quot;wav&quot;</span>, <span class="tok-str">&quot;mp3&quot;</span>, <span class="tok-str">&quot;aac&quot;</span>, <span class="tok-str">&quot;flac&quot;</span>, <span class="tok-str">&quot;ogg&quot;</span>,</span>
-<span class="ln" id="L356">    <span class="tok-str">&quot;opus&quot;</span>,</span>
-<span class="ln" id="L357">];</span>
-</span>
-<span class="ln" id="L358"></span>
-<span class="src-item" id="fn-is_container">
-<span class="ln" id="L359"><span class="tok-com">/// Whether a file looks like something [`extract_command`] should be offered</span></span>
-<span class="ln" id="L360"><span class="tok-com">/// for.</span></span>
-<span class="ln" id="L361"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_container</span>(path: &amp;Path) -&gt; bool {</span>
-<span class="ln" id="L362">    path.<span class="tok-fn">extension</span>()</span>
-<span class="ln" id="L363">        .<span class="tok-fn">and_then</span>(|e| e.<span class="tok-fn">to_str</span>())</span>
-<span class="ln" id="L364">        .<span class="tok-fn">map</span>(|e| e.<span class="tok-fn">to_ascii_lowercase</span>())</span>
-<span class="ln" id="L365">        .<span class="tok-fn">is_some_and</span>(|e| OBS_CONTAINERS.<span class="tok-fn">contains</span>(&amp;e.<span class="tok-fn">as_str</span>()))</span>
-<span class="ln" id="L366">}</span>
+<span class="ln" id="L357"><span class="tok-com">/// Containers OBS writes, which [`extract_command`] can take the sound out of.</span></span>
+<span class="ln" id="L358"><span class="tok-com">///</span></span>
+<span class="ln" id="L359"><span class="tok-com">/// Named rather than &quot;any file ffmpeg reads&quot;, which is true and useless: a</span></span>
+<span class="ln" id="L360"><span class="tok-com">/// person wants to know whether their recording will work, and the answer is a</span></span>
+<span class="ln" id="L361"><span class="tok-com">/// list they can check their own file against. Anything else ffmpeg supports</span></span>
+<span class="ln" id="L362"><span class="tok-com">/// still works; this is what is promised.</span></span>
+<span class="ln" id="L363"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> OBS_CONTAINERS: &amp;[&amp;str] = &amp;[</span>
+<span class="ln" id="L364">    <span class="tok-str">&quot;mkv&quot;</span>, <span class="tok-str">&quot;mp4&quot;</span>, <span class="tok-str">&quot;mov&quot;</span>, <span class="tok-str">&quot;flv&quot;</span>, <span class="tok-str">&quot;ts&quot;</span>, <span class="tok-str">&quot;m4a&quot;</span>, <span class="tok-str">&quot;webm&quot;</span>, <span class="tok-str">&quot;avi&quot;</span>, <span class="tok-str">&quot;wav&quot;</span>, <span class="tok-str">&quot;mp3&quot;</span>, <span class="tok-str">&quot;aac&quot;</span>, <span class="tok-str">&quot;flac&quot;</span>, <span class="tok-str">&quot;ogg&quot;</span>,</span>
+<span class="ln" id="L365">    <span class="tok-str">&quot;opus&quot;</span>,</span>
+<span class="ln" id="L366">];</span>
 </span>
 <span class="ln" id="L367"></span>
-<span class="src-item" id="fn-command_line">
-<span class="ln" id="L368"><span class="tok-com">/// The command as one line, for printing.</span></span>
-<span class="ln" id="L369"><span class="tok-com">///</span></span>
-<span class="ln" id="L370"><span class="tok-com">/// Quoted where a part contains a space. For a person to read and paste, not</span></span>
-<span class="ln" id="L371"><span class="tok-com">/// for a shell this program runs. Nothing here runs it.</span></span>
-<span class="ln" id="L372"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">command_line</span>(argv: &amp;[String]) -&gt; String {</span>
-<span class="ln" id="L373">    argv.<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L374">        .<span class="tok-fn">map</span>(|part| {</span>
-<span class="ln" id="L375">            <span class="tok-kw">if</span> part.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27; &#x27;</span>) {</span>
-<span class="ln" id="L376">                format!(<span class="tok-str">&quot;\&quot;{part}\&quot;&quot;</span>)</span>
-<span class="ln" id="L377">            } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L378">                part.<span class="tok-fn">clone</span>()</span>
-<span class="ln" id="L379">            }</span>
-<span class="ln" id="L380">        })</span>
-<span class="ln" id="L381">        .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L382">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>)</span>
-<span class="ln" id="L383">}</span>
+<span class="src-item" id="fn-is_container">
+<span class="ln" id="L368"><span class="tok-com">/// Whether a file looks like something [`extract_command`] should be offered</span></span>
+<span class="ln" id="L369"><span class="tok-com">/// for.</span></span>
+<span class="ln" id="L370"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">is_container</span>(path: &amp;Path) -&gt; bool {</span>
+<span class="ln" id="L371">    path.<span class="tok-fn">extension</span>()</span>
+<span class="ln" id="L372">        .<span class="tok-fn">and_then</span>(|e| e.<span class="tok-fn">to_str</span>())</span>
+<span class="ln" id="L373">        .<span class="tok-fn">map</span>(|e| e.<span class="tok-fn">to_ascii_lowercase</span>())</span>
+<span class="ln" id="L374">        .<span class="tok-fn">is_some_and</span>(|e| OBS_CONTAINERS.<span class="tok-fn">contains</span>(&amp;e.<span class="tok-fn">as_str</span>()))</span>
+<span class="ln" id="L375">}</span>
 </span>
-<span class="ln" id="L384"></span>
-<span class="src-item" id="fn-describe">
-<span class="ln" id="L385"><span class="tok-com">/// What to tell the user about their machine&#x27;s `ffmpeg`.</span></span>
-<span class="ln" id="L386"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>() -&gt; String {</span>
-<span class="ln" id="L387">    <span class="tok-kw">match</span> <span class="tok-fn">found</span>() {</span>
-<span class="ln" id="L388">        <span class="tok-fn">Some</span>(path) =&gt; format!(</span>
-<span class="ln" id="L389">            <span class="tok-str">&quot;ffmpeg is on this machine, at {}. VeilVoice will not run it for you; the \</span></span>
-<span class="ln" id="L390"><span class="tok-str">             command is printed so you can see what it does before it does it.&quot;</span>,</span>
+<span class="ln" id="L376"></span>
+<span class="src-item" id="fn-file_arg">
+<span class="ln" id="L377"><span class="tok-com">/// A path as ffmpeg must be given it: whole, and read as a file.</span></span>
+<span class="ln" id="L378"><span class="tok-com">///</span></span>
+<span class="ln" id="L379"><span class="tok-com">/// **F-283.** Paths went to ffmpeg as `display().to_string()`. A relative</span></span>
+<span class="ln" id="L380"><span class="tok-com">/// path starting with `-` was read as an option, one with a colon in it, such</span></span>
+<span class="ln" id="L381"><span class="tok-com">/// as `rtmp:x` or `concat:a|b`, as a protocol, and a name that is not UTF-8</span></span>
+<span class="ln" id="L382"><span class="tok-com">/// was quietly altered, so a different file was read or written. The `file:`</span></span>
+<span class="ln" id="L383"><span class="tok-com">/// prefix makes ffmpeg treat the rest as a file name whatever it looks like,</span></span>
+<span class="ln" id="L384"><span class="tok-com">/// including a frame pattern or a concat list, and a name that cannot be</span></span>
+<span class="ln" id="L385"><span class="tok-com">/// passed exactly is refused rather than changed.</span></span>
+<span class="ln" id="L386"><span class="tok-kw">pub</span>(<span class="tok-kw">crate</span>) <span class="tok-kw">fn</span> <span class="tok-fn">file_arg</span>(path: &amp;Path) -&gt; Result&lt;String, <span class="tok-kw">crate</span>::Error&gt; {</span>
+<span class="ln" id="L387">    <span class="tok-kw">let</span> text = path.<span class="tok-fn">to_str</span>().<span class="tok-fn">ok_or_else</span>(|| {</span>
+<span class="ln" id="L388">        <span class="tok-kw">crate</span>::Error::<span class="tok-fn">Malformed</span>(format!(</span>
+<span class="ln" id="L389">            <span class="tok-str">&quot;{} is not a name ffmpeg can be given exactly; rename it, or choose \</span></span>
+<span class="ln" id="L390"><span class="tok-str">             a folder whose name is plain text&quot;</span>,</span>
 <span class="ln" id="L391">            path.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L392">        ),</span>
-<span class="ln" id="L393">        None =&gt; <span class="tok-str">&quot;ffmpeg is not on this machine, so no video file can be written. Nothing \</span></span>
-<span class="ln" id="L394"><span class="tok-str">                 has failed: the page VeilVoice wrote plays everywhere and needs nothing \</span></span>
-<span class="ln" id="L395"><span class="tok-str">                 installed. If you want a video file, install ffmpeg yourself -- VeilVoice \</span></span>
-<span class="ln" id="L396"><span class="tok-str">                 will not download or install it.&quot;</span></span>
-<span class="ln" id="L397">            .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L398">    }</span>
-<span class="ln" id="L399">}</span>
+<span class="ln" id="L392">        ))</span>
+<span class="ln" id="L393">    })?;</span>
+<span class="ln" id="L394">    <span class="tok-fn">Ok</span>(format!(<span class="tok-str">&quot;file:{text}&quot;</span>))</span>
+<span class="ln" id="L395">}</span>
 </span>
-<span class="ln" id="L400"></span>
-<span class="ln" id="L401"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L402"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L403"></span>
-<span class="ln" id="L404">    <span class="tok-com">/// Roadmap item 87. A synthesised colour source never ends, so without</span></span>
-<span class="ln" id="L405">    <span class="tok-com">/// `-shortest` ffmpeg encodes black for ever and the only thing that stops</span></span>
-<span class="ln" id="L406">    <span class="tok-com">/// it is the disk filling up.</span></span>
-<span class="ln" id="L407">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L408">    <span class="tok-kw">fn</span> <span class="tok-fn">the_black_video_stops_when_the_audio_does</span>() {</span>
-<span class="ln" id="L409">        <span class="tok-kw">let</span> argv = <span class="tok-fn">black_command</span>(</span>
-<span class="ln" id="L410">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;talk.veiled.wav&quot;</span>),</span>
-<span class="ln" id="L411">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;talk.mp4&quot;</span>),</span>
-<span class="ln" id="L412">            Encoding::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L413">        );</span>
-<span class="ln" id="L414">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L415">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;color=c=black&quot;</span>)));</span>
-<span class="ln" id="L416">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;lavfi&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L417">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>()), <span class="tok-str">&quot;never overwrite silently&quot;</span>);</span>
-<span class="ln" id="L418">        assert_eq!(argv.<span class="tok-fn">last</span>().<span class="tok-fn">unwrap</span>(), <span class="tok-str">&quot;talk.mp4&quot;</span>);</span>
-<span class="ln" id="L419">        assert!(</span>
-<span class="ln" id="L420">            argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L421">            <span class="tok-str">&quot;without this a great many devices refuse to play the result&quot;</span></span>
-<span class="ln" id="L422">        );</span>
-<span class="ln" id="L423">    }</span>
-<span class="ln" id="L424"></span>
-<span class="ln" id="L425">    <span class="tok-com">/// Roadmap item 88. Taking the sound out has to discard every video stream, not</span></span>
-<span class="ln" id="L426">    <span class="tok-com">/// the first one: an OBS recording with a camera and a screen capture has</span></span>
-<span class="ln" id="L427">    <span class="tok-com">/// two, and a stream selector written for one fails on the other.</span></span>
-<span class="ln" id="L428">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L429">    <span class="tok-kw">fn</span> <span class="tok-fn">extracting_audio_discards_the_picture_and_keeps_the_rate</span>() {</span>
-<span class="ln" id="L430">        <span class="tok-kw">let</span> argv = <span class="tok-fn">extract_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;stream.mkv&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;stream.wav&quot;</span>));</span>
-<span class="ln" id="L431">        assert!(</span>
-<span class="ln" id="L432">            argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L433">            <span class="tok-str">&quot;-vn drops every video stream&quot;</span></span>
-<span class="ln" id="L434">        );</span>
-<span class="ln" id="L435">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;pcm_s16le&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L436">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;48000&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L437">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L438">        assert_eq!(argv.<span class="tok-fn">last</span>().<span class="tok-fn">unwrap</span>(), <span class="tok-str">&quot;stream.wav&quot;</span>);</span>
-<span class="ln" id="L439">    }</span>
-<span class="ln" id="L440"></span>
-<span class="ln" id="L441">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L442">    <span class="tok-kw">fn</span> <span class="tok-fn">every_container_obs_writes_is_recognised</span>() {</span>
-<span class="ln" id="L443">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;a.mkv&quot;</span>, <span class="tok-str">&quot;a.MP4&quot;</span>, <span class="tok-str">&quot;a.mov&quot;</span>, <span class="tok-str">&quot;a.flv&quot;</span>, <span class="tok-str">&quot;a.ts&quot;</span>, <span class="tok-str">&quot;a.webm&quot;</span>] {</span>
-<span class="ln" id="L444">            assert!(<span class="tok-fn">is_container</span>(Path::<span class="tok-fn">new</span>(name)), <span class="tok-str">&quot;{name}&quot;</span>);</span>
-<span class="ln" id="L445">        }</span>
-<span class="ln" id="L446">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;a.txt&quot;</span>, <span class="tok-str">&quot;a.png&quot;</span>, <span class="tok-str">&quot;a&quot;</span>, <span class="tok-str">&quot;a.veil&quot;</span>] {</span>
-<span class="ln" id="L447">            assert!(!<span class="tok-fn">is_container</span>(Path::<span class="tok-fn">new</span>(name)), <span class="tok-str">&quot;{name}&quot;</span>);</span>
-<span class="ln" id="L448">        }</span>
-<span class="ln" id="L449">    }</span>
-<span class="ln" id="L450"></span>
-<span class="ln" id="L451">    <span class="tok-com">/// The two commands must not be confusable: one makes a video from audio,</span></span>
-<span class="ln" id="L452">    <span class="tok-com">/// the other takes audio out of a video, and swapping them silently would</span></span>
-<span class="ln" id="L453">    <span class="tok-com">/// produce a file with no sound.</span></span>
-<span class="ln" id="L454">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L455">    <span class="tok-kw">fn</span> <span class="tok-fn">the_two_commands_point_in_opposite_directions</span>() {</span>
-<span class="ln" id="L456">        <span class="tok-kw">let</span> make = <span class="tok-fn">black_command</span>(</span>
-<span class="ln" id="L457">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;in.wav&quot;</span>),</span>
-<span class="ln" id="L458">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;out.mp4&quot;</span>),</span>
-<span class="ln" id="L459">            Encoding::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L460">        );</span>
-<span class="ln" id="L461">        <span class="tok-kw">let</span> take = <span class="tok-fn">extract_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;in.mkv&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;out.wav&quot;</span>));</span>
-<span class="ln" id="L462">        assert!(</span>
-<span class="ln" id="L463">            make.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L464">            <span class="tok-str">&quot;the video carries audio&quot;</span></span>
-<span class="ln" id="L465">        );</span>
-<span class="ln" id="L466">        assert!(</span>
-<span class="ln" id="L467">            take.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L468">            <span class="tok-str">&quot;the extract carries none&quot;</span></span>
-<span class="ln" id="L469">        );</span>
-<span class="ln" id="L470">        assert!(!make.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L471">        assert!(!take.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;color=&quot;</span>)));</span>
-<span class="ln" id="L472">    }</span>
-<span class="ln" id="L473">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L474"></span>
-<span class="ln" id="L475">    <span class="tok-kw">fn</span> <span class="tok-fn">argv</span>() -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L476">        <span class="tok-fn">command</span>(</span>
-<span class="ln" id="L477">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp/frames&quot;</span>),</span>
-<span class="ln" id="L478">            <span class="tok-str">&quot;frame-%05d.png&quot;</span>,</span>
-<span class="ln" id="L479">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp/out.wav&quot;</span>),</span>
-<span class="ln" id="L480">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp/out.mp4&quot;</span>),</span>
-<span class="ln" id="L481">            Encoding::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L482">        )</span>
-<span class="ln" id="L483">    }</span>
-<span class="ln" id="L484"></span>
-<span class="ln" id="L485">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L486">    <span class="tok-kw">fn</span> <span class="tok-fn">the_command_names_both_inputs_and_the_output</span>() {</span>
-<span class="ln" id="L487">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>();</span>
-<span class="ln" id="L488">        assert_eq!(argv[<span class="tok-num">0</span>], <span class="tok-str">&quot;ffmpeg&quot;</span>);</span>
-<span class="ln" id="L489">        <span class="tok-kw">let</span> line = <span class="tok-fn">command_line</span>(&amp;argv);</span>
-<span class="ln" id="L490">        assert!(line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;frame-%05d.png&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
-<span class="ln" id="L491">        assert!(line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;out.wav&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
-<span class="ln" id="L492">        assert!(line.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;out.mp4&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
-<span class="ln" id="L493">    }</span>
-<span class="ln" id="L494"></span>
-<span class="ln" id="L495">    <span class="tok-com">/// Without this a great many phones silently refuse to play the result,</span></span>
-<span class="ln" id="L496">    <span class="tok-com">/// which is a worse failure than an error.</span></span>
-<span class="ln" id="L497">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L498">    <span class="tok-kw">fn</span> <span class="tok-fn">the_pixel_format_is_the_one_every_device_accepts</span>() {</span>
-<span class="ln" id="L499">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>();</span>
-<span class="ln" id="L500">        <span class="tok-kw">let</span> at = argv.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-pix_fmt&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L501">        assert_eq!(argv[at + <span class="tok-num">1</span>], <span class="tok-str">&quot;yuv420p&quot;</span>);</span>
-<span class="ln" id="L502">    }</span>
-<span class="ln" id="L503"></span>
-<span class="ln" id="L504">    <span class="tok-com">/// A tool a person runs by hand over a directory they may have put</span></span>
-<span class="ln" id="L505">    <span class="tok-com">/// something else in must not overwrite without being asked.</span></span>
-<span class="ln" id="L506">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L507">    <span class="tok-kw">fn</span> <span class="tok-fn">the_command_refuses_to_overwrite</span>() {</span>
-<span class="ln" id="L508">        assert!(<span class="tok-fn">argv</span>().<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L509">        assert!(!<span class="tok-fn">argv</span>().<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-y&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L510">    }</span>
-<span class="ln" id="L511"></span>
-<span class="ln" id="L512">    <span class="tok-com">/// A rounding error in the frame count must not leave frozen picture on</span></span>
-<span class="ln" id="L513">    <span class="tok-com">/// the end.</span></span>
-<span class="ln" id="L514">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L515">    <span class="tok-kw">fn</span> <span class="tok-fn">the_command_stops_at_the_shorter_stream</span>() {</span>
-<span class="ln" id="L516">        assert!(<span class="tok-fn">argv</span>().<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L517">    }</span>
-<span class="ln" id="L518"></span>
-<span class="ln" id="L519">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L520">    <span class="tok-kw">fn</span> <span class="tok-fn">the_frame_rate_and_quality_are_the_documented_defaults</span>() {</span>
-<span class="ln" id="L521">        <span class="tok-kw">let</span> encoding = Encoding::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L522">        assert_eq!(encoding.plan.fps.<span class="tok-fn">get</span>(), <span class="tok-num">30</span>);</span>
-<span class="ln" id="L523">        assert_eq!(encoding.plan.size, size::Preset::Hd1080.<span class="tok-fn">size</span>());</span>
-<span class="ln" id="L524">        assert_eq!(encoding.crf, <span class="tok-num">20</span>);</span>
-<span class="ln" id="L525">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>();</span>
-<span class="ln" id="L526">        <span class="tok-kw">let</span> at = argv.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-framerate&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L527">        assert_eq!(argv[at + <span class="tok-num">1</span>], <span class="tok-str">&quot;30&quot;</span>);</span>
-<span class="ln" id="L528">        <span class="tok-kw">let</span> at = argv.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-crf&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L529">        assert_eq!(argv[at + <span class="tok-num">1</span>], <span class="tok-str">&quot;20&quot;</span>);</span>
-<span class="ln" id="L530">    }</span>
-<span class="ln" id="L531"></span>
-<span class="ln" id="L532">    <span class="tok-com">/// The three command builders agree about how to encode.</span></span>
-<span class="ln" id="L533">    <span class="tok-com">///</span></span>
-<span class="ln" id="L534">    <span class="tok-com">/// They differ in how the picture gets in, and only in that: a numbered</span></span>
-<span class="ln" id="L535">    <span class="tok-com">/// sequence, a concat list, or a synthesised black source. Everything</span></span>
-<span class="ln" id="L536">    <span class="tok-com">/// after the inputs is the same decision made three times, in three</span></span>
-<span class="ln" id="L537">    <span class="tok-com">/// functions, with nothing until now comparing them.</span></span>
-<span class="ln" id="L538">    <span class="tok-com">///</span></span>
-<span class="ln" id="L539">    <span class="tok-com">/// That matters because of which one is which. `concat_command` is what</span></span>
-<span class="ln" id="L540">    <span class="tok-com">/// the window runs. `command` is what `veilvoice conversation` **prints</span></span>
-<span class="ln" id="L541">    <span class="tok-com">/// for somebody to run by hand**, under a line saying VeilVoice never runs</span></span>
-<span class="ln" id="L542">    <span class="tok-com">/// it for you. If those two drift, the instruction this program gives is</span></span>
-<span class="ln" id="L543">    <span class="tok-com">/// not the thing this program does, and nobody would find out from a</span></span>
-<span class="ln" id="L544">    <span class="tok-com">/// passing build.</span></span>
-<span class="ln" id="L545">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L546">    <span class="tok-kw">fn</span> <span class="tok-fn">every_way_into_a_video_encodes_it_the_same_way</span>() {</span>
-<span class="ln" id="L547">        <span class="tok-kw">let</span> encoding = Encoding {</span>
-<span class="ln" id="L548">            plan: size::Plan::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L549">                size::Preset::Uhd2160.<span class="tok-fn">size</span>(),</span>
-<span class="ln" id="L550">                size::FrameRate::<span class="tok-fn">new</span>(<span class="tok-num">60</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L551">            ),</span>
-<span class="ln" id="L552">            ..Encoding::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L553">        };</span>
-<span class="ln" id="L554">        <span class="tok-kw">let</span> frames = <span class="tok-fn">command</span>(</span>
-<span class="ln" id="L555">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/frames&quot;</span>),</span>
-<span class="ln" id="L556">            <span class="tok-str">&quot;frame-%05d.png&quot;</span>,</span>
-<span class="ln" id="L557">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>),</span>
-<span class="ln" id="L558">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>),</span>
-<span class="ln" id="L559">            encoding.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L560">        );</span>
-<span class="ln" id="L561">        <span class="tok-kw">let</span> concat = <span class="tok-fn">concat_command</span>(</span>
-<span class="ln" id="L562">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/list.txt&quot;</span>),</span>
-<span class="ln" id="L563">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>),</span>
-<span class="ln" id="L564">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>),</span>
-<span class="ln" id="L565">            encoding.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L566">        );</span>
-<span class="ln" id="L567">        <span class="tok-kw">let</span> black = <span class="tok-fn">black_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>), encoding);</span>
-<span class="ln" id="L568"></span>
-<span class="ln" id="L569">        <span class="tok-com">/// The value after a switch, or nothing if the switch is absent.</span></span>
-<span class="ln" id="L570">        <span class="tok-kw">fn</span> after&lt;<span class="tok-str">&#x27;a&gt;(argv: &amp;&#x27;</span>a [String], switch: &amp;str) -&gt; Option&lt;&amp;&#x27;a str&gt; {</span>
-<span class="ln" id="L571">            <span class="tok-kw">let</span> at = argv.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == switch)?;</span>
-<span class="ln" id="L572">            argv.<span class="tok-fn">get</span>(at + <span class="tok-num">1</span>).<span class="tok-fn">map</span>(String::as_str)</span>
-<span class="ln" id="L573">        }</span>
-<span class="ln" id="L574"></span>
-<span class="ln" id="L575">        <span class="tok-com">// The printed command and the one the window runs take the same</span></span>
-<span class="ln" id="L576">        <span class="tok-com">// pictures in by two different routes, so every setting must match,</span></span>
-<span class="ln" id="L577">        <span class="tok-com">// the scale filter included.</span></span>
-<span class="ln" id="L578">        <span class="tok-kw">for</span> switch <span class="tok-kw">in</span> [<span class="tok-str">&quot;-c:v&quot;</span>, <span class="tok-str">&quot;-crf&quot;</span>, <span class="tok-str">&quot;-vf&quot;</span>, <span class="tok-str">&quot;-pix_fmt&quot;</span>, <span class="tok-str">&quot;-c:a&quot;</span>, <span class="tok-str">&quot;-b:a&quot;</span>] {</span>
-<span class="ln" id="L579">            <span class="tok-kw">let</span> printed = <span class="tok-fn">after</span>(&amp;frames, switch);</span>
-<span class="ln" id="L580">            <span class="tok-kw">let</span> run = <span class="tok-fn">after</span>(&amp;concat, switch);</span>
-<span class="ln" id="L581">            assert_eq!(</span>
-<span class="ln" id="L582">                printed, run,</span>
-<span class="ln" id="L583">                <span class="tok-str">&quot;the printed command and the one the window runs disagree \</span></span>
-<span class="ln" id="L584"><span class="tok-str">                 about {switch}: {printed:?} against {run:?}&quot;</span></span>
-<span class="ln" id="L585">            );</span>
-<span class="ln" id="L586">        }</span>
-<span class="ln" id="L587"></span>
-<span class="ln" id="L588">        <span class="tok-com">// The black-frame command has no scale filter and should not: there</span></span>
-<span class="ln" id="L589">        <span class="tok-com">// are no pictures to scale, because ffmpeg synthesises the source at</span></span>
-<span class="ln" id="L590">        <span class="tok-com">// the size asked for. Everything downstream of the picture is still</span></span>
-<span class="ln" id="L591">        <span class="tok-com">// the same decision.</span></span>
-<span class="ln" id="L592">        assert_eq!(<span class="tok-fn">after</span>(&amp;black, <span class="tok-str">&quot;-vf&quot;</span>), None, <span class="tok-str">&quot;there is nothing to scale&quot;</span>);</span>
-<span class="ln" id="L593">        <span class="tok-kw">for</span> switch <span class="tok-kw">in</span> [<span class="tok-str">&quot;-c:v&quot;</span>, <span class="tok-str">&quot;-crf&quot;</span>, <span class="tok-str">&quot;-pix_fmt&quot;</span>, <span class="tok-str">&quot;-c:a&quot;</span>, <span class="tok-str">&quot;-b:a&quot;</span>] {</span>
-<span class="ln" id="L594">            <span class="tok-kw">let</span> run = <span class="tok-fn">after</span>(&amp;concat, switch);</span>
-<span class="ln" id="L595">            <span class="tok-kw">let</span> plain = <span class="tok-fn">after</span>(&amp;black, switch);</span>
-<span class="ln" id="L596">            assert_eq!(</span>
-<span class="ln" id="L597">                run, plain,</span>
-<span class="ln" id="L598">                <span class="tok-str">&quot;the video commands disagree about {switch}: {run:?} against {plain:?}&quot;</span></span>
-<span class="ln" id="L599">            );</span>
-<span class="ln" id="L600">        }</span>
-<span class="ln" id="L601"></span>
-<span class="ln" id="L602">        <span class="tok-com">// And the three switches every one of them must carry, so that a</span></span>
-<span class="ln" id="L603">        <span class="tok-com">// settings comparison cannot pass by all three having lost the same</span></span>
-<span class="ln" id="L604">        <span class="tok-com">// switch at once.</span></span>
-<span class="ln" id="L605">        <span class="tok-kw">for</span> argv <span class="tok-kw">in</span> [&amp;frames, &amp;concat, &amp;black] {</span>
-<span class="ln" id="L606">            assert!(</span>
-<span class="ln" id="L607">                argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L608">                <span class="tok-str">&quot;overwrites without asking&quot;</span></span>
-<span class="ln" id="L609">            );</span>
-<span class="ln" id="L610">            assert!(</span>
-<span class="ln" id="L611">                argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L612">                <span class="tok-str">&quot;runs past the shorter stream&quot;</span></span>
-<span class="ln" id="L613">            );</span>
-<span class="ln" id="L614">            assert_eq!(<span class="tok-fn">after</span>(argv, <span class="tok-str">&quot;-pix_fmt&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;yuv420p&quot;</span>));</span>
-<span class="ln" id="L615">        }</span>
-<span class="ln" id="L616">    }</span>
-<span class="ln" id="L617"></span>
-<span class="ln" id="L618">    <span class="tok-com">/// The chosen size reaches both commands.</span></span>
-<span class="ln" id="L619">    <span class="tok-com">///</span></span>
-<span class="ln" id="L620">    <span class="tok-com">/// `black_command` had `1280x720` written into it, so a person who asked</span></span>
-<span class="ln" id="L621">    <span class="tok-com">/// for 4K got 720p and was told nothing. Both are checked here because they</span></span>
-<span class="ln" id="L622">    <span class="tok-com">/// build their arguments separately and only one of them was wrong.</span></span>
-<span class="ln" id="L623">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L624">    <span class="tok-kw">fn</span> <span class="tok-fn">the_chosen_size_reaches_the_command_rather_than_a_written_in_one</span>() {</span>
-<span class="ln" id="L625">        <span class="tok-kw">let</span> encoding = Encoding {</span>
-<span class="ln" id="L626">            plan: size::Plan::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L627">                size::Preset::Uhd2160.<span class="tok-fn">size</span>(),</span>
-<span class="ln" id="L628">                size::FrameRate::<span class="tok-fn">new</span>(<span class="tok-num">60</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L629">            ),</span>
-<span class="ln" id="L630">            ..Encoding::<span class="tok-fn">default</span>()</span>
-<span class="ln" id="L631">        };</span>
-<span class="ln" id="L632"></span>
-<span class="ln" id="L633">        <span class="tok-kw">let</span> frames = <span class="tok-fn">command</span>(</span>
-<span class="ln" id="L634">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/frames&quot;</span>),</span>
-<span class="ln" id="L635">            <span class="tok-str">&quot;frame-%05d.png&quot;</span>,</span>
-<span class="ln" id="L636">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>),</span>
-<span class="ln" id="L637">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>),</span>
-<span class="ln" id="L638">            encoding.<span class="tok-fn">clone</span>(),</span>
-<span class="ln" id="L639">        );</span>
-<span class="ln" id="L640">        <span class="tok-kw">let</span> at = frames.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-vf&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L641">        assert!(frames[at + <span class="tok-num">1</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;3840:2160&quot;</span>), <span class="tok-str">&quot;{:?}&quot;</span>, frames[at + <span class="tok-num">1</span>]);</span>
-<span class="ln" id="L642">        <span class="tok-kw">let</span> at = frames.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-framerate&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L643">        assert_eq!(frames[at + <span class="tok-num">1</span>], <span class="tok-str">&quot;60&quot;</span>);</span>
-<span class="ln" id="L644"></span>
-<span class="ln" id="L645">        <span class="tok-kw">let</span> black = <span class="tok-fn">black_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>), encoding);</span>
-<span class="ln" id="L646">        <span class="tok-kw">let</span> source = black</span>
-<span class="ln" id="L647">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L648">            .<span class="tok-fn">find</span>(|part| part.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;color=&quot;</span>))</span>
-<span class="ln" id="L649">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L650">        assert!(source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;s=3840x2160&quot;</span>), <span class="tok-str">&quot;{source}&quot;</span>);</span>
-<span class="ln" id="L651">        assert!(source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;r=60&quot;</span>), <span class="tok-str">&quot;{source}&quot;</span>);</span>
-<span class="ln" id="L652">        assert!(</span>
-<span class="ln" id="L653">            !black.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|part| part.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;1280x720&quot;</span>)),</span>
-<span class="ln" id="L654">            <span class="tok-str">&quot;the written-in 720p is back: {black:?}&quot;</span></span>
-<span class="ln" id="L655">        );</span>
-<span class="ln" id="L656">    }</span>
-<span class="ln" id="L657"></span>
-<span class="ln" id="L658">    <span class="tok-com">/// A path with a space in it is the ordinary case on two of the three</span></span>
-<span class="ln" id="L659">    <span class="tok-com">/// platforms here, so the printed line has to survive one.</span></span>
-<span class="ln" id="L660">    <span class="tok-com">///</span></span>
-<span class="ln" id="L661">    <span class="tok-com">/// The separator is whatever `Path::join` produced, which differs by</span></span>
-<span class="ln" id="L662">    <span class="tok-com">/// platform -- so the test checks the **quoting**, which is the thing this</span></span>
-<span class="ln" id="L663">    <span class="tok-com">/// function is responsible for, rather than a path spelling it is not.</span></span>
-<span class="ln" id="L664">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L665">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_with_a_space_is_quoted_when_printed</span>() {</span>
-<span class="ln" id="L666">        <span class="tok-kw">let</span> argv = <span class="tok-fn">command</span>(</span>
-<span class="ln" id="L667">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/somebody/My Videos&quot;</span>),</span>
-<span class="ln" id="L668">            <span class="tok-str">&quot;f-%04d.png&quot;</span>,</span>
-<span class="ln" id="L669">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/somebody/My Videos/out.wav&quot;</span>),</span>
-<span class="ln" id="L670">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/somebody/My Videos/out.mp4&quot;</span>),</span>
-<span class="ln" id="L671">            Encoding::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L672">        );</span>
-<span class="ln" id="L673">        <span class="tok-kw">for</span> part <span class="tok-kw">in</span> &amp;argv {</span>
-<span class="ln" id="L674">            <span class="tok-kw">if</span> part.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27; &#x27;</span>) {</span>
-<span class="ln" id="L675">                <span class="tok-kw">let</span> quoted = format!(<span class="tok-str">&quot;\&quot;{part}\&quot;&quot;</span>);</span>
-<span class="ln" id="L676">                assert!(</span>
-<span class="ln" id="L677">                    <span class="tok-fn">command_line</span>(&amp;argv).<span class="tok-fn">contains</span>(&amp;quoted),</span>
-<span class="ln" id="L678">                    <span class="tok-str">&quot;{part:?} was not quoted&quot;</span></span>
-<span class="ln" id="L679">                );</span>
-<span class="ln" id="L680">            }</span>
-<span class="ln" id="L681">        }</span>
-<span class="ln" id="L682">        <span class="tok-com">// And nothing without a space is quoted, or the line is unreadable.</span></span>
-<span class="ln" id="L683">        <span class="tok-kw">let</span> line = <span class="tok-fn">command_line</span>(&amp;argv);</span>
-<span class="ln" id="L684">        assert!(line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;ffmpeg -n -framerate 30&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
-<span class="ln" id="L685">        assert!(!line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;\&quot;ffmpeg\&quot;&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
-<span class="ln" id="L686">    }</span>
-<span class="ln" id="L687"></span>
-<span class="ln" id="L688">    <span class="tok-com">/// Looking for ffmpeg must not panic whatever the machine has, and must</span></span>
-<span class="ln" id="L689">    <span class="tok-com">/// give the same answer twice.</span></span>
-<span class="ln" id="L690">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L691">    <span class="tok-kw">fn</span> <span class="tok-fn">looking_for_ffmpeg_is_free_of_side_effects</span>() {</span>
-<span class="ln" id="L692">        assert_eq!(<span class="tok-fn">found</span>(), <span class="tok-fn">found</span>());</span>
-<span class="ln" id="L693">        <span class="tok-kw">let</span> described = <span class="tok-fn">describe</span>();</span>
-<span class="ln" id="L694">        assert!(!described.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L695">        <span class="tok-kw">if</span> <span class="tok-fn">found</span>().<span class="tok-fn">is_none</span>() {</span>
-<span class="ln" id="L696">            assert!(described.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Nothing has failed&quot;</span>), <span class="tok-str">&quot;{described}&quot;</span>);</span>
-<span class="ln" id="L697">            assert!(</span>
-<span class="ln" id="L698">                described.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;will not download or install it&quot;</span>),</span>
-<span class="ln" id="L699">                <span class="tok-str">&quot;{described}&quot;</span></span>
-<span class="ln" id="L700">            );</span>
-<span class="ln" id="L701">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L702">            assert!(described.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;will not run it for you&quot;</span>), <span class="tok-str">&quot;{described}&quot;</span>);</span>
-<span class="ln" id="L703">        }</span>
-<span class="ln" id="L704">    }</span>
-<span class="ln" id="L705"></span>
-<span class="ln" id="L706">    <span class="tok-com">/// Whatever the machine has, the message must not promise to fetch it.</span></span>
-<span class="ln" id="L707">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L708">    <span class="tok-kw">fn</span> <span class="tok-fn">the_description_never_offers_to_install_anything</span>() {</span>
-<span class="ln" id="L709">        <span class="tok-kw">let</span> described = <span class="tok-fn">describe</span>().<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L710">        <span class="tok-kw">for</span> offer <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L711">            <span class="tok-str">&quot;downloading ffmpeg&quot;</span>,</span>
-<span class="ln" id="L712">            <span class="tok-str">&quot;installing it for you&quot;</span>,</span>
-<span class="ln" id="L713">            <span class="tok-str">&quot;we will install&quot;</span>,</span>
-<span class="ln" id="L714">        ] {</span>
-<span class="ln" id="L715">            assert!(!described.<span class="tok-fn">contains</span>(offer), <span class="tok-str">&quot;{described}&quot;</span>);</span>
-<span class="ln" id="L716">        }</span>
-<span class="ln" id="L717">    }</span>
-<span class="ln" id="L718">}</span>
+<span class="ln" id="L396"></span>
+<span class="src-item" id="fn-command_line">
+<span class="ln" id="L397"><span class="tok-com">/// The command as one line, for printing.</span></span>
+<span class="ln" id="L398"><span class="tok-com">///</span></span>
+<span class="ln" id="L399"><span class="tok-com">/// Quoted where a part contains a space. For a person to read and paste, not</span></span>
+<span class="ln" id="L400"><span class="tok-com">/// for a shell this program runs. Nothing here runs it.</span></span>
+<span class="ln" id="L401"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">command_line</span>(argv: &amp;[String]) -&gt; String {</span>
+<span class="ln" id="L402">    argv.<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L403">        .<span class="tok-fn">map</span>(|part| {</span>
+<span class="ln" id="L404">            <span class="tok-kw">if</span> part.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27; &#x27;</span>) {</span>
+<span class="ln" id="L405">                format!(<span class="tok-str">&quot;\&quot;{part}\&quot;&quot;</span>)</span>
+<span class="ln" id="L406">            } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L407">                part.<span class="tok-fn">clone</span>()</span>
+<span class="ln" id="L408">            }</span>
+<span class="ln" id="L409">        })</span>
+<span class="ln" id="L410">        .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L411">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot; &quot;</span>)</span>
+<span class="ln" id="L412">}</span>
+</span>
+<span class="ln" id="L413"></span>
+<span class="src-item" id="fn-describe">
+<span class="ln" id="L414"><span class="tok-com">/// What to tell the user about their machine&#x27;s `ffmpeg`.</span></span>
+<span class="ln" id="L415"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>() -&gt; String {</span>
+<span class="ln" id="L416">    <span class="tok-kw">match</span> <span class="tok-fn">found</span>() {</span>
+<span class="ln" id="L417">        <span class="tok-fn">Some</span>(path) =&gt; format!(</span>
+<span class="ln" id="L418">            <span class="tok-str">&quot;ffmpeg is on this machine, at {}. VeilVoice will not run it for you; the \</span></span>
+<span class="ln" id="L419"><span class="tok-str">             command is printed so you can see what it does before it does it.&quot;</span>,</span>
+<span class="ln" id="L420">            path.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L421">        ),</span>
+<span class="ln" id="L422">        None =&gt; <span class="tok-str">&quot;ffmpeg is not on this machine, so no video file can be written. Nothing \</span></span>
+<span class="ln" id="L423"><span class="tok-str">                 has failed: the page VeilVoice wrote plays everywhere and needs nothing \</span></span>
+<span class="ln" id="L424"><span class="tok-str">                 installed. If you want a video file, install ffmpeg yourself -- VeilVoice \</span></span>
+<span class="ln" id="L425"><span class="tok-str">                 will not download or install it.&quot;</span></span>
+<span class="ln" id="L426">            .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L427">    }</span>
+<span class="ln" id="L428">}</span>
+</span>
+<span class="ln" id="L429"></span>
+<span class="ln" id="L430"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L431"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L432"></span>
+<span class="ln" id="L433">    <span class="tok-com">/// Roadmap item 87. A synthesised colour source never ends, so without</span></span>
+<span class="ln" id="L434">    <span class="tok-com">/// `-shortest` ffmpeg encodes black for ever and the only thing that stops</span></span>
+<span class="ln" id="L435">    <span class="tok-com">/// it is the disk filling up.</span></span>
+<span class="ln" id="L436">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L437">    <span class="tok-kw">fn</span> <span class="tok-fn">the_black_video_stops_when_the_audio_does</span>() {</span>
+<span class="ln" id="L438">        <span class="tok-kw">let</span> argv = <span class="tok-fn">black_command</span>(</span>
+<span class="ln" id="L439">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;talk.veiled.wav&quot;</span>),</span>
+<span class="ln" id="L440">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;talk.mp4&quot;</span>),</span>
+<span class="ln" id="L441">            Encoding::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L442">        )</span>
+<span class="ln" id="L443">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L444">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L445">        assert!(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;color=c=black&quot;</span>)));</span>
+<span class="ln" id="L446">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;lavfi&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L447">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>()), <span class="tok-str">&quot;never overwrite silently&quot;</span>);</span>
+<span class="ln" id="L448">        assert_eq!(argv.<span class="tok-fn">last</span>().<span class="tok-fn">unwrap</span>(), <span class="tok-str">&quot;file:talk.mp4&quot;</span>);</span>
+<span class="ln" id="L449">        assert!(</span>
+<span class="ln" id="L450">            argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;yuv420p&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L451">            <span class="tok-str">&quot;without this a great many devices refuse to play the result&quot;</span></span>
+<span class="ln" id="L452">        );</span>
+<span class="ln" id="L453">    }</span>
+<span class="ln" id="L454"></span>
+<span class="ln" id="L455">    <span class="tok-com">/// Roadmap item 88. Taking the sound out has to discard every video stream, not</span></span>
+<span class="ln" id="L456">    <span class="tok-com">/// the first one: an OBS recording with a camera and a screen capture has</span></span>
+<span class="ln" id="L457">    <span class="tok-com">/// two, and a stream selector written for one fails on the other.</span></span>
+<span class="ln" id="L458">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L459">    <span class="tok-kw">fn</span> <span class="tok-fn">extracting_audio_discards_the_picture_and_keeps_the_rate</span>() {</span>
+<span class="ln" id="L460">        <span class="tok-kw">let</span> argv = <span class="tok-fn">extract_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;stream.mkv&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;stream.wav&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L461">        assert!(</span>
+<span class="ln" id="L462">            argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L463">            <span class="tok-str">&quot;-vn drops every video stream&quot;</span></span>
+<span class="ln" id="L464">        );</span>
+<span class="ln" id="L465">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;pcm_s16le&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L466">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;48000&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L467">        assert!(argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L468">        assert_eq!(argv.<span class="tok-fn">last</span>().<span class="tok-fn">unwrap</span>(), <span class="tok-str">&quot;file:stream.wav&quot;</span>);</span>
+<span class="ln" id="L469">    }</span>
+<span class="ln" id="L470"></span>
+<span class="ln" id="L471">    <span class="tok-com">/// F-283. Every path in every command reaches ffmpeg as a file, so a</span></span>
+<span class="ln" id="L472">    <span class="tok-com">/// name that looks like an option or a protocol is still a file name, and</span></span>
+<span class="ln" id="L473">    <span class="tok-com">/// a name that cannot be passed exactly is refused.</span></span>
+<span class="ln" id="L474">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L475">    <span class="tok-kw">fn</span> <span class="tok-fn">every_path_reaches_ffmpeg_as_a_file</span>() {</span>
+<span class="ln" id="L476">        <span class="tok-kw">let</span> odd_in = Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;-y&quot;</span>);</span>
+<span class="ln" id="L477">        <span class="tok-kw">let</span> odd_out = Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;concat:a|b&quot;</span>);</span>
+<span class="ln" id="L478">        <span class="tok-kw">let</span> all = [</span>
+<span class="ln" id="L479">            <span class="tok-fn">command</span>(</span>
+<span class="ln" id="L480">                odd_in,</span>
+<span class="ln" id="L481">                <span class="tok-str">&quot;frame-%05d.png&quot;</span>,</span>
+<span class="ln" id="L482">                odd_in,</span>
+<span class="ln" id="L483">                odd_out,</span>
+<span class="ln" id="L484">                Encoding::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L485">            )</span>
+<span class="ln" id="L486">            .<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L487">            <span class="tok-fn">concat_command</span>(odd_in, odd_in, odd_out, Encoding::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L488">            <span class="tok-fn">black_command</span>(odd_in, odd_out, Encoding::<span class="tok-fn">default</span>()).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L489">            <span class="tok-fn">extract_command</span>(odd_in, odd_out).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L490">        ];</span>
+<span class="ln" id="L491">        <span class="tok-kw">for</span> argv <span class="tok-kw">in</span> &amp;all {</span>
+<span class="ln" id="L492">            assert!(</span>
+<span class="ln" id="L493">                !argv.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;-y&quot;</span> || a == <span class="tok-str">&quot;concat:a|b&quot;</span>),</span>
+<span class="ln" id="L494">                <span class="tok-str">&quot;{argv:?}&quot;</span></span>
+<span class="ln" id="L495">            );</span>
+<span class="ln" id="L496">            assert_eq!(argv.<span class="tok-fn">last</span>().<span class="tok-fn">map</span>(String::as_str), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;file:concat:a|b&quot;</span>));</span>
+<span class="ln" id="L497">        }</span>
+<span class="ln" id="L498"></span>
+<span class="ln" id="L499">        <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L500">        {</span>
+<span class="ln" id="L501">            <span class="tok-kw">use</span> std::os::unix::ffi::OsStrExt;</span>
+<span class="ln" id="L502">            <span class="tok-kw">let</span> odd = Path::<span class="tok-fn">new</span>(std::ffi::OsStr::<span class="tok-fn">from_bytes</span>(b<span class="tok-str">&quot;out\xff.wav&quot;</span>));</span>
+<span class="ln" id="L503">            assert!(<span class="tok-fn">extract_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;in.mkv&quot;</span>), odd).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L504">        }</span>
+<span class="ln" id="L505">    }</span>
+<span class="ln" id="L506"></span>
+<span class="ln" id="L507">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L508">    <span class="tok-kw">fn</span> <span class="tok-fn">every_container_obs_writes_is_recognised</span>() {</span>
+<span class="ln" id="L509">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;a.mkv&quot;</span>, <span class="tok-str">&quot;a.MP4&quot;</span>, <span class="tok-str">&quot;a.mov&quot;</span>, <span class="tok-str">&quot;a.flv&quot;</span>, <span class="tok-str">&quot;a.ts&quot;</span>, <span class="tok-str">&quot;a.webm&quot;</span>] {</span>
+<span class="ln" id="L510">            assert!(<span class="tok-fn">is_container</span>(Path::<span class="tok-fn">new</span>(name)), <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L511">        }</span>
+<span class="ln" id="L512">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;a.txt&quot;</span>, <span class="tok-str">&quot;a.png&quot;</span>, <span class="tok-str">&quot;a&quot;</span>, <span class="tok-str">&quot;a.veil&quot;</span>] {</span>
+<span class="ln" id="L513">            assert!(!<span class="tok-fn">is_container</span>(Path::<span class="tok-fn">new</span>(name)), <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L514">        }</span>
+<span class="ln" id="L515">    }</span>
+<span class="ln" id="L516"></span>
+<span class="ln" id="L517">    <span class="tok-com">/// The two commands must not be confusable: one makes a video from audio,</span></span>
+<span class="ln" id="L518">    <span class="tok-com">/// the other takes audio out of a video, and swapping them silently would</span></span>
+<span class="ln" id="L519">    <span class="tok-com">/// produce a file with no sound.</span></span>
+<span class="ln" id="L520">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L521">    <span class="tok-kw">fn</span> <span class="tok-fn">the_two_commands_point_in_opposite_directions</span>() {</span>
+<span class="ln" id="L522">        <span class="tok-kw">let</span> make = <span class="tok-fn">black_command</span>(</span>
+<span class="ln" id="L523">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;in.wav&quot;</span>),</span>
+<span class="ln" id="L524">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;out.mp4&quot;</span>),</span>
+<span class="ln" id="L525">            Encoding::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L526">        )</span>
+<span class="ln" id="L527">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L528">        <span class="tok-kw">let</span> take = <span class="tok-fn">extract_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;in.mkv&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;out.wav&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L529">        assert!(</span>
+<span class="ln" id="L530">            make.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-c:a&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L531">            <span class="tok-str">&quot;the video carries audio&quot;</span></span>
+<span class="ln" id="L532">        );</span>
+<span class="ln" id="L533">        assert!(</span>
+<span class="ln" id="L534">            take.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L535">            <span class="tok-str">&quot;the extract carries none&quot;</span></span>
+<span class="ln" id="L536">        );</span>
+<span class="ln" id="L537">        assert!(!make.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-vn&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L538">        assert!(!take.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;color=&quot;</span>)));</span>
+<span class="ln" id="L539">    }</span>
+<span class="ln" id="L540">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L541"></span>
+<span class="ln" id="L542">    <span class="tok-kw">fn</span> <span class="tok-fn">argv</span>() -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L543">        <span class="tok-fn">command</span>(</span>
+<span class="ln" id="L544">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp/frames&quot;</span>),</span>
+<span class="ln" id="L545">            <span class="tok-str">&quot;frame-%05d.png&quot;</span>,</span>
+<span class="ln" id="L546">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp/out.wav&quot;</span>),</span>
+<span class="ln" id="L547">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/tmp/out.mp4&quot;</span>),</span>
+<span class="ln" id="L548">            Encoding::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L549">        )</span>
+<span class="ln" id="L550">        .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L551">    }</span>
+<span class="ln" id="L552"></span>
+<span class="ln" id="L553">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L554">    <span class="tok-kw">fn</span> <span class="tok-fn">the_command_names_both_inputs_and_the_output</span>() {</span>
+<span class="ln" id="L555">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>();</span>
+<span class="ln" id="L556">        assert_eq!(argv[<span class="tok-num">0</span>], <span class="tok-str">&quot;ffmpeg&quot;</span>);</span>
+<span class="ln" id="L557">        <span class="tok-kw">let</span> line = <span class="tok-fn">command_line</span>(&amp;argv);</span>
+<span class="ln" id="L558">        assert!(line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;frame-%05d.png&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
+<span class="ln" id="L559">        assert!(line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;out.wav&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
+<span class="ln" id="L560">        assert!(line.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;out.mp4&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
+<span class="ln" id="L561">    }</span>
+<span class="ln" id="L562"></span>
+<span class="ln" id="L563">    <span class="tok-com">/// Without this a great many phones silently refuse to play the result,</span></span>
+<span class="ln" id="L564">    <span class="tok-com">/// which is a worse failure than an error.</span></span>
+<span class="ln" id="L565">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L566">    <span class="tok-kw">fn</span> <span class="tok-fn">the_pixel_format_is_the_one_every_device_accepts</span>() {</span>
+<span class="ln" id="L567">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>();</span>
+<span class="ln" id="L568">        <span class="tok-kw">let</span> at = argv.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-pix_fmt&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L569">        assert_eq!(argv[at + <span class="tok-num">1</span>], <span class="tok-str">&quot;yuv420p&quot;</span>);</span>
+<span class="ln" id="L570">    }</span>
+<span class="ln" id="L571"></span>
+<span class="ln" id="L572">    <span class="tok-com">/// A tool a person runs by hand over a directory they may have put</span></span>
+<span class="ln" id="L573">    <span class="tok-com">/// something else in must not overwrite without being asked.</span></span>
+<span class="ln" id="L574">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L575">    <span class="tok-kw">fn</span> <span class="tok-fn">the_command_refuses_to_overwrite</span>() {</span>
+<span class="ln" id="L576">        assert!(<span class="tok-fn">argv</span>().<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L577">        assert!(!<span class="tok-fn">argv</span>().<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-y&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L578">    }</span>
+<span class="ln" id="L579"></span>
+<span class="ln" id="L580">    <span class="tok-com">/// A rounding error in the frame count must not leave frozen picture on</span></span>
+<span class="ln" id="L581">    <span class="tok-com">/// the end.</span></span>
+<span class="ln" id="L582">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L583">    <span class="tok-kw">fn</span> <span class="tok-fn">the_command_stops_at_the_shorter_stream</span>() {</span>
+<span class="ln" id="L584">        assert!(<span class="tok-fn">argv</span>().<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L585">    }</span>
+<span class="ln" id="L586"></span>
+<span class="ln" id="L587">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L588">    <span class="tok-kw">fn</span> <span class="tok-fn">the_frame_rate_and_quality_are_the_documented_defaults</span>() {</span>
+<span class="ln" id="L589">        <span class="tok-kw">let</span> encoding = Encoding::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L590">        assert_eq!(encoding.plan.fps.<span class="tok-fn">get</span>(), <span class="tok-num">30</span>);</span>
+<span class="ln" id="L591">        assert_eq!(encoding.plan.size, size::Preset::Hd1080.<span class="tok-fn">size</span>());</span>
+<span class="ln" id="L592">        assert_eq!(encoding.crf, <span class="tok-num">20</span>);</span>
+<span class="ln" id="L593">        <span class="tok-kw">let</span> argv = <span class="tok-fn">argv</span>();</span>
+<span class="ln" id="L594">        <span class="tok-kw">let</span> at = argv.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-framerate&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L595">        assert_eq!(argv[at + <span class="tok-num">1</span>], <span class="tok-str">&quot;30&quot;</span>);</span>
+<span class="ln" id="L596">        <span class="tok-kw">let</span> at = argv.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-crf&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L597">        assert_eq!(argv[at + <span class="tok-num">1</span>], <span class="tok-str">&quot;20&quot;</span>);</span>
+<span class="ln" id="L598">    }</span>
+<span class="ln" id="L599"></span>
+<span class="ln" id="L600">    <span class="tok-com">/// The three command builders agree about how to encode.</span></span>
+<span class="ln" id="L601">    <span class="tok-com">///</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// They differ in how the picture gets in, and only in that: a numbered</span></span>
+<span class="ln" id="L603">    <span class="tok-com">/// sequence, a concat list, or a synthesised black source. Everything</span></span>
+<span class="ln" id="L604">    <span class="tok-com">/// after the inputs is the same decision made three times, in three</span></span>
+<span class="ln" id="L605">    <span class="tok-com">/// functions, with nothing until now comparing them.</span></span>
+<span class="ln" id="L606">    <span class="tok-com">///</span></span>
+<span class="ln" id="L607">    <span class="tok-com">/// That matters because of which one is which. `concat_command` is what</span></span>
+<span class="ln" id="L608">    <span class="tok-com">/// the window runs. `command` is what `veilvoice conversation` **prints</span></span>
+<span class="ln" id="L609">    <span class="tok-com">/// for somebody to run by hand**, under a line saying VeilVoice never runs</span></span>
+<span class="ln" id="L610">    <span class="tok-com">/// it for you. If those two drift, the instruction this program gives is</span></span>
+<span class="ln" id="L611">    <span class="tok-com">/// not the thing this program does, and nobody would find out from a</span></span>
+<span class="ln" id="L612">    <span class="tok-com">/// passing build.</span></span>
+<span class="ln" id="L613">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L614">    <span class="tok-kw">fn</span> <span class="tok-fn">every_way_into_a_video_encodes_it_the_same_way</span>() {</span>
+<span class="ln" id="L615">        <span class="tok-kw">let</span> encoding = Encoding {</span>
+<span class="ln" id="L616">            plan: size::Plan::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L617">                size::Preset::Uhd2160.<span class="tok-fn">size</span>(),</span>
+<span class="ln" id="L618">                size::FrameRate::<span class="tok-fn">new</span>(<span class="tok-num">60</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L619">            ),</span>
+<span class="ln" id="L620">            ..Encoding::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L621">        };</span>
+<span class="ln" id="L622">        <span class="tok-kw">let</span> frames = <span class="tok-fn">command</span>(</span>
+<span class="ln" id="L623">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/frames&quot;</span>),</span>
+<span class="ln" id="L624">            <span class="tok-str">&quot;frame-%05d.png&quot;</span>,</span>
+<span class="ln" id="L625">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>),</span>
+<span class="ln" id="L626">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>),</span>
+<span class="ln" id="L627">            encoding.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L628">        )</span>
+<span class="ln" id="L629">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L630">        <span class="tok-kw">let</span> concat = <span class="tok-fn">concat_command</span>(</span>
+<span class="ln" id="L631">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/list.txt&quot;</span>),</span>
+<span class="ln" id="L632">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>),</span>
+<span class="ln" id="L633">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>),</span>
+<span class="ln" id="L634">            encoding.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L635">        )</span>
+<span class="ln" id="L636">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L637">        <span class="tok-kw">let</span> black =</span>
+<span class="ln" id="L638">            <span class="tok-fn">black_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>), encoding).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L639"></span>
+<span class="ln" id="L640">        <span class="tok-com">/// The value after a switch, or nothing if the switch is absent.</span></span>
+<span class="ln" id="L641">        <span class="tok-kw">fn</span> after&lt;<span class="tok-str">&#x27;a&gt;(argv: &amp;&#x27;</span>a [String], switch: &amp;str) -&gt; Option&lt;&amp;&#x27;a str&gt; {</span>
+<span class="ln" id="L642">            <span class="tok-kw">let</span> at = argv.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == switch)?;</span>
+<span class="ln" id="L643">            argv.<span class="tok-fn">get</span>(at + <span class="tok-num">1</span>).<span class="tok-fn">map</span>(String::as_str)</span>
+<span class="ln" id="L644">        }</span>
+<span class="ln" id="L645"></span>
+<span class="ln" id="L646">        <span class="tok-com">// The printed command and the one the window runs take the same</span></span>
+<span class="ln" id="L647">        <span class="tok-com">// pictures in by two different routes, so every setting must match,</span></span>
+<span class="ln" id="L648">        <span class="tok-com">// the scale filter included.</span></span>
+<span class="ln" id="L649">        <span class="tok-kw">for</span> switch <span class="tok-kw">in</span> [<span class="tok-str">&quot;-c:v&quot;</span>, <span class="tok-str">&quot;-crf&quot;</span>, <span class="tok-str">&quot;-vf&quot;</span>, <span class="tok-str">&quot;-pix_fmt&quot;</span>, <span class="tok-str">&quot;-c:a&quot;</span>, <span class="tok-str">&quot;-b:a&quot;</span>] {</span>
+<span class="ln" id="L650">            <span class="tok-kw">let</span> printed = <span class="tok-fn">after</span>(&amp;frames, switch);</span>
+<span class="ln" id="L651">            <span class="tok-kw">let</span> run = <span class="tok-fn">after</span>(&amp;concat, switch);</span>
+<span class="ln" id="L652">            assert_eq!(</span>
+<span class="ln" id="L653">                printed, run,</span>
+<span class="ln" id="L654">                <span class="tok-str">&quot;the printed command and the one the window runs disagree \</span></span>
+<span class="ln" id="L655"><span class="tok-str">                 about {switch}: {printed:?} against {run:?}&quot;</span></span>
+<span class="ln" id="L656">            );</span>
+<span class="ln" id="L657">        }</span>
+<span class="ln" id="L658"></span>
+<span class="ln" id="L659">        <span class="tok-com">// The black-frame command has no scale filter and should not: there</span></span>
+<span class="ln" id="L660">        <span class="tok-com">// are no pictures to scale, because ffmpeg synthesises the source at</span></span>
+<span class="ln" id="L661">        <span class="tok-com">// the size asked for. Everything downstream of the picture is still</span></span>
+<span class="ln" id="L662">        <span class="tok-com">// the same decision.</span></span>
+<span class="ln" id="L663">        assert_eq!(<span class="tok-fn">after</span>(&amp;black, <span class="tok-str">&quot;-vf&quot;</span>), None, <span class="tok-str">&quot;there is nothing to scale&quot;</span>);</span>
+<span class="ln" id="L664">        <span class="tok-kw">for</span> switch <span class="tok-kw">in</span> [<span class="tok-str">&quot;-c:v&quot;</span>, <span class="tok-str">&quot;-crf&quot;</span>, <span class="tok-str">&quot;-pix_fmt&quot;</span>, <span class="tok-str">&quot;-c:a&quot;</span>, <span class="tok-str">&quot;-b:a&quot;</span>] {</span>
+<span class="ln" id="L665">            <span class="tok-kw">let</span> run = <span class="tok-fn">after</span>(&amp;concat, switch);</span>
+<span class="ln" id="L666">            <span class="tok-kw">let</span> plain = <span class="tok-fn">after</span>(&amp;black, switch);</span>
+<span class="ln" id="L667">            assert_eq!(</span>
+<span class="ln" id="L668">                run, plain,</span>
+<span class="ln" id="L669">                <span class="tok-str">&quot;the video commands disagree about {switch}: {run:?} against {plain:?}&quot;</span></span>
+<span class="ln" id="L670">            );</span>
+<span class="ln" id="L671">        }</span>
+<span class="ln" id="L672"></span>
+<span class="ln" id="L673">        <span class="tok-com">// And the three switches every one of them must carry, so that a</span></span>
+<span class="ln" id="L674">        <span class="tok-com">// settings comparison cannot pass by all three having lost the same</span></span>
+<span class="ln" id="L675">        <span class="tok-com">// switch at once.</span></span>
+<span class="ln" id="L676">        <span class="tok-kw">for</span> argv <span class="tok-kw">in</span> [&amp;frames, &amp;concat, &amp;black] {</span>
+<span class="ln" id="L677">            assert!(</span>
+<span class="ln" id="L678">                argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-n&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L679">                <span class="tok-str">&quot;overwrites without asking&quot;</span></span>
+<span class="ln" id="L680">            );</span>
+<span class="ln" id="L681">            assert!(</span>
+<span class="ln" id="L682">                argv.<span class="tok-fn">contains</span>(&amp;<span class="tok-str">&quot;-shortest&quot;</span>.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L683">                <span class="tok-str">&quot;runs past the shorter stream&quot;</span></span>
+<span class="ln" id="L684">            );</span>
+<span class="ln" id="L685">            assert_eq!(<span class="tok-fn">after</span>(argv, <span class="tok-str">&quot;-pix_fmt&quot;</span>), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;yuv420p&quot;</span>));</span>
+<span class="ln" id="L686">        }</span>
+<span class="ln" id="L687">    }</span>
+<span class="ln" id="L688"></span>
+<span class="ln" id="L689">    <span class="tok-com">/// The chosen size reaches both commands.</span></span>
+<span class="ln" id="L690">    <span class="tok-com">///</span></span>
+<span class="ln" id="L691">    <span class="tok-com">/// `black_command` had `1280x720` written into it, so a person who asked</span></span>
+<span class="ln" id="L692">    <span class="tok-com">/// for 4K got 720p and was told nothing. Both are checked here because they</span></span>
+<span class="ln" id="L693">    <span class="tok-com">/// build their arguments separately and only one of them was wrong.</span></span>
+<span class="ln" id="L694">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L695">    <span class="tok-kw">fn</span> <span class="tok-fn">the_chosen_size_reaches_the_command_rather_than_a_written_in_one</span>() {</span>
+<span class="ln" id="L696">        <span class="tok-kw">let</span> encoding = Encoding {</span>
+<span class="ln" id="L697">            plan: size::Plan::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L698">                size::Preset::Uhd2160.<span class="tok-fn">size</span>(),</span>
+<span class="ln" id="L699">                size::FrameRate::<span class="tok-fn">new</span>(<span class="tok-num">60</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L700">            ),</span>
+<span class="ln" id="L701">            ..Encoding::<span class="tok-fn">default</span>()</span>
+<span class="ln" id="L702">        };</span>
+<span class="ln" id="L703"></span>
+<span class="ln" id="L704">        <span class="tok-kw">let</span> frames = <span class="tok-fn">command</span>(</span>
+<span class="ln" id="L705">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/frames&quot;</span>),</span>
+<span class="ln" id="L706">            <span class="tok-str">&quot;frame-%05d.png&quot;</span>,</span>
+<span class="ln" id="L707">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>),</span>
+<span class="ln" id="L708">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>),</span>
+<span class="ln" id="L709">            encoding.<span class="tok-fn">clone</span>(),</span>
+<span class="ln" id="L710">        )</span>
+<span class="ln" id="L711">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L712">        <span class="tok-kw">let</span> at = frames.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-vf&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L713">        assert!(frames[at + <span class="tok-num">1</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;3840:2160&quot;</span>), <span class="tok-str">&quot;{:?}&quot;</span>, frames[at + <span class="tok-num">1</span>]);</span>
+<span class="ln" id="L714">        <span class="tok-kw">let</span> at = frames.<span class="tok-fn">iter</span>().<span class="tok-fn">position</span>(|part| part == <span class="tok-str">&quot;-framerate&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L715">        assert_eq!(frames[at + <span class="tok-num">1</span>], <span class="tok-str">&quot;60&quot;</span>);</span>
+<span class="ln" id="L716"></span>
+<span class="ln" id="L717">        <span class="tok-kw">let</span> black =</span>
+<span class="ln" id="L718">            <span class="tok-fn">black_command</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/audio.wav&quot;</span>), Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/out.mp4&quot;</span>), encoding).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L719">        <span class="tok-kw">let</span> source = black</span>
+<span class="ln" id="L720">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L721">            .<span class="tok-fn">find</span>(|part| part.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;color=&quot;</span>))</span>
+<span class="ln" id="L722">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L723">        assert!(source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;s=3840x2160&quot;</span>), <span class="tok-str">&quot;{source}&quot;</span>);</span>
+<span class="ln" id="L724">        assert!(source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;r=60&quot;</span>), <span class="tok-str">&quot;{source}&quot;</span>);</span>
+<span class="ln" id="L725">        assert!(</span>
+<span class="ln" id="L726">            !black.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|part| part.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;1280x720&quot;</span>)),</span>
+<span class="ln" id="L727">            <span class="tok-str">&quot;the written-in 720p is back: {black:?}&quot;</span></span>
+<span class="ln" id="L728">        );</span>
+<span class="ln" id="L729">    }</span>
+<span class="ln" id="L730"></span>
+<span class="ln" id="L731">    <span class="tok-com">/// A path with a space in it is the ordinary case on two of the three</span></span>
+<span class="ln" id="L732">    <span class="tok-com">/// platforms here, so the printed line has to survive one.</span></span>
+<span class="ln" id="L733">    <span class="tok-com">///</span></span>
+<span class="ln" id="L734">    <span class="tok-com">/// The separator is whatever `Path::join` produced, which differs by</span></span>
+<span class="ln" id="L735">    <span class="tok-com">/// platform -- so the test checks the **quoting**, which is the thing this</span></span>
+<span class="ln" id="L736">    <span class="tok-com">/// function is responsible for, rather than a path spelling it is not.</span></span>
+<span class="ln" id="L737">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L738">    <span class="tok-kw">fn</span> <span class="tok-fn">a_path_with_a_space_is_quoted_when_printed</span>() {</span>
+<span class="ln" id="L739">        <span class="tok-kw">let</span> argv = <span class="tok-fn">command</span>(</span>
+<span class="ln" id="L740">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/somebody/My Videos&quot;</span>),</span>
+<span class="ln" id="L741">            <span class="tok-str">&quot;f-%04d.png&quot;</span>,</span>
+<span class="ln" id="L742">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/somebody/My Videos/out.wav&quot;</span>),</span>
+<span class="ln" id="L743">            Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/home/somebody/My Videos/out.mp4&quot;</span>),</span>
+<span class="ln" id="L744">            Encoding::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L745">        )</span>
+<span class="ln" id="L746">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L747">        <span class="tok-kw">for</span> part <span class="tok-kw">in</span> &amp;argv {</span>
+<span class="ln" id="L748">            <span class="tok-kw">if</span> part.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27; &#x27;</span>) {</span>
+<span class="ln" id="L749">                <span class="tok-kw">let</span> quoted = format!(<span class="tok-str">&quot;\&quot;{part}\&quot;&quot;</span>);</span>
+<span class="ln" id="L750">                assert!(</span>
+<span class="ln" id="L751">                    <span class="tok-fn">command_line</span>(&amp;argv).<span class="tok-fn">contains</span>(&amp;quoted),</span>
+<span class="ln" id="L752">                    <span class="tok-str">&quot;{part:?} was not quoted&quot;</span></span>
+<span class="ln" id="L753">                );</span>
+<span class="ln" id="L754">            }</span>
+<span class="ln" id="L755">        }</span>
+<span class="ln" id="L756">        <span class="tok-com">// And nothing without a space is quoted, or the line is unreadable.</span></span>
+<span class="ln" id="L757">        <span class="tok-kw">let</span> line = <span class="tok-fn">command_line</span>(&amp;argv);</span>
+<span class="ln" id="L758">        assert!(line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;ffmpeg -n -framerate 30&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
+<span class="ln" id="L759">        assert!(!line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;\&quot;ffmpeg\&quot;&quot;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
+<span class="ln" id="L760">    }</span>
+<span class="ln" id="L761"></span>
+<span class="ln" id="L762">    <span class="tok-com">/// Looking for ffmpeg must not panic whatever the machine has, and must</span></span>
+<span class="ln" id="L763">    <span class="tok-com">/// give the same answer twice.</span></span>
+<span class="ln" id="L764">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L765">    <span class="tok-kw">fn</span> <span class="tok-fn">looking_for_ffmpeg_is_free_of_side_effects</span>() {</span>
+<span class="ln" id="L766">        assert_eq!(<span class="tok-fn">found</span>(), <span class="tok-fn">found</span>());</span>
+<span class="ln" id="L767">        <span class="tok-kw">let</span> described = <span class="tok-fn">describe</span>();</span>
+<span class="ln" id="L768">        assert!(!described.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L769">        <span class="tok-kw">if</span> <span class="tok-fn">found</span>().<span class="tok-fn">is_none</span>() {</span>
+<span class="ln" id="L770">            assert!(described.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Nothing has failed&quot;</span>), <span class="tok-str">&quot;{described}&quot;</span>);</span>
+<span class="ln" id="L771">            assert!(</span>
+<span class="ln" id="L772">                described.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;will not download or install it&quot;</span>),</span>
+<span class="ln" id="L773">                <span class="tok-str">&quot;{described}&quot;</span></span>
+<span class="ln" id="L774">            );</span>
+<span class="ln" id="L775">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L776">            assert!(described.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;will not run it for you&quot;</span>), <span class="tok-str">&quot;{described}&quot;</span>);</span>
+<span class="ln" id="L777">        }</span>
+<span class="ln" id="L778">    }</span>
+<span class="ln" id="L779"></span>
+<span class="ln" id="L780">    <span class="tok-com">/// Whatever the machine has, the message must not promise to fetch it.</span></span>
+<span class="ln" id="L781">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L782">    <span class="tok-kw">fn</span> <span class="tok-fn">the_description_never_offers_to_install_anything</span>() {</span>
+<span class="ln" id="L783">        <span class="tok-kw">let</span> described = <span class="tok-fn">describe</span>().<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L784">        <span class="tok-kw">for</span> offer <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L785">            <span class="tok-str">&quot;downloading ffmpeg&quot;</span>,</span>
+<span class="ln" id="L786">            <span class="tok-str">&quot;installing it for you&quot;</span>,</span>
+<span class="ln" id="L787">            <span class="tok-str">&quot;we will install&quot;</span>,</span>
+<span class="ln" id="L788">        ] {</span>
+<span class="ln" id="L789">            assert!(!described.<span class="tok-fn">contains</span>(offer), <span class="tok-str">&quot;{described}&quot;</span>);</span>
+<span class="ln" id="L790">        }</span>
+<span class="ln" id="L791">    }</span>
+<span class="ln" id="L792">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

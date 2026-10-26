@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-meta/src/audio.rs`
 
-[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 278 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs)
+[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 337 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs)
 
 ## Contents
 
@@ -61,13 +61,13 @@ recorded it and on what.
 
 ## What this file contains
 
-278 lines defining **3 functions** (2 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+337 lines defining **3 functions** (2 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
 - `clean_audio_file` (line 81) -- Strip or replace the tags of an audio file, in place.
   - reaches: `read_head`
-- `clean_audio_tags` (line 134) -- Report which tag blocks a file carries, without modifying it.
+- `clean_audio_tags` (line 155) -- Report which tag blocks a file carries, without modifying it.
   - reaches: `read_head`
 
 ## What calls what
@@ -86,12 +86,12 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 flowchart TD
     n_read_head["read_head<br/>line 57"]
     n_clean_audio_file(["clean_audio_file<br/>line 81"])
-    n_clean_audio_tags(["clean_audio_tags<br/>line 134"])
+    n_clean_audio_tags(["clean_audio_tags<br/>line 155"])
     n_clean_audio_file --> n_read_head
     n_clean_audio_tags --> n_read_head
     click n_read_head href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L57" "open the source"
     click n_clean_audio_file href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L81" "open the source"
-    click n_clean_audio_tags href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L134" "open the source"
+    click n_clean_audio_tags href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L155" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_audio_file,n_clean_audio_tags entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -107,4 +107,4 @@ flowchart TD
 | `read_head` <sub>fn</sub> | [57](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L57) | Read just enough of a file to identify its container. |
 | `REALISTIC` <sub>const</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L71) | Tags written in Policy::Realistic mode. |
 | `clean_audio_file` <sub>pub fn</sub> | [81](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L81) | Strip or replace the tags of an audio file, in place. |
-| `clean_audio_tags` <sub>pub fn</sub> | [134](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L134) | Report which tag blocks a file carries, without modifying it. |
+| `clean_audio_tags` <sub>pub fn</sub> | [155](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L155) | Report which tag blocks a file carries, without modifying it. |

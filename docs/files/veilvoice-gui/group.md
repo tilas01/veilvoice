@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-gui/src/group.rs`
 
-[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 2128 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs)
+[`veilvoice-gui`](../../../crates/veilvoice-gui/README.md) &middot; 2129 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs)
 
 ## Contents
 
@@ -80,7 +80,7 @@ restart is a mode somebody eventually forgets is on.
 
 ## What this file contains
 
-2128 lines defining **41 functions** (17 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+2129 lines defining **41 functions** (17 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -146,7 +146,7 @@ flowchart TD
     n_to_workspace["Group::to_workspace<br/>line 933"]
     n_from_workspace["Group::from_workspace<br/>line 959"]
     n_is_busy["Group::is_busy<br/>line 1011"]
-    n_assigned_colour["assigned_colour<br/>line 1517"]
+    n_assigned_colour["assigned_colour<br/>line 1518"]
     n_add --> n_at
     n_body --> n_collect_dialogs
     n_body --> n_mode_controls
@@ -187,7 +187,7 @@ flowchart TD
     click n_to_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L933" "open the source"
     click n_from_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L959" "open the source"
     click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1011" "open the source"
-    click n_assigned_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1517" "open the source"
+    click n_assigned_colour href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1518" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start_from,n_tab entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -244,9 +244,9 @@ flowchart TD
 | `Job` <sub>struct</sub> | [1295](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1295) | Everything one render needs, taken from the panel at the moment the button was pressed. |
 | `render_now` <sub>fn</sub> | [1315](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1315) | Do the render. |
 | `render_video` <sub>fn</sub> | [1435](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1435) | Roadmap item 139. |
-| `write_private` <sub>fn</sub> | [1499](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1499) | Replace the last extension, keeping any .veiled before it. |
-| `with_extension` <sub>fn</sub> | [1505](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1505) | path with its last extension replaced, for putting a render beside its plan. |
-| `assigned_colour` <sub>pub fn</sub> | [1517](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1517) | The colour a slot is given, as an egui colour. |
+| `write_private` <sub>fn</sub> | [1500](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1500) | Replace the last extension, keeping any .veiled before it. |
+| `with_extension` <sub>fn</sub> | [1506](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1506) | path with its last extension replaced, for putting a render beside its plan. |
+| `assigned_colour` <sub>pub fn</sub> | [1518](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/group.rs#L1518) | The colour a slot is given, as an egui colour. |
 
 ---
 

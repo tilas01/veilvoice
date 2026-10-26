@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-meta/audio.svg" alt="audio.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-meta/src/audio.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 278 lines &middot; <a href="audio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-meta.html">veilvoice-meta</a> &middot; 337 lines &middot; <a href="audio.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-tags-give-away">What tags give away</a>
@@ -92,12 +92,12 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>278 lines defining <strong>3 functions</strong> (2 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>337 lines defining <strong>3 functions</strong> (2 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>clean_audio_file</code> <span style="color:var(--muted)">line 81</span> &middot; Strip or replace the tags of an audio file, in place.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>read_head</code></span>
 </li>
-<li><code>clean_audio_tags</code> <span style="color:var(--muted)">line 134</span> &middot; Report which tag blocks a file carries, without modifying it.
+<li><code>clean_audio_tags</code> <span style="color:var(--muted)">line 155</span> &middot; Report which tag blocks a file carries, without modifying it.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>read_head</code></span>
 </li>
 </ul>
@@ -130,7 +130,7 @@
 <a href="audio.src.html#fn-clean_audio_tags">
 <rect x="337.5" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="416.0" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">clean_audio_tags</text>
-<text x="416.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 134</text>
+<text x="416.0" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 155</text>
 </a>
 <rect x="20.0" y="104.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -149,12 +149,12 @@
 flowchart TD
     n_read_head[&quot;read_head&lt;br/&gt;line 57&quot;]
     n_clean_audio_file([&quot;clean_audio_file&lt;br/&gt;line 81&quot;])
-    n_clean_audio_tags([&quot;clean_audio_tags&lt;br/&gt;line 134&quot;])
+    n_clean_audio_tags([&quot;clean_audio_tags&lt;br/&gt;line 155&quot;])
     n_clean_audio_file --&gt; n_read_head
     n_clean_audio_tags --&gt; n_read_head
     click n_read_head href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L57&quot; &quot;open the source&quot;
     click n_clean_audio_file href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L81&quot; &quot;open the source&quot;
-    click n_clean_audio_tags href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L134&quot; &quot;open the source&quot;
+    click n_clean_audio_tags href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs#L155&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_clean_audio_file,n_clean_audio_tags entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -168,7 +168,7 @@ flowchart TD
 <tr><td><code>read_head</code> <sub>fn</sub></td><td><a href="audio.src.html#fn-read_head">57</a></td><td>Read just enough of a file to identify its container.</td></tr>
 <tr><td><code>REALISTIC</code> <sub>const</sub></td><td><a href="audio.src.html#fn-realistic">71</a></td><td>Tags written in Policy::Realistic mode.</td></tr>
 <tr><td><code>clean_audio_file</code> <sub>pub fn</sub></td><td><a href="audio.src.html#fn-clean_audio_file">81</a></td><td>Strip or replace the tags of an audio file, in place.</td></tr>
-<tr><td><code>clean_audio_tags</code> <sub>pub fn</sub></td><td><a href="audio.src.html#fn-clean_audio_tags">134</a></td><td>Report which tag blocks a file carries, without modifying it.</td></tr>
+<tr><td><code>clean_audio_tags</code> <sub>pub fn</sub></td><td><a href="audio.src.html#fn-clean_audio_tags">155</a></td><td>Report which tag blocks a file carries, without modifying it.</td></tr>
 </tbody></table>
 </section>
 </div></div>

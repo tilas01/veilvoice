@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/io.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 574 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs)
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 608 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs)
 
 ## Contents
 
@@ -67,19 +67,19 @@ bring the program down.
 
 ## What this file contains
 
-574 lines defining **7 functions** (6 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+608 lines defining **8 functions** (6 public), **1 type** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Audio` (line 151) -- Mono audio in memory.
+- `struct Audio` (line 169) -- Mono audio in memory.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Audio::duration_secs` (line 160) -- Duration in seconds.
-- `Audio::peak` (line 168) -- Peak absolute sample value.
-- `load` (line 179) -- Decode any supported audio file to mono f32.
-  - reaches: `preflight`, `read_up_to`
-- `save_wav` (line 328) -- Write mono f32 audio to a 16-bit PCM WAV file.
+- `Audio::duration_secs` (line 178) -- Duration in seconds.
+- `Audio::peak` (line 186) -- Peak absolute sample value.
+- `load` (line 197) -- Decode any supported audio file to mono f32.
+  - reaches: `preflight`, `read_up_to`, `room_for`
+- `save_wav` (line 347) -- Write mono f32 audio to a 16-bit PCM WAV file.
   - reaches: `wav_bytes`
 
 ## What calls what
@@ -96,29 +96,32 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_preflight["preflight<br/>line 106"]
-    n_duration_secs(["Audio::duration_secs<br/>line 160"])
-    n_peak(["Audio::peak<br/>line 168"])
-    n_load(["load<br/>line 179"])
-    n_read_up_to["read_up_to<br/>line 287"]
-    n_wav_bytes["wav_bytes<br/>line 308"]
-    n_save_wav(["save_wav<br/>line 328"])
+    n_room_for["room_for<br/>line 86"]
+    n_preflight["preflight<br/>line 124"]
+    n_duration_secs(["Audio::duration_secs<br/>line 178"])
+    n_peak(["Audio::peak<br/>line 186"])
+    n_load(["load<br/>line 197"])
+    n_read_up_to["read_up_to<br/>line 306"]
+    n_wav_bytes["wav_bytes<br/>line 327"]
+    n_save_wav(["save_wav<br/>line 347"])
     n_load --> n_preflight
     n_load --> n_read_up_to
+    n_load --> n_room_for
     n_save_wav --> n_wav_bytes
-    click n_preflight href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L106" "open the source"
-    click n_duration_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L160" "open the source"
-    click n_peak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L168" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L179" "open the source"
-    click n_read_up_to href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L287" "open the source"
-    click n_wav_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L308" "open the source"
-    click n_save_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L328" "open the source"
+    click n_room_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L86" "open the source"
+    click n_preflight href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L124" "open the source"
+    click n_duration_secs href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L178" "open the source"
+    click n_peak href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L186" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L197" "open the source"
+    click n_read_up_to href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L306" "open the source"
+    click n_wav_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L327" "open the source"
+    click n_save_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L347" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration_secs,n_peak,n_load,n_save_wav entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_preflight,n_wav_bytes api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_read_up_to helper
+    class n_room_for,n_read_up_to helper
 ```
 
 </details>
@@ -128,11 +131,12 @@ flowchart TD
 | Item | Line | Documentation |
 |---|---:|---|
 | `MAX_DECODED_SAMPLES` <sub>pub const</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L76) | The most decoded audio load will hold, in mono f32 samples. |
-| `preflight` <sub>pub fn</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L106) | Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file. |
-| `Audio` <sub>pub struct</sub> | [151](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L151) | Mono audio in memory. |
-| `Audio::duration_secs` <sub>pub fn</sub> | [160](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L160) | Duration in seconds. |
-| `Audio::peak` <sub>pub fn</sub> | [168](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L168) | Peak absolute sample value. |
-| `load` <sub>pub fn</sub> | [179](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L179) | Decode any supported audio file to mono f32. |
-| `read_up_to` <sub>fn</sub> | [287](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L287) | Fill as much of buf as the file has, tolerating short reads. |
-| `wav_bytes` <sub>pub fn</sub> | [308](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L308) | Encode mono f32 audio as a 16-bit PCM WAV, in memory. |
-| `save_wav` <sub>pub fn</sub> | [328](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L328) | Write mono f32 audio to a 16-bit PCM WAV file. |
+| `room_for` <sub>fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L86) | Ask for room for more samples, and say so if the machine has none. |
+| `preflight` <sub>pub fn</sub> | [124](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L124) | Reject a file whose own header carries a value that will crash the decoder, before the decoder is given the file. |
+| `Audio` <sub>pub struct</sub> | [169](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L169) | Mono audio in memory. |
+| `Audio::duration_secs` <sub>pub fn</sub> | [178](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L178) | Duration in seconds. |
+| `Audio::peak` <sub>pub fn</sub> | [186](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L186) | Peak absolute sample value. |
+| `load` <sub>pub fn</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L197) | Decode any supported audio file to mono f32. |
+| `read_up_to` <sub>fn</sub> | [306](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L306) | Fill as much of buf as the file has, tolerating short reads. |
+| `wav_bytes` <sub>pub fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L327) | Encode mono f32 audio as a 16-bit PCM WAV, in memory. |
+| `save_wav` <sub>pub fn</sub> | [347](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs#L347) | Write mono f32 audio to a 16-bit PCM WAV file. |

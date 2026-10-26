@@ -70,7 +70,7 @@ flowchart TD
     n_lib(["lib.rs<br/>301 lines"])
     n_absent["absent.rs<br/>314 lines"]
     n_devices["devices.rs<br/>383 lines"]
-    n_io["io.rs<br/>574 lines"]
+    n_io["io.rs<br/>608 lines"]
     n_kinds["kinds.rs<br/>190 lines"]
     n_live["live.rs<br/>870 lines"]
     n_meter["meter.rs<br/>166 lines"]
@@ -108,7 +108,7 @@ flowchart TD
 |---|---:|---|
 | [`absent.rs`](File-veilvoice-audio-absent) | 314 | The live modules, in a build that has no live capture. |
 | [`devices.rs`](File-veilvoice-audio-devices) | 383 | Enumerating audio devices, and guessing which of them are virtual cables. |
-| [`io.rs`](File-veilvoice-audio-io) | 574 | Reading and writing audio files. |
+| [`io.rs`](File-veilvoice-audio-io) | 608 | Reading and writing audio files. |
 | [`kinds.rs`](File-veilvoice-audio-kinds) | 190 | What the live path reports, kept apart from the live path itself. |
 | [`lib.rs`](File-veilvoice-audio-lib) | 301 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
 | [`live.rs`](File-veilvoice-audio-live) | 870 | Live microphone scrambling. |
@@ -117,7 +117,7 @@ flowchart TD
 | [`record.rs`](File-veilvoice-audio-record) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
 | [`room.rs`](File-veilvoice-audio-room) | 555 | Roadmap item 147. |
 
-**2,412 functional lines of Rust** in this crate. A functional line is a line
+**2,433 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

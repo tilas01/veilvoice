@@ -170,7 +170,7 @@
 <span class="ln" id="L95">    <span class="tok-kw">let</span> bytes = std::fs::<span class="tok-fn">read</span>(path)?;</span>
 <span class="ln" id="L96">    <span class="tok-kw">let</span> (cleaned, report) = <span class="tok-fn">clean_image_bytes</span>(&amp;bytes, policy)?;</span>
 <span class="ln" id="L97">    <span class="tok-kw">if</span> report.changed {</span>
-<span class="ln" id="L98">        std::fs::<span class="tok-fn">write</span>(path, cleaned)?;</span>
+<span class="ln" id="L98">        <span class="tok-kw">crate</span>::<span class="tok-fn">replace_with</span>(path, |fresh| <span class="tok-fn">Ok</span>(std::fs::<span class="tok-fn">write</span>(fresh, &amp;cleaned)?))?;</span>
 <span class="ln" id="L99">    }</span>
 <span class="ln" id="L100">    <span class="tok-fn">Ok</span>(report)</span>
 <span class="ln" id="L101">}</span>
