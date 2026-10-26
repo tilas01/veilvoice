@@ -87,7 +87,7 @@ pub fn clean_audio_file(path: &Path, policy: Policy) -> Result<Report, Error> {
         let bytes = std::fs::read(path)?;
         let (cleaned, report) = crate::wav::clean_wav_bytes(&bytes, policy)?;
         if report.changed {
-            std::fs::write(path, cleaned)?;
+            crate::replace_with(path, |fresh| Ok(std::fs::write(fresh, &cleaned)?))?;
         }
         return Ok(report);
     }
@@ -102,28 +102,49 @@ pub fn clean_audio_file(path: &Path, policy: Policy) -> Result<Report, Error> {
     let primary = tagged.primary_tag_type();
     // Drop the parsed view before touching the file on disk.
     drop(tagged);
-
-    // Each tag block has to be deleted from the file itself. Removing it from
-    // the in-memory `TaggedFile` and saving is not enough: saving writes the
-    // tags the value holds, it does not erase the ones already in the file.
-    for tag_type in &present {
-        report.note(format!("{tag_type:?}"));
-        tag_type
-            .remove_from_path(path, WriteOptions::default())
-            .map_err(|e| Error::Malformed(e.to_string()))?;
+    if present.is_empty() && policy != Policy::Realistic {
+        return Ok(report);
     }
 
-    if policy == Policy::Realistic {
-        // Write into the format's own preferred tag type, so the result looks
-        // like anything else that might have touched the file.
-        let mut tag = Tag::new(primary);
-        for (key, value) in REALISTIC {
-            tag.insert_text(*key, (*value).to_string());
+    // The edits are made to a copy, which replaces the original only once
+    // every one of them has succeeded (F-281).
+    crate::replace_with(path, |fresh| {
+        std::fs::copy(path, fresh)?;
+        // Each tag block has to be deleted from the file itself. Removing it
+        // from the in-memory `TaggedFile` and saving is not enough: saving
+        // writes the tags the value holds, it does not erase the ones already
+        // in the file.
+        //
+        // Through a handle opened for writing. `TagType::remove_from_path`
+        // opens the file read-only and then writes to it, so every removal
+        // failed with "failed to write to file" and no MP3, FLAC, Ogg or M4A
+        // could be cleaned at all (F-282). Only WAV, which has its own cleaner,
+        // ever worked.
+        let mut file = std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open(fresh)?;
+        for tag_type in &present {
+            report.note(format!("{tag_type:?}"));
+            tag_type
+                .remove_from(&mut file, WriteOptions::default())
+                .map_err(|e| Error::Malformed(e.to_string()))?;
         }
-        tag.save_to_path(path, WriteOptions::default())
-            .map_err(|e| Error::Malformed(e.to_string()))?;
-        report.changed = true;
-    }
+        drop(file);
+
+        if policy == Policy::Realistic {
+            // Write into the format's own preferred tag type, so the result
+            // looks like anything else that might have touched the file.
+            let mut tag = Tag::new(primary);
+            for (key, value) in REALISTIC {
+                tag.insert_text(*key, (*value).to_string());
+            }
+            tag.save_to_path(fresh, WriteOptions::default())
+                .map_err(|e| Error::Malformed(e.to_string()))?;
+            report.changed = true;
+        }
+        Ok(())
+    })?;
     Ok(report)
 }
 
@@ -252,6 +273,44 @@ mod tests {
 
         let raw = std::fs::read(&path).unwrap();
         assert!(!raw.windows(14).any(|w| w == b"Jane Real Name"));
+    }
+
+    /// A few silent MPEG-1 Layer III frames, which is an MP3 the tag library
+    /// will read, with an ID3v2 tag naming somebody.
+    fn tagged_mp3(dir: &Path) -> std::path::PathBuf {
+        let mut frame = vec![0u8; 417];
+        frame[..4].copy_from_slice(&[0xFF, 0xFB, 0x90, 0x64]);
+        let path = dir.join("call.mp3");
+        std::fs::write(&path, frame.repeat(20)).unwrap();
+        let mut tag = Tag::new(TagType::Id3v2);
+        tag.insert_text(ItemKey::TrackArtist, "Jane Real Name".into());
+        tag.save_to_path(&path, WriteOptions::default()).unwrap();
+        path
+    }
+
+    /// F-282 and F-281. An MP3's tag is removed, which never worked before,
+    /// and the copy the edits are made to leaves nothing beside the file.
+    #[test]
+    fn an_mp3_is_cleaned_through_a_copy_and_nothing_is_left_beside_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = tagged_mp3(dir.path());
+        assert!(std::fs::read(&path)
+            .unwrap()
+            .windows(14)
+            .any(|w| w == b"Jane Real Name"));
+
+        let report = clean_audio_file(&path, Policy::Strip).unwrap();
+        assert!(report.changed);
+        let raw = std::fs::read(&path).unwrap();
+        assert!(!raw.windows(14).any(|w| w == b"Jane Real Name"));
+        assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 1);
+
+        clean_audio_file(&path, Policy::Realistic).unwrap();
+        assert!(clean_audio_tags(&path)
+            .unwrap()
+            .iter()
+            .any(|t| t.contains("Id3v2")));
+        assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 1);
     }
 
     #[test]

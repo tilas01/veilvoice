@@ -89,6 +89,67 @@ impl Report {
     }
 }
 
+use std::path::Path;
+
+/// Replace the file at `path` with one that `fill` makes beside it.
+///
+/// **F-281.** Cleaning used to rewrite the file where it stood: `fs::write`
+/// truncates first and writes after, and the tag path ran several separate
+/// edits over the original. A crash, a full disk or a power cut part way
+/// through left a truncated file, and the file being cleaned is usually the
+/// only copy of a recording somebody cares about.
+///
+/// Now the new contents go into a fresh file in the same folder, made with
+/// `create_new` so nothing already there is followed or overwritten, and
+/// that file is renamed over the original only once it is complete. A rename
+/// within one folder is all or nothing, so the original is either untouched
+/// or fully replaced. `fill` is handed the fresh file's path, empty, and the
+/// original keeps its permissions. The fresh name ends with the original's,
+/// extension included, because the tag library recognises a format partly by
+/// its extension.
+pub(crate) fn replace_with(
+    path: &Path,
+    fill: impl FnOnce(&Path) -> Result<(), Error>,
+) -> Result<(), Error> {
+    let folder = match path.parent() {
+        Some(parent) if !parent.as_os_str().is_empty() => parent,
+        _ => Path::new("."),
+    };
+    let name = path
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let permissions = std::fs::metadata(path)?.permissions();
+    let stamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|since| since.as_nanos())
+        .unwrap_or(0);
+
+    let mut attempt = 0u32;
+    let fresh = loop {
+        let candidate = folder.join(format!(".{}-{stamp}-{attempt}.{name}", std::process::id()));
+        match std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&candidate)
+        {
+            Ok(_) => break candidate,
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists && attempt < 16 => {
+                attempt += 1;
+            }
+            Err(e) => return Err(e.into()),
+        }
+    };
+
+    let made = fill(&fresh)
+        .and_then(|()| Ok(std::fs::set_permissions(&fresh, permissions)?))
+        .and_then(|()| Ok(std::fs::rename(&fresh, path)?));
+    if made.is_err() {
+        let _ = std::fs::remove_file(&fresh);
+    }
+    made
+}
+
 /// Everything that can go wrong in this crate.
 #[derive(Debug)]
 #[non_exhaustive]
@@ -122,6 +183,48 @@ impl std::error::Error for Error {
         match self {
             Self::Io(e) => Some(e),
             _ => None,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// F-281. A replacement that fails part way leaves the original exactly as
+    /// it was and nothing beside it, and one that succeeds keeps its
+    /// permissions.
+    #[test]
+    fn a_failed_clean_leaves_the_original_whole() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("only copy.wav");
+        std::fs::write(&path, b"the recording").unwrap();
+
+        let failed = replace_with(&path, |fresh| {
+            std::fs::write(fresh, b"the rec")?;
+            Err(Error::Malformed("the disk filled up".into()))
+        });
+        assert!(failed.is_err());
+        assert_eq!(std::fs::read(&path).unwrap(), b"the recording");
+        assert_eq!(
+            std::fs::read_dir(dir.path()).unwrap().count(),
+            1,
+            "a part-written file was left beside the original"
+        );
+
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600)).unwrap();
+        }
+        replace_with(&path, |fresh| Ok(std::fs::write(fresh, b"cleaned")?)).unwrap();
+        assert_eq!(std::fs::read(&path).unwrap(), b"cleaned");
+        assert_eq!(std::fs::read_dir(dir.path()).unwrap().count(), 1);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mode = std::fs::metadata(&path).unwrap().permissions().mode();
+            assert_eq!(mode & 0o777, 0o600, "the original's permissions were lost");
         }
     }
 }
