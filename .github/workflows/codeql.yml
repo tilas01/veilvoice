@@ -20,9 +20,10 @@
 # compile, so this needs neither the toolchain nor the GUI's system libraries
 # and finishes in minutes.
 #
-# Findings go to the repository's Security tab. GitHub's default CodeQL setup
-# must be switched off in Settings, Code security, while this file exists:
-# the two refuse to run side by side.
+# Findings go to the repository's Security tab, and are listed in the run's
+# log and summary as well. GitHub's default CodeQL setup must be switched off
+# in Settings, Code security, while this file exists: the two refuse to run
+# side by side.
 
 name: codeql
 
@@ -70,3 +71,11 @@ jobs:
       - uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         with:
           category: /language:${{ matrix.language }}
+          output: ${{ runner.temp }}/codeql-results
+
+      # The Security tab is the only place the analysis puts its findings, and
+      # it is closed to anybody without write access. This writes each one to
+      # the log and a count per rule to the run's summary, after the upload,
+      # so a run can be read and two runs compared without the tab.
+      - name: list the findings
+        run: python3 tools/repo/sarif_summary.py "$RUNNER_TEMP/codeql-results"

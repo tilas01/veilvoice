@@ -349,6 +349,8 @@ CHECKS = [
      [sys.executable, "tools/audit/checkout_tokens.py"]),
     ("the checkout guard reads the shapes it is meant to",
      [sys.executable, "tools/audit/checkout_tokens.py", "--self-test"]),
+    ("the CodeQL findings list reads SARIF as it should",
+     [sys.executable, "tools/repo/sarif_summary.py", "--self-test"]),
     # F-241. A PowerShell function that adds to a script's variable adds to a
     # copy of its own. The screenshot script found four kinds of broken capture
     # that way and forgot every one, then exited 0. Running that script needs
