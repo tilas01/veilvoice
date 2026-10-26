@@ -672,7 +672,8 @@ pub fn preview(
                 plan: render,
                 ..Default::default()
             },
-        );
+        )
+        .map_err(|error| error.to_string())?;
         println!("  {}", ffmpeg::command_line(&argv));
         println!();
         match ffmpeg::found() {

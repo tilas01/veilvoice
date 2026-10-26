@@ -2070,7 +2070,8 @@ fn run(command: Command) -> Result<(), String> {
                     plan,
                     ..Default::default()
                 },
-            );
+            )
+            .map_err(|error| error.to_string())?;
             run_ffmpeg("Video", &argv, &out, dry_run)
         }
 
@@ -2089,7 +2090,8 @@ fn run(command: Command) -> Result<(), String> {
                 );
             }
             let out = output.unwrap_or_else(|| source.with_extension("wav"));
-            let argv = veilvoice_video::ffmpeg::extract_command(&source, &out);
+            let argv = veilvoice_video::ffmpeg::extract_command(&source, &out)
+                .map_err(|error| error.to_string())?;
             run_ffmpeg("Import", &argv, &out, dry_run)
         }
     }

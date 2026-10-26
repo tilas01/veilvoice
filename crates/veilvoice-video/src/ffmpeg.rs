@@ -130,9 +130,9 @@ pub fn command(
     audio: &Path,
     output: &Path,
     encoding: Encoding,
-) -> Vec<String> {
+) -> Result<Vec<String>, crate::Error> {
     let input = frames.join(pattern);
-    vec![
+    Ok(vec![
         "ffmpeg".to_string(),
         // Never overwrite without being asked. `-n` fails instead, which is the
         // right way round for a tool a person is running by hand over a
@@ -141,9 +141,9 @@ pub fn command(
         "-framerate".to_string(),
         encoding.plan.fps.get().to_string(),
         "-i".to_string(),
-        input.display().to_string(),
+        file_arg(&input)?,
         "-i".to_string(),
-        audio.display().to_string(),
+        file_arg(audio)?,
         "-c:v".to_string(),
         encoding
             .encoder
@@ -182,8 +182,8 @@ pub fn command(
         // Stop at whichever of the two runs out first, so a rounding error in
         // the frame count cannot leave a second of frozen picture on the end.
         "-shortest".to_string(),
-        output.display().to_string(),
-    ]
+        file_arg(output)?,
+    ])
 }
 
 /// The command that turns a **concat list** of held pictures and a WAV into a
@@ -208,8 +208,13 @@ pub fn command(
 /// ffmpeg refuses relative paths in a concat list without it. The names are
 /// ones this program wrote into a directory this program made, which is the
 /// case the switch exists for.
-pub fn concat_command(list: &Path, audio: &Path, output: &Path, encoding: Encoding) -> Vec<String> {
-    vec![
+pub fn concat_command(
+    list: &Path,
+    audio: &Path,
+    output: &Path,
+    encoding: Encoding,
+) -> Result<Vec<String>, crate::Error> {
+    Ok(vec![
         "ffmpeg".to_string(),
         // Never overwrite without being asked, the same as `command`.
         "-n".to_string(),
@@ -218,9 +223,9 @@ pub fn concat_command(list: &Path, audio: &Path, output: &Path, encoding: Encodi
         "-safe".to_string(),
         "0".to_string(),
         "-i".to_string(),
-        list.display().to_string(),
+        file_arg(list)?,
         "-i".to_string(),
-        audio.display().to_string(),
+        file_arg(audio)?,
         "-c:v".to_string(),
         encoding
             .encoder
@@ -251,8 +256,8 @@ pub fn concat_command(list: &Path, audio: &Path, output: &Path, encoding: Encodi
         "-b:a".to_string(),
         "192k".to_string(),
         "-shortest".to_string(),
-        output.display().to_string(),
-    ]
+        file_arg(output)?,
+    ])
 }
 
 /// The command that turns a veiled recording into a video with a black frame.
@@ -272,8 +277,12 @@ pub fn concat_command(list: &Path, audio: &Path, output: &Path, encoding: Encodi
 /// black costs almost nothing at any size, so there is no reason for this one
 /// to disagree with the rest of the settings: it used to be pinned at 720p,
 /// which meant asking for 4K and getting 720p with no mention of it.
-pub fn black_command(audio: &Path, output: &Path, encoding: Encoding) -> Vec<String> {
-    vec![
+pub fn black_command(
+    audio: &Path,
+    output: &Path,
+    encoding: Encoding,
+) -> Result<Vec<String>, crate::Error> {
+    Ok(vec![
         "ffmpeg".to_string(),
         "-n".to_string(),
         // A synthesised source rather than a file. `-f lavfi` is ffmpeg's own
@@ -287,7 +296,7 @@ pub fn black_command(audio: &Path, output: &Path, encoding: Encoding) -> Vec<Str
             encoding.plan.fps.get()
         ),
         "-i".to_string(),
-        audio.display().to_string(),
+        file_arg(audio)?,
         "-c:v".to_string(),
         encoding
             .encoder
@@ -309,8 +318,8 @@ pub fn black_command(audio: &Path, output: &Path, encoding: Encoding) -> Vec<Str
         // encodes black for ever. `-shortest` stops at the audio, which is the
         // only thing here with a length.
         "-shortest".to_string(),
-        output.display().to_string(),
-    ]
+        file_arg(output)?,
+    ])
 }
 
 /// The command that takes the sound out of a recording made somewhere else.
@@ -327,12 +336,12 @@ pub fn black_command(audio: &Path, output: &Path, encoding: Encoding) -> Vec<Str
 /// `-vn` rather than a stream selector, so a file with two video tracks and one
 /// audio track does the obvious thing instead of failing on a mapping the user
 /// never wrote.
-pub fn extract_command(source: &Path, output: &Path) -> Vec<String> {
-    vec![
+pub fn extract_command(source: &Path, output: &Path) -> Result<Vec<String>, crate::Error> {
+    Ok(vec![
         "ffmpeg".to_string(),
         "-n".to_string(),
         "-i".to_string(),
-        source.display().to_string(),
+        file_arg(source)?,
         // No video at all, whatever the container holds.
         "-vn".to_string(),
         // Signed 16-bit little-endian, 48 kHz. What the engine works in, so
@@ -341,8 +350,8 @@ pub fn extract_command(source: &Path, output: &Path) -> Vec<String> {
         "pcm_s16le".to_string(),
         "-ar".to_string(),
         "48000".to_string(),
-        output.display().to_string(),
-    ]
+        file_arg(output)?,
+    ])
 }
 
 /// Containers OBS writes, which [`extract_command`] can take the sound out of.
@@ -363,6 +372,26 @@ pub fn is_container(path: &Path) -> bool {
         .and_then(|e| e.to_str())
         .map(|e| e.to_ascii_lowercase())
         .is_some_and(|e| OBS_CONTAINERS.contains(&e.as_str()))
+}
+
+/// A path as ffmpeg must be given it: whole, and read as a file.
+///
+/// **F-283.** Paths went to ffmpeg as `display().to_string()`. A relative
+/// path starting with `-` was read as an option, one with a colon in it, such
+/// as `rtmp:x` or `concat:a|b`, as a protocol, and a name that is not UTF-8
+/// was quietly altered, so a different file was read or written. The `file:`
+/// prefix makes ffmpeg treat the rest as a file name whatever it looks like,
+/// including a frame pattern or a concat list, and a name that cannot be
+/// passed exactly is refused rather than changed.
+pub(crate) fn file_arg(path: &Path) -> Result<String, crate::Error> {
+    let text = path.to_str().ok_or_else(|| {
+        crate::Error::Malformed(format!(
+            "{} is not a name ffmpeg can be given exactly; rename it, or choose \
+             a folder whose name is plain text",
+            path.display()
+        ))
+    })?;
+    Ok(format!("file:{text}"))
 }
 
 /// The command as one line, for printing.
@@ -410,12 +439,13 @@ mod tests {
             Path::new("talk.veiled.wav"),
             Path::new("talk.mp4"),
             Encoding::default(),
-        );
+        )
+        .unwrap();
         assert!(argv.contains(&"-shortest".to_string()));
         assert!(argv.iter().any(|a| a.starts_with("color=c=black")));
         assert!(argv.contains(&"lavfi".to_string()));
         assert!(argv.contains(&"-n".to_string()), "never overwrite silently");
-        assert_eq!(argv.last().unwrap(), "talk.mp4");
+        assert_eq!(argv.last().unwrap(), "file:talk.mp4");
         assert!(
             argv.contains(&"yuv420p".to_string()),
             "without this a great many devices refuse to play the result"
@@ -427,7 +457,7 @@ mod tests {
     /// two, and a stream selector written for one fails on the other.
     #[test]
     fn extracting_audio_discards_the_picture_and_keeps_the_rate() {
-        let argv = extract_command(Path::new("stream.mkv"), Path::new("stream.wav"));
+        let argv = extract_command(Path::new("stream.mkv"), Path::new("stream.wav")).unwrap();
         assert!(
             argv.contains(&"-vn".to_string()),
             "-vn drops every video stream"
@@ -435,7 +465,43 @@ mod tests {
         assert!(argv.contains(&"pcm_s16le".to_string()));
         assert!(argv.contains(&"48000".to_string()));
         assert!(argv.contains(&"-n".to_string()));
-        assert_eq!(argv.last().unwrap(), "stream.wav");
+        assert_eq!(argv.last().unwrap(), "file:stream.wav");
+    }
+
+    /// F-283. Every path in every command reaches ffmpeg as a file, so a
+    /// name that looks like an option or a protocol is still a file name, and
+    /// a name that cannot be passed exactly is refused.
+    #[test]
+    fn every_path_reaches_ffmpeg_as_a_file() {
+        let odd_in = Path::new("-y");
+        let odd_out = Path::new("concat:a|b");
+        let all = [
+            command(
+                odd_in,
+                "frame-%05d.png",
+                odd_in,
+                odd_out,
+                Encoding::default(),
+            )
+            .unwrap(),
+            concat_command(odd_in, odd_in, odd_out, Encoding::default()).unwrap(),
+            black_command(odd_in, odd_out, Encoding::default()).unwrap(),
+            extract_command(odd_in, odd_out).unwrap(),
+        ];
+        for argv in &all {
+            assert!(
+                !argv.iter().any(|a| a == "-y" || a == "concat:a|b"),
+                "{argv:?}"
+            );
+            assert_eq!(argv.last().map(String::as_str), Some("file:concat:a|b"));
+        }
+
+        #[cfg(unix)]
+        {
+            use std::os::unix::ffi::OsStrExt;
+            let odd = Path::new(std::ffi::OsStr::from_bytes(b"out\xff.wav"));
+            assert!(extract_command(Path::new("in.mkv"), odd).is_err());
+        }
     }
 
     #[test]
@@ -457,8 +523,9 @@ mod tests {
             Path::new("in.wav"),
             Path::new("out.mp4"),
             Encoding::default(),
-        );
-        let take = extract_command(Path::new("in.mkv"), Path::new("out.wav"));
+        )
+        .unwrap();
+        let take = extract_command(Path::new("in.mkv"), Path::new("out.wav")).unwrap();
         assert!(
             make.contains(&"-c:a".to_string()),
             "the video carries audio"
@@ -480,6 +547,7 @@ mod tests {
             Path::new("/tmp/out.mp4"),
             Encoding::default(),
         )
+        .unwrap()
     }
 
     #[test]
@@ -557,14 +625,17 @@ mod tests {
             Path::new("/audio.wav"),
             Path::new("/out.mp4"),
             encoding.clone(),
-        );
+        )
+        .unwrap();
         let concat = concat_command(
             Path::new("/list.txt"),
             Path::new("/audio.wav"),
             Path::new("/out.mp4"),
             encoding.clone(),
-        );
-        let black = black_command(Path::new("/audio.wav"), Path::new("/out.mp4"), encoding);
+        )
+        .unwrap();
+        let black =
+            black_command(Path::new("/audio.wav"), Path::new("/out.mp4"), encoding).unwrap();
 
         /// The value after a switch, or nothing if the switch is absent.
         fn after<'a>(argv: &'a [String], switch: &str) -> Option<&'a str> {
@@ -636,13 +707,15 @@ mod tests {
             Path::new("/audio.wav"),
             Path::new("/out.mp4"),
             encoding.clone(),
-        );
+        )
+        .unwrap();
         let at = frames.iter().position(|part| part == "-vf").unwrap();
         assert!(frames[at + 1].contains("3840:2160"), "{:?}", frames[at + 1]);
         let at = frames.iter().position(|part| part == "-framerate").unwrap();
         assert_eq!(frames[at + 1], "60");
 
-        let black = black_command(Path::new("/audio.wav"), Path::new("/out.mp4"), encoding);
+        let black =
+            black_command(Path::new("/audio.wav"), Path::new("/out.mp4"), encoding).unwrap();
         let source = black
             .iter()
             .find(|part| part.starts_with("color="))
@@ -669,7 +742,8 @@ mod tests {
             Path::new("/home/somebody/My Videos/out.wav"),
             Path::new("/home/somebody/My Videos/out.mp4"),
             Encoding::default(),
-        );
+        )
+        .unwrap();
         for part in &argv {
             if part.contains(' ') {
                 let quoted = format!("\"{part}\"");
