@@ -46,11 +46,11 @@ longer offered as the explanation for anything.
 Run on `main` at 5a808308, the first commit after the history was rewritten,
 signed and made the only branch. Every crate, the website, the wiki tools and
 the workflows were read again for anything from a syntax slip to a security
-hole. Six findings are fixed here. The rest are smaller or belong to work that
-is already in hand, and are listed in the project's audit notes rather than
-written up before they are fixed.
+hole. Eight findings are fixed here. The rest are smaller or belong to work
+that is already in hand, and are listed in the project's audit notes rather
+than written up before they are fixed.
 
-Three of the six are in the decoy passphrase and the lock around it, which is
+Three of the eight are in the decoy passphrase and the lock around it, which is
 where the last two rounds found their worst defects too. That is not a
 coincidence: the decoy is the newest code that makes a promise about what an
 observer cannot learn, and a promise of that kind is broken by any difference at
@@ -190,6 +190,123 @@ that keeps its token without a stated reason, and on a reason that no longer
 applies, and its `--self-test` covers the shapes it must tell apart.
 `tools/audit/publishing.py` still requires the notes waiver to be tied to the
 dry run in the new form.
+
+### F-277: four documents the website's renderer could not finish
+
+**Where:** `website/js/markdown.js`, the block loop in `render`;
+`tools/site/wiki_site.py`, `render`; every job in every workflow.
+
+**What happened:** `<details><summary>x</summary>` on one line stopped the
+renderer dead. So did a `<summary>` with no closing tag, anything typed after a
+closing `</details>`, and a heading holding U+2028. Not slowly: the loop stopped
+advancing and never came back.
+
+The block dispatch recognises three exact shapes of the collapsed-section tags,
+a whole line reading `<details>`, a whole line reading `</details>`, and a whole
+line that is one `<summary>` element, because an attribute is where markup gets
+into a page and those tags need none. Anything else falls through to the
+paragraph collector, and that collector refuses to take a line beginning with
+one of those tags, so that the tag handlers above get it. Both of those rules
+are right on their own. Together they leave a gap: a line neither will take
+moves the line index nowhere, and the loop reads it again.
+
+That is the whole defect, and it is worth stating as a shape rather than as four
+documents. Two correct rules about who handles a line, and nothing that says
+somebody must.
+
+**Why it is worse than a wrong rendering.** `website/js/repo.js` fetches
+README.md over the network and renders it on the main thread, so a document the
+renderer cannot finish is a frozen tab: a denial of service against the reader,
+from text the page went and asked for. `tools/site/wiki_site.py` renders every
+wiki page through the same renderer in CI, with no `subprocess` timeout, and no
+workflow in this repository set `timeout-minutes` on any job, so GitHub's
+six-hour default was the only limit either one had. Six hours of a job reading
+as green-pending is the worst way to learn this: a run that hangs that long
+looks like a fault of the runner and gets retried, where a failure gets read.
+
+The README writes eleven collapsed sections, all of them in the three shapes
+that work, which is why nothing had hit this yet.
+
+**Fix:** the guarantee is structural rather than a list of four shapes. A pass
+of the block loop that consumed nothing now emits the line as the text it is,
+escaped, and advances. Every pass moves the index, so no document can stop it,
+including the one nobody has thought of yet. Two things fall out of that and are
+fixed with it: `<details><summary>x</summary>` on one line is read as the two
+lines it means, because it is the shape a person writing a collapsed section by
+hand reaches for and literal tag text on the front page would be a defect of its
+own; and the heading pattern matches `[^\n]` rather than `.`, which does not
+match U+2028, so a line separator inside a heading is a character of its text
+like any other.
+
+Beside that, two limits. `wiki_site.py` gives the renderer 120 seconds and says
+what it means when that expires. Every job in every workflow now carries a
+`timeout-minutes` sized to what it does, from 20 for the wiki pages to 240 for
+the scheduled mutation campaign.
+
+**Regression test:** the four documents, and six more around them, are in the
+hostile corpus in `tools/site-tests/markdown.hostile.test.js`, which had no
+collapsed-section case at all. That absence had a cause: `ALLOWED_TAGS`, the
+list of everything the renderer may emit, did not include `details` or
+`summary`, so a case that exercised them would have failed on the renderer
+doing its job. The audit read that the other way round, as the suite not
+covering the markup the README uses eleven times, and it was right. The fuzz
+campaign gets the tags and both line separators as fragments; it could produce
+`<` and `>` before but never happened on the exact word between them.
+
+How it is measured matters as much as what. A loop that does not advance is
+synchronous and cannot be interrupted: no timer, signal or `await` gets control
+back, so a suite that rendered these in its own process would **hang rather than
+fail**, which is the outcome this finding is about. `render-probe.js` therefore
+renders the whole corpus in a process of its own, naming each document before it
+starts and writing that name with `fs.writeSync`, because `console.log` to a
+pipe is buffered and a buffer dies with the process. The parent kills it on a
+timeout and reports the last name printed, which is the document that would not
+finish. That check runs first and the in-process checks are skipped if it fails,
+because they would hang on the same document and the failure would never be
+printed. Inverting the fix is how that was found: the first attempt reported the
+hang correctly and then hung anyway on the next check.
+
+**The guard:** `tools/audit/job_limits.py` fails on any job in any workflow with
+no `timeout-minutes` of its own, or one above the 240 minutes this project has
+any use for. It runs in `tools/verify.py` and in `ci.yml` with its `--self-test`
+beside it, and it earned its place immediately: two security workflows landed
+from another thread while this was being written and it named both.
+
+### F-278: the questions page told readers to delete the file that holds their recordings' key
+
+**Where:** `docs/FAQ.md`, under "What happens if I forget a passphrase?", and
+`website/faq.html`, which is generated from it.
+
+**What happened:** the answer ended "The app lock can be removed by deleting its
+file, which does not affect encrypted recordings." Both halves of that are
+wrong, and the second is the dangerous one.
+`crates/veilvoice-crypto/src/reset.rs` says it plainly in its own module note:
+"somebody resetting a misconfigured interface wants their recordings afterwards,
+and the recordings are sealed with the lock. Losing it would mean losing them."
+The lock is not only the thing that asks for a password. It holds the key, so
+the file the page sent a reader to delete is the file their recordings cannot be
+opened without.
+
+A reader reaching that answer has, by definition, forgotten a passphrase and is
+looking for a way round it. It is the page's worst possible place for this
+sentence, and nothing would have warned them: deleting a file by hand does not
+go through `reset`, so none of the confirmations, the list of what is about to
+go, or the mark against what has no copy anywhere applies.
+
+**Fix:** the answer now says not to delete the file and why, and points at
+`veilvoice reset`, which shows everything it would remove before it removes any
+of it, and at `veilvoice reset --keep-keys`, which leaves the lock alone so that
+recordings already sealed under it can still be opened. The window's own route
+to the same thing is named in the same words `docs/COMMANDS.md` uses for it.
+
+**No guard, and why.** The rule here would be that a claim about what the lock
+does matches what the lock does, and nothing can read the one off the other. The
+guards in `tools/audit` that compare a document with the tree compare things
+with a shape: a command against the parser, a documented path against the
+layout, a network claim against the call. "Deleting this is harmless" has no
+such counterpart in the source. What stands in a guard's place here is that
+`reset.rs` had the correct sentence in its module note all along, where anybody
+writing about the lock would find it.
 
 ## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
 
@@ -11747,7 +11864,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and seventy-six defects found and fixed (F-1 to F-276), across
+**Two hundred and seventy-eight defects found and fixed (F-1 to F-278), across
 thirty-five rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

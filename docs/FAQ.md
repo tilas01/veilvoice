@@ -298,5 +298,19 @@ sending it to a graphics card and back costs more than doing it.
 ## What happens if I forget a passphrase?
 
 The recording stays sealed. There is no recovery, no backdoor and no reset,
-because any of those would be a way in for somebody else too. The app lock can
-be removed by deleting its file, which does not affect encrypted recordings.
+because any of those would be a way in for somebody else too.
+
+Do not delete the app lock's file to get past it. The lock is not only the
+thing that asks for a password: it holds the key your recordings are sealed
+with, so deleting the file destroys every recording made under it, and nothing
+asks you to confirm. If the password itself is what you have forgotten, it
+cannot be changed without it, for the same reason the recordings cannot be
+opened without theirs.
+
+If you want to start again, `veilvoice reset` is the way to do it. It lists
+everything it would remove, and how much of it there is, before it removes
+anything, and it marks what has no copy anywhere. `veilvoice reset
+--keep-keys` does the same but leaves the app lock alone, so recordings already
+sealed under it can still be opened afterwards. In the window it is under
+Settings, in the Storage section, which shows the same list and asks for the
+same word.

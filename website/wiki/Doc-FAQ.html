@@ -156,7 +156,9 @@
 <h2 id="do-i-need-a-gpu-or-the-internet">Do I need a GPU, or the internet?</h2>
 <p>Neither. It runs on the processor, offline, and the hardware report says what it found and why the engine does not use it: the work per frame is small and sending it to a graphics card and back costs more than doing it.</p>
 <h2 id="what-happens-if-i-forget-a-passphrase">What happens if I forget a passphrase?</h2>
-<p>The recording stays sealed. There is no recovery, no backdoor and no reset, because any of those would be a way in for somebody else too. The app lock can be removed by deleting its file, which does not affect encrypted recordings.</p>
+<p>The recording stays sealed. There is no recovery, no backdoor and no reset, because any of those would be a way in for somebody else too.</p>
+<p>Do not delete the app lock's file to get past it. The lock is not only the thing that asks for a password: it holds the key your recordings are sealed with, so deleting the file destroys every recording made under it, and nothing asks you to confirm. If the password itself is what you have forgotten, it cannot be changed without it, for the same reason the recordings cannot be opened without theirs.</p>
+<p>If you want to start again, <code>veilvoice reset</code> is the way to do it. It lists everything it would remove, and how much of it there is, before it removes anything, and it marks what has no copy anywhere. <code>veilvoice reset --keep-keys</code> does the same but leaves the app lock alone, so recordings already sealed under it can still be opened afterwards. In the window it is under Settings, in the Storage section, which shows the same list and asks for the same word.</p>
 <p style="color:var(--muted);margin-top:40px">This page is also <a href="https://github.com/tilas01/veilvoice/wiki/Doc-FAQ" rel="noopener noreferrer">Doc-FAQ in the GitHub wiki</a>, and both are generated from the same document in the repository.</p>
 </div>
 </div>

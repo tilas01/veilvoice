@@ -30,11 +30,17 @@
 
 "use strict";
 
+const { execFileSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.resolve(__dirname, "..", "..");
+
+// Generous, because this is not a stopwatch on the renderer: it is the line
+// between "slow machine" and "will never finish". The whole corpus renders in
+// well under a second.
+const PROBE_TIMEOUT_MS = 60000;
 
 function loadRenderer() {
   const src = fs.readFileSync(path.join(ROOT, "website", "js", "markdown.js"), "utf8");
@@ -52,7 +58,14 @@ const ALLOWED_TAGS = new Set([
   "p", "br", "hr", "h1", "h2", "h3", "h4", "h5", "h6",
   "strong", "em", "code", "pre", "blockquote",
   "ul", "ol", "li", "a", "img", "span",
-  "table", "thead", "tbody", "tr", "th", "td"
+  "table", "thead", "tbody", "tr", "th", "td",
+  // `<details>` and `<summary>` are the one piece of raw HTML the documents
+  // use and the renderer passes three exact shapes of them through. Leaving
+  // them off this list is why no `<details>` case could be written here: the
+  // suite would have called the renderer doing its job a violation. The audit
+  // read that the other way round, as the renderer not being tested on the
+  // markup the README uses eleven times, and it was right.
+  "details", "summary"
 ]);
 
 const ALLOWED_ATTRS = new Set(["href", "src", "alt", "class", "rel"]);
@@ -180,8 +193,33 @@ const HOSTILE = [
   ["asterisk soup", '*'.repeat(200)],
   ["pipe soup", '|'.repeat(200) + '\n' + '-|'.repeat(100)],
   ["mixed markers", '#'.repeat(50) + ' <script>x</script>'],
-  ["an anchor inside inline code inside a link", '[`</code><script>alert(1)</script>`](http://example.com)']
+  ["an anchor inside inline code inside a link", '[`</code><script>alert(1)</script>`](http://example.com)'],
+
+  // Collapsed sections. The README writes eleven of them and this file had no
+  // case for one, which is how four documents that stopped the renderer dead
+  // reached a published page. Each of these looped forever: the block
+  // dispatch recognised three exact shapes of the tags and nothing else,
+  // while the paragraph collector refused any line that started with one, so
+  // a line neither would take left the index where it was. They are kept as
+  // hostile input because that is what they are over the network: `repo.js`
+  // renders README.md as fetched from GitHub, so a document that freezes this
+  // renderer is a denial of service against the reader.
+  ["a details and summary on one line", '<details><summary>x</summary>'],
+  ["a summary that is never closed", '<summary>x'],
+  ["text after a closing details", '</details>junk'],
+  ["a heading holding a line separator", '# head\u2028ing'],
+  ["a summary with no details around it", '<summary>alone</summary>\n\ntext'],
+  ["a details with an attribute", '<details open>\nbody\n</details>'],
+  ["a summary carrying markup", '<details>\n<summary><img src=x onerror=alert(1)></summary>\n</details>'],
+  ["a details tag that never closes", '<details>\n<summary>s</summary>\nbody'],
+  ["a closing details with nothing open", '</details>\n\ntext'],
+  ["a line separator at every position", 'a\u2028'.repeat(200)]
 ];
+
+// Every document this suite knows about. `render-probe.js` renders this list
+// in a process of its own so that a renderer which stops advancing is a
+// reported failure rather than a hung job.
+const DOCUMENTS = HOSTILE;
 
 // --- randomised campaign ---------------------------------------------------
 
@@ -190,7 +228,13 @@ const FRAGMENTS = [
   "data:text/html", '"', "'", "<", ">", "&", "&quot;", "&#106;", "`", "```",
   "[", "]", "(", ")", "!", "*", "**", "_", "#", ">", "|", "---", "\n", " ",
   "0", " 1 ", " 2 ", "\t", "\u0000", "\\", "%", "%22", "//evil.example",
-  "http://example.com", "</a>", "</code>", "<svg", "onload=", "-->", "<!--"
+  "http://example.com", "</a>", "</code>", "<svg", "onload=", "-->", "<!--",
+  // The collapsed-section tags, and the line separator that `.` does not
+  // match. Without these the campaign could not reach the shapes that hung
+  // the renderer: it can produce `<` and `>` but never happens on the exact
+  // word between them.
+  "<details>", "</details>", "<summary>", "</summary>", "<details open>",
+  "\u2028", "\u2029"
 ];
 
 // A tiny deterministic PRNG, so a failure can be reproduced from its seed
@@ -216,7 +260,62 @@ function generate(random) {
 
 // --- runner ----------------------------------------------------------------
 
+/**
+ * Every document finishes rendering, measured from outside.
+ *
+ * This runs first and deliberately so. The checks below render in this
+ * process, and a document the renderer cannot finish would take the suite with
+ * it, so the thing that proves the renderer still advances cannot itself be
+ * one of them. A timeout here names the document that would not finish, from
+ * the last name the probe managed to write.
+ */
+function everyDocumentFinishes() {
+  const probe = path.join(__dirname, "render-probe.js");
+  let out;
+  try {
+    out = execFileSync(process.execPath, [probe],
+                       { encoding: "utf8", timeout: PROBE_TIMEOUT_MS });
+  } catch (e) {
+    const printed = String(e.stdout || "").trim().split("\n");
+    const last = printed[printed.length - 1] || "nothing at all";
+    if (e.killed || e.signal) {
+      console.log(`FAIL the renderer did not finish within ` +
+                  `${PROBE_TIMEOUT_MS / 1000}s, and stopped advancing on: ${last}`);
+      console.log("     every pass of the block loop in markdown.js must move");
+      console.log("     the line index. A pass that consumes nothing emits the");
+      console.log("     line as escaped text and advances.");
+    } else {
+      console.log(`FAIL the render probe failed: ${e.message.split("\n")[0]}`);
+    }
+    return 1;
+  }
+  if (!out.includes("every document finished")) {
+    console.log("FAIL the render probe stopped early:");
+    console.log(`     ${out.trim().split("\n").slice(-2).join(" / ")}`);
+    return 1;
+  }
+  const threw = out.split("\n").filter((l) => l.startsWith("threw "));
+  if (threw.length) {
+    console.log(`FAIL ${threw.length} document(s) made the renderer throw:`);
+    threw.slice(0, 5).forEach((l) => console.log(`     ${l}`));
+    return 1;
+  }
+  console.log(`  every one of the ${DOCUMENTS.length} documents finished, ` +
+              "measured in a process of its own");
+  return 0;
+}
+
 function run() {
+  // Nothing below this line can run if the renderer cannot finish: the checks
+  // that follow render in this process, so they would hang on the same
+  // document the probe has just reported, and the reported failure would
+  // never be printed. Inverting the fix to prove this check catches it is
+  // exactly how that was found.
+  if (everyDocumentFinishes()) {
+    console.log("     the checks that render in this process are skipped, " +
+                "because they would hang too");
+    return 1;
+  }
   let failures = 0;
 
   for (const [name, source] of HOSTILE) {
@@ -265,6 +364,6 @@ function run() {
   return failures;
 }
 
-module.exports = { run, name: "markdown renderer, hostile input" };
+module.exports = { run, name: "markdown renderer, hostile input", DOCUMENTS };
 
 if (require.main === module) { process.exit(run() ? 1 : 0); }

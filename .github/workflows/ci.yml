@@ -37,6 +37,7 @@ jobs:
   test:
     name: test / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -176,6 +177,7 @@ jobs:
   narrow:
     name: 32-bit / ${{ matrix.target }}
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -272,6 +274,7 @@ jobs:
   browser:
     name: the browser build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       # The wasm build is checked, not shipped, so a warning here is a defect
       # like any other. One was found writing this job: `veilvoice-video`
@@ -312,6 +315,7 @@ jobs:
   assets:
     name: generated assets are current (python ${{ matrix.python }})
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -516,6 +520,15 @@ jobs:
       - name: Every action a workflow runs must be pinned to a commit
         run: python tools/audit/actions.py
 
+      # Six hours is the default when a job sets no limit, and nothing here
+      # takes six hours. A job that reaches it has stopped making progress,
+      # and a run that hangs that long reads as an infrastructure fault and
+      # gets retried rather than read.
+      - name: Every workflow job must say how long it may take
+        run: |
+          python tools/audit/job_limits.py
+          python tools/audit/job_limits.py --self-test
+
       # The same runner, and the token on it. A checkout leaves the token in
       # `.git/config` unless told not to, where any build script that runs
       # afterwards can read it. Only the workflows that push through origin
@@ -713,6 +726,7 @@ jobs:
   site:
     name: website tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -747,6 +761,7 @@ jobs:
   fuzz:
     name: parser campaigns
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -767,6 +782,7 @@ jobs:
   audit:
     name: dependency advisories
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     # Over the top-level `contents: read`, because `audit-check` reports what it
     # finds as a check run and opens an issue for a new advisory. Without these
     # it still scans and still fails the job; it just cannot say where.
@@ -798,6 +814,7 @@ jobs:
   offline:
     name: no network dependencies
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -904,6 +921,7 @@ jobs:
   offline-runtime:
     name: the built program opens no network socket
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -1066,6 +1084,7 @@ jobs:
   rsa-usage:
     name: no RSA private-key operations
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -1084,6 +1103,7 @@ jobs:
     name: every commit is tilas01's and signed
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:

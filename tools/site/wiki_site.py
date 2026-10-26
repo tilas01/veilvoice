@@ -249,6 +249,17 @@ def resolve_links(text, page, already, ours):
     return out
 
 
+# How long the renderer gets. The whole wiki renders in a second or two, so
+# this is not a stopwatch on it: it is the line between a slow machine and a
+# render that is never going to return. Without it a renderer that stopped
+# advancing took the whole job with it, and because no workflow here set
+# `timeout-minutes` either, that was six hours of a job that reads as an
+# infrastructure fault and gets retried rather than read. Four documents could
+# do exactly that before `website/js/markdown.js` was made to advance on every
+# pass, and the point of a limit is the one nobody has found yet.
+RENDER_TIMEOUT = 120
+
+
 def render(pages):
     """Markdown to HTML, through the renderer the website already ships."""
     driver = os.path.join(HERE, "render_markdown.js")
@@ -256,7 +267,17 @@ def render(pages):
         done = subprocess.run(
             ["node", driver],
             input=json.dumps(pages).encode("utf-8"),
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=ROOT)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=ROOT,
+            timeout=RENDER_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        raise SystemExit(
+            "rendering the wiki did not finish within %d seconds, so the\n"
+            "  renderer in website/js/markdown.js stopped advancing on one of\n"
+            "  the %d page(s). Every pass of its block loop must move the line\n"
+            "  index; a pass that consumes nothing emits the line as escaped\n"
+            "  text and advances. tools/site-tests/markdown.hostile.test.js\n"
+            "  names the document when run."
+            % (RENDER_TIMEOUT, len(pages)))
     except OSError as error:
         raise SystemExit(
             "node is needed to render the wiki, because the renderer is the\n"

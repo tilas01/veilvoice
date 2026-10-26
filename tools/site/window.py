@@ -176,8 +176,10 @@ def installed_bindgen():
         return None
     try:
         done = subprocess.run([exe, "--version"], capture_output=True,
-                              check=False)
-    except OSError:
+                              check=False, timeout=30)
+    except (OSError, subprocess.TimeoutExpired):
+        # A tool that will not even say its version is a tool this cannot use,
+        # and waiting on it is how a build job becomes a six-hour one.
         return None
     found = re.search(r"(\d+\.\d+\.\d+)", (done.stdout or b"").decode("utf-8",
                                                                      "replace"))

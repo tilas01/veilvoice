@@ -51,6 +51,7 @@ jobs:
   release:
     name: which release to publish
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     # A failed release is not a reason to publish. Pressing the button is.
     if: >-
       github.event_name != 'workflow_run' ||
@@ -96,6 +97,7 @@ jobs:
     needs: release
     if: needs.release.outputs.tag != ''
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     # `configure-pages` reads the site's settings to find its address, which
     # needs read access to Pages and nothing more.
     permissions:
@@ -159,6 +161,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     # Publishing the uploaded site is the one write this workflow makes, and
     # `id-token` is how `deploy-pages` proves to Pages which run it came from.
     permissions:

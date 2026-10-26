@@ -333,6 +333,15 @@ CHECKS = [
     # and a token.
     ("every action a workflow runs is pinned to a commit",
      [sys.executable, "tools/audit/actions.py"]),
+    # A job with no `timeout-minutes` runs until GitHub's six-hour default
+    # kills it, and nothing here takes six hours. The job that reaches it has
+    # stopped making progress, and six hours later it reads as a fault of the
+    # runner rather than of the code, so it gets retried instead of read. The
+    # renderer that could not finish four documents is why this is a check.
+    ("every workflow job says how long it may take",
+     [sys.executable, "tools/audit/job_limits.py"]),
+    ("that guard catches a job with no limit",
+     [sys.executable, "tools/audit/job_limits.py", "--self-test"]),
     # And the token on that runner. `actions/checkout` leaves it in the
     # checkout's git configuration by default, where every later step can read
     # it, including the build scripts of every crate compiled after it.
