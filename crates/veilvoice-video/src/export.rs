@@ -489,6 +489,8 @@ impl Export {
     /// from standard input.
     pub fn command(&self, audio: &Path, output: &Path) -> Result<Vec<String>, Error> {
         self.checked()?;
+        let audio = crate::ffmpeg::file_arg(audio)?;
+        let output = crate::ffmpeg::file_arg(output)?;
         let mut argv: Vec<String> = vec![
             "ffmpeg".into(),
             // Never overwrite, as everywhere else in this crate.
@@ -502,12 +504,14 @@ impl Export {
             "error".into(),
             "-nostats".into(),
             // Nothing interactive: ffmpeg reads keystrokes from standard input
-            // unless told not to, and here standard input is the picture.
+            // unless told not to. Kept for an audio-only export, which reads
+            // nothing from standard input, and taken out below when the
+            // picture arrives there.
             "-nostdin".into(),
         ];
 
         if !self.content.wants_picture() {
-            argv.extend(["-i".into(), audio.display().to_string()]);
+            argv.extend(["-i".into(), audio.clone()]);
             argv.extend(["-vn".into(), "-c:a".into()]);
             argv.push(match self.audio_file {
                 AudioFile::Flac => AudioCodec::Flac.encoder().into(),
@@ -522,7 +526,7 @@ impl Export {
             // the vault's WAV has none, and a rule that holds anyway costs
             // one flag.
             argv.extend(["-map_metadata".into(), "-1".into()]);
-            argv.push(output.display().to_string());
+            argv.push(output);
             return Ok(argv);
         }
 
@@ -543,7 +547,7 @@ impl Export {
             "pipe:0".into(),
         ]);
         if self.content.wants_sound() {
-            argv.extend(["-i".into(), audio.display().to_string()]);
+            argv.extend(["-i".into(), audio.clone()]);
         }
 
         argv.extend(["-map".into(), "0:v:0".into()]);
@@ -579,7 +583,7 @@ impl Export {
             argv.extend(["-movflags".into(), "+faststart".into()]);
         }
         argv.extend(["-map_metadata".into(), "-1".into()]);
-        argv.push(output.display().to_string());
+        argv.push(output);
         Ok(argv)
     }
 
@@ -794,7 +798,34 @@ mod tests {
             value_after(&argv, "-movflags").as_deref(),
             Some("+faststart")
         );
-        assert_eq!(argv.last().map(String::as_str), Some("out"));
+        assert_eq!(argv.last().map(String::as_str), Some("file:out"));
+    }
+
+    /// F-283. A path that looks like an option or a protocol is still read
+    /// as a file, and one that cannot be passed exactly is refused.
+    #[test]
+    fn every_path_reaches_ffmpeg_as_a_file() {
+        for content in Content::ALL {
+            let export = Export {
+                content,
+                ..Export::default()
+            };
+            let argv = export
+                .command(Path::new("-y"), Path::new("concat:a|b"))
+                .unwrap();
+            if content.wants_sound() {
+                assert!(argv.iter().any(|arg| arg == "file:-y"), "{argv:?}");
+            }
+            assert!(!argv.iter().any(|arg| arg == "-y" || arg == "concat:a|b"));
+            assert_eq!(argv.last().map(String::as_str), Some("file:concat:a|b"));
+        }
+
+        #[cfg(unix)]
+        {
+            use std::os::unix::ffi::OsStrExt;
+            let odd = Path::new(std::ffi::OsStr::from_bytes(b"out\xff.wav"));
+            assert!(Export::default().command(Path::new("in.wav"), odd).is_err());
+        }
     }
 
     #[test]
@@ -817,7 +848,7 @@ mod tests {
         };
         let argv = argv(&export);
         assert!(argv.iter().any(|arg| arg == "-an"));
-        assert!(!argv.iter().any(|arg| arg == "in.wav"));
+        assert!(!argv.iter().any(|arg| arg.ends_with("in.wav")));
         assert!(value_after(&argv, "-c:a").is_none());
     }
 

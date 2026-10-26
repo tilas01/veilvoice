@@ -1457,7 +1457,8 @@ fn render_video(
     .map_err(|error| error.to_string())?;
 
     let video = with_extension(base, "mp4");
-    let argv = ffmpeg::concat_command(&written_frames.list, base, &video, encoding);
+    let argv = ffmpeg::concat_command(&written_frames.list, base, &video, encoding)
+        .map_err(|error| error.to_string())?;
 
     let Some(program) = ffmpeg::found() else {
         return Err(format!(
