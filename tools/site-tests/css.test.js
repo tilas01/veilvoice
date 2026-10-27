@@ -40,6 +40,20 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..", "..");
 const CSS_DIR = path.join(ROOT, "website", "css");
 
+/**
+ * Remove every match of `pattern`, repeating until nothing changes. One pass
+ * can join the halves of a split tag into a whole one, as `<!-<!-- -->-` does,
+ * and the result must hold no match at all.
+ */
+function untilSettled(text, pattern, by) {
+  let before;
+  do {
+    before = text;
+    text = text.replace(pattern, by);
+  } while (text !== before);
+  return text;
+}
+
 function read(name) {
   return fs.readFileSync(path.join(CSS_DIR, name), "utf8");
 }
@@ -611,7 +625,7 @@ function run() {
       const html = fs.readFileSync(path.join(ROOT, "website", name), "utf8");
       // Prose only: a `float: left` in an inline style is not a claim about
       // where something is on a phone.
-      const prose = html.replace(/<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, " ");
+      const prose = untilSettled(html, /<style[\s\S]*?<\/style>/g, "").replace(/<[^>]+>/g, " ");
       const found = prose.match(directions);
       if (found) guilty.push(`${name}: "${found[0]}"`);
     }

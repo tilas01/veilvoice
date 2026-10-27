@@ -21,6 +21,20 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const SITE = path.join(ROOT, "website");
 
 /**
+ * Remove every match of `pattern`, repeating until nothing changes. One pass
+ * can join the halves of a split tag into a whole one, as `<!-<!-- -->-` does,
+ * and the result must hold no match at all.
+ */
+function untilSettled(text, pattern, by) {
+  let before;
+  do {
+    before = text;
+    text = text.replace(pattern, by);
+  } while (text !== before);
+  return text;
+}
+
+/**
  * Every HTML page the site publishes, **discovered** rather than listed.
  *
  * This was a hardcoded list of three files, under a comment saying the checks
@@ -109,7 +123,7 @@ function run() {
   for (const page of PAGES) {
     const rel = path.relative(ROOT, page).replace(/\\/g, "/");
     const raw = fs.readFileSync(page, "utf8");
-    const html = raw.replace(/<!--[\s\S]*?-->/g, "");
+    const html = untilSettled(raw, /<!--[\s\S]*?-->/g, "");
     const problems = [];
 
     problems.push(...balance(html));
