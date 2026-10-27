@@ -529,6 +529,13 @@ jobs:
           python tools/audit/job_limits.py
           python tools/audit/job_limits.py --self-test
 
+      # A write granted at the top of a workflow goes to every job in it. It
+      # belongs on the one job that needs it, where a reviewer sees the ask.
+      - name: No workflow may grant a write to every job
+        run: |
+          python tools/audit/top_permissions.py
+          python tools/audit/top_permissions.py --self-test
+
       # The same runner, and the token on it. A checkout leaves the token in
       # `.git/config` unless told not to, where any build script that runs
       # afterwards can read it. Only the workflows that push through origin
