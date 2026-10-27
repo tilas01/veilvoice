@@ -209,6 +209,7 @@ And what it then checks:
 - **that guard catches a job with no limit**: `python tools/audit/job_limits.py --self-test`
 - **a checkout that never pushes does not keep the token**: `python tools/audit/checkout_tokens.py`
 - **the checkout guard reads the shapes it is meant to**: `python tools/audit/checkout_tokens.py --self-test`
+- **the CodeQL findings list reads SARIF as it should**: `python tools/repo/sarif_summary.py --self-test`
 - **no PowerShell function keeps a script variable's change to itself**: `python tools/audit/powershell.py`
 - **that guard catches what it claims to, as well**: `python tools/audit/powershell.py --self-test`
 - **the release step tags the commit it built**: `python tools/audit/publishing.py`
