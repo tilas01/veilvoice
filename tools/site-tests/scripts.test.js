@@ -126,7 +126,9 @@ function modules() {
 function prose(html) {
   return html
     .replace(/<!--[\s\S]*?-->/g, " ")
-    .replace(/<script[\s\S]*?<\/script>/g, " ");
+    // Case-blind, and a closing tag may carry spaces or junk before its `>`,
+    // because a browser ends the script there too.
+    .replace(/<script\b[\s\S]*?<\/script\b[^>]*>/gi, " ");
 }
 
 function run() {
