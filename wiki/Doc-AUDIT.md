@@ -41,6 +41,82 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirty-sixth round: every code scanning alert, read one at a time
+
+The repository's own CodeQL workflow replaced GitHub's default setup on
+2026-10-25, and with it came four languages instead of one and about 380 open
+alerts in the Security tab. That tab is the only place CodeQL put its findings,
+so the workflow now also lists each one in its run's log and summary
+(`tools/repo/sarif_summary.py`), which is how this round read them. A run on
+2026-10-27 at b60cc374 reported 373: 368 in the Rust, three in the website's
+test suites, two in the workflows, none in the Python. The Scorecard adds its
+own on top, one per check it marks down.
+
+Two findings are fixed here. Everything else was read and judged a false
+positive, and the reason for each group is below so that a dismissal in the tab
+can point at it.
+
+**rust/hard-coded-cryptographic-value, 363 alerts.** 349 are in tests, fuzz
+targets and examples, where a passphrase the test knows and a salt of zeros are
+what make an assertion repeatable. The other 14 are in shipped code and none is
+a key: ten are a salt, nonce or tag buffer declared as zeros and filled from
+the file being parsed or from `random_nonce` before it is used, one is the app
+lock's record being written to its file, one is the locked-memory allocator's
+backing buffer, and two are the reseal tool's
+deliberate try of the empty passphrase, which is how it finds a file sealed
+under nothing. `tools/audit/randomness.py` already requires every salt, nonce
+and seed in shipped code to come from the operating system's generator.
+
+**rust/cleartext-logging, 5 alerts.** Four are in tests and an example. The
+fifth, `guard.rs` line 240, prints how many files a guard record holds; the
+count is tainted only because the record it comes from may be sealed under a
+passphrase, and a count is not the passphrase.
+
+**actions/untrusted-checkout and actions/cache-poisoning, 2 alerts.**
+`wiki.yml` and `pages.yml` check out the release they publish, by a tag the
+previous job found with `git tag --points-at` on the commit a successful
+release run built. Only somebody who can push to this repository can create
+that tag, so the code checked out is the maintainer's own, released code.
+
+### F-284: two workflows granted a write to every job they might ever have
+
+**Where:** `.github/workflows/rewrite.yml` and `signing.yml`.
+
+**What happened:** both set `contents: write` in the top-level `permissions:`
+block, which is the default for every job in the workflow. Each has one job and
+that job does need to push, so nothing could misuse it today, but a job added
+to either would have started with write access without asking for it. The
+Scorecard's Token-Permissions check marks a workflow down for exactly this.
+
+**Fix:** the top level grants `contents: read` and the job that pushes asks for
+`contents: write` itself. What either job can do is unchanged.
+
+**Regression test:** `tools/audit/top_permissions.py` fails CI on any workflow
+whose top-level block grants a write, or that has no top-level block at all, and
+its `--self-test` covers the inline, mapped and missing shapes.
+
+### F-285: the website's tests stripped tags in a way a crafted page could slip past
+
+**Where:** `tools/site-tests/scripts.test.js`, `css.test.js` and
+`html.test.js`.
+
+**What happened:** before reading a page as prose, the suites removed its
+scripts, styles and comments with one regular expression pass each. The script
+pattern was case-sensitive and wanted `</script>` exactly, so `<SCRIPT>` or
+`</script >`, both of which a browser accepts, were left in and read as prose.
+A single pass of the comment and style patterns can also join the halves of a
+split tag into a whole one, as `<!-<!-- -->-` does. These suites only read the
+site's own pages, so nothing hostile reached them, but a check that reads a
+page differently from a browser can pass a page a browser would show
+differently.
+
+**Fix:** the script pattern ignores case and accepts anything before the
+closing `>`, and the comment and style removals repeat until nothing changes.
+
+**Regression test:** the three suites pass over all 408 pages as before, and
+CodeQL's `js/bad-tag-filter` and `js/incomplete-multi-character-sanitization`
+no longer report them.
+
 ## The thirty-fifth round: the whole project, after the signed history
 
 Run on `main` at 5a808308, the first commit after the history was rewritten,
@@ -11962,8 +12038,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and eighty-three defects found and fixed (F-1 to F-283), across
-thirty-five rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Two hundred and eighty-five defects found and fixed (F-1 to F-285), across
+thirty-six rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven
