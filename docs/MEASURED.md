@@ -35,6 +35,6 @@ it beside the workspace members for the same reason.
 | Crates in the workspace | 13 |
 | Website suites | 20 |
 | Functional lines of Rust | 76852 |
-| Findings written up in the audit | 283 |
-| Highest finding number used | 283 |
+| Findings written up in the audit | 285 |
+| Highest finding number used | 285 |
 | Measured on | `x86_64-unknown-linux-gnu` |
