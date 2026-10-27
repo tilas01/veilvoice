@@ -342,6 +342,12 @@ CHECKS = [
      [sys.executable, "tools/audit/job_limits.py"]),
     ("that guard catches a job with no limit",
      [sys.executable, "tools/audit/job_limits.py", "--self-test"]),
+    # A write granted at the top of a workflow goes to every job in it,
+    # including one added later by somebody who never read the block.
+    ("no workflow grants a write to every job",
+     [sys.executable, "tools/audit/top_permissions.py"]),
+    ("that guard catches a write at the top level",
+     [sys.executable, "tools/audit/top_permissions.py", "--self-test"]),
     # And the token on that runner. `actions/checkout` leaves it in the
     # checkout's git configuration by default, where every later step can read
     # it, including the build scripts of every crate compiled after it.

@@ -142,6 +142,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/rsa_usage.py`](../tools/audit/rsa_usage.py) | No crate reaching `pgp` may gain an RSA private-key code path |
 | [`tools/audit/state_paths.py`](../tools/audit/state_paths.py) | Find state files that one part of VeilVoice writes and another reads |
 | [`tools/audit/tables.py`](../tools/audit/tables.py) | Every row of a Markdown table has as many cells as its heading says |
+| [`tools/audit/top_permissions.py`](../tools/audit/top_permissions.py) | No workflow grants a write permission to every job at once |
 | [`tools/audit/wiki_publish.py`](../tools/audit/wiki_publish.py) | A wiki with no repository behind it skips the publish, and does not fail it |
 
 Every one of them was written after something got through. The reasoning is in [`docs/AUDIT.md`](AUDIT.md) under a finding number, which is worth reading before deciding a guard is unnecessary.
@@ -207,6 +208,8 @@ And what it then checks:
 - **every action a workflow runs is pinned to a commit**: `python tools/audit/actions.py`
 - **every workflow job says how long it may take**: `python tools/audit/job_limits.py`
 - **that guard catches a job with no limit**: `python tools/audit/job_limits.py --self-test`
+- **no workflow grants a write to every job**: `python tools/audit/top_permissions.py`
+- **that guard catches a write at the top level**: `python tools/audit/top_permissions.py --self-test`
 - **a checkout that never pushes does not keep the token**: `python tools/audit/checkout_tokens.py`
 - **the checkout guard reads the shapes it is meant to**: `python tools/audit/checkout_tokens.py --self-test`
 - **the CodeQL findings list reads SARIF as it should**: `python tools/repo/sarif_summary.py --self-test`
