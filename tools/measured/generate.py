@@ -172,9 +172,15 @@ def measured_tests() -> int:
     output = finished.stdout.decode("utf-8", errors="replace")
     if finished.returncode != 0:
         stderr = finished.stderr.decode("utf-8", errors="replace")
+        # The names of the failing tests and their panics are on stdout, under
+        # `failures:`. stderr holds only cargo's progress lines, which said
+        # which crate failed and nothing about which test, so that is all a
+        # failure here used to show.
+        failures = output[output.find("failures:"):] if "failures:" in output else ""
         raise SystemExit(
             "the tests did not pass, so there is no number to record:\n"
-            + (stderr or output)[-2000:]
+            + (failures[:4000] or output[-2000:])
+            + "\n" + stderr[-1000:]
         )
     totals = [int(n) for n in re.findall(r"^test result: ok\. (\d+) passed", output, re.M)]
     if not totals:
@@ -183,7 +189,7 @@ def measured_tests() -> int:
 
 
 def audit_findings() -> tuple[int, int]:
-    """How many findings the audit writes up, and the highest number it uses.
+    r"""How many findings the audit writes up, and the highest number it uses.
 
     A finding "exists" here when it has an entry of its own: a line beginning
     `### F-n`, or one beginning `**F-n` followed by a colon or a ` --`. Those
