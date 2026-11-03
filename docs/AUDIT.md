@@ -119,7 +119,7 @@ no longer report them.
 Run on `main` at 5a808308, the first commit after the history was rewritten,
 signed and made the only branch. Every crate, the website, the wiki tools and
 the workflows were read again for anything from a syntax slip to a security
-hole. Thirteen findings are fixed here. The rest are smaller or belong to work
+hole. Fifteen findings are fixed here. The rest are smaller or belong to work
 that is already in hand, and are listed in the project's audit notes rather than
 written up before they are fixed.
 
@@ -478,6 +478,61 @@ and read and wrote each as a file.
 **Regression test:** `every_path_reaches_ffmpeg_as_a_file`, in both modules,
 builds every command with those names and requires each to arrive prefixed,
 and a name that is not UTF-8 to be refused.
+
+### F-NNN: the updater kept its own way of replacing a running program
+
+**Where:** `crates/veilvoice-verify/src/update.rs`, `put_in_place`.
+
+**What happened:** this project has one routine for putting a program where
+somebody may be running it: `veilvoice_setup::install::replace_with_copy`,
+written for F-237 and made public for F-266. The updater had its own. It
+removed anything at `<name>.new`, copied the new program there with
+`std::fs::copy`, carried the permissions over and renamed it into place.
+`std::fs::copy` opens its destination and truncates it, so anything that
+appeared at `<name>.new` between the removal and the copy was written through
+rather than refused, and a link left at that name in the install directory had
+whatever it pointed at truncated. That is F-237 again, at a different name. The
+shared routine creates its staged file with `create_new`, which leaves no
+window to appear in. The permissions were also best effort here, so an update
+could finish and report success with a new program that had no execute bit.
+
+**Fix:** `put_in_place` calls the shared routine once per program and keeps
+only what an update needs: which programs to look for, what moved, and what
+could not be cleaned up. The Windows step that moves a running program aside
+moved down into the shared routine with it, so `veilvoice install` can now
+replace a program that is running on Windows, which it could not before. The
+third copy is gone, the staging window with it, and a permission failure now
+refuses the replacement rather than leaving a program nobody can run. F-266
+wrote this down as worth doing the next time the function was touched.
+
+**Regression test:** `the_new_program_goes_in_through_the_one_routine_that_stages_and_renames`
+reads `put_in_place` and requires the call to the shared routine, and no copy
+of its own. `the_copy_reaches_the_destination_only_by_a_rename`, in
+`veilvoice-setup`, holds the order down where the code now lives: the staged
+file is created fresh, given its permissions, and only then renamed.
+
+### F-NNN+1: a part-finished update said nothing had been replaced
+
+**Where:** `crates/veilvoice-verify/src/update.rs`, `put_in_place`.
+
+**What happened:** a release carries two programs, the command line and the
+window, and they are replaced one after the other. The failures inside that
+loop were written as though the first program were the only one: "Nothing has
+been replaced." and "nothing was replaced". Replace the command line, fail on
+the window, and the message told the reader nothing on their machine had
+changed while they were holding one program a version ahead of the other.
+Somebody told that reasonably runs the update again, or carries on using a pair
+of programs they believe match, and neither answer fits the machine they have.
+
+**Fix:** one sentence, `replaced_so_far`, says what had already gone in, and
+every failure inside the loop ends with it. It reads "Nothing was replaced."
+only when that is true.
+
+**Regression test:** `a_failure_partway_through_names_what_it_had_already_replaced`
+makes the second program's destination a directory, so no rename can go over
+it, and requires the failure to name the first program as already replaced and
+not to claim that nothing was. `what_was_already_replaced_reads_as_a_sentence`
+covers the three shapes the sentence takes.
 
 ## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
 
@@ -10365,7 +10420,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1936 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1940 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |

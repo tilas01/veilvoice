@@ -2240,18 +2240,27 @@ fn command_install(from: &Path, cli: bool, gui: bool) -> ExitCode {
             );
         }
         let target = destination.join(&file);
-        if let Err(e) = veilvoice_setup::install::replace_with_copy(&source, &target) {
-            return cannot(
-                "a binary could not be copied",
-                &[&format!(
-                    "{} -> {}: {e}",
-                    source.display(),
-                    target.display()
-                )],
-            );
-        }
+        let aside = match veilvoice_setup::install::replace_with_copy(&source, &target) {
+            Ok(aside) => aside,
+            Err(e) => {
+                return cannot(
+                    "a binary could not be copied",
+                    &[&format!(
+                        "{} -> {}: {e}",
+                        source.display(),
+                        target.display()
+                    )],
+                );
+            }
+        };
         good(&format!("installed {file}"));
         note!("{} -> {}", source.display(), target.display());
+        if let Some(old) = aside {
+            note!(
+                "the copy it replaced is still at {}. Delete it once nothing is running it.",
+                old.display()
+            );
+        }
         copied.push(file);
     }
 

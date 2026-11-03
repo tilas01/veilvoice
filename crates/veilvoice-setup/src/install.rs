@@ -245,8 +245,12 @@ fn path_contains(dir: &Path) -> bool {
     std::env::split_paths(&path).any(|entry| entry == dir)
 }
 
-/// Copy the binaries into place. Returns what was copied.
-fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
+/// Copy the binaries into place.
+///
+/// Returns what was copied, and any old copy that had to be moved aside and
+/// could not then be removed. The second list is almost always empty: see
+/// [`replace_with_copy`] for the Windows case that fills it.
+fn copy_programs(into: &Path) -> Result<(Vec<String>, Vec<PathBuf>), String> {
     let running =
         std::env::current_exe().map_err(|e| format!("cannot find this program on disk: {e}"))?;
     let source = running
@@ -256,6 +260,7 @@ fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
     std::fs::create_dir_all(into).map_err(|e| format!("cannot create {}: {e}", into.display()))?;
 
     let mut copied = Vec::new();
+    let mut left_behind = Vec::new();
     for stem in PROGRAMS {
         let name = exe_name(stem);
         let from = source.join(&name);
@@ -273,18 +278,23 @@ fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
                 into.display()
             ));
         }
-        replace_with_copy(&from, &to)
+        let aside = replace_with_copy(&from, &to)
             .map_err(|e| format!("cannot copy {} to {}: {e}", from.display(), to.display()))?;
+        left_behind.extend(aside);
         copied.push(name);
     }
     if copied.is_empty() {
         return Err("found none of the VeilVoice programs beside this one".to_string());
     }
-    Ok(copied)
+    Ok((copied, left_behind))
 }
 
 /// Put a copy of `from` at `to`, replacing whatever name is there rather than
 /// writing through it.
+///
+/// Returns the old copy's path when one had to be moved aside and could not
+/// then be removed, so the caller can say where it is. `None` is the ordinary
+/// case and means nothing was left behind.
 ///
 /// **F-237.** This was `std::fs::copy(from, to)`, which opens `to` and
 /// truncates it, following a symbolic link and writing into a hard link. On
@@ -301,16 +311,40 @@ fn copy_programs(into: &Path) -> Result<Vec<String>, String> {
 /// holding the old contents, and on Unix a `to` that is running is replaced
 /// rather than refused with "text file busy".
 ///
-/// Public because `veilvoice verify install --from` puts binaries in the same
-/// directory and had the same defect, as F-266. One implementation rather than
-/// two, so the next thing learned about replacing a running program is learned
-/// once.
-pub fn replace_with_copy(from: &Path, to: &Path) -> std::io::Result<()> {
+/// **The rename is also what makes the name safe to run during an install.** A
+/// rename within a directory is atomic, so somebody starting VeilVoice while
+/// this is working gets the old program or the new one, never a half-written
+/// file and never nothing at all. Copying onto `to` instead leaves that name
+/// incomplete for the length of a copy, which is a small window and the one a
+/// person hits by double-clicking the thing they just told to update itself.
+/// That was F-261, in the updater's own copy of this routine.
+///
+/// **The permissions are set before the rename rather than after**, so the name
+/// people run is never reachable without the bit that makes it runnable. A copy
+/// takes the destination's mode on some systems and the source's on others, and
+/// a new VeilVoice with no execute bit is a defect the extracted-archive check
+/// exists to report.
+///
+/// **On Windows the old copy moves aside first.** A running program cannot be
+/// renamed over there, but it can be renamed away, which frees the name. The
+/// copy left at `<name>.old` is then removed if Windows allows it and returned
+/// here if it does not, because a `veilvoice.old` nobody was told about is a
+/// file somebody finds in a year and cannot explain. Unix needs none of that:
+/// renaming over a running program is allowed there, and the running process
+/// keeps the file it started from.
+///
+/// Public because `veilvoice verify install --from` and `veilvoice update` both
+/// put binaries where somebody may be running them, and both carried a copy of
+/// this with a defect of its own: F-266 and F-NNN. One implementation rather
+/// than three, so the next thing learned about replacing a running program is
+/// learned once.
+pub fn replace_with_copy(from: &Path, to: &Path) -> std::io::Result<Option<PathBuf>> {
     let name = to
         .file_name()
-        .ok_or_else(|| std::io::Error::other("the destination names no file"))?;
+        .ok_or_else(|| std::io::Error::other("the destination names no file"))?
+        .to_os_string();
     let mut staged_name = std::ffi::OsString::from(".");
-    staged_name.push(name);
+    staged_name.push(&name);
     staged_name.push(".installing");
     let staged = to.with_file_name(staged_name);
     // Left by an install that was interrupted. `remove_file` removes a link
@@ -318,7 +352,7 @@ pub fn replace_with_copy(from: &Path, to: &Path) -> std::io::Result<()> {
     // that appears in between.
     let _ = std::fs::remove_file(&staged);
 
-    let written = (|| {
+    let written = (|| -> std::io::Result<()> {
         let mut source = std::fs::File::open(from)?;
         let mut copy = std::fs::OpenOptions::new()
             .write(true)
@@ -327,13 +361,43 @@ pub fn replace_with_copy(from: &Path, to: &Path) -> std::io::Result<()> {
         std::io::copy(&mut source, &mut copy)?;
         copy.sync_all()?;
         drop(copy);
-        std::fs::set_permissions(&staged, std::fs::metadata(from)?.permissions())?;
-        std::fs::rename(&staged, to)
+        std::fs::set_permissions(&staged, std::fs::metadata(from)?.permissions())
     })();
-    if written.is_err() {
+    if let Err(e) = written {
         let _ = std::fs::remove_file(&staged);
+        return Err(e);
     }
-    written
+
+    // Only on Windows, and only when there is something at that name to move.
+    // Everywhere else the rename below replaces it in one step.
+    let aside = if cfg!(windows) && to.exists() {
+        let mut old_name = name.clone();
+        old_name.push(".old");
+        let moved = to.with_file_name(old_name);
+        let _ = std::fs::remove_file(&moved);
+        if let Err(e) = std::fs::rename(to, &moved) {
+            let _ = std::fs::remove_file(&staged);
+            return Err(e);
+        }
+        Some(moved)
+    } else {
+        None
+    };
+
+    if let Err(e) = std::fs::rename(&staged, to) {
+        // Put the old one back. Failing an install and leaving no program at
+        // all is much worse than failing.
+        if let Some(moved) = &aside {
+            let _ = std::fs::rename(moved, to);
+        }
+        let _ = std::fs::remove_file(&staged);
+        return Err(e);
+    }
+
+    match aside {
+        Some(moved) if moved.exists() && std::fs::remove_file(&moved).is_err() => Ok(Some(moved)),
+        _ => Ok(None),
+    }
 }
 
 /// Add `dir` to the user's `PATH`, if it is not there already.
@@ -620,12 +684,19 @@ pub fn install() -> Result<Vec<String>, String> {
         .ok_or_else(|| "no per-user program directory could be found on this system".to_string())?;
     let mut report = Vec::new();
 
-    let copied = copy_programs(&dir)?;
+    let (copied, left_behind) = copy_programs(&dir)?;
     report.push(format!(
         "copied {} into {}",
         copied.join(", "),
         dir.display()
     ));
+    for old in &left_behind {
+        report.push(format!(
+            "the copy it replaced is still at {}, because Windows would not remove \
+             it. Delete it once nothing is running it.",
+            old.display()
+        ));
+    }
 
     match add_to_path(&dir) {
         Ok(true) => report.push(format!("added {} to your PATH", dir.display())),
@@ -1069,6 +1140,77 @@ mod tests {
             vec![std::ffi::OsString::from("veilvoice")],
             "{left:?}"
         );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    /// The destination is only ever created by a rename.
+    ///
+    /// F-261, now that this routine is the only one that replaces a running
+    /// program. The new file is created fresh under a hidden name, filled,
+    /// given its permissions and then renamed, so the name people run either
+    /// does not exist yet, holds the old program whole, or holds the new one
+    /// whole. Writing to it directly leaves it incomplete for the length of a
+    /// copy, and that is the instant somebody double-clicks the thing they
+    /// just told to update itself.
+    ///
+    /// Read out of the source rather than raced, because the window is a few
+    /// milliseconds wide and a test that has to catch it is a test that passes
+    /// on a fast machine whatever the code says. What it is a backstop for is a
+    /// tidy-up that replaces the staging with `std::fs::copy(from, to)` and one
+    /// fewer name, which looks like a simplification and is the defect.
+    #[test]
+    fn the_copy_reaches_the_destination_only_by_a_rename() {
+        let source = include_str!("install.rs").replace("\r\n", "\n");
+        let start = source
+            .find("pub fn replace_with_copy(")
+            .expect("replace_with_copy exists");
+        let end = source[start..]
+            .find("\n/// Add `dir` to the user's `PATH`")
+            .map(|at| start + at)
+            .expect("the function ends");
+        let body = &source[start..end];
+
+        let created = body
+            .find(".create_new(true)")
+            .expect("the staged file is created fresh");
+        let permissions = body
+            .find("std::fs::set_permissions(&staged")
+            .expect("the staged file is given the source's permissions");
+        let renamed = body
+            .find("std::fs::rename(&staged, to)")
+            .expect("the staged file is renamed into place");
+        assert!(
+            created < permissions && permissions < renamed,
+            "the staged file is renamed into place before it is complete or \
+             before it is runnable"
+        );
+        assert!(
+            !body.contains("std::fs::copy("),
+            "the copy is written straight to the destination, which truncates \
+             whatever is at that name and leaves it partial while it runs. That \
+             is F-237 and F-261 together."
+        );
+    }
+
+    /// Nothing is left behind on a platform that never moves the old copy.
+    ///
+    /// The returned path exists for the Windows case where a replaced program
+    /// cannot then be removed. On Unix no copy moves aside at all, so a caller
+    /// that reports what came back has nothing to report, and an update saying
+    /// "a file was left behind" on Linux would be a lie about the machine.
+    #[cfg(unix)]
+    #[test]
+    fn replacing_leaves_nothing_behind_on_unix() {
+        let dir = scratch("install-nothing-behind");
+        let from = dir.join("source");
+        std::fs::write(&from, b"new").unwrap();
+        let to = dir.join("veilvoice");
+        std::fs::write(&to, b"an older install").unwrap();
+
+        let aside = replace_with_copy(&from, &to).expect("the copy goes in");
+
+        assert!(aside.is_none(), "{aside:?}");
+        assert!(!dir.join("veilvoice.old").exists());
         std::fs::remove_dir_all(&dir).ok();
     }
 

@@ -44,8 +44,8 @@
 //! 4. **Open.** Only now, and with the system's own `tar`, into an empty
 //!    directory. What lands is hashed again against the same signed list,
 //!    because an extractor is a program too.
-//! 5. **Replace.** The binaries beside the running one are moved aside and the
-//!    new ones put in their place.
+//! 5. **Replace.** Each new binary is written beside the one it replaces and
+//!    renamed into place, through the same routine `veilvoice install` uses.
 //! 6. **Record.** The integrity record is re-taken, for the reason below.
 //! 7. **Restart**, which the caller does, because a window and a command line
 //!    part company here.
@@ -824,25 +824,25 @@ fn tar_program() -> Option<PathBuf> {
     candidates.into_iter().find(|p| p.is_file())
 }
 
-/// Write the new binaries beside the old ones and rename them into place.
+/// Put each new binary at the name people run, one program at a time.
 ///
-/// **The new file is written under a temporary name first, and only a rename
-/// puts it at the name people run.** A rename within a directory is atomic, so
-/// somebody starting VeilVoice during an update gets the old program or the new
-/// one, never a half-written file and never nothing at all.
+/// **Every replacement goes through
+/// [`veilvoice_setup::install::replace_with_copy`], which is the one routine in
+/// this project that replaces a program somebody may be running.** It writes
+/// the new file beside the old one, carries the permissions over, and only a
+/// rename puts it at the name people run; on Windows it moves the old copy
+/// aside first, because a running program cannot be renamed over there. The
+/// reasoning for all of that, and the two findings behind it, are in its own
+/// documentation.
 ///
-/// The order this had before F-261 was the other way round: the old file was
-/// renamed aside and the new one was then copied to the name it had left. That
-/// leaves the name absent for the length of a copy and then present but
-/// incomplete for the rest of it, which is exactly the window the doc comment
-/// claimed did not exist. It is a small window and it is the one a person hits
-/// by double-clicking the thing they just told to update itself.
+/// This function had a third copy of that routine until F-NNN, and the copy
+/// staged with `std::fs::copy` after a `remove_file`, so a program appearing at
+/// the staged name in between was written through rather than refused. Folding
+/// it in was written down as worth doing when F-266 removed the second copy.
 ///
-/// The old copy is still **moved, not deleted**, on Windows, and there it still
-/// has to move first: a running program cannot be overwritten or renamed over
-/// there, but it can be renamed away, which frees the name. On Unix nothing
-/// needs to move at all, because renaming over a running program is allowed and
-/// the running process keeps the inode it started from.
+/// What is left here is what only an update needs: which programs to look for,
+/// a report of the ones that moved, and an honest account of where it got to if
+/// one of them cannot be replaced.
 ///
 /// Anything that could not be cleaned up afterwards is returned rather than
 /// ignored, because a `veilvoice.old` nobody was told about is a file somebody
@@ -861,53 +861,15 @@ fn put_in_place(root: &Path, into: &Path) -> Result<(Vec<String>, Vec<PathBuf>),
             continue;
         }
         let target = into.join(&name);
-        let aside = into.join(format!("{name}.old"));
-        let staged = into.join(format!("{name}.new"));
-
-        // The new program, whole, beside the old one. Nothing anybody runs is
-        // touched yet, so a failure here changes nothing at all.
-        let _ = std::fs::remove_file(&staged);
-        if let Err(e) = std::fs::copy(&from, &staged) {
-            let _ = std::fs::remove_file(&staged);
-            return Err(Error::Replace(format!(
-                "could not write the new {name} beside the old one: {e}. Nothing \
-                 has been replaced."
-            )));
-        }
-        // Before it is anybody's program rather than after, so it is never
-        // reachable under its real name without the bit that makes it runnable.
-        carry_over_permissions(&from, &staged);
-
-        // Windows will not let a running program be renamed over, so there the
-        // old one moves away first and the name is briefly free. On Unix the
-        // rename below replaces it in one step and this does nothing.
-        let moved_aside = if cfg!(windows) && target.exists() {
-            let _ = std::fs::remove_file(&aside);
-            if let Err(e) = std::fs::rename(&target, &aside) {
-                let _ = std::fs::remove_file(&staged);
+        match veilvoice_setup::install::replace_with_copy(&from, &target) {
+            Ok(aside) => left_behind.extend(aside),
+            Err(e) => {
                 return Err(Error::Replace(format!(
-                    "could not move the old {name} aside, so nothing was replaced: {e}"
+                    "could not put the new {name} in place: {e}. The {name} you had \
+                     is still there. {}",
+                    replaced_so_far(&replaced)
                 )));
             }
-            true
-        } else {
-            false
-        };
-
-        if let Err(e) = std::fs::rename(&staged, &target) {
-            // Put it back. Failing halfway through an update and leaving no
-            // program at all is much worse than failing.
-            if moved_aside {
-                let _ = std::fs::rename(&aside, &target);
-            }
-            let _ = std::fs::remove_file(&staged);
-            return Err(Error::Replace(format!(
-                "could not put the new {name} in place: {e}. The copy you had is \
-                 still there."
-            )));
-        }
-        if moved_aside && aside.exists() && std::fs::remove_file(&aside).is_err() {
-            left_behind.push(aside);
         }
         replaced.push(name);
     }
@@ -921,25 +883,29 @@ fn put_in_place(root: &Path, into: &Path) -> Result<(Vec<String>, Vec<PathBuf>),
     Ok((replaced, left_behind))
 }
 
-/// Give the new file the mode the archive published for it.
+/// Say what an update had already put in place when it stopped.
 ///
-/// A copy takes the destination's mode on some systems and the source's on
-/// others, and a new VeilVoice without its execute bit is the defect
-/// `crate::extracted` exists to report. Best effort: a failure here leaves a
-/// file that is byte for byte correct, which the report can still be honest
-/// about, and refusing the whole update over a permission bit would be worse.
-#[cfg(unix)]
-fn carry_over_permissions(from: &Path, to: &Path) {
-    use std::os::unix::fs::PermissionsExt;
-    if let Ok(meta) = std::fs::metadata(from) {
-        let mode = meta.permissions().mode();
-        let _ = std::fs::set_permissions(to, std::fs::Permissions::from_mode(mode));
+/// **F-NNN+1.** The failures inside [`put_in_place`] said "Nothing has been
+/// replaced" and "nothing was replaced", which is true of the first program the
+/// loop reaches and false of every one after it. A release carries a command
+/// line and a window, so an update that replaced the command line and then
+/// could not replace the window told the reader that nothing had changed while
+/// one of their two programs was a version newer than the other. Somebody told
+/// that reasonably tries again, or carries on using a pair of programs they
+/// believe are the same version, and neither is what the machine looks like.
+///
+/// Said once here rather than at each failure, because a third message that
+/// forgets the loop is exactly how this came back.
+fn replaced_so_far(replaced: &[String]) -> String {
+    match replaced {
+        [] => "Nothing was replaced.".to_string(),
+        [one] => format!("{one} was already replaced and is the new version."),
+        [rest @ .., last] => format!(
+            "{} and {last} were already replaced and are the new version.",
+            rest.join(", ")
+        ),
     }
 }
-
-/// The everywhere-else half: there is no execute bit to carry over.
-#[cfg(not(unix))]
-fn carry_over_permissions(_from: &Path, _to: &Path) {}
 
 /// Re-take the integrity record over the files that were just replaced.
 ///
@@ -1384,20 +1350,22 @@ mod tests {
         std::fs::remove_dir_all(&root).ok();
     }
 
-    /// The name people run is never absent and never half-written.
+    /// An update replaces a program through the one routine that knows how.
     ///
-    /// The order this checks is the whole of the fix: the new program is
-    /// written under `<name>.new` and only a rename puts it at `<name>`, so at
-    /// every instant the name either does not exist yet, holds the old program
-    /// whole, or holds the new program whole. The order before it wrote
-    /// straight to `<name>` after moving the old one away, which leaves the
-    /// name missing for the length of a copy and incomplete for the rest.
+    /// The property being protected is that the name people run is never absent
+    /// and never half-written: the new file is written beside it and only a
+    /// rename puts it at that name. That mechanism lives in
+    /// `veilvoice_setup::install::replace_with_copy` and is held down by that
+    /// crate's own tests, including the link and hard-link cases a plain copy
+    /// got wrong. What this test holds down is the thing those tests cannot
+    /// see, which is that the updater still goes through it rather than growing
+    /// a copy of it again. It grew one twice: F-261 and F-NNN.
     ///
     /// Asserted against the source rather than by racing a thread, because the
     /// window is a few milliseconds wide and a test that has to catch it is a
     /// test that passes on a fast machine whatever the code says.
     #[test]
-    fn the_new_program_is_written_beside_the_old_one_and_renamed_into_place() {
+    fn the_new_program_goes_in_through_the_one_routine_that_stages_and_renames() {
         let source = include_str!("update.rs").replace("\r\n", "\n");
         let start = source
             .find("fn put_in_place(")
@@ -1408,18 +1376,72 @@ mod tests {
             .expect("the loop ends");
         let body = &source[start..end];
 
-        let staged = body.find("&staged").expect("it stages the new program");
-        let rename = body
-            .find("std::fs::rename(&staged, &target)")
-            .expect("it renames the staged program into place");
         assert!(
-            staged < rename,
-            "the new program is put at the name people run before it is complete"
+            body.contains("veilvoice_setup::install::replace_with_copy(&from, &target)"),
+            "an update no longer replaces programs through \
+             install::replace_with_copy, so whatever it does instead is a second \
+             implementation of replacing a running program. That is F-NNN."
         );
         assert!(
-            !body.contains("std::fs::copy(&from, &target)"),
-            "the new program is copied straight to the name people run, so that \
-             name is briefly a partial file. That is F-261."
+            !body.contains("std::fs::copy("),
+            "an update copies a program into place itself again. A copy opens the \
+             destination and truncates it, which is F-237, and staging with a copy \
+             after a remove_file is the window F-NNN closed."
+        );
+    }
+
+    /// F-NNN+1. A failure partway through says what it had already replaced.
+    ///
+    /// The second program cannot be replaced, because the name it goes at is a
+    /// directory and no rename will go over one. The first one has already been
+    /// replaced by then, so a message saying nothing was replaced is false, and
+    /// it is false in the direction that matters: it tells somebody their pair
+    /// of programs still match when one is a version ahead of the other.
+    #[test]
+    fn a_failure_partway_through_names_what_it_had_already_replaced() {
+        let root = room("partway");
+        let from = root.join("new");
+        let into = root.join("installed");
+        std::fs::create_dir_all(&from).unwrap();
+        std::fs::create_dir_all(&into).unwrap();
+        for stem in crate::extracted::PROGRAMS {
+            let name = crate::builder::with_platform_extension(stem);
+            std::fs::write(from.join(&name), b"the new one").unwrap();
+        }
+        let first = crate::builder::with_platform_extension(crate::extracted::PROGRAMS[0]);
+        let second = crate::builder::with_platform_extension(crate::extracted::PROGRAMS[1]);
+        std::fs::write(into.join(&first), b"the old one").unwrap();
+        std::fs::create_dir_all(into.join(&second)).unwrap();
+
+        let error = put_in_place(&from, &into).expect_err("the second one cannot go in");
+        let said = error.to_string();
+        assert!(
+            said.contains(&format!("{first} was already replaced")),
+            "the failure does not say that {first} was already replaced: {said}"
+        );
+        assert!(
+            !said.contains("othing was replaced") && !said.contains("othing has been replaced"),
+            "the failure claims nothing was replaced after replacing {first}: {said}"
+        );
+        assert_eq!(
+            std::fs::read(into.join(&first)).unwrap(),
+            b"the new one",
+            "{first} was not replaced, so the message was right and the test is wrong"
+        );
+        std::fs::remove_dir_all(&root).ok();
+    }
+
+    /// Each of the three shapes that sentence takes.
+    #[test]
+    fn what_was_already_replaced_reads_as_a_sentence() {
+        assert_eq!(replaced_so_far(&[]), "Nothing was replaced.");
+        assert_eq!(
+            replaced_so_far(&["veilvoice".to_string()]),
+            "veilvoice was already replaced and is the new version."
+        );
+        assert_eq!(
+            replaced_so_far(&["veilvoice".to_string(), "veilvoice-gui".to_string()]),
+            "veilvoice and veilvoice-gui were already replaced and are the new version."
         );
     }
 
