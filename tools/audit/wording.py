@@ -113,6 +113,7 @@ NAMES = (
     "upload-artifact",          # GitHub Actions
     "download-artifact",
     "minimized* Ubuntu",        # what Ubuntu calls its cut-down images
+    "Partner Center",           # Microsoft's name for the Store's publishing portal
 )
 
 AMERICAN_RE = re.compile(
