@@ -105,9 +105,7 @@ pub const WHY_NO_CAPTURE: Option<&str> = Some(absent::REASON);
 pub use devices::{DeviceInfo, Direction};
 pub use io::Audio;
 pub use live::{Interference, Keeping, Kept, LiveSession, LiveStats, Side};
-pub use record::Recorder;
-#[cfg(feature = "live")]
-pub use record::Sink;
+pub use record::{Recorder, Sink};
 pub use room::{Guest, GuestStats, KeptRoom, RoomSession, RoomStats, MAX_GUESTS};
 
 /// Crate version string, surfaced in the About panel.
@@ -220,6 +218,133 @@ pub fn deidentify(audio: &Audio, config: veilvoice_core::DeidConfig) -> Result<A
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The public items of one module, as `kind name` plus a normalised
+    /// signature for a function.
+    ///
+    /// Read from the source, because only one of the two builds is compiled
+    /// at a time, and the one CI runs tests in is the one with live audio.
+    fn surface(source: &str) -> std::collections::BTreeSet<String> {
+        let mut found = std::collections::BTreeSet::new();
+        let mut rest = source;
+        while let Some(at) = rest.find("pub ") {
+            let after = &rest[at..];
+            let line_start = rest[..at].rfind('\n').map_or(0, |n| n + 1);
+            let indent_ok = rest[line_start..at].trim().is_empty();
+            rest = &rest[at + 4..];
+            if !indent_ok {
+                continue;
+            }
+            let item = after.split(['{', ';']).next().unwrap_or("");
+            let item: String = item.split_whitespace().collect::<Vec<_>>().join(" ");
+            // Argument names differ (`_samples` where nothing is read), and
+            // the device type is reached by a different path in each build.
+            let item = item
+                .replace("( ", "(")
+                .replace(", )", ")")
+                .replace(",)", ")")
+                .replace("(_", "(")
+                .replace(", _", ", ")
+                .replace("super::devices::Device", "Device")
+                .replace("crate::devices::Device", "Device")
+                .replace("crate::live::", "")
+                .replace("crate::record::", "")
+                .replace("crate::Error", "Error")
+                .replace("(mut ", "(")
+                .replace(", mut ", ", ");
+            // A stand-in holds `Infallible` where the live type holds its
+            // fields, and the live build names cpal's device by an alias, so
+            // a type is compared by its name alone.
+            let item = match item.split_once('(') {
+                Some((head, _)) if head.starts_with("pub struct ") => head.to_string(),
+                _ => item,
+            };
+            let item = match item.strip_prefix("pub type ") {
+                Some(name) => format!("pub struct {name}"),
+                None => item,
+            };
+            if item.starts_with("pub fn ")
+                || item.starts_with("pub struct ")
+                || item.starts_with("pub const ")
+                || item.starts_with("pub type ")
+                || item.starts_with("pub use ")
+            {
+                let item = match item.find(" -> ") {
+                    Some(_) if item.starts_with("pub fn ") => item,
+                    _ => item.split(" =").next().unwrap_or(&item).to_string(),
+                };
+                found.insert(item);
+            }
+        }
+        found
+    }
+
+    /// The body of `pub mod name { ... }` in `absent.rs`.
+    fn absent_module<'a>(source: &'a str, name: &str) -> &'a str {
+        let at = source
+            .find(&format!("pub mod {name} {{"))
+            .unwrap_or_else(|| panic!("absent.rs has no `{name}` module"));
+        let body = &source[at..];
+        let mut depth = 0usize;
+        for (i, c) in body.char_indices() {
+            match c {
+                '{' => depth += 1,
+                '}' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        return &body[..i];
+                    }
+                }
+                _ => {}
+            }
+        }
+        body
+    }
+
+    /// **Roadmap item 162.** The build without live audio offers what the
+    /// live build offers, by the same names and signatures, so the window
+    /// compiles against either without a `cfg`.
+    ///
+    /// Checked here, in the build CI tests, because the build without live
+    /// audio is only ever compiled, and a compiler checks only what the
+    /// window happens to call. Two differences are deliberate and named:
+    /// `record::start` makes a recorder, which no build without live audio
+    /// can hold, and only a live session calls it; and the live build's
+    /// private helpers do not exist to be offered.
+    #[test]
+    fn the_build_without_live_audio_offers_what_the_live_build_offers() {
+        let absent = include_str!("absent.rs").replace("\r\n", "\n");
+        let modules = [
+            ("devices", include_str!("devices.rs")),
+            ("record", include_str!("record.rs")),
+            ("playback", include_str!("playback.rs")),
+            ("live", include_str!("live.rs")),
+            ("room", include_str!("room.rs")),
+        ];
+        let not_offered = ["pub fn start(sample_rate: u32) -> (Recorder, Sink)"];
+        let mut wrong = Vec::new();
+        for (name, live) in modules {
+            let live = live.replace("\r\n", "\n");
+            let live = live.split("\n#[cfg(test)]").next().unwrap_or(&live);
+            let live = surface(live);
+            let stand_in = surface(absent_module(&absent, name));
+            for item in live.difference(&stand_in) {
+                if !not_offered.contains(&item.as_str()) {
+                    wrong.push(format!(
+                        "{name}: the live build has `{item}` and absent.rs does not"
+                    ));
+                }
+            }
+            for item in stand_in.difference(&live) {
+                if !item.starts_with("pub mod ") {
+                    wrong.push(format!(
+                        "{name}: absent.rs has `{item}` and the live build does not"
+                    ));
+                }
+            }
+        }
+        assert!(wrong.is_empty(), "\n{}", wrong.join("\n"));
+    }
 
     /// The two answers to "can this build capture?" never disagree.
     #[test]

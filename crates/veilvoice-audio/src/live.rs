@@ -40,6 +40,7 @@
 //! hidden. A gap in the sound you can see explained is far better than one you
 //! cannot.
 
+use crate::devices::Device;
 pub use crate::kinds::{Interference, Keeping, LiveStats, Side};
 use crate::Error;
 use cpal::traits::{DeviceTrait, StreamTrait};
@@ -382,11 +383,7 @@ impl LiveSession {
     /// `config.sample_rate` is overwritten with the rate the hardware actually
     /// agrees to, so the engine is never configured for a rate the device is
     /// not running at.
-    pub fn start(
-        input: &cpal::Device,
-        output: &cpal::Device,
-        config: DeidConfig,
-    ) -> Result<Self, Error> {
+    pub fn start(input: &Device, output: &Device, config: DeidConfig) -> Result<Self, Error> {
         Self::start_recording(input, output, config, Keeping::default()).map(|(session, _)| session)
     }
 
@@ -425,8 +422,8 @@ impl LiveSession {
     /// else. A sink that cannot keep up drops samples and counts them rather
     /// than stalling the audio somebody is speaking into.
     pub fn start_recording(
-        input: &cpal::Device,
-        output: &cpal::Device,
+        input: &Device,
+        output: &Device,
         mut config: DeidConfig,
         keeping: Keeping,
     ) -> Result<(Self, Kept), Error> {

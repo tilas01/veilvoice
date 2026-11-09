@@ -268,6 +268,83 @@ Scorecard's Token-Permissions check marks a workflow down for exactly this.
 whose top-level block grants a write, or that has no top-level block at all, and
 its `--self-test` covers the inline, mapped and missing shapes.
 
+### F-287: the build without live audio did not offer what the live build offers, and its tests never ran
+
+**Where:** `crates/veilvoice-audio/src/absent.rs`, the stand-ins a build
+without `cpal` uses, and `.github/workflows/ci.yml`. Found by the audit thread
+in roadmap item 162's commit, which said the stand-ins had "the same
+signatures".
+
+Three of them did not. `absent::record` had no `start`; `Sink` was re-exported
+from the crate root only when `live` was on; and the device type was cpal's
+`Device` in one build and a stand-in struct in the other, reached by a
+different path in each. None of it broke a build, because the compiler checks
+only what the window happens to call. The first caller of any of them in the
+window would have built on Linux, macOS and Windows and failed on the BSDs, the
+one place the stand-ins exist for. And the stand-ins' own tests are compiled
+only without `live`, a selection CI built but never tested.
+
+- `Sink` is re-exported in both builds, and the live build names the device
+  type through `devices::Device`, an alias the stand-ins match.
+- `record::start` stays missing on purpose: it makes a recorder, which no build
+  without live audio can hold. `absent.rs` now says so rather than claiming the
+  same signatures throughout.
+- `the_build_without_live_audio_offers_what_the_live_build_offers` reads each
+  live module and its stand-in and fails on any public name in one and not the
+  other, with that one exception named. It runs in the default build, so CI
+  runs it everywhere.
+- CI's test job runs `veilvoice-audio` and `veilvoice-gui` with
+  `--no-default-features` on Linux, so the stand-ins' tests run.
+- `veilvoice_audio::WHY_NO_CAPTURE` gives the reason a build cannot capture,
+  for the window's device pickers, which still show an empty list on the BSDs.
+  That side belongs to `app.rs` and is not part of this fix.
+
+### F-286: exporting from the window followed links, deleted files it had not made, and lost the first of two exports
+
+**Where:** `crates/veilvoice-gui/src/exporting.rs` and the Studio's export
+controls in `crates/veilvoice-gui/src/studio.rs`, both new since v0.1.22 and
+made reachable by roadmap item 175. Found by the audit thread; the first two
+were checked there against the code and the rest checked here.
+
+- The temporary sound file and a WAV-only output were written with
+  `write_owner_only`, which creates or truncates, so a link planted at either
+  name in a shared folder was followed and the file it named emptied. The
+  `exists()` check before it is false for a dangling link and was in any case
+  a look before the write rather than part of it.
+- A failed render ran `remove_file` on the output, including when `ffmpeg`
+  refused because the output already existed, so a failed export could delete
+  a file this run had never made.
+- FLAC, MP4, MKV and MOV outputs were created under the umask and never
+  tightened; the command line tightens what it writes.
+- The temporary sound file was left behind by a crash or a closed window,
+  whatever its comment said, and was written for exports that never read it.
+- The export and preview buttons stayed live while an export ran, and a
+  second press replaced the first job's receiver, so the first result was
+  lost.
+- The thumbnails were redrawn only when the template changed, so "the look,
+  in detail" never reached them.
+- A WAV export with nothing to count said that `ffmpeg` had written no frames,
+  though a WAV never runs `ffmpeg`.
+- A recording named `con` or `lpt1` was exported under a device name older
+  Windows will not open as a file.
+
+The export now works in a private folder of its own beside the output, made
+with mode 0700 and removed when the job ends whichever way it ends. The sound
+is written there only when the render reads it, every file is created with
+`create_new`, the result is tightened to 0600 and then put in place with a hard
+link, which refuses to replace anything at the destination, a link included.
+A run deletes only its own folder. The export controls and the form are
+disabled while an export runs or the folder picker is open, which also means
+the choice exported is the one shown when the button was pressed. The
+thumbnails compare the whole look. A device name gets `take-` in front.
+
+`a_render_lands_owner_only_and_leaves_nothing_else`,
+`a_failed_render_removes_only_its_own_work` and
+`a_link_at_the_destination_is_not_followed` drive the `ffmpeg` branch with a
+stand-in script, which nothing had run before; `a_second_export_waits_for_the_first`,
+`a_new_look_redraws_the_thumbnails` and `a_device_name_is_not_a_file_name`
+cover the rest.
+
 ### F-285: the website's tests stripped tags in a way a crafted page could slip past
 
 **Where:** `tools/site-tests/scripts.test.js`, `css.test.js` and

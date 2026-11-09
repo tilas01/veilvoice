@@ -1329,3 +1329,26 @@ fn an_unlock_still_running_when_the_window_locks_is_not_installed_after() {
     );
     assert!(studio.entries.is_empty(), "its recordings are listed");
 }
+
+/// A second export cannot start while the first is still running: its answer
+/// would replace the first one's, and the first would never be heard of.
+#[test]
+fn a_second_export_waits_for_the_first() {
+    let (_dir, mut studio, id) = studio_with_a_take("a take");
+    let (_tx, rx) = std::sync::mpsc::channel();
+    studio.exporting = Some(rx);
+    studio.apply(Act::Export(id.clone(), Render::File));
+    assert!(
+        !studio.picker.is_open() && studio.choosing.is_none(),
+        "a second export started while the first was running"
+    );
+    studio.exporting = None;
+    studio.apply(Act::Export(id.clone(), Render::Preview));
+    assert!(studio.picker.is_open());
+    studio.apply(Act::Export(id, Render::File));
+    assert_eq!(
+        studio.choosing.as_ref().map(|(_, what)| *what),
+        Some(Render::Preview),
+        "a second press while the folder was being chosen replaced the first"
+    );
+}

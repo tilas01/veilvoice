@@ -10,7 +10,10 @@
 //! rot.
 //!
 //! So the same names exist here, with the same signatures, and **none of them
-//! can do anything**. Every constructor refuses with [`REASON`], which a front
+//! can do anything**. One is missing on purpose: `record::start` makes a
+//! recorder, which this build cannot hold, and only a live session calls it.
+//! The crate's tests compare this file with the live modules, so a name added
+//! to one and not the other fails in the build CI tests. Every constructor refuses with [`REASON`], which a front
 //! end shows where the button was pressed. Every type that stands for a
 //! running thing (a session, a room, a recorder, a player, an opened device)
 //! holds a [`std::convert::Infallible`], so no value of it can ever exist and

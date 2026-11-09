@@ -116,8 +116,8 @@ pub struct Job {
 }
 
 /// Why no bar can be drawn for an export that has no picture.
-pub const NO_FRAMES: &str = "the sound is handed to ffmpeg whole, and it reports nothing \
-     back that this window can read";
+pub const NO_FRAMES: &str = "a file of sound alone is written in one piece, with no frames \
+     in it to count";
 
 /// How far an export with this choice can say it has got.
 ///
@@ -134,8 +134,10 @@ pub fn reach_for(choice: &Choice) -> crate::progress::Reach {
 
 /// A file name built from what somebody called a recording.
 ///
-/// The same rule the older export follows: a name reaches a path here, so
-/// anything but a letter, a digit, a dash or an underscore becomes a dash.
+/// A name reaches a path here, so anything but a letter, a digit, a dash or an
+/// underscore becomes a dash. A name Windows reserves for a device (`CON`,
+/// `NUL`, `COM1` and the rest) gets `take-` in front: on older Windows,
+/// writing `con.wav` writes to the console and leaves no file.
 pub fn safe_stem(name: &str) -> String {
     let cleaned: String = name
         .chars()
@@ -149,10 +151,24 @@ pub fn safe_stem(name: &str) -> String {
         .collect();
     let trimmed = cleaned.trim_matches('-');
     if trimmed.is_empty() {
-        "take".to_string()
-    } else {
-        trimmed.chars().take(60).collect()
+        return "take".to_string();
     }
+    let stem: String = trimmed.chars().take(60).collect();
+    if reserved_on_windows(&stem) {
+        format!("take-{stem}")
+    } else {
+        stem
+    }
+}
+
+/// Whether Windows treats this name as a device rather than a file.
+fn reserved_on_windows(stem: &str) -> bool {
+    let upper = stem.to_ascii_uppercase();
+    matches!(upper.as_str(), "CON" | "PRN" | "AUX" | "NUL")
+        || ((upper.starts_with("COM") || upper.starts_with("LPT"))
+            && upper.len() == 4
+            && upper.as_bytes()[3].is_ascii_digit()
+            && upper.as_bytes()[3] != b'0')
 }
 
 /// The samples and the rate of a canonical 16-bit WAV, mixed to one channel.
@@ -182,6 +198,22 @@ pub fn samples_of(wav: &[u8]) -> Option<(Vec<f32>, u32)> {
 /// Do the export. Runs on a worker; the Browser starts it and collects the
 /// answer.
 pub fn run(job: Job) -> (String, Outcome) {
+    run_with(job, veilvoice_video::ffmpeg::found)
+}
+
+/// [`run`], with where `ffmpeg` is found passed in, so a test can hand it a
+/// stand-in rather than depend on what the machine has installed.
+///
+/// # Nothing is written through a link, and nothing is written over
+///
+/// The folder is one somebody chose, and may be shared. Every file this
+/// creates there is created new, by the kernel's one atomic answer
+/// (`create_new`, `mkdir`, `link`), never by checking and then writing: a check
+/// is false for a link that points nowhere, and a write follows it to wherever
+/// it points. `ffmpeg` writes into a folder of this run's own, readable only by
+/// its owner, and the finished file is linked into place only if nothing is
+/// there. So a failure removes only what this run made.
+fn run_with(job: Job, ffmpeg: impl FnOnce() -> Option<PathBuf>) -> (String, Outcome) {
     let Job {
         vault,
         id,
@@ -203,28 +235,21 @@ pub fn run(job: Job) -> (String, Outcome) {
 
     let stem = safe_stem(&name);
     let output = into.join(format!("{stem}.{}", choice.export.extension()));
-    if output.exists() {
-        return (
-            format!(
-                "{} is already there, and nothing here writes over a file. Move it or \
-                 choose another folder.",
-                output.display()
-            ),
-            Outcome::Warn,
-        );
-    }
 
     // A WAV of the sound alone needs nothing but the bytes already in hand.
     if choice.export.content == Content::Audio
         && choice.export.audio_file == veilvoice_video::export::AudioFile::Wav
     {
-        return match veilvoice_crypto::privatefile::write_owner_only(&output, wav.expose()) {
+        return match veilvoice_crypto::privatefile::write_owner_only_new(&output, wav.expose()) {
             Ok(()) => (wrote(&output), Outcome::Good),
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+                already_there(&output)
+            }
             Err(error) => (error.to_string(), Outcome::Bad),
         };
     }
 
-    let Some(program) = veilvoice_video::ffmpeg::found() else {
+    let Some(program) = ffmpeg() else {
         return (
             "Nothing was written: every file but a WAV is made by ffmpeg, and ffmpeg is \
              not on this machine. The Setup tab lists it under companion software, with \
@@ -241,27 +266,128 @@ pub fn run(job: Job) -> (String, Outcome) {
             Outcome::Bad,
         );
     };
+    // Said before minutes of rendering rather than after them. Not what keeps
+    // a file from being written over: `place` is.
+    if std::fs::symlink_metadata(&output).is_ok() {
+        return already_there(&output);
+    }
 
+    let room = match Workroom::new(&into) {
+        Ok(room) => room,
+        Err(error) => return (error.to_string(), Outcome::Bad),
+    };
     // ffmpeg reads the sound from a file and the picture from its standard
-    // input, and there is only one standard input. So the sound goes beside
-    // the output for the length of the render, owner-only, and is removed
-    // after, whatever happened.
-    let sound = into.join(format!(".{stem}.veiled-sound.wav"));
-    if let Err(error) = veilvoice_crypto::privatefile::write_owner_only(&sound, wav.expose()) {
-        return (error.to_string(), Outcome::Bad);
+    // input, and there is only one standard input. So the sound goes into the
+    // private folder, when the export has any sound in it.
+    let sound = room.path().join("sound.wav");
+    if choice.export.content.wants_sound() {
+        if let Err(error) =
+            veilvoice_crypto::privatefile::write_owner_only_new(&sound, wav.expose())
+        {
+            return (error.to_string(), Outcome::Bad);
+        }
     }
     drop(wav);
-    let result = render(
-        &program, &choice, &name, &samples, rate, &sound, &output, &reach,
-    );
-    let _ = std::fs::remove_file(&sound);
-    match result {
+    let made = room
+        .path()
+        .join(format!("{stem}.{}", choice.export.extension()));
+    if let Err(why) = render(
+        &program, &choice, &name, &samples, rate, &sound, &made, &reach,
+    ) {
+        return (why, Outcome::Bad);
+    }
+    // ffmpeg made the file under its own umask, inside a folder nobody else
+    // can open; it is owner-only before it leaves that folder.
+    if let Err(error) = veilvoice_crypto::privatefile::tighten(&made) {
+        return (error.to_string(), Outcome::Bad);
+    }
+    match place(&made, &output) {
         Ok(()) => (wrote(&output), Outcome::Good),
-        Err(why) => {
-            // A half-written file is worse than none: it plays, and stops.
-            let _ = std::fs::remove_file(&output);
-            (why, Outcome::Bad)
+        Err(said) => said,
+    }
+    // `room` goes here, and the sound and anything ffmpeg left with it.
+}
+
+/// What an export says when its file is already there.
+fn already_there(output: &Path) -> (String, Outcome) {
+    (
+        format!(
+            "{} is already there, and nothing here writes over a file. Move it or \
+             choose another folder.",
+            output.display()
+        ),
+        Outcome::Warn,
+    )
+}
+
+/// Put the finished file where it was asked for, if nothing is there.
+///
+/// A hard link is created new or not at all, and does not follow a link that
+/// is already at the destination. A filesystem without hard links (FAT and
+/// exFAT, which most memory sticks are) gets a rename after a look, which is
+/// the one place a check comes before a write; such a filesystem has no
+/// symbolic links to plant either.
+fn place(made: &Path, output: &Path) -> Result<(), (String, Outcome)> {
+    match std::fs::hard_link(made, output) {
+        Ok(()) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+            Err(already_there(output))
         }
+        Err(_) => {
+            if std::fs::symlink_metadata(output).is_ok() {
+                return Err(already_there(output));
+            }
+            std::fs::rename(made, output).map_err(|error| (error.to_string(), Outcome::Bad))
+        }
+    }
+}
+
+/// A folder of one export's own, beside where its file is going, removed with
+/// everything in it when the export is done, however it ended.
+///
+/// Beside rather than in the system's temporary folder, so the finished file
+/// can be linked into place on the same filesystem. Created by `mkdir`, which
+/// fails rather than follows anything already at the name, and readable only
+/// by its owner. A crash in the middle of a render leaves it behind, under a
+/// name that says what it is.
+struct Workroom(PathBuf);
+
+impl Workroom {
+    /// Makes a folder only this user can enter, beside `beside`, under a name
+    /// no other folder there has.
+    fn new(beside: &Path) -> std::io::Result<Self> {
+        let mut builder = std::fs::DirBuilder::new();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::DirBuilderExt;
+            builder.mode(0o700);
+        }
+        for attempt in 0..100u32 {
+            let path = beside.join(format!(
+                ".veilvoice-export-{}-{attempt}",
+                std::process::id()
+            ));
+            match builder.create(&path) {
+                Ok(()) => return Ok(Self(path)),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => return Err(error),
+            }
+        }
+        Err(std::io::Error::new(
+            std::io::ErrorKind::AlreadyExists,
+            "a hundred folders from earlier exports are in the way",
+        ))
+    }
+
+    /// Where the folder is, to write the job's files into.
+    fn path(&self) -> &Path {
+        &self.0
+    }
+}
+
+impl Drop for Workroom {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
     }
 }
 
@@ -587,7 +713,7 @@ pub struct Thumbs {
     made: HashMap<String, egui::TextureHandle>,
     asked: HashSet<String>,
     arriving: Option<mpsc::Receiver<(String, Vec<u8>)>>,
-    drawn_with: Option<&'static str>,
+    drawn_with: Option<Motion>,
 }
 
 impl Thumbs {
@@ -632,19 +758,17 @@ impl Thumbs {
     ///
     /// Does nothing while a batch is still arriving, so a list drawn sixty
     /// times a second starts one worker rather than sixty.
-    pub fn ask(
-        &mut self,
-        ctx: &egui::Context,
-        vault: &Arc<Vault>,
-        ids: &[String],
-        template: &'static str,
-        look: &Motion,
-    ) {
-        if self.drawn_with.is_some_and(|drawn| drawn != template) {
-            self.clear();
-        }
+    pub fn ask(&mut self, ctx: &egui::Context, vault: &Arc<Vault>, ids: &[String], look: &Motion) {
+        // One batch at a time, so a slider being dragged starts one worker
+        // and not one a frame. The look is compared whole, not by template:
+        // the advanced half changes a look without changing its template.
         if self.arriving.is_some() {
             return;
+        }
+        if self.drawn_with.is_some_and(|drawn| drawn != *look) {
+            // Asked again, and the old pictures stay until the new ones land,
+            // so the list does not blink empty.
+            self.asked.clear();
         }
         let wanted: Vec<String> = ids
             .iter()
@@ -655,7 +779,7 @@ impl Thumbs {
             return;
         }
         self.asked.extend(wanted.iter().cloned());
-        self.drawn_with = Some(template);
+        self.drawn_with = Some(*look);
         let (tx, rx) = mpsc::channel();
         self.arriving = Some(rx);
         let weak: Weak<Vault> = Arc::downgrade(vault);
@@ -739,6 +863,186 @@ mod tests {
         assert_eq!(safe_stem("../../etc/passwd"), "etc-passwd");
         assert_eq!(safe_stem("///"), "take");
         assert_eq!(safe_stem("Interview 2"), "Interview-2");
+    }
+
+    /// A name Windows keeps for a device is not used as a file name.
+    #[test]
+    fn a_device_name_is_not_a_file_name() {
+        for name in ["con", "CON", "nul", "Aux", "prn", "com1", "LPT9"] {
+            assert_eq!(safe_stem(name), format!("take-{name}"));
+        }
+        for name in ["console", "com", "com0", "lpt10", "nulled"] {
+            assert_eq!(safe_stem(name), name, "{name} is an ordinary name");
+        }
+    }
+
+    /// A stand-in for ffmpeg: reads the frames, then writes its last argument,
+    /// or fails after doing what `script` says.
+    /// `$last` has the `file:` prefix every path is given (F-283) taken off.
+    #[cfg(unix)]
+    fn fake_ffmpeg(dir: &Path, script: &str) -> PathBuf {
+        use std::os::unix::fs::PermissionsExt;
+        let path = dir.join("ffmpeg");
+        std::fs::write(
+            &path,
+            format!(
+                "#!/bin/sh\ncat > /dev/null\nfor last; do :; done\nlast=\"${{last#file:}}\"\n{script}\n"
+            ),
+        )
+        .unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
+        path
+    }
+
+    #[cfg(unix)]
+    fn small_video() -> Choice {
+        let mut choice = Choice::default();
+        choice.export.plan.size = veilvoice_video::size::Preset::Hd720.size();
+        choice
+    }
+
+    /// Only the export's own folder and the finished file are left behind.
+    #[cfg(unix)]
+    fn leftovers(dir: &Path) -> Vec<String> {
+        let mut names: Vec<String> = std::fs::read_dir(dir)
+            .unwrap()
+            .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+            .filter(|n| n != "vault" && n != "tools")
+            .collect();
+        names.sort();
+        names
+    }
+
+    /// A render is placed, owner-only, the frames counted, and nothing else
+    /// is left in the folder.
+    #[cfg(unix)]
+    #[test]
+    fn a_render_lands_owner_only_and_leaves_nothing_else() {
+        use std::os::unix::fs::PermissionsExt;
+        let (dir, vault, id) = vault_with(&[1000; 800]);
+        let tools = dir.path().join("tools");
+        std::fs::create_dir(&tools).unwrap();
+        let ffmpeg = fake_ffmpeg(&tools, "umask 022; printf made > \"$last\"");
+        let reach = Arc::new(crate::progress::Reach::counting(0));
+        let mut job = job(&vault, &id, dir.path(), small_video());
+        job.reach = Arc::clone(&reach);
+        let (said, outcome) = run_with(job, || Some(ffmpeg));
+        assert_eq!(outcome, Outcome::Good, "{said}");
+        let output = dir.path().join("take-one.mp4");
+        assert_eq!(std::fs::read(&output).unwrap(), b"made");
+        let mode = std::fs::metadata(&output).unwrap().permissions().mode() & 0o777;
+        assert_eq!(mode, 0o600, "the export is readable by others: {mode:o}");
+        assert!(reach.total() > 0 && reach.done() == reach.total());
+        assert_eq!(leftovers(dir.path()), ["take-one.mp4"]);
+    }
+
+    /// A failed render removes only what this run made. A file that turned up
+    /// at the destination while it rendered is somebody else's and stays.
+    #[cfg(unix)]
+    #[test]
+    fn a_failed_render_removes_only_its_own_work() {
+        let (dir, vault, id) = vault_with(&[1000; 800]);
+        let tools = dir.path().join("tools");
+        std::fs::create_dir(&tools).unwrap();
+        let ffmpeg = fake_ffmpeg(
+            &tools,
+            "room=$(dirname \"$last\"); printf theirs > \"$(dirname \"$room\")/$(basename \"$last\")\"; \
+             echo 'File exists' >&2; exit 1",
+        );
+        let (said, outcome) =
+            run_with(job(&vault, &id, dir.path(), small_video()), || Some(ffmpeg));
+        assert_eq!(outcome, Outcome::Bad, "{said}");
+        assert!(said.contains("File exists"), "{said}");
+        assert_eq!(
+            std::fs::read(dir.path().join("take-one.mp4")).unwrap(),
+            b"theirs",
+            "the failed render deleted a file it did not make"
+        );
+        assert_eq!(leftovers(dir.path()), ["take-one.mp4"]);
+    }
+
+    /// A link planted where the file is going is not followed, whether it
+    /// points at something or at nothing.
+    #[cfg(unix)]
+    #[test]
+    fn a_link_at_the_destination_is_not_followed() {
+        let (dir, vault, id) = vault_with(&[1000; 800]);
+        let tools = dir.path().join("tools");
+        std::fs::create_dir(&tools).unwrap();
+        let victim = tools.join("victim");
+        std::fs::write(&victim, b"precious").unwrap();
+        let ffmpeg = fake_ffmpeg(&tools, "printf made > \"$last\"");
+
+        for (choice, name) in [
+            (wav_only(), "take-one.wav"),
+            (small_video(), "take-one.mp4"),
+        ] {
+            for target in [victim.clone(), tools.join("nothing-here")] {
+                let link = dir.path().join(name);
+                std::os::unix::fs::symlink(&target, &link).unwrap();
+                let program = ffmpeg.clone();
+                let (said, outcome) =
+                    run_with(job(&vault, &id, dir.path(), choice.clone()), || {
+                        Some(program)
+                    });
+                assert_eq!(
+                    outcome,
+                    Outcome::Warn,
+                    "{name} -> {}: {said}",
+                    target.display()
+                );
+                assert_eq!(std::fs::read(&victim).unwrap(), b"precious");
+                assert!(
+                    !tools.join("nothing-here").exists(),
+                    "a dangling link was followed"
+                );
+                std::fs::remove_file(&link).unwrap();
+            }
+        }
+        assert!(
+            leftovers(dir.path()).is_empty(),
+            "{:?}",
+            leftovers(dir.path())
+        );
+    }
+
+    /// The thumbnails are drawn again when the look changes, not only when
+    /// the template does, and one batch runs at a time.
+    #[test]
+    fn a_new_look_redraws_the_thumbnails() {
+        let (_dir, vault, id) = vault_with(&[1000; 800]);
+        let ctx = egui::Context::default();
+        let mut thumbs = Thumbs::default();
+        let mut look = Motion::default();
+        let ids = vec![id.clone()];
+        thumbs.ask(&ctx, &vault, &ids, &look);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(30);
+        while thumbs.arriving.is_some() {
+            thumbs.poll(&ctx);
+            assert!(
+                std::time::Instant::now() < deadline,
+                "the picture never came"
+            );
+        }
+        assert!(thumbs.get(&id).is_some());
+
+        thumbs.ask(&ctx, &vault, &ids, &look);
+        assert!(thumbs.arriving.is_none(), "the same look was drawn twice");
+
+        look.response *= 2.0;
+        thumbs.ask(&ctx, &vault, &ids, &look);
+        assert!(thumbs.arriving.is_some(), "a new look did not redraw");
+        assert!(
+            thumbs.get(&id).is_some(),
+            "the old picture went before the new one came"
+        );
+        look.response *= 2.0;
+        let before = thumbs.drawn_with;
+        thumbs.ask(&ctx, &vault, &ids, &look);
+        assert_eq!(
+            thumbs.drawn_with, before,
+            "a second batch started over the first"
+        );
     }
 
     #[test]

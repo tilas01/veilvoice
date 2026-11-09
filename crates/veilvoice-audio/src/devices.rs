@@ -57,6 +57,13 @@
 //! are allowed to choose.
 
 pub use crate::kinds::{DeviceInfo, Direction};
+
+/// An opened device.
+///
+/// Named here rather than written as `cpal::Device` at every use, so a front
+/// end names it without depending on `cpal`, and a build without live audio
+/// (`crate::absent`) can offer a type of the same name.
+pub type Device = cpal::Device;
 use crate::Error;
 use cpal::traits::{DeviceTrait, HostTrait};
 
@@ -229,13 +236,13 @@ pub fn find_virtual_cable() -> Option<DeviceInfo> {
 /// The name of an opened device, or a placeholder when the OS will not say.
 ///
 /// Saves every caller from depending on `cpal` just to print a device name.
-pub fn name_of(device: &cpal::Device) -> String {
+pub fn name_of(device: &Device) -> String {
     name_of_opt(device).unwrap_or_else(|| "<unnamed device>".into())
 }
 
 /// Look up a device by the name [`list`] gave it, or the host default when
 /// `name` is `None`. See [`position_of`] for the names it also accepts.
-pub fn open(direction: Direction, name: Option<&str>) -> Result<cpal::Device, Error> {
+pub fn open(direction: Direction, name: Option<&str>) -> Result<Device, Error> {
     let host = cpal::default_host();
     match name {
         None => match direction {

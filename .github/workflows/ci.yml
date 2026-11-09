@@ -110,6 +110,17 @@ jobs:
         if: runner.os == 'Linux'
         run: python tools/audit/features.py --build
 
+      # The step above builds the selection without live audio; this one runs
+      # its tests. `absent.rs`, the stand-ins a build without `cpal` uses, has
+      # tests of its own that only exist in that selection, so until this step
+      # they had never run anywhere but on a desk. The window's tests run too,
+      # because the window is what has to say that this build cannot capture.
+      #
+      # Linux only, for the same reason as the step above.
+      - name: The tests pass in a build without live audio
+        if: runner.os == 'Linux'
+        run: cargo test -p veilvoice-audio -p veilvoice-gui --no-default-features --locked
+
       # The last two checks in `tools/verify.py` that nothing here ran.
       #
       # Everything else it does is in the `assets` job, which has an

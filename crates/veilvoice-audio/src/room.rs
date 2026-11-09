@@ -63,6 +63,7 @@
 //! deadline, so the screen shows how much of that deadline is being used. If it
 //! reaches the top, the computer cannot keep up and the sound will break.
 
+use crate::devices::Device;
 pub use crate::kinds::{GuestStats, RoomStats, MAX_GUESTS};
 use crate::live::{Keeping, Kept};
 use crate::Error;
@@ -77,7 +78,7 @@ use veilvoice_core::{DeidConfig, Deidentifier};
 pub struct Guest<'a> {
     /// The device their voice arrives on. One each: two guests sharing a
     /// microphone is one signal, and this crate cannot separate it.
-    pub device: &'a cpal::Device,
+    pub device: &'a Device,
     /// Their engine's settings, carrying the destination voice their slot has.
     ///
     /// **This crate does not choose voices.** Two guests given the same
@@ -148,7 +149,7 @@ impl RoomSession {
     /// with no sample rate they all accept.
     pub fn start(
         guests: &[Guest<'_>],
-        output: &cpal::Device,
+        output: &Device,
         mixed: bool,
     ) -> Result<(Self, KeptRoom), Error> {
         if guests.is_empty() {

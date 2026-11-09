@@ -1842,7 +1842,6 @@ impl Studio {
                     .iter()
                     .map(|e| e.id.clone())
                     .collect::<Vec<_>>(),
-                self.export_choice.template,
                 &self.export_choice.motion,
             );
         }
@@ -1857,6 +1856,10 @@ impl Studio {
         // Collected first: the row buttons borrow `self` mutably, and the list
         // they are drawn from is `self.entries`.
         let rows: Vec<Entry> = self.entries.clone();
+        // While an export runs or its folder is being chosen, nothing starts a
+        // second one and the form cannot change under it: the answer to the
+        // first would be lost, and the second would be told it was the first.
+        let busy = self.exporting.is_some() || self.picker.is_open();
         let mut act: Option<Act> = None;
 
         egui::ScrollArea::vertical()
@@ -1984,40 +1987,45 @@ impl Studio {
                                 }
                             });
                             ui.add_space(4.0);
-                            ui.horizontal(|ui| {
-                                ui.label(RichText::new("take it out:").color(p::muted()).small());
-                                if ui
-                                    .button("preview page")
-                                    .on_hover_text(
-                                        "A page that plays it, draws the waveform and \
+                            ui.add_enabled_ui(!busy, |ui| {
+                                ui.horizontal(|ui| {
+                                    ui.label(
+                                        RichText::new("take it out:").color(p::muted()).small(),
+                                    );
+                                    if ui
+                                        .button("preview page")
+                                        .on_hover_text(
+                                            "A page that plays it, draws the waveform and \
                                          carries its own captions. Opens in a browser \
                                          with nothing installed.",
-                                    )
-                                    .clicked()
-                                {
-                                    act = Some(Act::Export(entry.id.clone(), Render::Preview));
-                                }
-                                let open = self.export_form.as_deref() == Some(entry.id.as_str());
-                                if ui
-                                    .add(crate::layout::chip(open, "export"))
-                                    .on_hover_text(
-                                        "A file of the sound, a video of it, or both, \
+                                        )
+                                        .clicked()
+                                    {
+                                        act = Some(Act::Export(entry.id.clone(), Render::Preview));
+                                    }
+                                    let open =
+                                        self.export_form.as_deref() == Some(entry.id.as_str());
+                                    if ui
+                                        .add(crate::layout::chip(open, "export"))
+                                        .on_hover_text(
+                                            "A file of the sound, a video of it, or both, \
                                          with the sound lossless whatever the picture \
                                          is. Everything but a WAV needs ffmpeg, which \
                                          VeilVoice does not ship: the Setup tab can \
                                          install it.",
-                                    )
-                                    .clicked()
-                                {
-                                    act = Some(Act::ExportForm(entry.id.clone()));
+                                        )
+                                        .clicked()
+                                    {
+                                        act = Some(Act::ExportForm(entry.id.clone()));
+                                    }
+                                });
+                                if self.export_form.as_deref() == Some(entry.id.as_str()) {
+                                    ui.add_space(4.0);
+                                    if crate::exporting::form(ui, &mut self.export_choice) {
+                                        act = Some(Act::Export(entry.id.clone(), Render::File));
+                                    }
                                 }
                             });
-                            if self.export_form.as_deref() == Some(entry.id.as_str()) {
-                                ui.add_space(4.0);
-                                if crate::exporting::form(ui, &mut self.export_choice) {
-                                    act = Some(Act::Export(entry.id.clone(), Render::File));
-                                }
-                            }
                             ui.label(
                                 RichText::new(
                                     "Anything taken out is written unsealed. The voice in \
@@ -2273,6 +2281,10 @@ impl Studio {
                     Some(open) if open == id => None,
                     _ => Some(id),
                 };
+            }
+            Act::Export(_, _) if self.exporting.is_some() || self.picker.is_open() => {
+                // The buttons are greyed out for this; this is the same rule
+                // for anything that reaches here another way.
             }
             Act::Export(id, what) => {
                 // Off the render loop. `rfd`'s blocking picker freezes the
@@ -2561,28 +2573,10 @@ fn pcm16(wav: &[u8]) -> Vec<f32> {
 /// was chosen. Empty after that, and it is `take`: a file called nothing is not
 /// a file.
 fn safe_stem(name: &str) -> String {
-    let cleaned: String = name
-        .chars()
-        .map(|ch| {
-            if ch.is_ascii_alphanumeric() || ch == '-' || ch == '_' {
-                ch
-            } else {
-                '-'
-            }
-        })
-        .collect();
-    let trimmed = cleaned.trim_matches('-');
-    if trimmed.is_empty() {
-        "take".to_string()
-    } else {
-        // A long name makes a path some systems refuse, and the name is a
-        // label rather than an identifier, so shortening loses nothing that
-        // is not still in the vault.
-        trimmed.chars().take(60).collect()
-    }
+    // One rule for every file a recording's name reaches, in one place.
+    crate::exporting::safe_stem(name)
 }
 
-/// Run `ffmpeg` to put the audio in a video with a black picture.
 /// An opened vault, with everything the panel needs to draw it.
 struct Opened {
     vault: Vault,
