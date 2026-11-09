@@ -488,9 +488,11 @@ enum Command {
     /// anywhere else, and this program itself, are not its business:
     /// `veilvoice uninstall` is what removes the program.
     Reset {
-        /// Leave the app lock, and the key to anything sealed with it, alone.
+        /// Remove the app lock as well, and with it the key to anything sealed
+        /// with it. Without this the lock is kept, which is what the window
+        /// does and what somebody resetting a misconfigured interface means.
         #[arg(long)]
-        keep_keys: bool,
+        drop_keys: bool,
         /// Print what would go and stop.
         #[arg(long)]
         dry_run: bool,
@@ -1718,11 +1720,11 @@ fn run(command: Command) -> Result<(), String> {
         Command::Reseal { folders, dry_run } => reseal::run(folders, dry_run),
 
         Command::Reset {
-            keep_keys,
+            drop_keys,
             dry_run,
             yes,
             confirm,
-        } => reset::run(keep_keys, dry_run, yes, confirm.as_deref()),
+        } => reset::run(drop_keys, dry_run, yes, confirm.as_deref()),
 
         Command::Conversation { what } => match what {
             ConversationCommand::Inspect { plan } => conversation::inspect(&plan),

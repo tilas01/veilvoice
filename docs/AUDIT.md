@@ -38,6 +38,150 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirty-seventh round: the reset, read against what it promises
+
+`veilvoice reset` and the window's **Start again** are the only things in this
+project that delete somebody's recordings on purpose. Everything else about
+them has been audited for whether they delete the right files. This round asked
+a different question: whether what they *say* they are keeping is what they
+keep.
+
+Three of the three answers were no, and all three failed in the same direction:
+the plan on the screen was right and the disk was wrong. One of them had also
+been protected by a test for half a year, which is the part worth reading.
+
+### F-286: the command line and the window disagreed about what a reset means
+
+Found by reading the two front ends next to each other, which is not how either
+had been read before.
+
+The window's reset opens with a ticked box, "Keep my password, and the key to my
+recordings", and `crates/veilvoice-gui/src/reset.rs` initialises it
+`keep_keys: true`. The command line had the opposite default, because its flag
+was `--keep-keys`: a flag absent is a flag false, so `veilvoice reset` removed
+the app lock, and with it the key to everything sealed with the app lock, unless
+somebody knew to ask it not to.
+
+`Keep::default()` was `Keep::Nothing`, which is the same decision in the type
+rather than in the interface. Anything written later that reaches for the
+default would have reached for the destructive one.
+
+**What it cost.** Somebody resetting a misconfigured interface from the command
+line, having done the same thing in the window the week before and watched it
+keep their password, lost every recording sealed with the app lock. There is no
+other copy of that key. The two commands differed by the one decision in this
+project that cannot be undone, and the difference was a flag's polarity.
+
+**The fix.** `Keep::Keys` is the default, `--drop-keys` replaces `--keep-keys`,
+and both front ends now mean the same thing with no flags and no clicks. The
+safe answer is the one a caller arrives at by not thinking, which is the rule a
+destructive default breaks.
+
+**What is checked.** `the_default_is_to_keep_the_keys` asserts the type's own
+answer. The flag is its own question and `docs/COMMANDS.md` is generated from
+the parser, so a flag that goes back to naming the wrong half of the choice
+changes a document that is checked.
+
+The shape, and it is the same one as F-178 and F-278: **two front ends to one
+library is two defaults unless the library holds the default.** Neither front
+end was wrong about what it was doing. They were wrong about each other.
+
+### F-287: keeping the keys removed the decoy passphrase, and on an older machine the lock itself
+
+Found by building a reset plan against a **real** app lock for the first time.
+See F-288 for why that had never happened.
+
+`reset::key_paths` named three files: the vault's index and the two copies of
+the lock it derives. The app lock is kept in more than three:
+
+- **The decoy record.** `crate::decoy` keeps it under a derived name, so
+  nothing in `crate::layout` names it, and a reset puts anything the layout has
+  never heard of into "VeilVoice's own files" and removes it. Keeping the keys
+  therefore kept the lock and removed the second passphrase that opens it.
+  Nothing reported this: the lock still worked, the decoy passphrase simply
+  stopped being recognised, which reads as a forgotten passphrase rather than
+  as a file that was deleted.
+- **`applock.bin`, the file the vault replaced.** `lock::open_in` still adopts
+  it, deliberately, because every user who set a lock through the window in
+  0.1.17 has one and ignoring it would take their lock away (F-141). It is not
+  in the layout either. So on a machine whose only lock is that file, "keep my
+  password" removed the password, and `key_paths` returned an empty list, so the
+  plan did not even claim to be keeping anything: there was nothing on the
+  screen for somebody to notice was missing.
+
+**The fix.** `keys_in` names all five: the index, the two copies, the decoy
+record and the legacy file, and `crate::lock::LEGACY_NAME` is `pub(crate)` so
+the reset and the lock spell that name once between them rather than twice.
+
+**What is checked.**
+`keeping_the_keys_keeps_the_decoy_and_the_old_lock_file` makes a real lock with
+a real decoy and a legacy file beside it, and asserts of each that it is in the
+plan's `keeping` and in none of its `going`, then carries the plan out and
+asserts the files are still there, and that the vaults went anyway.
+`removing_the_keys_removes_the_decoy_and_the_old_lock_file` asserts the other
+direction, because a reset asked for the whole folder that leaves a lock behind
+is not the new install it reports.
+`the_old_lock_file_alone_is_still_the_lock` is the 0.1.17 machine.
+
+The shape: **a file kept under a derived name is invisible to anything that
+works from a list of names.** The reset works by exclusion precisely so that an
+unknown file is still removed, and that is right; what it needs, and now has, is
+for every file that is part of the lock to be named by the one module that
+derives those names.
+
+### F-288: a test that had only ever exercised the branch where nothing works
+
+Found while writing F-287's test, and it is the reason F-287 survived six
+releases.
+
+`reset::tests::folder()` builds a folder with one of everything in it, and
+writes the app lock's index as the twelve bytes `a named file`. No vault can
+parse that. So `Vault::at` failed, `key_paths` took its fallback arm, returned
+the index on its own, and every test that asked for `Keep::Keys` asserted
+against the behaviour of a machine whose lock is broken. The branch that
+resolves a real lock, which is the branch every user is on, had no test at all.
+`keeping_the_keys_keeps_the_lock_and_nothing_else` passed throughout, and what
+it proved was that an unreadable index is kept.
+
+**And the fallback arm was itself wrong.** It kept the one file it could name
+and let the rest of the folder go, so a reset on a machine with a damaged index
+would have kept the index and removed the two copies of the lock, the decoy
+record and everything else: the plan said the keys were staying and the disk
+would have lost them. "Keep the keys" is a promise, and a plan that cannot work
+out which files the keys are in cannot keep it.
+
+**The fix.** `keys_in` returns the paths **and** a reason when it cannot
+resolve them, `Plan::blocked` carries that reason, `plan_in` returns a plan with
+nothing in it, and `carry_out` refuses one outright rather than trusting its
+caller to have read the field. Both front ends print the reason and say what
+the way through is: the reset that keeps nothing, which needs none of this
+worked out. `folder_with_a_real_lock` is the helper tests about keeping the keys
+use now, and `folder`'s own documentation says what its index is for.
+
+**The administrator's copy had the same problem from the other side.**
+`vault::admin_dir` puts the second copy of the lock under `/etc/veilvoice` where
+the process can write there, so whether that copy is inside the folder being
+reset depends on the machine the tests run on: a laptop has no such directory, a
+container running as root has one the moment any test makes a lock, and a
+runner that is not root has none again. The same assertion asked a different
+question in each place. `vault::pretend_admin_dir` is a `#[cfg(test)]`
+thread-local that lets a test say which machine it is on, and these tests say
+"an ordinary user's". It is deliberately not an environment variable: the
+administrator-owned copy is a security property, and a variable that redirects
+it is a way to talk a real run into writing its spare lock where an ordinary
+user can edit it.
+
+**What is checked.** `a_lock_that_will_not_read_blocks_the_reset` asserts the
+reason, that the plan is empty, that `carry_out` refuses it and removes nothing,
+and that asking for the reset that keeps nothing still works.
+
+The shape, which this document has now recorded eight times: **a test that
+passes can be a test of nothing.** F-186 and F-182 are the same thing in
+different modules. What is new here is the mechanism, and it is worth naming
+because it is cheap to repeat: the fixture was easier to write wrongly than
+rightly, so every test built on it inherited the wrong branch, and each of them
+passed.
+
 ## The thirty-sixth round: every code scanning alert, read one at a time
 
 The repository's own CodeQL workflow replaced GitHub's default setup on
@@ -12090,8 +12234,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and eighty-five defects found and fixed (F-1 to F-285), across
-thirty-six rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Two hundred and eighty-eight defects found and fixed (F-1 to F-288), across
+thirty-seven rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

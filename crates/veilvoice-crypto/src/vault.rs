@@ -395,8 +395,51 @@ const ADMIN_DIR: &str = "/etc/veilvoice";
 /// About panel -- must not leave a directory behind under `/etc` on a machine
 /// that never had one. This is that caller's question.
 pub fn admin_dir_present() -> Option<PathBuf> {
+    #[cfg(test)]
+    if let Some(pretend) = pretended() {
+        return pretend;
+    }
     let dir = PathBuf::from(ADMIN_DIR);
     dir.is_dir().then_some(dir)
+}
+
+#[cfg(test)]
+thread_local! {
+    /// What a test has said this machine's administrator directory is.
+    ///
+    /// `None` means no test has said anything and the real answer stands;
+    /// `Some(None)` is a test saying there is none, which is the ordinary
+    /// user's machine. Per thread, so tests running side by side do not read
+    /// each other's answer.
+    static PRETEND_ADMIN: std::cell::RefCell<Option<Option<PathBuf>>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+/// This thread's answer from [`pretend_admin_dir`], if a test has given one.
+#[cfg(test)]
+fn pretended() -> Option<Option<PathBuf>> {
+    PRETEND_ADMIN.with(|cell| cell.borrow().clone())
+}
+
+/// Tell this thread's tests where the administrator's directory is, or that
+/// there is none.
+///
+/// Both functions above answer from the machine the tests are running on, and
+/// that is a machine the tests do not choose: a developer's laptop has no
+/// `/etc/veilvoice`, a container running as root has one the moment any test
+/// makes a lock, and a continuous-integration runner that is not root has none
+/// again. So the same test asks a different question in each place: whether
+/// the second copy of the lock is inside the folder being reset or outside it,
+/// which is the whole subject of several of them.
+///
+/// `#[cfg(test)]`, and nothing outside this crate's own tests can reach it. It
+/// is deliberately not an environment variable: the administrator-owned copy
+/// is a security property, and a variable that redirects it is a way to
+/// persuade a real run to write its spare lock somewhere an ordinary user can
+/// edit.
+#[cfg(test)]
+pub(crate) fn pretend_admin_dir(dir: Option<PathBuf>) {
+    PRETEND_ADMIN.with(|cell| *cell.borrow_mut() = Some(dir));
 }
 
 /// A directory only an administrator can write to, if this process can make
@@ -415,6 +458,10 @@ pub fn admin_dir_present() -> Option<PathBuf> {
 /// would be a second copy, which [`Vault`] already provides, not a privileged
 /// one, and calling it privileged would be the overclaim.
 pub fn admin_dir() -> Option<PathBuf> {
+    #[cfg(test)]
+    if let Some(pretend) = pretended() {
+        return pretend;
+    }
     if cfg!(windows) {
         return None;
     }

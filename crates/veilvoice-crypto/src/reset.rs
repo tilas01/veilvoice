@@ -72,13 +72,21 @@ use crate::{layout, vault, Error};
 use std::path::{Path, PathBuf};
 
 /// What a reset leaves behind.
+///
+/// [`Keep::Keys`] is the default, and which way round that goes is a decision
+/// rather than a detail. A `Keep::default()` meaning "remove the key to the
+/// recordings" is the wrong way round for a type whose mistaken value costs
+/// somebody their recordings: the safe answer has to be the one a caller
+/// arrives at by not thinking about it. The window had it this way round
+/// already and the command line did not, which is how the two ended up
+/// disagreeing about what `veilvoice reset` with no flags means.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Keep {
     /// Nothing. The folder goes back to the state it was in before VeilVoice
     /// first ran.
-    #[default]
     Nothing,
     /// The app lock, and with it the key to anything sealed with the app lock.
+    #[default]
     Keys,
 }
 
@@ -115,6 +123,14 @@ pub struct Plan {
     /// lock left under `/etc` restores itself, so it is reported rather than
     /// silently skipped.
     pub beyond_reach: Option<PathBuf>,
+    /// Why this reset will not go ahead, where it will not.
+    ///
+    /// A plan carrying this has an empty [`Plan::going`], so a front end that
+    /// ignores the field still removes nothing, and [`carry_out`] refuses it
+    /// outright. It exists because "keep the keys" is a promise, and a reset
+    /// that cannot work out which files the keys are in cannot keep it: going
+    /// ahead would remove them while the plan said they were staying.
+    pub blocked: Option<String>,
 }
 
 impl Plan {
@@ -181,16 +197,28 @@ pub fn plan(keep: Keep) -> Result<Plan, Error> {
 /// way to test something that deletes without deleting the machine it is
 /// tested on.
 pub fn plan_in(dir: &Path, keep: Keep) -> Plan {
-    let keys = key_paths(dir);
+    let keys = keys_in(dir);
     let mut plan = Plan {
         dir: dir.to_path_buf(),
         going: Vec::new(),
         keeping: Vec::new(),
         beyond_reach: None,
+        blocked: None,
     };
 
+    // A promise this reset cannot keep stops it here, with nothing planned, so
+    // the only way a front end can get past it is by asking for a reset that
+    // keeps nothing. Checked before the folder is even read: there is nothing
+    // to describe, because nothing is going to happen.
     if keep == Keep::Keys {
-        for path in &keys {
+        if let Some(why) = keys.unresolved {
+            plan.blocked = Some(why);
+            return plan;
+        }
+    }
+
+    if keep == Keep::Keys {
+        for path in &keys.paths {
             if path.exists() && path.starts_with(dir) {
                 plan.keeping.push((
                     layout::entry(layout::Item::AppLock).label.to_string(),
@@ -198,7 +226,7 @@ pub fn plan_in(dir: &Path, keep: Keep) -> Plan {
                 ));
             }
         }
-    } else if let Some(outside) = keys.iter().find(|path| !path.starts_with(dir)) {
+    } else if let Some(outside) = keys.paths.iter().find(|path| !path.starts_with(dir)) {
         if outside.exists() {
             plan.beyond_reach = Some(outside.clone());
         }
@@ -214,7 +242,7 @@ pub fn plan_in(dir: &Path, keep: Keep) -> Plan {
     present.sort();
 
     let kept: Vec<&PathBuf> = if keep == Keep::Keys {
-        keys.iter().collect()
+        keys.paths.iter().collect()
     } else {
         Vec::new()
     };
@@ -292,6 +320,14 @@ pub fn plan_in(dir: &Path, keep: Keep) -> Plan {
 /// not a failure: it was going anyway.
 pub fn carry_out(plan: &Plan) -> Report {
     let mut report = Report::default();
+    // Stated here as well as in `plan_in`, which returns a blocked plan with
+    // nothing in it. Two front ends and anything written later all call this,
+    // and a refusal that depends on the caller having read a field is not a
+    // refusal.
+    if let Some(why) = &plan.blocked {
+        report.refused.push(why.clone());
+        return report;
+    }
     for going in &plan.going {
         let mut failed = Vec::new();
         for path in &going.paths {
@@ -317,29 +353,87 @@ pub fn carry_out(plan: &Plan) -> Report {
     report
 }
 
-/// The app lock's own files: the index, and the two copies it names.
+/// Everything "keep the keys" has to keep, or the reason it cannot be worked
+/// out.
+struct Keys {
+    /// The files themselves.
+    paths: Vec<PathBuf>,
+    /// Why this is not the whole list, where it is not. See [`Plan::blocked`]:
+    /// a partial list is the dangerous answer, because the files missing from
+    /// it are removed by a reset that said it was keeping them.
+    unresolved: Option<String>,
+}
+
+/// The app lock's own files: the index, the two copies it names, the decoy
+/// record and the single file the vault replaced.
 ///
-/// Resolved through [`vault`] rather than worked out here, because the two
-/// copies' names are derived from the index and that module is the one place
-/// that knows how. The index is read rather than created: `Vault::at` makes one
-/// where there is none, and a function that is only *looking* must not leave a
-/// new lock index in a folder that had no lock.
-fn key_paths(dir: &Path) -> Vec<PathBuf> {
+/// Resolved through [`vault`] rather than worked out here, because the derived
+/// names come from the index and that module is the one place that knows how.
+/// The index is read rather than created: `Vault::at` makes one where there is
+/// none, and a function that is only *looking* must not leave a new lock index
+/// in a folder that had no lock.
+///
+/// # Why the list is longer than the lock
+///
+/// Two of these were missing, and both are things somebody who ticked "keep my
+/// password" would have lost:
+///
+/// - **The decoy record.** [`crate::decoy`] keeps it under a derived name, so
+///   nothing in [`layout`] names it and it fell into the group of files a
+///   reset removes without knowing what they are. The decoy passphrase is part
+///   of how the lock behaves, not a vault, so a reset that keeps the lock and
+///   removes this leaves a lock whose second passphrase has silently stopped
+///   working.
+/// - **The file the vault replaced.** [`crate::lock::open_in`] still adopts
+///   `applock.bin`, because every user who set a lock through the window in
+///   0.1.17 has one and ignoring it would take their lock away (F-141). It is
+///   not in the layout either, so the same reset removed the *only* lock those
+///   machines have.
+fn keys_in(dir: &Path) -> Keys {
     let index = dir.join(layout::entry(layout::Item::AppLock).name);
+    let legacy = dir.join(crate::lock::LEGACY_NAME);
     if !index.is_file() {
-        return Vec::new();
+        // No index. There may still be the file the vault replaced, which is
+        // the whole lock on a machine that has not been through a vaulted
+        // release, and is therefore exactly what keeping the keys keeps.
+        let paths = if legacy.is_file() {
+            vec![legacy]
+        } else {
+            Vec::new()
+        };
+        return Keys {
+            paths,
+            unresolved: None,
+        };
     }
     let Ok(vault) = vault::Vault::at(dir, vault::admin_dir_present().as_deref()) else {
-        // An index that will not read. The lock cannot be resolved, so the
-        // index is all that can be named, and it is named: a reset keeping the
-        // keys keeps it, and a reset removing them removes it.
-        return vec![index];
+        // An index that will not read. The derived names cannot be worked out
+        // from it, so the two copies and the decoy record cannot be named at
+        // all: see `Plan::blocked` for why that refuses the reset rather than
+        // keeping the one file it can name.
+        return Keys {
+            paths: vec![index],
+            unresolved: Some(
+                "the app lock's index will not read, so the files it names cannot be \
+                 worked out. Keeping the keys would mean keeping files this cannot \
+                 identify, and removing the rest of the folder would take them with it"
+                    .to_string(),
+            ),
+        };
     };
-    vec![
+    let mut paths = vec![
         vault.index().to_path_buf(),
         vault.primary().to_path_buf(),
         vault.shadow().to_path_buf(),
-    ]
+        vault.decoy().to_path_buf(),
+    ];
+    if legacy.is_file() {
+        paths.push(legacy);
+    }
+    Keys {
+        paths,
+        unresolved: None,
+    }
 }
 
 /// How many files and how many bytes, counting inside a folder.
@@ -375,7 +469,21 @@ mod tests {
 
     /// A folder with one of everything named in it, and some things that are
     /// not.
+    ///
+    /// The app lock's index here is twelve bytes of the words "a named file",
+    /// which no vault can parse. That is deliberate and it is also what hid
+    /// two defects for as long as it did: every test that asked for
+    /// [`Keep::Keys`] went down the branch for an index that will not read,
+    /// and never once exercised the branch that resolves a real one. Anything
+    /// about what keeping the keys keeps belongs in
+    /// [`folder_with_a_real_lock`] instead.
     fn folder() -> tempfile::TempDir {
+        // The folder under test is the whole machine as far as these tests are
+        // concerned. Without this, a container running as root has an
+        // `/etc/veilvoice` and the second copy of the lock lands outside the
+        // folder, so the same assertions ask a different question here than on
+        // a laptop or a continuous-integration runner.
+        vault::pretend_admin_dir(None);
         let dir = tempfile::tempdir().expect("a temporary directory");
         for entry in layout::ALL {
             let path = dir.path().join(entry.name);
@@ -392,6 +500,189 @@ mod tests {
             std::fs::write(dir.path().join(name), b"derived").unwrap();
         }
         dir
+    }
+
+    /// Cheap Argon2id, so a test that makes a real lock finishes.
+    fn weak() -> crate::kdf::KdfParams {
+        crate::kdf::KdfParams::weak_for_tests()
+    }
+
+    /// A folder with a **real** app lock in it: a vault, its two copies, a
+    /// decoy record, and the file the vault replaced.
+    ///
+    /// Everything else the layout names is there too, so a plan made here is
+    /// the plan a used machine gets. Returns the paths the keys are in, in the
+    /// order a reader would name them.
+    fn folder_with_a_real_lock() -> (tempfile::TempDir, Vec<PathBuf>) {
+        let dir = folder();
+        // The twelve-byte index from `folder` has to go first: `create_in`
+        // writes a real one, and a reset is being asked about what is there
+        // afterwards.
+        std::fs::remove_file(dir.path().join(layout::entry(layout::Item::AppLock).name)).unwrap();
+
+        let mut store = crate::lock::create_in(dir.path(), b"the real one", weak()).unwrap();
+        let decoys = crate::decoy::Store::at(dir.path()).unwrap();
+        decoys
+            .set(&mut store, "the real one", "the other one")
+            .expect("a decoy is set");
+        std::fs::write(dir.path().join(crate::lock::LEGACY_NAME), b"the old lock").unwrap();
+
+        let vault = vault::Vault::at(dir.path(), vault::admin_dir_present().as_deref()).unwrap();
+        let paths = vec![
+            vault.index().to_path_buf(),
+            vault.primary().to_path_buf(),
+            vault.shadow().to_path_buf(),
+            vault.decoy().to_path_buf(),
+            dir.path().join(crate::lock::LEGACY_NAME),
+        ];
+        for path in &paths {
+            assert!(path.is_file(), "{} was not written", path.display());
+        }
+        (dir, paths)
+    }
+
+    /// Not passing a choice keeps the keys.
+    ///
+    /// Which way round this goes is the decision, not the detail. The window
+    /// had it this way and the command line did not, so `veilvoice reset` and
+    /// the window's own button meant different things, and the one that
+    /// differed was the one that removed the key to the recordings.
+    #[test]
+    fn the_default_is_to_keep_the_keys() {
+        assert_eq!(Keep::default(), Keep::Keys);
+    }
+
+    /// Keeping the keys keeps **all** of them.
+    ///
+    /// The decoy record and the file the vault replaced are kept under derived
+    /// or legacy names that [`layout`] does not list, so both fell into the
+    /// group of files a reset removes without knowing what they are. Somebody
+    /// who ticked "keep my password" lost their decoy passphrase, and on a
+    /// machine that had only ever set a lock through the 0.1.17 window they
+    /// lost the lock itself.
+    #[test]
+    fn keeping_the_keys_keeps_the_decoy_and_the_old_lock_file() {
+        let (dir, keys) = folder_with_a_real_lock();
+        let plan = plan_in(dir.path(), Keep::Keys);
+        assert!(plan.blocked.is_none(), "{:?}", plan.blocked);
+
+        for path in &keys {
+            assert!(
+                plan.keeping.iter().any(|(_, kept)| kept == path),
+                "{} is part of the lock and was not kept: {:?}",
+                path.display(),
+                plan.keeping
+            );
+            assert!(
+                !plan
+                    .going
+                    .iter()
+                    .flat_map(|going| &going.paths)
+                    .any(|doomed| doomed == path),
+                "{} is both kept and removed",
+                path.display()
+            );
+        }
+
+        // And the reset still happens: this is not a plan that keeps
+        // everything because it failed to work anything out.
+        assert!(!plan.is_empty(), "nothing at all was planned");
+        carry_out(&plan);
+        for path in &keys {
+            assert!(path.is_file(), "{} went anyway", path.display());
+        }
+        assert!(
+            !dir.path()
+                .join(layout::entry(layout::Item::Vaults).name)
+                .exists(),
+            "the vaults stayed, and they are what starting again means"
+        );
+    }
+
+    /// A reset that removes the keys removes all of them too.
+    ///
+    /// The other direction of the same list. A reset asked for the whole
+    /// folder that left the decoy record or the old lock file behind would
+    /// leave a machine that is not the new install it reports.
+    #[test]
+    fn removing_the_keys_removes_the_decoy_and_the_old_lock_file() {
+        let (dir, keys) = folder_with_a_real_lock();
+        let plan = plan_in(dir.path(), Keep::Nothing);
+        assert!(plan.keeping.is_empty(), "{:?}", plan.keeping);
+        carry_out(&plan);
+        for path in &keys {
+            assert!(!path.exists(), "{} is still there", path.display());
+        }
+    }
+
+    /// A machine whose only lock is the file the vault replaced keeps it.
+    ///
+    /// There is no index to resolve, so the plan cannot be built from the
+    /// vault at all, and the answer still has to be "that file is the lock".
+    #[test]
+    fn the_old_lock_file_alone_is_still_the_lock() {
+        let dir = tempfile::tempdir().unwrap();
+        let legacy = dir.path().join(crate::lock::LEGACY_NAME);
+        crate::LockStore::create(&legacy, b"from 0.1.17", weak()).unwrap();
+        std::fs::write(
+            dir.path().join(layout::entry(layout::Item::Settings).name),
+            b"{}",
+        )
+        .unwrap();
+
+        let plan = plan_in(dir.path(), Keep::Keys);
+        assert!(plan.blocked.is_none(), "{:?}", plan.blocked);
+        assert!(
+            plan.keeping.iter().any(|(_, path)| *path == legacy),
+            "the only lock this machine has was not kept: {:?}",
+            plan.keeping
+        );
+        carry_out(&plan);
+        assert!(legacy.is_file(), "the only lock this machine has went");
+        assert!(crate::LockStore::open(&legacy).unwrap().is_some());
+    }
+
+    /// A reset that cannot work out where the keys are does not go ahead.
+    ///
+    /// "Keep the keys" is a promise. An index that will not read means the
+    /// derived names cannot be worked out, so the two copies and the decoy
+    /// record cannot be told apart from the files a reset removes. Keeping the
+    /// one file that can be named and removing the rest would have kept the
+    /// promise in the plan and broken it on the disk.
+    #[test]
+    fn a_lock_that_will_not_read_blocks_the_reset() {
+        // `folder`'s index is twelve bytes of text, which is exactly this case.
+        let dir = folder();
+        let plan = plan_in(dir.path(), Keep::Keys);
+
+        let why = plan.blocked.as_ref().expect("the reset refused");
+        assert!(why.contains("will not read"), "{why}");
+        assert!(
+            plan.is_empty() && plan.keeping.is_empty(),
+            "a blocked plan described work it must not do"
+        );
+
+        // The half that removes refuses it as well, because two front ends and
+        // anything written later all call it, and a refusal that depends on
+        // the caller reading a field is not a refusal.
+        let before: Vec<PathBuf> = std::fs::read_dir(dir.path())
+            .unwrap()
+            .flatten()
+            .map(|entry| entry.path())
+            .collect();
+        let report = carry_out(&plan);
+        assert!(!report.complete(), "a blocked plan reported success");
+        assert_eq!(report.removed, Vec::<String>::new());
+        assert_eq!(report.refused, vec![why.clone()]);
+        for path in before {
+            assert!(path.exists(), "{} went", path.display());
+        }
+
+        // And the way through is the reset that keeps nothing, which needs
+        // none of this worked out.
+        let whole = plan_in(dir.path(), Keep::Nothing);
+        assert!(whole.blocked.is_none());
+        assert!(!whole.is_empty());
     }
 
     #[test]
@@ -450,7 +741,7 @@ mod tests {
 
     #[test]
     fn keeping_the_keys_keeps_the_lock_and_nothing_else() {
-        let dir = folder();
+        let (dir, _) = folder_with_a_real_lock();
         let plan = plan_in(dir.path(), Keep::Keys);
         let index = dir.path().join(layout::entry(layout::Item::AppLock).name);
 

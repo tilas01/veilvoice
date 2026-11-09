@@ -246,6 +246,34 @@ impl Reset {
             return;
         };
 
+        // Before `is_empty`, which a blocked plan also is. The folder is full
+        // and the reset is refusing, so "there is nothing to remove" is the
+        // one sentence this must not show.
+        if let Some(why) = &plan.blocked {
+            ui.label(
+                RichText::new("This reset will not go ahead")
+                    .color(p::yellow())
+                    .strong(),
+            );
+            ui.label(RichText::new(why.clone()).small().color(p::muted()));
+            ui.add_space(8.0);
+            ui.label(
+                RichText::new(
+                    "  Nothing was touched. Turning the checkbox off removes the whole \
+                     folder, the app lock included, which needs none of this worked \
+                     out: that is the way through if the lock is one you have given \
+                     up on.",
+                )
+                .small()
+                .color(p::muted()),
+            );
+            ui.add_space(8.0);
+            if ui.button("back").clicked() {
+                self.state = State::Idle;
+            }
+            return;
+        }
+
         if plan.is_empty() {
             ui.label(
                 RichText::new("There is nothing to remove: this is already a new install.")

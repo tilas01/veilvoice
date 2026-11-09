@@ -32,8 +32,9 @@
 //! # In plain words
 //!
 //! Puts VeilVoice back to how it was the day you installed it. It shows you
-//! what it is about to remove before it removes anything, and `--keep-keys`
-//! leaves your password and the key to your recordings alone.
+//! what it is about to remove before it removes anything, and it leaves your
+//! password and the key to your recordings alone unless you ask for those too
+//! with `--drop-keys`.
 
 use crate::theme::{colour, err, field, heading, ok, paint, warn};
 use std::io::IsTerminal;
@@ -46,10 +47,16 @@ use veilvoice_crypto::reset::{self, Keep, Plan};
 pub const TYPED: &str = "RESET";
 
 /// Run the reset.
-pub fn run(keep_keys: bool, dry_run: bool, yes: bool, confirm: Option<&str>) -> Result<(), String> {
+///
+/// The flag says what to *drop*, not what to keep, because the lock is kept by
+/// default: `veilvoice reset` with no flags and the window's own reset now mean
+/// the same thing. They did not, and the command line was the one in the
+/// wrong: it removed the key to the recordings unless somebody passed a flag
+/// asking it not to.
+pub fn run(drop_keys: bool, dry_run: bool, yes: bool, confirm: Option<&str>) -> Result<(), String> {
     println!("{}", heading("Start again"));
 
-    let keep = if keep_keys { Keep::Keys } else { Keep::Nothing };
+    let keep = if drop_keys { Keep::Nothing } else { Keep::Keys };
     let plan = reset::plan(keep).map_err(|_| {
         "this platform did not say where to keep configuration, so there is no \
          folder to reset"
@@ -58,6 +65,25 @@ pub fn run(keep_keys: bool, dry_run: bool, yes: bool, confirm: Option<&str>) -> 
 
     println!("{}", field("folder", &plan.dir.display().to_string()));
     println!();
+
+    // Before `is_empty`, which a blocked plan also is. "There is nothing to
+    // remove" would be the one wrong thing to say here: the folder is full and
+    // the reset is refusing.
+    if let Some(why) = &plan.blocked {
+        println!("{}", err("this reset will not go ahead"));
+        for line in crate::lock::wrap(why, 66) {
+            println!("{}", paint(colour::MUTED, &format!("  {line}")));
+        }
+        println!();
+        println!(
+            "{}",
+            paint(
+                colour::MUTED,
+                "  Nothing was touched. `veilvoice reset --drop-keys` removes the whole\n                   folder, the app lock included, which needs none of this worked out;\n                   that is the way through if the lock is one you have given up on."
+            )
+        );
+        return Err("the app lock could not be identified, so nothing was removed".to_string());
+    }
 
     if plan.is_empty() {
         println!(

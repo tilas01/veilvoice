@@ -278,12 +278,14 @@ NOTES = {
                "the mandate, the vaults and the app lock. What would go is "
                "printed first, a line per thing with the size of it, and "
                "where any of it cannot be put back the word RESET has to be "
-               "typed. It is here as well as in the window because a policy "
+               "typed. The app lock is kept unless --drop-keys asks for it "
+               "too, which is what the window does. It is here as well as in "
+               "the window because a policy "
                "set from the command line has to be removable there, and "
                "because a machine with no display has no window to open.",
         "window": ("settings", "**Settings**, under Storage, which shows the "
                    "same list and asks for the same word"),
-        "example": "veilvoice reset --keep-keys --dry-run",
+        "example": "veilvoice reset --dry-run",
     },
     "policy": {
         "use": "Settings fixed so the interface cannot turn them off, for a "

@@ -231,6 +231,40 @@ def audit_findings() -> tuple[int, int]:
     return len(entries), max(entries)
 
 
+def audit_rounds() -> str:
+    """How many rounds the audit's verdict says it has run, in its own words.
+
+    Counted by nobody. The number of rounds cannot be measured the way the
+    findings can: thirty-one sections carry a round heading and the verdict
+    says thirty-seven, because the earliest rounds are written up together in
+    §2 rather than under a heading each. So any count taken from the headings
+    would be a different claim wearing the same words, which is F-61 again.
+
+    The verdict is therefore the source, read rather than written: it is the
+    one sentence in the project that states this, a person maintains it, and
+    the front page is a restatement of it. Reading it here is what stops the
+    restatement drifting, which it did once already and stood wrong for six
+    rounds (F-105).
+
+    The bold markers are part of the pattern for the reason
+    `tools/site-tests/css.test.js` gives: the audit quotes its own stale
+    verdicts inside write-ups about them having gone stale, a quotation is not
+    bold, and the verdict always is.
+    """
+    text = (ROOT / "docs" / "AUDIT.md").read_text(encoding="utf-8")
+    found = re.search(
+        r"\*\*[A-Za-z- ]+ defects found and fixed \(F-1 to F-\d+\), across\s+"
+        r"([a-z-]+) rounds\.\*\*",
+        text)
+    if not found:
+        raise SystemExit(
+            "docs/AUDIT.md's verdict does not state its round count in the shape "
+            "this reads (a bold \"... defects found and fixed (F-1 to F-n), across "
+            "<words> rounds.\"), so the front page's round count has nothing to "
+            "follow")
+    return found.group(1)
+
+
 def host_triple() -> str:
     """The target this machine builds for, as rustc names it.
 
@@ -286,6 +320,13 @@ CLAIMS = [
     # written after (F-61, F-63, F-71).
     ("README.md", r"\*\*(\d+) defects\*\*", "written_up"),
     ("website/index.html", r"(\d+) defects found and fixed across", "written_up"),
+    # The round count beside it, which is the half nobody was writing: the
+    # digits were kept current here while the words were typed once and left,
+    # so the page said thirty-six for a round after the audit said
+    # thirty-seven. Its measurement is `audit_rounds`, which reads the verdict
+    # rather than counting anything, and the reasoning is there.
+    ("website/index.html", r"\d+ defects found and fixed across ([a-z-]+) audit rounds",
+     "rounds"),
 ]
 
 
@@ -338,6 +379,7 @@ def measure() -> dict:
         "lines": sum(loc.per_crate().values()),
         "written_up": written_up,
         "highest": highest,
+        "rounds": audit_rounds(),
     }
 
 
@@ -349,6 +391,7 @@ def render(measurements: dict) -> str:
         ("Functional lines of Rust", measurements["lines"]),
         ("Findings written up in the audit", measurements["written_up"]),
         ("Highest finding number used", measurements["highest"]),
+        ("Audit rounds, as the verdict states them", measurements["rounds"]),
     ]
     body = "".join(f"| {name} | {value} |\n" for name, value in rows)
     body += f"| Measured on | `{host_triple()}` |\n"

@@ -975,7 +975,13 @@ pub fn open_default() -> Result<(Option<LockStore>, bool), Error> {
 }
 
 /// The name the lock had before the vault: one file, under the obvious name.
-const LEGACY_NAME: &str = "applock.bin";
+///
+/// `pub(crate)` because [`crate::reset`] has to name it too: it is the whole
+/// lock on a machine that set one through the window in 0.1.17, [`open_in`]
+/// still adopts it, and a reset that keeps the keys has to keep it. Spelled in
+/// one place rather than two, so a rename cannot leave the reset removing a
+/// file the lock still reads.
+pub(crate) const LEGACY_NAME: &str = "applock.bin";
 
 /// Whether a lock is kept under `base`, in the vault or as the old single
 /// file, found without opening it or writing anything.
