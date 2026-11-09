@@ -55,8 +55,14 @@ jobs:
 
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
 
+      # An exact version, because `--locked` pins the tool's dependencies and
+      # not the tool. Without it this builds whatever cargo-mutants release is
+      # newest that morning, and a change in how it counts survivors would
+      # change this job's verdict without anything here saying so. Dependabot
+      # does not read `cargo install`, so a newer release is a change somebody
+      # makes and reads. Checked by `tools/audit/cargo_installs.py`.
       - name: Install cargo-mutants
-        run: cargo install cargo-mutants --locked
+        run: cargo install cargo-mutants --version 27.1.0 --locked
 
       # `--timeout 300` because the crypto tests run Argon2id, which is
       # expensive by design: the default timeout reports a mutant as timing out

@@ -559,6 +559,14 @@ jobs:
           python tools/audit/checkout_tokens.py
           python tools/audit/checkout_tokens.py --self-test
 
+      # One layer down from an unpinned action. `cargo install --locked` pins
+      # the tool's dependencies, not the tool, so without `--version` the job
+      # builds whichever release is newest that morning.
+      - name: Every tool a workflow installs with cargo must be at an exact version
+        run: |
+          python tools/audit/cargo_installs.py
+          python tools/audit/cargo_installs.py --self-test
+
       # F-241. PowerShell scopes a variable to the function that assigns it, so
       # `$problems +=` inside a function appends to a copy that is discarded
       # when the function returns. The screenshot script lost every problem it

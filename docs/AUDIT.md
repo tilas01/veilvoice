@@ -809,6 +809,32 @@ notes tool and fails on one without the dry-run waiver. Checked both ways: it
 names the technical document step against the workflow before the fix, and
 passes after it.
 
+### F-NNN: the mutation and fuzz jobs built whichever tool release was newest
+
+**Where:** `.github/workflows/mutants.yml`, the cargo-mutants install, and
+`.github/workflows/fuzz.yml`, the cargo-fuzz install.
+
+**What happened:** both ran `cargo install <tool> --locked` with no version.
+`--locked` pins the tool's dependencies to the lockfile it was published with,
+not the tool itself, so each run asked crates.io for the newest release that
+morning and built it on a runner holding a checkout of this repository. Every
+action here is pinned to a commit for exactly that reason, and these two
+installs were the same hole one layer down. A release that changed how
+cargo-mutants counts survivors would also have changed what the weekly verdict
+means, with nothing in the tree recording it. Found by the skill and plugin
+scanner while it read the workflows.
+
+**Fix:** both installs name an exact release, cargo-mutants 27.1.0 and
+cargo-fuzz 0.13.2, each checked to build with `--locked` before it was
+written in. Dependabot does not read `cargo install`, so a newer release is a
+change somebody makes and reads.
+
+**Regression test:** `tools/audit/cargo_installs.py`, run by CI and by
+`tools/verify.py`, fails on any `cargo install` in a workflow without an exact
+version and `--locked`. It names both lines against the workflows before the
+fix and passes after it, and its `--self-test` covers the version spellings,
+continued lines and a version that only appears in a comment.
+
 ## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
 
 The round before 0.1.23, and it is a different kind of round from the three

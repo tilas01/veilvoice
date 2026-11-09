@@ -37,10 +37,14 @@ jobs:
         with:
           persist-credentials: false
 
+      # Nightly floats, because cargo-fuzz needs it and the campaigns test our
+      # code rather than the compiler. cargo-fuzz does not: an exact version,
+      # so a new release reaches this job as a change somebody reads. Checked
+      # by `tools/audit/cargo_installs.py`.
       - name: Install nightly and cargo-fuzz
         run: |
           rustup toolchain install nightly --profile minimal
-          cargo +nightly install cargo-fuzz --locked
+          cargo +nightly install cargo-fuzz --version 0.13.2 --locked
 
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
         with:
