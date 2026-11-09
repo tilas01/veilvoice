@@ -48,6 +48,9 @@ use std::path::{Path, PathBuf};
 
 /// The extensions this project publishes releases as.
 const ARCHIVES: &[&str] = &[".zip", ".tar.gz", ".tgz", ".tar.xz"];
+/// The installer packages published beside them: the two MSIs, the AppImage
+/// and the RPMs. Checked whole, like an archive, and never opened.
+const PACKAGES: &[&str] = &[".msi", ".appimage", ".rpm"];
 
 /// The names of the two files a signed release carries beside its archives.
 pub const SUMS: &str = "SHA256SUMS";
@@ -107,7 +110,11 @@ impl Found {
 /// A filename test, and therefore evidence of nothing. See the module note.
 pub fn looks_like_archive(name: &str) -> bool {
     let lower = name.to_ascii_lowercase();
-    lower.starts_with("veilvoice-") && ARCHIVES.iter().any(|end| lower.ends_with(end))
+    lower.starts_with("veilvoice-")
+        && ARCHIVES
+            .iter()
+            .chain(PACKAGES)
+            .any(|end| lower.ends_with(end))
 }
 
 /// Look in one directory, one level deep.
@@ -317,6 +324,10 @@ mod tests {
             "veilvoice-v0.1.12-linux-x86_64.tar.gz",
             "veilvoice-v0.1.11-openbsd-x86_64.tar.gz",
             "VeilVoice-v0.1.12-macos-aarch64.tar.xz",
+            "veilvoice-v0.1.23-windows-x86_64-user.msi",
+            "veilvoice-v0.1.23-windows-x86_64-machine.msi",
+            "veilvoice-v0.1.23-linux-x86_64.AppImage",
+            "veilvoice-0.1.23-1.fc44.x86_64.rpm",
         ] {
             assert!(looks_like_archive(name), "{name}");
         }

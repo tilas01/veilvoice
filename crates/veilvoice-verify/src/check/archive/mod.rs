@@ -73,6 +73,15 @@ pub enum Kind {
     Zip,
     /// An archive this project publishes and this reader cannot open.
     Unreadable(&'static str),
+    /// An installer package: checked whole against the signed hash list and
+    /// never opened, with a few words for what it is.
+    ///
+    /// Not an archive with contents to compare. The contents list describes
+    /// the zips and tarballs, and the programs inside an MSI or an AppImage
+    /// are the same bytes as the ones in the zip or tarball of the same
+    /// release, so the package's own SHA-256 covers every byte of it and there
+    /// is nothing a second list would add.
+    Package(&'static str),
     /// Not a release archive at all, by its name.
     Unknown,
 }
@@ -88,6 +97,12 @@ pub fn kind_of(name: &str) -> Kind {
         Kind::TarGz
     } else if lower.ends_with(".zip") {
         Kind::Zip
+    } else if lower.ends_with(".msi") {
+        Kind::Package("a Windows installer")
+    } else if lower.ends_with(".appimage") {
+        Kind::Package("an AppImage")
+    } else if lower.ends_with(".rpm") {
+        Kind::Package("an RPM package")
     } else if lower.ends_with(".tar.xz") {
         // Published for the platforms whose packagers expect it. Reading it
         // would mean an xz decoder in the one binary whose smallness is a
@@ -126,6 +141,9 @@ pub fn members(archive: &Path) -> Result<Vec<Inside>, Error> {
         .unwrap_or_default();
     match kind_of(&name) {
         Kind::Unreadable(why) => Err(Error::Malformed(why.to_string())),
+        Kind::Package(what) => Err(Error::Malformed(format!(
+            "{name} is {what}, which is checked whole rather than opened"
+        ))),
         Kind::Unknown => Err(Error::Malformed(format!(
             "{name} is not a name this project publishes a release under"
         ))),

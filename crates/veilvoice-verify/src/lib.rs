@@ -1449,6 +1449,19 @@ fn report_inside(archive: &Path, published: Option<&[check::contents::ArchiveCon
         .to_string_lossy()
         .into_owned();
 
+    // An installer package has no inside to report. It matched the signed
+    // hash list whole before this was reached, and that covers every byte of
+    // it, so there is nothing a contents list would add and its absence from
+    // one is not a gap.
+    if let check::archive::Kind::Package(what) = check::archive::kind_of(&name) {
+        out!("Inside {name}");
+        out!("  {what}, checked whole against the signed hash list and not opened.");
+        out!("  The programs it installs are the same files as the ones in this");
+        out!("  release's archive for the same platform.");
+        out!();
+        return 0;
+    }
+
     let Some(published) = published else {
         out!("Inside {name}");
         out!("  this release published no list of what is inside its archives, so");
@@ -1627,6 +1640,16 @@ fn command_archive(archive: &Path) -> ExitCode {
     if wrong > 0 {
         verdict!("  {wrong} thing(s) inside it did not check out. Do not run any of it.");
         return Status::Refused.into();
+    }
+
+    // An installer package is never opened, so neither of the sentences below
+    // is true of it: what was established is the one hash, of the whole file.
+    if let check::archive::Kind::Package(what) = check::archive::kind_of(&name) {
+        verdict!("  {name} is the published file: {what}, exactly as released.");
+        out!();
+        out!("  {}", check::SCOPE);
+        out!();
+        return Status::Success.into();
     }
 
     // Two different sentences, because two different things were established.

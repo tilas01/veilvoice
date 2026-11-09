@@ -1,0 +1,35 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# The first thing an AppImage runs. It decides which of the two programs
+# inside to start, and nothing else.
+#
+#   ./VeilVoice.AppImage                 opens the window
+#   ./VeilVoice.AppImage --cli info      runs `veilvoice info`
+#   a link named veilvoice to the file   behaves as the veilvoice command
+#
+# So `ln -s ~/Applications/veilvoice-*.AppImage ~/.local/bin/veilvoice` puts
+# the command on PATH, the way a package manager would.
+
+here="$(dirname "$(readlink -f "$0")")"
+
+# Three small libraries the window opens by name at startup and some
+# distributions leave out of a minimal install. They are carried in usr/lib,
+# and used only when this computer has none of its own: a newer copy from the
+# distribution is better than the one built in.
+if ! /sbin/ldconfig -p 2>/dev/null | grep -q 'libxkbcommon-x11\.so\.0 '; then
+    LD_LIBRARY_PATH="$here/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    export LD_LIBRARY_PATH
+fi
+
+# The AppImage runtime sets ARGV0 to the name it was started by.
+case "$(basename "${ARGV0:-$0}")" in
+    veilvoice) exec "$here/usr/bin/veilvoice" "$@" ;;
+    veilvoice-gui) exec "$here/usr/bin/veilvoice-gui" "$@" ;;
+esac
+
+if [ "$1" = "--cli" ]; then
+    shift
+    exec "$here/usr/bin/veilvoice" "$@"
+fi
+exec "$here/usr/bin/veilvoice-gui" "$@"

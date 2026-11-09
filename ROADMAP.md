@@ -480,6 +480,35 @@ is a list of version headings. Both are worth being able to look around in.
 |---:|---|---|---|
 | 191 | **The roadmap you can search**: the scrolling picture of what is done stays as the preview, and opening it brings the whole roadmap up as an overlay. Every item is in it, searchable by number, word or status as you type, filterable by status, and each result opens the item itself with its link. It is generated from this file, like the page and the picture, so the three cannot disagree, and it works with a keyboard alone and on a phone | **planned** | 4 |
 | 192 | **Every release on one line, left to right**: a full-screen overlay that draws the project's history as a timeline across the screen, one mark per release, and animates what each one brought onto it as it is reached: features added, fixes, and security fixes in their own colour by severity, critical, high, medium and low. A legend names every colour and shape. It is generated from `CHANGELOG.md` and `docs/AUDIT.md`, so a release cannot appear on it with a different story than its notes tell. The audit does not give every finding a severity today, so each security finding gets one, written once beside its number and checked by the build so none is left out. The motion stops for anybody who has asked their system for reduced motion | **planned** | 5 |
+
+## Installing it the way your system already installs things
+
+Asked for in October 2026: Windows installers alongside the portable zip, the
+Microsoft Store and winget, an AppImage and an RPM, and later a way for anybody
+on Linux or a BSD to add this project's own repository to the package manager
+they already use, so VeilVoice updates with everything else.
+
+Every one of these is built in CI from source with open tools, lands in the
+signed `SHA256SUMS` like every other download, and installs the same two
+programs the zip carries, so `veilvoice verify machine` checks an installed copy
+against the release whichever way it came. The Store and winget are a
+convenience, never a requirement: the zip and the install scripts keep working
+exactly as they do.
+
+| # | Item | Status | Estimate |
+|---:|---|---|---|
+| 191 | **Two Windows installers**: MSIs built with WiX 5, an open-source toolchain, one for the person installing it with no administrator prompt and one for everybody on the computer. Each program is its own box in the installer, the desktop application and the command line, both ticked by default so either can be left out; the command line puts its folder on `PATH` as a further box that is ticked by default and can be cleared, and take it off `PATH` again on uninstall. `packages.yml` installs each on a Windows runner, runs both programs, checks `PATH` was added and removed, installs again with each program left out in turn, and uninstalls. The installer is not code-signed, which the release notes and `docs/PACKAGING.md` say plainly: its hash is in the signed list, and the Store copy is the one Microsoft signs | **next** | 2 |
+| 192 | **VeilVoice in the Microsoft Store**: an MSIX built from the same two programs, with `veilvoice` reachable from any terminal through an app execution alias, signed by Microsoft at no cost when it is certified, and updated by the Store. The package, its tiles and the listing text are ready; the Store needs the developer account and the reserved name, which are tilas01's to create | **blocked** | 1 |
+| 193 | **winget**: `winget install` by the Store ID once the listing is live, which installs the same Microsoft-signed package and updates through the Store, and a community manifest for the per-user MSI for machines without the Store, written from the signed `SHA256SUMS` by `tools/package/winget.py` | **blocked** | 1 |
+| 194 | **New releases reach the Store and winget by themselves**: a workflow after each release that submits the new package through the Partner Center submission API and opens the winget pull request with komac, each switched on by secrets tilas01 creates, and doing nothing until they exist | **planned** | 2 |
+| 195 | **An AppImage and an RPM**: the AppImage built on the oldest supported Ubuntu so it runs on every distribution from that age onwards, starting the window by default and the command line as `veilvoice`; the RPM built by `rpmbuild` in Fedora from a source tarball, checked with `rpmlint`, installed and run | **next** | 1 |
+| 196 | **Add this project's repository to your package manager**: a signed repository that apt, dnf, zypper, pacman, xbps, apk, Portage and the BSDs' `pkg` can each be pointed at once, after which VeilVoice updates whenever everything else does, as a binary or built from source, for every architecture the release builds. A separate AUR package for those who want one, with pacman's own repository offered first because some Arch users will not use the AUR at all. A tutorial per package manager on the website, the wiki and the README, each one tried on a clean machine before it is published. Parked until tilas01 starts it | **planned** | 10 |
+| 197 | **Phone apps, each in a repository of its own**: an iPhone app in Swift, published as an IPA, and the Android app of roadmap item 107, linked from this repository. At least five releases away, and started only when tilas01 says when and how, including whether they live here instead | **blocked** | - |
+| 198 | **Scoop and Chocolatey**: a Scoop bucket of this project's own that installs the portable zip and updates itself from the signed `SHA256SUMS`, and a Chocolatey package that installs the machine-wide MSI with the same choices as its boxes, through Chocolatey's moderation. Both prepared privately with a tutorial each, and each updated by the release workflow once tilas01 has created the bucket and the account | **planned** | 1 |
+| 199 | **Homebrew for Intel and Apple Silicon Macs**: a tap of this project's own, `brew install tilas01/veilvoice/veilvoice`, building the tagged source on the Mac that installs it, with prebuilt bottles for both kinds of Mac made on GitHub's own runners, and homebrew-core once the project meets its bar. MacPorts after it | **planned** | 1 |
+| 200 | **Signed AUR packages**: `veilvoice` built from the release tag, which makepkg refuses unless tilas01's key signed the tag; `veilvoice-bin`, the release tarball, checked against the signed `SHA256SUMS`; and `veilvoice-git`. Every AUR commit is signed with the same key, by the release workflow, so a release reaches the AUR without tilas01's computer | **planned** | 1 |
+| 201 | **`veilvoice verify <link>`**: paste a release download link and the verifier fetches that file into a private temporary folder, checks its signature and hash, confirms from its first bytes which platform and kind of package it is, and on Windows asks Windows for the Authenticode verdict, then removes the folder. The link is read, never followed: only a release of this repository is accepted, and the address is rebuilt from the constants already compiled in, so the verifier still cannot be pointed at an arbitrary host | **planned** | 2 |
+
 ---
 
 ## The things that are not just work

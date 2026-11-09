@@ -403,7 +403,7 @@ impl Verify {
         ui.add_space(4.0);
         ui.label(
             RichText::new(
-                "Drop the downloaded archive on this window and the hash list and \
+                "Drop the downloaded archive or installer on this window and the hash list and \
                  signature beside it are picked up automatically. Nothing is \
                  downloaded and nothing leaves this machine.",
             )

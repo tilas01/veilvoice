@@ -11,6 +11,11 @@
 
 %global vv_version %{?vv_version}%{!?vv_version:0.1.22}
 
+# The workspace's release profile strips its binaries (`strip = true` in
+# Cargo.toml), so there is no debugging information for a -debuginfo package
+# to carry, and rpmbuild stops on the empty list it would otherwise make.
+%global debug_package %{nil}
+
 Name:           veilvoice
 Version:        %{vv_version}
 Release:        1%{?dist}
@@ -22,14 +27,15 @@ License:        GPL-3.0-or-later
 URL:            https://github.com/tilas01/veilvoice
 Source0:        https://github.com/tilas01/veilvoice/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
+# The same short list docs/INSTALL.md gives for building from source: the
+# ALSA headers, a C compiler and pkg-config. The window opens its windowing
+# libraries at run time rather than linking them, so it needs no headers for
+# them, and the file dialogue is the desktop portal rather than GTK.
 BuildRequires:  cargo
 BuildRequires:  rust >= 1.96
 BuildRequires:  pkgconfig(alsa)
 BuildRequires:  gcc
 BuildRequires:  python3
-# The desktop app needs the windowing stack; the CLI does not.
-BuildRequires:  pkgconfig(gtk+-3.0)
-BuildRequires:  pkgconfig(xkbcommon)
 
 %description
 VeilVoice destroys the biometric voiceprint of a speaker: pitch, formants,

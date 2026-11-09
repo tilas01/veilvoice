@@ -1656,6 +1656,53 @@ fn what_is_inside_an_archive_is_counted_rather_than_glanced_at() {
     std::fs::remove_dir_all(&work).ok();
 }
 
+/// The installers a release publishes beside its archives, the two MSIs, the
+/// AppImage and the RPMs, are found, checked whole and never opened.
+///
+/// The case worth pinning is the one `report_inside` would otherwise get
+/// wrong: the contents list describes the zips and tarballs and names no
+/// package, and "the list does not mention this file" is counted as a
+/// failure for an archive. For a package it is not one, because the
+/// package's own hash in the signed list already covers every byte of it.
+#[test]
+fn an_installer_is_checked_whole_and_not_counted_against_the_contents_list() {
+    let work = tempfile::tempdir().expect("a directory to work in");
+    let only_archives: Vec<check::contents::ArchiveContents> =
+        vec![check::contents::ArchiveContents {
+            archive: "veilvoice-v0.1.23-windows-x86_64.zip".to_string(),
+            members: Vec::new(),
+        }];
+    for (name, what) in [
+        (
+            "veilvoice-v0.1.23-windows-x86_64-user.msi",
+            "a Windows installer",
+        ),
+        (
+            "veilvoice-v0.1.23-windows-x86_64-machine.msi",
+            "a Windows installer",
+        ),
+        ("veilvoice-v0.1.23-linux-x86_64.AppImage", "an AppImage"),
+        ("veilvoice-0.1.23-1.fc44.x86_64.rpm", "an RPM package"),
+    ] {
+        assert_eq!(
+            check::archive::kind_of(name),
+            check::archive::Kind::Package(what),
+            "{name}"
+        );
+        assert!(discover::looks_like_archive(name), "{name} is not found");
+
+        let package = work.path().join(name);
+        std::fs::write(&package, b"not opened, so any bytes will do").unwrap();
+        assert_eq!(report_inside(&package, Some(&only_archives)), 0, "{name}");
+        assert_eq!(report_inside(&package, None), 0, "{name}");
+    }
+
+    // A zip still is opened, and a zip the list leaves out still counts.
+    let zip = work.path().join("veilvoice-v0.1.23-windows-arm64.zip");
+    std::fs::write(&zip, b"").unwrap();
+    assert_eq!(report_inside(&zip, Some(&only_archives)), 1);
+}
+
 /// A `tar` to run, if this machine has one.
 ///
 /// The same skip the release-manifest test takes, for the same reason: the

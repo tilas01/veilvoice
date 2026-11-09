@@ -1,0 +1,407 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# The installer packages: two Windows MSIs, the Microsoft Store MSIX, the
+# AppImage and the RPMs. Every one is built here from source with open tools
+# (the one exception, the Windows SDK's packager for the MSIX, is named where
+# it is used), installed on the runner, run, and removed again.
+#
+# Two ways in:
+#
+#   * Called by release.yml, after its build matrix. The Windows packages then
+#     wrap the very veilvoice.exe and veilvoice-gui.exe that are in the
+#     release's zip, which the signed CONTENTS.sha256 lists, so an installed
+#     copy can be checked against the release byte for byte. Every artifact
+#     this uploads under a `packages-` name lands in the release's staging
+#     folder before SHA256SUMS is
+#     computed, so each package is in the hash list and under its signature
+#     with no step of its own.
+#   * Pushed with a change to the packaging. Then the Windows programs
+#     are compiled here, and the packages are built and tested and kept as the
+#     run's artifacts. Nothing is published.
+#
+# The Linux packages are always compiled here: the AppImage on Ubuntu 22.04,
+# so that it runs on every distribution from that age onwards, and the RPMs
+# by rpmbuild in Fedora, from a source tarball, the way a distribution builds.
+#
+# In plain words: makes the installers people asked for, proves each one
+# installs and runs, and hands them to the release.
+
+name: packages
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: The release's tag, e.g. v0.1.23, or a branch name for a dry run
+        type: string
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'packaging/**'
+      - 'tools/package/**'
+      - '.github/workflows/packages.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  # A push supersedes the one before it; a release run is never cancelled.
+  group: packages-${{ github.event_name }}-${{ github.ref }}-${{ inputs.version }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+env:
+  CARGO_TERM_COLOR: always
+  # Called from a release when an input arrives; pushed otherwise.
+  FROM_RELEASE: ${{ inputs.version != '' }}
+
+jobs:
+  windows:
+    name: windows installers
+    runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      # From Partner Center's Product identity page; repository variables,
+      # not secrets, because they are printed in every Store listing anyway.
+      MSIX_IDENTITY_NAME: ${{ vars.MSIX_IDENTITY_NAME }}
+      MSIX_PUBLISHER: ${{ vars.MSIX_PUBLISHER }}
+      MSIX_PUBLISHER_DISPLAY_NAME: ${{ vars.MSIX_PUBLISHER_DISPLAY_NAME }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: The version
+        shell: bash
+        run: |
+          v="$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1)"
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+          echo "packaging $v"
+
+      - name: The release's own Windows programs
+        if: env.FROM_RELEASE == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: windows-x86_64
+          path: release-zip
+
+      - name: Unpack them
+        if: env.FROM_RELEASE == 'true'
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem release-zip -Filter '*-windows-x86_64.zip' | Select-Object -First 1
+          if (-not $zip) { throw 'the release build uploaded no Windows zip' }
+          Expand-Archive -Path $zip.FullName -DestinationPath unpacked
+          $folder = Get-ChildItem unpacked -Directory | Select-Object -First 1
+          "BIN=$($folder.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Or compile them, for a push
+        if: env.FROM_RELEASE != 'true'
+        shell: bash
+        run: |
+          rustup show
+          cargo build --release --locked --workspace
+          mkdir -p bin
+          cp target/release/veilvoice.exe target/release/veilvoice-gui.exe LICENSE README.md bin/
+          echo "BIN=$(pwd -W)/bin" >> "$GITHUB_ENV"
+
+      # WiX 5.0.2: the last version whose binaries are under the Microsoft
+      # Reciprocal Licence alone. From 6 onwards they carry a separate
+      # maintenance-fee licence. See tools/package/msi.py.
+      - name: Install the WiX Toolset 5
+        shell: bash
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          tools="$USERPROFILE/.dotnet/tools"
+          echo "$tools" >> "$GITHUB_PATH"
+          export PATH="$tools:$PATH"
+          wix extension add --global WixToolset.UI.wixext/5.0.2
+          wix extension add --global WixToolset.Util.wixext/5.0.2
+          wix --version
+
+      - name: Build the two MSIs
+        shell: bash
+        run: python tools/package/msi.py "$BIN" dist --version "$VERSION"
+
+      - name: The per-user MSI asks for no administrator
+        shell: pwsh
+        run: |
+          $msi = (Resolve-Path "dist/veilvoice-v$env:VERSION-windows-x86_64-user.msi").Path
+          $installer = New-Object -ComObject WindowsInstaller.Installer
+          $words = $installer.SummaryInformation($msi, 0).Property(15)
+          # Bit 3 of the word count: elevated privileges are not required.
+          if (($words -band 8) -eq 0) { throw "the per-user MSI would ask for elevation (word count $words)" }
+          "ok: word count $words, no elevation"
+
+      - name: Install, run and remove each MSI
+        shell: pwsh
+        run: |
+          $cases = @(
+            @{ scope = 'user'; folder = "$env:LOCALAPPDATA\Programs\VeilVoice"; env = 'HKCU:\Environment' },
+            @{ scope = 'machine'; folder = "$env:ProgramFiles\VeilVoice"; env = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' }
+          )
+          foreach ($case in $cases) {
+            $msi = (Resolve-Path "dist/veilvoice-v$env:VERSION-windows-x86_64-$($case.scope).msi").Path
+            $log = "install-$($case.scope).log"
+            $run = Start-Process msiexec.exe -ArgumentList @('/i', "`"$msi`"", '/qn', '/l*v', $log) -Wait -PassThru
+            if ($run.ExitCode -ne 0) { Get-Content $log -Tail 60; throw "$($case.scope): install exited $($run.ExitCode)" }
+            foreach ($name in 'veilvoice.exe', 'veilvoice-gui.exe', 'LICENSE') {
+              if (-not (Test-Path (Join-Path $case.folder $name))) { throw "$($case.scope): $name is not in $($case.folder)" }
+            }
+            $said = & (Join-Path $case.folder 'veilvoice.exe') --version
+            if ($said -notmatch [regex]::Escape($env:VERSION)) { throw "$($case.scope): veilvoice --version said $said" }
+            $path = (Get-ItemProperty -Path $case.env -Name Path).Path
+            if ($path -notlike "*$($case.folder)*") { throw "$($case.scope): $($case.folder) is not on PATH: $path" }
+            "ok: $($case.scope) installed into $($case.folder), on PATH, and says $said"
+
+            $run = Start-Process msiexec.exe -ArgumentList @('/x', "`"$msi`"", '/qn') -Wait -PassThru
+            if ($run.ExitCode -ne 0) { throw "$($case.scope): uninstall exited $($run.ExitCode)" }
+            if (Test-Path (Join-Path $case.folder 'veilvoice.exe')) { throw "$($case.scope): the program is still there after uninstalling" }
+            $path = (Get-ItemProperty -Path $case.env -Name Path -ErrorAction SilentlyContinue).Path
+            if ($path -like "*$($case.folder)*") { throw "$($case.scope): PATH still names $($case.folder)" }
+            "ok: $($case.scope) removed, and its PATH entry with it"
+          }
+
+      # Each program, and PATH, is a box in the installer. Leaving any of them
+      # out has to leave out exactly that and nothing else.
+      - name: Each program and PATH can be left out
+        shell: pwsh
+        run: |
+          $msi = (Resolve-Path "dist/veilvoice-v$env:VERSION-windows-x86_64-user.msi").Path
+          $folder = "$env:LOCALAPPDATA\Programs\VeilVoice"
+          $cases = @(
+            @{ features = 'Main,Gui,Cli'; cli = $true; gui = $true; path = $false },
+            @{ features = 'Main,Cli,PathEntry'; cli = $true; gui = $false; path = $true },
+            @{ features = 'Main,Gui'; cli = $false; gui = $true; path = $false }
+          )
+          foreach ($case in $cases) {
+            $run = Start-Process msiexec.exe -ArgumentList @('/i', "`"$msi`"", '/qn', "ADDLOCAL=$($case.features)") -Wait -PassThru
+            if ($run.ExitCode -ne 0) { throw "$($case.features): install exited $($run.ExitCode)" }
+            $cli = Test-Path (Join-Path $folder 'veilvoice.exe')
+            $gui = Test-Path (Join-Path $folder 'veilvoice-gui.exe')
+            $path = (Get-ItemProperty -Path 'HKCU:\Environment' -Name Path -ErrorAction SilentlyContinue).Path
+            $onPath = [bool]($path -like "*$folder*")
+            if ($cli -ne $case.cli) { throw "$($case.features): veilvoice.exe present is $cli" }
+            if ($gui -ne $case.gui) { throw "$($case.features): veilvoice-gui.exe present is $gui" }
+            if ($onPath -ne $case.path) { throw "$($case.features): on PATH is $onPath" }
+            $run = Start-Process msiexec.exe -ArgumentList @('/x', "`"$msi`"", '/qn') -Wait -PassThru
+            if ($run.ExitCode -ne 0) { throw "$($case.features): uninstall exited $($run.ExitCode)" }
+            "ok: $($case.features) installs the command line $cli, the window $gui, PATH $onPath"
+          }
+
+      # The Windows SDK's makeappx and makepri, which every Windows runner
+      # carries. Microsoft's tools, not open source; the package's contents
+      # and the recipe are. See tools/package/msix.py.
+      - name: Build an MSIX with a throwaway identity, to test
+        shell: bash
+        run: python tools/package/msix.py "$BIN" msix-test --version "$VERSION" --test-identity
+
+      - name: Install it, run both aliases, and remove it
+        shell: pwsh
+        run: |
+          $msix = (Resolve-Path "msix-test/veilvoice-v$env:VERSION-windows-x86_64-store.msix").Path
+          # Outside the Store an MSIX installs only when signed by a certificate
+          # the computer trusts. This one is made for the test and thrown away.
+          $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject 'CN=VeilVoice Test' `
+            -CertStoreLocation Cert:\CurrentUser\My -KeyUsage DigitalSignature `
+            -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3', '2.5.29.19={text}')
+          $password = ConvertTo-SecureString -String ([guid]::NewGuid().ToString()) -Force -AsPlainText
+          Export-PfxCertificate -Cert $cert -FilePath test.pfx -Password $password | Out-Null
+          Export-Certificate -Cert $cert -FilePath test.cer | Out-Null
+          Import-Certificate -FilePath test.cer -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null
+          $kits = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\10.*\x64\signtool.exe" | Sort-Object FullName | Select-Object -Last 1
+          $plain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
+          & $kits.FullName sign /fd SHA256 /f test.pfx /p $plain $msix
+          if ($LASTEXITCODE -ne 0) { throw 'signing the test package failed' }
+
+          Add-AppxPackage -Path $msix
+          $package = Get-AppxPackage -Name 'tilas01.VeilVoice.Test'
+          if (-not $package) { throw 'the package did not install' }
+          "ok: installed $($package.PackageFullName)"
+          $alias = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\veilvoice.exe'
+          if (-not (Test-Path $alias)) { throw "no veilvoice.exe alias at $alias" }
+          $said = & $alias --version
+          if ($said -notmatch [regex]::Escape($env:VERSION)) { throw "the alias said $said" }
+          "ok: the veilvoice alias runs and says $said"
+          if (-not (Test-Path (Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\veilvoice-gui.exe'))) { throw 'no veilvoice-gui.exe alias' }
+          Remove-AppxPackage -Package $package.PackageFullName
+          if (Get-AppxPackage -Name 'tilas01.VeilVoice.Test') { throw 'the package is still installed' }
+          'ok: removed'
+
+      # The copy for the Store, unsigned, because the Store signs it. Built
+      # only when the identity Partner Center reserved is known: a package with
+      # any other identity is refused at upload.
+      - name: Build the MSIX for the Store
+        if: env.MSIX_IDENTITY_NAME != ''
+        shell: bash
+        run: python tools/package/msix.py "$BIN" store --version "$VERSION"
+
+      - name: What was built
+        shell: bash
+        run: |
+          cd dist
+          ls -l
+          sha256sum *
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: packages-windows
+          path: dist/*.msi
+          if-no-files-found: error
+
+      # Its own artifact, and never part of the release: it has no signature
+      # until the Store signs it, and Windows will not install an unsigned
+      # package, so a public copy would only be a download that fails. The
+      # release workflow collects `packages-*` and nothing else.
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: env.MSIX_IDENTITY_NAME != ''
+        with:
+          name: store-msix
+          path: store/*.msix
+          if-no-files-found: error
+
+  appimage:
+    name: appimage
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    # The oldest Ubuntu still supported, so the AppImage runs on its C library
+    # and everything newer. See tools/package/appimage.sh.
+    container: ubuntu:22.04
+    env:
+      # The AppImage project's own builder and runtime, by tag and by hash.
+      # A tag can be moved; the hash cannot, and a mismatch stops the build.
+      APPIMAGETOOL_URL: https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage
+      APPIMAGETOOL_SHA256: discover
+      RUNTIME_URL: https://github.com/AppImage/type2-runtime/releases/download/20251108/runtime-x86_64
+      RUNTIME_SHA256: discover
+      # No FUSE inside a container: the tools unpack themselves instead.
+      APPIMAGE_EXTRACT_AND_RUN: 1
+    steps:
+      - name: Build tools and the one library the window needs
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates curl git build-essential pkg-config file python3 \
+            libasound2-dev libxkbcommon-x11-0
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: The pinned Rust toolchain
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+            | sh -s -- -y --profile minimal --default-toolchain none
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Build both programs
+        run: |
+          git config --global --add safe.directory "$PWD"
+          rustup show
+          export SOURCE_DATE_EPOCH="$(git log -1 --pretty=%ct)"
+          export RUSTFLAGS="--remap-path-prefix=$PWD=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
+          cargo build --release --locked --workspace
+          v="$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1)"
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+          echo "C library: $(ldd --version | head -1)"
+          echo "linked by the window:"
+          ldd target/release/veilvoice-gui
+
+      - name: The AppImage tools, checked
+        run: |
+          curl -sSfL -o appimagetool "$APPIMAGETOOL_URL"
+          curl -sSfL -o runtime "$RUNTIME_URL"
+          bad=0
+          for pair in "appimagetool $APPIMAGETOOL_SHA256" "runtime $RUNTIME_SHA256"; do
+            set -- $pair
+            got="$(sha256sum "$1" | cut -d' ' -f1)"
+            if [ "$got" != "$2" ]; then
+              echo "::error::$1 is $got, the workflow pins $2"
+              bad=1
+            fi
+          done
+          [ "$bad" = 0 ]
+          chmod +x appimagetool
+
+      - name: Build the AppImage
+        run: |
+          export SOURCE_DATE_EPOCH="$(git log -1 --pretty=%ct)"
+          sh tools/package/appimage.sh target/release dist "$VERSION" "$PWD/appimagetool" "$PWD/runtime"
+
+      - name: Run it
+        run: |
+          image="dist/veilvoice-v$VERSION-linux-x86_64.AppImage"
+          chmod +x "$image"
+          said="$("$image" --cli --version)"
+          echo "$said"
+          case "$said" in *"$VERSION"*) ;; *) echo "::error::it said $said"; exit 1 ;; esac
+          "$image" --cli info
+          # And by the name a link on PATH would give it.
+          ln -s "$PWD/$image" veilvoice
+          ./veilvoice --version | grep -F "$VERSION"
+          sha256sum dist/*
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: packages-appimage
+          path: dist/*.AppImage
+          if-no-files-found: error
+
+  rpm:
+    name: rpm
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    # Built by rpmbuild in Fedora, from a source tarball, with Fedora's own
+    # Rust: what a distribution's build machine would do.
+    container: fedora:44
+    steps:
+      - name: Build tools
+        run: |
+          dnf install -y --setopt=install_weak_deps=False \
+            rpm-build rpmlint git cargo rust gcc python3 alsa-lib-devel pkgconf-pkg-config
+          cargo --version
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: The source tarball
+        run: |
+          git config --global --add safe.directory "$PWD"
+          v="$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1)"
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+          mkdir -p "$HOME/rpmbuild/SOURCES"
+          git archive --prefix="veilvoice-$v/" -o "$HOME/rpmbuild/SOURCES/veilvoice-$v.tar.gz" HEAD
+
+      - name: Build the source and binary RPMs
+        run: |
+          rpmbuild -ba packaging/rpm/veilvoice.spec \
+            --define "_sourcedir $HOME/rpmbuild/SOURCES" --define "vv_version $VERSION"
+          find "$HOME/rpmbuild/RPMS" "$HOME/rpmbuild/SRPMS" -name '*.rpm' -print
+
+      # Reported, not enforced: docs/PACKAGING.md says which of its findings
+      # stand and why.
+      - name: rpmlint
+        run: rpmlint "$HOME"/rpmbuild/RPMS/*/*.rpm "$HOME"/rpmbuild/SRPMS/*.rpm || true
+
+      - name: Install them with dnf, run, and remove
+        run: |
+          dnf install -y "$HOME"/rpmbuild/RPMS/x86_64/veilvoice-*.rpm
+          veilvoice --version | grep -F "$VERSION"
+          veilvoice info
+          test -x /usr/bin/veilvoice-gui
+          rpm -ql veilvoice veilvoice-gui
+          dnf remove -y veilvoice veilvoice-gui
+          ! command -v veilvoice
+
+      - name: Collect them
+        run: |
+          mkdir -p dist
+          cp "$HOME"/rpmbuild/RPMS/x86_64/veilvoice-*.rpm "$HOME"/rpmbuild/SRPMS/veilvoice-*.src.rpm dist/
+          sha256sum dist/*
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: packages-rpm
+          path: dist/*.rpm
+          if-no-files-found: error

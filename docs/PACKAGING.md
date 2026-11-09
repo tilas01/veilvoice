@@ -217,17 +217,27 @@ install it.**
 
 ## Building each one
 
-```bash
-# Windows MSI (needs: dotnet tool install -g wix)
-wix build packaging/wix/veilvoice.wxs -arch x64 \
-    -d Version=0.1.22 -d BinDir=dist/veilvoice-v0.1.22-windows-x86_64 \
-    -o dist/VeilVoice-0.1.22-x64.msi
+```bat
+:: Windows: both MSIs, then the Store's MSIX. The folder is the Windows zip,
+:: unpacked. Needs the WiX Toolset 5 (see the script) and, for the MSIX, the
+:: Windows SDK.
+python tools\package\msi.py veilvoice-v0.1.22-windows-x86_64 dist --version 0.1.22
+python tools\package\msix.py veilvoice-v0.1.22-windows-x86_64 dist --version 0.1.22 ^
+    --identity-name <from Partner Center> --publisher <from Partner Center> ^
+    --publisher-display-name <from Partner Center>
 ```
 
-The WiX source refers to `packaging/wix/LICENSE.rtf` for the licence dialog,
-which is not committed: WiX needs RTF, and converting `LICENSE` to RTF is a
-build step rather than a source file. Any converter will do; the text must be
-the unmodified GPL-3.0.
+`msi.py` runs `wix build packaging/wix/veilvoice.wxs -d Version=0.1.22` once
+per scope, with the product code it derives from the version and the licence
+converted to RTF on the way, so neither is a file somebody has to keep in step
+by hand.
+
+```bash
+# The AppImage, from two programs built on the oldest Linux it should run on.
+# appimagetool and the runtime are the AppImage project's own; packages.yml
+# pins both by hash.
+tools/package/appimage.sh target/release dist 0.1.22 ./appimagetool ./runtime
+```
 
 ```bash
 # Debian / Ubuntu  (copy packaging/debian to ./debian first)

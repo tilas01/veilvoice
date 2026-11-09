@@ -2,158 +2,241 @@
 <!--
   SPDX-License-Identifier: GPL-3.0-or-later
 
-  WiX v4 source for the Windows installer.
-
-  Build (needs the WiX .NET tool: `dotnet tool install -g wix`):
+  WiX source for the two Windows installers. One file, two packages: the
+  `Scope` variable decides which.
 
       wix build packaging/wix/veilvoice.wxs -arch x64 ^
-          -d Version=0.1.22 -d BinDir=dist\veilvoice-v0.1.22-windows-x86_64 ^
-          -o dist/VeilVoice-0.1.22-x64.msi
+          -ext WixToolset.UI.wixext -ext WixToolset.Util.wixext ^
+          -d Version=0.1.22 -d Scope=user -d ProductCode=<GUID> ^
+          -d BinDir=dist\veilvoice-v0.1.22-windows-x86_64 ^
+          -d LicenceRtf=dist\LICENSE.rtf ^
+          -o dist\veilvoice-v0.1.22-windows-x86_64-user.msi
 
-  # What this installs, and what it deliberately does not
+  `tools/package/msi.py` runs exactly that, works out the product code and
+  writes the licence as RTF first. Use it rather than typing the command.
 
-  Two executables, the licence, the documentation, a Start Menu shortcut, and
-  nothing else. No service, no scheduled task, no driver, nothing that runs at
-  startup, no registry key outside the installer's own uninstall entry. A
-  privacy tool that installs a background service is a privacy tool with a
-  background service, and this one has no need of it.
+  # The two packages
 
-  It installs **per-machine** into Program Files, so it needs elevation. That is
-  the one thing an MSI gives that the script does not, and it is why this exists
-  alongside `install/install.ps1` rather than instead of it.
+  Scope=user     Installs into %LOCALAPPDATA%\Programs\VeilVoice for the person
+                 running it. Needs no administrator and never asks for one.
+                 PATH is that person's own.
+  Scope=machine  Installs into Program Files for everybody on the computer.
+                 Needs an administrator, once, to install. PATH is the
+                 system's.
+
+  Two files rather than one that asks. An installer that can do either has to
+  decide where to put things before it knows whether it may, and the rules
+  Windows Installer follows for that differ between a silent install and one
+  with a window. Two packages each do one thing, the same way every time, and
+  winget can name both.
+
+  # What it installs, and what it deliberately does not
+
+  Both programs, each a box that is ticked by default and can be cleared, the
+  licence and the README, a Start Menu entry with the window, and the folder
+  on PATH with the command line unless that box is cleared. Nothing else: no service, no
+  scheduled task, no driver, nothing that runs at startup, no registry value
+  outside the installer's own records. A privacy tool that installs a
+  background service is a privacy tool with a background service.
 
   # The optional components
 
-  VB-CABLE and Audacity appear in the feature tree as features that are **off by
-  default** (`Level="1000"`, above the install level, so they are not selected
-  unless the user goes into the custom-setup page and turns them on). They do
-  not install those programs. They cannot: VB-CABLE is proprietary donationware
-  with its own licence and its own installer, and Audacity is a separate
-  project. What they install is a shortcut to the download page, so that
-  choosing them is an informed act rather than a silent one.
+  VB-CABLE and Audacity are in the feature tree, off by default
+  (`Level="1000"`, above the install level). They install a link to the
+  download page, never the software: VB-CABLE is proprietary donationware with
+  its own licence and its own installer, and Audacity is a separate project
+  under a licence this one cannot be combined with. Never silently, never by
+  default, which is the same rule the install scripts follow.
 
-  This is the same rule the install scripts follow, for the same reason: never
-  silently, never by default. An installer that quietly bundles somebody else's
-  proprietary driver is exactly the kind of thing this project exists to be the
-  opposite of.
+  # Signing
 
-  # What is NOT verified here
-
-  An MSI can be signed with an Authenticode certificate. This one is not, and
-  cannot be: Authenticode requires a certificate issued to a verified legal
-  identity, and this project is published under a pseudonym. Windows will show
-  an "unknown publisher" warning. That is stated in `docs/INSTALL.md` rather
-  than worked around, and it is the reason the OpenPGP signature over
-  SHA256SUMS remains the real check: verify the archive first, then install.
+  Neither package carries an Authenticode signature, and SmartScreen will say
+  the publisher is unknown. Each package's SHA-256 is in the release's
+  SHA256SUMS, which is signed with the project's OpenPGP key, so the check is
+  the same as for every other download: verify the file, then run it. The
+  copy in the Microsoft Store is signed by Microsoft. See docs/PACKAGING.md.
 -->
+<?if $(var.Scope) = "user" ?>
+  <?define PackageScope = "perUser" ?>
+  <?define RootDirectory = "LocalAppDataFolder" ?>
+  <?define RegistryRoot = "HKCU" ?>
+  <?define PathIsSystem = "no" ?>
+  <?define UpgradeCode = "B1E7C0D4-5A63-4F2E-9C18-7D2A4E6B0F91" ?>
+  <?define PackageTitle = "VeilVoice (just for me)" ?>
+<?elseif $(var.Scope) = "machine" ?>
+  <?define PackageScope = "perMachine" ?>
+  <?define RootDirectory = "ProgramFiles64Folder" ?>
+  <?define RegistryRoot = "HKLM" ?>
+  <?define PathIsSystem = "yes" ?>
+  <?define UpgradeCode = "6F3B1C2A-9D4E-4A18-B7C5-2E9A1F0D8B34" ?>
+  <?define PackageTitle = "VeilVoice (everyone on this computer)" ?>
+<?else?>
+  <?error Scope must be user or machine ?>
+<?endif?>
+
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
 
   <Package Name="VeilVoice"
            Manufacturer="tilas01"
            Version="$(var.Version)"
-           UpgradeCode="6F3B1C2A-9D4E-4A18-B7C5-2E9A1F0D8B34"
-           Scope="perMachine"
+           UpgradeCode="$(var.UpgradeCode)"
+           ProductCode="$(var.ProductCode)"
+           Scope="$(var.PackageScope)"
            Compressed="yes">
 
-    <!-- Upgrades replace an older install rather than sitting beside it. -->
+    <SummaryInformation Description="$(var.PackageTitle)" />
+
+    <!-- An upgrade replaces the older version rather than sitting beside it. -->
     <MajorUpgrade DowngradeErrorMessage="A newer version of VeilVoice is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
     <!-- The licence has to be accepted, and it is the real GPL text. -->
-    <WixVariable Id="WixUILicenseRtf" Value="packaging/wix/LICENSE.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.LicenceRtf)" />
     <ui:WixUI Id="WixUI_FeatureTree" />
 
     <Icon Id="VeilVoiceIcon" SourceFile="assets/icon.ico" />
     <Property Id="ARPPRODUCTICON" Value="VeilVoiceIcon" />
     <Property Id="ARPURLINFOABOUT" Value="https://tilas01.github.io/veilvoice/" />
     <Property Id="ARPHELPLINK" Value="https://github.com/tilas01/veilvoice" />
-    <!-- No "run at startup" checkbox, deliberately: there is nothing to run. -->
 
-    <StandardDirectory Id="ProgramFiles64Folder">
-      <Directory Id="INSTALLFOLDER" Name="VeilVoice">
-        <Directory Id="DocsFolder" Name="docs" />
+    <StandardDirectory Id="$(var.RootDirectory)">
+<?if $(var.Scope) = "user" ?>
+      <!-- %LOCALAPPDATA%\Programs is where Windows puts per-user programs. -->
+      <Directory Id="UserPrograms" Name="Programs">
+        <Directory Id="INSTALLFOLDER" Name="VeilVoice" />
       </Directory>
+<?else?>
+      <Directory Id="INSTALLFOLDER" Name="VeilVoice" />
+<?endif?>
     </StandardDirectory>
 
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="AppShortcutFolder" Name="VeilVoice" />
     </StandardDirectory>
 
-    <!-- ================= the program itself ================= -->
-    <Feature Id="Main" Title="VeilVoice" Level="1" AllowAbsent="no"
-             Description="The command-line tool, the desktop app and the portable verifier.">
-      <ComponentGroupRef Id="ProgramFiles" />
-      <ComponentGroupRef Id="Shortcuts" />
+    <!--
+      Both programs are ticked by default, and either can be left out: somebody
+      who only ever uses the terminal does not need the window, and the other
+      way round. They are recommended together, because the window and the
+      command line share settings and each can hand work to the other. The
+      licence and the README always go in, so an install of either one says
+      what it is and under what terms.
+    -->
+    <Feature Id="Main" Title="VeilVoice" Level="1" AllowAbsent="no" Display="expand"
+             Description="The licence and the README. Choose the programs below; both are recommended.">
+      <ComponentGroupRef Id="Documents" />
+
+      <Feature Id="Gui" Title="Desktop application (veilvoice-gui.exe)" Level="1"
+               Description="The window, with a Start Menu entry.">
+        <ComponentRef Id="VeilVoiceGui" />
+        <ComponentGroupRef Id="Shortcuts" />
+      </Feature>
+
+      <Feature Id="Cli" Title="Command line (veilvoice.exe)" Level="1"
+               Description="The veilvoice command, for terminals and scripts.">
+        <ComponentRef Id="VeilVoiceCli" />
+
+        <!-- On by default, and one click to leave out. -->
+        <Feature Id="PathEntry" Title="Add veilvoice to PATH" Level="1"
+                 Description="Lets you type veilvoice in any terminal. Removed again when VeilVoice is uninstalled.">
+          <ComponentRef Id="PathVariable" />
+        </Feature>
+      </Feature>
     </Feature>
 
-    <!-- ================= optional, off by default ================= -->
-    <!--
-      Level="1000" is above the default install level, so neither of these is
-      selected unless the user turns it on in the feature tree. Never silently,
-      never by default.
-    -->
+    <!-- Level 1000 is above the install level: off unless turned on. -->
     <Feature Id="VBCableLink" Level="1000" Title="VB-CABLE (a link, not the software)"
-             Description="Adds a shortcut to VB-Audio's download page. VB-CABLE is a virtual audio cable, needed only for live mode. It is PROPRIETARY donationware by VB-Audio, is not free software, and is NOT installed by this installer -- you would be accepting their licence, on their site.">
-      <ComponentGroupRef Id="VBCableShortcut" />
+             Description="Adds a Start Menu link to VB-Audio's download page. VB-CABLE is a virtual audio cable, needed only for live mode. It is proprietary donationware, not free software, and this installer does not install it: you would accept its licence yourself, on its own site.">
+      <ComponentRef Id="VBCableUrl" />
     </Feature>
 
     <Feature Id="AudacityLink" Level="1000" Title="Audacity (a link, not the software)"
-             Description="Adds a shortcut to Audacity's download page. Audacity is a free audio editor, useful for recording before veiling. It is not bundled: it is GPL-2.0-or-later, which cannot be combined with this project's GPL-3.0-or-later.">
-      <ComponentGroupRef Id="AudacityShortcut" />
+             Description="Adds a Start Menu link to Audacity's download page. Audacity is a free audio editor, useful for recording before veiling. It is not bundled, because its licence (GPL-2.0-or-later) cannot be combined with this project's (GPL-3.0-or-later).">
+      <ComponentRef Id="AudacityUrl" />
     </Feature>
 
-    <ComponentGroup Id="ProgramFiles" Directory="INSTALLFOLDER">
-      <Component Id="VeilVoiceCli" Guid="*">
-        <File Id="veilvoice.exe" Source="$(var.BinDir)\veilvoice.exe" KeyPath="yes" />
+    <!--
+      Every component's key is a registry value rather than the file, because
+      in the per-user package the files are under the user's profile and
+      Windows Installer requires that (ICE38). Doing the same in both packages
+      keeps them one source.
+    -->
+    <Component Id="VeilVoiceCli" Directory="INSTALLFOLDER">
+      <File Id="veilvoice.exe" Source="$(var.BinDir)\veilvoice.exe" />
+      <RegistryValue Root="$(var.RegistryRoot)" Key="Software\tilas01\VeilVoice"
+                     Name="cli" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+    <Component Id="VeilVoiceGui" Directory="INSTALLFOLDER">
+      <File Id="veilvoice_gui.exe" Source="$(var.BinDir)\veilvoice-gui.exe" />
+      <RegistryValue Root="$(var.RegistryRoot)" Key="Software\tilas01\VeilVoice"
+                     Name="gui" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <ComponentGroup Id="Documents" Directory="INSTALLFOLDER">
+      <Component Id="LicenceText">
+        <File Id="LICENSE" Source="$(var.BinDir)\LICENSE" />
+        <RegistryValue Root="$(var.RegistryRoot)" Key="Software\tilas01\VeilVoice"
+                       Name="licence" Type="integer" Value="1" KeyPath="yes" />
       </Component>
-      <Component Id="VeilVoiceGui" Guid="*">
-        <File Id="veilvoice_gui.exe" Source="$(var.BinDir)\veilvoice-gui.exe" KeyPath="yes" />
-      </Component>
-      <Component Id="LicenceText" Guid="*">
-        <File Id="LICENSE" Source="$(var.BinDir)\LICENSE" KeyPath="yes" />
-      </Component>
-      <Component Id="Readme" Guid="*">
-        <File Id="README.md" Source="$(var.BinDir)\README.md" KeyPath="yes" />
+      <Component Id="Readme">
+        <File Id="README.md" Source="$(var.BinDir)\README.md" />
+        <RegistryValue Root="$(var.RegistryRoot)" Key="Software\tilas01\VeilVoice"
+                       Name="readme" Type="integer" Value="1" KeyPath="yes" />
+<?if $(var.Scope) = "user" ?>
+        <!-- Folders under a profile must be removed by name (ICE64). -->
+        <RemoveFolder Id="RemoveInstallFolder" Directory="INSTALLFOLDER" On="uninstall" />
+        <RemoveFolder Id="RemoveUserPrograms" Directory="UserPrograms" On="uninstall" />
+<?endif?>
       </Component>
     </ComponentGroup>
 
+    <!--
+      Part="last" appends, so a program already on PATH keeps its place, and
+      Permanent="no" takes the entry out again on uninstall. Windows tells
+      running programs the variable changed; a terminal that was already open
+      needs reopening, as with any installer.
+    -->
+    <Component Id="PathVariable" Directory="INSTALLFOLDER">
+      <Environment Id="PATH" Name="PATH" Value="[INSTALLFOLDER]" Action="set"
+                   Part="last" Permanent="no" System="$(var.PathIsSystem)" />
+      <RegistryValue Root="$(var.RegistryRoot)" Key="Software\tilas01\VeilVoice"
+                     Name="path" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
     <ComponentGroup Id="Shortcuts" Directory="AppShortcutFolder">
-      <Component Id="AppShortcut" Guid="*">
+      <Component Id="AppShortcut">
         <Shortcut Id="GuiShortcut"
                   Name="VeilVoice"
-                  Description="Irreversible voice de-identification"
+                  Description="Remove the voiceprint from a recording, keep the words"
                   Target="[INSTALLFOLDER]veilvoice-gui.exe"
                   WorkingDirectory="INSTALLFOLDER"
                   Icon="VeilVoiceIcon" />
-        <Shortcut Id="SiteShortcut"
-                  Name="VeilVoice documentation"
-                  Target="https://tilas01.github.io/veilvoice/" />
+        <util:InternetShortcut Id="SiteShortcut" Directory="AppShortcutFolder"
+                               Name="VeilVoice documentation"
+                               Target="https://tilas01.github.io/veilvoice/" />
         <RemoveFolder Id="RemoveAppShortcutFolder" Directory="AppShortcutFolder" On="uninstall" />
-        <RegistryValue Root="HKCU" Key="Software\tilas01\VeilVoice"
-                       Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        <RegistryValue Root="$(var.RegistryRoot)" Key="Software\tilas01\VeilVoice"
+                       Name="shortcut" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 
-    <ComponentGroup Id="VBCableShortcut" Directory="AppShortcutFolder">
-      <Component Id="VBCableUrl" Guid="*">
-        <Shortcut Id="VBCableLinkShortcut"
-                  Name="Get VB-CABLE (proprietary, third party)"
-                  Target="https://vb-audio.com/Cable/" />
-        <RegistryValue Root="HKCU" Key="Software\tilas01\VeilVoice"
-                       Name="vbcable_link" Type="integer" Value="1" KeyPath="yes" />
-      </Component>
-    </ComponentGroup>
+    <Component Id="VBCableUrl" Directory="AppShortcutFolder">
+      <util:InternetShortcut Id="VBCableLinkShortcut" Directory="AppShortcutFolder"
+                             Name="Get VB-CABLE (proprietary, third party)"
+                             Target="https://vb-audio.com/Cable/" />
+      <RegistryValue Root="$(var.RegistryRoot)" Key="Software\tilas01\VeilVoice"
+                     Name="vbcable_link" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
 
-    <ComponentGroup Id="AudacityShortcut" Directory="AppShortcutFolder">
-      <Component Id="AudacityUrl" Guid="*">
-        <Shortcut Id="AudacityLinkShortcut"
-                  Name="Get Audacity (free software, third party)"
-                  Target="https://www.audacityteam.org/download/" />
-        <RegistryValue Root="HKCU" Key="Software\tilas01\VeilVoice"
-                       Name="audacity_link" Type="integer" Value="1" KeyPath="yes" />
-      </Component>
-    </ComponentGroup>
+    <Component Id="AudacityUrl" Directory="AppShortcutFolder">
+      <util:InternetShortcut Id="AudacityLinkShortcut" Directory="AppShortcutFolder"
+                             Name="Get Audacity (free software, third party)"
+                             Target="https://www.audacityteam.org/download/" />
+      <RegistryValue Root="$(var.RegistryRoot)" Key="Software\tilas01\VeilVoice"
+                     Name="audacity_link" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
 
   </Package>
 </Wix>

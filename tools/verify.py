@@ -478,6 +478,18 @@ CHECKS = [
      [sys.executable, "tools/audit/platform_table.py", "--self-test"]),
     ("the app-manifest tooling works",
      [sys.executable, "tools/sign/selftest.py"]),
+    # The installer packages are built on Windows and in Linux containers by
+    # packages.yml, which nothing local can run. What can be checked here is
+    # everything those builds are given: the product codes, the licence's
+    # conversion to RTF, the Store manifest, the icons and the winget files.
+    ("the Windows installer tooling works",
+     [sys.executable, "tools/package/msi.py", "--self-test"]),
+    ("the Store package's manifest and icons are complete",
+     [sys.executable, "tools/package/msix.py", "--self-test"]),
+    ("the Store and package icons are the right sizes",
+     [sys.executable, "tools/package/icons.py", "--self-test"]),
+    ("the winget manifests are written from the signed hash list",
+     [sys.executable, "tools/package/winget.py", "--self-test"]),
     ("artwork matches its generator", [sys.executable, "assets/generate.py", "--check"]),
     # Roadmap item 183. The card is the release's own entry drawn as a
     # picture, so it goes stale the moment the entry is edited, and a picture

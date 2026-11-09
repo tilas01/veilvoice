@@ -193,6 +193,16 @@ pub fn version_in(directory: &Path) -> Option<String> {
     Some(version.to_string())
 }
 
+/// Where the per-machine MSI puts the programs, given `%ProgramFiles%`.
+///
+/// `None` when the variable is unset, as everywhere but Windows, and when it
+/// is empty or relative, for the reason F-239 gives: a relative directory is
+/// wherever this happened to be started.
+fn program_files(variable: Option<std::ffi::OsString>) -> Option<PathBuf> {
+    let base = PathBuf::from(variable?);
+    base.is_absolute().then(|| base.join("VeilVoice"))
+}
+
 /// Every place worth looking for a copy, in order, without duplicates.
 ///
 /// Bounded and named, for the reason [`crate::discover`] gives at length: a
@@ -211,6 +221,13 @@ pub fn places() -> Vec<(PathBuf, Where)> {
 
     add(veilvoice_setup::install::bin_dir(), Where::Installed);
     add(veilvoice_setup::install::prefix(), Where::Installed);
+    // The MSI for everybody on the computer installs under Program Files. The
+    // one for a single person installs into `prefix`, the folder `veilvoice
+    // install` uses, so it is covered above.
+    add(
+        program_files(std::env::var_os("ProgramFiles")),
+        Where::Installed,
+    );
 
     if let Some(path) = std::env::var_os("PATH") {
         for entry in std::env::split_paths(&path) {
@@ -458,6 +475,20 @@ pub fn examine(copy: &Copy, published: &Published) -> Checked {
 mod tests {
     use super::*;
     use crate::check::contents::Member;
+
+    /// The machine-wide MSI's folder is looked in, and only when Windows names
+    /// a real Program Files.
+    #[test]
+    fn the_machine_wide_install_is_looked_for_under_program_files() {
+        let base = std::env::temp_dir();
+        assert_eq!(
+            program_files(Some(base.clone().into_os_string())),
+            Some(base.join("VeilVoice"))
+        );
+        assert_eq!(program_files(None), None);
+        assert_eq!(program_files(Some("".into())), None);
+        assert_eq!(program_files(Some("Program Files".into())), None);
+    }
 
     /// A release directory names its own version, and nothing else does.
     #[test]
