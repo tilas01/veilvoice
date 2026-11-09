@@ -192,7 +192,7 @@ def main():
     # told it is a dry run, and a dry run is named after its branch, which no
     # changelog entry is. So a step that runs the tool without the waiver ends
     # every dry run there, before the steps it exists to rehearse. That is
-    # F-NNN: the technical document step was added without it, and no dry run
+    # F-294: the technical document step was added without it, and no dry run
     # had reached the checksums since.
     for at in notes_steps(lines):
         start, block = at

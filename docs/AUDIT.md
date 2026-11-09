@@ -38,7 +38,7 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
-## The thirty-eighth round: the reset, read against what it promises
+## The thirty-ninth round: the reset, read against what it promises
 
 `veilvoice reset` and the window's **Start again** are the only things in this
 project that delete somebody's recordings on purpose. Everything else about
@@ -182,7 +182,7 @@ because it is cheap to repeat: the fixture was easier to write wrongly than
 rightly, so every test built on it inherited the wrong branch, and each of them
 passed.
 
-## The thirty-seventh round: every drawing explains itself
+## The thirty-eighth round: every drawing explains itself
 
 Every generated picture should carry its own key, and each Mermaid chart the
 same key, since either can be the only one a reader sees. Reading every drawing under `assets/diagrams/` and `assets/sources/` for
@@ -247,7 +247,7 @@ which `tools/audit/checkout_tokens.py` already records; and the release still
 publishes through a pinned `softprops/action-gh-release`, because replacing the
 step that publishes needs a test release of its own.
 
-### F-286: the changelog and roadmap had doubled words, and the roadmap cut its tooltips mid-word
+### F-296: the changelog and roadmap had doubled words, and the roadmap cut its tooltips mid-word
 
 **Where:** `CHANGELOG.md`, `ROADMAP.md` and `tools/site/roadmap.py`.
 
@@ -267,7 +267,7 @@ before punctuation, and a word cut short in front of a roadmap status, and it
 reads the generated roadmap page, so a generator that cuts mid-word again fails
 verify. Its `--self-test` holds an example of each.
 
-### F-287: Dependabot proposed a new release on the day it was published
+### F-297: Dependabot proposed a new release on the day it was published
 
 **Where:** `.github/dependabot.yml`.
 
@@ -857,7 +857,7 @@ it, and requires the failure to name the first program as already replaced and
 not to claim that nothing was. `what_was_already_replaced_reads_as_a_sentence`
 covers the three shapes the sentence takes.
 
-### F-NNN: no dry run of a release got past the technical document
+### F-294: no dry run of a release got past the technical document
 
 **Where:** `.github/workflows/release.yml`, the publishing job's technical
 document step.
@@ -879,7 +879,7 @@ notes tool and fails on one without the dry-run waiver. Checked both ways: it
 names the technical document step against the workflow before the fix, and
 passes after it.
 
-### F-NNN: the mutation and fuzz jobs built whichever tool release was newest
+### F-295: the mutation and fuzz jobs built whichever tool release was newest
 
 **Where:** `.github/workflows/mutants.yml`, the cargo-mutants install, and
 `.github/workflows/fuzz.yml`, the cargo-fuzz install.
@@ -12461,8 +12461,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and ninety-three defects found and fixed (F-1 to F-293), across
-thirty-eight rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Two hundred and ninety-seven defects found and fixed (F-1 to F-297), across
+thirty-nine rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven
