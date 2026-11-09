@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-audio/src/live.rs`
 
-[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 870 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
+[`veilvoice-audio`](../../../crates/veilvoice-audio/README.md) &middot; 867 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs)
 
 ## Contents
 
@@ -66,21 +66,21 @@ cannot.
 
 ## What this file contains
 
-870 lines defining **12 functions** (4 public), **4 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+867 lines defining **12 functions** (4 public), **4 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `struct Kept` (line 62) -- The recorders a session was asked for, one per side of Keeping.
-- `struct LiveSession` (line 70) -- A running live-scramble session.
-- `struct Shared` (line 86) -- What the audio callbacks and the caller both touch, held behind one handle.
-- `struct Troubles` (line 112) -- What the platform has said about a session's streams, counted where it is said and read by whoever asks.
+- `struct Kept` (line 63) -- The recorders a session was asked for, one per side of Keeping.
+- `struct LiveSession` (line 71) -- A running live-scramble session.
+- `struct Shared` (line 87) -- What the audio callbacks and the caller both touch, held behind one handle.
+- `struct Troubles` (line 113) -- What the platform has said about a session's streams, counted where it is said and read by whoever asks.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `LiveSession::start` (line 385) -- Start scrambling from input into output.
+- `LiveSession::start` (line 386) -- Start scrambling from input into output.
   - reaches: `start_recording`, `agree_on_a_rate`, `agree_on_a_rate_for`, `at_rate`, `input_ranges`, `rate_they_agree_on`
-- `LiveSession::stats` (line 599) -- Read the current statistics, resetting the peak meters.
-- `LiveSession::interference` (line 618) -- What the platform last reported about either stream.
+- `LiveSession::stats` (line 596) -- Read the current statistics, resetting the peak meters.
+- `LiveSession::interference` (line 615) -- What the platform last reported about either stream.
 
 ## What calls what
 
@@ -102,18 +102,18 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_report["Troubles::report<br/>line 130"]
-    n_count["Troubles::count<br/>line 156"]
-    n_latest["Troubles::latest<br/>line 162"]
-    n_rate_they_agree_on["rate_they_agree_on<br/>line 198"]
-    n_input_ranges["input_ranges<br/>line 230"]
-    n_at_rate["at_rate<br/>line 245"]
-    n_agree_on_a_rate["agree_on_a_rate<br/>line 276"]
-    n_agree_on_a_rate_for["agree_on_a_rate_for<br/>line 290"]
-    n_start(["LiveSession::start<br/>line 385"])
-    n_start_recording["LiveSession::start_recording<br/>line 427"]
-    n_stats(["LiveSession::stats<br/>line 599"])
-    n_interference(["LiveSession::interference<br/>line 618"])
+    n_report["Troubles::report<br/>line 131"]
+    n_count["Troubles::count<br/>line 157"]
+    n_latest["Troubles::latest<br/>line 163"]
+    n_rate_they_agree_on["rate_they_agree_on<br/>line 199"]
+    n_input_ranges["input_ranges<br/>line 231"]
+    n_at_rate["at_rate<br/>line 246"]
+    n_agree_on_a_rate["agree_on_a_rate<br/>line 277"]
+    n_agree_on_a_rate_for["agree_on_a_rate_for<br/>line 291"]
+    n_start(["LiveSession::start<br/>line 386"])
+    n_start_recording["LiveSession::start_recording<br/>line 424"]
+    n_stats(["LiveSession::stats<br/>line 596"])
+    n_interference(["LiveSession::interference<br/>line 615"])
     n_agree_on_a_rate --> n_agree_on_a_rate_for
     n_agree_on_a_rate_for --> n_at_rate
     n_agree_on_a_rate_for --> n_input_ranges
@@ -121,24 +121,33 @@ flowchart TD
     n_latest --> n_count
     n_start --> n_start_recording
     n_start_recording --> n_agree_on_a_rate
-    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L130" "open the source"
-    click n_count href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L156" "open the source"
-    click n_latest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L162" "open the source"
-    click n_rate_they_agree_on href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L198" "open the source"
-    click n_input_ranges href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L230" "open the source"
-    click n_at_rate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L245" "open the source"
-    click n_agree_on_a_rate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L276" "open the source"
-    click n_agree_on_a_rate_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L290" "open the source"
-    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L385" "open the source"
-    click n_start_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L427" "open the source"
-    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L599" "open the source"
-    click n_interference href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L618" "open the source"
+    click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L131" "open the source"
+    click n_count href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L157" "open the source"
+    click n_latest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L163" "open the source"
+    click n_rate_they_agree_on href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L199" "open the source"
+    click n_input_ranges href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L231" "open the source"
+    click n_at_rate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L246" "open the source"
+    click n_agree_on_a_rate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L277" "open the source"
+    click n_agree_on_a_rate_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L291" "open the source"
+    click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L386" "open the source"
+    click n_start_recording href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L424" "open the source"
+    click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L596" "open the source"
+    click n_interference href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L615" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_stats,n_interference entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_start_recording api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_report,n_count,n_latest,n_rate_they_agree_on,n_input_ranges,n_at_rate,n_agree_on_a_rate,n_agree_on_a_rate_for helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>
@@ -147,24 +156,24 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `RING_MILLIS` <sub>pub(crate) const</sub> | [53](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L53) | How much jitter the ring absorbs before it starts dropping samples. |
-| `Kept` <sub>pub struct</sub> | [62](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L62) | The recorders a session was asked for, one per side of Keeping. |
-| `LiveSession` <sub>pub struct</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L70) | A running live-scramble session. |
-| `Shared` <sub>struct</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L86) | What the audio callbacks and the caller both touch, held behind one handle. |
-| `Troubles` <sub>pub(crate) struct</sub> | [112](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L112) | What the platform has said about a session's streams, counted where it is said and read by whoever asks. |
-| `GLITCH` <sub>const</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L125) | What a glitch is called when somebody asks, since the audio thread that reported it does not stop to say. |
-| `Troubles::report` <sub>pub(crate) fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L130) | Record what the platform said about a stream. |
-| `Troubles::count` <sub>pub(crate) fn</sub> | [156](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L156) | How many reports there have been, glitches included. |
-| `Troubles::latest` <sub>pub(crate) fn</sub> | [162](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L162) | The newest report. |
-| `rate_they_agree_on` <sub>fn</sub> | [198](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L198) | Which sample rate a set of devices can all run at, if any. |
-| `input_ranges` <sub>pub(crate) fn</sub> | [230](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L230) | The ranges a device reports, as plain numbers. |
-| `at_rate` <sub>fn</sub> | [245](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L245) | One of a device's configurations at rate, preferring f32. |
-| `agree_on_a_rate` <sub>fn</sub> | [276](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L276) | A microphone and an output, configured to one rate. |
-| `agree_on_a_rate_for` <sub>pub(crate) fn</sub> | [290](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L290) | The same, for any number of microphones. |
-| `LiveSession::start` <sub>pub fn</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L385) | Start scrambling from input into output. |
-| `LiveSession::start_recording` <sub>pub fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L427) | Start scrambling, keeping the sides of it Keeping asks for. |
-| `LiveSession::stats` <sub>pub fn</sub> | [599](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L599) | Read the current statistics, resetting the peak meters. |
-| `LiveSession::interference` <sub>pub fn</sub> | [618](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L618) | What the platform last reported about either stream. |
+| `RING_MILLIS` <sub>pub(crate) const</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L54) | How much jitter the ring absorbs before it starts dropping samples. |
+| `Kept` <sub>pub struct</sub> | [63](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L63) | The recorders a session was asked for, one per side of Keeping. |
+| `LiveSession` <sub>pub struct</sub> | [71](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L71) | A running live-scramble session. |
+| `Shared` <sub>struct</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L87) | What the audio callbacks and the caller both touch, held behind one handle. |
+| `Troubles` <sub>pub(crate) struct</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L113) | What the platform has said about a session's streams, counted where it is said and read by whoever asks. |
+| `GLITCH` <sub>const</sub> | [126](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L126) | What a glitch is called when somebody asks, since the audio thread that reported it does not stop to say. |
+| `Troubles::report` <sub>pub(crate) fn</sub> | [131](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L131) | Record what the platform said about a stream. |
+| `Troubles::count` <sub>pub(crate) fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L157) | How many reports there have been, glitches included. |
+| `Troubles::latest` <sub>pub(crate) fn</sub> | [163](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L163) | The newest report. |
+| `rate_they_agree_on` <sub>pub(crate) fn</sub> | [199](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L199) | Which sample rate a set of devices can all run at, if any. |
+| `input_ranges` <sub>pub(crate) fn</sub> | [231](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L231) | The ranges a device reports, as plain numbers. |
+| `at_rate` <sub>pub(crate) fn</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L246) | One of a device's configurations at rate, preferring f32. |
+| `agree_on_a_rate` <sub>fn</sub> | [277](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L277) | A microphone and an output, configured to one rate. |
+| `agree_on_a_rate_for` <sub>pub(crate) fn</sub> | [291](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L291) | The same, for any number of microphones. |
+| `LiveSession::start` <sub>pub fn</sub> | [386](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L386) | Start scrambling from input into output. |
+| `LiveSession::start_recording` <sub>pub fn</sub> | [424](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L424) | Start scrambling, keeping the sides of it Keeping asks for. |
+| `LiveSession::stats` <sub>pub fn</sub> | [596](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L596) | Read the current statistics, resetting the peak meters. |
+| `LiveSession::interference` <sub>pub fn</sub> | [615](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L615) | What the platform last reported about either stream. |
 
 ---
 

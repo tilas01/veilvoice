@@ -205,6 +205,15 @@ flowchart TD
     class n_is_busy,n_accept,n_found_beside api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_slot_for,n_fill_from_beside,n_body,n_drop_target,n_slot_row,n_gnupg_section,n_start_survey,n_poll_survey,n_checker_section,n_copyable_command,n_verdict,n_contents_verdict,n_gnupg_verdict,n_archive_verdict,n_start,n_examine,n_examine_contents helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

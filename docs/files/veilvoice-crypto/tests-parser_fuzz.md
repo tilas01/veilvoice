@@ -138,6 +138,11 @@ flowchart TD
     click n_the_header_the_coverage_guided_campaign_found_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/parser_fuzz.rs#L335" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_new,n_next_u32,n_below,n_byte,n_rounds,n_mutate,n_weak,n_cheap,n_the_container_header_parser_survives_hostile_input,n_the_app_lock_parser_survives_hostile_input,n_both_parsers_survive_pure_noise,n_every_length_around_a_boundary_is_handled,n_the_header_the_coverage_guided_campaign_found_is_refused helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>

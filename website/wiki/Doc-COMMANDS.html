@@ -184,9 +184,9 @@
 <pre><code>veilvoice reseal --dry-run</code></pre>
 <h2 id="veilvoice-reset"><code>veilvoice reset</code></h2>
 <blockquote><p>Put this machine back to a new install: settings, policies, the mandate, the vaults and the app lock</p></blockquote>
-<p>Puts this machine back to a new install: settings, policies, the mandate, the vaults and the app lock. What would go is printed first, a line per thing with the size of it, and where any of it cannot be put back the word RESET has to be typed. It is here as well as in the window because a policy set from the command line has to be removable there, and because a machine with no display has no window to open.</p>
+<p>Puts this machine back to a new install: settings, policies, the mandate, the vaults and the app lock. What would go is printed first, a line per thing with the size of it, and where any of it cannot be put back the word RESET has to be typed. The app lock is kept unless --drop-keys asks for it too, which is what the window does. It is here as well as in the window because a policy set from the command line has to be removable there, and because a machine with no display has no window to open.</p>
 <p><strong>In the window:</strong> <strong>Settings</strong>, under Storage, which shows the same list and asks for the same word.</p>
-<pre><code>veilvoice reset --keep-keys --dry-run</code></pre>
+<pre><code>veilvoice reset --dry-run</code></pre>
 <h2 id="veilvoice-policy"><code>veilvoice policy</code></h2>
 <blockquote><p>Settings fixed so the interface cannot turn them off</p></blockquote>
 <p>Settings fixed so the interface cannot turn them off, for a machine somebody else is responsible for. Every setting a policy can reach makes VeilVoice stricter; there is no room in the format for one that loosens it.</p>

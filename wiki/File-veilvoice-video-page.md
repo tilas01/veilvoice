@@ -166,6 +166,15 @@ flowchart TD
     class n_layout,n_escape,n_data_uri,n_still api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_default,n_base64,n_media_type,n_background_markup,n_player_head,n_player_body,n_player_script,n_names_array,n_js_string,n_speaker_markup helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

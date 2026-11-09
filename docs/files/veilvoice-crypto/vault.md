@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/vault.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 769 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 816 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs)
 
 ## Contents
 
@@ -78,7 +78,7 @@ cannot touch, and that part is not a speed bump.
 
 ## What this file contains
 
-769 lines defining **18 functions** (14 public), **2 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+816 lines defining **20 functions** (14 public), **2 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -105,7 +105,9 @@ cannot touch, and that part is not a speed bump.
   - reaches: `write_one`, `mask`
 - `Vault::clear` (line 303) -- Remove both copies, and the index with them.
 - `admin_dir_present` (line 397) -- That same directory, but only when it is already there.
-- `admin_dir` (line 417) -- A directory only an administrator can write to, if this process can make one there.
+  - reaches: `pretended`
+- `admin_dir` (line 460) -- A directory only an administrator can write to, if this process can make one there.
+  - reaches: `pretended`
 
 ## What calls what
 
@@ -144,7 +146,11 @@ flowchart TD
     n_name_for["name_for<br/>line 350"]
     n_mask["mask<br/>line 369"]
     n_admin_dir_present(["admin_dir_present<br/>line 397"])
-    n_admin_dir(["admin_dir<br/>line 417"])
+    n_pretended["pretended<br/>line 420"]
+    n_pretend_admin_dir["pretend_admin_dir<br/>line 441"]
+    n_admin_dir(["admin_dir<br/>line 460"])
+    n_admin_dir --> n_pretended
+    n_admin_dir_present --> n_pretended
     n_at --> n_name_for
     n_load --> n_read_masked
     n_load --> n_write_one
@@ -170,11 +176,20 @@ flowchart TD
     click n_name_for href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L350" "open the source"
     click n_mask href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L369" "open the source"
     click n_admin_dir_present href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L397" "open the source"
-    click n_admin_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L417" "open the source"
+    click n_pretended href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L420" "open the source"
+    click n_pretend_admin_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L441" "open the source"
+    click n_admin_dir href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L460" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_at,n_primary,n_shadow,n_index,n_decoy,n_load_decoy,n_has_decoy_file,n_store_decoy,n_clear_decoy,n_load,n_store,n_clear,n_admin_dir_present,n_admin_dir entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_write_one,n_read_masked,n_name_for,n_mask helper
+    class n_write_one,n_read_masked,n_name_for,n_mask,n_pretended,n_pretend_admin_dir helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>
@@ -210,7 +225,9 @@ flowchart TD
 | `mask` <sub>fn</sub> | [369](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L369) | Exclusive-or bytes with a keystream derived from site. |
 | `ADMIN_DIR` <sub>const</sub> | [388](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L388) | Where an administrator's copy of the lock goes, on a platform that has one. |
 | `admin_dir_present` <sub>pub fn</sub> | [397](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L397) | That same directory, but only when it is already there. |
-| `admin_dir` <sub>pub fn</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L417) | A directory only an administrator can write to, if this process can make one there. |
+| `pretended` <sub>fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L420) | This thread's answer from pretend_admin_dir, if a test has given one. |
+| `pretend_admin_dir` <sub>pub(crate) fn</sub> | [441](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L441) | Tell this thread's tests where the administrator's directory is, or that there is none. |
+| `admin_dir` <sub>pub fn</sub> | [460](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs#L460) | A directory only an administrator can write to, if this process can make one there. |
 
 ---
 

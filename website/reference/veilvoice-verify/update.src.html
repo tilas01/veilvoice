@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/update.rs</code></h1>
-<p style="color:var(--muted)"><a href="update.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1620 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="update.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1642 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -112,8 +112,8 @@
 <span class="ln" id="L44"><span class="tok-com">//! 4. **Open.** Only now, and with the system&#x27;s own `tar`, into an empty</span></span>
 <span class="ln" id="L45"><span class="tok-com">//!    directory. What lands is hashed again against the same signed list,</span></span>
 <span class="ln" id="L46"><span class="tok-com">//!    because an extractor is a program too.</span></span>
-<span class="ln" id="L47"><span class="tok-com">//! 5. **Replace.** The binaries beside the running one are moved aside and the</span></span>
-<span class="ln" id="L48"><span class="tok-com">//!    new ones put in their place.</span></span>
+<span class="ln" id="L47"><span class="tok-com">//! 5. **Replace.** Each new binary is written beside the one it replaces and</span></span>
+<span class="ln" id="L48"><span class="tok-com">//!    renamed into place, through the same routine `veilvoice install` uses.</span></span>
 <span class="ln" id="L49"><span class="tok-com">//! 6. **Record.** The integrity record is re-taken, for the reason below.</span></span>
 <span class="ln" id="L50"><span class="tok-com">//! 7. **Restart**, which the caller does, because a window and a command line</span></span>
 <span class="ln" id="L51"><span class="tok-com">//!    part company here.</span></span>
@@ -941,25 +941,25 @@
 </span>
 <span class="ln" id="L826"></span>
 <span class="src-item" id="fn-put_in_place">
-<span class="ln" id="L827"><span class="tok-com">/// Write the new binaries beside the old ones and rename them into place.</span></span>
+<span class="ln" id="L827"><span class="tok-com">/// Put each new binary at the name people run, one program at a time.</span></span>
 <span class="ln" id="L828"><span class="tok-com">///</span></span>
-<span class="ln" id="L829"><span class="tok-com">/// **The new file is written under a temporary name first, and only a rename</span></span>
-<span class="ln" id="L830"><span class="tok-com">/// puts it at the name people run.** A rename within a directory is atomic, so</span></span>
-<span class="ln" id="L831"><span class="tok-com">/// somebody starting VeilVoice during an update gets the old program or the new</span></span>
-<span class="ln" id="L832"><span class="tok-com">/// one, never a half-written file and never nothing at all.</span></span>
-<span class="ln" id="L833"><span class="tok-com">///</span></span>
-<span class="ln" id="L834"><span class="tok-com">/// The order this had before F-261 was the other way round: the old file was</span></span>
-<span class="ln" id="L835"><span class="tok-com">/// renamed aside and the new one was then copied to the name it had left. That</span></span>
-<span class="ln" id="L836"><span class="tok-com">/// leaves the name absent for the length of a copy and then present but</span></span>
-<span class="ln" id="L837"><span class="tok-com">/// incomplete for the rest of it, which is exactly the window the doc comment</span></span>
-<span class="ln" id="L838"><span class="tok-com">/// claimed did not exist. It is a small window and it is the one a person hits</span></span>
-<span class="ln" id="L839"><span class="tok-com">/// by double-clicking the thing they just told to update itself.</span></span>
-<span class="ln" id="L840"><span class="tok-com">///</span></span>
-<span class="ln" id="L841"><span class="tok-com">/// The old copy is still **moved, not deleted**, on Windows, and there it still</span></span>
-<span class="ln" id="L842"><span class="tok-com">/// has to move first: a running program cannot be overwritten or renamed over</span></span>
-<span class="ln" id="L843"><span class="tok-com">/// there, but it can be renamed away, which frees the name. On Unix nothing</span></span>
-<span class="ln" id="L844"><span class="tok-com">/// needs to move at all, because renaming over a running program is allowed and</span></span>
-<span class="ln" id="L845"><span class="tok-com">/// the running process keeps the inode it started from.</span></span>
+<span class="ln" id="L829"><span class="tok-com">/// **Every replacement goes through</span></span>
+<span class="ln" id="L830"><span class="tok-com">/// [`veilvoice_setup::install::replace_with_copy`], which is the one routine in</span></span>
+<span class="ln" id="L831"><span class="tok-com">/// this project that replaces a program somebody may be running.** It writes</span></span>
+<span class="ln" id="L832"><span class="tok-com">/// the new file beside the old one, carries the permissions over, and only a</span></span>
+<span class="ln" id="L833"><span class="tok-com">/// rename puts it at the name people run; on Windows it moves the old copy</span></span>
+<span class="ln" id="L834"><span class="tok-com">/// aside first, because a running program cannot be renamed over there. The</span></span>
+<span class="ln" id="L835"><span class="tok-com">/// reasoning for all of that, and the two findings behind it, are in its own</span></span>
+<span class="ln" id="L836"><span class="tok-com">/// documentation.</span></span>
+<span class="ln" id="L837"><span class="tok-com">///</span></span>
+<span class="ln" id="L838"><span class="tok-com">/// This function had a third copy of that routine until F-286, and the copy</span></span>
+<span class="ln" id="L839"><span class="tok-com">/// staged with `std::fs::copy` after a `remove_file`, so a program appearing at</span></span>
+<span class="ln" id="L840"><span class="tok-com">/// the staged name in between was written through rather than refused. Folding</span></span>
+<span class="ln" id="L841"><span class="tok-com">/// it in was written down as worth doing when F-266 removed the second copy.</span></span>
+<span class="ln" id="L842"><span class="tok-com">///</span></span>
+<span class="ln" id="L843"><span class="tok-com">/// What is left here is what only an update needs: which programs to look for,</span></span>
+<span class="ln" id="L844"><span class="tok-com">/// a report of the ones that moved, and an honest account of where it got to if</span></span>
+<span class="ln" id="L845"><span class="tok-com">/// one of them cannot be replaced.</span></span>
 <span class="ln" id="L846"><span class="tok-com">///</span></span>
 <span class="ln" id="L847"><span class="tok-com">/// Anything that could not be cleaned up afterwards is returned rather than</span></span>
 <span class="ln" id="L848"><span class="tok-com">/// ignored, because a `veilvoice.old` nobody was told about is a file somebody</span></span>
@@ -978,774 +978,794 @@
 <span class="ln" id="L861">            continue;</span>
 <span class="ln" id="L862">        }</span>
 <span class="ln" id="L863">        <span class="tok-kw">let</span> target = into.<span class="tok-fn">join</span>(&amp;name);</span>
-<span class="ln" id="L864">        <span class="tok-kw">let</span> aside = into.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.old&quot;</span>));</span>
-<span class="ln" id="L865">        <span class="tok-kw">let</span> staged = into.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.new&quot;</span>));</span>
-<span class="ln" id="L866"></span>
-<span class="ln" id="L867">        <span class="tok-com">// The new program, whole, beside the old one. Nothing anybody runs is</span></span>
-<span class="ln" id="L868">        <span class="tok-com">// touched yet, so a failure here changes nothing at all.</span></span>
-<span class="ln" id="L869">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;staged);</span>
-<span class="ln" id="L870">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(e) = std::fs::<span class="tok-fn">copy</span>(&amp;from, &amp;staged) {</span>
-<span class="ln" id="L871">            <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;staged);</span>
-<span class="ln" id="L872">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Replace</span>(format!(</span>
-<span class="ln" id="L873">                <span class="tok-str">&quot;could not write the new {name} beside the old one: {e}. Nothing \</span></span>
-<span class="ln" id="L874"><span class="tok-str">                 has been replaced.&quot;</span></span>
-<span class="ln" id="L875">            )));</span>
-<span class="ln" id="L876">        }</span>
-<span class="ln" id="L877">        <span class="tok-com">// Before it is anybody&#x27;s program rather than after, so it is never</span></span>
-<span class="ln" id="L878">        <span class="tok-com">// reachable under its real name without the bit that makes it runnable.</span></span>
-<span class="ln" id="L879">        <span class="tok-fn">carry_over_permissions</span>(&amp;from, &amp;staged);</span>
-<span class="ln" id="L880"></span>
-<span class="ln" id="L881">        <span class="tok-com">// Windows will not let a running program be renamed over, so there the</span></span>
-<span class="ln" id="L882">        <span class="tok-com">// old one moves away first and the name is briefly free. On Unix the</span></span>
-<span class="ln" id="L883">        <span class="tok-com">// rename below replaces it in one step and this does nothing.</span></span>
-<span class="ln" id="L884">        <span class="tok-kw">let</span> moved_aside = <span class="tok-kw">if</span> cfg!(windows) &amp;&amp; target.<span class="tok-fn">exists</span>() {</span>
-<span class="ln" id="L885">            <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;aside);</span>
-<span class="ln" id="L886">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(e) = std::fs::<span class="tok-fn">rename</span>(&amp;target, &amp;aside) {</span>
-<span class="ln" id="L887">                <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;staged);</span>
-<span class="ln" id="L888">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Replace</span>(format!(</span>
-<span class="ln" id="L889">                    <span class="tok-str">&quot;could not move the old {name} aside, so nothing was replaced: {e}&quot;</span></span>
-<span class="ln" id="L890">                )));</span>
-<span class="ln" id="L891">            }</span>
-<span class="ln" id="L892">            true</span>
-<span class="ln" id="L893">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L894">            false</span>
-<span class="ln" id="L895">        };</span>
-<span class="ln" id="L896"></span>
-<span class="ln" id="L897">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Err</span>(e) = std::fs::<span class="tok-fn">rename</span>(&amp;staged, &amp;target) {</span>
-<span class="ln" id="L898">            <span class="tok-com">// Put it back. Failing halfway through an update and leaving no</span></span>
-<span class="ln" id="L899">            <span class="tok-com">// program at all is much worse than failing.</span></span>
-<span class="ln" id="L900">            <span class="tok-kw">if</span> moved_aside {</span>
-<span class="ln" id="L901">                <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">rename</span>(&amp;aside, &amp;target);</span>
-<span class="ln" id="L902">            }</span>
-<span class="ln" id="L903">            <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;staged);</span>
-<span class="ln" id="L904">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Replace</span>(format!(</span>
-<span class="ln" id="L905">                <span class="tok-str">&quot;could not put the new {name} in place: {e}. The copy you had is \</span></span>
-<span class="ln" id="L906"><span class="tok-str">                 still there.&quot;</span></span>
-<span class="ln" id="L907">            )));</span>
-<span class="ln" id="L908">        }</span>
-<span class="ln" id="L909">        <span class="tok-kw">if</span> moved_aside &amp;&amp; aside.<span class="tok-fn">exists</span>() &amp;&amp; std::fs::<span class="tok-fn">remove_file</span>(&amp;aside).<span class="tok-fn">is_err</span>() {</span>
-<span class="ln" id="L910">            left_behind.<span class="tok-fn">push</span>(aside);</span>
-<span class="ln" id="L911">        }</span>
-<span class="ln" id="L912">        replaced.<span class="tok-fn">push</span>(name);</span>
-<span class="ln" id="L913">    }</span>
-<span class="ln" id="L914"></span>
-<span class="ln" id="L915">    <span class="tok-kw">if</span> replaced.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L916">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Replace</span>(format!(</span>
-<span class="ln" id="L917">            <span class="tok-str">&quot;the release carried none of the VeilVoice programs, so {} was left alone&quot;</span>,</span>
-<span class="ln" id="L918">            into.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L919">        )));</span>
-<span class="ln" id="L920">    }</span>
-<span class="ln" id="L921">    <span class="tok-fn">Ok</span>((replaced, left_behind))</span>
-<span class="ln" id="L922">}</span>
+<span class="ln" id="L864">        <span class="tok-kw">match</span> veilvoice_setup::install::<span class="tok-fn">replace_with_copy</span>(&amp;from, &amp;target) {</span>
+<span class="ln" id="L865">            <span class="tok-fn">Ok</span>(aside) =&gt; left_behind.<span class="tok-fn">extend</span>(aside),</span>
+<span class="ln" id="L866">            <span class="tok-fn">Err</span>(e) =&gt; {</span>
+<span class="ln" id="L867">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Replace</span>(format!(</span>
+<span class="ln" id="L868">                    <span class="tok-str">&quot;could not put the new {name} in place: {e}. The {name} you had \</span></span>
+<span class="ln" id="L869"><span class="tok-str">                     is still there. {}&quot;</span>,</span>
+<span class="ln" id="L870">                    <span class="tok-fn">replaced_so_far</span>(&amp;replaced)</span>
+<span class="ln" id="L871">                )));</span>
+<span class="ln" id="L872">            }</span>
+<span class="ln" id="L873">        }</span>
+<span class="ln" id="L874">        replaced.<span class="tok-fn">push</span>(name);</span>
+<span class="ln" id="L875">    }</span>
+<span class="ln" id="L876"></span>
+<span class="ln" id="L877">    <span class="tok-kw">if</span> replaced.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L878">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Replace</span>(format!(</span>
+<span class="ln" id="L879">            <span class="tok-str">&quot;the release carried none of the VeilVoice programs, so {} was left alone&quot;</span>,</span>
+<span class="ln" id="L880">            into.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L881">        )));</span>
+<span class="ln" id="L882">    }</span>
+<span class="ln" id="L883">    <span class="tok-fn">Ok</span>((replaced, left_behind))</span>
+<span class="ln" id="L884">}</span>
 </span>
-<span class="ln" id="L923"></span>
-<span class="src-item" id="fn-carry_over_permissions">
-<span class="ln" id="L924"><span class="tok-com">/// Give the new file the mode the archive published for it.</span></span>
-<span class="ln" id="L925"><span class="tok-com">///</span></span>
-<span class="ln" id="L926"><span class="tok-com">/// A copy takes the destination&#x27;s mode on some systems and the source&#x27;s on</span></span>
-<span class="ln" id="L927"><span class="tok-com">/// others, and a new VeilVoice without its execute bit is the defect</span></span>
-<span class="ln" id="L928"><span class="tok-com">/// `crate::extracted` exists to report. Best effort: a failure here leaves a</span></span>
-<span class="ln" id="L929"><span class="tok-com">/// file that is byte for byte correct, which the report can still be honest</span></span>
-<span class="ln" id="L930"><span class="tok-com">/// about, and refusing the whole update over a permission bit would be worse.</span></span>
-<span class="ln" id="L931"><span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L932"><span class="tok-kw">fn</span> <span class="tok-fn">carry_over_permissions</span>(from: &amp;Path, to: &amp;Path) {</span>
-<span class="ln" id="L933">    <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
-<span class="ln" id="L934">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(meta) = std::fs::<span class="tok-fn">metadata</span>(from) {</span>
-<span class="ln" id="L935">        <span class="tok-kw">let</span> mode = meta.<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>();</span>
-<span class="ln" id="L936">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">set_permissions</span>(to, std::fs::Permissions::<span class="tok-fn">from_mode</span>(mode));</span>
-<span class="ln" id="L937">    }</span>
-<span class="ln" id="L938">}</span>
+<span class="ln" id="L885"></span>
+<span class="src-item" id="fn-replaced_so_far">
+<span class="ln" id="L886"><span class="tok-com">/// Say what an update had already put in place when it stopped.</span></span>
+<span class="ln" id="L887"><span class="tok-com">///</span></span>
+<span class="ln" id="L888"><span class="tok-com">/// **F-287.** The failures inside [`put_in_place`] said &quot;Nothing has been</span></span>
+<span class="ln" id="L889"><span class="tok-com">/// replaced&quot; and &quot;nothing was replaced&quot;, which is true of the first program the</span></span>
+<span class="ln" id="L890"><span class="tok-com">/// loop reaches and false of every one after it. A release carries a command</span></span>
+<span class="ln" id="L891"><span class="tok-com">/// line and a window, so an update that replaced the command line and then</span></span>
+<span class="ln" id="L892"><span class="tok-com">/// could not replace the window told the reader that nothing had changed while</span></span>
+<span class="ln" id="L893"><span class="tok-com">/// one of their two programs was a version newer than the other. Somebody told</span></span>
+<span class="ln" id="L894"><span class="tok-com">/// that reasonably tries again, or carries on using a pair of programs they</span></span>
+<span class="ln" id="L895"><span class="tok-com">/// believe are the same version, and neither is what the machine looks like.</span></span>
+<span class="ln" id="L896"><span class="tok-com">///</span></span>
+<span class="ln" id="L897"><span class="tok-com">/// Said once here rather than at each failure, because a third message that</span></span>
+<span class="ln" id="L898"><span class="tok-com">/// forgets the loop is exactly how this came back.</span></span>
+<span class="ln" id="L899"><span class="tok-kw">fn</span> <span class="tok-fn">replaced_so_far</span>(replaced: &amp;[String]) -&gt; String {</span>
+<span class="ln" id="L900">    <span class="tok-kw">match</span> replaced {</span>
+<span class="ln" id="L901">        [] =&gt; <span class="tok-str">&quot;Nothing was replaced.&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L902">        [one] =&gt; format!(<span class="tok-str">&quot;{one} was already replaced and is the new version.&quot;</span>),</span>
+<span class="ln" id="L903">        [rest @ .., last] =&gt; format!(</span>
+<span class="ln" id="L904">            <span class="tok-str">&quot;{} and {last} were already replaced and are the new version.&quot;</span>,</span>
+<span class="ln" id="L905">            rest.<span class="tok-fn">join</span>(<span class="tok-str">&quot;, &quot;</span>)</span>
+<span class="ln" id="L906">        ),</span>
+<span class="ln" id="L907">    }</span>
+<span class="ln" id="L908">}</span>
 </span>
-<span class="ln" id="L939"></span>
-<span class="src-item" id="fn-carry_over_permissions-2">
-<span class="ln" id="L940"><span class="tok-com">/// The everywhere-else half: there is no execute bit to carry over.</span></span>
-<span class="ln" id="L941"><span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(unix))]</span>
-<span class="ln" id="L942"><span class="tok-kw">fn</span> <span class="tok-fn">carry_over_permissions</span>(_from: &amp;Path, _to: &amp;Path) {}</span>
-</span>
-<span class="ln" id="L943"></span>
+<span class="ln" id="L909"></span>
 <span class="src-item" id="fn-retake_record">
-<span class="ln" id="L944"><span class="tok-com">/// Re-take the integrity record over the files that were just replaced.</span></span>
-<span class="ln" id="L945"><span class="tok-com">///</span></span>
-<span class="ln" id="L946"><span class="tok-com">/// Never fails the update. By the time this runs the new files are in place and</span></span>
-<span class="ln" id="L947"><span class="tok-com">/// have been proved against a signature; a record that could not be written is</span></span>
-<span class="ln" id="L948"><span class="tok-com">/// worth reporting and is not worth undoing a good update for. [`Record`] says</span></span>
-<span class="ln" id="L949"><span class="tok-com">/// which happened.</span></span>
-<span class="ln" id="L950"><span class="tok-kw">fn</span> <span class="tok-fn">retake_record</span>(into: &amp;Path, replaced: &amp;[String], password: Option&lt;&amp;[u8]&gt;) -&gt; Record {</span>
-<span class="ln" id="L951">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(plain) = veilvoice_guard::<span class="tok-fn">record_path</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L952">        <span class="tok-kw">return</span> Record::<span class="tok-fn">NotTaken</span>(</span>
-<span class="ln" id="L953">            <span class="tok-str">&quot;this platform names no configuration directory, so there is nowhere \</span></span>
-<span class="ln" id="L954"><span class="tok-str">             to keep the record&quot;</span></span>
-<span class="ln" id="L955">                .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L956">        );</span>
-<span class="ln" id="L957">    };</span>
-<span class="ln" id="L958">    <span class="tok-kw">let</span> sealed = veilvoice_guard::<span class="tok-fn">sealed_record_path</span>(&amp;plain);</span>
-<span class="ln" id="L959">    <span class="tok-kw">let</span> files: Vec&lt;PathBuf&gt; = replaced.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|name| into.<span class="tok-fn">join</span>(name)).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L960"></span>
-<span class="ln" id="L961">    <span class="tok-com">// The record that was there, with the replaced programs measured again and</span></span>
-<span class="ln" id="L962">    <span class="tok-com">// every other entry kept. A record covers more than the two binaries this</span></span>
-<span class="ln" id="L963">    <span class="tok-com">// replaces: the guard&#x27;s own first run records the app lock beside them, and</span></span>
-<span class="ln" id="L964">    <span class="tok-com">// somebody can name files of their own. Building a fresh record from the</span></span>
-<span class="ln" id="L965">    <span class="tok-com">// replaced files alone drops all of that, and the next check calls the</span></span>
-<span class="ln" id="L966">    <span class="tok-com">// dropped files unrecorded rather than unchanged.</span></span>
-<span class="ln" id="L967">    <span class="tok-kw">let</span> previous = <span class="tok-kw">match</span> password {</span>
-<span class="ln" id="L968">        <span class="tok-fn">Some</span>(pw) =&gt; std::fs::<span class="tok-fn">read</span>(&amp;sealed)</span>
-<span class="ln" id="L969">            .<span class="tok-fn">ok</span>()</span>
-<span class="ln" id="L970">            .<span class="tok-fn">and_then</span>(|bytes| veilvoice_guard::Manifest::<span class="tok-fn">open_sealed</span>(pw, &amp;bytes).<span class="tok-fn">ok</span>()),</span>
-<span class="ln" id="L971">        None =&gt; veilvoice_guard::Manifest::<span class="tok-fn">load</span>(&amp;plain).<span class="tok-fn">ok</span>(),</span>
-<span class="ln" id="L972">    };</span>
-<span class="ln" id="L973"></span>
-<span class="ln" id="L974">    <span class="tok-kw">let</span> manifest = <span class="tok-kw">match</span> previous {</span>
-<span class="ln" id="L975">        <span class="tok-fn">Some</span>(previous) =&gt; <span class="tok-kw">match</span> previous.<span class="tok-fn">refresh</span>(&amp;files) {</span>
-<span class="ln" id="L976">            <span class="tok-fn">Ok</span>(manifest) =&gt; manifest,</span>
-<span class="ln" id="L977">            <span class="tok-fn">Err</span>(why) =&gt; <span class="tok-kw">return</span> Record::<span class="tok-fn">NotTaken</span>(why.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L978">        },</span>
-<span class="ln" id="L979">        <span class="tok-com">// No record yet, or one this cannot read. Recording the programs is</span></span>
-<span class="ln" id="L980">        <span class="tok-com">// what the next launch needs, and a record that covers less than the</span></span>
-<span class="ln" id="L981">        <span class="tok-com">// last one is still better than none.</span></span>
-<span class="ln" id="L982">        None =&gt; <span class="tok-kw">match</span> veilvoice_guard::Manifest::<span class="tok-fn">of</span>(&amp;files) {</span>
-<span class="ln" id="L983">            <span class="tok-fn">Ok</span>(manifest) =&gt; manifest,</span>
-<span class="ln" id="L984">            <span class="tok-fn">Err</span>(why) =&gt; <span class="tok-kw">return</span> Record::<span class="tok-fn">NotTaken</span>(why.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L985">        },</span>
-<span class="ln" id="L986">    };</span>
-<span class="ln" id="L987"></span>
-<span class="ln" id="L988">    <span class="tok-kw">match</span> password {</span>
-<span class="ln" id="L989">        <span class="tok-fn">Some</span>(pw) =&gt; <span class="tok-kw">match</span> manifest.<span class="tok-fn">seal</span>(pw) {</span>
-<span class="ln" id="L990">            <span class="tok-fn">Err</span>(why) =&gt; Record::<span class="tok-fn">NotTaken</span>(why.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L991">            <span class="tok-fn">Ok</span>(bytes) =&gt; <span class="tok-kw">match</span> <span class="tok-fn">write_beside</span>(&amp;sealed, &amp;bytes) {</span>
-<span class="ln" id="L992">                <span class="tok-fn">Err</span>(why) =&gt; Record::<span class="tok-fn">NotTaken</span>(why),</span>
-<span class="ln" id="L993">                <span class="tok-fn">Ok</span>(()) =&gt; {</span>
-<span class="ln" id="L994">                    <span class="tok-com">// A plain record left beside a sealed one is a downgrade</span></span>
-<span class="ln" id="L995">                    <span class="tok-com">// waiting to be used: whoever can write that directory could</span></span>
-<span class="ln" id="L996">                    <span class="tok-com">// drop one there and have the next check read it instead.</span></span>
-<span class="ln" id="L997">                    <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;plain);</span>
-<span class="ln" id="L998">                    Record::Sealed</span>
-<span class="ln" id="L999">                }</span>
-<span class="ln" id="L1000">            },</span>
-<span class="ln" id="L1001">        },</span>
-<span class="ln" id="L1002">        None =&gt; <span class="tok-kw">match</span> manifest.<span class="tok-fn">save</span>(&amp;plain) {</span>
-<span class="ln" id="L1003">            <span class="tok-fn">Err</span>(why) =&gt; Record::<span class="tok-fn">NotTaken</span>(why.<span class="tok-fn">to_string</span>()),</span>
-<span class="ln" id="L1004">            <span class="tok-fn">Ok</span>(()) =&gt; Record::Plain,</span>
-<span class="ln" id="L1005">        },</span>
-<span class="ln" id="L1006">    }</span>
-<span class="ln" id="L1007">}</span>
+<span class="ln" id="L910"><span class="tok-com">/// Re-take the integrity record over the files that were just replaced.</span></span>
+<span class="ln" id="L911"><span class="tok-com">///</span></span>
+<span class="ln" id="L912"><span class="tok-com">/// Never fails the update. By the time this runs the new files are in place and</span></span>
+<span class="ln" id="L913"><span class="tok-com">/// have been proved against a signature; a record that could not be written is</span></span>
+<span class="ln" id="L914"><span class="tok-com">/// worth reporting and is not worth undoing a good update for. [`Record`] says</span></span>
+<span class="ln" id="L915"><span class="tok-com">/// which happened.</span></span>
+<span class="ln" id="L916"><span class="tok-kw">fn</span> <span class="tok-fn">retake_record</span>(into: &amp;Path, replaced: &amp;[String], password: Option&lt;&amp;[u8]&gt;) -&gt; Record {</span>
+<span class="ln" id="L917">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(plain) = veilvoice_guard::<span class="tok-fn">record_path</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L918">        <span class="tok-kw">return</span> Record::<span class="tok-fn">NotTaken</span>(</span>
+<span class="ln" id="L919">            <span class="tok-str">&quot;this platform names no configuration directory, so there is nowhere \</span></span>
+<span class="ln" id="L920"><span class="tok-str">             to keep the record&quot;</span></span>
+<span class="ln" id="L921">                .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L922">        );</span>
+<span class="ln" id="L923">    };</span>
+<span class="ln" id="L924">    <span class="tok-kw">let</span> sealed = veilvoice_guard::<span class="tok-fn">sealed_record_path</span>(&amp;plain);</span>
+<span class="ln" id="L925">    <span class="tok-kw">let</span> files: Vec&lt;PathBuf&gt; = replaced.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|name| into.<span class="tok-fn">join</span>(name)).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L926"></span>
+<span class="ln" id="L927">    <span class="tok-com">// The record that was there, with the replaced programs measured again and</span></span>
+<span class="ln" id="L928">    <span class="tok-com">// every other entry kept. A record covers more than the two binaries this</span></span>
+<span class="ln" id="L929">    <span class="tok-com">// replaces: the guard&#x27;s own first run records the app lock beside them, and</span></span>
+<span class="ln" id="L930">    <span class="tok-com">// somebody can name files of their own. Building a fresh record from the</span></span>
+<span class="ln" id="L931">    <span class="tok-com">// replaced files alone drops all of that, and the next check calls the</span></span>
+<span class="ln" id="L932">    <span class="tok-com">// dropped files unrecorded rather than unchanged.</span></span>
+<span class="ln" id="L933">    <span class="tok-kw">let</span> previous = <span class="tok-kw">match</span> password {</span>
+<span class="ln" id="L934">        <span class="tok-fn">Some</span>(pw) =&gt; std::fs::<span class="tok-fn">read</span>(&amp;sealed)</span>
+<span class="ln" id="L935">            .<span class="tok-fn">ok</span>()</span>
+<span class="ln" id="L936">            .<span class="tok-fn">and_then</span>(|bytes| veilvoice_guard::Manifest::<span class="tok-fn">open_sealed</span>(pw, &amp;bytes).<span class="tok-fn">ok</span>()),</span>
+<span class="ln" id="L937">        None =&gt; veilvoice_guard::Manifest::<span class="tok-fn">load</span>(&amp;plain).<span class="tok-fn">ok</span>(),</span>
+<span class="ln" id="L938">    };</span>
+<span class="ln" id="L939"></span>
+<span class="ln" id="L940">    <span class="tok-kw">let</span> manifest = <span class="tok-kw">match</span> previous {</span>
+<span class="ln" id="L941">        <span class="tok-fn">Some</span>(previous) =&gt; <span class="tok-kw">match</span> previous.<span class="tok-fn">refresh</span>(&amp;files) {</span>
+<span class="ln" id="L942">            <span class="tok-fn">Ok</span>(manifest) =&gt; manifest,</span>
+<span class="ln" id="L943">            <span class="tok-fn">Err</span>(why) =&gt; <span class="tok-kw">return</span> Record::<span class="tok-fn">NotTaken</span>(why.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L944">        },</span>
+<span class="ln" id="L945">        <span class="tok-com">// No record yet, or one this cannot read. Recording the programs is</span></span>
+<span class="ln" id="L946">        <span class="tok-com">// what the next launch needs, and a record that covers less than the</span></span>
+<span class="ln" id="L947">        <span class="tok-com">// last one is still better than none.</span></span>
+<span class="ln" id="L948">        None =&gt; <span class="tok-kw">match</span> veilvoice_guard::Manifest::<span class="tok-fn">of</span>(&amp;files) {</span>
+<span class="ln" id="L949">            <span class="tok-fn">Ok</span>(manifest) =&gt; manifest,</span>
+<span class="ln" id="L950">            <span class="tok-fn">Err</span>(why) =&gt; <span class="tok-kw">return</span> Record::<span class="tok-fn">NotTaken</span>(why.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L951">        },</span>
+<span class="ln" id="L952">    };</span>
+<span class="ln" id="L953"></span>
+<span class="ln" id="L954">    <span class="tok-kw">match</span> password {</span>
+<span class="ln" id="L955">        <span class="tok-fn">Some</span>(pw) =&gt; <span class="tok-kw">match</span> manifest.<span class="tok-fn">seal</span>(pw) {</span>
+<span class="ln" id="L956">            <span class="tok-fn">Err</span>(why) =&gt; Record::<span class="tok-fn">NotTaken</span>(why.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L957">            <span class="tok-fn">Ok</span>(bytes) =&gt; <span class="tok-kw">match</span> <span class="tok-fn">write_beside</span>(&amp;sealed, &amp;bytes) {</span>
+<span class="ln" id="L958">                <span class="tok-fn">Err</span>(why) =&gt; Record::<span class="tok-fn">NotTaken</span>(why),</span>
+<span class="ln" id="L959">                <span class="tok-fn">Ok</span>(()) =&gt; {</span>
+<span class="ln" id="L960">                    <span class="tok-com">// A plain record left beside a sealed one is a downgrade</span></span>
+<span class="ln" id="L961">                    <span class="tok-com">// waiting to be used: whoever can write that directory could</span></span>
+<span class="ln" id="L962">                    <span class="tok-com">// drop one there and have the next check read it instead.</span></span>
+<span class="ln" id="L963">                    <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_file</span>(&amp;plain);</span>
+<span class="ln" id="L964">                    Record::Sealed</span>
+<span class="ln" id="L965">                }</span>
+<span class="ln" id="L966">            },</span>
+<span class="ln" id="L967">        },</span>
+<span class="ln" id="L968">        None =&gt; <span class="tok-kw">match</span> manifest.<span class="tok-fn">save</span>(&amp;plain) {</span>
+<span class="ln" id="L969">            <span class="tok-fn">Err</span>(why) =&gt; Record::<span class="tok-fn">NotTaken</span>(why.<span class="tok-fn">to_string</span>()),</span>
+<span class="ln" id="L970">            <span class="tok-fn">Ok</span>(()) =&gt; Record::Plain,</span>
+<span class="ln" id="L971">        },</span>
+<span class="ln" id="L972">    }</span>
+<span class="ln" id="L973">}</span>
 </span>
-<span class="ln" id="L1008"></span>
+<span class="ln" id="L974"></span>
 <span class="src-item" id="fn-write_beside">
-<span class="ln" id="L1009"><span class="tok-com">/// Write the sealed record, owner-readable, making its directory if needed.</span></span>
-<span class="ln" id="L1010"><span class="tok-kw">fn</span> <span class="tok-fn">write_beside</span>(path: &amp;Path, bytes: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L1011">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
-<span class="ln" id="L1012">        <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L1013">            std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L1014">        }</span>
-<span class="ln" id="L1015">    }</span>
-<span class="ln" id="L1016">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, bytes).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L1017">}</span>
+<span class="ln" id="L975"><span class="tok-com">/// Write the sealed record, owner-readable, making its directory if needed.</span></span>
+<span class="ln" id="L976"><span class="tok-kw">fn</span> <span class="tok-fn">write_beside</span>(path: &amp;Path, bytes: &amp;[u8]) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L977">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
+<span class="ln" id="L978">        <span class="tok-kw">if</span> !parent.<span class="tok-fn">as_os_str</span>().<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L979">            std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L980">        }</span>
+<span class="ln" id="L981">    }</span>
+<span class="ln" id="L982">    veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, bytes).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L983">}</span>
 </span>
-<span class="ln" id="L1018"></span>
+<span class="ln" id="L984"></span>
 <span class="src-item" id="fn-relaunch">
-<span class="ln" id="L1019"><span class="tok-com">/// Start the updated program and return.</span></span>
-<span class="ln" id="L1020"><span class="tok-com">///</span></span>
-<span class="ln" id="L1021"><span class="tok-com">/// The caller exits afterwards; this does not exit for it, because a window has</span></span>
-<span class="ln" id="L1022"><span class="tok-com">/// state to put down first and a command line has an exit status to return.</span></span>
-<span class="ln" id="L1023"><span class="tok-com">/// Nothing is waited for: the point is to replace this process, not to supervise</span></span>
-<span class="ln" id="L1024"><span class="tok-com">/// a child.</span></span>
-<span class="ln" id="L1025"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">relaunch</span>(program: &amp;Path) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="ln" id="L1026">    std::process::Command::<span class="tok-fn">new</span>(program)</span>
-<span class="ln" id="L1027">        .<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L1028">        .<span class="tok-fn">map</span>(|_| ())</span>
-<span class="ln" id="L1029">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;could not start {}: {e}&quot;</span>, program.<span class="tok-fn">display</span>())))</span>
-<span class="ln" id="L1030">}</span>
+<span class="ln" id="L985"><span class="tok-com">/// Start the updated program and return.</span></span>
+<span class="ln" id="L986"><span class="tok-com">///</span></span>
+<span class="ln" id="L987"><span class="tok-com">/// The caller exits afterwards; this does not exit for it, because a window has</span></span>
+<span class="ln" id="L988"><span class="tok-com">/// state to put down first and a command line has an exit status to return.</span></span>
+<span class="ln" id="L989"><span class="tok-com">/// Nothing is waited for: the point is to replace this process, not to supervise</span></span>
+<span class="ln" id="L990"><span class="tok-com">/// a child.</span></span>
+<span class="ln" id="L991"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">relaunch</span>(program: &amp;Path) -&gt; Result&lt;(), Error&gt; {</span>
+<span class="ln" id="L992">    std::process::Command::<span class="tok-fn">new</span>(program)</span>
+<span class="ln" id="L993">        .<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L994">        .<span class="tok-fn">map</span>(|_| ())</span>
+<span class="ln" id="L995">        .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Io</span>(format!(<span class="tok-str">&quot;could not start {}: {e}&quot;</span>, program.<span class="tok-fn">display</span>())))</span>
+<span class="ln" id="L996">}</span>
 </span>
-<span class="ln" id="L1031"></span>
-<span class="ln" id="L1032"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L1033"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L1034">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L1035"></span>
-<span class="ln" id="L1036">    <span class="tok-com">/// This build must be offerable an update, or must say it cannot be.</span></span>
-<span class="ln" id="L1037">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1038">    <span class="tok-com">/// The two lists exist because a label is a string in a workflow and a</span></span>
-<span class="ln" id="L1039">    <span class="tok-com">/// `cfg` here, and nothing in the compiler relates them. A build whose</span></span>
-<span class="ln" id="L1040">    <span class="tok-com">/// label is not one the release publishes would ask for an archive that has</span></span>
-<span class="ln" id="L1041">    <span class="tok-com">/// never existed and report the 404 as a failed download.</span></span>
-<span class="ln" id="L1042">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1043">    <span class="tok-kw">fn</span> <span class="tok-fn">this_builds_label_is_one_the_release_publishes</span>() {</span>
-<span class="ln" id="L1044">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(label) = PLATFORM <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1045">            <span class="tok-com">// A target the workflow has no row for. Saying nothing is offered</span></span>
-<span class="ln" id="L1046">            <span class="tok-com">// is the right answer and there is nothing further to check.</span></span>
-<span class="ln" id="L1047">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L1048">        };</span>
-<span class="ln" id="L1049">        assert!(</span>
-<span class="ln" id="L1050">            PUBLISHED.<span class="tok-fn">contains</span>(&amp;label),</span>
-<span class="ln" id="L1051">            <span class="tok-str">&quot;this build calls itself {label:?}, which the release publishes nothing for&quot;</span></span>
+<span class="ln" id="L997"></span>
+<span class="ln" id="L998"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L999"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L1000">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L1001"></span>
+<span class="ln" id="L1002">    <span class="tok-com">/// This build must be offerable an update, or must say it cannot be.</span></span>
+<span class="ln" id="L1003">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1004">    <span class="tok-com">/// The two lists exist because a label is a string in a workflow and a</span></span>
+<span class="ln" id="L1005">    <span class="tok-com">/// `cfg` here, and nothing in the compiler relates them. A build whose</span></span>
+<span class="ln" id="L1006">    <span class="tok-com">/// label is not one the release publishes would ask for an archive that has</span></span>
+<span class="ln" id="L1007">    <span class="tok-com">/// never existed and report the 404 as a failed download.</span></span>
+<span class="ln" id="L1008">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1009">    <span class="tok-kw">fn</span> <span class="tok-fn">this_builds_label_is_one_the_release_publishes</span>() {</span>
+<span class="ln" id="L1010">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(label) = PLATFORM <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1011">            <span class="tok-com">// A target the workflow has no row for. Saying nothing is offered</span></span>
+<span class="ln" id="L1012">            <span class="tok-com">// is the right answer and there is nothing further to check.</span></span>
+<span class="ln" id="L1013">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L1014">        };</span>
+<span class="ln" id="L1015">        assert!(</span>
+<span class="ln" id="L1016">            PUBLISHED.<span class="tok-fn">contains</span>(&amp;label),</span>
+<span class="ln" id="L1017">            <span class="tok-str">&quot;this build calls itself {label:?}, which the release publishes nothing for&quot;</span></span>
+<span class="ln" id="L1018">        );</span>
+<span class="ln" id="L1019">    }</span>
+<span class="ln" id="L1020"></span>
+<span class="ln" id="L1021">    <span class="tok-com">/// Every published label is distinct, and none is a prefix of another.</span></span>
+<span class="ln" id="L1022">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1023">    <span class="tok-com">/// The prefix half is not pedantry: `archive_for` decides the extension by</span></span>
+<span class="ln" id="L1024">    <span class="tok-com">/// asking whether the label starts with `windows`, and a label that began</span></span>
+<span class="ln" id="L1025">    <span class="tok-com">/// with another label would make a reader of this code have to work out</span></span>
+<span class="ln" id="L1026">    <span class="tok-com">/// which rule won.</span></span>
+<span class="ln" id="L1027">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1028">    <span class="tok-kw">fn</span> <span class="tok-fn">the_published_labels_are_distinct</span>() {</span>
+<span class="ln" id="L1029">        <span class="tok-kw">for</span> (at, label) <span class="tok-kw">in</span> PUBLISHED.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
+<span class="ln" id="L1030">            assert!(!label.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L1031">            assert!(</span>
+<span class="ln" id="L1032">                !PUBLISHED[..at].<span class="tok-fn">contains</span>(label),</span>
+<span class="ln" id="L1033">                <span class="tok-str">&quot;{label:?} is listed twice&quot;</span></span>
+<span class="ln" id="L1034">            );</span>
+<span class="ln" id="L1035">        }</span>
+<span class="ln" id="L1036">    }</span>
+<span class="ln" id="L1037"></span>
+<span class="ln" id="L1038">    <span class="tok-com">/// The archive name is the one the release workflow writes.</span></span>
+<span class="ln" id="L1039">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1040">    <span class="tok-com">/// `veilvoice-&lt;tag&gt;-&lt;label&gt;`, then `.zip` on Windows and `.tar.gz`</span></span>
+<span class="ln" id="L1041">    <span class="tok-com">/// everywhere else, which is `dist/$out` in `.github/workflows/release.yml`</span></span>
+<span class="ln" id="L1042">    <span class="tok-com">/// followed by whichever of the two archive steps that row selects.</span></span>
+<span class="ln" id="L1043">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1044">    <span class="tok-kw">fn</span> <span class="tok-fn">an_archive_is_named_the_way_the_release_workflow_names_it</span>() {</span>
+<span class="ln" id="L1045">        assert_eq!(</span>
+<span class="ln" id="L1046">            <span class="tok-fn">archive_for</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>, <span class="tok-str">&quot;linux-x86_64&quot;</span>),</span>
+<span class="ln" id="L1047">            <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span></span>
+<span class="ln" id="L1048">        );</span>
+<span class="ln" id="L1049">        assert_eq!(</span>
+<span class="ln" id="L1050">            <span class="tok-fn">archive_for</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>, <span class="tok-str">&quot;windows-x86_64&quot;</span>),</span>
+<span class="ln" id="L1051">            <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64.zip&quot;</span></span>
 <span class="ln" id="L1052">        );</span>
-<span class="ln" id="L1053">    }</span>
-<span class="ln" id="L1054"></span>
-<span class="ln" id="L1055">    <span class="tok-com">/// Every published label is distinct, and none is a prefix of another.</span></span>
-<span class="ln" id="L1056">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1057">    <span class="tok-com">/// The prefix half is not pedantry: `archive_for` decides the extension by</span></span>
-<span class="ln" id="L1058">    <span class="tok-com">/// asking whether the label starts with `windows`, and a label that began</span></span>
-<span class="ln" id="L1059">    <span class="tok-com">/// with another label would make a reader of this code have to work out</span></span>
-<span class="ln" id="L1060">    <span class="tok-com">/// which rule won.</span></span>
-<span class="ln" id="L1061">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1062">    <span class="tok-kw">fn</span> <span class="tok-fn">the_published_labels_are_distinct</span>() {</span>
-<span class="ln" id="L1063">        <span class="tok-kw">for</span> (at, label) <span class="tok-kw">in</span> PUBLISHED.<span class="tok-fn">iter</span>().<span class="tok-fn">enumerate</span>() {</span>
-<span class="ln" id="L1064">            assert!(!label.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L1065">            assert!(</span>
-<span class="ln" id="L1066">                !PUBLISHED[..at].<span class="tok-fn">contains</span>(label),</span>
-<span class="ln" id="L1067">                <span class="tok-str">&quot;{label:?} is listed twice&quot;</span></span>
-<span class="ln" id="L1068">            );</span>
-<span class="ln" id="L1069">        }</span>
-<span class="ln" id="L1070">    }</span>
-<span class="ln" id="L1071"></span>
-<span class="ln" id="L1072">    <span class="tok-com">/// The archive name is the one the release workflow writes.</span></span>
-<span class="ln" id="L1073">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1074">    <span class="tok-com">/// `veilvoice-&lt;tag&gt;-&lt;label&gt;`, then `.zip` on Windows and `.tar.gz`</span></span>
-<span class="ln" id="L1075">    <span class="tok-com">/// everywhere else, which is `dist/$out` in `.github/workflows/release.yml`</span></span>
-<span class="ln" id="L1076">    <span class="tok-com">/// followed by whichever of the two archive steps that row selects.</span></span>
-<span class="ln" id="L1077">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1078">    <span class="tok-kw">fn</span> <span class="tok-fn">an_archive_is_named_the_way_the_release_workflow_names_it</span>() {</span>
-<span class="ln" id="L1079">        assert_eq!(</span>
-<span class="ln" id="L1080">            <span class="tok-fn">archive_for</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>, <span class="tok-str">&quot;linux-x86_64&quot;</span>),</span>
-<span class="ln" id="L1081">            <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span></span>
-<span class="ln" id="L1082">        );</span>
-<span class="ln" id="L1083">        assert_eq!(</span>
-<span class="ln" id="L1084">            <span class="tok-fn">archive_for</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>, <span class="tok-str">&quot;windows-x86_64&quot;</span>),</span>
-<span class="ln" id="L1085">            <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64.zip&quot;</span></span>
-<span class="ln" id="L1086">        );</span>
-<span class="ln" id="L1087">        assert_eq!(</span>
-<span class="ln" id="L1088">            <span class="tok-fn">archive_for</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>, <span class="tok-str">&quot;macos-arm64&quot;</span>),</span>
-<span class="ln" id="L1089">            <span class="tok-str">&quot;veilvoice-v0.1.23-macos-arm64.tar.gz&quot;</span></span>
-<span class="ln" id="L1090">        );</span>
-<span class="ln" id="L1091">        <span class="tok-com">// Every published label produces a name of one of the two shapes, and</span></span>
-<span class="ln" id="L1092">        <span class="tok-com">// none of them produces something with no extension at all.</span></span>
-<span class="ln" id="L1093">        <span class="tok-kw">for</span> label <span class="tok-kw">in</span> PUBLISHED {</span>
-<span class="ln" id="L1094">            <span class="tok-kw">let</span> name = <span class="tok-fn">archive_for</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>, label);</span>
-<span class="ln" id="L1095">            assert!(</span>
-<span class="ln" id="L1096">                name.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;.zip&quot;</span>) || name.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;.tar.gz&quot;</span>),</span>
-<span class="ln" id="L1097">                <span class="tok-str">&quot;{name} is neither of the two forms the workflow builds&quot;</span></span>
-<span class="ln" id="L1098">            );</span>
-<span class="ln" id="L1099">            assert!(name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-&quot;</span>), <span class="tok-str">&quot;{name}&quot;</span>);</span>
-<span class="ln" id="L1100">        }</span>
-<span class="ln" id="L1101">    }</span>
-<span class="ln" id="L1102"></span>
-<span class="ln" id="L1103">    <span class="tok-com">/// The order in [`update_within`] is the security property, read out of the</span></span>
-<span class="ln" id="L1104">    <span class="tok-com">/// source.</span></span>
-<span class="ln" id="L1105">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1106">    <span class="tok-com">/// **What actually enforces this order is the compiler, and that is the</span></span>
-<span class="ln" id="L1107">    <span class="tok-com">/// stronger thing.** Each step consumes the previous step&#x27;s result:</span></span>
-<span class="ln" id="L1108">    <span class="tok-com">/// `open_archive` needs the `ArchiveContents` that only `proved_contents`</span></span>
-<span class="ln" id="L1109">    <span class="tok-com">/// returns, `put_in_place` needs the release directory that only</span></span>
-<span class="ln" id="L1110">    <span class="tok-com">/// `open_archive` returns, and `retake_record` needs the file names that</span></span>
-<span class="ln" id="L1111">    <span class="tok-com">/// only `put_in_place` returns. Reversing any pair of them does not</span></span>
-<span class="ln" id="L1112">    <span class="tok-com">/// compile. That is deliberate, and it is why the functions hand values</span></span>
-<span class="ln" id="L1113">    <span class="tok-com">/// back rather than writing to paths the next one knows about.</span></span>
-<span class="ln" id="L1114">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1115">    <span class="tok-com">/// So this test is not what stops the reversal today. It is the backstop</span></span>
-<span class="ln" id="L1116">    <span class="tok-com">/// for the rewrite that would remove the compiler&#x27;s hold on it: a version</span></span>
-<span class="ln" id="L1117">    <span class="tok-com">/// of this function that passed directory paths around instead of values</span></span>
-<span class="ln" id="L1118">    <span class="tok-com">/// would still type-check in any order, and that is a perfectly natural</span></span>
-<span class="ln" id="L1119">    <span class="tok-com">/// thing for somebody to do while tidying. Kept for that, and for saying in</span></span>
-<span class="ln" id="L1120">    <span class="tok-com">/// one place what the order is.</span></span>
-<span class="ln" id="L1121">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1122">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_happens_before_the_thing_that_makes_it_safe</span>() {</span>
-<span class="ln" id="L1123">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1124">        <span class="tok-kw">let</span> start = source</span>
-<span class="ln" id="L1125">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn update_within(&quot;</span>)</span>
-<span class="ln" id="L1126">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;update_within exists&quot;</span>);</span>
-<span class="ln" id="L1127">        <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L1128">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n/// The signature, the hash list&quot;</span>)</span>
-<span class="ln" id="L1129">            .<span class="tok-fn">map</span>(|at| start + at)</span>
-<span class="ln" id="L1130">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function ends&quot;</span>);</span>
-<span class="ln" id="L1131">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
-<span class="ln" id="L1132"></span>
-<span class="ln" id="L1133">        <span class="tok-kw">let</span> proved = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;proved_contents(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the check is called&quot;</span>);</span>
-<span class="ln" id="L1134">        <span class="tok-kw">let</span> opened = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;open_archive(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the archive is opened&quot;</span>);</span>
-<span class="ln" id="L1135">        <span class="tok-kw">let</span> replaced = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;put_in_place(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the files are replaced&quot;</span>);</span>
-<span class="ln" id="L1136">        <span class="tok-kw">let</span> recorded = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;retake_record(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the record is re-taken&quot;</span>);</span>
-<span class="ln" id="L1137"></span>
-<span class="ln" id="L1138">        assert!(</span>
-<span class="ln" id="L1139">            proved &lt; opened,</span>
-<span class="ln" id="L1140">            <span class="tok-str">&quot;the archive is opened before it has been checked&quot;</span></span>
-<span class="ln" id="L1141">        );</span>
-<span class="ln" id="L1142">        assert!(</span>
-<span class="ln" id="L1143">            opened &lt; replaced,</span>
-<span class="ln" id="L1144">            <span class="tok-str">&quot;files are replaced before the archive has been opened&quot;</span></span>
+<span class="ln" id="L1053">        assert_eq!(</span>
+<span class="ln" id="L1054">            <span class="tok-fn">archive_for</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>, <span class="tok-str">&quot;macos-arm64&quot;</span>),</span>
+<span class="ln" id="L1055">            <span class="tok-str">&quot;veilvoice-v0.1.23-macos-arm64.tar.gz&quot;</span></span>
+<span class="ln" id="L1056">        );</span>
+<span class="ln" id="L1057">        <span class="tok-com">// Every published label produces a name of one of the two shapes, and</span></span>
+<span class="ln" id="L1058">        <span class="tok-com">// none of them produces something with no extension at all.</span></span>
+<span class="ln" id="L1059">        <span class="tok-kw">for</span> label <span class="tok-kw">in</span> PUBLISHED {</span>
+<span class="ln" id="L1060">            <span class="tok-kw">let</span> name = <span class="tok-fn">archive_for</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>, label);</span>
+<span class="ln" id="L1061">            assert!(</span>
+<span class="ln" id="L1062">                name.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;.zip&quot;</span>) || name.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;.tar.gz&quot;</span>),</span>
+<span class="ln" id="L1063">                <span class="tok-str">&quot;{name} is neither of the two forms the workflow builds&quot;</span></span>
+<span class="ln" id="L1064">            );</span>
+<span class="ln" id="L1065">            assert!(name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-&quot;</span>), <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L1066">        }</span>
+<span class="ln" id="L1067">    }</span>
+<span class="ln" id="L1068"></span>
+<span class="ln" id="L1069">    <span class="tok-com">/// The order in [`update_within`] is the security property, read out of the</span></span>
+<span class="ln" id="L1070">    <span class="tok-com">/// source.</span></span>
+<span class="ln" id="L1071">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1072">    <span class="tok-com">/// **What actually enforces this order is the compiler, and that is the</span></span>
+<span class="ln" id="L1073">    <span class="tok-com">/// stronger thing.** Each step consumes the previous step&#x27;s result:</span></span>
+<span class="ln" id="L1074">    <span class="tok-com">/// `open_archive` needs the `ArchiveContents` that only `proved_contents`</span></span>
+<span class="ln" id="L1075">    <span class="tok-com">/// returns, `put_in_place` needs the release directory that only</span></span>
+<span class="ln" id="L1076">    <span class="tok-com">/// `open_archive` returns, and `retake_record` needs the file names that</span></span>
+<span class="ln" id="L1077">    <span class="tok-com">/// only `put_in_place` returns. Reversing any pair of them does not</span></span>
+<span class="ln" id="L1078">    <span class="tok-com">/// compile. That is deliberate, and it is why the functions hand values</span></span>
+<span class="ln" id="L1079">    <span class="tok-com">/// back rather than writing to paths the next one knows about.</span></span>
+<span class="ln" id="L1080">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1081">    <span class="tok-com">/// So this test is not what stops the reversal today. It is the backstop</span></span>
+<span class="ln" id="L1082">    <span class="tok-com">/// for the rewrite that would remove the compiler&#x27;s hold on it: a version</span></span>
+<span class="ln" id="L1083">    <span class="tok-com">/// of this function that passed directory paths around instead of values</span></span>
+<span class="ln" id="L1084">    <span class="tok-com">/// would still type-check in any order, and that is a perfectly natural</span></span>
+<span class="ln" id="L1085">    <span class="tok-com">/// thing for somebody to do while tidying. Kept for that, and for saying in</span></span>
+<span class="ln" id="L1086">    <span class="tok-com">/// one place what the order is.</span></span>
+<span class="ln" id="L1087">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1088">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_happens_before_the_thing_that_makes_it_safe</span>() {</span>
+<span class="ln" id="L1089">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1090">        <span class="tok-kw">let</span> start = source</span>
+<span class="ln" id="L1091">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn update_within(&quot;</span>)</span>
+<span class="ln" id="L1092">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;update_within exists&quot;</span>);</span>
+<span class="ln" id="L1093">        <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L1094">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n/// The signature, the hash list&quot;</span>)</span>
+<span class="ln" id="L1095">            .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L1096">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function ends&quot;</span>);</span>
+<span class="ln" id="L1097">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
+<span class="ln" id="L1098"></span>
+<span class="ln" id="L1099">        <span class="tok-kw">let</span> proved = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;proved_contents(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the check is called&quot;</span>);</span>
+<span class="ln" id="L1100">        <span class="tok-kw">let</span> opened = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;open_archive(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the archive is opened&quot;</span>);</span>
+<span class="ln" id="L1101">        <span class="tok-kw">let</span> replaced = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;put_in_place(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the files are replaced&quot;</span>);</span>
+<span class="ln" id="L1102">        <span class="tok-kw">let</span> recorded = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;retake_record(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the record is re-taken&quot;</span>);</span>
+<span class="ln" id="L1103"></span>
+<span class="ln" id="L1104">        assert!(</span>
+<span class="ln" id="L1105">            proved &lt; opened,</span>
+<span class="ln" id="L1106">            <span class="tok-str">&quot;the archive is opened before it has been checked&quot;</span></span>
+<span class="ln" id="L1107">        );</span>
+<span class="ln" id="L1108">        assert!(</span>
+<span class="ln" id="L1109">            opened &lt; replaced,</span>
+<span class="ln" id="L1110">            <span class="tok-str">&quot;files are replaced before the archive has been opened&quot;</span></span>
+<span class="ln" id="L1111">        );</span>
+<span class="ln" id="L1112">        assert!(</span>
+<span class="ln" id="L1113">            proved &lt; recorded,</span>
+<span class="ln" id="L1114">            <span class="tok-str">&quot;the integrity record is re-taken before the signature has been checked, \</span></span>
+<span class="ln" id="L1115"><span class="tok-str">             which would write down whatever arrived as the correct files&quot;</span></span>
+<span class="ln" id="L1116">        );</span>
+<span class="ln" id="L1117">        assert!(</span>
+<span class="ln" id="L1118">            replaced &lt; recorded,</span>
+<span class="ln" id="L1119">            <span class="tok-str">&quot;the record is taken before the new files are in place, so it would \</span></span>
+<span class="ln" id="L1120"><span class="tok-str">             describe the old ones&quot;</span></span>
+<span class="ln" id="L1121">        );</span>
+<span class="ln" id="L1122">    }</span>
+<span class="ln" id="L1123"></span>
+<span class="ln" id="L1124">    <span class="tok-com">/// A locked machine is refused before a single byte is fetched.</span></span>
+<span class="ln" id="L1125">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1126">    <span class="tok-com">/// Read out of [`perform`], which is short for exactly this reason: the</span></span>
+<span class="ln" id="L1127">    <span class="tok-com">/// check has to be the first thing in it, and a short function is one where</span></span>
+<span class="ln" id="L1128">    <span class="tok-com">/// that is obvious to a reader as well as to this test.</span></span>
+<span class="ln" id="L1129">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1130">    <span class="tok-kw">fn</span> <span class="tok-fn">a_locked_machine_is_refused_before_anything_is_downloaded</span>() {</span>
+<span class="ln" id="L1131">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1132">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn perform(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;perform exists&quot;</span>);</span>
+<span class="ln" id="L1133">        <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L1134">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n/// Where an update does its work&quot;</span>)</span>
+<span class="ln" id="L1135">            .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L1136">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function ends&quot;</span>);</span>
+<span class="ln" id="L1137">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
+<span class="ln" id="L1138"></span>
+<span class="ln" id="L1139">        <span class="tok-kw">let</span> locked = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Error::Locked&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the refusal is there&quot;</span>);</span>
+<span class="ln" id="L1140">        <span class="tok-kw">let</span> work = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;update_within(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the work is dispatched&quot;</span>);</span>
+<span class="ln" id="L1141">        assert!(</span>
+<span class="ln" id="L1142">            locked &lt; work,</span>
+<span class="ln" id="L1143">            <span class="tok-str">&quot;an update on a locked machine starts fetching before it finds out it \</span></span>
+<span class="ln" id="L1144"><span class="tok-str">             cannot finish&quot;</span></span>
 <span class="ln" id="L1145">        );</span>
-<span class="ln" id="L1146">        assert!(</span>
-<span class="ln" id="L1147">            proved &lt; recorded,</span>
-<span class="ln" id="L1148">            <span class="tok-str">&quot;the integrity record is re-taken before the signature has been checked, \</span></span>
-<span class="ln" id="L1149"><span class="tok-str">             which would write down whatever arrived as the correct files&quot;</span></span>
-<span class="ln" id="L1150">        );</span>
-<span class="ln" id="L1151">        assert!(</span>
-<span class="ln" id="L1152">            replaced &lt; recorded,</span>
-<span class="ln" id="L1153">            <span class="tok-str">&quot;the record is taken before the new files are in place, so it would \</span></span>
-<span class="ln" id="L1154"><span class="tok-str">             describe the old ones&quot;</span></span>
-<span class="ln" id="L1155">        );</span>
-<span class="ln" id="L1156">    }</span>
-<span class="ln" id="L1157"></span>
-<span class="ln" id="L1158">    <span class="tok-com">/// A locked machine is refused before a single byte is fetched.</span></span>
-<span class="ln" id="L1159">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1160">    <span class="tok-com">/// Read out of [`perform`], which is short for exactly this reason: the</span></span>
-<span class="ln" id="L1161">    <span class="tok-com">/// check has to be the first thing in it, and a short function is one where</span></span>
-<span class="ln" id="L1162">    <span class="tok-com">/// that is obvious to a reader as well as to this test.</span></span>
-<span class="ln" id="L1163">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1164">    <span class="tok-kw">fn</span> <span class="tok-fn">a_locked_machine_is_refused_before_anything_is_downloaded</span>() {</span>
-<span class="ln" id="L1165">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1166">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn perform(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;perform exists&quot;</span>);</span>
-<span class="ln" id="L1167">        <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L1168">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n/// Where an update does its work&quot;</span>)</span>
-<span class="ln" id="L1169">            .<span class="tok-fn">map</span>(|at| start + at)</span>
-<span class="ln" id="L1170">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function ends&quot;</span>);</span>
-<span class="ln" id="L1171">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
-<span class="ln" id="L1172"></span>
-<span class="ln" id="L1173">        <span class="tok-kw">let</span> locked = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;Error::Locked&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the refusal is there&quot;</span>);</span>
-<span class="ln" id="L1174">        <span class="tok-kw">let</span> work = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;update_within(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the work is dispatched&quot;</span>);</span>
+<span class="ln" id="L1146">    }</span>
+<span class="ln" id="L1147"></span>
+<span class="ln" id="L1148">    <span class="tok-com">/// The only program this module runs is `tar`, and it comes from</span></span>
+<span class="ln" id="L1149">    <span class="tok-com">/// [`tar_program`].</span></span>
+<span class="ln" id="L1150">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1151">    <span class="tok-com">/// The point of an updater that checks a download is that it never runs</span></span>
+<span class="ln" id="L1152">    <span class="tok-com">/// what it fetched. A spawn added here later, of anything at all, is the</span></span>
+<span class="ln" id="L1153">    <span class="tok-com">/// one change to this file that could undo that, and it is not a change a</span></span>
+<span class="ln" id="L1154">    <span class="tok-com">/// reviewer would necessarily read as dangerous.</span></span>
+<span class="ln" id="L1155">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1156">    <span class="tok-kw">fn</span> <span class="tok-fn">the_only_program_it_runs_is_the_systems_own_tar</span>() {</span>
+<span class="ln" id="L1157">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1158">        <span class="tok-kw">let</span> shipped = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
+<span class="ln" id="L1159">        <span class="tok-kw">let</span> spawns: Vec&lt;&amp;str&gt; = shipped</span>
+<span class="ln" id="L1160">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L1161">            .<span class="tok-fn">map</span>(str::trim_start)</span>
+<span class="ln" id="L1162">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
+<span class="ln" id="L1163">            .<span class="tok-fn">filter</span>(|line| line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new&quot;</span>))</span>
+<span class="ln" id="L1164">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1165">        assert_eq!(</span>
+<span class="ln" id="L1166">            spawns.<span class="tok-fn">len</span>(),</span>
+<span class="ln" id="L1167">            <span class="tok-num">2</span>,</span>
+<span class="ln" id="L1168">            <span class="tok-str">&quot;exactly two spawns are expected, tar and the relaunch: {spawns:?}&quot;</span></span>
+<span class="ln" id="L1169">        );</span>
+<span class="ln" id="L1170">        assert!(</span>
+<span class="ln" id="L1171">            spawns[<span class="tok-num">0</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&amp;tar&quot;</span>),</span>
+<span class="ln" id="L1172">            <span class="tok-str">&quot;the first spawn is not the system tar: {}&quot;</span>,</span>
+<span class="ln" id="L1173">            spawns[<span class="tok-num">0</span>]</span>
+<span class="ln" id="L1174">        );</span>
 <span class="ln" id="L1175">        assert!(</span>
-<span class="ln" id="L1176">            locked &lt; work,</span>
-<span class="ln" id="L1177">            <span class="tok-str">&quot;an update on a locked machine starts fetching before it finds out it \</span></span>
-<span class="ln" id="L1178"><span class="tok-str">             cannot finish&quot;</span></span>
+<span class="ln" id="L1176">            spawns[<span class="tok-num">1</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;program&quot;</span>),</span>
+<span class="ln" id="L1177">            <span class="tok-str">&quot;the second spawn is not the relaunch: {}&quot;</span>,</span>
+<span class="ln" id="L1178">            spawns[<span class="tok-num">1</span>]</span>
 <span class="ln" id="L1179">        );</span>
 <span class="ln" id="L1180">    }</span>
 <span class="ln" id="L1181"></span>
-<span class="ln" id="L1182">    <span class="tok-com">/// The only program this module runs is `tar`, and it comes from</span></span>
-<span class="ln" id="L1183">    <span class="tok-com">/// [`tar_program`].</span></span>
-<span class="ln" id="L1184">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1185">    <span class="tok-com">/// The point of an updater that checks a download is that it never runs</span></span>
-<span class="ln" id="L1186">    <span class="tok-com">/// what it fetched. A spawn added here later, of anything at all, is the</span></span>
-<span class="ln" id="L1187">    <span class="tok-com">/// one change to this file that could undo that, and it is not a change a</span></span>
-<span class="ln" id="L1188">    <span class="tok-com">/// reviewer would necessarily read as dangerous.</span></span>
-<span class="ln" id="L1189">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1190">    <span class="tok-kw">fn</span> <span class="tok-fn">the_only_program_it_runs_is_the_systems_own_tar</span>() {</span>
-<span class="ln" id="L1191">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1192">        <span class="tok-kw">let</span> shipped = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>);</span>
-<span class="ln" id="L1193">        <span class="tok-kw">let</span> spawns: Vec&lt;&amp;str&gt; = shipped</span>
-<span class="ln" id="L1194">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L1195">            .<span class="tok-fn">map</span>(str::trim_start)</span>
-<span class="ln" id="L1196">            .<span class="tok-fn">filter</span>(|line| !line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>))</span>
-<span class="ln" id="L1197">            .<span class="tok-fn">filter</span>(|line| line.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new&quot;</span>))</span>
-<span class="ln" id="L1198">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1199">        assert_eq!(</span>
-<span class="ln" id="L1200">            spawns.<span class="tok-fn">len</span>(),</span>
-<span class="ln" id="L1201">            <span class="tok-num">2</span>,</span>
-<span class="ln" id="L1202">            <span class="tok-str">&quot;exactly two spawns are expected, tar and the relaunch: {spawns:?}&quot;</span></span>
-<span class="ln" id="L1203">        );</span>
-<span class="ln" id="L1204">        assert!(</span>
-<span class="ln" id="L1205">            spawns[<span class="tok-num">0</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;&amp;tar&quot;</span>),</span>
-<span class="ln" id="L1206">            <span class="tok-str">&quot;the first spawn is not the system tar: {}&quot;</span>,</span>
-<span class="ln" id="L1207">            spawns[<span class="tok-num">0</span>]</span>
-<span class="ln" id="L1208">        );</span>
-<span class="ln" id="L1209">        assert!(</span>
-<span class="ln" id="L1210">            spawns[<span class="tok-num">1</span>].<span class="tok-fn">contains</span>(<span class="tok-str">&quot;program&quot;</span>),</span>
-<span class="ln" id="L1211">            <span class="tok-str">&quot;the second spawn is not the relaunch: {}&quot;</span>,</span>
-<span class="ln" id="L1212">            spawns[<span class="tok-num">1</span>]</span>
-<span class="ln" id="L1213">        );</span>
-<span class="ln" id="L1214">    }</span>
-<span class="ln" id="L1215"></span>
-<span class="ln" id="L1216">    <span class="tok-com">// -----------------------------------------------------------------------</span></span>
-<span class="ln" id="L1217">    <span class="tok-com">// The parts that can be exercised for real</span></span>
-<span class="ln" id="L1218">    <span class="tok-com">//</span></span>
-<span class="ln" id="L1219">    <span class="tok-com">// The whole of `perform` cannot be: it needs the network and a signature</span></span>
-<span class="ln" id="L1220">    <span class="tok-com">// only the maintainer can make. What can be, and is below, is everything</span></span>
-<span class="ln" id="L1221">    <span class="tok-com">// after the signature: opening an archive built by the real `tar`, hashing</span></span>
-<span class="ln" id="L1222">    <span class="tok-com">// what came out of it against a list, and putting files in place.</span></span>
-<span class="ln" id="L1223">    <span class="tok-com">// -----------------------------------------------------------------------</span></span>
-<span class="ln" id="L1224"></span>
-<span class="ln" id="L1225">    <span class="tok-com">/// Somewhere to work, removed by the caller.</span></span>
-<span class="ln" id="L1226">    <span class="tok-kw">fn</span> <span class="tok-fn">room</span>(what: &amp;str) -&gt; PathBuf {</span>
-<span class="ln" id="L1227">        <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
-<span class="ln" id="L1228">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
-<span class="ln" id="L1229">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
-<span class="ln" id="L1230">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
-<span class="ln" id="L1231">        <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;veilvoice-update-{what}-{stamp:x}&quot;</span>));</span>
-<span class="ln" id="L1232">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a directory to work in&quot;</span>);</span>
-<span class="ln" id="L1233">        path</span>
-<span class="ln" id="L1234">    }</span>
-<span class="ln" id="L1235"></span>
-<span class="ln" id="L1236">    <span class="tok-com">/// Stage a release directory and tar it up, the shape the release job</span></span>
-<span class="ln" id="L1237">    <span class="tok-com">/// builds. `None` where this machine has no `tar`, which is a fact about</span></span>
-<span class="ln" id="L1238">    <span class="tok-com">/// the machine.</span></span>
-<span class="ln" id="L1239">    <span class="tok-kw">fn</span> <span class="tok-fn">a_release</span>(root: &amp;Path, tag: &amp;str) -&gt; Option&lt;(PathBuf, contents::ArchiveContents)&gt; {</span>
-<span class="ln" id="L1240">        <span class="tok-kw">let</span> tar = <span class="tok-fn">tar_program</span>()?;</span>
-<span class="ln" id="L1241">        <span class="tok-kw">let</span> name = format!(<span class="tok-str">&quot;veilvoice-{tag}-test&quot;</span>);</span>
-<span class="ln" id="L1242">        <span class="tok-kw">let</span> staged = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staged&quot;</span>);</span>
-<span class="ln" id="L1243">        <span class="tok-kw">let</span> release = staged.<span class="tok-fn">join</span>(&amp;name);</span>
-<span class="ln" id="L1244">        std::fs::<span class="tok-fn">create_dir_all</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1245">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;the command line&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1246">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>), b<span class="tok-str">&quot;the window&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1247">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/README.md&quot;</span>), b<span class="tok-str">&quot;# VeilVoice\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1248"></span>
-<span class="ln" id="L1249">        <span class="tok-kw">let</span> archive = root.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
-<span class="ln" id="L1250">        <span class="tok-kw">let</span> ran = std::process::Command::<span class="tok-fn">new</span>(&amp;tar)</span>
-<span class="ln" id="L1251">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
-<span class="ln" id="L1252">            .<span class="tok-fn">arg</span>(&amp;archive)</span>
-<span class="ln" id="L1253">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
-<span class="ln" id="L1254">            .<span class="tok-fn">arg</span>(&amp;staged)</span>
-<span class="ln" id="L1255">            .<span class="tok-fn">arg</span>(&amp;name)</span>
-<span class="ln" id="L1256">            .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L1257">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
-<span class="ln" id="L1258">        assert!(ran.status.<span class="tok-fn">success</span>(), <span class="tok-str">&quot;tar failed&quot;</span>);</span>
-<span class="ln" id="L1259"></span>
-<span class="ln" id="L1260">        <span class="tok-com">// The list, built here from the staged files rather than by the</span></span>
-<span class="ln" id="L1261">        <span class="tok-com">// generator. What the generator and the reader agree about is</span></span>
-<span class="ln" id="L1262">        <span class="tok-com">// `tests/inside_the_archive.rs`&#x27;s subject; what this file is about is</span></span>
-<span class="ln" id="L1263">        <span class="tok-com">// what happens after a list has been proved.</span></span>
-<span class="ln" id="L1264">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> members = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1265">        <span class="tok-kw">for</span> relative <span class="tok-kw">in</span> [<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;veilvoice-gui&quot;</span>, <span class="tok-str">&quot;docs/README.md&quot;</span>] {</span>
-<span class="ln" id="L1266">            members.<span class="tok-fn">push</span>(contents::Member {</span>
-<span class="ln" id="L1267">                path: format!(<span class="tok-str">&quot;{name}/{relative}&quot;</span>),</span>
-<span class="ln" id="L1268">                digest: check::<span class="tok-fn">sha256_file</span>(&amp;release.<span class="tok-fn">join</span>(relative)).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1269">            });</span>
-<span class="ln" id="L1270">        }</span>
-<span class="ln" id="L1271">        <span class="tok-fn">Some</span>((</span>
-<span class="ln" id="L1272">            archive,</span>
-<span class="ln" id="L1273">            contents::ArchiveContents {</span>
-<span class="ln" id="L1274">                archive: format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>),</span>
-<span class="ln" id="L1275">                members,</span>
-<span class="ln" id="L1276">            },</span>
-<span class="ln" id="L1277">        ))</span>
-<span class="ln" id="L1278">    }</span>
-<span class="ln" id="L1279"></span>
-<span class="ln" id="L1280">    <span class="tok-com">/// An archive that matches its list is opened, and the release directory</span></span>
-<span class="ln" id="L1281">    <span class="tok-com">/// named by the **list** is what comes back.</span></span>
-<span class="ln" id="L1282">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1283">    <span class="tok-kw">fn</span> <span class="tok-fn">an_archive_that_matches_its_signed_list_is_opened</span>() {</span>
-<span class="ln" id="L1284">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;opened&quot;</span>);</span>
-<span class="ln" id="L1285">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((archive, listed)) = <span class="tok-fn">a_release</span>(&amp;root, <span class="tok-str">&quot;v0.1.23&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1286">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1287">            <span class="tok-kw">return</span>; <span class="tok-com">// no tar on this machine</span></span>
-<span class="ln" id="L1288">        };</span>
-<span class="ln" id="L1289">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;unpacked&quot;</span>);</span>
-<span class="ln" id="L1290">        <span class="tok-kw">let</span> release = <span class="tok-fn">open_archive</span>(&amp;archive, &amp;into, &amp;listed).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it opens&quot;</span>);</span>
-<span class="ln" id="L1291">        assert!(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>).<span class="tok-fn">is_file</span>());</span>
-<span class="ln" id="L1292">        assert!(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/README.md&quot;</span>).<span class="tok-fn">is_file</span>());</span>
-<span class="ln" id="L1293">        assert_eq!(release.<span class="tok-fn">parent</span>(), <span class="tok-fn">Some</span>(into.<span class="tok-fn">as_path</span>()));</span>
-<span class="ln" id="L1294">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1295">    }</span>
-<span class="ln" id="L1296"></span>
-<span class="ln" id="L1297">    <span class="tok-com">/// What came out of the archive is hashed **again**, against the same</span></span>
-<span class="ln" id="L1298">    <span class="tok-com">/// signed list.</span></span>
-<span class="ln" id="L1299">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1300">    <span class="tok-com">/// The members were already proved inside the archive before it was opened,</span></span>
-<span class="ln" id="L1301">    <span class="tok-com">/// so this second pass exists only to catch an extractor that wrote</span></span>
-<span class="ln" id="L1302">    <span class="tok-com">/// something other than what it read. Proved by giving the list a digest</span></span>
-<span class="ln" id="L1303">    <span class="tok-com">/// the file does not have: if the second pass were not there, or were</span></span>
-<span class="ln" id="L1304">    <span class="tok-com">/// comparing against something it derived from the disk, this would open</span></span>
-<span class="ln" id="L1305">    <span class="tok-com">/// happily.</span></span>
-<span class="ln" id="L1306">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1307">    <span class="tok-kw">fn</span> <span class="tok-fn">what_came_out_of_the_archive_is_hashed_again</span>() {</span>
-<span class="ln" id="L1308">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;rehashed&quot;</span>);</span>
-<span class="ln" id="L1309">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((archive, <span class="tok-kw">mut</span> listed)) = <span class="tok-fn">a_release</span>(&amp;root, <span class="tok-str">&quot;v0.1.23&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1310">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1311">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L1312">        };</span>
-<span class="ln" id="L1313">        listed.members[<span class="tok-num">0</span>].digest =</span>
-<span class="ln" id="L1314">            <span class="tok-str">&quot;0000000000000000000000000000000000000000000000000000000000000000&quot;</span>.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L1315">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;unpacked&quot;</span>);</span>
-<span class="ln" id="L1316">        <span class="tok-kw">let</span> error = <span class="tok-fn">open_archive</span>(&amp;archive, &amp;into, &amp;listed)</span>
-<span class="ln" id="L1317">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a file that is not what the list says must be refused&quot;</span>);</span>
-<span class="ln" id="L1318">        <span class="tok-kw">let</span> said = error.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L1319">        assert!(said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not what the release signed&quot;</span>), <span class="tok-str">&quot;{said}&quot;</span>);</span>
-<span class="ln" id="L1320">        assert!(</span>
-<span class="ln" id="L1321">            said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice&quot;</span>),</span>
-<span class="ln" id="L1322">            <span class="tok-str">&quot;the refusal must name the file: {said}&quot;</span></span>
-<span class="ln" id="L1323">        );</span>
-<span class="ln" id="L1324">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1325">    }</span>
-<span class="ln" id="L1326"></span>
-<span class="ln" id="L1327">    <span class="tok-com">/// An archive carrying a file the release never published is refused.</span></span>
-<span class="ln" id="L1328">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1329">    <span class="tok-com">/// The comparison before the archive is opened already catches this, and</span></span>
-<span class="ln" id="L1330">    <span class="tok-com">/// the sweep afterwards catches it again. Both are kept: the first means</span></span>
-<span class="ln" id="L1331">    <span class="tok-com">/// nothing is written at all, and the second means an extractor that</span></span>
-<span class="ln" id="L1332">    <span class="tok-com">/// invented a file on its own does not go unnoticed either.</span></span>
-<span class="ln" id="L1333">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1334">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_the_release_never_published_is_refused</span>() {</span>
-<span class="ln" id="L1335">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;extras&quot;</span>);</span>
-<span class="ln" id="L1336">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((archive, <span class="tok-kw">mut</span> listed)) = <span class="tok-fn">a_release</span>(&amp;root, <span class="tok-str">&quot;v0.1.23&quot;</span>) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1337">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1338">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L1339">        };</span>
-<span class="ln" id="L1340">        <span class="tok-com">// Drop a member from the list rather than adding a file to the archive:</span></span>
-<span class="ln" id="L1341">        <span class="tok-com">// the same disagreement, and it does not need tar run twice.</span></span>
-<span class="ln" id="L1342">        <span class="tok-kw">let</span> dropped = listed.members.<span class="tok-fn">pop</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;three members&quot;</span>);</span>
-<span class="ln" id="L1343">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;unpacked&quot;</span>);</span>
-<span class="ln" id="L1344">        <span class="tok-kw">let</span> error = <span class="tok-fn">open_archive</span>(&amp;archive, &amp;into, &amp;listed)</span>
-<span class="ln" id="L1345">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a file that was never published must be refused&quot;</span>);</span>
-<span class="ln" id="L1346">        <span class="tok-kw">let</span> said = error.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L1347">        assert!(said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;never published&quot;</span>), <span class="tok-str">&quot;{said}&quot;</span>);</span>
-<span class="ln" id="L1348">        assert!(</span>
-<span class="ln" id="L1349">            said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;README.md&quot;</span>),</span>
-<span class="ln" id="L1350">            <span class="tok-str">&quot;the refusal must name it, and {} is what was dropped: {said}&quot;</span>,</span>
-<span class="ln" id="L1351">            dropped.path</span>
-<span class="ln" id="L1352">        );</span>
-<span class="ln" id="L1353">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1354">    }</span>
-<span class="ln" id="L1355"></span>
-<span class="ln" id="L1356">    <span class="tok-com">/// Replacing puts the new files in and takes the old ones away.</span></span>
-<span class="ln" id="L1357">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1358">    <span class="tok-kw">fn</span> <span class="tok-fn">the_new_files_replace_the_old_ones</span>() {</span>
-<span class="ln" id="L1359">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;replace&quot;</span>);</span>
-<span class="ln" id="L1360">        <span class="tok-kw">let</span> from = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;new&quot;</span>);</span>
-<span class="ln" id="L1361">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;installed&quot;</span>);</span>
-<span class="ln" id="L1362">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;from).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1363">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;into).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1364">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::extracted::PROGRAMS {</span>
-<span class="ln" id="L1365">            <span class="tok-kw">let</span> name = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(stem);</span>
-<span class="ln" id="L1366">            std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;the new one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1367">            std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;the old one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1368">        }</span>
-<span class="ln" id="L1369"></span>
-<span class="ln" id="L1370">        <span class="tok-kw">let</span> (replaced, left_behind) = <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it replaces&quot;</span>);</span>
-<span class="ln" id="L1371">        assert_eq!(replaced.<span class="tok-fn">len</span>(), <span class="tok-kw">crate</span>::extracted::PROGRAMS.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L1372">        assert!(left_behind.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{left_behind:?}&quot;</span>);</span>
-<span class="ln" id="L1373">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> &amp;replaced {</span>
-<span class="ln" id="L1374">            assert_eq!(</span>
-<span class="ln" id="L1375">                std::fs::<span class="tok-fn">read</span>(into.<span class="tok-fn">join</span>(name)).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1376">                b<span class="tok-str">&quot;the new one&quot;</span>,</span>
-<span class="ln" id="L1377">                <span class="tok-str">&quot;{name} was not replaced&quot;</span></span>
-<span class="ln" id="L1378">            );</span>
-<span class="ln" id="L1379">            assert!(</span>
-<span class="ln" id="L1380">                !into.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.old&quot;</span>)).<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L1381">                <span class="tok-str">&quot;{name}.old was left behind&quot;</span></span>
-<span class="ln" id="L1382">            );</span>
-<span class="ln" id="L1383">        }</span>
-<span class="ln" id="L1384">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1385">    }</span>
-<span class="ln" id="L1386"></span>
-<span class="ln" id="L1387">    <span class="tok-com">/// The name people run is never absent and never half-written.</span></span>
-<span class="ln" id="L1388">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1389">    <span class="tok-com">/// The order this checks is the whole of the fix: the new program is</span></span>
-<span class="ln" id="L1390">    <span class="tok-com">/// written under `&lt;name&gt;.new` and only a rename puts it at `&lt;name&gt;`, so at</span></span>
-<span class="ln" id="L1391">    <span class="tok-com">/// every instant the name either does not exist yet, holds the old program</span></span>
-<span class="ln" id="L1392">    <span class="tok-com">/// whole, or holds the new program whole. The order before it wrote</span></span>
-<span class="ln" id="L1393">    <span class="tok-com">/// straight to `&lt;name&gt;` after moving the old one away, which leaves the</span></span>
-<span class="ln" id="L1394">    <span class="tok-com">/// name missing for the length of a copy and incomplete for the rest.</span></span>
-<span class="ln" id="L1395">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1396">    <span class="tok-com">/// Asserted against the source rather than by racing a thread, because the</span></span>
-<span class="ln" id="L1397">    <span class="tok-com">/// window is a few milliseconds wide and a test that has to catch it is a</span></span>
-<span class="ln" id="L1398">    <span class="tok-com">/// test that passes on a fast machine whatever the code says.</span></span>
-<span class="ln" id="L1399">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1400">    <span class="tok-kw">fn</span> <span class="tok-fn">the_new_program_is_written_beside_the_old_one_and_renamed_into_place</span>() {</span>
-<span class="ln" id="L1401">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1402">        <span class="tok-kw">let</span> start = source</span>
-<span class="ln" id="L1403">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn put_in_place(&quot;</span>)</span>
-<span class="ln" id="L1404">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;put_in_place exists&quot;</span>);</span>
-<span class="ln" id="L1405">        <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L1406">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    if replaced.is_empty()&quot;</span>)</span>
-<span class="ln" id="L1407">            .<span class="tok-fn">map</span>(|at| start + at)</span>
-<span class="ln" id="L1408">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the loop ends&quot;</span>);</span>
-<span class="ln" id="L1409">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
-<span class="ln" id="L1410"></span>
-<span class="ln" id="L1411">        <span class="tok-kw">let</span> staged = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;&amp;staged&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it stages the new program&quot;</span>);</span>
-<span class="ln" id="L1412">        <span class="tok-kw">let</span> rename = body</span>
-<span class="ln" id="L1413">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;std::fs::rename(&amp;staged, &amp;target)&quot;</span>)</span>
-<span class="ln" id="L1414">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it renames the staged program into place&quot;</span>);</span>
-<span class="ln" id="L1415">        assert!(</span>
-<span class="ln" id="L1416">            staged &lt; rename,</span>
-<span class="ln" id="L1417">            <span class="tok-str">&quot;the new program is put at the name people run before it is complete&quot;</span></span>
-<span class="ln" id="L1418">        );</span>
-<span class="ln" id="L1419">        assert!(</span>
-<span class="ln" id="L1420">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;std::fs::copy(&amp;from, &amp;target)&quot;</span>),</span>
-<span class="ln" id="L1421">            <span class="tok-str">&quot;the new program is copied straight to the name people run, so that \</span></span>
-<span class="ln" id="L1422"><span class="tok-str">             name is briefly a partial file. That is F-261.&quot;</span></span>
-<span class="ln" id="L1423">        );</span>
-<span class="ln" id="L1424">    }</span>
-<span class="ln" id="L1425"></span>
-<span class="ln" id="L1426">    <span class="tok-com">/// An update keeps the files the old record covered and did not replace.</span></span>
-<span class="ln" id="L1427">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1428">    <span class="tok-com">/// The record covers more than the programs an update replaces: the guard</span></span>
-<span class="ln" id="L1429">    <span class="tok-com">/// records the app lock beside them on its first run, and somebody can name</span></span>
-<span class="ln" id="L1430">    <span class="tok-com">/// files of their own. Rebuilding it from the replaced programs alone drops</span></span>
-<span class="ln" id="L1431">    <span class="tok-com">/// the rest, and the next check calls a dropped file unrecorded rather than</span></span>
-<span class="ln" id="L1432">    <span class="tok-com">/// unchanged.</span></span>
-<span class="ln" id="L1433">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1434">    <span class="tok-kw">fn</span> <span class="tok-fn">re_recording_keeps_what_the_update_did_not_touch</span>() {</span>
-<span class="ln" id="L1435">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;record-keeps&quot;</span>);</span>
-<span class="ln" id="L1436">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;root).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1437">        <span class="tok-kw">let</span> program = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>);</span>
-<span class="ln" id="L1438">        <span class="tok-kw">let</span> other = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;something-else-that-was-recorded&quot;</span>);</span>
-<span class="ln" id="L1439">        std::fs::<span class="tok-fn">write</span>(&amp;program, b<span class="tok-str">&quot;the old one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1440">        std::fs::<span class="tok-fn">write</span>(&amp;other, b<span class="tok-str">&quot;not part of the update&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1441"></span>
-<span class="ln" id="L1442">        <span class="tok-kw">let</span> before = veilvoice_guard::Manifest::<span class="tok-fn">of</span>(&amp;[&amp;program, &amp;other]).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a record&quot;</span>);</span>
-<span class="ln" id="L1443">        assert_eq!(before.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L1444"></span>
-<span class="ln" id="L1445">        <span class="tok-com">// The update replaces the program and nothing else.</span></span>
-<span class="ln" id="L1446">        std::fs::<span class="tok-fn">write</span>(&amp;program, b<span class="tok-str">&quot;the new one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1447">        <span class="tok-kw">let</span> after = before.<span class="tok-fn">refresh</span>(&amp;[&amp;program]).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the record is retaken&quot;</span>);</span>
-<span class="ln" id="L1448"></span>
-<span class="ln" id="L1449">        assert_eq!(after.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;an entry was dropped by the update&quot;</span>);</span>
-<span class="ln" id="L1450">        <span class="tok-kw">let</span> paths: Vec&lt;&amp;str&gt; = after.<span class="tok-fn">paths</span>().<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1451">        assert!(</span>
-<span class="ln" id="L1452">            paths</span>
-<span class="ln" id="L1453">                .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L1454">                .<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;something-else-that-was-recorded&quot;</span>)),</span>
-<span class="ln" id="L1455">            <span class="tok-str">&quot;the file the update never touched is no longer recorded: {paths:?}&quot;</span></span>
-<span class="ln" id="L1456">        );</span>
-<span class="ln" id="L1457">        <span class="tok-com">// And the replaced one really was measured again.</span></span>
-<span class="ln" id="L1458">        assert!(</span>
-<span class="ln" id="L1459">            after.check::&lt;&amp;std::path::Path&gt;(&amp;[]).<span class="tok-fn">is_clean</span>(),</span>
-<span class="ln" id="L1460">            <span class="tok-str">&quot;the record does not match what is on disk now&quot;</span></span>
-<span class="ln" id="L1461">        );</span>
-<span class="ln" id="L1462">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1463">    }</span>
-<span class="ln" id="L1464"></span>
-<span class="ln" id="L1465">    <span class="tok-com">/// F-271. A lock kept in the vault is found, its passphrase is checked,</span></span>
-<span class="ln" id="L1466">    <span class="tok-com">/// and asking whether there is one writes nothing.</span></span>
-<span class="ln" id="L1467">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1468">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lock_kept_in_the_vault_is_seen_and_its_passphrase_is_checked</span>() {</span>
-<span class="ln" id="L1469">        <span class="tok-com">// F-271. The lock lives in the vault, and opening it there deletes</span></span>
-<span class="ln" id="L1470">        <span class="tok-com">// `applock.bin`, which is the file this used to look for.</span></span>
-<span class="ln" id="L1471">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1472">        assert!(matches!(<span class="tok-fn">lock_in</span>(dir.<span class="tok-fn">path</span>()), <span class="tok-fn">Ok</span>(None)));</span>
+<span class="ln" id="L1182">    <span class="tok-com">// -----------------------------------------------------------------------</span></span>
+<span class="ln" id="L1183">    <span class="tok-com">// The parts that can be exercised for real</span></span>
+<span class="ln" id="L1184">    <span class="tok-com">//</span></span>
+<span class="ln" id="L1185">    <span class="tok-com">// The whole of `perform` cannot be: it needs the network and a signature</span></span>
+<span class="ln" id="L1186">    <span class="tok-com">// only the maintainer can make. What can be, and is below, is everything</span></span>
+<span class="ln" id="L1187">    <span class="tok-com">// after the signature: opening an archive built by the real `tar`, hashing</span></span>
+<span class="ln" id="L1188">    <span class="tok-com">// what came out of it against a list, and putting files in place.</span></span>
+<span class="ln" id="L1189">    <span class="tok-com">// -----------------------------------------------------------------------</span></span>
+<span class="ln" id="L1190"></span>
+<span class="ln" id="L1191">    <span class="tok-com">/// Somewhere to work, removed by the caller.</span></span>
+<span class="ln" id="L1192">    <span class="tok-kw">fn</span> <span class="tok-fn">room</span>(what: &amp;str) -&gt; PathBuf {</span>
+<span class="ln" id="L1193">        <span class="tok-kw">let</span> stamp = std::time::SystemTime::<span class="tok-fn">now</span>()</span>
+<span class="ln" id="L1194">            .<span class="tok-fn">duration_since</span>(std::time::UNIX_EPOCH)</span>
+<span class="ln" id="L1195">            .<span class="tok-fn">map</span>(|d| d.<span class="tok-fn">as_nanos</span>())</span>
+<span class="ln" id="L1196">            .<span class="tok-fn">unwrap_or</span>(<span class="tok-num">0</span>);</span>
+<span class="ln" id="L1197">        <span class="tok-kw">let</span> path = std::env::<span class="tok-fn">temp_dir</span>().<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;veilvoice-update-{what}-{stamp:x}&quot;</span>));</span>
+<span class="ln" id="L1198">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;path).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a directory to work in&quot;</span>);</span>
+<span class="ln" id="L1199">        path</span>
+<span class="ln" id="L1200">    }</span>
+<span class="ln" id="L1201"></span>
+<span class="ln" id="L1202">    <span class="tok-com">/// Stage a release directory and tar it up, the shape the release job</span></span>
+<span class="ln" id="L1203">    <span class="tok-com">/// builds. `None` where this machine has no `tar`, which is a fact about</span></span>
+<span class="ln" id="L1204">    <span class="tok-com">/// the machine.</span></span>
+<span class="ln" id="L1205">    <span class="tok-kw">fn</span> <span class="tok-fn">a_release</span>(root: &amp;Path, tag: &amp;str) -&gt; Option&lt;(PathBuf, contents::ArchiveContents)&gt; {</span>
+<span class="ln" id="L1206">        <span class="tok-kw">let</span> tar = <span class="tok-fn">tar_program</span>()?;</span>
+<span class="ln" id="L1207">        <span class="tok-kw">let</span> name = format!(<span class="tok-str">&quot;veilvoice-{tag}-test&quot;</span>);</span>
+<span class="ln" id="L1208">        <span class="tok-kw">let</span> staged = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;staged&quot;</span>);</span>
+<span class="ln" id="L1209">        <span class="tok-kw">let</span> release = staged.<span class="tok-fn">join</span>(&amp;name);</span>
+<span class="ln" id="L1210">        std::fs::<span class="tok-fn">create_dir_all</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1211">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>), b<span class="tok-str">&quot;the command line&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1212">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>), b<span class="tok-str">&quot;the window&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1213">        std::fs::<span class="tok-fn">write</span>(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/README.md&quot;</span>), b<span class="tok-str">&quot;# VeilVoice\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1214"></span>
+<span class="ln" id="L1215">        <span class="tok-kw">let</span> archive = root.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>));</span>
+<span class="ln" id="L1216">        <span class="tok-kw">let</span> ran = std::process::Command::<span class="tok-fn">new</span>(&amp;tar)</span>
+<span class="ln" id="L1217">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-czf&quot;</span>)</span>
+<span class="ln" id="L1218">            .<span class="tok-fn">arg</span>(&amp;archive)</span>
+<span class="ln" id="L1219">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-C&quot;</span>)</span>
+<span class="ln" id="L1220">            .<span class="tok-fn">arg</span>(&amp;staged)</span>
+<span class="ln" id="L1221">            .<span class="tok-fn">arg</span>(&amp;name)</span>
+<span class="ln" id="L1222">            .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L1223">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;tar runs&quot;</span>);</span>
+<span class="ln" id="L1224">        assert!(ran.status.<span class="tok-fn">success</span>(), <span class="tok-str">&quot;tar failed&quot;</span>);</span>
+<span class="ln" id="L1225"></span>
+<span class="ln" id="L1226">        <span class="tok-com">// The list, built here from the staged files rather than by the</span></span>
+<span class="ln" id="L1227">        <span class="tok-com">// generator. What the generator and the reader agree about is</span></span>
+<span class="ln" id="L1228">        <span class="tok-com">// `tests/inside_the_archive.rs`&#x27;s subject; what this file is about is</span></span>
+<span class="ln" id="L1229">        <span class="tok-com">// what happens after a list has been proved.</span></span>
+<span class="ln" id="L1230">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> members = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1231">        <span class="tok-kw">for</span> relative <span class="tok-kw">in</span> [<span class="tok-str">&quot;veilvoice&quot;</span>, <span class="tok-str">&quot;veilvoice-gui&quot;</span>, <span class="tok-str">&quot;docs/README.md&quot;</span>] {</span>
+<span class="ln" id="L1232">            members.<span class="tok-fn">push</span>(contents::Member {</span>
+<span class="ln" id="L1233">                path: format!(<span class="tok-str">&quot;{name}/{relative}&quot;</span>),</span>
+<span class="ln" id="L1234">                digest: check::<span class="tok-fn">sha256_file</span>(&amp;release.<span class="tok-fn">join</span>(relative)).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1235">            });</span>
+<span class="ln" id="L1236">        }</span>
+<span class="ln" id="L1237">        <span class="tok-fn">Some</span>((</span>
+<span class="ln" id="L1238">            archive,</span>
+<span class="ln" id="L1239">            contents::ArchiveContents {</span>
+<span class="ln" id="L1240">                archive: format!(<span class="tok-str">&quot;{name}.tar.gz&quot;</span>),</span>
+<span class="ln" id="L1241">                members,</span>
+<span class="ln" id="L1242">            },</span>
+<span class="ln" id="L1243">        ))</span>
+<span class="ln" id="L1244">    }</span>
+<span class="ln" id="L1245"></span>
+<span class="ln" id="L1246">    <span class="tok-com">/// An archive that matches its list is opened, and the release directory</span></span>
+<span class="ln" id="L1247">    <span class="tok-com">/// named by the **list** is what comes back.</span></span>
+<span class="ln" id="L1248">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1249">    <span class="tok-kw">fn</span> <span class="tok-fn">an_archive_that_matches_its_signed_list_is_opened</span>() {</span>
+<span class="ln" id="L1250">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;opened&quot;</span>);</span>
+<span class="ln" id="L1251">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((archive, listed)) = <span class="tok-fn">a_release</span>(&amp;root, <span class="tok-str">&quot;v0.1.23&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1252">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1253">            <span class="tok-kw">return</span>; <span class="tok-com">// no tar on this machine</span></span>
+<span class="ln" id="L1254">        };</span>
+<span class="ln" id="L1255">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;unpacked&quot;</span>);</span>
+<span class="ln" id="L1256">        <span class="tok-kw">let</span> release = <span class="tok-fn">open_archive</span>(&amp;archive, &amp;into, &amp;listed).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it opens&quot;</span>);</span>
+<span class="ln" id="L1257">        assert!(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>).<span class="tok-fn">is_file</span>());</span>
+<span class="ln" id="L1258">        assert!(release.<span class="tok-fn">join</span>(<span class="tok-str">&quot;docs/README.md&quot;</span>).<span class="tok-fn">is_file</span>());</span>
+<span class="ln" id="L1259">        assert_eq!(release.<span class="tok-fn">parent</span>(), <span class="tok-fn">Some</span>(into.<span class="tok-fn">as_path</span>()));</span>
+<span class="ln" id="L1260">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1261">    }</span>
+<span class="ln" id="L1262"></span>
+<span class="ln" id="L1263">    <span class="tok-com">/// What came out of the archive is hashed **again**, against the same</span></span>
+<span class="ln" id="L1264">    <span class="tok-com">/// signed list.</span></span>
+<span class="ln" id="L1265">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1266">    <span class="tok-com">/// The members were already proved inside the archive before it was opened,</span></span>
+<span class="ln" id="L1267">    <span class="tok-com">/// so this second pass exists only to catch an extractor that wrote</span></span>
+<span class="ln" id="L1268">    <span class="tok-com">/// something other than what it read. Proved by giving the list a digest</span></span>
+<span class="ln" id="L1269">    <span class="tok-com">/// the file does not have: if the second pass were not there, or were</span></span>
+<span class="ln" id="L1270">    <span class="tok-com">/// comparing against something it derived from the disk, this would open</span></span>
+<span class="ln" id="L1271">    <span class="tok-com">/// happily.</span></span>
+<span class="ln" id="L1272">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1273">    <span class="tok-kw">fn</span> <span class="tok-fn">what_came_out_of_the_archive_is_hashed_again</span>() {</span>
+<span class="ln" id="L1274">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;rehashed&quot;</span>);</span>
+<span class="ln" id="L1275">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((archive, <span class="tok-kw">mut</span> listed)) = <span class="tok-fn">a_release</span>(&amp;root, <span class="tok-str">&quot;v0.1.23&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1276">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1277">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L1278">        };</span>
+<span class="ln" id="L1279">        listed.members[<span class="tok-num">0</span>].digest =</span>
+<span class="ln" id="L1280">            <span class="tok-str">&quot;0000000000000000000000000000000000000000000000000000000000000000&quot;</span>.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1281">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;unpacked&quot;</span>);</span>
+<span class="ln" id="L1282">        <span class="tok-kw">let</span> error = <span class="tok-fn">open_archive</span>(&amp;archive, &amp;into, &amp;listed)</span>
+<span class="ln" id="L1283">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a file that is not what the list says must be refused&quot;</span>);</span>
+<span class="ln" id="L1284">        <span class="tok-kw">let</span> said = error.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1285">        assert!(said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not what the release signed&quot;</span>), <span class="tok-str">&quot;{said}&quot;</span>);</span>
+<span class="ln" id="L1286">        assert!(</span>
+<span class="ln" id="L1287">            said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice&quot;</span>),</span>
+<span class="ln" id="L1288">            <span class="tok-str">&quot;the refusal must name the file: {said}&quot;</span></span>
+<span class="ln" id="L1289">        );</span>
+<span class="ln" id="L1290">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1291">    }</span>
+<span class="ln" id="L1292"></span>
+<span class="ln" id="L1293">    <span class="tok-com">/// An archive carrying a file the release never published is refused.</span></span>
+<span class="ln" id="L1294">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1295">    <span class="tok-com">/// The comparison before the archive is opened already catches this, and</span></span>
+<span class="ln" id="L1296">    <span class="tok-com">/// the sweep afterwards catches it again. Both are kept: the first means</span></span>
+<span class="ln" id="L1297">    <span class="tok-com">/// nothing is written at all, and the second means an extractor that</span></span>
+<span class="ln" id="L1298">    <span class="tok-com">/// invented a file on its own does not go unnoticed either.</span></span>
+<span class="ln" id="L1299">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1300">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_the_release_never_published_is_refused</span>() {</span>
+<span class="ln" id="L1301">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;extras&quot;</span>);</span>
+<span class="ln" id="L1302">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((archive, <span class="tok-kw">mut</span> listed)) = <span class="tok-fn">a_release</span>(&amp;root, <span class="tok-str">&quot;v0.1.23&quot;</span>) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1303">            std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1304">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L1305">        };</span>
+<span class="ln" id="L1306">        <span class="tok-com">// Drop a member from the list rather than adding a file to the archive:</span></span>
+<span class="ln" id="L1307">        <span class="tok-com">// the same disagreement, and it does not need tar run twice.</span></span>
+<span class="ln" id="L1308">        <span class="tok-kw">let</span> dropped = listed.members.<span class="tok-fn">pop</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;three members&quot;</span>);</span>
+<span class="ln" id="L1309">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;unpacked&quot;</span>);</span>
+<span class="ln" id="L1310">        <span class="tok-kw">let</span> error = <span class="tok-fn">open_archive</span>(&amp;archive, &amp;into, &amp;listed)</span>
+<span class="ln" id="L1311">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;a file that was never published must be refused&quot;</span>);</span>
+<span class="ln" id="L1312">        <span class="tok-kw">let</span> said = error.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1313">        assert!(said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;never published&quot;</span>), <span class="tok-str">&quot;{said}&quot;</span>);</span>
+<span class="ln" id="L1314">        assert!(</span>
+<span class="ln" id="L1315">            said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;README.md&quot;</span>),</span>
+<span class="ln" id="L1316">            <span class="tok-str">&quot;the refusal must name it, and {} is what was dropped: {said}&quot;</span>,</span>
+<span class="ln" id="L1317">            dropped.path</span>
+<span class="ln" id="L1318">        );</span>
+<span class="ln" id="L1319">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1320">    }</span>
+<span class="ln" id="L1321"></span>
+<span class="ln" id="L1322">    <span class="tok-com">/// Replacing puts the new files in and takes the old ones away.</span></span>
+<span class="ln" id="L1323">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1324">    <span class="tok-kw">fn</span> <span class="tok-fn">the_new_files_replace_the_old_ones</span>() {</span>
+<span class="ln" id="L1325">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;replace&quot;</span>);</span>
+<span class="ln" id="L1326">        <span class="tok-kw">let</span> from = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;new&quot;</span>);</span>
+<span class="ln" id="L1327">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;installed&quot;</span>);</span>
+<span class="ln" id="L1328">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;from).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1329">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;into).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1330">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::extracted::PROGRAMS {</span>
+<span class="ln" id="L1331">            <span class="tok-kw">let</span> name = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(stem);</span>
+<span class="ln" id="L1332">            std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;the new one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1333">            std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;the old one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1334">        }</span>
+<span class="ln" id="L1335"></span>
+<span class="ln" id="L1336">        <span class="tok-kw">let</span> (replaced, left_behind) = <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it replaces&quot;</span>);</span>
+<span class="ln" id="L1337">        assert_eq!(replaced.<span class="tok-fn">len</span>(), <span class="tok-kw">crate</span>::extracted::PROGRAMS.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L1338">        assert!(left_behind.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{left_behind:?}&quot;</span>);</span>
+<span class="ln" id="L1339">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> &amp;replaced {</span>
+<span class="ln" id="L1340">            assert_eq!(</span>
+<span class="ln" id="L1341">                std::fs::<span class="tok-fn">read</span>(into.<span class="tok-fn">join</span>(name)).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1342">                b<span class="tok-str">&quot;the new one&quot;</span>,</span>
+<span class="ln" id="L1343">                <span class="tok-str">&quot;{name} was not replaced&quot;</span></span>
+<span class="ln" id="L1344">            );</span>
+<span class="ln" id="L1345">            assert!(</span>
+<span class="ln" id="L1346">                !into.<span class="tok-fn">join</span>(format!(<span class="tok-str">&quot;{name}.old&quot;</span>)).<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L1347">                <span class="tok-str">&quot;{name}.old was left behind&quot;</span></span>
+<span class="ln" id="L1348">            );</span>
+<span class="ln" id="L1349">        }</span>
+<span class="ln" id="L1350">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1351">    }</span>
+<span class="ln" id="L1352"></span>
+<span class="ln" id="L1353">    <span class="tok-com">/// An update replaces a program through the one routine that knows how.</span></span>
+<span class="ln" id="L1354">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1355">    <span class="tok-com">/// The property being protected is that the name people run is never absent</span></span>
+<span class="ln" id="L1356">    <span class="tok-com">/// and never half-written: the new file is written beside it and only a</span></span>
+<span class="ln" id="L1357">    <span class="tok-com">/// rename puts it at that name. That mechanism lives in</span></span>
+<span class="ln" id="L1358">    <span class="tok-com">/// `veilvoice_setup::install::replace_with_copy` and is held down by that</span></span>
+<span class="ln" id="L1359">    <span class="tok-com">/// crate&#x27;s own tests, including the link and hard-link cases a plain copy</span></span>
+<span class="ln" id="L1360">    <span class="tok-com">/// got wrong. What this test holds down is the thing those tests cannot</span></span>
+<span class="ln" id="L1361">    <span class="tok-com">/// see, which is that the updater still goes through it rather than growing</span></span>
+<span class="ln" id="L1362">    <span class="tok-com">/// a copy of it again. It grew one twice: F-261 and F-286.</span></span>
+<span class="ln" id="L1363">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1364">    <span class="tok-com">/// Asserted against the source rather than by racing a thread, because the</span></span>
+<span class="ln" id="L1365">    <span class="tok-com">/// window is a few milliseconds wide and a test that has to catch it is a</span></span>
+<span class="ln" id="L1366">    <span class="tok-com">/// test that passes on a fast machine whatever the code says.</span></span>
+<span class="ln" id="L1367">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1368">    <span class="tok-kw">fn</span> <span class="tok-fn">the_new_program_goes_in_through_the_one_routine_that_stages_and_renames</span>() {</span>
+<span class="ln" id="L1369">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1370">        <span class="tok-kw">let</span> start = source</span>
+<span class="ln" id="L1371">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn put_in_place(&quot;</span>)</span>
+<span class="ln" id="L1372">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;put_in_place exists&quot;</span>);</span>
+<span class="ln" id="L1373">        <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L1374">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    if replaced.is_empty()&quot;</span>)</span>
+<span class="ln" id="L1375">            .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L1376">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the loop ends&quot;</span>);</span>
+<span class="ln" id="L1377">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
+<span class="ln" id="L1378"></span>
+<span class="ln" id="L1379">        assert!(</span>
+<span class="ln" id="L1380">            body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice_setup::install::replace_with_copy(&amp;from, &amp;target)&quot;</span>),</span>
+<span class="ln" id="L1381">            <span class="tok-str">&quot;an update no longer replaces programs through \</span></span>
+<span class="ln" id="L1382"><span class="tok-str">             install::replace_with_copy, so whatever it does instead is a second \</span></span>
+<span class="ln" id="L1383"><span class="tok-str">             implementation of replacing a running program. That is F-286.&quot;</span></span>
+<span class="ln" id="L1384">        );</span>
+<span class="ln" id="L1385">        assert!(</span>
+<span class="ln" id="L1386">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;std::fs::copy(&quot;</span>),</span>
+<span class="ln" id="L1387">            <span class="tok-str">&quot;an update copies a program into place itself again. A copy opens the \</span></span>
+<span class="ln" id="L1388"><span class="tok-str">             destination and truncates it, which is F-237, and staging with a copy \</span></span>
+<span class="ln" id="L1389"><span class="tok-str">             after a remove_file is the window F-286 closed.&quot;</span></span>
+<span class="ln" id="L1390">        );</span>
+<span class="ln" id="L1391">    }</span>
+<span class="ln" id="L1392"></span>
+<span class="ln" id="L1393">    <span class="tok-com">/// F-287. A failure partway through says what it had already replaced.</span></span>
+<span class="ln" id="L1394">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1395">    <span class="tok-com">/// The second program cannot be replaced, because the name it goes at is a</span></span>
+<span class="ln" id="L1396">    <span class="tok-com">/// directory and no rename will go over one. The first one has already been</span></span>
+<span class="ln" id="L1397">    <span class="tok-com">/// replaced by then, so a message saying nothing was replaced is false, and</span></span>
+<span class="ln" id="L1398">    <span class="tok-com">/// it is false in the direction that matters: it tells somebody their pair</span></span>
+<span class="ln" id="L1399">    <span class="tok-com">/// of programs still match when one is a version ahead of the other.</span></span>
+<span class="ln" id="L1400">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1401">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failure_partway_through_names_what_it_had_already_replaced</span>() {</span>
+<span class="ln" id="L1402">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;partway&quot;</span>);</span>
+<span class="ln" id="L1403">        <span class="tok-kw">let</span> from = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;new&quot;</span>);</span>
+<span class="ln" id="L1404">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;installed&quot;</span>);</span>
+<span class="ln" id="L1405">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;from).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1406">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;into).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1407">        <span class="tok-kw">for</span> stem <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::extracted::PROGRAMS {</span>
+<span class="ln" id="L1408">            <span class="tok-kw">let</span> name = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(stem);</span>
+<span class="ln" id="L1409">            std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;the new one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1410">        }</span>
+<span class="ln" id="L1411">        <span class="tok-kw">let</span> first = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(<span class="tok-kw">crate</span>::extracted::PROGRAMS[<span class="tok-num">0</span>]);</span>
+<span class="ln" id="L1412">        <span class="tok-kw">let</span> second = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(<span class="tok-kw">crate</span>::extracted::PROGRAMS[<span class="tok-num">1</span>]);</span>
+<span class="ln" id="L1413">        std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;first), b<span class="tok-str">&quot;the old one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1414">        std::fs::<span class="tok-fn">create_dir_all</span>(into.<span class="tok-fn">join</span>(&amp;second)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1415"></span>
+<span class="ln" id="L1416">        <span class="tok-kw">let</span> error = <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;the second one cannot go in&quot;</span>);</span>
+<span class="ln" id="L1417">        <span class="tok-kw">let</span> said = error.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L1418">        assert!(</span>
+<span class="ln" id="L1419">            said.<span class="tok-fn">contains</span>(&amp;format!(<span class="tok-str">&quot;{first} was already replaced&quot;</span>)),</span>
+<span class="ln" id="L1420">            <span class="tok-str">&quot;the failure does not say that {first} was already replaced: {said}&quot;</span></span>
+<span class="ln" id="L1421">        );</span>
+<span class="ln" id="L1422">        assert!(</span>
+<span class="ln" id="L1423">            !said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;othing was replaced&quot;</span>) &amp;&amp; !said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;othing has been replaced&quot;</span>),</span>
+<span class="ln" id="L1424">            <span class="tok-str">&quot;the failure claims nothing was replaced after replacing {first}: {said}&quot;</span></span>
+<span class="ln" id="L1425">        );</span>
+<span class="ln" id="L1426">        assert_eq!(</span>
+<span class="ln" id="L1427">            std::fs::<span class="tok-fn">read</span>(into.<span class="tok-fn">join</span>(&amp;first)).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1428">            b<span class="tok-str">&quot;the new one&quot;</span>,</span>
+<span class="ln" id="L1429">            <span class="tok-str">&quot;{first} was not replaced, so the message was right and the test is wrong&quot;</span></span>
+<span class="ln" id="L1430">        );</span>
+<span class="ln" id="L1431">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1432">    }</span>
+<span class="ln" id="L1433"></span>
+<span class="ln" id="L1434">    <span class="tok-com">/// Each of the three shapes that sentence takes.</span></span>
+<span class="ln" id="L1435">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1436">    <span class="tok-kw">fn</span> <span class="tok-fn">what_was_already_replaced_reads_as_a_sentence</span>() {</span>
+<span class="ln" id="L1437">        assert_eq!(<span class="tok-fn">replaced_so_far</span>(&amp;[]), <span class="tok-str">&quot;Nothing was replaced.&quot;</span>);</span>
+<span class="ln" id="L1438">        assert_eq!(</span>
+<span class="ln" id="L1439">            <span class="tok-fn">replaced_so_far</span>(&amp;[<span class="tok-str">&quot;veilvoice&quot;</span>.<span class="tok-fn">to_string</span>()]),</span>
+<span class="ln" id="L1440">            <span class="tok-str">&quot;veilvoice was already replaced and is the new version.&quot;</span></span>
+<span class="ln" id="L1441">        );</span>
+<span class="ln" id="L1442">        assert_eq!(</span>
+<span class="ln" id="L1443">            <span class="tok-fn">replaced_so_far</span>(&amp;[<span class="tok-str">&quot;veilvoice&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;veilvoice-gui&quot;</span>.<span class="tok-fn">to_string</span>()]),</span>
+<span class="ln" id="L1444">            <span class="tok-str">&quot;veilvoice and veilvoice-gui were already replaced and are the new version.&quot;</span></span>
+<span class="ln" id="L1445">        );</span>
+<span class="ln" id="L1446">    }</span>
+<span class="ln" id="L1447"></span>
+<span class="ln" id="L1448">    <span class="tok-com">/// An update keeps the files the old record covered and did not replace.</span></span>
+<span class="ln" id="L1449">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1450">    <span class="tok-com">/// The record covers more than the programs an update replaces: the guard</span></span>
+<span class="ln" id="L1451">    <span class="tok-com">/// records the app lock beside them on its first run, and somebody can name</span></span>
+<span class="ln" id="L1452">    <span class="tok-com">/// files of their own. Rebuilding it from the replaced programs alone drops</span></span>
+<span class="ln" id="L1453">    <span class="tok-com">/// the rest, and the next check calls a dropped file unrecorded rather than</span></span>
+<span class="ln" id="L1454">    <span class="tok-com">/// unchanged.</span></span>
+<span class="ln" id="L1455">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1456">    <span class="tok-kw">fn</span> <span class="tok-fn">re_recording_keeps_what_the_update_did_not_touch</span>() {</span>
+<span class="ln" id="L1457">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;record-keeps&quot;</span>);</span>
+<span class="ln" id="L1458">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;root).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1459">        <span class="tok-kw">let</span> program = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice&quot;</span>);</span>
+<span class="ln" id="L1460">        <span class="tok-kw">let</span> other = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;something-else-that-was-recorded&quot;</span>);</span>
+<span class="ln" id="L1461">        std::fs::<span class="tok-fn">write</span>(&amp;program, b<span class="tok-str">&quot;the old one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1462">        std::fs::<span class="tok-fn">write</span>(&amp;other, b<span class="tok-str">&quot;not part of the update&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1463"></span>
+<span class="ln" id="L1464">        <span class="tok-kw">let</span> before = veilvoice_guard::Manifest::<span class="tok-fn">of</span>(&amp;[&amp;program, &amp;other]).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a record&quot;</span>);</span>
+<span class="ln" id="L1465">        assert_eq!(before.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L1466"></span>
+<span class="ln" id="L1467">        <span class="tok-com">// The update replaces the program and nothing else.</span></span>
+<span class="ln" id="L1468">        std::fs::<span class="tok-fn">write</span>(&amp;program, b<span class="tok-str">&quot;the new one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1469">        <span class="tok-kw">let</span> after = before.<span class="tok-fn">refresh</span>(&amp;[&amp;program]).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the record is retaken&quot;</span>);</span>
+<span class="ln" id="L1470"></span>
+<span class="ln" id="L1471">        assert_eq!(after.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>, <span class="tok-str">&quot;an entry was dropped by the update&quot;</span>);</span>
+<span class="ln" id="L1472">        <span class="tok-kw">let</span> paths: Vec&lt;&amp;str&gt; = after.<span class="tok-fn">paths</span>().<span class="tok-fn">collect</span>();</span>
 <span class="ln" id="L1473">        assert!(</span>
-<span class="ln" id="L1474">            std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">next</span>().<span class="tok-fn">is_none</span>(),</span>
-<span class="ln" id="L1475">            <span class="tok-str">&quot;asking whether there is a lock wrote something&quot;</span></span>
-<span class="ln" id="L1476">        );</span>
-<span class="ln" id="L1477">        assert!(<span class="tok-fn">check_password_in</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;anything&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L1478"></span>
-<span class="ln" id="L1479">        veilvoice_crypto::lock::<span class="tok-fn">create_in</span>(</span>
-<span class="ln" id="L1480">            dir.<span class="tok-fn">path</span>(),</span>
-<span class="ln" id="L1481">            b<span class="tok-str">&quot;the right one&quot;</span>,</span>
-<span class="ln" id="L1482">            veilvoice_crypto::kdf::KdfParams::<span class="tok-fn">weak_for_tests</span>(),</span>
-<span class="ln" id="L1483">        )</span>
-<span class="ln" id="L1484">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1485">        assert!(matches!(<span class="tok-fn">lock_in</span>(dir.<span class="tok-fn">path</span>()), <span class="tok-fn">Ok</span>(<span class="tok-fn">Some</span>(_))));</span>
-<span class="ln" id="L1486">        assert!(matches!(</span>
-<span class="ln" id="L1487">            <span class="tok-fn">check_password_in</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;the wrong one&quot;</span>),</span>
-<span class="ln" id="L1488">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">WrongPassword</span>(_))</span>
-<span class="ln" id="L1489">        ));</span>
-<span class="ln" id="L1490">        assert!(<span class="tok-fn">check_password_in</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;the right one&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L1491">    }</span>
-<span class="ln" id="L1492"></span>
-<span class="ln" id="L1493">    <span class="tok-com">/// A wrong passphrase stops the update before anything is fetched.</span></span>
-<span class="ln" id="L1494">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1495">    <span class="tok-com">/// Source-level, because the real check needs an app lock on the machine</span></span>
-<span class="ln" id="L1496">    <span class="tok-com">/// running the tests. What it pins is the order, which is the part that</span></span>
-<span class="ln" id="L1497">    <span class="tok-com">/// matters: finding out at the reseal, after the binaries are replaced,</span></span>
-<span class="ln" id="L1498">    <span class="tok-com">/// leaves new programs and a record sealed under a passphrase nobody knows.</span></span>
-<span class="ln" id="L1499">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1500">    <span class="tok-kw">fn</span> <span class="tok-fn">the_passphrase_is_checked_before_anything_is_fetched</span>() {</span>
-<span class="ln" id="L1501">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1502">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn perform(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;perform exists&quot;</span>);</span>
-<span class="ln" id="L1503">        <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L1504">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n/// Refuse a passphrase&quot;</span>)</span>
-<span class="ln" id="L1505">            .<span class="tok-fn">map</span>(|at| start + at)</span>
-<span class="ln" id="L1506">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function ends&quot;</span>);</span>
-<span class="ln" id="L1507">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
-<span class="ln" id="L1508"></span>
-<span class="ln" id="L1509">        <span class="tok-kw">let</span> checked = body</span>
-<span class="ln" id="L1510">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;check_password(&quot;</span>)</span>
-<span class="ln" id="L1511">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the passphrase is checked&quot;</span>);</span>
-<span class="ln" id="L1512">        <span class="tok-kw">let</span> work = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;update_within(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the work is dispatched&quot;</span>);</span>
-<span class="ln" id="L1513">        assert!(</span>
-<span class="ln" id="L1514">            checked &lt; work,</span>
-<span class="ln" id="L1515">            <span class="tok-str">&quot;an update with a wrong passphrase replaces the programs and only \</span></span>
-<span class="ln" id="L1516"><span class="tok-str">             then finds out it cannot reseal the record&quot;</span></span>
-<span class="ln" id="L1517">        );</span>
-<span class="ln" id="L1518">    }</span>
-<span class="ln" id="L1519"></span>
-<span class="ln" id="L1520">    <span class="tok-com">/// A release carrying only the command line replaces only the command line.</span></span>
-<span class="ln" id="L1521">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1522">    <span class="tok-com">/// Three of the published targets are command-line only, so this is the</span></span>
-<span class="ln" id="L1523">    <span class="tok-com">/// ordinary case on them rather than an edge. Replacing what is there and</span></span>
-<span class="ln" id="L1524">    <span class="tok-com">/// leaving the rest alone is right; refusing because the window was not in</span></span>
-<span class="ln" id="L1525">    <span class="tok-com">/// the archive would make those platforms un-updatable.</span></span>
-<span class="ln" id="L1526">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1527">    <span class="tok-kw">fn</span> <span class="tok-fn">a_release_with_only_the_command_line_replaces_only_that</span>() {</span>
-<span class="ln" id="L1528">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;cli-only&quot;</span>);</span>
-<span class="ln" id="L1529">        <span class="tok-kw">let</span> from = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;new&quot;</span>);</span>
-<span class="ln" id="L1530">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;installed&quot;</span>);</span>
-<span class="ln" id="L1531">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;from).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1532">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;into).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1533">        <span class="tok-kw">let</span> cli = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(<span class="tok-str">&quot;veilvoice&quot;</span>);</span>
-<span class="ln" id="L1534">        <span class="tok-kw">let</span> gui = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>);</span>
-<span class="ln" id="L1535">        std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(&amp;cli), b<span class="tok-str">&quot;the new one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1536">        std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;cli), b<span class="tok-str">&quot;the old one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1537">        std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;gui), b<span class="tok-str">&quot;a window nobody replaced&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1538"></span>
-<span class="ln" id="L1539">        <span class="tok-kw">let</span> (replaced, _) = <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it replaces what is there&quot;</span>);</span>
-<span class="ln" id="L1540">        assert_eq!(replaced, vec![cli.<span class="tok-fn">clone</span>()]);</span>
-<span class="ln" id="L1541">        assert_eq!(std::fs::<span class="tok-fn">read</span>(into.<span class="tok-fn">join</span>(&amp;cli)).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;the new one&quot;</span>);</span>
-<span class="ln" id="L1542">        assert_eq!(</span>
-<span class="ln" id="L1543">            std::fs::<span class="tok-fn">read</span>(into.<span class="tok-fn">join</span>(&amp;gui)).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1544">            b<span class="tok-str">&quot;a window nobody replaced&quot;</span>,</span>
-<span class="ln" id="L1545">            <span class="tok-str">&quot;a program the release did not carry was touched&quot;</span></span>
-<span class="ln" id="L1546">        );</span>
-<span class="ln" id="L1547">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1548">    }</span>
-<span class="ln" id="L1549"></span>
-<span class="ln" id="L1550">    <span class="tok-com">/// A directory carrying none of the programs replaces nothing and says so.</span></span>
-<span class="ln" id="L1551">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1552">    <span class="tok-com">/// Rather than reporting a successful update of no files, which is how</span></span>
-<span class="ln" id="L1553">    <span class="tok-com">/// somebody ends up believing they are on a version they are not.</span></span>
-<span class="ln" id="L1554">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1555">    <span class="tok-kw">fn</span> <span class="tok-fn">a_release_carrying_no_programs_is_refused</span>() {</span>
-<span class="ln" id="L1556">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;empty&quot;</span>);</span>
-<span class="ln" id="L1557">        <span class="tok-kw">let</span> from = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;new&quot;</span>);</span>
-<span class="ln" id="L1558">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;installed&quot;</span>);</span>
-<span class="ln" id="L1559">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;from).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1560">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;into).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1561">        std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(<span class="tok-str">&quot;README.md&quot;</span>), b<span class="tok-str">&quot;# nothing to install\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1562"></span>
-<span class="ln" id="L1563">        <span class="tok-kw">let</span> error = <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;nothing to install must be refused&quot;</span>);</span>
-<span class="ln" id="L1564">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;none of the VeilVoice programs&quot;</span>));</span>
-<span class="ln" id="L1565">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1566">    }</span>
-<span class="ln" id="L1567"></span>
-<span class="ln" id="L1568">    <span class="tok-com">/// The new file keeps the execute bit the archive published for it.</span></span>
-<span class="ln" id="L1569">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1570">    <span class="tok-com">/// A copy takes the destination&#x27;s mode on some systems, and an update that</span></span>
-<span class="ln" id="L1571">    <span class="tok-com">/// left VeilVoice without its execute bit would produce exactly the</span></span>
-<span class="ln" id="L1572">    <span class="tok-com">/// complaint `crate::extracted` exists to report: a folder that looks</span></span>
-<span class="ln" id="L1573">    <span class="tok-com">/// perfect and does nothing.</span></span>
-<span class="ln" id="L1574">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L1575">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1576">    <span class="tok-kw">fn</span> <span class="tok-fn">the_replaced_program_is_still_runnable</span>() {</span>
-<span class="ln" id="L1577">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
-<span class="ln" id="L1578">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;mode&quot;</span>);</span>
+<span class="ln" id="L1474">            paths</span>
+<span class="ln" id="L1475">                .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L1476">                .<span class="tok-fn">any</span>(|p| p.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;something-else-that-was-recorded&quot;</span>)),</span>
+<span class="ln" id="L1477">            <span class="tok-str">&quot;the file the update never touched is no longer recorded: {paths:?}&quot;</span></span>
+<span class="ln" id="L1478">        );</span>
+<span class="ln" id="L1479">        <span class="tok-com">// And the replaced one really was measured again.</span></span>
+<span class="ln" id="L1480">        assert!(</span>
+<span class="ln" id="L1481">            after.check::&lt;&amp;std::path::Path&gt;(&amp;[]).<span class="tok-fn">is_clean</span>(),</span>
+<span class="ln" id="L1482">            <span class="tok-str">&quot;the record does not match what is on disk now&quot;</span></span>
+<span class="ln" id="L1483">        );</span>
+<span class="ln" id="L1484">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1485">    }</span>
+<span class="ln" id="L1486"></span>
+<span class="ln" id="L1487">    <span class="tok-com">/// F-271. A lock kept in the vault is found, its passphrase is checked,</span></span>
+<span class="ln" id="L1488">    <span class="tok-com">/// and asking whether there is one writes nothing.</span></span>
+<span class="ln" id="L1489">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1490">    <span class="tok-kw">fn</span> <span class="tok-fn">a_lock_kept_in_the_vault_is_seen_and_its_passphrase_is_checked</span>() {</span>
+<span class="ln" id="L1491">        <span class="tok-com">// F-271. The lock lives in the vault, and opening it there deletes</span></span>
+<span class="ln" id="L1492">        <span class="tok-com">// `applock.bin`, which is the file this used to look for.</span></span>
+<span class="ln" id="L1493">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1494">        assert!(matches!(<span class="tok-fn">lock_in</span>(dir.<span class="tok-fn">path</span>()), <span class="tok-fn">Ok</span>(None)));</span>
+<span class="ln" id="L1495">        assert!(</span>
+<span class="ln" id="L1496">            std::fs::<span class="tok-fn">read_dir</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">unwrap</span>().<span class="tok-fn">next</span>().<span class="tok-fn">is_none</span>(),</span>
+<span class="ln" id="L1497">            <span class="tok-str">&quot;asking whether there is a lock wrote something&quot;</span></span>
+<span class="ln" id="L1498">        );</span>
+<span class="ln" id="L1499">        assert!(<span class="tok-fn">check_password_in</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;anything&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L1500"></span>
+<span class="ln" id="L1501">        veilvoice_crypto::lock::<span class="tok-fn">create_in</span>(</span>
+<span class="ln" id="L1502">            dir.<span class="tok-fn">path</span>(),</span>
+<span class="ln" id="L1503">            b<span class="tok-str">&quot;the right one&quot;</span>,</span>
+<span class="ln" id="L1504">            veilvoice_crypto::kdf::KdfParams::<span class="tok-fn">weak_for_tests</span>(),</span>
+<span class="ln" id="L1505">        )</span>
+<span class="ln" id="L1506">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1507">        assert!(matches!(<span class="tok-fn">lock_in</span>(dir.<span class="tok-fn">path</span>()), <span class="tok-fn">Ok</span>(<span class="tok-fn">Some</span>(_))));</span>
+<span class="ln" id="L1508">        assert!(matches!(</span>
+<span class="ln" id="L1509">            <span class="tok-fn">check_password_in</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;the wrong one&quot;</span>),</span>
+<span class="ln" id="L1510">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">WrongPassword</span>(_))</span>
+<span class="ln" id="L1511">        ));</span>
+<span class="ln" id="L1512">        assert!(<span class="tok-fn">check_password_in</span>(dir.<span class="tok-fn">path</span>(), b<span class="tok-str">&quot;the right one&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L1513">    }</span>
+<span class="ln" id="L1514"></span>
+<span class="ln" id="L1515">    <span class="tok-com">/// A wrong passphrase stops the update before anything is fetched.</span></span>
+<span class="ln" id="L1516">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1517">    <span class="tok-com">/// Source-level, because the real check needs an app lock on the machine</span></span>
+<span class="ln" id="L1518">    <span class="tok-com">/// running the tests. What it pins is the order, which is the part that</span></span>
+<span class="ln" id="L1519">    <span class="tok-com">/// matters: finding out at the reseal, after the binaries are replaced,</span></span>
+<span class="ln" id="L1520">    <span class="tok-com">/// leaves new programs and a record sealed under a passphrase nobody knows.</span></span>
+<span class="ln" id="L1521">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1522">    <span class="tok-kw">fn</span> <span class="tok-fn">the_passphrase_is_checked_before_anything_is_fetched</span>() {</span>
+<span class="ln" id="L1523">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1524">        <span class="tok-kw">let</span> start = source.<span class="tok-fn">find</span>(<span class="tok-str">&quot;pub fn perform(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;perform exists&quot;</span>);</span>
+<span class="ln" id="L1525">        <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L1526">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n/// Refuse a passphrase&quot;</span>)</span>
+<span class="ln" id="L1527">            .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L1528">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the function ends&quot;</span>);</span>
+<span class="ln" id="L1529">        <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
+<span class="ln" id="L1530"></span>
+<span class="ln" id="L1531">        <span class="tok-kw">let</span> checked = body</span>
+<span class="ln" id="L1532">            .<span class="tok-fn">find</span>(<span class="tok-str">&quot;check_password(&quot;</span>)</span>
+<span class="ln" id="L1533">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the passphrase is checked&quot;</span>);</span>
+<span class="ln" id="L1534">        <span class="tok-kw">let</span> work = body.<span class="tok-fn">find</span>(<span class="tok-str">&quot;update_within(&quot;</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the work is dispatched&quot;</span>);</span>
+<span class="ln" id="L1535">        assert!(</span>
+<span class="ln" id="L1536">            checked &lt; work,</span>
+<span class="ln" id="L1537">            <span class="tok-str">&quot;an update with a wrong passphrase replaces the programs and only \</span></span>
+<span class="ln" id="L1538"><span class="tok-str">             then finds out it cannot reseal the record&quot;</span></span>
+<span class="ln" id="L1539">        );</span>
+<span class="ln" id="L1540">    }</span>
+<span class="ln" id="L1541"></span>
+<span class="ln" id="L1542">    <span class="tok-com">/// A release carrying only the command line replaces only the command line.</span></span>
+<span class="ln" id="L1543">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1544">    <span class="tok-com">/// Three of the published targets are command-line only, so this is the</span></span>
+<span class="ln" id="L1545">    <span class="tok-com">/// ordinary case on them rather than an edge. Replacing what is there and</span></span>
+<span class="ln" id="L1546">    <span class="tok-com">/// leaving the rest alone is right; refusing because the window was not in</span></span>
+<span class="ln" id="L1547">    <span class="tok-com">/// the archive would make those platforms un-updatable.</span></span>
+<span class="ln" id="L1548">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1549">    <span class="tok-kw">fn</span> <span class="tok-fn">a_release_with_only_the_command_line_replaces_only_that</span>() {</span>
+<span class="ln" id="L1550">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;cli-only&quot;</span>);</span>
+<span class="ln" id="L1551">        <span class="tok-kw">let</span> from = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;new&quot;</span>);</span>
+<span class="ln" id="L1552">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;installed&quot;</span>);</span>
+<span class="ln" id="L1553">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;from).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1554">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;into).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1555">        <span class="tok-kw">let</span> cli = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(<span class="tok-str">&quot;veilvoice&quot;</span>);</span>
+<span class="ln" id="L1556">        <span class="tok-kw">let</span> gui = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(<span class="tok-str">&quot;veilvoice-gui&quot;</span>);</span>
+<span class="ln" id="L1557">        std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(&amp;cli), b<span class="tok-str">&quot;the new one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1558">        std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;cli), b<span class="tok-str">&quot;the old one&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1559">        std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;gui), b<span class="tok-str">&quot;a window nobody replaced&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1560"></span>
+<span class="ln" id="L1561">        <span class="tok-kw">let</span> (replaced, _) = <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it replaces what is there&quot;</span>);</span>
+<span class="ln" id="L1562">        assert_eq!(replaced, vec![cli.<span class="tok-fn">clone</span>()]);</span>
+<span class="ln" id="L1563">        assert_eq!(std::fs::<span class="tok-fn">read</span>(into.<span class="tok-fn">join</span>(&amp;cli)).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;the new one&quot;</span>);</span>
+<span class="ln" id="L1564">        assert_eq!(</span>
+<span class="ln" id="L1565">            std::fs::<span class="tok-fn">read</span>(into.<span class="tok-fn">join</span>(&amp;gui)).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1566">            b<span class="tok-str">&quot;a window nobody replaced&quot;</span>,</span>
+<span class="ln" id="L1567">            <span class="tok-str">&quot;a program the release did not carry was touched&quot;</span></span>
+<span class="ln" id="L1568">        );</span>
+<span class="ln" id="L1569">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1570">    }</span>
+<span class="ln" id="L1571"></span>
+<span class="ln" id="L1572">    <span class="tok-com">/// A directory carrying none of the programs replaces nothing and says so.</span></span>
+<span class="ln" id="L1573">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1574">    <span class="tok-com">/// Rather than reporting a successful update of no files, which is how</span></span>
+<span class="ln" id="L1575">    <span class="tok-com">/// somebody ends up believing they are on a version they are not.</span></span>
+<span class="ln" id="L1576">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1577">    <span class="tok-kw">fn</span> <span class="tok-fn">a_release_carrying_no_programs_is_refused</span>() {</span>
+<span class="ln" id="L1578">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;empty&quot;</span>);</span>
 <span class="ln" id="L1579">        <span class="tok-kw">let</span> from = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;new&quot;</span>);</span>
 <span class="ln" id="L1580">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;installed&quot;</span>);</span>
 <span class="ln" id="L1581">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;from).<span class="tok-fn">unwrap</span>();</span>
 <span class="ln" id="L1582">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;into).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1583">        <span class="tok-kw">let</span> name = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(<span class="tok-str">&quot;veilvoice&quot;</span>);</span>
-<span class="ln" id="L1584">        std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;#!/bin/sh\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1585">        std::fs::<span class="tok-fn">set_permissions</span>(from.<span class="tok-fn">join</span>(&amp;name), std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o755)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1586">        std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;#!/bin/sh\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1587">        std::fs::<span class="tok-fn">set_permissions</span>(into.<span class="tok-fn">join</span>(&amp;name), std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o644)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1588"></span>
-<span class="ln" id="L1589">        <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it replaces&quot;</span>);</span>
-<span class="ln" id="L1590">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(into.<span class="tok-fn">join</span>(&amp;name))</span>
-<span class="ln" id="L1591">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1592">            .<span class="tok-fn">permissions</span>()</span>
-<span class="ln" id="L1593">            .<span class="tok-fn">mode</span>();</span>
-<span class="ln" id="L1594">        assert!(</span>
-<span class="ln" id="L1595">            mode &amp; 0o111 != <span class="tok-num">0</span>,</span>
-<span class="ln" id="L1596">            <span class="tok-str">&quot;the replacement is not runnable: mode {mode:o}&quot;</span></span>
-<span class="ln" id="L1597">        );</span>
-<span class="ln" id="L1598">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
-<span class="ln" id="L1599">    }</span>
-<span class="ln" id="L1600"></span>
-<span class="ln" id="L1601">    <span class="tok-com">/// The workspace is beside the copy being replaced, and is hidden.</span></span>
-<span class="ln" id="L1602">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1603">    <span class="tok-kw">fn</span> <span class="tok-fn">the_workspace_sits_beside_the_program_it_replaces</span>() {</span>
-<span class="ln" id="L1604">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(workspace) = <span class="tok-fn">workspace</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1605">            <span class="tok-kw">return</span>; <span class="tok-com">// no current_exe on this platform</span></span>
-<span class="ln" id="L1606">        };</span>
-<span class="ln" id="L1607">        <span class="tok-kw">let</span> installation = <span class="tok-fn">installation</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;an installation, since there is a workspace&quot;</span>);</span>
-<span class="ln" id="L1608">        assert_eq!(workspace.<span class="tok-fn">parent</span>(), <span class="tok-fn">Some</span>(installation.<span class="tok-fn">as_path</span>()));</span>
-<span class="ln" id="L1609">        <span class="tok-kw">let</span> name = workspace</span>
-<span class="ln" id="L1610">            .<span class="tok-fn">file_name</span>()</span>
-<span class="ln" id="L1611">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1612">            .<span class="tok-fn">to_string_lossy</span>()</span>
-<span class="ln" id="L1613">            .<span class="tok-fn">into_owned</span>();</span>
-<span class="ln" id="L1614">        assert!(</span>
-<span class="ln" id="L1615">            name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;.&#x27;</span>),</span>
-<span class="ln" id="L1616">            <span class="tok-str">&quot;a directory an update leaves for a moment should not sit in the middle \</span></span>
-<span class="ln" id="L1617"><span class="tok-str">             of somebody&#x27;s folder listing: {name}&quot;</span></span>
-<span class="ln" id="L1618">        );</span>
-<span class="ln" id="L1619">    }</span>
-<span class="ln" id="L1620">}</span>
+<span class="ln" id="L1583">        std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(<span class="tok-str">&quot;README.md&quot;</span>), b<span class="tok-str">&quot;# nothing to install\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1584"></span>
+<span class="ln" id="L1585">        <span class="tok-kw">let</span> error = <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;nothing to install must be refused&quot;</span>);</span>
+<span class="ln" id="L1586">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;none of the VeilVoice programs&quot;</span>));</span>
+<span class="ln" id="L1587">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1588">    }</span>
+<span class="ln" id="L1589"></span>
+<span class="ln" id="L1590">    <span class="tok-com">/// The new file keeps the execute bit the archive published for it.</span></span>
+<span class="ln" id="L1591">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1592">    <span class="tok-com">/// A copy takes the destination&#x27;s mode on some systems, and an update that</span></span>
+<span class="ln" id="L1593">    <span class="tok-com">/// left VeilVoice without its execute bit would produce exactly the</span></span>
+<span class="ln" id="L1594">    <span class="tok-com">/// complaint `crate::extracted` exists to report: a folder that looks</span></span>
+<span class="ln" id="L1595">    <span class="tok-com">/// perfect and does nothing.</span></span>
+<span class="ln" id="L1596">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L1597">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1598">    <span class="tok-kw">fn</span> <span class="tok-fn">the_replaced_program_is_still_runnable</span>() {</span>
+<span class="ln" id="L1599">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L1600">        <span class="tok-kw">let</span> root = <span class="tok-fn">room</span>(<span class="tok-str">&quot;mode&quot;</span>);</span>
+<span class="ln" id="L1601">        <span class="tok-kw">let</span> from = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;new&quot;</span>);</span>
+<span class="ln" id="L1602">        <span class="tok-kw">let</span> into = root.<span class="tok-fn">join</span>(<span class="tok-str">&quot;installed&quot;</span>);</span>
+<span class="ln" id="L1603">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;from).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1604">        std::fs::<span class="tok-fn">create_dir_all</span>(&amp;into).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1605">        <span class="tok-kw">let</span> name = <span class="tok-kw">crate</span>::builder::<span class="tok-fn">with_platform_extension</span>(<span class="tok-str">&quot;veilvoice&quot;</span>);</span>
+<span class="ln" id="L1606">        std::fs::<span class="tok-fn">write</span>(from.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;#!/bin/sh\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1607">        std::fs::<span class="tok-fn">set_permissions</span>(from.<span class="tok-fn">join</span>(&amp;name), std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o755)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1608">        std::fs::<span class="tok-fn">write</span>(into.<span class="tok-fn">join</span>(&amp;name), b<span class="tok-str">&quot;#!/bin/sh\n&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1609">        std::fs::<span class="tok-fn">set_permissions</span>(into.<span class="tok-fn">join</span>(&amp;name), std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o644)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1610"></span>
+<span class="ln" id="L1611">        <span class="tok-fn">put_in_place</span>(&amp;from, &amp;into).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;it replaces&quot;</span>);</span>
+<span class="ln" id="L1612">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(into.<span class="tok-fn">join</span>(&amp;name))</span>
+<span class="ln" id="L1613">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1614">            .<span class="tok-fn">permissions</span>()</span>
+<span class="ln" id="L1615">            .<span class="tok-fn">mode</span>();</span>
+<span class="ln" id="L1616">        assert!(</span>
+<span class="ln" id="L1617">            mode &amp; 0o111 != <span class="tok-num">0</span>,</span>
+<span class="ln" id="L1618">            <span class="tok-str">&quot;the replacement is not runnable: mode {mode:o}&quot;</span></span>
+<span class="ln" id="L1619">        );</span>
+<span class="ln" id="L1620">        std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;root).<span class="tok-fn">ok</span>();</span>
+<span class="ln" id="L1621">    }</span>
+<span class="ln" id="L1622"></span>
+<span class="ln" id="L1623">    <span class="tok-com">/// The workspace is beside the copy being replaced, and is hidden.</span></span>
+<span class="ln" id="L1624">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1625">    <span class="tok-kw">fn</span> <span class="tok-fn">the_workspace_sits_beside_the_program_it_replaces</span>() {</span>
+<span class="ln" id="L1626">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(workspace) = <span class="tok-fn">workspace</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1627">            <span class="tok-kw">return</span>; <span class="tok-com">// no current_exe on this platform</span></span>
+<span class="ln" id="L1628">        };</span>
+<span class="ln" id="L1629">        <span class="tok-kw">let</span> installation = <span class="tok-fn">installation</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;an installation, since there is a workspace&quot;</span>);</span>
+<span class="ln" id="L1630">        assert_eq!(workspace.<span class="tok-fn">parent</span>(), <span class="tok-fn">Some</span>(installation.<span class="tok-fn">as_path</span>()));</span>
+<span class="ln" id="L1631">        <span class="tok-kw">let</span> name = workspace</span>
+<span class="ln" id="L1632">            .<span class="tok-fn">file_name</span>()</span>
+<span class="ln" id="L1633">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1634">            .<span class="tok-fn">to_string_lossy</span>()</span>
+<span class="ln" id="L1635">            .<span class="tok-fn">into_owned</span>();</span>
+<span class="ln" id="L1636">        assert!(</span>
+<span class="ln" id="L1637">            name.<span class="tok-fn">starts_with</span>(<span class="tok-str">&#x27;.&#x27;</span>),</span>
+<span class="ln" id="L1638">            <span class="tok-str">&quot;a directory an update leaves for a moment should not sit in the middle \</span></span>
+<span class="ln" id="L1639"><span class="tok-str">             of somebody&#x27;s folder listing: {name}&quot;</span></span>
+<span class="ln" id="L1640">        );</span>
+<span class="ln" id="L1641">    }</span>
+<span class="ln" id="L1642">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

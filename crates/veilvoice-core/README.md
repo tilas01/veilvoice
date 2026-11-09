@@ -136,6 +136,10 @@ flowchart TD
     click n_stft href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/stft.rs" "open the source"
     click n_voices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/voices.rs" "open the source"
     click n_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/window.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>

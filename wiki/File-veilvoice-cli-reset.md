@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/reset.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 405 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs)
+[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 431 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs)
 
 ## Contents
 
@@ -46,16 +46,17 @@ flags off another command.
 # In plain words
 
 Puts VeilVoice back to how it was the day you installed it. It shows you
-what it is about to remove before it removes anything, and `--keep-keys`
-leaves your password and the key to your recordings alone.
+what it is about to remove before it removes anything, and it leaves your
+password and the key to your recordings alone unless you ask for those too
+with `--drop-keys`.
 
 ## What this file contains
 
-405 lines defining **6 functions** (1 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+431 lines defining **6 functions** (1 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `run` (line 49) -- Run the reset.
+- `run` (line 56) -- Run the reset.
   - reaches: `agreed`, `describe`, `report_kept`, `count`, `size`
 
 ## What calls what
@@ -72,28 +73,35 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_run(["run<br/>line 49"])
-    n_describe["describe<br/>line 110"]
-    n_report_kept["report_kept<br/>line 161"]
-    n_agreed["agreed<br/>line 187"]
-    n_count["count<br/>line 253"]
-    n_size["size<br/>line 266"]
+    n_run(["run<br/>line 56"])
+    n_describe["describe<br/>line 136"]
+    n_report_kept["report_kept<br/>line 187"]
+    n_agreed["agreed<br/>line 213"]
+    n_count["count<br/>line 279"]
+    n_size["size<br/>line 292"]
     n_describe --> n_count
     n_describe --> n_report_kept
     n_describe --> n_size
     n_run --> n_agreed
     n_run --> n_describe
     n_run --> n_report_kept
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L49" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L110" "open the source"
-    click n_report_kept href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L161" "open the source"
-    click n_agreed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L187" "open the source"
-    click n_count href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L253" "open the source"
-    click n_size href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L266" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L56" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L136" "open the source"
+    click n_report_kept href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L187" "open the source"
+    click n_agreed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L213" "open the source"
+    click n_count href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L279" "open the source"
+    click n_size href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L292" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_describe,n_report_kept,n_agreed,n_count,n_size helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>
@@ -102,10 +110,10 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `TYPED` <sub>pub const</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L46) | The word somebody types where the plan cannot be undone. |
-| `run` <sub>pub fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L49) | Run the reset. |
-| `describe` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L110) | Print the plan: a line per thing, and what it adds up to. |
-| `report_kept` <sub>fn</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L161) | Print what stays, when anything does. |
-| `agreed` <sub>fn</sub> | [187](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L187) | Whether to go ahead: a flag where that is enough, a typed word where it is not. |
-| `count` <sub>fn</sub> | [253](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L253) | "one file" or "nine files". |
-| `size` <sub>fn</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L266) | A size somebody can judge at a glance. |
+| `TYPED` <sub>pub const</sub> | [47](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L47) | The word somebody types where the plan cannot be undone. |
+| `run` <sub>pub fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L56) | Run the reset. |
+| `describe` <sub>fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L136) | Print the plan: a line per thing, and what it adds up to. |
+| `report_kept` <sub>fn</sub> | [187](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L187) | Print what stays, when anything does. |
+| `agreed` <sub>fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L213) | Whether to go ahead: a flag where that is enough, a typed word where it is not. |
+| `count` <sub>fn</sub> | [279](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L279) | "one file" or "nine files". |
+| `size` <sub>fn</sub> | [292](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L292) | A size somebody can judge at a glance. |

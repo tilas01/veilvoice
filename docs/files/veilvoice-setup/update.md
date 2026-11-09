@@ -172,6 +172,15 @@ flowchart TD
     class n_of,n_report,n_tag_in api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_fmt,n_parse,n_precedence,n_find_tool,n_fetch helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

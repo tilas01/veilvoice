@@ -18,6 +18,7 @@ Every crate and every source file, generated from the doc comments in the code b
 Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice.
 
 - [[`absent.rs`|File-veilvoice-audio-absent]] &middot; The live modules, in a build that has no live capture.
+- [[`call.rs`|File-veilvoice-audio-call]] &middot; Roadmap item 188.
 - [[`devices.rs`|File-veilvoice-audio-devices]] &middot; Enumerating audio devices, and guessing which of them are virtual cables.
 - [[`io.rs`|File-veilvoice-audio-io]] &middot; Reading and writing audio files.
 - [[`kinds.rs`|File-veilvoice-audio-kinds]] &middot; What the live path reports, kept apart from the live path itself.

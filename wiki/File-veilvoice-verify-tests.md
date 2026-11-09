@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/tests.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1860 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
+[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1907 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs)
 
 ## Contents
 
@@ -38,11 +38,11 @@ whether it says no.
 
 ## What this file contains
 
-1860 lines defining **43 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1907 lines defining **44 functions** (0 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
-_22 of 43 functions are drawn; the diagram is bounded at 22 so it stays readable._
+_22 of 44 functions are drawn; the diagram is bounded at 22 so it stays readable._
 
 _Colour key: **helper** -- private to this file._
 
@@ -77,7 +77,7 @@ flowchart TD
     n_a_contents_list_with_nothing_to_check_it_against_is_unusable["a_contents_list_with_nothing_to_check_<br/>it_against_is_unusable<br/>line 406"]
     n_matches_name["matches_name<br/>line 421"]
     n_what_is_inside_an_archive_is_counted_rather_than_glanced_at["what_is_inside_an_archive_is_counted_<br/>rather_than_glanced_at<br/>line 1573"]
-    n_tar_on_this_machine["tar_on_this_machine<br/>line 1664"]
+    n_tar_on_this_machine["tar_on_this_machine<br/>line 1711"]
     n_a_contents_list_with_nothing_to_check_it_against_is_unusable --> n_matches_name
     n_what_is_inside_an_archive_is_counted_rather_than_glanced_at --> n_tar_on_this_machine
     click n_the_embedded_key_parses_and_is_the_expected_one href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L30" "open the source"
@@ -101,9 +101,14 @@ flowchart TD
     click n_a_contents_list_with_nothing_to_check_it_against_is_unusable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L406" "open the source"
     click n_matches_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L421" "open the source"
     click n_what_is_inside_an_archive_is_counted_rather_than_glanced_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1573" "open the source"
-    click n_tar_on_this_machine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1664" "open the source"
+    click n_tar_on_this_machine href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1711" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_the_embedded_key_parses_and_is_the_expected_one,n_the_embedded_key_carries_no_email_address,n_the_fingerprint_constant_is_written_out_not_computed,n_a_hash_is_found_by_its_file_name,n_a_binary_mode_star_is_not_part_of_the_name,n_a_file_that_is_not_listed_is_not_found,n_a_name_that_merely_contains_the_wanted_one_does_not_match,n_blank_and_comment_lines_are_skipped,n_a_malformed_line_is_skipped_rather_than_panicking,n_digests_compare_case_insensitively_and_ignore_surrounding_space,n_a_signature_that_is_not_openpgp_is_refused,n_an_empty_signature_is_refused,n_an_armoured_block_that_is_not_a_signature_is_refused,n_every_line_printed_by_a_check_goes_through_the_level,n_nothing_exits_with_an_undocumented_status,n_every_test_that_reads_source_normalises_its_line_endings,n_searching_for_a_brace_on_its_own_line_fails_against_crlf,n_the_repository_pins_its_line_endings,n_a_contents_list_with_nothing_to_check_it_against_is_unusable,n_matches_name,n_what_is_inside_an_archive_is_counted_rather_than_glanced_at,n_tar_on_this_machine helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>
@@ -150,8 +155,9 @@ flowchart TD
 | `an_archive_is_checked_against_the_signed_list_before_it_is_opened` <sub>fn</sub> | [1483](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1483) | Roadmap item 164. |
 | `nothing_that_reads_an_archive_ever_writes_one_out` <sub>fn</sub> | [1518](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1518) | Roadmap item 164. |
 | `what_is_inside_an_archive_is_counted_rather_than_glanced_at` <sub>fn</sub> | [1573](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1573) | Roadmap item 164. |
-| `tar_on_this_machine` <sub>fn</sub> | [1664](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1664) | A tar to run, if this machine has one. |
-| `the_machine_pass_never_runs_a_program_it_finds` <sub>fn</sub> | [1685](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1685) | Roadmap item 164. |
-| `the_remembered_record_says_in_itself_that_it_is_not_evidence` <sub>fn</sub> | [1726](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1726) | Roadmap item 164. |
-| `a_question_about_the_program_is_answered_wherever_it_is_asked` <sub>fn</sub> | [1752](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1752) | F-228. |
-| `verify_install_goes_through_the_one_routine_that_stages_and_renames` <sub>fn</sub> | [1838](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1838) | verify install puts binaries in place through the one routine that stages. |
+| `an_installer_is_checked_whole_and_not_counted_against_the_contents_list` <sub>fn</sub> | [1668](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1668) | The installers a release publishes beside its archives, the two MSIs, the AppImage and the RPMs, are found, checked whole and never opened. |
+| `tar_on_this_machine` <sub>fn</sub> | [1711](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1711) | A tar to run, if this machine has one. |
+| `the_machine_pass_never_runs_a_program_it_finds` <sub>fn</sub> | [1732](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1732) | Roadmap item 164. |
+| `the_remembered_record_says_in_itself_that_it_is_not_evidence` <sub>fn</sub> | [1773](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1773) | Roadmap item 164. |
+| `a_question_about_the_program_is_answered_wherever_it_is_asked` <sub>fn</sub> | [1799](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1799) | F-228. |
+| `verify_install_goes_through_the_one_routine_that_stages_and_renames` <sub>fn</sub> | [1885](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs#L1885) | verify install puts binaries in place through the one routine that stages. |

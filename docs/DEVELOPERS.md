@@ -25,17 +25,17 @@ Read from `Cargo.toml` and each crate's own manifest, with the functional line c
 | Crate | What it is | Lines | Detail |
 |---|---|---:|---|
 | `fuzz` | - | 165 | [`fuzz/README.md`](../fuzz/README.md) |
-| `veilvoice-audio` | Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice. | 2,433 | [`crates/veilvoice-audio/README.md`](../crates/veilvoice-audio/README.md) |
-| `veilvoice-cli` | Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings. | 7,239 | [`crates/veilvoice-cli/README.md`](../crates/veilvoice-cli/README.md) |
+| `veilvoice-audio` | Real-time capture and playback (cpal), lock-free ring buffers, virtual-cable routing and file import for VeilVoice. | 3,091 | [`crates/veilvoice-audio/README.md`](../crates/veilvoice-audio/README.md) |
+| `veilvoice-cli` | Command-line interface for VeilVoice: anonymise files, scramble a microphone live, strip metadata, encrypt recordings. | 7,254 | [`crates/veilvoice-cli/README.md`](../crates/veilvoice-cli/README.md) |
 | `veilvoice-conversation` | Several speakers in one recording: who spoke when, a distinct voice for each, names, and subtitles. | 2,676 | [`crates/veilvoice-conversation/README.md`](../crates/veilvoice-conversation/README.md) |
 | `veilvoice-core` | Irreversible voice de-identification DSP engine: cryptographically-modulated pitch/formant scrambling with preserved intelligibility. | 3,141 | [`crates/veilvoice-core/README.md`](../crates/veilvoice-core/README.md) |
-| `veilvoice-crypto` | Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice. | 8,628 | [`crates/veilvoice-crypto/README.md`](../crates/veilvoice-crypto/README.md) |
+| `veilvoice-crypto` | Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice. | 8,811 | [`crates/veilvoice-crypto/README.md`](../crates/veilvoice-crypto/README.md) |
 | `veilvoice-guard` | Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them. | 2,955 | [`crates/veilvoice-guard/README.md`](../crates/veilvoice-guard/README.md) |
-| `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 24,233 | [`crates/veilvoice-gui/README.md`](../crates/veilvoice-gui/README.md) |
+| `veilvoice-gui` | egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes. | 24,499 | [`crates/veilvoice-gui/README.md`](../crates/veilvoice-gui/README.md) |
 | `veilvoice-meta` | Strip or spoof identifying metadata: audio tags, and image EXIF/GPS. | 814 | [`crates/veilvoice-meta/README.md`](../crates/veilvoice-meta/README.md) |
 | `veilvoice-policy` | Settings that can only be tightened, sealed with the project's own post-quantum cryptography. | 1,689 | [`crates/veilvoice-policy/README.md`](../crates/veilvoice-policy/README.md) |
-| `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 2,955 | [`crates/veilvoice-setup/README.md`](../crates/veilvoice-setup/README.md) |
-| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 9,834 | [`crates/veilvoice-verify/README.md`](../crates/veilvoice-verify/README.md) |
+| `veilvoice-setup` | Per-user installation and companion-software detection, shared by the command line and the desktop app. | 3,033 | [`crates/veilvoice-setup/README.md`](../crates/veilvoice-setup/README.md) |
+| `veilvoice-verify` | Verify a VeilVoice release without GnuPG installed | 9,948 | [`crates/veilvoice-verify/README.md`](../crates/veilvoice-verify/README.md) |
 | `veilvoice-video` | A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg. | 6,138 | [`crates/veilvoice-video/README.md`](../crates/veilvoice-video/README.md) |
 | `veilvoice-watch` | Detect which applications are currently using the microphone and camera, with alerts on change. | 3,952 | [`crates/veilvoice-watch/README.md`](../crates/veilvoice-watch/README.md) |
 
@@ -123,6 +123,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/authorship.py`](../tools/audit/authorship.py) | Every commit is tilas01's in both of its fields, names no assistant, and is signed |
 | [`tools/audit/build_output.py`](../tools/audit/build_output.py) | No build output lives inside this repository except where it is expected |
 | [`tools/audit/build_prerequisites.py`](../tools/audit/build_prerequisites.py) | What a fresh machine needs before it can build this, said once |
+| [`tools/audit/cargo_installs.py`](../tools/audit/cargo_installs.py) | A tool a workflow installs with cargo is named at a version |
 | [`tools/audit/checkout_tokens.py`](../tools/audit/checkout_tokens.py) | A checkout that never pushes does not keep the token |
 | [`tools/audit/crate_tables.py`](../tools/audit/crate_tables.py) | Every crate in the workspace appears in every table that lists the crates |
 | [`tools/audit/dependabot.py`](../tools/audit/dependabot.py) | Every manifest in this tree is covered by a Dependabot entry, aimed at `main` |
@@ -130,6 +131,7 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/documented.py`](../tools/audit/documented.py) | Every item on a generated page has something written under it |
 | [`tools/audit/features.py`](../tools/audit/features.py) | Every feature selection a release builds is built here too |
 | [`tools/audit/fixtures.py`](../tools/audit/fixtures.py) | A file the build needs is in the commit, not merely on the machine that wrote it |
+| [`tools/audit/hidden_text.py`](../tools/audit/hidden_text.py) | No tracked file carries text a reader cannot see |
 | [`tools/audit/job_limits.py`](../tools/audit/job_limits.py) | Every job in every workflow says how long it is allowed to take |
 | [`tools/audit/network_claims.py`](../tools/audit/network_claims.py) | The manual names every command that reaches the network |
 | [`tools/audit/network_wording.py`](../tools/audit/network_wording.py) | No sentence a reader sees may claim more about the network than is true |
@@ -144,6 +146,8 @@ Each of these is a script that fails a build and names the line. They are listed
 | [`tools/audit/tables.py`](../tools/audit/tables.py) | Every row of a Markdown table has as many cells as its heading says |
 | [`tools/audit/top_permissions.py`](../tools/audit/top_permissions.py) | No workflow grants a write permission to every job at once |
 | [`tools/audit/wiki_publish.py`](../tools/audit/wiki_publish.py) | A wiki with no repository behind it skips the publish, and does not fail it |
+| [`tools/audit/wording.py`](../tools/audit/wording.py) | Every sentence a person reads is spelt, built and pitched the way a careful |
+| [`tools/audit/workflows.py`](../tools/audit/workflows.py) | The workflows and the Dependabot configuration pass zizmor, and stay hardened |
 
 Every one of them was written after something got through. The reasoning is in [`docs/AUDIT.md`](AUDIT.md) under a finding number, which is worth reading before deciding a guard is unnecessary.
 
@@ -166,6 +170,7 @@ python tools/verify.py --check    # verify, regenerate nothing
 What it regenerates, in the order it has to:
 
 - **measured numbers**: `python tools/measured/generate.py`
+- **workflow hardening**: `python tools/audit/workflows.py --fix`
 - **artwork**: `python assets/generate.py`
 - **release cards**: `python tools/release/card.py`
 - **screenshot borders**: `python tools/shots/crop.py`
@@ -186,6 +191,7 @@ What it regenerates, in the order it has to:
 - **questions page**: `python tools/site/faq.py`
 - **releases page**: `python tools/site/releases.py`
 - **addresses and the sitemap**: `python tools/site/seo.py`
+- **per-file graphs**: `python tools/graphs/generate.py`
 - **search index**: `python tools/search-index/generate.py`
 
 And what it then checks:
@@ -213,8 +219,16 @@ And what it then checks:
 - **a checkout that never pushes does not keep the token**: `python tools/audit/checkout_tokens.py`
 - **the checkout guard reads the shapes it is meant to**: `python tools/audit/checkout_tokens.py --self-test`
 - **the CodeQL findings list reads SARIF as it should**: `python tools/repo/sarif_summary.py --self-test`
+- **every tool a workflow installs with cargo is at an exact version**: `python tools/audit/cargo_installs.py`
+- **that guard reads the shapes it is meant to**: `python tools/audit/cargo_installs.py --self-test`
 - **no PowerShell function keeps a script variable's change to itself**: `python tools/audit/powershell.py`
 - **that guard catches what it claims to, as well**: `python tools/audit/powershell.py --self-test`
+- **zizmor finds nothing in the workflows**: `python tools/audit/workflows.py`
+- **that guard refuses a silent exception**: `python tools/audit/workflows.py --self-test`
+- **no tracked file hides text from its reader**: `python tools/audit/hidden_text.py`
+- **that guard catches every hidden class**: `python tools/audit/hidden_text.py --self-test`
+- **the prose is spelt, worded and finished properly**: `python tools/audit/wording.py`
+- **the wording guard catches what it claims to**: `python tools/audit/wording.py --self-test`
 - **the release step tags the commit it built**: `python tools/audit/publishing.py`
 - **a wiki that does not exist yet skips the publish, not fails it**: `python tools/audit/wiki_publish.py`
 - **that guard catches what it claims to, too**: `python tools/audit/wiki_publish.py --self-test`
@@ -231,6 +245,10 @@ And what it then checks:
 - **the manual's platform table says what the workflow builds**: `python tools/audit/platform_table.py`
 - **that guard catches what it claims to, as well**: `python tools/audit/platform_table.py --self-test`
 - **the app-manifest tooling works**: `python tools/sign/selftest.py`
+- **the Windows installer tooling works**: `python tools/package/msi.py --self-test`
+- **the Store package's manifest and icons are complete**: `python tools/package/msix.py --self-test`
+- **the Store and package icons are the right sizes**: `python tools/package/icons.py --self-test`
+- **the winget manifests are written from the signed hash list**: `python tools/package/winget.py --self-test`
 - **artwork matches its generator**: `python assets/generate.py --check`
 - **the release cards match CHANGELOG.md**: `python tools/release/card.py --check`
 - **no screenshot has a capture border**: `python tools/shots/crop.py --check`
@@ -261,6 +279,8 @@ And what it then checks:
 - **the questions page matches docs/FAQ.md**: `python tools/site/faq.py --check`
 - **the releases page matches CHANGELOG.md**: `python tools/site/releases.py --check`
 - **every page says where it lives, and the sitemap lists it**: `python tools/site/seo.py --check`
+- **every crate's and file's graph is current**: `python tools/graphs/generate.py --check`
+- **the graphs read renames, fixes and releases right**: `python tools/graphs/generate.py --self-test`
 - **search index matches the tree**: `python tools/search-index/generate.py --check`
 - **measured numbers match the tree**: `python tools/measured/generate.py --check`
 - **the line counter is right about what a line is**: `python tools/loc/count.py --self-test`

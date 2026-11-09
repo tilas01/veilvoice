@@ -86,15 +86,15 @@ Give it arguments and it does exactly what you asked.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>2607 lines"])
+    n_lib(["lib.rs<br/>2639 lines"])
     n_builder["builder.rs<br/>1210 lines"]
     n_deps["deps.rs<br/>652 lines"]
-    n_discover["discover.rs<br/>460 lines"]
+    n_discover["discover.rs<br/>471 lines"]
     n_extracted["extracted.rs<br/>316 lines"]
     n_fetch["fetch.rs<br/>382 lines"]
     n_report["report.rs<br/>385 lines"]
-    n_tests["tests.rs<br/>1860 lines"]
-    n_update["update.rs<br/>1620 lines"]
+    n_tests["tests.rs<br/>1907 lines"]
+    n_update["update.rs<br/>1642 lines"]
     n_builder --> n_deps
     n_builder --> n_extracted
     n_builder --> n_report
@@ -111,6 +111,10 @@ flowchart TD
     click n_report href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/report.rs" "open the source"
     click n_tests href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" "open the source"
     click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>
@@ -121,17 +125,17 @@ flowchart TD
 |---|---:|---|
 | [`builder.rs`](File-veilvoice-verify-builder) | 1210 | Build VeilVoice here, and compare what came out against what was published. |
 | [`deps.rs`](File-veilvoice-verify-deps) | 652 | What this machine needs before it can build VeilVoice, and who ships it. |
-| [`discover.rs`](File-veilvoice-verify-discover) | 460 | Finding a release to check, without being told where it is. |
+| [`discover.rs`](File-veilvoice-verify-discover) | 471 | Finding a release to check, without being told where it is. |
 | [`extracted.rs`](File-veilvoice-verify-extracted) | 316 | What came out of the archive, and the GnuPG somebody already has. |
 | [`fetch.rs`](File-veilvoice-verify-fetch) | 382 | Download a release, without putting an HTTP client in the dependency graph. |
-| [`lib.rs`](File-veilvoice-verify-lib) | 2607 | The portable verifier: check a VeilVoice release without GnuPG installed. |
+| [`lib.rs`](File-veilvoice-verify-lib) | 2639 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](File-veilvoice-verify-report) | 385 | How much this program says, and what it returns when it says nothing. |
-| [`tests.rs`](File-veilvoice-verify-tests) | 1860 | The verifier's own tests. |
-| [`update.rs`](File-veilvoice-verify-update) | 1620 | The update that does the update. |
+| [`tests.rs`](File-veilvoice-verify-tests) | 1907 | The verifier's own tests. |
+| [`update.rs`](File-veilvoice-verify-update) | 1642 | The update that does the update. |
 | [`inside_the_archive.rs`](File-veilvoice-verify-tests-inside_the_archive) | 498 | Roadmap item 164. |
 | [`release_manifest.rs`](File-veilvoice-verify-tests-release_manifest) | 208 | Roadmap item 97. |
 
-**9,834 functional lines of Rust** in this crate. A functional line is a line
+**9,948 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

@@ -123,6 +123,11 @@ flowchart TD
     click n_rubbish_in_place_of_an_archive_is_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs#L484" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_repository,n_python,n_have,n_room,n_stage,n_generate,n_agrees,n_spelling_this_tar_knows,n_a_tarball_holds_what_the_release_job_published,n_a_zip_holds_what_the_release_job_published,n_a_changed_or_added_file_inside_the_archive_is_caught,n_a_file_taken_out_of_the_archive_is_reported,n_an_archive_this_cannot_read_says_so,n_rubbish_in_place_of_an_archive_is_refused helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>

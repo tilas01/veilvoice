@@ -69,6 +69,13 @@ flowchart TD
     class n_clean_image_file entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_sniff,n_clean_image_bytes api
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+    end
+    class key_entry entry
+    class key_api api
 ```
 
 </details>

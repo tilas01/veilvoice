@@ -106,6 +106,10 @@ flowchart TD
     click n_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" "open the source"
     click n_render href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/render.rs" "open the source"
     click n_subtitles href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/subtitles.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>

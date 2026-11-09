@@ -97,7 +97,7 @@ you who makes each one, and installs none of them unless you say so.
 flowchart TD
     n_lib(["lib.rs<br/>226 lines"])
     n_companions["companions.rs<br/>1100 lines"]
-    n_install["install.rs<br/>1106 lines"]
+    n_install["install.rs<br/>1248 lines"]
     n_needs["needs.rs<br/>565 lines"]
     n_space["space.rs<br/>170 lines"]
     n_update["update.rs<br/>908 lines"]
@@ -112,6 +112,10 @@ flowchart TD
     click n_space href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs" "open the source"
     click n_update href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs" "open the source"
     click n_volumes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/volumes.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>
@@ -121,14 +125,14 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`companions.rs`](File-veilvoice-setup-companions) | 1100 | Optional third-party software, detected rather than assumed. |
-| [`install.rs`](File-veilvoice-setup-install) | 1106 | Put this program somewhere the system can find it. |
+| [`install.rs`](File-veilvoice-setup-install) | 1248 | Put this program somewhere the system can find it. |
 | [`lib.rs`](File-veilvoice-setup-lib) | 226 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [`needs.rs`](File-veilvoice-setup-needs) | 565 | What this machine is missing, asked once and at the right moment. |
 | [`space.rs`](File-veilvoice-setup-space) | 170 | How much room is actually free where VeilVoice keeps things. |
 | [`update.rs`](File-veilvoice-setup-update) | 908 | Ask, only when told to, whether a newer VeilVoice release exists. |
 | [`volumes.rs`](File-veilvoice-setup-volumes) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**2,955 functional lines of Rust** in this crate. A functional line is a line
+**3,033 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

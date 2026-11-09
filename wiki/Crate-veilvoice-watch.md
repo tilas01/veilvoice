@@ -83,6 +83,10 @@ flowchart TD
     click n_privilege href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs" "open the source"
     click n_proc href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/proc.rs" "open the source"
     click n_windows href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/windows.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>

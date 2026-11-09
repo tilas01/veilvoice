@@ -23,6 +23,7 @@
 <script src="js/prefetch.js" defer></script>
 <script src="js/legal.js" defer></script>
 <script src="js/reveal.js" defer></script>
+<script src="js/banner.js" defer></script>
 <script src="js/teleport.js" defer></script>
 <!-- Written by tools/site/seo.py. Edit that, not this. -->
 <link rel="canonical" href="https://tilas01.github.io/veilvoice/releases.html">
@@ -1338,7 +1339,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <p>Recordings sealed this way do not depend on the lock file. Each carries its own salt, so <code>veilvoice decrypt</code> opens it with the same password on any machine. That is deliberate: a key derived from the lock&#x27;s own salt would have meant deleting the lock destroyed the archive, and deleting the lock is the documented remedy for forgetting the password.</p>
 <p>The passphrase is kept for the session only when that mode is already chosen. A user who has not asked for it keeps the previous behaviour exactly, where it is wiped the instant it has been checked.</p>
 <h4 id="getting-the-tree-ready-for-a-release-audit">Getting the tree ready for a release audit</h4>
-<p>The work that a roadmap roadmap item does not cover, and that a deploy needs.</p>
+<p>The work that a roadmap item does not cover, and that a deploy needs.</p>
 <p><strong>Manual pages.</strong> <code>lintian</code> reported <code>no-manual-page</code> for all three binaries, and it was right: <code>man veilvoice</code> produced nothing. <code>tools/release/manpage.py</code> now derives each page from the binary&#x27;s own <code>--help</code> while a package is being built, so nothing is committed and no page can drift from the command it describes. <code>help2man</code> does this job and was tried first; it turns every em dash in VeilVoice&#x27;s help into <code>???</code>, at every locale, and a page that renders the program&#x27;s own description as three question marks looks finished and is not.</p>
 <p><code>veilvoice-gui</code> had no <code>--help</code> at all. It opened a window instead, and on a machine with no display answered with a winit error naming <code>WAYLAND_DISPLAY</code>. It now answers, on Unix, where a release build is guaranteed a console; on Windows <code>windows_subsystem = &quot;windows&quot;</code> sends <code>println!</code> nowhere, so behaviour there is deliberately unchanged rather than quietly made worse.</p>
 <p><strong>The RPM builds.</strong> A source RPM and two binary subpackages, and the thing a build proves that a parse cannot is that <code>%files</code> and <code>%install</code> agree. They do. The gaps are named rather than glossed: it ran on Ubuntu rather than any RPM distribution, and it needed <code>--nodeps</code> and <code>--nocheck</code>. Four of the six package definitions are still drafts and are still described as drafts.</p>
@@ -1703,7 +1704,7 @@ veilvoice input known</code></pre>
 <summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.13</span></summary>
 <p>Build it yourself and check the release against what you built; group mode you can see; projects, profiles and a voice limit that was measured rather than chosen; and the eighth audit round.</p>
 <p><strong>The headline is <code>veilvoice-verify reproduce</code>.</strong> Until now the verifier answered one question: <em>is this download the one that was published</em>. It now answers the harder one: <strong>is the published build the one this source produces</strong>. A signature says who made a file. Only a build says what it is made of.</p>
-<p><strong>The eighth audit round found seven defects , none of them shipped.</strong> Two were found by continuous integration rather than by anybody&#x27;s judgement, and both had been watched to pass on the machine they failed on. Three more were found by running a command and reading what it printed. Not one would have been found by reading the code, which is the round&#x27;s whole lesson and the third time this project has had to learn it.</p>
+<p><strong>The eighth audit round found seven defects, none of them shipped.</strong> Two were found by continuous integration rather than by anybody&#x27;s judgement, and both had been watched to pass on the machine they failed on. Three more were found by running a command and reading what it printed. Not one would have been found by reading the code, which is the round&#x27;s whole lesson and the third time this project has had to learn it.</p>
 <h4 id="build-it-yourself-and-check-the-release-against-what-you-built">Build it yourself, and check the release against what you built</h4>
 <pre><code>veilvoice-verify deps
 veilvoice-verify reproduce. --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
@@ -2319,7 +2320,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 </ul>
 <h4 id="security-fixes----the-website">Security fixes -- the website</h4>
 <ul>
-<li><strong>The Markdown renderer could freeze the reader&#x27;s tab.</strong> Two independent quadratics, measured rather than guessed: 128 000 characters on one line took <strong>eight seconds</strong>, and a second shape took <strong>fourteen</strong>. That is on the main thread, on text the page fetches over the network. Both are now linear .</li>
+<li><strong>The Markdown renderer could freeze the reader&#x27;s tab.</strong> Two independent quadratics, measured rather than guessed: 128 000 characters on one line took <strong>eight seconds</strong>, and a second shape took <strong>fourteen</strong>. That is on the main thread, on text the page fetches over the network. Both are now linear.</li>
 <li><strong>A deeply nested blockquote crashed the render</strong> and the reader was told the network had failed.</li>
 <li><strong>Download links from the GitHub API were assigned with no scheme check</strong> -- the item the previous audit listed as open. A refused asset is still named, just not clickable.</li>
 <li><strong>The legal gate was an invisible modal</strong> on any engine older than Chrome 111, Safari 16.2 or Firefox 113: <code>color-mix()</code> with no fallback left it with no background while it still locked scrolling. And it <strong>could not be dismissed at all on an iPhone</strong>, because <code>88vh</code> put the continue button below the visible area while the page behind was scroll-locked.</li>

@@ -139,7 +139,12 @@ flowchart TD
     click n_answered_without_a_window href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L195&quot; &quot;open the source&quot;
     click n_main href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/main.rs#L204&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_answered_without_a_window,n_answered_without_a_window,n_main helper</code></pre>
+    class n_answered_without_a_window,n_answered_without_a_window,n_main helper
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_helper[&quot;helper: private to this file&quot;]
+    end
+    class key_helper helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

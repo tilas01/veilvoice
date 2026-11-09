@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-cli/reset.svg" alt="reset.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-cli/src/reset.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 405 lines &middot; <a href="reset.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 431 lines &middot; <a href="reset.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-it-is-here-as-well-as-in-the-window">Why it is here as well as in the window</a>
@@ -89,13 +89,13 @@
 <li><code>--confirm RESET</code> is that typed word, for a machine with nothing to type into. A server being rebuilt has no terminal and still has to be resettable. It is a separate flag carrying the word itself rather than a second meaning for <code>--yes</code>, so it cannot be arrived at by copying the flags off another command.</li>
 </ul>
 <h2 id="in-plain-words">In plain words</h2>
-<p>Puts VeilVoice back to how it was the day you installed it. It shows you what it is about to remove before it removes anything, and <code>--keep-keys</code> leaves your password and the key to your recordings alone.</p>
+<p>Puts VeilVoice back to how it was the day you installed it. It shows you what it is about to remove before it removes anything, and it leaves your password and the key to your recordings alone unless you ask for those too with <code>--drop-keys</code>.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>405 lines defining <strong>6 functions</strong> (1 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>431 lines defining <strong>6 functions</strong> (1 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>run</code> <span style="color:var(--muted)">line 49</span> &middot; Run the reset.
+<li><code>run</code> <span style="color:var(--muted)">line 56</span> &middot; Run the reset.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>agreed</code>, <code>describe</code>, <code>report_kept</code>, <code>count</code>, <code>size</code></span>
 </li>
 </ul>
@@ -122,32 +122,32 @@
 <a href="reset.src.html#fn-run">
 <rect x="183.1" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="225.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">run</text>
-<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 49</text>
+<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 56</text>
 </a>
 <a href="reset.src.html#fn-describe">
 <rect x="119.8" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="166.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe</text>
-<text x="166.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
+<text x="166.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
 </a>
 <a href="reset.src.html#fn-report_kept">
 <rect x="48.5" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="106.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">report_kept</text>
-<text x="106.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
+<text x="106.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 187</text>
 </a>
 <a href="reset.src.html#fn-agreed">
 <rect x="238.3" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="284.5" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">agreed</text>
-<text x="284.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 187</text>
+<text x="284.5" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 213</text>
 </a>
 <a href="reset.src.html#fn-count">
 <rect x="191.1" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="237.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">count</text>
-<text x="237.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 253</text>
+<text x="237.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 279</text>
 </a>
 <a href="reset.src.html#fn-size">
 <rect x="309.6" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="355.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">size</text>
-<text x="355.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 266</text>
+<text x="355.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 292</text>
 </a>
 <rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -165,41 +165,48 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_run([&quot;run&lt;br/&gt;line 49&quot;])
-    n_describe[&quot;describe&lt;br/&gt;line 110&quot;]
-    n_report_kept[&quot;report_kept&lt;br/&gt;line 161&quot;]
-    n_agreed[&quot;agreed&lt;br/&gt;line 187&quot;]
-    n_count[&quot;count&lt;br/&gt;line 253&quot;]
-    n_size[&quot;size&lt;br/&gt;line 266&quot;]
+    n_run([&quot;run&lt;br/&gt;line 56&quot;])
+    n_describe[&quot;describe&lt;br/&gt;line 136&quot;]
+    n_report_kept[&quot;report_kept&lt;br/&gt;line 187&quot;]
+    n_agreed[&quot;agreed&lt;br/&gt;line 213&quot;]
+    n_count[&quot;count&lt;br/&gt;line 279&quot;]
+    n_size[&quot;size&lt;br/&gt;line 292&quot;]
     n_describe --&gt; n_count
     n_describe --&gt; n_report_kept
     n_describe --&gt; n_size
     n_run --&gt; n_agreed
     n_run --&gt; n_describe
     n_run --&gt; n_report_kept
-    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L49&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L110&quot; &quot;open the source&quot;
-    click n_report_kept href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L161&quot; &quot;open the source&quot;
-    click n_agreed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L187&quot; &quot;open the source&quot;
-    click n_count href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L253&quot; &quot;open the source&quot;
-    click n_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L266&quot; &quot;open the source&quot;
+    click n_run href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L56&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L136&quot; &quot;open the source&quot;
+    click n_report_kept href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L187&quot; &quot;open the source&quot;
+    click n_agreed href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L213&quot; &quot;open the source&quot;
+    click n_count href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L279&quot; &quot;open the source&quot;
+    click n_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/reset.rs#L292&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_describe,n_report_kept,n_agreed,n_count,n_size helper</code></pre>
+    class n_describe,n_report_kept,n_agreed,n_count,n_size helper
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
+        key_helper[&quot;helper: private to this file&quot;]
+    end
+    class key_entry entry
+    class key_helper helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>TYPED</code> <sub>pub const</sub></td><td><a href="reset.src.html#fn-typed">46</a></td><td>The word somebody types where the plan cannot be undone.</td></tr>
-<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-run">49</a></td><td>Run the reset.</td></tr>
-<tr><td><code>describe</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-describe">110</a></td><td>Print the plan: a line per thing, and what it adds up to.</td></tr>
-<tr><td><code>report_kept</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-report_kept">161</a></td><td>Print what stays, when anything does.</td></tr>
-<tr><td><code>agreed</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-agreed">187</a></td><td>Whether to go ahead: a flag where that is enough, a typed word where it is not.</td></tr>
-<tr><td><code>count</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-count">253</a></td><td>&quot;one file&quot; or &quot;nine files&quot;.</td></tr>
-<tr><td><code>size</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-size">266</a></td><td>A size somebody can judge at a glance.</td></tr>
+<tr><td><code>TYPED</code> <sub>pub const</sub></td><td><a href="reset.src.html#fn-typed">47</a></td><td>The word somebody types where the plan cannot be undone.</td></tr>
+<tr><td><code>run</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-run">56</a></td><td>Run the reset.</td></tr>
+<tr><td><code>describe</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-describe">136</a></td><td>Print the plan: a line per thing, and what it adds up to.</td></tr>
+<tr><td><code>report_kept</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-report_kept">187</a></td><td>Print what stays, when anything does.</td></tr>
+<tr><td><code>agreed</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-agreed">213</a></td><td>Whether to go ahead: a flag where that is enough, a typed word where it is not.</td></tr>
+<tr><td><code>count</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-count">279</a></td><td>&quot;one file&quot; or &quot;nine files&quot;.</td></tr>
+<tr><td><code>size</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-size">292</a></td><td>A size somebody can judge at a glance.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -122,6 +122,11 @@ flowchart TD
     click n_source href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/lib.rs#L132" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_from,n_fmt,n_source helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>

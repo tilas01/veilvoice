@@ -160,7 +160,14 @@ flowchart TD
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_new,n_latency_samples,n_process entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_process_frame helper</code></pre>
+    class n_process_frame helper
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
+        key_helper[&quot;helper: private to this file&quot;]
+    end
+    class key_entry entry
+    class key_helper helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

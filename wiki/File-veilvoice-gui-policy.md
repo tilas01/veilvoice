@@ -114,6 +114,13 @@ flowchart TD
     class n_from_policy,n_load,n_is_active,n_minimum_intensity,n_constrain,n_note,n_panel entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_default_dir,n_none,n_requires api
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+    end
+    class key_entry entry
+    class key_api api
 ```
 
 </details>

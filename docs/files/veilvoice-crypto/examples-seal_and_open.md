@@ -51,6 +51,11 @@ flowchart TD
     click n_main href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs#L24" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_main helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>

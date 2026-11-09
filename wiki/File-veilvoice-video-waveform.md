@@ -99,6 +99,11 @@ flowchart TD
     click n_svg_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L154" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_len,n_is_empty,n_envelope,n_level_at,n_svg_path entry
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+    end
+    class key_entry entry
 ```
 
 </details>

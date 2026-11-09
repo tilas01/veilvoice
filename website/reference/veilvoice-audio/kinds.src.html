@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-audio/src/kinds.rs</code></h1>
-<p style="color:var(--muted)"><a href="kinds.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 190 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="kinds.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 204 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -199,84 +199,100 @@
 </span>
 <span class="ln" id="L120">}</span>
 <span class="ln" id="L121"></span>
-<span class="src-item" id="fn-max_guests">
-<span class="ln" id="L122"><span class="tok-com">/// The most microphones one room will open at once.</span></span>
+<span class="src-item" id="fn-capture">
+<span class="ln" id="L122"><span class="tok-com">/// How one side of a call reaches this computer. **Roadmap item 188.**</span></span>
 <span class="ln" id="L123"><span class="tok-com">///</span></span>
-<span class="ln" id="L124"><span class="tok-com">/// A bound on the arithmetic rather than a claim about any machine: what a</span></span>
-<span class="ln" id="L125"><span class="tok-com">/// machine can actually carry is [`RoomStats::load`], measured while it runs.</span></span>
-<span class="ln" id="L126"><span class="tok-com">/// Eight is past the number of people who can hold one conversation, and every</span></span>
-<span class="ln" id="L127"><span class="tok-com">/// guest costs a device, a ring, an engine and a place in the mix.</span></span>
-<span class="ln" id="L128"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_GUESTS: usize = <span class="tok-num">8</span>;</span>
+<span class="ln" id="L124"><span class="tok-com">/// Kept beside the device rather than guessed from it, because one name can be</span></span>
+<span class="ln" id="L125"><span class="tok-com">/// both: a headset is a microphone and an output called the same thing, and</span></span>
+<span class="ln" id="L126"><span class="tok-com">/// which of the two a side is decides how it is opened.</span></span>
+<span class="ln" id="L127"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L128"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Capture {</span>
+<span class="ln" id="L129">    <span class="tok-com">/// An input: a microphone, or a line in that a splitter cable feeds.</span></span>
+<span class="ln" id="L130">    Microphone,</span>
+<span class="ln" id="L131">    <span class="tok-com">/// An output, recorded as it plays: the other side of a call that is</span></span>
+<span class="ln" id="L132">    <span class="tok-com">/// running on this computer.</span></span>
+<span class="ln" id="L133">    Playback,</span>
+<span class="ln" id="L134">}</span>
 </span>
-<span class="ln" id="L129"></span>
+<span class="ln" id="L135"></span>
+<span class="src-item" id="fn-max_guests">
+<span class="ln" id="L136"><span class="tok-com">/// The most microphones one room will open at once.</span></span>
+<span class="ln" id="L137"><span class="tok-com">///</span></span>
+<span class="ln" id="L138"><span class="tok-com">/// A bound on the arithmetic rather than a claim about any machine: what a</span></span>
+<span class="ln" id="L139"><span class="tok-com">/// machine can actually carry is [`RoomStats::load`], measured while it runs.</span></span>
+<span class="ln" id="L140"><span class="tok-com">/// Eight is past the number of people who can hold one conversation, and every</span></span>
+<span class="ln" id="L141"><span class="tok-com">/// guest costs a device, a ring, an engine and a place in the mix.</span></span>
+<span class="ln" id="L142"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_GUESTS: usize = <span class="tok-num">8</span>;</span>
+</span>
+<span class="ln" id="L143"></span>
 <span class="src-item" id="fn-gueststats">
-<span class="ln" id="L130"><span class="tok-com">/// What one guest&#x27;s half of a running room is doing.</span></span>
-<span class="ln" id="L131"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, Default)]</span>
-<span class="ln" id="L132"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> GuestStats {</span>
-<span class="ln" id="L133">    <span class="tok-com">/// Peak of what arrived from their microphone, since the last read.</span></span>
-<span class="ln" id="L134">    <span class="tok-kw">pub</span> input_peak: f32,</span>
-<span class="ln" id="L135">    <span class="tok-com">/// Peak of what their engine produced, since the last read.</span></span>
-<span class="ln" id="L136">    <span class="tok-kw">pub</span> output_peak: f32,</span>
-<span class="ln" id="L137">    <span class="tok-com">/// Samples dropped because their ring overflowed. Their device is running</span></span>
-<span class="ln" id="L138">    <span class="tok-com">/// faster than the output, or the output callback is late.</span></span>
-<span class="ln" id="L139">    <span class="tok-kw">pub</span> dropped: u64,</span>
-<span class="ln" id="L140">}</span>
+<span class="ln" id="L144"><span class="tok-com">/// What one guest&#x27;s half of a running room is doing.</span></span>
+<span class="ln" id="L145"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, Default)]</span>
+<span class="ln" id="L146"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> GuestStats {</span>
+<span class="ln" id="L147">    <span class="tok-com">/// Peak of what arrived from their microphone, since the last read.</span></span>
+<span class="ln" id="L148">    <span class="tok-kw">pub</span> input_peak: f32,</span>
+<span class="ln" id="L149">    <span class="tok-com">/// Peak of what their engine produced, since the last read.</span></span>
+<span class="ln" id="L150">    <span class="tok-kw">pub</span> output_peak: f32,</span>
+<span class="ln" id="L151">    <span class="tok-com">/// Samples dropped because their ring overflowed. Their device is running</span></span>
+<span class="ln" id="L152">    <span class="tok-com">/// faster than the output, or the output callback is late.</span></span>
+<span class="ln" id="L153">    <span class="tok-kw">pub</span> dropped: u64,</span>
+<span class="ln" id="L154">}</span>
 </span>
-<span class="ln" id="L141"></span>
+<span class="ln" id="L155"></span>
 <span class="src-item" id="fn-roomstats">
-<span class="ln" id="L142"><span class="tok-com">/// What a running room is doing, safe to read from the interface.</span></span>
-<span class="ln" id="L143"><span class="tok-com">///</span></span>
-<span class="ln" id="L144"><span class="tok-com">/// Not `Copy`: it holds one entry per guest. Read once a frame, as</span></span>
-<span class="ln" id="L145"><span class="tok-com">/// [`crate::LiveStats`] is.</span></span>
-<span class="ln" id="L146"><span class="tok-attr">#[derive</span>(Clone, Debug, Default)]</span>
-<span class="ln" id="L147"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> RoomStats {</span>
-<span class="ln" id="L148">    <span class="tok-com">/// One per guest, in the order they were given.</span></span>
-<span class="ln" id="L149">    <span class="tok-kw">pub</span> guests: Vec&lt;GuestStats&gt;,</span>
-<span class="ln" id="L150">    <span class="tok-com">/// Peak of the mix **before** it was clipped, since the last read.</span></span>
-<span class="ln" id="L151">    <span class="tok-com">///</span></span>
-<span class="ln" id="L152">    <span class="tok-com">/// Above 1.0 means the guests together went past full scale and the excess</span></span>
-<span class="ln" id="L153">    <span class="tok-com">/// was cut off. It is reported unclipped on purpose: a meter that showed</span></span>
-<span class="ln" id="L154">    <span class="tok-com">/// the clipped value would sit at exactly 1.0 and look correct.</span></span>
-<span class="ln" id="L155">    <span class="tok-kw">pub</span> mix_peak: f32,</span>
-<span class="ln" id="L156">    <span class="tok-com">/// Output blocks in which the mix went past full scale.</span></span>
-<span class="ln" id="L157">    <span class="tok-kw">pub</span> clipped: u64,</span>
-<span class="ln" id="L158">    <span class="tok-com">/// Times the output callback found a guest&#x27;s ring empty and padded with</span></span>
-<span class="ln" id="L159">    <span class="tok-com">/// silence.</span></span>
-<span class="ln" id="L160">    <span class="tok-kw">pub</span> starved: u64,</span>
-<span class="ln" id="L161">    <span class="tok-com">/// How many times the platform has reported trouble on any of the streams.</span></span>
-<span class="ln" id="L162">    <span class="tok-com">/// **Roadmap item 132**, the same counter the single-microphone path carries.</span></span>
-<span class="ln" id="L163">    <span class="tok-kw">pub</span> interfered: u64,</span>
-<span class="ln" id="L164">    <span class="tok-com">/// What every engine together costs against the deadline they share.</span></span>
+<span class="ln" id="L156"><span class="tok-com">/// What a running room is doing, safe to read from the interface.</span></span>
+<span class="ln" id="L157"><span class="tok-com">///</span></span>
+<span class="ln" id="L158"><span class="tok-com">/// Not `Copy`: it holds one entry per guest. Read once a frame, as</span></span>
+<span class="ln" id="L159"><span class="tok-com">/// [`crate::LiveStats`] is.</span></span>
+<span class="ln" id="L160"><span class="tok-attr">#[derive</span>(Clone, Debug, Default)]</span>
+<span class="ln" id="L161"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> RoomStats {</span>
+<span class="ln" id="L162">    <span class="tok-com">/// One per guest, in the order they were given.</span></span>
+<span class="ln" id="L163">    <span class="tok-kw">pub</span> guests: Vec&lt;GuestStats&gt;,</span>
+<span class="ln" id="L164">    <span class="tok-com">/// Peak of the mix **before** it was clipped, since the last read.</span></span>
 <span class="ln" id="L165">    <span class="tok-com">///</span></span>
-<span class="ln" id="L166">    <span class="tok-com">/// The sum of each guest&#x27;s realtime factor. Below 1.0 the machine keeps up;</span></span>
-<span class="ln" id="L167">    <span class="tok-com">/// at 1.0 the engines have used the whole block, and past it the audio</span></span>
-<span class="ln" id="L168">    <span class="tok-com">/// breaks. This is the honest account roadmap item 147 asked for.</span></span>
-<span class="ln" id="L169">    <span class="tok-kw">pub</span> load: f32,</span>
-<span class="ln" id="L170">}</span>
+<span class="ln" id="L166">    <span class="tok-com">/// Above 1.0 means the guests together went past full scale and the excess</span></span>
+<span class="ln" id="L167">    <span class="tok-com">/// was cut off. It is reported unclipped on purpose: a meter that showed</span></span>
+<span class="ln" id="L168">    <span class="tok-com">/// the clipped value would sit at exactly 1.0 and look correct.</span></span>
+<span class="ln" id="L169">    <span class="tok-kw">pub</span> mix_peak: f32,</span>
+<span class="ln" id="L170">    <span class="tok-com">/// Output blocks in which the mix went past full scale.</span></span>
+<span class="ln" id="L171">    <span class="tok-kw">pub</span> clipped: u64,</span>
+<span class="ln" id="L172">    <span class="tok-com">/// Times the output callback found a guest&#x27;s ring empty and padded with</span></span>
+<span class="ln" id="L173">    <span class="tok-com">/// silence.</span></span>
+<span class="ln" id="L174">    <span class="tok-kw">pub</span> starved: u64,</span>
+<span class="ln" id="L175">    <span class="tok-com">/// How many times the platform has reported trouble on any of the streams.</span></span>
+<span class="ln" id="L176">    <span class="tok-com">/// **Roadmap item 132**, the same counter the single-microphone path carries.</span></span>
+<span class="ln" id="L177">    <span class="tok-kw">pub</span> interfered: u64,</span>
+<span class="ln" id="L178">    <span class="tok-com">/// What every engine together costs against the deadline they share.</span></span>
+<span class="ln" id="L179">    <span class="tok-com">///</span></span>
+<span class="ln" id="L180">    <span class="tok-com">/// The sum of each guest&#x27;s realtime factor. Below 1.0 the machine keeps up;</span></span>
+<span class="ln" id="L181">    <span class="tok-com">/// at 1.0 the engines have used the whole block, and past it the audio</span></span>
+<span class="ln" id="L182">    <span class="tok-com">/// breaks. This is the honest account roadmap item 147 asked for.</span></span>
+<span class="ln" id="L183">    <span class="tok-kw">pub</span> load: f32,</span>
+<span class="ln" id="L184">}</span>
 </span>
-<span class="ln" id="L171"></span>
+<span class="ln" id="L185"></span>
 <span class="src-item" id="fn-direction">
-<span class="ln" id="L172"><span class="tok-com">/// Which direction a device carries audio.</span></span>
-<span class="ln" id="L173"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
-<span class="ln" id="L174"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Direction {</span>
-<span class="ln" id="L175">    <span class="tok-com">/// A capture device (microphone, loopback).</span></span>
-<span class="ln" id="L176">    Input,</span>
-<span class="ln" id="L177">    <span class="tok-com">/// A playback device (speakers, virtual cable).</span></span>
-<span class="ln" id="L178">    Output,</span>
-<span class="ln" id="L179">}</span>
+<span class="ln" id="L186"><span class="tok-com">/// Which direction a device carries audio.</span></span>
+<span class="ln" id="L187"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L188"><span class="tok-kw">pub</span> <span class="tok-kw">enum</span> Direction {</span>
+<span class="ln" id="L189">    <span class="tok-com">/// A capture device (microphone, loopback).</span></span>
+<span class="ln" id="L190">    Input,</span>
+<span class="ln" id="L191">    <span class="tok-com">/// A playback device (speakers, virtual cable).</span></span>
+<span class="ln" id="L192">    Output,</span>
+<span class="ln" id="L193">}</span>
 </span>
-<span class="ln" id="L180"></span>
+<span class="ln" id="L194"></span>
 <span class="src-item" id="fn-deviceinfo">
-<span class="ln" id="L181"><span class="tok-com">/// A device the user can choose.</span></span>
-<span class="ln" id="L182"><span class="tok-attr">#[derive</span>(Clone, Debug, PartialEq, Eq)]</span>
-<span class="ln" id="L183"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> DeviceInfo {</span>
-<span class="ln" id="L184">    <span class="tok-com">/// Human-readable device name, as the OS reports it.</span></span>
-<span class="ln" id="L185">    <span class="tok-kw">pub</span> name: String,</span>
-<span class="ln" id="L186">    <span class="tok-com">/// Whether this is the host&#x27;s default device for its direction.</span></span>
-<span class="ln" id="L187">    <span class="tok-kw">pub</span> is_default: bool,</span>
-<span class="ln" id="L188">    <span class="tok-com">/// Whether the name matches a known virtual audio cable.</span></span>
-<span class="ln" id="L189">    <span class="tok-kw">pub</span> is_virtual_cable: bool,</span>
-<span class="ln" id="L190">}</span>
+<span class="ln" id="L195"><span class="tok-com">/// A device the user can choose.</span></span>
+<span class="ln" id="L196"><span class="tok-attr">#[derive</span>(Clone, Debug, PartialEq, Eq)]</span>
+<span class="ln" id="L197"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> DeviceInfo {</span>
+<span class="ln" id="L198">    <span class="tok-com">/// Human-readable device name, as the OS reports it.</span></span>
+<span class="ln" id="L199">    <span class="tok-kw">pub</span> name: String,</span>
+<span class="ln" id="L200">    <span class="tok-com">/// Whether this is the host&#x27;s default device for its direction.</span></span>
+<span class="ln" id="L201">    <span class="tok-kw">pub</span> is_default: bool,</span>
+<span class="ln" id="L202">    <span class="tok-com">/// Whether the name matches a known virtual audio cable.</span></span>
+<span class="ln" id="L203">    <span class="tok-kw">pub</span> is_virtual_cable: bool,</span>
+<span class="ln" id="L204">}</span>
 </span>
 </code></pre>
 </main>

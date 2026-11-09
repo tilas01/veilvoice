@@ -178,6 +178,15 @@ flowchart TD
     class n_from_names,n_colour,n_add,n_limit,n_remove,n_to_workspace,n_from_workspace,n_is_busy,n_assigned_colour api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_at,n_default,n_default,n_collect_dialogs,n_body,n_profile_controls,n_apply_profile,n_mode_controls,n_voice_mode_controls,n_strip,n_people_list helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

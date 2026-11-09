@@ -115,6 +115,10 @@ flowchart TD
     click n_blame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" "open the source"
     click n_manifest href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/manifest.rs" "open the source"
     click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/record.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>

@@ -96,6 +96,11 @@ flowchart TD
     click n_what_the_release_job_writes_is_what_the_verifier_reads href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs#L102" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_repository,n_python,n_room,n_stage,n_have,n_what_the_release_job_writes_is_what_the_verifier_reads helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>

@@ -217,6 +217,15 @@ flowchart TD
     class n_list,n_from_entries,n_vault_dirs,n_make_decoy api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_secret_key,n_write_index,n_seal,n_unseal,n_unseal_secret,n_new_id,n_safe_id,n_render_index,n_parse_index,n_bare_index helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

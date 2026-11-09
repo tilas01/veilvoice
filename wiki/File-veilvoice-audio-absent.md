@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/absent.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 314 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs)
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 372 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs)
 
 ## Contents
 
@@ -23,7 +23,10 @@ uses them, which is where a build that only one platform exercises goes to
 rot.
 
 So the same names exist here, with the same signatures, and **none of them
-can do anything**. Every constructor refuses with `REASON`, which a front
+can do anything**. One is missing on purpose: `record::start` makes a
+recorder, which this build cannot hold, and only a live session calls it.
+The crate's tests compare this file with the live modules, so a name added
+to one and not the other fails in the build CI tests. Every constructor refuses with `REASON`, which a front
 end shows where the button was pressed. Every type that stands for a
 running thing (a session, a room, a recorder, a player, an opened device)
 holds a `std::convert::Infallible`, so no value of it can ever exist and
@@ -47,7 +50,7 @@ capture sound when it is asked to start.
 
 ## What this file contains
 
-314 lines defining **1 function** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+372 lines defining **1 function** (0 public), **0 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 ## What calls what
 
@@ -63,10 +66,15 @@ _Colour key: **helper** -- private to this file._
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_refused["refused<br/>line 46"]
-    click n_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L46" "open the source"
+    n_refused["refused<br/>line 49"]
+    click n_refused href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L49" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_refused helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>
@@ -75,10 +83,11 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `REASON` <sub>pub const</sub> | [40](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L40) | Why nothing live can start in this build, in the words a person reads. |
-| `refused` <sub>fn</sub> | [46](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L46) | The one answer every constructor here gives. |
-| `devices` <sub>pub mod</sub> | [51](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L51) | Devices, of which this build can see none. |
-| `record` <sub>pub mod</sub> | [82](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L82) | Recorders, which only a live session can create. |
-| `playback` <sub>pub mod</sub> | [140](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L140) | Playback, which needs an output device this build cannot open. |
-| `live` <sub>pub mod</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L173) | The single-microphone session, which cannot start in this build. |
-| `room` <sub>pub mod</sub> | [226](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L226) | Several microphones at once, which cannot start in this build. |
+| `REASON` <sub>pub const</sub> | [43](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L43) | Why nothing live can start in this build, in the words a person reads. |
+| `refused` <sub>fn</sub> | [49](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L49) | The one answer every constructor here gives. |
+| `devices` <sub>pub mod</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L54) | Devices, of which this build can see none. |
+| `record` <sub>pub mod</sub> | [85](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L85) | Recorders, which only a live session can create. |
+| `playback` <sub>pub mod</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L143) | Playback, which needs an output device this build cannot open. |
+| `live` <sub>pub mod</sub> | [176](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L176) | The single-microphone session, which cannot start in this build. |
+| `call` <sub>pub mod</sub> | [229](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L229) | A call, which cannot be recorded in this build. |
+| `room` <sub>pub mod</sub> | [284](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L284) | Several microphones at once, which cannot start in this build. |

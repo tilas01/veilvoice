@@ -168,7 +168,12 @@ flowchart TD
     click n_peak href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs#L88&quot; &quot;open the source&quot;
     click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs#L107&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_position,n_duration,n_finished,n_peak,n_start entry</code></pre>
+    class n_position,n_duration,n_finished,n_peak,n_start entry
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
+    end
+    class key_entry entry</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

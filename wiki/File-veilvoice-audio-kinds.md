@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/kinds.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 190 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs)
+[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 204 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs)
 
 ## Contents
 
@@ -28,7 +28,7 @@ own so that a build with no microphone support still knows what they are.
 
 ## What this file contains
 
-190 lines defining **2 functions** (2 public), **8 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+204 lines defining **2 functions** (2 public), **9 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -36,10 +36,11 @@ own so that a build with no microphone support still knows what they are.
 - `struct Interference` (line 51) -- Something that happened to the audio path while it was running.
 - `struct LiveStats` (line 77) -- A snapshot of what the live path is doing, safe to read from the UI.
 - `struct Keeping` (line 106) -- Which sides of the engine a session keeps.
-- `struct GuestStats` (line 132) -- What one guest's half of a running room is doing.
-- `struct RoomStats` (line 147) -- What a running room is doing, safe to read from the interface.
-- `enum Direction` (line 174) -- Which direction a device carries audio.
-- `struct DeviceInfo` (line 183) -- A device the user can choose.
+- `enum Capture` (line 128) -- How one side of a call reaches this computer.
+- `struct GuestStats` (line 146) -- What one guest's half of a running room is doing.
+- `struct RoomStats` (line 161) -- What a running room is doing, safe to read from the interface.
+- `enum Direction` (line 188) -- Which direction a device carries audio.
+- `struct DeviceInfo` (line 197) -- A device the user can choose.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -66,6 +67,11 @@ flowchart TD
     click n_is_anything href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L117" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_word,n_is_anything entry
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+    end
+    class key_entry entry
 ```
 
 </details>
@@ -80,8 +86,9 @@ flowchart TD
 | `LiveStats` <sub>pub struct</sub> | [77](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L77) | A snapshot of what the live path is doing, safe to read from the UI. |
 | `Keeping` <sub>pub struct</sub> | [106](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L106) | Which sides of the engine a session keeps. |
 | `Keeping::is_anything` <sub>pub fn</sub> | [117](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L117) | Whether anything at all is being kept. |
-| `MAX_GUESTS` <sub>pub const</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L128) | The most microphones one room will open at once. |
-| `GuestStats` <sub>pub struct</sub> | [132](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L132) | What one guest's half of a running room is doing. |
-| `RoomStats` <sub>pub struct</sub> | [147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L147) | What a running room is doing, safe to read from the interface. |
-| `Direction` <sub>pub enum</sub> | [174](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L174) | Which direction a device carries audio. |
-| `DeviceInfo` <sub>pub struct</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L183) | A device the user can choose. |
+| `Capture` <sub>pub enum</sub> | [128](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L128) | How one side of a call reaches this computer. |
+| `MAX_GUESTS` <sub>pub const</sub> | [142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L142) | The most microphones one room will open at once. |
+| `GuestStats` <sub>pub struct</sub> | [146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L146) | What one guest's half of a running room is doing. |
+| `RoomStats` <sub>pub struct</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L161) | What a running room is doing, safe to read from the interface. |
+| `Direction` <sub>pub enum</sub> | [188](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L188) | Which direction a device carries audio. |
+| `DeviceInfo` <sub>pub struct</sub> | [197](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L197) | A device the user can choose. |

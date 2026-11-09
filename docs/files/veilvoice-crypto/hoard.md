@@ -264,6 +264,15 @@ flowchart TD
     class n_name_for,n_path_for,n_roster api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_expand,n_base64url,n_bucket_for,n_write_raw,n_open_bytes,n_save_roster,n_is_hoard_shaped,n_fill_random helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

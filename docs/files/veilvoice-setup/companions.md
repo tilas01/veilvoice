@@ -199,6 +199,13 @@ flowchart TD
     class n_is_present,n_describe,n_is_runnable,n_command_line,n_detect,n_offer,n_for_this_platform,n_by_key entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_on_path,n_first_existing,n_env_path,n_detect_vb_cable,n_detect_blackhole,n_detect_pipewire,n_detect_audacity,n_unix_package,n_detect_ffmpeg,n_ffmpeg_offer,n_brew,n_detect_gnupg,n_gnupg_offer,n_audacity_offer helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>

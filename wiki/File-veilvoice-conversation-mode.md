@@ -130,6 +130,13 @@ flowchart TD
     class n_label,n_speaker_limit,n_voice_for,n_note,n_of,n_crowded,n_note,n_check entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_separable,n_fmt helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>

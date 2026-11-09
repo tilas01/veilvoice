@@ -247,6 +247,15 @@ flowchart TD
     class n_from_key api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_preferred_output,n_preferred_input,n_count_frames,n_frame_readout,n_frame_rate_detail,n_without_devices,n_default,n_integrity_panel,n_tab_from_arguments,n_apply_policy,n_posture,n_config,n_fit_to_the_screen,n_header_button,n_ui,n_poll_job,n_settings,n_file_tab,n_start_job,n_guest_list helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

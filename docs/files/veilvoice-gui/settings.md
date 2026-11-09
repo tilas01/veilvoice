@@ -177,6 +177,13 @@ flowchart TD
     class n_load,n_set_destination,n_set_always_group,n_set_seal_with_app_lock,n_mark_toured,n_first_run_appearance,n_first_run_autolock,n_finish_first_run entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_from_key,n_motion,n_set_hide_install_tab,n_set_acceleration,n_frame_target,n_set_frame_target,n_autolock,n_set_autolock,n_failsafe,n_set_failsafe,n_notify_style,n_set_notify_style,n_live_monitor,n_set_live_monitor api
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+    end
+    class key_entry entry
+    class key_api api
 ```
 
 </details>

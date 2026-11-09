@@ -92,6 +92,10 @@ flowchart TD
     click n_audio href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/audio.rs" "open the source"
     click n_image href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/image.rs" "open the source"
     click n_wav href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/wav.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>

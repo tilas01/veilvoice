@@ -213,7 +213,12 @@ flowchart TD
     click n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L168&quot; &quot;open the source&quot;
     click n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs#L220&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_params,n_summarise,n_show,n_time_it,n_time_each,n_ratio,n_opening_a_container_does_not_leak_how_much_of_the_password_was_right,n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right,n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended helper</code></pre>
+    class n_params,n_summarise,n_show,n_time_it,n_time_each,n_ratio,n_opening_a_container_does_not_leak_how_much_of_the_password_was_right,n_the_app_lock_takes_the_same_time_whether_or_not_the_password_is_right,n_a_rate_limited_attempt_is_visibly_cheaper_and_that_is_intended helper
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_helper[&quot;helper: private to this file&quot;]
+    end
+    class key_helper helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

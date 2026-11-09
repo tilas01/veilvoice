@@ -123,6 +123,11 @@ flowchart TD
     click n_hide_console href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/lib.rs#L120" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_command,n_hide_console,n_hide_console helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>

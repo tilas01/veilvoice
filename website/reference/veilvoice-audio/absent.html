@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/absent.svg" alt="absent.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/absent.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 314 lines &middot; <a href="absent.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 372 lines &middot; <a href="absent.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-not">What this is not</a>
@@ -77,7 +77,7 @@
 <section id="s-about">
 <p>The live modules, in a build that has no live capture.</p>
 <p><strong>Roadmap item 162.</strong> <code>cpal</code> has no backend for FreeBSD, OpenBSD or NetBSD, so the <code>live</code> feature is off there. The command line has always coped by leaving its live commands out. The window cannot do that as neatly: the Studio and the Browser are written against sessions, recorders and players, and leaving each use out would mean a <code>cfg</code> on every line of the tab that uses them, which is where a build that only one platform exercises goes to rot.</p>
-<p>So the same names exist here, with the same signatures, and <strong>none of them can do anything</strong>. Every constructor refuses with <code>REASON</code>, which a front end shows where the button was pressed. Every type that stands for a running thing (a session, a room, a recorder, a player, an opened device) holds a <code>std::convert::Infallible</code>, so no value of it can ever exist and its methods are proofs that they are never called rather than code that pretends to measure something.</p>
+<p>So the same names exist here, with the same signatures, and <strong>none of them can do anything</strong>. One is missing on purpose: <code>record::start</code> makes a recorder, which this build cannot hold, and only a live session calls it. The crate&#x27;s tests compare this file with the live modules, so a name added to one and not the other fails in the build CI tests. Every constructor refuses with <code>REASON</code>, which a front end shows where the button was pressed. Every type that stands for a running thing (a session, a room, a recorder, a player, an opened device) holds a <code>std::convert::Infallible</code>, so no value of it can ever exist and its methods are proofs that they are never called rather than code that pretends to measure something.</p>
 <p>The data the live path reports is not here: it is in <code>crate::kinds</code> and is the same type in both builds.</p>
 <h2 id="what-this-is-not">What this is not</h2>
 <p>It is not a fake microphone. Nothing here produces a sample, a level or a device name, because a meter that moved on a platform that cannot hear anything would be a lie about the one thing this program is for.</p>
@@ -86,7 +86,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>314 lines defining <strong>1 function</strong> (0 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>372 lines defining <strong>1 function</strong> (0 public), <strong>0 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
@@ -104,7 +104,7 @@
 <a href="absent.src.html#fn-refused">
 <rect x="183.1" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="225.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">refused</text>
-<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 46</text>
+<text x="225.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 49</text>
 </a>
 <rect x="20.0" y="104.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
 <text x="35.0" y="113.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
@@ -120,23 +120,29 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_refused[&quot;refused&lt;br/&gt;line 46&quot;]
-    click n_refused href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L46&quot; &quot;open the source&quot;
+    n_refused[&quot;refused&lt;br/&gt;line 49&quot;]
+    click n_refused href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs#L49&quot; &quot;open the source&quot;
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_refused helper</code></pre>
+    class n_refused helper
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_helper[&quot;helper: private to this file&quot;]
+    end
+    class key_helper helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>REASON</code> <sub>pub const</sub></td><td><a href="absent.src.html#fn-reason">40</a></td><td>Why nothing live can start in this build, in the words a person reads.</td></tr>
-<tr><td><code>refused</code> <sub>fn</sub></td><td><a href="absent.src.html#fn-refused">46</a></td><td>The one answer every constructor here gives.</td></tr>
-<tr><td><code>devices</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-devices">51</a></td><td>Devices, of which this build can see none.</td></tr>
-<tr><td><code>record</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-record">82</a></td><td>Recorders, which only a live session can create.</td></tr>
-<tr><td><code>playback</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-playback">140</a></td><td>Playback, which needs an output device this build cannot open.</td></tr>
-<tr><td><code>live</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-live">173</a></td><td>The single-microphone session, which cannot start in this build.</td></tr>
-<tr><td><code>room</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-room">226</a></td><td>Several microphones at once, which cannot start in this build.</td></tr>
+<tr><td><code>REASON</code> <sub>pub const</sub></td><td><a href="absent.src.html#fn-reason">43</a></td><td>Why nothing live can start in this build, in the words a person reads.</td></tr>
+<tr><td><code>refused</code> <sub>fn</sub></td><td><a href="absent.src.html#fn-refused">49</a></td><td>The one answer every constructor here gives.</td></tr>
+<tr><td><code>devices</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-devices">54</a></td><td>Devices, of which this build can see none.</td></tr>
+<tr><td><code>record</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-record">85</a></td><td>Recorders, which only a live session can create.</td></tr>
+<tr><td><code>playback</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-playback">143</a></td><td>Playback, which needs an output device this build cannot open.</td></tr>
+<tr><td><code>live</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-live">176</a></td><td>The single-microphone session, which cannot start in this build.</td></tr>
+<tr><td><code>call</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-call">229</a></td><td>A call, which cannot be recorded in this build.</td></tr>
+<tr><td><code>room</code> <sub>pub mod</sub></td><td><a href="absent.src.html#fn-room">284</a></td><td>Several microphones at once, which cannot start in this build.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/reset.svg" alt="reset.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/reset.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 612 lines &middot; <a href="reset.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 903 lines &middot; <a href="reset.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-a-reset-is-for">What a reset is for</a>
@@ -99,28 +99,29 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>612 lines defining <strong>10 functions</strong> (8 public), <strong>4 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>903 lines defining <strong>10 functions</strong> (8 public), <strong>5 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>enum Keep</code> <span style="color:var(--muted)">line 76</span> &middot; What a reset leaves behind.</li>
-<li><code>struct Doomed</code> <span style="color:var(--muted)">line 87</span> &middot; One thing a reset would remove, in the words somebody can read.</li>
-<li><code>struct Plan</code> <span style="color:var(--muted)">line 105</span> &middot; What a reset would do, before it does any of it.</li>
-<li><code>struct Report</code> <span style="color:var(--muted)">line 148</span> &middot; What a reset did.</li>
+<li><code>enum Keep</code> <span style="color:var(--muted)">line 84</span> &middot; What a reset leaves behind.</li>
+<li><code>struct Doomed</code> <span style="color:var(--muted)">line 95</span> &middot; One thing a reset would remove, in the words somebody can read.</li>
+<li><code>struct Plan</code> <span style="color:var(--muted)">line 113</span> &middot; What a reset would do, before it does any of it.</li>
+<li><code>struct Report</code> <span style="color:var(--muted)">line 164</span> &middot; What a reset did.</li>
+<li><code>struct Keys</code> <span style="color:var(--muted)">line 358</span> &middot; Everything &quot;keep the keys&quot; has to keep, or the reason it cannot be worked out.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>Plan::bytes</code> <span style="color:var(--muted)">line 122</span> &middot; How much would go altogether.
+<li><code>Plan::bytes</code> <span style="color:var(--muted)">line 138</span> &middot; How much would go altogether.
 </li>
-<li><code>Plan::files</code> <span style="color:var(--muted)">line 127</span> &middot; How many files would go altogether.
+<li><code>Plan::files</code> <span style="color:var(--muted)">line 143</span> &middot; How many files would go altogether.
 </li>
-<li><code>Plan::irreplaceable</code> <span style="color:var(--muted)">line 136</span> &middot; Whether any of it is something nothing can put back.
+<li><code>Plan::irreplaceable</code> <span style="color:var(--muted)">line 152</span> &middot; Whether any of it is something nothing can put back.
 </li>
-<li><code>Plan::is_empty</code> <span style="color:var(--muted)">line 141</span> &middot; Whether there is nothing to do.
+<li><code>Plan::is_empty</code> <span style="color:var(--muted)">line 157</span> &middot; Whether there is nothing to do.
 </li>
-<li><code>Report::complete</code> <span style="color:var(--muted)">line 161</span> &middot; Whether everything the plan named is gone.
+<li><code>Report::complete</code> <span style="color:var(--muted)">line 177</span> &middot; Whether everything the plan named is gone.
 </li>
-<li><code>plan</code> <span style="color:var(--muted)">line 173</span> &middot; What this reset would do to the folder this copy is using.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>plan_in</code>, <code>key_paths</code>, <code>measure</code></span>
+<li><code>plan</code> <span style="color:var(--muted)">line 189</span> &middot; What this reset would do to the folder this copy is using.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>plan_in</code>, <code>keys_in</code>, <code>measure</code></span>
 </li>
-<li><code>carry_out</code> <span style="color:var(--muted)">line 293</span> &middot; Remove what the plan named.
+<li><code>carry_out</code> <span style="color:var(--muted)">line 321</span> &middot; Remove what the plan named.
 </li>
 </ul>
 </section>
@@ -139,56 +140,56 @@
 <rect x="0" y="0" width="609" height="531" fill="var(--bg-inset, #16161e)" rx="8"/>
 <path d="M416.0 174.0 C 416.0 194.0, 304.4 200.0, 304.4 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M304.4 274.0 C 304.4 294.0, 245.2 300.0, 245.2 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
-<path d="M304.4 274.0 C 304.4 294.0, 367.7 300.0, 367.7 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M304.4 274.0 C 304.4 294.0, 363.7 300.0, 363.7 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <a href="reset.src.html#fn-plan-bytes">
 <rect x="71.2" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="129.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Plan::bytes</text>
-<text x="129.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 122</text>
+<text x="129.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 138</text>
 </a>
 <a href="reset.src.html#fn-plan-files">
 <rect x="213.8" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="272.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Plan::files</text>
-<text x="272.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
+<text x="272.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 143</text>
 </a>
 <a href="reset.src.html#fn-plan-irreplaceable">
 <rect x="356.5" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="447.1" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Plan::irreplaceable</text>
-<text x="447.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 136</text>
+<text x="447.1" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 152</text>
 </a>
 <a href="reset.src.html#fn-plan-is_empty">
 <rect x="20.0" y="120.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="90.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Plan::is_empty</text>
-<text x="90.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 141</text>
+<text x="90.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 157</text>
 </a>
 <a href="reset.src.html#fn-report-complete">
 <rect x="186.8" y="120.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="265.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Report::complete</text>
-<text x="265.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 161</text>
+<text x="265.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 177</text>
 </a>
 <a href="reset.src.html#fn-plan-2">
 <rect x="369.8" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="416.0" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">plan</text>
-<text x="416.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 173</text>
+<text x="416.0" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 189</text>
 </a>
 <a href="reset.src.html#fn-plan_in">
 <rect x="258.2" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="304.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">plan_in</text>
-<text x="304.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 183</text>
+<text x="304.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 199</text>
 </a>
 <a href="reset.src.html#fn-carry_out">
 <rect x="488.3" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="538.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">carry_out</text>
-<text x="538.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 293</text>
+<text x="538.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 321</text>
 </a>
-<a href="reset.src.html#fn-key_paths">
-<rect x="194.9" y="320.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="245.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">key_paths</text>
-<text x="245.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 327</text>
+<a href="reset.src.html#fn-keys_in">
+<rect x="198.9" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="245.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">keys_in</text>
+<text x="245.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 392</text>
 </a>
 <a href="reset.src.html#fn-measure">
-<rect x="321.4" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="367.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">measure</text>
-<text x="367.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 351</text>
+<rect x="317.4" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="363.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">measure</text>
+<text x="363.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 445</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -207,55 +208,65 @@
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_bytes([&quot;Plan::bytes&lt;br/&gt;line 122&quot;])
-    n_files([&quot;Plan::files&lt;br/&gt;line 127&quot;])
-    n_irreplaceable([&quot;Plan::irreplaceable&lt;br/&gt;line 136&quot;])
-    n_is_empty([&quot;Plan::is_empty&lt;br/&gt;line 141&quot;])
-    n_complete([&quot;Report::complete&lt;br/&gt;line 161&quot;])
-    n_plan([&quot;plan&lt;br/&gt;line 173&quot;])
-    n_plan_in[&quot;plan_in&lt;br/&gt;line 183&quot;]
-    n_carry_out([&quot;carry_out&lt;br/&gt;line 293&quot;])
-    n_key_paths[&quot;key_paths&lt;br/&gt;line 327&quot;]
-    n_measure[&quot;measure&lt;br/&gt;line 351&quot;]
+    n_bytes([&quot;Plan::bytes&lt;br/&gt;line 138&quot;])
+    n_files([&quot;Plan::files&lt;br/&gt;line 143&quot;])
+    n_irreplaceable([&quot;Plan::irreplaceable&lt;br/&gt;line 152&quot;])
+    n_is_empty([&quot;Plan::is_empty&lt;br/&gt;line 157&quot;])
+    n_complete([&quot;Report::complete&lt;br/&gt;line 177&quot;])
+    n_plan([&quot;plan&lt;br/&gt;line 189&quot;])
+    n_plan_in[&quot;plan_in&lt;br/&gt;line 199&quot;]
+    n_carry_out([&quot;carry_out&lt;br/&gt;line 321&quot;])
+    n_keys_in[&quot;keys_in&lt;br/&gt;line 392&quot;]
+    n_measure[&quot;measure&lt;br/&gt;line 445&quot;]
     n_plan --&gt; n_plan_in
-    n_plan_in --&gt; n_key_paths
+    n_plan_in --&gt; n_keys_in
     n_plan_in --&gt; n_measure
-    click n_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L122&quot; &quot;open the source&quot;
-    click n_files href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L127&quot; &quot;open the source&quot;
-    click n_irreplaceable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L136&quot; &quot;open the source&quot;
-    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L141&quot; &quot;open the source&quot;
-    click n_complete href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L161&quot; &quot;open the source&quot;
-    click n_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L173&quot; &quot;open the source&quot;
-    click n_plan_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L183&quot; &quot;open the source&quot;
-    click n_carry_out href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L293&quot; &quot;open the source&quot;
-    click n_key_paths href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L327&quot; &quot;open the source&quot;
-    click n_measure href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L351&quot; &quot;open the source&quot;
+    click n_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L138&quot; &quot;open the source&quot;
+    click n_files href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L143&quot; &quot;open the source&quot;
+    click n_irreplaceable href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L152&quot; &quot;open the source&quot;
+    click n_is_empty href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L157&quot; &quot;open the source&quot;
+    click n_complete href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L177&quot; &quot;open the source&quot;
+    click n_plan href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L189&quot; &quot;open the source&quot;
+    click n_plan_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L199&quot; &quot;open the source&quot;
+    click n_carry_out href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L321&quot; &quot;open the source&quot;
+    click n_keys_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L392&quot; &quot;open the source&quot;
+    click n_measure href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L445&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_bytes,n_files,n_irreplaceable,n_is_empty,n_complete,n_plan,n_carry_out entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_plan_in api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_key_paths,n_measure helper</code></pre>
+    class n_keys_in,n_measure helper
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
+        key_api[&quot;api: public, and also used inside this file&quot;]
+        key_helper[&quot;helper: private to this file&quot;]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>Keep</code> <sub>pub enum</sub></td><td><a href="reset.src.html#fn-keep">76</a></td><td>What a reset leaves behind.</td></tr>
-<tr><td><code>Doomed</code> <sub>pub struct</sub></td><td><a href="reset.src.html#fn-doomed">87</a></td><td>One thing a reset would remove, in the words somebody can read.</td></tr>
-<tr><td><code>Plan</code> <sub>pub struct</sub></td><td><a href="reset.src.html#fn-plan">105</a></td><td>What a reset would do, before it does any of it.</td></tr>
-<tr><td><code>Plan::bytes</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-bytes">122</a></td><td>How much would go altogether.</td></tr>
-<tr><td><code>Plan::files</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-files">127</a></td><td>How many files would go altogether.</td></tr>
-<tr><td><code>Plan::irreplaceable</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-irreplaceable">136</a></td><td>Whether any of it is something nothing can put back.</td></tr>
-<tr><td><code>Plan::is_empty</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-is_empty">141</a></td><td>Whether there is nothing to do.</td></tr>
-<tr><td><code>Report</code> <sub>pub struct</sub></td><td><a href="reset.src.html#fn-report">148</a></td><td>What a reset did.</td></tr>
-<tr><td><code>Report::complete</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-report-complete">161</a></td><td>Whether everything the plan named is gone.</td></tr>
-<tr><td><code>plan</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-2">173</a></td><td>What this reset would do to the folder this copy is using.</td></tr>
-<tr><td><code>plan_in</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan_in">183</a></td><td>The same, for a folder named outright.</td></tr>
-<tr><td><code>carry_out</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-carry_out">293</a></td><td>Remove what the plan named.</td></tr>
-<tr><td><code>key_paths</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-key_paths">327</a></td><td>The app lock&#x27;s own files: the index, and the two copies it names.</td></tr>
-<tr><td><code>measure</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-measure">351</a></td><td>How many files and how many bytes, counting inside a folder.</td></tr>
+<tr><td><code>Keep</code> <sub>pub enum</sub></td><td><a href="reset.src.html#fn-keep">84</a></td><td>What a reset leaves behind.</td></tr>
+<tr><td><code>Doomed</code> <sub>pub struct</sub></td><td><a href="reset.src.html#fn-doomed">95</a></td><td>One thing a reset would remove, in the words somebody can read.</td></tr>
+<tr><td><code>Plan</code> <sub>pub struct</sub></td><td><a href="reset.src.html#fn-plan">113</a></td><td>What a reset would do, before it does any of it.</td></tr>
+<tr><td><code>Plan::bytes</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-bytes">138</a></td><td>How much would go altogether.</td></tr>
+<tr><td><code>Plan::files</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-files">143</a></td><td>How many files would go altogether.</td></tr>
+<tr><td><code>Plan::irreplaceable</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-irreplaceable">152</a></td><td>Whether any of it is something nothing can put back.</td></tr>
+<tr><td><code>Plan::is_empty</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-is_empty">157</a></td><td>Whether there is nothing to do.</td></tr>
+<tr><td><code>Report</code> <sub>pub struct</sub></td><td><a href="reset.src.html#fn-report">164</a></td><td>What a reset did.</td></tr>
+<tr><td><code>Report::complete</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-report-complete">177</a></td><td>Whether everything the plan named is gone.</td></tr>
+<tr><td><code>plan</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan-2">189</a></td><td>What this reset would do to the folder this copy is using.</td></tr>
+<tr><td><code>plan_in</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-plan_in">199</a></td><td>The same, for a folder named outright.</td></tr>
+<tr><td><code>carry_out</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-carry_out">321</a></td><td>Remove what the plan named.</td></tr>
+<tr><td><code>Keys</code> <sub>struct</sub></td><td><a href="reset.src.html#fn-keys">358</a></td><td>Everything &quot;keep the keys&quot; has to keep, or the reason it cannot be worked out.</td></tr>
+<tr><td><code>keys_in</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-keys_in">392</a></td><td>The app lock&#x27;s own files: the index, the two copies it names, the decoy record and the single file the vault replaced.</td></tr>
+<tr><td><code>measure</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-measure">445</a></td><td>How many files and how many bytes, counting inside a folder.</td></tr>
 </tbody></table>
 </section>
 </div></div>

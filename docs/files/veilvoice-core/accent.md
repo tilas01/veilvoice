@@ -157,6 +157,13 @@ flowchart TD
     class n_new,n_enabled,n_stats,n_observe,n_prosody_ratio,n_measure_envelope,n_vtln_ratio,n_shape entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_default,n_recompute_shape,n_log_centroid,n_gain_to_db,n_db_to_gain helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>

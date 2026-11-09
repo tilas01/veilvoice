@@ -41,6 +41,252 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The thirty-ninth round: the reset, read against what it promises
+
+`veilvoice reset` and the window's **Start again** are the only things in this
+project that delete somebody's recordings on purpose. Everything else about
+them has been audited for whether they delete the right files. This round asked
+a different question: whether what they *say* they are keeping is what they
+keep.
+
+Three of the three answers were no, and all three failed in the same direction:
+the plan on the screen was right and the disk was wrong. One of them had also
+been protected by a test for half a year, which is the part worth reading.
+
+### F-291: the command line and the window disagreed about what a reset means
+
+Found by reading the two front ends next to each other, which is not how either
+had been read before.
+
+The window's reset opens with a ticked box, "Keep my password, and the key to my
+recordings", and `crates/veilvoice-gui/src/reset.rs` initialises it
+`keep_keys: true`. The command line had the opposite default, because its flag
+was `--keep-keys`: a flag absent is a flag false, so `veilvoice reset` removed
+the app lock, and with it the key to everything sealed with the app lock, unless
+somebody knew to ask it not to.
+
+`Keep::default()` was `Keep::Nothing`, which is the same decision in the type
+rather than in the interface. Anything written later that reaches for the
+default would have reached for the destructive one.
+
+**What it cost.** Somebody resetting a misconfigured interface from the command
+line, having done the same thing in the window the week before and watched it
+keep their password, lost every recording sealed with the app lock. There is no
+other copy of that key. The two commands differed by the one decision in this
+project that cannot be undone, and the difference was a flag's polarity.
+
+**The fix.** `Keep::Keys` is the default, `--drop-keys` replaces `--keep-keys`,
+and both front ends now mean the same thing with no flags and no clicks. The
+safe answer is the one a caller arrives at by not thinking, which is the rule a
+destructive default breaks.
+
+**What is checked.** `the_default_is_to_keep_the_keys` asserts the type's own
+answer. The flag is its own question and `docs/COMMANDS.md` is generated from
+the parser, so a flag that goes back to naming the wrong half of the choice
+changes a document that is checked.
+
+The shape, and it is the same one as F-178 and F-278: **two front ends to one
+library is two defaults unless the library holds the default.** Neither front
+end was wrong about what it was doing. They were wrong about each other.
+
+### F-292: keeping the keys removed the decoy passphrase, and on an older machine the lock itself
+
+Found by building a reset plan against a **real** app lock for the first time.
+See F-293 for why that had never happened.
+
+`reset::key_paths` named three files: the vault's index and the two copies of
+the lock it derives. The app lock is kept in more than three:
+
+- **The decoy record.** `crate::decoy` keeps it under a derived name, so
+  nothing in `crate::layout` names it, and a reset puts anything the layout has
+  never heard of into "VeilVoice's own files" and removes it. Keeping the keys
+  therefore kept the lock and removed the second passphrase that opens it.
+  Nothing reported this: the lock still worked, the decoy passphrase simply
+  stopped being recognised, which reads as a forgotten passphrase rather than
+  as a file that was deleted.
+- **`applock.bin`, the file the vault replaced.** `lock::open_in` still adopts
+  it, deliberately, because every user who set a lock through the window in
+  0.1.17 has one and ignoring it would take their lock away (F-141). It is not
+  in the layout either. So on a machine whose only lock is that file, "keep my
+  password" removed the password, and `key_paths` returned an empty list, so the
+  plan did not even claim to be keeping anything: there was nothing on the
+  screen for somebody to notice was missing.
+
+**The fix.** `keys_in` names all five: the index, the two copies, the decoy
+record and the legacy file, and `crate::lock::LEGACY_NAME` is `pub(crate)` so
+the reset and the lock spell that name once between them rather than twice.
+
+**What is checked.**
+`keeping_the_keys_keeps_the_decoy_and_the_old_lock_file` makes a real lock with
+a real decoy and a legacy file beside it, and asserts of each that it is in the
+plan's `keeping` and in none of its `going`, then carries the plan out and
+asserts the files are still there, and that the vaults went anyway.
+`removing_the_keys_removes_the_decoy_and_the_old_lock_file` asserts the other
+direction, because a reset asked for the whole folder that leaves a lock behind
+is not the new install it reports.
+`the_old_lock_file_alone_is_still_the_lock` is the 0.1.17 machine.
+
+The shape: **a file kept under a derived name is invisible to anything that
+works from a list of names.** The reset works by exclusion precisely so that an
+unknown file is still removed, and that is right; what it needs, and now has, is
+for every file that is part of the lock to be named by the one module that
+derives those names.
+
+### F-293: a test that had only ever exercised the branch where nothing works
+
+Found while writing F-292's test, and it is the reason F-292 survived six
+releases.
+
+`reset::tests::folder()` builds a folder with one of everything in it, and
+writes the app lock's index as the twelve bytes `a named file`. No vault can
+parse that. So `Vault::at` failed, `key_paths` took its fallback arm, returned
+the index on its own, and every test that asked for `Keep::Keys` asserted
+against the behaviour of a machine whose lock is broken. The branch that
+resolves a real lock, which is the branch every user is on, had no test at all.
+`keeping_the_keys_keeps_the_lock_and_nothing_else` passed throughout, and what
+it proved was that an unreadable index is kept.
+
+**And the fallback arm was itself wrong.** It kept the one file it could name
+and let the rest of the folder go, so a reset on a machine with a damaged index
+would have kept the index and removed the two copies of the lock, the decoy
+record and everything else: the plan said the keys were staying and the disk
+would have lost them. "Keep the keys" is a promise, and a plan that cannot work
+out which files the keys are in cannot keep it.
+
+**The fix.** `keys_in` returns the paths **and** a reason when it cannot
+resolve them, `Plan::blocked` carries that reason, `plan_in` returns a plan with
+nothing in it, and `carry_out` refuses one outright rather than trusting its
+caller to have read the field. Both front ends print the reason and say what
+the way through is: the reset that keeps nothing, which needs none of this
+worked out. `folder_with_a_real_lock` is the helper tests about keeping the keys
+use now, and `folder`'s own documentation says what its index is for.
+
+**The administrator's copy had the same problem from the other side.**
+`vault::admin_dir` puts the second copy of the lock under `/etc/veilvoice` where
+the process can write there, so whether that copy is inside the folder being
+reset depends on the machine the tests run on: a laptop has no such directory, a
+container running as root has one the moment any test makes a lock, and a
+runner that is not root has none again. The same assertion asked a different
+question in each place. `vault::pretend_admin_dir` is a `#[cfg(test)]`
+thread-local that lets a test say which machine it is on, and these tests say
+"an ordinary user's". It is deliberately not an environment variable: the
+administrator-owned copy is a security property, and a variable that redirects
+it is a way to talk a real run into writing its spare lock where an ordinary
+user can edit it.
+
+**What is checked.** `a_lock_that_will_not_read_blocks_the_reset` asserts the
+reason, that the plan is empty, that `carry_out` refuses it and removes nothing,
+and that asking for the reset that keeps nothing still works.
+
+The shape, which this document has now recorded eight times: **a test that
+passes can be a test of nothing.** F-186 and F-182 are the same thing in
+different modules. What is new here is the mechanism, and it is worth naming
+because it is cheap to repeat: the fixture was easier to write wrongly than
+rightly, so every test built on it inherited the wrong branch, and each of them
+passed.
+
+## The thirty-eighth round: every drawing explains itself
+
+Every generated picture should carry its own key, and each Mermaid chart the
+same key, since either can be the only one a reader sees. Reading every drawing under `assets/diagrams/` and `assets/sources/` for
+that turned up one finding.
+
+### F-290: a crate's map of its files, and the website's script charts, had no key
+
+**Where:** `tools/docs/generate.py` (`diagram_svg`, `mermaid`, `OWNED`) and
+`tools/docs/sources.py`.
+
+**What happened:** a drawing's key listed the roles its boxes were coloured
+by, and nothing else. The crate maps and the script charts colour no box by
+role, so their key was empty and was not drawn: thirteen crate pictures and
+eleven script charts reached the README, the wiki and the site with only a
+caption. No Mermaid chart carried a key at all. Fourteen more crate pictures,
+for crates folded into others, were still in `assets/diagrams/` because that
+folder was not in the list of places the generator sweeps for files it no
+longer writes.
+
+**Fix:** a drawing with no roles keys what its plain box is (a file with its
+line count, or a function with its first line), drawn as the boxes are, above
+the dashed row every key already had. Every Mermaid chart ends in a `Key`
+subgraph with one box per row of the picture's key, in the same colours.
+`assets/diagrams/` joins the swept places, which removed the 42 stale files.
+
+**Regression test:** `tools/site-tests/diagrams.test.js` fails any drawing in
+`assets/diagrams/` or any `assets/sources/` chart without the key's last row,
+and any Mermaid flowchart in the wiki, `docs/` or a crate's README without the
+`Key` subgraph. Run against the tree before this fix it fails on the crate
+maps.
+
+## The thirty-seventh round: the prose, hidden text and the workflows
+
+This round adds three checks to `tools/verify.py` and CI, and fixes what they
+found on their first run.
+
+- `tools/audit/wording.py` reads every document, page and doc comment, and the
+  commit message being built, for American spellings, misspellings (through
+  codespell), doubled words, "a" and "an" before the wrong sound, placeholder
+  and chat-like wording, stray spaces before punctuation, and text a generator
+  cut off in the middle of a word. Em dashes stay with `tools/audit/prose.py`.
+- `tools/audit/hidden_text.py` reads every tracked text file for characters a
+  reader cannot see: the bidirectional overrides behind the Trojan Source
+  attack (CVE-2021-42574), zero-width characters, and the Unicode tag
+  characters, which can carry a whole sentence of instructions that shows as
+  nothing. It found none.
+- `tools/audit/workflows.py` runs zizmor over the workflows and the Dependabot
+  configuration, and refuses an exception that does not give its reason on its
+  own line. `--fix`, which `tools/verify.py` runs before its checks, applies
+  zizmor's safe fixes and keeps them only when a second audit has fewer
+  findings and the other workflow guards still pass.
+
+codespell and zizmor are pinned by hash in `tools/audit/requirements.txt`,
+which Dependabot now watches, and CI fails when either is missing rather than
+skipping the check.
+
+The four findings zizmor still reports at its default level were each read and
+are kept, with the reason beside them: `pages.yml` and `wiki.yml` run after a
+release through `workflow_run`, which only the release workflow can trigger;
+`rewrite.yml` and `signing.yml` keep the checkout's token because they push,
+which `tools/audit/checkout_tokens.py` already records; and the release still
+publishes through a pinned `softprops/action-gh-release`, because replacing the
+step that publishes needs a test release of its own.
+
+### F-296: the changelog and roadmap had doubled words, and the roadmap cut its tooltips mid-word
+
+**Where:** `CHANGELOG.md`, `ROADMAP.md` and `tools/site/roadmap.py`.
+
+**What happened:** the changelog and the roadmap each said
+`a roadmap roadmap item`, the roadmap said `the still still served`, and the
+changelog had `defects , none` and a sentence whose full stop sat alone on the next line.
+Each was copied into the website's releases and roadmap pages. Separately, the
+roadmap picture gave every square a tooltip of the item's first ninety
+characters, cut wherever the ninetieth fell, so screen readers and hover text
+read `off by defaul`, `reads thi` and `witho`.
+
+**Fix:** the five sentences are corrected, and the tooltip is cut at the last
+space that fits, with an ellipsis to show that the sentence goes on.
+
+**Regression test:** `tools/audit/wording.py` fails on a doubled word, a space
+before punctuation, and a word cut short in front of a roadmap status, and it
+reads the generated roadmap page, so a generator that cuts mid-word again fails
+verify. Its `--self-test` holds an example of each.
+
+### F-297: Dependabot proposed a new release on the day it was published
+
+**Where:** `.github/dependabot.yml`.
+
+**What happened:** no entry set a cooldown, so a version of a crate or an
+action was proposed the day it appeared. Most hijacked releases are found and
+pulled within days, and a project that takes a release on its first day is the
+one that takes the hijacked one. zizmor reported three of the entries.
+
+**Fix:** every entry, including the new one for the audit's Python tools, waits
+seven days. Security updates are not held back by a cooldown.
+
+**Regression test:** `tools/audit/dependabot.py` now fails on any entry without
+a cooldown, and its `--self-test` checks that the reader sees a missing one and
+is not fooled by a cooldown nested inside another block. zizmor alone was not
+enough: once the first entry had a cooldown it stopped reporting the others.
+
 ## The thirty-sixth round: every code scanning alert, read one at a time
 
 The repository's own CodeQL workflow replaced GitHub's default setup on
@@ -95,6 +341,83 @@ Scorecard's Token-Permissions check marks a workflow down for exactly this.
 whose top-level block grants a write, or that has no top-level block at all, and
 its `--self-test` covers the inline, mapped and missing shapes.
 
+### F-288: the build without live audio did not offer what the live build offers, and its tests never ran
+
+**Where:** `crates/veilvoice-audio/src/absent.rs`, the stand-ins a build
+without `cpal` uses, and `.github/workflows/ci.yml`. Found by the audit thread
+in roadmap item 162's commit, which said the stand-ins had "the same
+signatures".
+
+Three of them did not. `absent::record` had no `start`; `Sink` was re-exported
+from the crate root only when `live` was on; and the device type was cpal's
+`Device` in one build and a stand-in struct in the other, reached by a
+different path in each. None of it broke a build, because the compiler checks
+only what the window happens to call. The first caller of any of them in the
+window would have built on Linux, macOS and Windows and failed on the BSDs, the
+one place the stand-ins exist for. And the stand-ins' own tests are compiled
+only without `live`, a selection CI built but never tested.
+
+- `Sink` is re-exported in both builds, and the live build names the device
+  type through `devices::Device`, an alias the stand-ins match.
+- `record::start` stays missing on purpose: it makes a recorder, which no build
+  without live audio can hold. `absent.rs` now says so rather than claiming the
+  same signatures throughout.
+- `the_build_without_live_audio_offers_what_the_live_build_offers` reads each
+  live module and its stand-in and fails on any public name in one and not the
+  other, with that one exception named. It runs in the default build, so CI
+  runs it everywhere.
+- CI's test job runs `veilvoice-audio` and `veilvoice-gui` with
+  `--no-default-features` on Linux, so the stand-ins' tests run.
+- `veilvoice_audio::WHY_NO_CAPTURE` gives the reason a build cannot capture,
+  for the window's device pickers, which still show an empty list on the BSDs.
+  That side belongs to `app.rs` and is not part of this fix.
+
+### F-289: exporting from the window followed links, deleted files it had not made, and lost the first of two exports
+
+**Where:** `crates/veilvoice-gui/src/exporting.rs` and the Studio's export
+controls in `crates/veilvoice-gui/src/studio.rs`, both new since v0.1.22 and
+made reachable by roadmap item 175. Found by the audit thread; the first two
+were checked there against the code and the rest checked here.
+
+- The temporary sound file and a WAV-only output were written with
+  `write_owner_only`, which creates or truncates, so a link planted at either
+  name in a shared folder was followed and the file it named emptied. The
+  `exists()` check before it is false for a dangling link and was in any case
+  a look before the write rather than part of it.
+- A failed render ran `remove_file` on the output, including when `ffmpeg`
+  refused because the output already existed, so a failed export could delete
+  a file this run had never made.
+- FLAC, MP4, MKV and MOV outputs were created under the umask and never
+  tightened; the command line tightens what it writes.
+- The temporary sound file was left behind by a crash or a closed window,
+  whatever its comment said, and was written for exports that never read it.
+- The export and preview buttons stayed live while an export ran, and a
+  second press replaced the first job's receiver, so the first result was
+  lost.
+- The thumbnails were redrawn only when the template changed, so "the look,
+  in detail" never reached them.
+- A WAV export with nothing to count said that `ffmpeg` had written no frames,
+  though a WAV never runs `ffmpeg`.
+- A recording named `con` or `lpt1` was exported under a device name older
+  Windows will not open as a file.
+
+The export now works in a private folder of its own beside the output, made
+with mode 0700 and removed when the job ends whichever way it ends. The sound
+is written there only when the render reads it, every file is created with
+`create_new`, the result is tightened to 0600 and then put in place with a hard
+link, which refuses to replace anything at the destination, a link included.
+A run deletes only its own folder. The export controls and the form are
+disabled while an export runs or the folder picker is open, which also means
+the choice exported is the one shown when the button was pressed. The
+thumbnails compare the whole look. A device name gets `take-` in front.
+
+`a_render_lands_owner_only_and_leaves_nothing_else`,
+`a_failed_render_removes_only_its_own_work` and
+`a_link_at_the_destination_is_not_followed` drive the `ffmpeg` branch with a
+stand-in script, which nothing had run before; `a_second_export_waits_for_the_first`,
+`a_new_look_redraws_the_thumbnails` and `a_device_name_is_not_a_file_name`
+cover the rest.
+
 ### F-285: the website's tests stripped tags in a way a crafted page could slip past
 
 **Where:** `tools/site-tests/scripts.test.js`, `css.test.js` and
@@ -122,7 +445,7 @@ no longer report them.
 Run on `main` at 5a808308, the first commit after the history was rewritten,
 signed and made the only branch. Every crate, the website, the wiki tools and
 the workflows were read again for anything from a syntax slip to a security
-hole. Thirteen findings are fixed here. The rest are smaller or belong to work
+hole. Fifteen findings are fixed here. The rest are smaller or belong to work
 that is already in hand, and are listed in the project's audit notes rather than
 written up before they are fixed.
 
@@ -481,6 +804,109 @@ and read and wrote each as a file.
 **Regression test:** `every_path_reaches_ffmpeg_as_a_file`, in both modules,
 builds every command with those names and requires each to arrive prefixed,
 and a name that is not UTF-8 to be refused.
+
+### F-286: the updater kept its own way of replacing a running program
+
+**Where:** `crates/veilvoice-verify/src/update.rs`, `put_in_place`.
+
+**What happened:** this project has one routine for putting a program where
+somebody may be running it: `veilvoice_setup::install::replace_with_copy`,
+written for F-237 and made public for F-266. The updater had its own. It
+removed anything at `<name>.new`, copied the new program there with
+`std::fs::copy`, carried the permissions over and renamed it into place.
+`std::fs::copy` opens its destination and truncates it, so anything that
+appeared at `<name>.new` between the removal and the copy was written through
+rather than refused, and a link left at that name in the install directory had
+whatever it pointed at truncated. That is F-237 again, at a different name. The
+shared routine creates its staged file with `create_new`, which leaves no
+window to appear in. The permissions were also best effort here, so an update
+could finish and report success with a new program that had no execute bit.
+
+**Fix:** `put_in_place` calls the shared routine once per program and keeps
+only what an update needs: which programs to look for, what moved, and what
+could not be cleaned up. The Windows step that moves a running program aside
+moved down into the shared routine with it, so `veilvoice install` can now
+replace a program that is running on Windows, which it could not before. The
+third copy is gone, the staging window with it, and a permission failure now
+refuses the replacement rather than leaving a program nobody can run. F-266
+wrote this down as worth doing the next time the function was touched.
+
+**Regression test:** `the_new_program_goes_in_through_the_one_routine_that_stages_and_renames`
+reads `put_in_place` and requires the call to the shared routine, and no copy
+of its own. `the_copy_reaches_the_destination_only_by_a_rename`, in
+`veilvoice-setup`, holds the order down where the code now lives: the staged
+file is created fresh, given its permissions, and only then renamed.
+
+### F-287: a part-finished update said nothing had been replaced
+
+**Where:** `crates/veilvoice-verify/src/update.rs`, `put_in_place`.
+
+**What happened:** a release carries two programs, the command line and the
+window, and they are replaced one after the other. The failures inside that
+loop were written as though the first program were the only one: "Nothing has
+been replaced." and "nothing was replaced". Replace the command line, fail on
+the window, and the message told the reader nothing on their machine had
+changed while they were holding one program a version ahead of the other.
+Somebody told that reasonably runs the update again, or carries on using a pair
+of programs they believe match, and neither answer fits the machine they have.
+
+**Fix:** one sentence, `replaced_so_far`, says what had already gone in, and
+every failure inside the loop ends with it. It reads "Nothing was replaced."
+only when that is true.
+
+**Regression test:** `a_failure_partway_through_names_what_it_had_already_replaced`
+makes the second program's destination a directory, so no rename can go over
+it, and requires the failure to name the first program as already replaced and
+not to claim that nothing was. `what_was_already_replaced_reads_as_a_sentence`
+covers the three shapes the sentence takes.
+
+### F-294: no dry run of a release got past the technical document
+
+**Where:** `.github/workflows/release.yml`, the publishing job's technical
+document step.
+
+**What happened:** a release dispatched with no version is a dry run. It
+builds, compares, hashes and signs everything and publishes nothing. The run is
+named after its branch, and no changelog entry is called `## main`, so the notes
+tool refuses unless it is told the run is a dry one. The release notes step
+tells it. The technical document step, added with roadmap item 180, does not,
+so every dry run since then stopped there, before the checksums, the signature
+and the notes it exists to rehearse. Found by dispatching one after F-276: all
+eleven builds passed and the publishing job failed on its first script.
+
+**Fix:** the technical document step passes the same waiver on the same
+condition as the release notes step.
+
+**Regression test:** `tools/audit/publishing.py` finds every step that runs the
+notes tool and fails on one without the dry-run waiver. Checked both ways: it
+names the technical document step against the workflow before the fix, and
+passes after it.
+
+### F-295: the mutation and fuzz jobs built whichever tool release was newest
+
+**Where:** `.github/workflows/mutants.yml`, the cargo-mutants install, and
+`.github/workflows/fuzz.yml`, the cargo-fuzz install.
+
+**What happened:** both ran `cargo install <tool> --locked` with no version.
+`--locked` pins the tool's dependencies to the lockfile it was published with,
+not the tool itself, so each run asked crates.io for the newest release that
+morning and built it on a runner holding a checkout of this repository. Every
+action here is pinned to a commit for exactly that reason, and these two
+installs were the same hole one layer down. A release that changed how
+cargo-mutants counts survivors would also have changed what the weekly verdict
+means, with nothing in the tree recording it. Found by the skill and plugin
+scanner while it read the workflows.
+
+**Fix:** both installs name an exact release, cargo-mutants 27.1.0 and
+cargo-fuzz 0.13.2, each checked to build with `--locked` before it was
+written in. Dependabot does not read `cargo install`, so a newer release is a
+change somebody makes and reads.
+
+**Regression test:** `tools/audit/cargo_installs.py`, run by CI and by
+`tools/verify.py`, fails on any `cargo install` in a workflow without an exact
+version and `--locked`. It names both lines against the workflows before the
+fix and passes after it, and its `--self-test` covers the version spellings,
+continued lines and a version that only appears in a comment.
 
 ## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
 
@@ -10368,7 +10794,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1936 tests across 13 crates, plus doctests and 20 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1962 tests across 13 crates, plus doctests and 21 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -12038,8 +12464,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and eighty-five defects found and fixed (F-1 to F-285), across
-thirty-six rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Two hundred and ninety-seven defects found and fixed (F-1 to F-297), across
+thirty-nine rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

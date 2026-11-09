@@ -222,6 +222,13 @@ flowchart TD
     class n_applied_to,n_checked,n_describe,n_voice,n_clear_voices,n_closest_pair,n_distinct_voices entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_rendered_f0_hz,n_bin_hz,n_all,n_separation api
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+    end
+    class key_entry entry
+    class key_api api
 ```
 
 </details>

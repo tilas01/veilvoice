@@ -117,14 +117,14 @@ flowchart TD
     n_hybrid["hybrid.rs<br/>531 lines"]
     n_kdf["kdf.rs<br/>649 lines"]
     n_layout["layout.rs<br/>331 lines"]
-    n_lock["lock.rs<br/>2378 lines"]
+    n_lock["lock.rs<br/>2384 lines"]
     n_privatefile["privatefile.rs<br/>313 lines"]
     n_reseal["reseal.rs<br/>538 lines"]
-    n_reset["reset.rs<br/>612 lines"]
+    n_reset["reset.rs<br/>903 lines"]
     n_shred["shred.rs<br/>417 lines"]
     n_studio["studio.rs<br/>1522 lines"]
     n_tape["tape.rs<br/>391 lines"]
-    n_vault["vault.rs<br/>769 lines"]
+    n_vault["vault.rs<br/>816 lines"]
     n_weave["weave.rs<br/>1811 lines"]
     n_decoy --> n_kdf
     n_decoy --> n_lock
@@ -139,6 +139,9 @@ flowchart TD
     n_lock --> n_privatefile
     n_lock --> n_vault
     n_reseal --> n_hybrid
+    n_reset --> n_decoy
+    n_reset --> n_kdf
+    n_reset --> n_lock
     n_studio --> n_aead
     n_studio --> n_privatefile
     n_vault --> n_decoy
@@ -163,6 +166,10 @@ flowchart TD
     click n_tape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/tape.rs" "open the source"
     click n_vault href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" "open the source"
     click n_weave href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>
@@ -180,20 +187,20 @@ flowchart TD
 | [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 649 | Password-based key derivation with Argon2id. |
 | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | 331 | Everything VeilVoice keeps between runs, in one list. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 289 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2378 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2384 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 313 | Writing a file that only its owner can read. |
 | [`reseal.rs`](../../docs/files/veilvoice-crypto/reseal.md) | 538 | Finding files that were sealed under no passphrase at all, and sealing them again under a real one. |
-| [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | 612 | Putting this machine back to a new install. |
+| [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | 903 | Putting this machine back to a new install. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 417 | Secure erasure, the self-destruct. |
 | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1522 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | 391 | A recording held in locked, zeroizing memory while it is still being made. |
-| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 769 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 816 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1811 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**8,628 functional lines of Rust** in this crate. A functional line is a line
+**8,811 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/reset.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 576 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 604 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs)
 
 ## Contents
 
@@ -53,7 +53,7 @@ of it, and it can leave your password and the key to your recordings alone.
 
 ## What this file contains
 
-576 lines defining **13 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+604 lines defining **13 functions** (3 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -92,9 +92,9 @@ flowchart TD
     n_panel(["Reset::panel<br/>line 190"])
     n_offer["Reset::offer<br/>line 223"]
     n_agree["Reset::agree<br/>line 244"]
-    n_finished["Reset::finished<br/>line 373"]
-    n_files["files<br/>line 414"]
-    n_size["size<br/>line 427"]
+    n_finished["Reset::finished<br/>line 401"]
+    n_files["files<br/>line 442"]
+    n_size["size<br/>line 455"]
     n_agree --> n_carry_out
     n_agree --> n_files
     n_agree --> n_may_proceed
@@ -114,13 +114,20 @@ flowchart TD
     click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L190" "open the source"
     click n_offer href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L223" "open the source"
     click n_agree href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L244" "open the source"
-    click n_finished href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L373" "open the source"
-    click n_files href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L414" "open the source"
-    click n_size href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L427" "open the source"
+    click n_finished href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L401" "open the source"
+    click n_files href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L442" "open the source"
+    click n_size href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L455" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_busy,n_poll,n_panel entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_default,n_look,n_carry_out,n_keep,n_may_proceed,n_offer,n_agree,n_finished,n_files,n_size helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>
@@ -143,6 +150,6 @@ flowchart TD
 | `Reset::panel` <sub>pub fn</sub> | [190](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L190) | Draw it. |
 | `Reset::offer` <sub>fn</sub> | [223](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L223) | The offer, before anything has been counted. |
 | `Reset::agree` <sub>fn</sub> | [244](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L244) | The plan, and the decision. |
-| `Reset::finished` <sub>fn</sub> | [373](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L373) | What happened, and the way out. |
-| `files` <sub>fn</sub> | [414](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L414) | "one file" or "nine files". |
-| `size` <sub>fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L427) | A size somebody can judge at a glance. |
+| `Reset::finished` <sub>fn</sub> | [401](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L401) | What happened, and the way out. |
+| `files` <sub>fn</sub> | [442](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L442) | "one file" or "nine files". |
+| `size` <sub>fn</sub> | [455](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L455) | A size somebody can judge at a glance. |

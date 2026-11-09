@@ -157,6 +157,13 @@ flowchart TD
     class n_to_bytes,n_from_bytes,n_to_bytes,n_from_bytes,n_generate,n_to_bytes,n_from_bytes,n_public_key,n_decapsulate,n_encapsulate entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_combine,n_next_u32,n_next_u64,n_fill_bytes,n_try_fill_bytes helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>

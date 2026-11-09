@@ -153,6 +153,13 @@ flowchart TD
     class n_panel entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_next,n_position,n_should_skip,n_appearance,n_app_lock,n_recording,n_machine,n_autolock,n_card,n_read_machine,n_still_reading,n_field,n_buttons helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>

@@ -67,29 +67,36 @@ program are drawing.
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_lib(["lib.rs<br/>301 lines"])
-    n_absent["absent.rs<br/>314 lines"]
-    n_devices["devices.rs<br/>383 lines"]
+    n_lib(["lib.rs<br/>431 lines"])
+    n_absent["absent.rs<br/>372 lines"]
+    n_call["call.rs<br/>716 lines"]
+    n_devices["devices.rs<br/>390 lines"]
     n_io["io.rs<br/>608 lines"]
-    n_kinds["kinds.rs<br/>190 lines"]
-    n_live["live.rs<br/>870 lines"]
+    n_kinds["kinds.rs<br/>204 lines"]
+    n_live["live.rs<br/>867 lines"]
     n_meter["meter.rs<br/>166 lines"]
     n_playback["playback.rs<br/>219 lines"]
     n_record["record.rs<br/>543 lines"]
-    n_room["room.rs<br/>555 lines"]
+    n_room["room.rs<br/>556 lines"]
     n_absent --> n_devices
     n_absent --> n_kinds
     n_absent --> n_live
     n_absent --> n_record
+    n_call --> n_kinds
+    n_call --> n_live
+    n_call --> n_record
     n_devices --> n_kinds
+    n_live --> n_devices
     n_live --> n_kinds
     n_live --> n_record
     n_playback --> n_devices
+    n_room --> n_devices
     n_room --> n_kinds
     n_room --> n_live
     n_room --> n_record
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs" "open the source"
     click n_absent href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/absent.rs" "open the source"
+    click n_call href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/call.rs" "open the source"
     click n_devices href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/devices.rs" "open the source"
     click n_io href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" "open the source"
     click n_kinds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs" "open the source"
@@ -98,6 +105,10 @@ flowchart TD
     click n_playback href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs" "open the source"
     click n_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs" "open the source"
     click n_room href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>
@@ -106,18 +117,19 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`absent.rs`](File-veilvoice-audio-absent) | 314 | The live modules, in a build that has no live capture. |
-| [`devices.rs`](File-veilvoice-audio-devices) | 383 | Enumerating audio devices, and guessing which of them are virtual cables. |
+| [`absent.rs`](File-veilvoice-audio-absent) | 372 | The live modules, in a build that has no live capture. |
+| [`call.rs`](File-veilvoice-audio-call) | 716 | Roadmap item 188. |
+| [`devices.rs`](File-veilvoice-audio-devices) | 390 | Enumerating audio devices, and guessing which of them are virtual cables. |
 | [`io.rs`](File-veilvoice-audio-io) | 608 | Reading and writing audio files. |
-| [`kinds.rs`](File-veilvoice-audio-kinds) | 190 | What the live path reports, kept apart from the live path itself. |
-| [`lib.rs`](File-veilvoice-audio-lib) | 301 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
-| [`live.rs`](File-veilvoice-audio-live) | 870 | Live microphone scrambling. |
+| [`kinds.rs`](File-veilvoice-audio-kinds) | 204 | What the live path reports, kept apart from the live path itself. |
+| [`lib.rs`](File-veilvoice-audio-lib) | 431 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
+| [`live.rs`](File-veilvoice-audio-live) | 867 | Live microphone scrambling. |
 | [`meter.rs`](File-veilvoice-audio-meter) | 166 | The scale a level meter is drawn on. |
 | [`playback.rs`](File-veilvoice-audio-playback) | 219 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](File-veilvoice-audio-record) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
-| [`room.rs`](File-veilvoice-audio-room) | 555 | Roadmap item 147. |
+| [`room.rs`](File-veilvoice-audio-room) | 556 | Roadmap item 147. |
 
-**2,433 functional lines of Rust** in this crate. A functional line is a line
+**3,091 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

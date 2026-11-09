@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/kinds.svg" alt="kinds.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/kinds.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 190 lines &middot; <a href="kinds.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 204 lines &middot; <a href="kinds.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#in-plain-words">In plain words</a>
@@ -81,16 +81,17 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>190 lines defining <strong>2 functions</strong> (2 public), <strong>8 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>204 lines defining <strong>2 functions</strong> (2 public), <strong>9 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Side</code> <span style="color:var(--muted)">line 21</span> &middot; Which side of the engine something happened to.</li>
 <li><code>struct Interference</code> <span style="color:var(--muted)">line 51</span> &middot; Something that happened to the audio path while it was running.</li>
 <li><code>struct LiveStats</code> <span style="color:var(--muted)">line 77</span> &middot; A snapshot of what the live path is doing, safe to read from the UI.</li>
 <li><code>struct Keeping</code> <span style="color:var(--muted)">line 106</span> &middot; Which sides of the engine a session keeps.</li>
-<li><code>struct GuestStats</code> <span style="color:var(--muted)">line 132</span> &middot; What one guest&#x27;s half of a running room is doing.</li>
-<li><code>struct RoomStats</code> <span style="color:var(--muted)">line 147</span> &middot; What a running room is doing, safe to read from the interface.</li>
-<li><code>enum Direction</code> <span style="color:var(--muted)">line 174</span> &middot; Which direction a device carries audio.</li>
-<li><code>struct DeviceInfo</code> <span style="color:var(--muted)">line 183</span> &middot; A device the user can choose.</li>
+<li><code>enum Capture</code> <span style="color:var(--muted)">line 128</span> &middot; How one side of a call reaches this computer.</li>
+<li><code>struct GuestStats</code> <span style="color:var(--muted)">line 146</span> &middot; What one guest&#x27;s half of a running room is doing.</li>
+<li><code>struct RoomStats</code> <span style="color:var(--muted)">line 161</span> &middot; What a running room is doing, safe to read from the interface.</li>
+<li><code>enum Direction</code> <span style="color:var(--muted)">line 188</span> &middot; Which direction a device carries audio.</li>
+<li><code>struct DeviceInfo</code> <span style="color:var(--muted)">line 197</span> &middot; A device the user can choose.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Side::word</code> <span style="color:var(--muted)">line 30</span> &middot; The word for this side, as a person reading a warning would meet it.
@@ -141,7 +142,12 @@ flowchart TD
     click n_word href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L30&quot; &quot;open the source&quot;
     click n_is_anything href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/kinds.rs#L117&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_word,n_is_anything entry</code></pre>
+    class n_word,n_is_anything entry
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
+    end
+    class key_entry entry</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -154,11 +160,12 @@ flowchart TD
 <tr><td><code>LiveStats</code> <sub>pub struct</sub></td><td><a href="kinds.src.html#fn-livestats">77</a></td><td>A snapshot of what the live path is doing, safe to read from the UI.</td></tr>
 <tr><td><code>Keeping</code> <sub>pub struct</sub></td><td><a href="kinds.src.html#fn-keeping">106</a></td><td>Which sides of the engine a session keeps.</td></tr>
 <tr><td><code>Keeping::is_anything</code> <sub>pub fn</sub></td><td><a href="kinds.src.html#fn-keeping-is_anything">117</a></td><td>Whether anything at all is being kept.</td></tr>
-<tr><td><code>MAX_GUESTS</code> <sub>pub const</sub></td><td><a href="kinds.src.html#fn-max_guests">128</a></td><td>The most microphones one room will open at once.</td></tr>
-<tr><td><code>GuestStats</code> <sub>pub struct</sub></td><td><a href="kinds.src.html#fn-gueststats">132</a></td><td>What one guest&#x27;s half of a running room is doing.</td></tr>
-<tr><td><code>RoomStats</code> <sub>pub struct</sub></td><td><a href="kinds.src.html#fn-roomstats">147</a></td><td>What a running room is doing, safe to read from the interface.</td></tr>
-<tr><td><code>Direction</code> <sub>pub enum</sub></td><td><a href="kinds.src.html#fn-direction">174</a></td><td>Which direction a device carries audio.</td></tr>
-<tr><td><code>DeviceInfo</code> <sub>pub struct</sub></td><td><a href="kinds.src.html#fn-deviceinfo">183</a></td><td>A device the user can choose.</td></tr>
+<tr><td><code>Capture</code> <sub>pub enum</sub></td><td><a href="kinds.src.html#fn-capture">128</a></td><td>How one side of a call reaches this computer.</td></tr>
+<tr><td><code>MAX_GUESTS</code> <sub>pub const</sub></td><td><a href="kinds.src.html#fn-max_guests">142</a></td><td>The most microphones one room will open at once.</td></tr>
+<tr><td><code>GuestStats</code> <sub>pub struct</sub></td><td><a href="kinds.src.html#fn-gueststats">146</a></td><td>What one guest&#x27;s half of a running room is doing.</td></tr>
+<tr><td><code>RoomStats</code> <sub>pub struct</sub></td><td><a href="kinds.src.html#fn-roomstats">161</a></td><td>What a running room is doing, safe to read from the interface.</td></tr>
+<tr><td><code>Direction</code> <sub>pub enum</sub></td><td><a href="kinds.src.html#fn-direction">188</a></td><td>Which direction a device carries audio.</td></tr>
+<tr><td><code>DeviceInfo</code> <sub>pub struct</sub></td><td><a href="kinds.src.html#fn-deviceinfo">197</a></td><td>A device the user can choose.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -101,6 +101,15 @@ flowchart TD
     class n_wrap api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_resolve,n_describe,n_open,n_create,n_print_scope,n_status,n_set,n_change,n_remove,n_open_or_explain helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-verify/src/tests.rs</code></h1>
-<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1860 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="tests.html">what this file is for</a> &middot; <a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1907 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/tests.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -1800,217 +1800,266 @@
 <span class="ln" id="L1657">}</span>
 </span>
 <span class="ln" id="L1658"></span>
+<span class="src-item" id="fn-an_installer_is_checked_whole_and_not_counted_against_the_contents_list">
+<span class="ln" id="L1659"><span class="tok-com">/// The installers a release publishes beside its archives, the two MSIs, the</span></span>
+<span class="ln" id="L1660"><span class="tok-com">/// AppImage and the RPMs, are found, checked whole and never opened.</span></span>
+<span class="ln" id="L1661"><span class="tok-com">///</span></span>
+<span class="ln" id="L1662"><span class="tok-com">/// The case worth pinning is the one `report_inside` would otherwise get</span></span>
+<span class="ln" id="L1663"><span class="tok-com">/// wrong: the contents list describes the zips and tarballs and names no</span></span>
+<span class="ln" id="L1664"><span class="tok-com">/// package, and &quot;the list does not mention this file&quot; is counted as a</span></span>
+<span class="ln" id="L1665"><span class="tok-com">/// failure for an archive. For a package it is not one, because the</span></span>
+<span class="ln" id="L1666"><span class="tok-com">/// package&#x27;s own hash in the signed list already covers every byte of it.</span></span>
+<span class="ln" id="L1667"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1668"><span class="tok-kw">fn</span> <span class="tok-fn">an_installer_is_checked_whole_and_not_counted_against_the_contents_list</span>() {</span>
+<span class="ln" id="L1669">    <span class="tok-kw">let</span> work = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a directory to work in&quot;</span>);</span>
+<span class="ln" id="L1670">    <span class="tok-kw">let</span> only_archives: Vec&lt;check::contents::ArchiveContents&gt; =</span>
+<span class="ln" id="L1671">        vec![check::contents::ArchiveContents {</span>
+<span class="ln" id="L1672">            archive: <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64.zip&quot;</span>.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L1673">            members: Vec::<span class="tok-fn">new</span>(),</span>
+<span class="ln" id="L1674">        }];</span>
+<span class="ln" id="L1675">    <span class="tok-kw">for</span> (name, what) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1676">        (</span>
+<span class="ln" id="L1677">            <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64-user.msi&quot;</span>,</span>
+<span class="ln" id="L1678">            <span class="tok-str">&quot;a Windows installer&quot;</span>,</span>
+<span class="ln" id="L1679">        ),</span>
+<span class="ln" id="L1680">        (</span>
+<span class="ln" id="L1681">            <span class="tok-str">&quot;veilvoice-v0.1.23-windows-x86_64-machine.msi&quot;</span>,</span>
+<span class="ln" id="L1682">            <span class="tok-str">&quot;a Windows installer&quot;</span>,</span>
+<span class="ln" id="L1683">        ),</span>
+<span class="ln" id="L1684">        (<span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.AppImage&quot;</span>, <span class="tok-str">&quot;an AppImage&quot;</span>),</span>
+<span class="ln" id="L1685">        (<span class="tok-str">&quot;veilvoice-0.1.23-1.fc44.x86_64.rpm&quot;</span>, <span class="tok-str">&quot;an RPM package&quot;</span>),</span>
+<span class="ln" id="L1686">    ] {</span>
+<span class="ln" id="L1687">        assert_eq!(</span>
+<span class="ln" id="L1688">            check::archive::<span class="tok-fn">kind_of</span>(name),</span>
+<span class="ln" id="L1689">            check::archive::Kind::<span class="tok-fn">Package</span>(what),</span>
+<span class="ln" id="L1690">            <span class="tok-str">&quot;{name}&quot;</span></span>
+<span class="ln" id="L1691">        );</span>
+<span class="ln" id="L1692">        assert!(discover::<span class="tok-fn">looks_like_archive</span>(name), <span class="tok-str">&quot;{name} is not found&quot;</span>);</span>
+<span class="ln" id="L1693"></span>
+<span class="ln" id="L1694">        <span class="tok-kw">let</span> package = work.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L1695">        std::fs::<span class="tok-fn">write</span>(&amp;package, b<span class="tok-str">&quot;not opened, so any bytes will do&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1696">        assert_eq!(<span class="tok-fn">report_inside</span>(&amp;package, <span class="tok-fn">Some</span>(&amp;only_archives)), <span class="tok-num">0</span>, <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L1697">        assert_eq!(<span class="tok-fn">report_inside</span>(&amp;package, None), <span class="tok-num">0</span>, <span class="tok-str">&quot;{name}&quot;</span>);</span>
+<span class="ln" id="L1698">    }</span>
+<span class="ln" id="L1699"></span>
+<span class="ln" id="L1700">    <span class="tok-com">// A zip still is opened, and a zip the list leaves out still counts.</span></span>
+<span class="ln" id="L1701">    <span class="tok-kw">let</span> zip = work.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;veilvoice-v0.1.23-windows-arm64.zip&quot;</span>);</span>
+<span class="ln" id="L1702">    std::fs::<span class="tok-fn">write</span>(&amp;zip, b<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1703">    assert_eq!(<span class="tok-fn">report_inside</span>(&amp;zip, <span class="tok-fn">Some</span>(&amp;only_archives)), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L1704">}</span>
+</span>
+<span class="ln" id="L1705"></span>
 <span class="src-item" id="fn-tar_on_this_machine">
-<span class="ln" id="L1659"><span class="tok-com">/// A `tar` to run, if this machine has one.</span></span>
-<span class="ln" id="L1660"><span class="tok-com">///</span></span>
-<span class="ln" id="L1661"><span class="tok-com">/// The same skip the release-manifest test takes, for the same reason: the</span></span>
-<span class="ln" id="L1662"><span class="tok-com">/// absence of `tar` is a fact about the machine rather than a defect here, and</span></span>
-<span class="ln" id="L1663"><span class="tok-com">/// every runner this project uses has one.</span></span>
-<span class="ln" id="L1664"><span class="tok-kw">fn</span> <span class="tok-fn">tar_on_this_machine</span>() -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt; {</span>
-<span class="ln" id="L1665">    [<span class="tok-str">&quot;tar&quot;</span>, <span class="tok-str">&quot;bsdtar&quot;</span>].<span class="tok-fn">into_iter</span>().<span class="tok-fn">find</span>(|name| {</span>
-<span class="ln" id="L1666">        std::process::Command::<span class="tok-fn">new</span>(name)</span>
-<span class="ln" id="L1667">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--version&quot;</span>)</span>
-<span class="ln" id="L1668">            .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L1669">            .<span class="tok-fn">is_ok</span>()</span>
-<span class="ln" id="L1670">    })</span>
-<span class="ln" id="L1671">}</span>
+<span class="ln" id="L1706"><span class="tok-com">/// A `tar` to run, if this machine has one.</span></span>
+<span class="ln" id="L1707"><span class="tok-com">///</span></span>
+<span class="ln" id="L1708"><span class="tok-com">/// The same skip the release-manifest test takes, for the same reason: the</span></span>
+<span class="ln" id="L1709"><span class="tok-com">/// absence of `tar` is a fact about the machine rather than a defect here, and</span></span>
+<span class="ln" id="L1710"><span class="tok-com">/// every runner this project uses has one.</span></span>
+<span class="ln" id="L1711"><span class="tok-kw">fn</span> <span class="tok-fn">tar_on_this_machine</span>() -&gt; Option&lt;&amp;&#x27;<span class="tok-kw">static</span> str&gt; {</span>
+<span class="ln" id="L1712">    [<span class="tok-str">&quot;tar&quot;</span>, <span class="tok-str">&quot;bsdtar&quot;</span>].<span class="tok-fn">into_iter</span>().<span class="tok-fn">find</span>(|name| {</span>
+<span class="ln" id="L1713">        std::process::Command::<span class="tok-fn">new</span>(name)</span>
+<span class="ln" id="L1714">            .<span class="tok-fn">arg</span>(<span class="tok-str">&quot;--version&quot;</span>)</span>
+<span class="ln" id="L1715">            .<span class="tok-fn">output</span>()</span>
+<span class="ln" id="L1716">            .<span class="tok-fn">is_ok</span>()</span>
+<span class="ln" id="L1717">    })</span>
+<span class="ln" id="L1718">}</span>
 </span>
-<span class="ln" id="L1672"></span>
+<span class="ln" id="L1719"></span>
 <span class="src-item" id="fn-the_machine_pass_never_runs_a_program_it_finds">
-<span class="ln" id="L1673"><span class="tok-com">/// **Roadmap item 164.** The machine pass never runs anything it finds.</span></span>
-<span class="ln" id="L1674"><span class="tok-com">///</span></span>
-<span class="ln" id="L1675"><span class="tok-com">/// The promise `check::machine` makes for itself, and the one a reader has to</span></span>
-<span class="ln" id="L1676"><span class="tok-com">/// be able to check. Asking a binary its version to decide whether that binary</span></span>
-<span class="ln" id="L1677"><span class="tok-com">/// is the published one is asking the suspect: a tampered copy answers</span></span>
-<span class="ln" id="L1678"><span class="tok-com">/// whatever looks right, and the answer arrives after it has already run.</span></span>
-<span class="ln" id="L1679"><span class="tok-com">///</span></span>
-<span class="ln" id="L1680"><span class="tok-com">/// It is a claim about code that does not exist, so nothing but reading the</span></span>
-<span class="ln" id="L1681"><span class="tok-com">/// source can check it. And it cannot be caught by testing the behaviour: a</span></span>
-<span class="ln" id="L1682"><span class="tok-com">/// version that shelled out would pass every test written against an honest</span></span>
-<span class="ln" id="L1683"><span class="tok-com">/// machine, because on an honest machine the binary tells the truth.</span></span>
-<span class="ln" id="L1684"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1685"><span class="tok-kw">fn</span> <span class="tok-fn">the_machine_pass_never_runs_a_program_it_finds</span>() {</span>
-<span class="ln" id="L1686">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;check/machine.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1687">    <span class="tok-kw">let</span> code: String = source</span>
-<span class="ln" id="L1688">        .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L1689">        .<span class="tok-fn">filter</span>(|line| {</span>
-<span class="ln" id="L1690">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L1691">            !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//!&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>)</span>
-<span class="ln" id="L1692">        })</span>
-<span class="ln" id="L1693">        .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L1694">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1695">    <span class="tok-com">// The tests at the foot of that file write files to hash; they start no</span></span>
-<span class="ln" id="L1696">    <span class="tok-com">// processes either, but they are not the subject.</span></span>
-<span class="ln" id="L1697">    <span class="tok-kw">let</span> code = code.<span class="tok-fn">split</span>(<span class="tok-str">&quot;mod tests&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1698"></span>
-<span class="ln" id="L1699">    <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;Command&quot;</span>, <span class="tok-str">&quot;process::&quot;</span>, <span class="tok-str">&quot;spawn&quot;</span>, <span class="tok-str">&quot;exec&quot;</span>] {</span>
-<span class="ln" id="L1700">        assert!(</span>
-<span class="ln" id="L1701">            !code.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L1702">            <span class="tok-str">&quot;check/machine.rs reaches {forbidden}: a copy under suspicion must \</span></span>
-<span class="ln" id="L1703"><span class="tok-str">             never be run to ask it what it is&quot;</span></span>
-<span class="ln" id="L1704">        );</span>
-<span class="ln" id="L1705">    }</span>
-<span class="ln" id="L1706">    <span class="tok-com">// And it writes nothing where it looks. The record is `check::seen`&#x27;s</span></span>
-<span class="ln" id="L1707">    <span class="tok-com">// business and goes to one known path; a pass that wrote into the</span></span>
-<span class="ln" id="L1708">    <span class="tok-com">// directories it was searching would be changing what it is measuring.</span></span>
-<span class="ln" id="L1709">    <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;fs::write&quot;</span>, <span class="tok-str">&quot;fs::create_dir&quot;</span>, <span class="tok-str">&quot;fs::remove&quot;</span>, <span class="tok-str">&quot;fs::rename&quot;</span>] {</span>
-<span class="ln" id="L1710">        assert!(</span>
-<span class="ln" id="L1711">            !code.<span class="tok-fn">contains</span>(forbidden),</span>
-<span class="ln" id="L1712">            <span class="tok-str">&quot;check/machine.rs reaches {forbidden}: finding copies must not \</span></span>
-<span class="ln" id="L1713"><span class="tok-str">             change the machine it is looking at&quot;</span></span>
-<span class="ln" id="L1714">        );</span>
-<span class="ln" id="L1715">    }</span>
-<span class="ln" id="L1716">}</span>
+<span class="ln" id="L1720"><span class="tok-com">/// **Roadmap item 164.** The machine pass never runs anything it finds.</span></span>
+<span class="ln" id="L1721"><span class="tok-com">///</span></span>
+<span class="ln" id="L1722"><span class="tok-com">/// The promise `check::machine` makes for itself, and the one a reader has to</span></span>
+<span class="ln" id="L1723"><span class="tok-com">/// be able to check. Asking a binary its version to decide whether that binary</span></span>
+<span class="ln" id="L1724"><span class="tok-com">/// is the published one is asking the suspect: a tampered copy answers</span></span>
+<span class="ln" id="L1725"><span class="tok-com">/// whatever looks right, and the answer arrives after it has already run.</span></span>
+<span class="ln" id="L1726"><span class="tok-com">///</span></span>
+<span class="ln" id="L1727"><span class="tok-com">/// It is a claim about code that does not exist, so nothing but reading the</span></span>
+<span class="ln" id="L1728"><span class="tok-com">/// source can check it. And it cannot be caught by testing the behaviour: a</span></span>
+<span class="ln" id="L1729"><span class="tok-com">/// version that shelled out would pass every test written against an honest</span></span>
+<span class="ln" id="L1730"><span class="tok-com">/// machine, because on an honest machine the binary tells the truth.</span></span>
+<span class="ln" id="L1731"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1732"><span class="tok-kw">fn</span> <span class="tok-fn">the_machine_pass_never_runs_a_program_it_finds</span>() {</span>
+<span class="ln" id="L1733">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;check/machine.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1734">    <span class="tok-kw">let</span> code: String = source</span>
+<span class="ln" id="L1735">        .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L1736">        .<span class="tok-fn">filter</span>(|line| {</span>
+<span class="ln" id="L1737">            <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L1738">            !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//!&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>)</span>
+<span class="ln" id="L1739">        })</span>
+<span class="ln" id="L1740">        .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L1741">        .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1742">    <span class="tok-com">// The tests at the foot of that file write files to hash; they start no</span></span>
+<span class="ln" id="L1743">    <span class="tok-com">// processes either, but they are not the subject.</span></span>
+<span class="ln" id="L1744">    <span class="tok-kw">let</span> code = code.<span class="tok-fn">split</span>(<span class="tok-str">&quot;mod tests&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1745"></span>
+<span class="ln" id="L1746">    <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;Command&quot;</span>, <span class="tok-str">&quot;process::&quot;</span>, <span class="tok-str">&quot;spawn&quot;</span>, <span class="tok-str">&quot;exec&quot;</span>] {</span>
+<span class="ln" id="L1747">        assert!(</span>
+<span class="ln" id="L1748">            !code.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L1749">            <span class="tok-str">&quot;check/machine.rs reaches {forbidden}: a copy under suspicion must \</span></span>
+<span class="ln" id="L1750"><span class="tok-str">             never be run to ask it what it is&quot;</span></span>
+<span class="ln" id="L1751">        );</span>
+<span class="ln" id="L1752">    }</span>
+<span class="ln" id="L1753">    <span class="tok-com">// And it writes nothing where it looks. The record is `check::seen`&#x27;s</span></span>
+<span class="ln" id="L1754">    <span class="tok-com">// business and goes to one known path; a pass that wrote into the</span></span>
+<span class="ln" id="L1755">    <span class="tok-com">// directories it was searching would be changing what it is measuring.</span></span>
+<span class="ln" id="L1756">    <span class="tok-kw">for</span> forbidden <span class="tok-kw">in</span> [<span class="tok-str">&quot;fs::write&quot;</span>, <span class="tok-str">&quot;fs::create_dir&quot;</span>, <span class="tok-str">&quot;fs::remove&quot;</span>, <span class="tok-str">&quot;fs::rename&quot;</span>] {</span>
+<span class="ln" id="L1757">        assert!(</span>
+<span class="ln" id="L1758">            !code.<span class="tok-fn">contains</span>(forbidden),</span>
+<span class="ln" id="L1759">            <span class="tok-str">&quot;check/machine.rs reaches {forbidden}: finding copies must not \</span></span>
+<span class="ln" id="L1760"><span class="tok-str">             change the machine it is looking at&quot;</span></span>
+<span class="ln" id="L1761">        );</span>
+<span class="ln" id="L1762">    }</span>
+<span class="ln" id="L1763">}</span>
 </span>
-<span class="ln" id="L1717"></span>
+<span class="ln" id="L1764"></span>
 <span class="src-item" id="fn-the_remembered_record_says_in_itself_that_it_is_not_evidence">
-<span class="ln" id="L1718"><span class="tok-com">/// **Roadmap item 164.** The record of what was found says it is not evidence.</span></span>
-<span class="ln" id="L1719"><span class="tok-com">///</span></span>
-<span class="ln" id="L1720"><span class="tok-com">/// A file listing every copy of a program and its hash looks exactly like</span></span>
-<span class="ln" id="L1721"><span class="tok-com">/// proof, and it is not: this program writes it, unsigned, and anything able</span></span>
-<span class="ln" id="L1722"><span class="tok-com">/// to alter a copy of VeilVoice could alter it too. Somebody who finds that</span></span>
-<span class="ln" id="L1723"><span class="tok-com">/// file years later has only what is written in it to go on, so the disclaimer</span></span>
-<span class="ln" id="L1724"><span class="tok-com">/// lives in the file rather than in the documentation about the file.</span></span>
-<span class="ln" id="L1725"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1726"><span class="tok-kw">fn</span> <span class="tok-fn">the_remembered_record_says_in_itself_that_it_is_not_evidence</span>() {</span>
-<span class="ln" id="L1727">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;check/seen.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1728">    <span class="tok-kw">let</span> preamble = source</span>
-<span class="ln" id="L1729">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;const PREAMBLE: &amp;str = \&quot;\\\n&quot;</span>)</span>
-<span class="ln" id="L1730">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
-<span class="ln" id="L1731">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the record&#x27;s opening lines have to be findable&quot;</span>)</span>
-<span class="ln" id="L1732">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;\&quot;;&quot;</span>)</span>
-<span class="ln" id="L1733">        .<span class="tok-fn">next</span>()</span>
-<span class="ln" id="L1734">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1735">    assert!(</span>
-<span class="ln" id="L1736">        preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;NOT evidence&quot;</span>),</span>
-<span class="ln" id="L1737">        <span class="tok-str">&quot;the record must say so in its own first lines:\n{preamble}&quot;</span></span>
-<span class="ln" id="L1738">    );</span>
-<span class="ln" id="L1739">    assert!(</span>
-<span class="ln" id="L1740">        preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing signs it&quot;</span>) || preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing\n# signs it&quot;</span>),</span>
-<span class="ln" id="L1741">        <span class="tok-str">&quot;and say why:\n{preamble}&quot;</span></span>
-<span class="ln" id="L1742">    );</span>
-<span class="ln" id="L1743">}</span>
+<span class="ln" id="L1765"><span class="tok-com">/// **Roadmap item 164.** The record of what was found says it is not evidence.</span></span>
+<span class="ln" id="L1766"><span class="tok-com">///</span></span>
+<span class="ln" id="L1767"><span class="tok-com">/// A file listing every copy of a program and its hash looks exactly like</span></span>
+<span class="ln" id="L1768"><span class="tok-com">/// proof, and it is not: this program writes it, unsigned, and anything able</span></span>
+<span class="ln" id="L1769"><span class="tok-com">/// to alter a copy of VeilVoice could alter it too. Somebody who finds that</span></span>
+<span class="ln" id="L1770"><span class="tok-com">/// file years later has only what is written in it to go on, so the disclaimer</span></span>
+<span class="ln" id="L1771"><span class="tok-com">/// lives in the file rather than in the documentation about the file.</span></span>
+<span class="ln" id="L1772"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1773"><span class="tok-kw">fn</span> <span class="tok-fn">the_remembered_record_says_in_itself_that_it_is_not_evidence</span>() {</span>
+<span class="ln" id="L1774">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;check/seen.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1775">    <span class="tok-kw">let</span> preamble = source</span>
+<span class="ln" id="L1776">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;const PREAMBLE: &amp;str = \&quot;\\\n&quot;</span>)</span>
+<span class="ln" id="L1777">        .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L1778">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the record&#x27;s opening lines have to be findable&quot;</span>)</span>
+<span class="ln" id="L1779">        .<span class="tok-fn">split</span>(<span class="tok-str">&quot;\&quot;;&quot;</span>)</span>
+<span class="ln" id="L1780">        .<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L1781">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1782">    assert!(</span>
+<span class="ln" id="L1783">        preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;NOT evidence&quot;</span>),</span>
+<span class="ln" id="L1784">        <span class="tok-str">&quot;the record must say so in its own first lines:\n{preamble}&quot;</span></span>
+<span class="ln" id="L1785">    );</span>
+<span class="ln" id="L1786">    assert!(</span>
+<span class="ln" id="L1787">        preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing signs it&quot;</span>) || preamble.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nothing\n# signs it&quot;</span>),</span>
+<span class="ln" id="L1788">        <span class="tok-str">&quot;and say why:\n{preamble}&quot;</span></span>
+<span class="ln" id="L1789">    );</span>
+<span class="ln" id="L1790">}</span>
 </span>
-<span class="ln" id="L1744"></span>
+<span class="ln" id="L1791"></span>
 <span class="src-item" id="fn-a_question_about_the_program_is_answered_wherever_it_is_asked">
-<span class="ln" id="L1745"><span class="tok-com">/// **F-228.** A request for help must be answered, wherever it is written.</span></span>
-<span class="ln" id="L1746"><span class="tok-com">///</span></span>
-<span class="ln" id="L1747"><span class="tok-com">/// `veilvoice verify release --help` read `release` as the subcommand and</span></span>
-<span class="ln" id="L1748"><span class="tok-com">/// `--help` as the tag to fetch, so asking for help opened a connection. Every</span></span>
-<span class="ln" id="L1749"><span class="tok-com">/// case below was confirmed against the old rule, which read only the first</span></span>
-<span class="ln" id="L1750"><span class="tok-com">/// argument: each of the &quot;behind a subcommand&quot; ones failed.</span></span>
-<span class="ln" id="L1751"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1752"><span class="tok-kw">fn</span> <span class="tok-fn">a_question_about_the_program_is_answered_wherever_it_is_asked</span>() {</span>
-<span class="ln" id="L1753">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::Asked;</span>
-<span class="ln" id="L1754"></span>
-<span class="ln" id="L1755">    <span class="tok-kw">fn</span> <span class="tok-fn">args</span>(words: &amp;[&amp;str]) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L1756">        words.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|w| w.<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>()</span>
-<span class="ln" id="L1757">    }</span>
-<span class="ln" id="L1758"></span>
-<span class="ln" id="L1759">    <span class="tok-kw">for</span> words <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1760">        vec![<span class="tok-str">&quot;--help&quot;</span>],</span>
-<span class="ln" id="L1761">        vec![<span class="tok-str">&quot;-h&quot;</span>],</span>
-<span class="ln" id="L1762">        vec![<span class="tok-str">&quot;help&quot;</span>],</span>
-<span class="ln" id="L1763">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>],</span>
-<span class="ln" id="L1764">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;-h&quot;</span>],</span>
-<span class="ln" id="L1765">        vec![<span class="tok-str">&quot;archive&quot;</span>, <span class="tok-str">&quot;some.tar.gz&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>],</span>
-<span class="ln" id="L1766">        vec![<span class="tok-str">&quot;reproduce&quot;</span>, <span class="tok-str">&quot;.&quot;</span>, <span class="tok-str">&quot;--sums&quot;</span>, <span class="tok-str">&quot;SHA256SUMS&quot;</span>, <span class="tok-str">&quot;-h&quot;</span>],</span>
-<span class="ln" id="L1767">    ] {</span>
-<span class="ln" id="L1768">        assert_eq!(</span>
-<span class="ln" id="L1769">            Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;words)),</span>
-<span class="ln" id="L1770">            <span class="tok-fn">Some</span>(Asked::Help),</span>
-<span class="ln" id="L1771">            <span class="tok-str">&quot;help asked for as {words:?} must be answered before anything runs&quot;</span></span>
-<span class="ln" id="L1772">        );</span>
-<span class="ln" id="L1773">    }</span>
-<span class="ln" id="L1774"></span>
-<span class="ln" id="L1775">    assert_eq!(</span>
-<span class="ln" id="L1776">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--version&quot;</span>])),</span>
-<span class="ln" id="L1777">        <span class="tok-fn">Some</span>(Asked::Version)</span>
-<span class="ln" id="L1778">    );</span>
-<span class="ln" id="L1779">    assert_eq!(</span>
-<span class="ln" id="L1780">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--explain&quot;</span>])),</span>
-<span class="ln" id="L1781">        <span class="tok-fn">Some</span>(Asked::Explain)</span>
-<span class="ln" id="L1782">    );</span>
-<span class="ln" id="L1783">    assert_eq!(</span>
-<span class="ln" id="L1784">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--exit-status&quot;</span>])),</span>
-<span class="ln" id="L1785">        <span class="tok-fn">Some</span>(Asked::ExitStatus)</span>
-<span class="ln" id="L1786">    );</span>
-<span class="ln" id="L1787"></span>
-<span class="ln" id="L1788">    <span class="tok-com">// Help wins, whichever order they are written in.</span></span>
-<span class="ln" id="L1789">    assert_eq!(</span>
-<span class="ln" id="L1790">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;--version&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>])),</span>
-<span class="ln" id="L1791">        <span class="tok-fn">Some</span>(Asked::Help)</span>
-<span class="ln" id="L1792">    );</span>
-<span class="ln" id="L1793">    assert_eq!(</span>
-<span class="ln" id="L1794">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;--help&quot;</span>, <span class="tok-str">&quot;--version&quot;</span>])),</span>
-<span class="ln" id="L1795">        <span class="tok-fn">Some</span>(Asked::Help)</span>
-<span class="ln" id="L1796">    );</span>
-<span class="ln" id="L1797"></span>
-<span class="ln" id="L1798">    <span class="tok-com">// And a real invocation asks nothing about the program, so nothing here</span></span>
-<span class="ln" id="L1799">    <span class="tok-com">// may catch it. `help` after the first word is a path or a tag.</span></span>
-<span class="ln" id="L1800">    <span class="tok-kw">for</span> words <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L1801">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;v0.1.23&quot;</span>],</span>
-<span class="ln" id="L1802">        vec![<span class="tok-str">&quot;auto&quot;</span>],</span>
-<span class="ln" id="L1803">        vec![<span class="tok-str">&quot;archive&quot;</span>, <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>],</span>
-<span class="ln" id="L1804">        vec![<span class="tok-str">&quot;gnupg&quot;</span>, <span class="tok-str">&quot;help&quot;</span>],</span>
-<span class="ln" id="L1805">        vec![</span>
-<span class="ln" id="L1806">            <span class="tok-str">&quot;reproduce&quot;</span>,</span>
-<span class="ln" id="L1807">            <span class="tok-str">&quot;.&quot;</span>,</span>
-<span class="ln" id="L1808">            <span class="tok-str">&quot;--sums&quot;</span>,</span>
-<span class="ln" id="L1809">            <span class="tok-str">&quot;SHA256SUMS&quot;</span>,</span>
-<span class="ln" id="L1810">            <span class="tok-str">&quot;--sig&quot;</span>,</span>
-<span class="ln" id="L1811">            <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>,</span>
-<span class="ln" id="L1812">        ],</span>
-<span class="ln" id="L1813">    ] {</span>
-<span class="ln" id="L1814">        assert_eq!(</span>
-<span class="ln" id="L1815">            Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;words)),</span>
-<span class="ln" id="L1816">            None,</span>
-<span class="ln" id="L1817">            <span class="tok-str">&quot;{words:?} is work to do, not a question about the program&quot;</span></span>
-<span class="ln" id="L1818">        );</span>
-<span class="ln" id="L1819">    }</span>
-<span class="ln" id="L1820">}</span>
-</span>
+<span class="ln" id="L1792"><span class="tok-com">/// **F-228.** A request for help must be answered, wherever it is written.</span></span>
+<span class="ln" id="L1793"><span class="tok-com">///</span></span>
+<span class="ln" id="L1794"><span class="tok-com">/// `veilvoice verify release --help` read `release` as the subcommand and</span></span>
+<span class="ln" id="L1795"><span class="tok-com">/// `--help` as the tag to fetch, so asking for help opened a connection. Every</span></span>
+<span class="ln" id="L1796"><span class="tok-com">/// case below was confirmed against the old rule, which read only the first</span></span>
+<span class="ln" id="L1797"><span class="tok-com">/// argument: each of the &quot;behind a subcommand&quot; ones failed.</span></span>
+<span class="ln" id="L1798"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1799"><span class="tok-kw">fn</span> <span class="tok-fn">a_question_about_the_program_is_answered_wherever_it_is_asked</span>() {</span>
+<span class="ln" id="L1800">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::Asked;</span>
+<span class="ln" id="L1801"></span>
+<span class="ln" id="L1802">    <span class="tok-kw">fn</span> <span class="tok-fn">args</span>(words: &amp;[&amp;str]) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L1803">        words.<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|w| w.<span class="tok-fn">to_string</span>()).<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L1804">    }</span>
+<span class="ln" id="L1805"></span>
+<span class="ln" id="L1806">    <span class="tok-kw">for</span> words <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1807">        vec![<span class="tok-str">&quot;--help&quot;</span>],</span>
+<span class="ln" id="L1808">        vec![<span class="tok-str">&quot;-h&quot;</span>],</span>
+<span class="ln" id="L1809">        vec![<span class="tok-str">&quot;help&quot;</span>],</span>
+<span class="ln" id="L1810">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>],</span>
+<span class="ln" id="L1811">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;-h&quot;</span>],</span>
+<span class="ln" id="L1812">        vec![<span class="tok-str">&quot;archive&quot;</span>, <span class="tok-str">&quot;some.tar.gz&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>],</span>
+<span class="ln" id="L1813">        vec![<span class="tok-str">&quot;reproduce&quot;</span>, <span class="tok-str">&quot;.&quot;</span>, <span class="tok-str">&quot;--sums&quot;</span>, <span class="tok-str">&quot;SHA256SUMS&quot;</span>, <span class="tok-str">&quot;-h&quot;</span>],</span>
+<span class="ln" id="L1814">    ] {</span>
+<span class="ln" id="L1815">        assert_eq!(</span>
+<span class="ln" id="L1816">            Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;words)),</span>
+<span class="ln" id="L1817">            <span class="tok-fn">Some</span>(Asked::Help),</span>
+<span class="ln" id="L1818">            <span class="tok-str">&quot;help asked for as {words:?} must be answered before anything runs&quot;</span></span>
+<span class="ln" id="L1819">        );</span>
+<span class="ln" id="L1820">    }</span>
 <span class="ln" id="L1821"></span>
+<span class="ln" id="L1822">    assert_eq!(</span>
+<span class="ln" id="L1823">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--version&quot;</span>])),</span>
+<span class="ln" id="L1824">        <span class="tok-fn">Some</span>(Asked::Version)</span>
+<span class="ln" id="L1825">    );</span>
+<span class="ln" id="L1826">    assert_eq!(</span>
+<span class="ln" id="L1827">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--explain&quot;</span>])),</span>
+<span class="ln" id="L1828">        <span class="tok-fn">Some</span>(Asked::Explain)</span>
+<span class="ln" id="L1829">    );</span>
+<span class="ln" id="L1830">    assert_eq!(</span>
+<span class="ln" id="L1831">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;--exit-status&quot;</span>])),</span>
+<span class="ln" id="L1832">        <span class="tok-fn">Some</span>(Asked::ExitStatus)</span>
+<span class="ln" id="L1833">    );</span>
+<span class="ln" id="L1834"></span>
+<span class="ln" id="L1835">    <span class="tok-com">// Help wins, whichever order they are written in.</span></span>
+<span class="ln" id="L1836">    assert_eq!(</span>
+<span class="ln" id="L1837">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;--version&quot;</span>, <span class="tok-str">&quot;--help&quot;</span>])),</span>
+<span class="ln" id="L1838">        <span class="tok-fn">Some</span>(Asked::Help)</span>
+<span class="ln" id="L1839">    );</span>
+<span class="ln" id="L1840">    assert_eq!(</span>
+<span class="ln" id="L1841">        Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;[<span class="tok-str">&quot;--help&quot;</span>, <span class="tok-str">&quot;--version&quot;</span>])),</span>
+<span class="ln" id="L1842">        <span class="tok-fn">Some</span>(Asked::Help)</span>
+<span class="ln" id="L1843">    );</span>
+<span class="ln" id="L1844"></span>
+<span class="ln" id="L1845">    <span class="tok-com">// And a real invocation asks nothing about the program, so nothing here</span></span>
+<span class="ln" id="L1846">    <span class="tok-com">// may catch it. `help` after the first word is a path or a tag.</span></span>
+<span class="ln" id="L1847">    <span class="tok-kw">for</span> words <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L1848">        vec![<span class="tok-str">&quot;release&quot;</span>, <span class="tok-str">&quot;v0.1.23&quot;</span>],</span>
+<span class="ln" id="L1849">        vec![<span class="tok-str">&quot;auto&quot;</span>],</span>
+<span class="ln" id="L1850">        vec![<span class="tok-str">&quot;archive&quot;</span>, <span class="tok-str">&quot;veilvoice-v0.1.23-linux-x86_64.tar.gz&quot;</span>],</span>
+<span class="ln" id="L1851">        vec![<span class="tok-str">&quot;gnupg&quot;</span>, <span class="tok-str">&quot;help&quot;</span>],</span>
+<span class="ln" id="L1852">        vec![</span>
+<span class="ln" id="L1853">            <span class="tok-str">&quot;reproduce&quot;</span>,</span>
+<span class="ln" id="L1854">            <span class="tok-str">&quot;.&quot;</span>,</span>
+<span class="ln" id="L1855">            <span class="tok-str">&quot;--sums&quot;</span>,</span>
+<span class="ln" id="L1856">            <span class="tok-str">&quot;SHA256SUMS&quot;</span>,</span>
+<span class="ln" id="L1857">            <span class="tok-str">&quot;--sig&quot;</span>,</span>
+<span class="ln" id="L1858">            <span class="tok-str">&quot;SHA256SUMS.asc&quot;</span>,</span>
+<span class="ln" id="L1859">        ],</span>
+<span class="ln" id="L1860">    ] {</span>
+<span class="ln" id="L1861">        assert_eq!(</span>
+<span class="ln" id="L1862">            Asked::<span class="tok-fn">in_args</span>(&amp;<span class="tok-fn">args</span>(&amp;words)),</span>
+<span class="ln" id="L1863">            None,</span>
+<span class="ln" id="L1864">            <span class="tok-str">&quot;{words:?} is work to do, not a question about the program&quot;</span></span>
+<span class="ln" id="L1865">        );</span>
+<span class="ln" id="L1866">    }</span>
+<span class="ln" id="L1867">}</span>
+</span>
+<span class="ln" id="L1868"></span>
 <span class="src-item" id="fn-verify_install_goes_through_the_one_routine_that_stages_and_renames">
-<span class="ln" id="L1822"><span class="tok-com">/// `verify install` puts binaries in place through the one routine that stages.</span></span>
-<span class="ln" id="L1823"><span class="tok-com">///</span></span>
-<span class="ln" id="L1824"><span class="tok-com">/// The case is ordinary rather than adversarial: somebody points</span></span>
-<span class="ln" id="L1825"><span class="tok-com">/// `~/.local/bin/veilvoice` at a portable copy they keep elsewhere, and then</span></span>
-<span class="ln" id="L1826"><span class="tok-com">/// runs `veilvoice verify install`. With `std::fs::copy` the new binary lands</span></span>
-<span class="ln" id="L1827"><span class="tok-com">/// on the portable copy and the link still points at it, so there is one file</span></span>
-<span class="ln" id="L1828"><span class="tok-com">/// where the reader believes there are two, and the &quot;installed&quot; copy and the</span></span>
-<span class="ln" id="L1829"><span class="tok-com">/// &quot;portable&quot; copy can never again differ. **F-266.**</span></span>
-<span class="ln" id="L1830"><span class="tok-com">///</span></span>
-<span class="ln" id="L1831"><span class="tok-com">/// That behaviour is held down where it lives, by</span></span>
-<span class="ln" id="L1832"><span class="tok-com">/// `veilvoice_setup::install`&#x27;s own tests of `replace_with_copy`. What this</span></span>
-<span class="ln" id="L1833"><span class="tok-com">/// test holds down is the thing that went wrong: `command_install` writing its</span></span>
-<span class="ln" id="L1834"><span class="tok-com">/// own copy instead of calling it. So it reads the source rather than</span></span>
-<span class="ln" id="L1835"><span class="tok-com">/// installing anything, because installing for real means writing into</span></span>
-<span class="ln" id="L1836"><span class="tok-com">/// `bin_dir()`, which is the tester&#x27;s own `~/.local/bin`.</span></span>
-<span class="ln" id="L1837"><span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1838"><span class="tok-kw">fn</span> <span class="tok-fn">verify_install_goes_through_the_one_routine_that_stages_and_renames</span>() {</span>
-<span class="ln" id="L1839">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1840">    <span class="tok-kw">let</span> start = source</span>
-<span class="ln" id="L1841">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn command_install(&quot;</span>)</span>
-<span class="ln" id="L1842">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_install exists&quot;</span>);</span>
-<span class="ln" id="L1843">    <span class="tok-kw">let</span> end = source[start..]</span>
-<span class="ln" id="L1844">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    verdict!(&quot;</span>)</span>
-<span class="ln" id="L1845">        .<span class="tok-fn">map</span>(|at| start + at)</span>
-<span class="ln" id="L1846">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the copying loop ends before the verdict&quot;</span>);</span>
-<span class="ln" id="L1847">    <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
-<span class="ln" id="L1848"></span>
-<span class="ln" id="L1849">    assert!(</span>
-<span class="ln" id="L1850">        body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice_setup::install::replace_with_copy(&amp;source, &amp;target)&quot;</span>),</span>
-<span class="ln" id="L1851">        <span class="tok-str">&quot;command_install no longer installs through install::replace_with_copy, \</span></span>
-<span class="ln" id="L1852"><span class="tok-str">         which is the one place that stages a new file and renames it over the \</span></span>
-<span class="ln" id="L1853"><span class="tok-str">         name people run. That is F-266, and F-237 one command over.&quot;</span></span>
-<span class="ln" id="L1854">    );</span>
-<span class="ln" id="L1855">    assert!(</span>
-<span class="ln" id="L1856">        !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;fs::copy(&quot;</span>),</span>
-<span class="ln" id="L1857">        <span class="tok-str">&quot;command_install copies straight to the destination again, which follows \</span></span>
-<span class="ln" id="L1858"><span class="tok-str">         a link already at that name and writes wherever it points. That is F-266.&quot;</span></span>
-<span class="ln" id="L1859">    );</span>
-<span class="ln" id="L1860">}</span>
+<span class="ln" id="L1869"><span class="tok-com">/// `verify install` puts binaries in place through the one routine that stages.</span></span>
+<span class="ln" id="L1870"><span class="tok-com">///</span></span>
+<span class="ln" id="L1871"><span class="tok-com">/// The case is ordinary rather than adversarial: somebody points</span></span>
+<span class="ln" id="L1872"><span class="tok-com">/// `~/.local/bin/veilvoice` at a portable copy they keep elsewhere, and then</span></span>
+<span class="ln" id="L1873"><span class="tok-com">/// runs `veilvoice verify install`. With `std::fs::copy` the new binary lands</span></span>
+<span class="ln" id="L1874"><span class="tok-com">/// on the portable copy and the link still points at it, so there is one file</span></span>
+<span class="ln" id="L1875"><span class="tok-com">/// where the reader believes there are two, and the &quot;installed&quot; copy and the</span></span>
+<span class="ln" id="L1876"><span class="tok-com">/// &quot;portable&quot; copy can never again differ. **F-266.**</span></span>
+<span class="ln" id="L1877"><span class="tok-com">///</span></span>
+<span class="ln" id="L1878"><span class="tok-com">/// That behaviour is held down where it lives, by</span></span>
+<span class="ln" id="L1879"><span class="tok-com">/// `veilvoice_setup::install`&#x27;s own tests of `replace_with_copy`. What this</span></span>
+<span class="ln" id="L1880"><span class="tok-com">/// test holds down is the thing that went wrong: `command_install` writing its</span></span>
+<span class="ln" id="L1881"><span class="tok-com">/// own copy instead of calling it. So it reads the source rather than</span></span>
+<span class="ln" id="L1882"><span class="tok-com">/// installing anything, because installing for real means writing into</span></span>
+<span class="ln" id="L1883"><span class="tok-com">/// `bin_dir()`, which is the tester&#x27;s own `~/.local/bin`.</span></span>
+<span class="ln" id="L1884"><span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1885"><span class="tok-kw">fn</span> <span class="tok-fn">verify_install_goes_through_the_one_routine_that_stages_and_renames</span>() {</span>
+<span class="ln" id="L1886">    <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;lib.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1887">    <span class="tok-kw">let</span> start = source</span>
+<span class="ln" id="L1888">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;fn command_install(&quot;</span>)</span>
+<span class="ln" id="L1889">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;command_install exists&quot;</span>);</span>
+<span class="ln" id="L1890">    <span class="tok-kw">let</span> end = source[start..]</span>
+<span class="ln" id="L1891">        .<span class="tok-fn">find</span>(<span class="tok-str">&quot;\n    verdict!(&quot;</span>)</span>
+<span class="ln" id="L1892">        .<span class="tok-fn">map</span>(|at| start + at)</span>
+<span class="ln" id="L1893">        .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the copying loop ends before the verdict&quot;</span>);</span>
+<span class="ln" id="L1894">    <span class="tok-kw">let</span> body = &amp;source[start..end];</span>
+<span class="ln" id="L1895"></span>
+<span class="ln" id="L1896">    assert!(</span>
+<span class="ln" id="L1897">        body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice_setup::install::replace_with_copy(&amp;source, &amp;target)&quot;</span>),</span>
+<span class="ln" id="L1898">        <span class="tok-str">&quot;command_install no longer installs through install::replace_with_copy, \</span></span>
+<span class="ln" id="L1899"><span class="tok-str">         which is the one place that stages a new file and renames it over the \</span></span>
+<span class="ln" id="L1900"><span class="tok-str">         name people run. That is F-266, and F-237 one command over.&quot;</span></span>
+<span class="ln" id="L1901">    );</span>
+<span class="ln" id="L1902">    assert!(</span>
+<span class="ln" id="L1903">        !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;fs::copy(&quot;</span>),</span>
+<span class="ln" id="L1904">        <span class="tok-str">&quot;command_install copies straight to the destination again, which follows \</span></span>
+<span class="ln" id="L1905"><span class="tok-str">         a link already at that name and writes wherever it points. That is F-266.&quot;</span></span>
+<span class="ln" id="L1906">    );</span>
+<span class="ln" id="L1907">}</span>
 </span>
 </code></pre>
 </main>

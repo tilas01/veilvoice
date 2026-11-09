@@ -248,6 +248,15 @@ flowchart TD
     class n_stages,n_start,n_stop api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_settled,n_applies,n_wipe,n_body,n_app_lock,n_finished,n_at_rest,n_decoy,n_install,n_settings_headings,n_heading,n_secret helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

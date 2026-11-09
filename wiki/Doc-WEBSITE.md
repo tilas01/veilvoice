@@ -48,6 +48,7 @@ is built last, after the SEO pass has edited the pages it indexes.
 | `tools/site/releases.py` | `releases.html`, from `CHANGELOG.md` |
 | `tools/site/demo.py` | `website/js/demo-data.js`, from the recorded sessions |
 | `tools/site/seo.py` | Canonical addresses, the sitemap and `robots.txt` |
+| `tools/graphs/generate.py` | `assets/graphs/`: a timeline picture of every crate and source file, from `tools/graphs/history.json` and `ROADMAP.md` |
 | `tools/search-index/generate.py` | `search-index.json` and `nojs/search.html` |
 
 Each writes a header saying it is generated. Editing the output is wasted work:

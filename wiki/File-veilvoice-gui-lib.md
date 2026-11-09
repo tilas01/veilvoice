@@ -121,6 +121,13 @@ flowchart TD
     class n_tabs,n_settings_pages,n_tour_stops,n_jetbrains_mono_path entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_command,n_hide_console,n_hide_console,n_headless_frame,n_no_motion,n_sources,n_shipped,n_declared_modules helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>

@@ -157,6 +157,15 @@ flowchart TD
     class n_new,n_poll api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_default,n_start_probe,n_visibility_note,n_where_this_copy_lives,n_install_controls,n_carry_question,n_start,n_progress,n_companion_rows,n_detect_all,n_can_install,n_install_changes,n_field helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

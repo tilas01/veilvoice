@@ -121,7 +121,12 @@ flowchart TD
     n_show([&quot;show&lt;br/&gt;line 14&quot;])
     click n_show href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/priv_mode.rs#L14&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_show entry</code></pre>
+    class n_show entry
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
+    end
+    class key_entry entry</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

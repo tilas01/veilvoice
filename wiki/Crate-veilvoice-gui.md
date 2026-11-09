@@ -90,7 +90,7 @@ flowchart TD
     n_crashreport["crashreport.rs<br/>306 lines"]
     n_decoys["decoys.rs<br/>230 lines"]
     n_dialog["dialog.rs<br/>430 lines"]
-    n_exporting["exporting.rs<br/>859 lines"]
+    n_exporting["exporting.rs<br/>1163 lines"]
     n_firstrun["firstrun.rs<br/>871 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
     n_group["group.rs<br/>2129 lines"]
@@ -107,13 +107,13 @@ flowchart TD
     n_probe["probe.rs<br/>426 lines"]
     n_progress["progress.rs<br/>539 lines"]
     n_reduced_motion["reduced_motion.rs<br/>285 lines"]
-    n_reset["reset.rs<br/>576 lines"]
+    n_reset["reset.rs<br/>604 lines"]
     n_security["security.rs<br/>3258 lines"]
     n_settings["settings.rs<br/>1686 lines"]
     n_setup["setup.rs<br/>1144 lines"]
     n_soundbar["soundbar.rs<br/>782 lines"]
     n_storage["storage.rs<br/>661 lines"]
-    n_studio["studio.rs<br/>2851 lines"]
+    n_studio["studio.rs<br/>2845 lines"]
     n_theme["theme.rs<br/>813 lines"]
     n_tour["tour.rs<br/>1347 lines"]
     n_updates["updates.rs<br/>276 lines"]
@@ -302,6 +302,10 @@ flowchart TD
     click n_verify href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/verify.rs" "open the source"
     click n_watchfeed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/watchfeed.rs" "open the source"
     click n_window href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/window.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>
@@ -317,7 +321,7 @@ flowchart TD
 | [`crashreport.rs`](File-veilvoice-gui-crashreport) | 306 | Offering the report from the last crash, on the run after it. |
 | [`decoys.rs`](File-veilvoice-gui-decoys) | 230 | Decoy vaults: how many there is room for, and the panel that offers them. |
 | [`dialog.rs`](File-veilvoice-gui-dialog) | 430 | Asking for a file without stopping the window. |
-| [`exporting.rs`](File-veilvoice-gui-exporting) | 859 | The Browser's export, the way a recording tool does it, and its thumbnails. |
+| [`exporting.rs`](File-veilvoice-gui-exporting) | 1163 | The Browser's export, the way a recording tool does it, and its thumbnails. |
 | [`firstrun.rs`](File-veilvoice-gui-firstrun) | 871 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](File-veilvoice-gui-graphics) | 214 | What the window is drawn with, asked for explicitly and then reported. |
 | [`group.rs`](File-veilvoice-gui-group) | 2129 | Group mode: several people in one recording, each with a name and a colour. |
@@ -336,13 +340,13 @@ flowchart TD
 | [`probe.rs`](File-veilvoice-gui-probe) | 426 | What this machine answers, so the settings it starts on were measured here. |
 | [`progress.rs`](File-veilvoice-gui-progress) | 539 | How far through a job is, in the two cases that exist: the ones that can honestly say, and the ones that cannot. |
 | [`reduced_motion.rs`](File-veilvoice-gui-reduced_motion) | 285 | Whether the operating system has been asked to reduce motion. |
-| [`reset.rs`](File-veilvoice-gui-reset) | 576 | Starting again from the window: what would go, then going. |
+| [`reset.rs`](File-veilvoice-gui-reset) | 604 | Starting again from the window: what would go, then going. |
 | [`security.rs`](File-veilvoice-gui-security) | 3258 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](File-veilvoice-gui-settings) | 1686 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](File-veilvoice-gui-setup) | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](File-veilvoice-gui-soundbar) | 782 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](File-veilvoice-gui-storage) | 661 | Where veiled recordings are written, and the encrypted volume that may hold them. |
-| [`studio.rs`](File-veilvoice-gui-studio) | 2851 | The Recording Studio and the Recording Browser. |
+| [`studio.rs`](File-veilvoice-gui-studio) | 2845 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](File-veilvoice-gui-theme) | 813 | Colour schemes for the desktop app. |
 | [`tour.rs`](File-veilvoice-gui-tour) | 1347 | The short walkthrough on a first run, and after an upgrade. |
 | [`updates.rs`](File-veilvoice-gui-updates) | 276 | The manual update check, as the window shows it. |
@@ -351,7 +355,7 @@ flowchart TD
 | [`watchfeed.rs`](File-veilvoice-gui-watchfeed) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](File-veilvoice-gui-window) | 249 | How big the window opens, and why it is not a constant. |
 
-**24,233 functional lines of Rust** in this crate. A functional line is a line
+**24,499 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

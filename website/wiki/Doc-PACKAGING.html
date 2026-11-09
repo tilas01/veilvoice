@@ -123,11 +123,18 @@
 <p>Binaries are never signed in place. The signature is over <code>SHA256SUMS</code> only, so that signing and reproducibility do not conflict: a signature embedded in a binary changes the binary, and two people building the same source would then produce different files for a reason that has nothing to do with the source.</p>
 <p>Authenticode and notarisation both require a certificate tied to a verified legal identity. Windows will show &quot;unknown publisher&quot; and macOS Gatekeeper will refuse to run the binaries until allowed explicitly. Both are stated in <a href="../wiki/Doc-INSTALL.html">INSTALL.md</a> rather than worked around, and both are why the OpenPGP signature over the hash list remains the real check: <strong>verify the archive, then install it.</strong></p>
 <h2 id="building-each-one">Building each one</h2>
-<pre><code><span class="tok-com"># Windows MSI (needs: dotnet tool install -g wix)</span>
-wix build packaging/wix/veilvoice.wxs -arch x64 \
-    -d Version=<span class="tok-num">0.1</span>.<span class="tok-num">22</span> -d BinDir=dist/veilvoice-v0.<span class="tok-num">1.22</span>-windows-x86_64 \
-    -o dist/VeilVoice-<span class="tok-num">0.1</span>.<span class="tok-num">22</span>-x64.msi</code></pre>
-<p>The WiX source refers to <code>packaging/wix/LICENSE.rtf</code> for the licence dialog, which is not committed: WiX needs RTF, and converting <code>LICENSE</code> to RTF is a build step rather than a source file. Any converter will do; the text must be the unmodified GPL-3.0.</p>
+<pre><code>:: Windows: both MSIs, then the Store's MSIX. The folder is the Windows zip,
+:: unpacked. Needs the WiX Toolset <span class="tok-num">5</span> (see the script) and, for the MSIX, the
+:: Windows SDK.
+python tools\package\msi.py veilvoice-v0.<span class="tok-num">1.22</span>-windows-x86_64 dist --version <span class="tok-num">0.1</span>.<span class="tok-num">22</span>
+python tools\package\msix.py veilvoice-v0.<span class="tok-num">1.22</span>-windows-x86_64 dist --version <span class="tok-num">0.1</span>.<span class="tok-num">22</span> ^
+    --identity-name &lt;from Partner Center&gt; --publisher &lt;from Partner Center&gt; ^
+    --publisher-display-name &lt;from Partner Center&gt;</code></pre>
+<p><code>msi.py</code> runs <code>wix build packaging/wix/veilvoice.wxs -d Version=0.1.22</code> once per scope, with the product code it derives from the version and the licence converted to RTF on the way, so neither is a file somebody has to keep in step by hand.</p>
+<pre><code><span class="tok-com"># The AppImage, from two programs built on the oldest Linux it should run on.</span>
+<span class="tok-com"># appimagetool and the runtime are the AppImage project's own; packages.yml</span>
+<span class="tok-com"># pins both by hash.</span>
+tools/package/appimage.sh target/release dist <span class="tok-num">0.1</span>.<span class="tok-num">22</span> ./appimagetool ./runtime</code></pre>
 <pre><code><span class="tok-com"># Debian / Ubuntu  (copy packaging/debian to ./debian first)</span>
 <span class="tok-com">#</span>
 <span class="tok-com"># `debian/source/format` is a file in a directory, and this repository keeps it</span>

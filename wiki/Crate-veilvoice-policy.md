@@ -99,6 +99,10 @@ flowchart TD
     click n_mandate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" "open the source"
     click n_workspace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/workspace.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>

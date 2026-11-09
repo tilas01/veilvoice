@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/reset.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 612 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 903 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs)
 
 ## Contents
 
@@ -96,25 +96,26 @@ alone if that is all you wanted.
 
 ## What this file contains
 
-612 lines defining **10 functions** (8 public), **4 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+903 lines defining **10 functions** (8 public), **5 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
-- `enum Keep` (line 76) -- What a reset leaves behind.
-- `struct Doomed` (line 87) -- One thing a reset would remove, in the words somebody can read.
-- `struct Plan` (line 105) -- What a reset would do, before it does any of it.
-- `struct Report` (line 148) -- What a reset did.
+- `enum Keep` (line 84) -- What a reset leaves behind.
+- `struct Doomed` (line 95) -- One thing a reset would remove, in the words somebody can read.
+- `struct Plan` (line 113) -- What a reset would do, before it does any of it.
+- `struct Report` (line 164) -- What a reset did.
+- `struct Keys` (line 358) -- Everything "keep the keys" has to keep, or the reason it cannot be worked out.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Plan::bytes` (line 122) -- How much would go altogether.
-- `Plan::files` (line 127) -- How many files would go altogether.
-- `Plan::irreplaceable` (line 136) -- Whether any of it is something nothing can put back.
-- `Plan::is_empty` (line 141) -- Whether there is nothing to do.
-- `Report::complete` (line 161) -- Whether everything the plan named is gone.
-- `plan` (line 173) -- What this reset would do to the folder this copy is using.
-  - reaches: `plan_in`, `key_paths`, `measure`
-- `carry_out` (line 293) -- Remove what the plan named.
+- `Plan::bytes` (line 138) -- How much would go altogether.
+- `Plan::files` (line 143) -- How many files would go altogether.
+- `Plan::irreplaceable` (line 152) -- Whether any of it is something nothing can put back.
+- `Plan::is_empty` (line 157) -- Whether there is nothing to do.
+- `Report::complete` (line 177) -- Whether everything the plan named is gone.
+- `plan` (line 189) -- What this reset would do to the folder this copy is using.
+  - reaches: `plan_in`, `keys_in`, `measure`
+- `carry_out` (line 321) -- Remove what the plan named.
 
 ## What calls what
 
@@ -136,35 +137,44 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_bytes(["Plan::bytes<br/>line 122"])
-    n_files(["Plan::files<br/>line 127"])
-    n_irreplaceable(["Plan::irreplaceable<br/>line 136"])
-    n_is_empty(["Plan::is_empty<br/>line 141"])
-    n_complete(["Report::complete<br/>line 161"])
-    n_plan(["plan<br/>line 173"])
-    n_plan_in["plan_in<br/>line 183"]
-    n_carry_out(["carry_out<br/>line 293"])
-    n_key_paths["key_paths<br/>line 327"]
-    n_measure["measure<br/>line 351"]
+    n_bytes(["Plan::bytes<br/>line 138"])
+    n_files(["Plan::files<br/>line 143"])
+    n_irreplaceable(["Plan::irreplaceable<br/>line 152"])
+    n_is_empty(["Plan::is_empty<br/>line 157"])
+    n_complete(["Report::complete<br/>line 177"])
+    n_plan(["plan<br/>line 189"])
+    n_plan_in["plan_in<br/>line 199"]
+    n_carry_out(["carry_out<br/>line 321"])
+    n_keys_in["keys_in<br/>line 392"]
+    n_measure["measure<br/>line 445"]
     n_plan --> n_plan_in
-    n_plan_in --> n_key_paths
+    n_plan_in --> n_keys_in
     n_plan_in --> n_measure
-    click n_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L122" "open the source"
-    click n_files href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L127" "open the source"
-    click n_irreplaceable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L136" "open the source"
-    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L141" "open the source"
-    click n_complete href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L161" "open the source"
-    click n_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L173" "open the source"
-    click n_plan_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L183" "open the source"
-    click n_carry_out href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L293" "open the source"
-    click n_key_paths href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L327" "open the source"
-    click n_measure href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L351" "open the source"
+    click n_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L138" "open the source"
+    click n_files href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L143" "open the source"
+    click n_irreplaceable href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L152" "open the source"
+    click n_is_empty href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L157" "open the source"
+    click n_complete href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L177" "open the source"
+    click n_plan href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L189" "open the source"
+    click n_plan_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L199" "open the source"
+    click n_carry_out href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L321" "open the source"
+    click n_keys_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L392" "open the source"
+    click n_measure href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L445" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_bytes,n_files,n_irreplaceable,n_is_empty,n_complete,n_plan,n_carry_out entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_plan_in api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_key_paths,n_measure helper
+    class n_keys_in,n_measure helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>
@@ -173,20 +183,21 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `Keep` <sub>pub enum</sub> | [76](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L76) | What a reset leaves behind. |
-| `Doomed` <sub>pub struct</sub> | [87](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L87) | One thing a reset would remove, in the words somebody can read. |
-| `Plan` <sub>pub struct</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L105) | What a reset would do, before it does any of it. |
-| `Plan::bytes` <sub>pub fn</sub> | [122](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L122) | How much would go altogether. |
-| `Plan::files` <sub>pub fn</sub> | [127](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L127) | How many files would go altogether. |
-| `Plan::irreplaceable` <sub>pub fn</sub> | [136](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L136) | Whether any of it is something nothing can put back. |
-| `Plan::is_empty` <sub>pub fn</sub> | [141](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L141) | Whether there is nothing to do. |
-| `Report` <sub>pub struct</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L148) | What a reset did. |
-| `Report::complete` <sub>pub fn</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L161) | Whether everything the plan named is gone. |
-| `plan` <sub>pub fn</sub> | [173](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L173) | What this reset would do to the folder this copy is using. |
-| `plan_in` <sub>pub fn</sub> | [183](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L183) | The same, for a folder named outright. |
-| `carry_out` <sub>pub fn</sub> | [293](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L293) | Remove what the plan named. |
-| `key_paths` <sub>fn</sub> | [327](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L327) | The app lock's own files: the index, and the two copies it names. |
-| `measure` <sub>fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L351) | How many files and how many bytes, counting inside a folder. |
+| `Keep` <sub>pub enum</sub> | [84](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L84) | What a reset leaves behind. |
+| `Doomed` <sub>pub struct</sub> | [95](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L95) | One thing a reset would remove, in the words somebody can read. |
+| `Plan` <sub>pub struct</sub> | [113](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L113) | What a reset would do, before it does any of it. |
+| `Plan::bytes` <sub>pub fn</sub> | [138](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L138) | How much would go altogether. |
+| `Plan::files` <sub>pub fn</sub> | [143](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L143) | How many files would go altogether. |
+| `Plan::irreplaceable` <sub>pub fn</sub> | [152](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L152) | Whether any of it is something nothing can put back. |
+| `Plan::is_empty` <sub>pub fn</sub> | [157](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L157) | Whether there is nothing to do. |
+| `Report` <sub>pub struct</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L164) | What a reset did. |
+| `Report::complete` <sub>pub fn</sub> | [177](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L177) | Whether everything the plan named is gone. |
+| `plan` <sub>pub fn</sub> | [189](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L189) | What this reset would do to the folder this copy is using. |
+| `plan_in` <sub>pub fn</sub> | [199](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L199) | The same, for a folder named outright. |
+| `carry_out` <sub>pub fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L321) | Remove what the plan named. |
+| `Keys` <sub>struct</sub> | [358](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L358) | Everything "keep the keys" has to keep, or the reason it cannot be worked out. |
+| `keys_in` <sub>fn</sub> | [392](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L392) | The app lock's own files: the index, the two copies it names, the decoy record and the single file the vault replaced. |
+| `measure` <sub>fn</sub> | [445](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/reset.rs#L445) | How many files and how many bytes, counting inside a folder. |
 
 ---
 

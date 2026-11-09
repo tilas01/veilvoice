@@ -171,7 +171,12 @@ flowchart TD
     click n_level_at href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L127&quot; &quot;open the source&quot;
     click n_svg_path href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/waveform.rs#L154&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_len,n_is_empty,n_envelope,n_level_at,n_svg_path entry</code></pre>
+    class n_len,n_is_empty,n_envelope,n_level_at,n_svg_path entry
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
+    end
+    class key_entry entry</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>

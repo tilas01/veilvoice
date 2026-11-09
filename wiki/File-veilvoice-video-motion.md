@@ -190,6 +190,15 @@ flowchart TD
     class n_at,n_templates,n_still api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_default,n_from_palette,n_layout,n_draw_wave,n_draw_foot,n_paint,n_letter,n_clock,n_mix helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

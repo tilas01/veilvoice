@@ -287,12 +287,12 @@ veilvoice reseal --dry-run
 
 > Put this machine back to a new install: settings, policies, the mandate, the vaults and the app lock
 
-Puts this machine back to a new install: settings, policies, the mandate, the vaults and the app lock. What would go is printed first, a line per thing with the size of it, and where any of it cannot be put back the word RESET has to be typed. It is here as well as in the window because a policy set from the command line has to be removable there, and because a machine with no display has no window to open.
+Puts this machine back to a new install: settings, policies, the mandate, the vaults and the app lock. What would go is printed first, a line per thing with the size of it, and where any of it cannot be put back the word RESET has to be typed. The app lock is kept unless --drop-keys asks for it too, which is what the window does. It is here as well as in the window because a policy set from the command line has to be removable there, and because a machine with no display has no window to open.
 
 **In the window:** **Settings**, under Storage, which shows the same list and asks for the same word.
 
 ```bash
-veilvoice reset --keep-keys --dry-run
+veilvoice reset --dry-run
 ```
 
 ## `veilvoice policy`

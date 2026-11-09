@@ -192,6 +192,15 @@ flowchart TD
     class n_random api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_nibble,n_base32_encode,n_base32_decode,n_base45_encode,n_base45_decode,n_base85_encode,n_base85_decode,n_base91_encode,n_base91_decode,n_sixbit_encode,n_sixbit_decode helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

@@ -112,6 +112,11 @@ flowchart TD
     click n_zero_sized_chunks_do_not_stall_the_walker href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs#L282" "open the source"
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_new,n_next_u32,n_below,n_byte,n_rounds,n_seed_wav,n_mutate,n_check_output,n_the_chunk_walker_survives_hostile_input,n_the_realistic_policy_survives_hostile_input,n_pure_noise_is_rejected_or_handled,n_cleaning_is_idempotent,n_every_truncation_of_a_valid_file_is_handled,n_a_riff_size_of_u32_max_does_not_overflow_the_length_arithmetic,n_zero_sized_chunks_do_not_stall_the_walker helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_helper["helper: private to this file"]
+    end
+    class key_helper helper
 ```
 
 </details>

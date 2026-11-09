@@ -59,6 +59,11 @@ flowchart TD
     click n_known href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/input.rs#L84" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_look,n_known entry
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+    end
+    class key_entry entry
 ```
 
 </details>

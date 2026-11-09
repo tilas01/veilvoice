@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/reset.svg" alt="reset.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/reset.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 576 lines &middot; <a href="reset.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 604 lines &middot; <a href="reset.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#two-steps-always-and-never-one">Two steps, always, and never one</a>
@@ -90,7 +90,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>576 lines defining <strong>13 functions</strong> (3 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>604 lines defining <strong>13 functions</strong> (3 public), <strong>3 types</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum State</code> <span style="color:var(--muted)">line 51</span> &middot; Where the reset is up to.</li>
 <li><code>enum Answer</code> <span style="color:var(--muted)">line 67</span> &middot; What a worker sends back.</li>
@@ -181,17 +181,17 @@
 <a href="reset.src.html#fn-reset-finished">
 <rect x="472.1" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="546.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Reset::finished</text>
-<text x="546.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 373</text>
+<text x="546.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 401</text>
 </a>
 <a href="reset.src.html#fn-files">
 <rect x="219.0" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="265.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">files</text>
-<text x="265.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 414</text>
+<text x="265.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 442</text>
 </a>
 <a href="reset.src.html#fn-size">
 <rect x="337.5" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="383.7" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">size</text>
-<text x="383.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 427</text>
+<text x="383.7" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 455</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -218,9 +218,9 @@ flowchart TD
     n_panel([&quot;Reset::panel&lt;br/&gt;line 190&quot;])
     n_offer[&quot;Reset::offer&lt;br/&gt;line 223&quot;]
     n_agree[&quot;Reset::agree&lt;br/&gt;line 244&quot;]
-    n_finished[&quot;Reset::finished&lt;br/&gt;line 373&quot;]
-    n_files[&quot;files&lt;br/&gt;line 414&quot;]
-    n_size[&quot;size&lt;br/&gt;line 427&quot;]
+    n_finished[&quot;Reset::finished&lt;br/&gt;line 401&quot;]
+    n_files[&quot;files&lt;br/&gt;line 442&quot;]
+    n_size[&quot;size&lt;br/&gt;line 455&quot;]
     n_agree --&gt; n_carry_out
     n_agree --&gt; n_files
     n_agree --&gt; n_may_proceed
@@ -240,13 +240,20 @@ flowchart TD
     click n_panel href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L190&quot; &quot;open the source&quot;
     click n_offer href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L223&quot; &quot;open the source&quot;
     click n_agree href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L244&quot; &quot;open the source&quot;
-    click n_finished href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L373&quot; &quot;open the source&quot;
-    click n_files href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L414&quot; &quot;open the source&quot;
-    click n_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L427&quot; &quot;open the source&quot;
+    click n_finished href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L401&quot; &quot;open the source&quot;
+    click n_files href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L442&quot; &quot;open the source&quot;
+    click n_size href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/reset.rs#L455&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_is_busy,n_poll,n_panel entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_default,n_look,n_carry_out,n_keep,n_may_proceed,n_offer,n_agree,n_finished,n_files,n_size helper</code></pre>
+    class n_default,n_look,n_carry_out,n_keep,n_may_proceed,n_offer,n_agree,n_finished,n_files,n_size helper
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
+        key_helper[&quot;helper: private to this file&quot;]
+    end
+    class key_entry entry
+    class key_helper helper</code></pre>
 <p style="color:var(--muted);font-size:13px">This site loads no third-party script, so it cannot run Mermaid; the diagram above is the same nodes and edges drawn by the generator instead. GitHub renders the source below directly.</p>
 </details>
 </section>
@@ -267,9 +274,9 @@ flowchart TD
 <tr><td><code>Reset::panel</code> <sub>pub fn</sub></td><td><a href="reset.src.html#fn-reset-panel">190</a></td><td>Draw it.</td></tr>
 <tr><td><code>Reset::offer</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-reset-offer">223</a></td><td>The offer, before anything has been counted.</td></tr>
 <tr><td><code>Reset::agree</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-reset-agree">244</a></td><td>The plan, and the decision.</td></tr>
-<tr><td><code>Reset::finished</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-reset-finished">373</a></td><td>What happened, and the way out.</td></tr>
-<tr><td><code>files</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-files">414</a></td><td>&quot;one file&quot; or &quot;nine files&quot;.</td></tr>
-<tr><td><code>size</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-size">427</a></td><td>A size somebody can judge at a glance.</td></tr>
+<tr><td><code>Reset::finished</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-reset-finished">401</a></td><td>What happened, and the way out.</td></tr>
+<tr><td><code>files</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-files">442</a></td><td>&quot;one file&quot; or &quot;nine files&quot;.</td></tr>
+<tr><td><code>size</code> <sub>fn</sub></td><td><a href="reset.src.html#fn-size">455</a></td><td>A size somebody can judge at a glance.</td></tr>
 </tbody></table>
 </section>
 </div></div>

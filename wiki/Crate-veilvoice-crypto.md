@@ -104,14 +104,14 @@ flowchart TD
     n_hybrid["hybrid.rs<br/>531 lines"]
     n_kdf["kdf.rs<br/>649 lines"]
     n_layout["layout.rs<br/>331 lines"]
-    n_lock["lock.rs<br/>2378 lines"]
+    n_lock["lock.rs<br/>2384 lines"]
     n_privatefile["privatefile.rs<br/>313 lines"]
     n_reseal["reseal.rs<br/>538 lines"]
-    n_reset["reset.rs<br/>612 lines"]
+    n_reset["reset.rs<br/>903 lines"]
     n_shred["shred.rs<br/>417 lines"]
     n_studio["studio.rs<br/>1522 lines"]
     n_tape["tape.rs<br/>391 lines"]
-    n_vault["vault.rs<br/>769 lines"]
+    n_vault["vault.rs<br/>816 lines"]
     n_weave["weave.rs<br/>1811 lines"]
     n_decoy --> n_kdf
     n_decoy --> n_lock
@@ -126,6 +126,9 @@ flowchart TD
     n_lock --> n_privatefile
     n_lock --> n_vault
     n_reseal --> n_hybrid
+    n_reset --> n_decoy
+    n_reset --> n_kdf
+    n_reset --> n_lock
     n_studio --> n_aead
     n_studio --> n_privatefile
     n_vault --> n_decoy
@@ -150,6 +153,10 @@ flowchart TD
     click n_tape href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/tape.rs" "open the source"
     click n_vault href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/vault.rs" "open the source"
     click n_weave href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/weave.rs" "open the source"
+    subgraph chart_key ["Key"]
+        direction LR
+        key_box["box: a file in this crate, with how many lines it holds"]
+    end
 ```
 
 </details>
@@ -167,20 +174,20 @@ flowchart TD
 | [`kdf.rs`](File-veilvoice-crypto-kdf) | 649 | Password-based key derivation with Argon2id. |
 | [`layout.rs`](File-veilvoice-crypto-layout) | 331 | Everything VeilVoice keeps between runs, in one list. |
 | [`lib.rs`](File-veilvoice-crypto-lib) | 289 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
-| [`lock.rs`](File-veilvoice-crypto-lock) | 2378 | The application lock: an Argon2id password verifier with a rate limit. |
+| [`lock.rs`](File-veilvoice-crypto-lock) | 2384 | The application lock: an Argon2id password verifier with a rate limit. |
 | [`privatefile.rs`](File-veilvoice-crypto-privatefile) | 313 | Writing a file that only its owner can read. |
 | [`reseal.rs`](File-veilvoice-crypto-reseal) | 538 | Finding files that were sealed under no passphrase at all, and sealing them again under a real one. |
-| [`reset.rs`](File-veilvoice-crypto-reset) | 612 | Putting this machine back to a new install. |
+| [`reset.rs`](File-veilvoice-crypto-reset) | 903 | Putting this machine back to a new install. |
 | [`shred.rs`](File-veilvoice-crypto-shred) | 417 | Secure erasure, the self-destruct. |
 | [`studio.rs`](File-veilvoice-crypto-studio) | 1522 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](File-veilvoice-crypto-tape) | 391 | A recording held in locked, zeroizing memory while it is still being made. |
-| [`vault.rs`](File-veilvoice-crypto-vault) | 769 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [`vault.rs`](File-veilvoice-crypto-vault) | 816 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
 | [`weave.rs`](File-veilvoice-crypto-weave) | 1811 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
 | [`seal_and_open.rs`](File-veilvoice-crypto-examples-seal_and_open) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](File-veilvoice-crypto-tests-parser_fuzz) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](File-veilvoice-crypto-tests-timing) | 249 | Timing measurement of the password paths. |
 
-**8,628 functional lines of Rust** in this crate. A functional line is a line
+**8,811 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

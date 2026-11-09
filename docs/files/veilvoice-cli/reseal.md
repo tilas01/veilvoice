@@ -108,6 +108,13 @@ flowchart TD
     class n_run entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_where_to_look,n_applock,n_ask,n_print_reach helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>

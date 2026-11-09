@@ -113,6 +113,13 @@ flowchart TD
     class n_can_draw,n_scale_for entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_glyph,n_width_of api
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+    end
+    class key_entry entry
+    class key_api api
 ```
 
 </details>

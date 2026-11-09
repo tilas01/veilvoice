@@ -128,6 +128,15 @@ flowchart TD
     class n_explain api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_status,n_set,n_remove,n_allowed,n_lock_or_explain,n_read_twice,n_text,n_print_scope,n_print_no_destruction,n_print_wrapped,n_print_pair_rule,n_paragraphs helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_api["api: public, and also used inside this file"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_api api
+    class key_helper helper
 ```
 
 </details>

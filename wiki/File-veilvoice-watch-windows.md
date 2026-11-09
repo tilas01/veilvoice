@@ -135,6 +135,13 @@ flowchart TD
     class n_scan entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_no_window,n_reg_exe,n_collect,n_query_tree,n_parse_consent_dump,n_hex_value,n_decode_path,n_friendly_name,n_filetime_to_system helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>

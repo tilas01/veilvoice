@@ -115,6 +115,11 @@ flowchart TD
     click n_panel href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/crashreport.rs#L105" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_look,n_waiting,n_panel entry
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+    end
+    class key_entry entry
 ```
 
 </details>

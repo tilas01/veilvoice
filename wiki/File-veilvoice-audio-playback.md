@@ -88,6 +88,11 @@ flowchart TD
     click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/playback.rs#L107" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_position,n_duration,n_finished,n_peak,n_start entry
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+    end
+    class key_entry entry
 ```
 
 </details>

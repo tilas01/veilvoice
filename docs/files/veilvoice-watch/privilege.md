@@ -144,6 +144,13 @@ flowchart TD
     class n_label,n_what_it_sees,n_how_to_raise,n_is_full_view,n_level,n_service_installed entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
     class n_windows_level,n_unix_level helper
+    subgraph chart_key ["Key"]
+        direction LR
+        key_entry["entry: a way in: public, and nothing in this file calls it"]
+        key_helper["helper: private to this file"]
+    end
+    class key_entry entry
+    class key_helper helper
 ```
 
 </details>
