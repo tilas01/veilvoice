@@ -20,6 +20,7 @@
 <script src="js/prefetch.js" defer></script>
 <script src="js/legal.js" defer></script>
 <script src="js/reveal.js" defer></script>
+<script src="js/banner.js" defer></script>
 <script src="js/teleport.js" defer></script>
 <!-- Written by tools/site/seo.py. Edit that, not this. -->
 <link rel="canonical" href="https://tilas01.github.io/veilvoice/">
@@ -112,6 +113,10 @@
     </ul>
     <span class="bn-rule"></span>
   </div>
+  <!-- Shown only to readers whose system asks for reduced motion, for whom the
+       banner keeps a slow sweep running; see "calmer, not frozen" in main.css.
+       Outside the aria-hidden banner so that it can be reached and announced. -->
+  <button type="button" class="bn-pause" aria-pressed="false">Pause the banner</button>
   <noscript>
     <img class="bn-fallback" src="assets/banner.gif"
          alt="VeilVoice: irreversible voice de-identification"

@@ -67,6 +67,10 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: none
+          # The extended suite traces untrusted input further than the
+          # default, including into a prompt for an AI model, so a pull
+          # request that opens a prompt injection route is flagged in review.
+          queries: security-extended
 
       - uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:

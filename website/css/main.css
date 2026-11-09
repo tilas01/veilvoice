@@ -490,6 +490,55 @@ html:not(.js) .bn { display: none; }
   to   { background-position: 200% 0; }
 }
 
+/*
+ * The banner under reduced motion: calmer, not frozen.
+ *
+ * The global rule at the top of this file stops every animation for a reader
+ * whose system asks for less movement, and for the rest of the page that is
+ * right. The banner was the exception people noticed: frozen, it read as
+ * broken rather than as calm. So for those readers two of its three motions
+ * keep running at well under half their usual speed, the light crossing behind
+ * the wordmark and the line along the bottom edge, and the drifting blurred
+ * copy of the word stays still. Nothing flashes and nothing moves fast.
+ *
+ * Moving for longer than five seconds earns a way to stop it (WCAG 2.2.2), so
+ * the same readers get a pause button, `.bn-pause` below, which `banner.js`
+ * wires up. Everyone else sees the banner exactly as before and no button.
+ *
+ * `.bn .bn-sweep` outranks the global `*` rule because both are `!important`
+ * and this selector is more specific. A browser that does not understand the
+ * media query never applies any of this, and so shows the full banner, which
+ * is the intended default.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .bn .bn-sweep,
+  .bn .bn-rule {
+    animation-duration: 24s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .bn.bn-paused .bn-sweep,
+  .bn.bn-paused .bn-rule {
+    animation-play-state: paused !important;
+  }
+  html.js .bn-pause { display: inline-block; }
+}
+
+.bn-pause {
+  display: none;
+  margin: 8px auto 0;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-soft);
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.bn-pause:hover { color: var(--fg); }
+.bn-pause:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* The `<noscript>` copy, which is the README's GIF. Sized like the drawing it
  * stands in for so the page does not change shape between the two editions. */
 .bn-fallback {

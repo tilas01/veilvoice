@@ -21,6 +21,7 @@ const SUITES = [
   require("./markdown.complexity.test.js"),
   require("./repo.test.js"),
   require("./reveal.test.js"),
+  require("./banner.test.js"),
   require("./search.test.js"),
   require("./links.test.js"),
   require("./nav.test.js"),
