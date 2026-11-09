@@ -19,7 +19,7 @@
 <text x="38.0" y="172.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--fg, #c0caf5)">ahead</text>
 <text x="38.0" y="185.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="var(--muted, #737aa2)">ROADMAP.md</text>
 </g>
-<g opacity="0.85"><title>Roadmap 191. Next: Two Windows installers</title><rect class="gr-square" style="animation-delay:8ms" x="142.0" y="160.0" width="22.0" height="22.0" rx="4" fill="var(--accent, #7aa2f7)"/></g>
+<g opacity="0.85"><title>Roadmap 193. Next: Two Windows installers</title><rect class="gr-square" style="animation-delay:8ms" x="142.0" y="160.0" width="22.0" height="22.0" rx="4" fill="var(--accent, #7aa2f7)"/></g>
 <g><title>A feature or other change, landed</title>
 <rect x="24.0" y="212.0" width="12" height="12" rx="3" fill="var(--ok, #9ece6a)"/>
 <text x="42.0" y="222.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">done: 1</text></g>
