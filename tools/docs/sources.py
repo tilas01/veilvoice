@@ -384,7 +384,8 @@ def html_page(colours, rel, text, fingerprint):
         body.append('<section id="s-calls">')
         body.append("<h2>WHAT CALLS WHAT</h2>")
         body.append('<div class="diagram">')
-        body.append(docs.diagram_svg(colours, nodes, edges).rstrip("\n"))
+        body.append(docs.diagram_svg(colours, nodes, edges,
+                                     box_key=docs.FUNCTION_BOX).rstrip("\n"))
         body.append("</div>")
         body.append(
             '<p style="color:var(--muted);font-size:13px">Read out of the source: an '
@@ -596,7 +597,7 @@ def outputs():
         if kind_of(rel) != "css":
             nodes, edges = call_graph(text, kind_of(rel))
             files["assets/sources/%s-chart.svg" % slug] = docs.diagram_svg(
-                colours, nodes, edges
+                colours, nodes, edges, box_key=docs.FUNCTION_BOX
             )
         files["docs/source/%s.md" % slug] = markdown_page(colours, rel, text)
         files["wiki/%s.md" % wiki_page_name(rel)] = wiki_page(rel, text)

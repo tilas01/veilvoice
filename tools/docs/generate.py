@@ -1298,8 +1298,24 @@ ROLES = (
     ("helper", "accent-2", "private to this file"),
 )
 
+# What a box means in a drawing whose boxes have no role, which is the crate
+# map and the website's script charts. Those were drawn with no key at all,
+# because the key only ever listed roles, and a picture with no key is one a
+# reader has to guess at.
+FILE_BOX = "a file in this crate, with how many lines it holds"
+FUNCTION_BOX = "a function in this file, with the line it starts on"
 
-def mermaid(colours, nodes, edges, direction="TD"):
+
+def drawing_key(nodes, box_key=None):
+    """The rows of a drawing's key: its roles, or what a plain box is."""
+    used = {node.get("role") for node in nodes}
+    key = [(role, token, why) for role, token, why in ROLES if role in used]
+    if not key and box_key and nodes:
+        key = [("box", "border", box_key)]
+    return key
+
+
+def mermaid(colours, nodes, edges, direction="TD", box_key=None):
     out = [mermaid_theme(colours), "flowchart %s" % direction]
     for node in nodes:
         label = "<br/>".join(node["label"])
@@ -1327,6 +1343,19 @@ def mermaid(colours, nodes, edges, direction="TD"):
                    % (role, colours["bg-soft"], colours[token], colours["fg"]))
         members = [mermaid_id(n["id"]) for n in nodes if n.get("role") == role]
         out.append("    class %s %s" % (",".join(members), role))
+
+    # The key, inside the chart, so the Mermaid twin explains itself the way
+    # the drawn picture does: one box per colour, in that colour.
+    key = drawing_key(nodes, box_key)
+    if key:
+        out.append('    subgraph chart_key ["Key"]')
+        out.append("        direction LR")
+        for role, _, why in key:
+            out.append('        key_%s["%s: %s"]' % (role, role, why))
+        out.append("    end")
+        for role, _, _ in key:
+            if role in used:
+                out.append("    class key_%s %s" % (role, role))
     return "\n".join(out)
 
 
@@ -1649,7 +1678,8 @@ def wrap_text(text, columns):
     return out
 
 
-def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
+def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None,
+                box_key=None):
     """Lay the same graph out as SVG, for readers with no JavaScript.
 
     A simple layered drawing: rank by longest path, order within a rank by
@@ -1750,8 +1780,7 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
     # everywhere else the drawing goes, which is a README, the wiki, and an
     # `<img>` where nothing around it comes with it. A picture that needs a
     # caption it does not carry is a picture that arrives without its meaning.
-    role_names = {node.get("role") for node in nodes}
-    key = [(role, token, why) for role, token, why in ROLES if role in role_names]
+    key = drawing_key(nodes, box_key)
 
     # The canvas has to be at least as wide as its own key.
     #
@@ -1922,9 +1951,16 @@ def diagram_svg(colours, nodes, edges, width=640, on_site=False, note=None):
     if key:
         y += 6.0
         for role, token, why in key:
-            add('<rect x="%.1f" y="%.1f" width="9" height="9" rx="2" '
-                'fill="var(--%s, %s)"/>'
-                % (margin, y, token, colours[token]))
+            if role == "box":
+                # Drawn as the boxes are: an outline, not a swatch of colour.
+                add('<rect x="%.1f" y="%.1f" width="9" height="9" rx="2" '
+                    'fill="var(--bg-soft, %s)" stroke="var(--border, %s)" '
+                    'stroke-width="1.5"/>'
+                    % (margin, y, colours["bg-soft"], colours["border"]))
+            else:
+                add('<rect x="%.1f" y="%.1f" width="9" height="9" rx="2" '
+                    'fill="var(--%s, %s)"/>'
+                    % (margin, y, token, colours[token]))
             add('<text x="%.1f" y="%.1f" font-family="%s" font-size="11" '
                 'fill="var(--muted, %s)">%s</text>'
                 % (margin + 15, y + 9, MONO, colours["muted"],
@@ -2250,7 +2286,7 @@ def markdown_crate(colours, model, links):
         "uses, read out of the source by the generator rather than drawn by\n"
         "hand. A dependency that goes away loses its arrow the next time this\n"
         "file is written.\n",
-        mermaid(colours, nodes, edges)))
+        mermaid(colours, nodes, edges, box_key=FILE_BOX)))
 
     out.append("## The files\n")
     out.append("| File | Lines | What it is |")
@@ -2642,7 +2678,7 @@ def doc_html(lines, anchors=None):
     return out
 
 
-def diagram_block(colours, nodes, edges, note, mermaid_source):
+def diagram_block(colours, nodes, edges, note, mermaid_source, box_key=None):
     """The inline SVG, the explanation, and the Mermaid source beside it.
 
     The note goes *into* the drawing as well as under it. On this page the
@@ -2653,7 +2689,7 @@ def diagram_block(colours, nodes, edges, note, mermaid_source):
     """
     out = ['<div class="diagram">']
     out.append(diagram_svg(colours, nodes, edges, on_site=True,
-                           note=strip_markup(note)).rstrip("\n"))
+                           note=strip_markup(note), box_key=box_key).rstrip("\n"))
     out.append('</div>')
     out.append('<p class="muted" style="color:var(--muted);font-size:13px">%s</p>'
                % note)
@@ -2759,7 +2795,7 @@ def html_crate(colours, model, fingerprint, links):
         colours, nodes, edges,
         "Every arrow is a <code>crate::</code> or <code>super::</code> path one "
         "module actually uses, read out of the source rather than drawn by hand.",
-        mermaid(colours, nodes, edges)))
+        mermaid(colours, nodes, edges, box_key=FILE_BOX), box_key=FILE_BOX))
     body.append('</section>')
 
     body.append('<section id="s-files">')
@@ -2977,7 +3013,7 @@ def wiki_crate(colours, model, links):
     out.extend(diagram_markdown(
         "%sassets/diagrams/%s.svg" % (RAW, crate),
         "how %s fits together" % crate, None,
-        mermaid(colours, nodes, edges)))
+        mermaid(colours, nodes, edges, box_key=FILE_BOX)))
 
     out.append("## The files\n")
     out.append("| File | Lines | What it is |")
@@ -3132,7 +3168,7 @@ def outputs(root):
             colours, crate, model["description"], "crate")
         crate_nodes, crate_edges = crate_graph(model)
         files["assets/diagrams/%s.svg" % crate] = diagram_svg(
-            colours, crate_nodes, crate_edges,
+            colours, crate_nodes, crate_edges, box_key=FILE_BOX,
             note="The files in %s, and which of them names which. An edge means "
                  "the name appears in the other file, which is a reading of the "
                  "source rather than a resolved import." % crate)
@@ -3222,7 +3258,7 @@ def is_ours(path):
 NOT_OURS = ("website/reference/source/", "wiki/Source-", "wiki/Guide-",
             "wiki/Doc-", "wiki/Home.md", "wiki/_Sidebar.md")
 
-OWNED = ("docs/files", "website/reference", "assets/banners",
+OWNED = ("docs/files", "website/reference", "assets/banners", "assets/diagrams",
          "website/assets/banners", "wiki")
 
 

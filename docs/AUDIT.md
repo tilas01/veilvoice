@@ -182,6 +182,38 @@ because it is cheap to repeat: the fixture was easier to write wrongly than
 rightly, so every test built on it inherited the wrong branch, and each of them
 passed.
 
+## The thirty-seventh round: every drawing explains itself
+
+Every generated picture should carry its own key, and each Mermaid chart the
+same key, since either can be the only one a reader sees. Reading every drawing under `assets/diagrams/` and `assets/sources/` for
+that turned up one finding.
+
+### F-286: a crate's map of its files, and the website's script charts, had no key
+
+**Where:** `tools/docs/generate.py` (`diagram_svg`, `mermaid`, `OWNED`) and
+`tools/docs/sources.py`.
+
+**What happened:** a drawing's key listed the roles its boxes were coloured
+by, and nothing else. The crate maps and the script charts colour no box by
+role, so their key was empty and was not drawn: thirteen crate pictures and
+eleven script charts reached the README, the wiki and the site with only a
+caption. No Mermaid chart carried a key at all. Fourteen more crate pictures,
+for crates folded into others, were still in `assets/diagrams/` because that
+folder was not in the list of places the generator sweeps for files it no
+longer writes.
+
+**Fix:** a drawing with no roles keys what its plain box is (a file with its
+line count, or a function with its first line), drawn as the boxes are, above
+the dashed row every key already had. Every Mermaid chart ends in a `Key`
+subgraph with one box per row of the picture's key, in the same colours.
+`assets/diagrams/` joins the swept places, which removed the 42 stale files.
+
+**Regression test:** `tools/site-tests/diagrams.test.js` fails any drawing in
+`assets/diagrams/` or any `assets/sources/` chart without the key's last row,
+and any Mermaid flowchart in the wiki, `docs/` or a crate's README without the
+`Key` subgraph. Run against the tree before this fix it fails on the crate
+maps.
+
 ## The thirty-sixth round: every code scanning alert, read one at a time
 
 The repository's own CodeQL workflow replaced GitHub's default setup on

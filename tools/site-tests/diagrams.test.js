@@ -38,6 +38,12 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..", "..");
 const REFERENCE = path.join(ROOT, "website", "reference");
 const DIAGRAMS = path.join(ROOT, "assets", "diagrams");
+const SOURCES = path.join(ROOT, "assets", "sources");
+
+// The last row of every drawing's key, whatever else the key lists. A crate's
+// map of its files and the website's script charts used to be drawn with no
+// key at all, because the key only listed roles and their boxes have none.
+const KEY_ROW = "dashed: a call that goes back up, or across a wrapped rank";
 
 // The reference pages put the drawing in a 630 px column, measured. The
 // generator lays out to 640 and a single box may be wider than the budget when
@@ -150,6 +156,41 @@ function run() {
       }
       tags.forEach((tag) => check(tag, rel));
     }
+  }
+
+  // Every drawing explains itself: a key inside the picture, and a key inside
+  // its Mermaid twin, since either can be the only one a reader sees.
+  const unkeyed = [];
+  const keyable = [
+    ...walk(DIAGRAMS, ".svg"),
+    ...walk(SOURCES, ".svg").filter((file) => file.endsWith("-chart.svg")),
+  ];
+  for (const file of keyable) {
+    const text = fs.readFileSync(file, "utf8");
+    if (/aria-label="no items"/.test(text)) continue;
+    if (!text.includes(KEY_ROW)) {
+      unkeyed.push(`${path.relative(ROOT, file).replace(/\\/g, "/")}: no key in the picture`);
+    }
+  }
+  const markdown = [path.join(ROOT, "wiki"), path.join(ROOT, "docs"),
+                    path.join(ROOT, "crates")]
+    .flatMap((dir) => walk(dir, ".md"));
+  let fences = 0;
+  for (const file of markdown) {
+    const text = fs.readFileSync(file, "utf8");
+    for (const m of text.matchAll(/```mermaid\n([\s\S]*?)```/g)) {
+      if (!/\bflowchart\b/.test(m[1]) || !/\["/.test(m[1])) continue;
+      fences++;
+      if (!/subgraph chart_key\b/.test(m[1])) {
+        unkeyed.push(`${path.relative(ROOT, file).replace(/\\/g, "/")}: a Mermaid chart with no key`);
+      }
+    }
+  }
+  if (unkeyed.length) {
+    unkeyed.slice(0, 20).forEach(fail);
+    if (unkeyed.length > 20) fail(`… and ${unkeyed.length - 20} more`);
+  } else {
+    pass(`${keyable.length} drawings and ${fences} Mermaid charts carry their own key`);
   }
 
   if (problems.length) {
