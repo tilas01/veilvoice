@@ -28,7 +28,7 @@ on:
   # Success only: a release that failed halfway is not something to redeploy
   # the site for. And a release run that published nothing, a dry run, leaves
   # no tag behind, which is how the job below tells the two apart.
-  workflow_run:
+  workflow_run:  # zizmor: ignore[dangerous-triggers] only `release` triggers it, and that runs on a tag push or by hand, never for a fork's pull request
     workflows: [release]
     types: [completed]
 

@@ -115,6 +115,10 @@ GENERATORS = [
     # the index walked docs/ before this file had been rewritten and then
     # disagreed with it, on the very first run.
     ("measured numbers", [sys.executable, "tools/measured/generate.py"]),
+    # Not a page but the workflows themselves: zizmor's safe fixes, kept only
+    # when a second audit has fewer findings and the workflow guards below
+    # still pass. Early, because the documentation reads the workflows.
+    ("workflow hardening", [sys.executable, "tools/audit/workflows.py", "--fix"]),
     ("artwork", [sys.executable, "assets/generate.py"]),
     # After the artwork, because it loads `assets/generate.py` for the PNG
     # writer, the palette and the font rather than keeping copies of them, and
@@ -380,6 +384,29 @@ CHECKS = [
      [sys.executable, "tools/audit/powershell.py"]),
     ("that guard catches what it claims to, as well",
      [sys.executable, "tools/audit/powershell.py", "--self-test"]),
+    # zizmor reads the workflows for the attacks published against GitHub
+    # Actions: script injection, dangerous triggers, tokens left in artefacts,
+    # impostor commits, missing cooldowns. The guards above are this project's
+    # own rules; this is everybody else's research. A reviewed exception stays
+    # only with its reason written on its line.
+    ("zizmor finds nothing in the workflows",
+     [sys.executable, "tools/audit/workflows.py"]),
+    ("that guard refuses a silent exception",
+     [sys.executable, "tools/audit/workflows.py", "--self-test"]),
+    # Characters that change what a file says without changing how it looks:
+    # bidirectional overrides (Trojan Source), zero-width characters, and the
+    # invisible tag characters that can hide a sentence of instructions.
+    ("no tracked file hides text from its reader",
+     [sys.executable, "tools/audit/hidden_text.py"]),
+    ("that guard catches every hidden class",
+     [sys.executable, "tools/audit/hidden_text.py", "--self-test"]),
+    # The prose: British spelling, misspellings (codespell, when installed),
+    # doubled words, a/an, placeholder and chat-like wording, and text cut
+    # off mid-word by a generator. Unpushed commit messages are read too.
+    ("the prose is spelt, worded and finished properly",
+     [sys.executable, "tools/audit/wording.py"]),
+    ("the wording guard catches what it claims to",
+     [sys.executable, "tools/audit/wording.py", "--self-test"]),
     # F-170. The tag a release publishes must name the commit that was built,
     # or the reproducibility every other check exists to support is a claim
     # about a different tree than the one somebody would check out.

@@ -63,7 +63,7 @@ on:
       - '.github/workflows/wiki.yml'
   # When a release finishes. Success only, and a run that published nothing
   # leaves no tag, which is how `release` below tells a dry run apart.
-  workflow_run:
+  workflow_run:  # zizmor: ignore[dangerous-triggers] only `release` triggers it, and that runs on a tag push or by hand, never for a fork's pull request
     workflows: [release]
     types: [completed]
   # Publish the newest release's wiki again, by hand.

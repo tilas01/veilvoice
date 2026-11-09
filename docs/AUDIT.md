@@ -214,6 +214,76 @@ and any Mermaid flowchart in the wiki, `docs/` or a crate's README without the
 `Key` subgraph. Run against the tree before this fix it fails on the crate
 maps.
 
+## The thirty-seventh round: the prose, hidden text and the workflows
+
+This round adds three checks to `tools/verify.py` and CI, and fixes what they
+found on their first run.
+
+- `tools/audit/wording.py` reads every document, page and doc comment, and the
+  commit message being built, for American spellings, misspellings (through
+  codespell), doubled words, "a" and "an" before the wrong sound, placeholder
+  and chat-like wording, stray spaces before punctuation, and text a generator
+  cut off in the middle of a word. Em dashes stay with `tools/audit/prose.py`.
+- `tools/audit/hidden_text.py` reads every tracked text file for characters a
+  reader cannot see: the bidirectional overrides behind the Trojan Source
+  attack (CVE-2021-42574), zero-width characters, and the Unicode tag
+  characters, which can carry a whole sentence of instructions that shows as
+  nothing. It found none.
+- `tools/audit/workflows.py` runs zizmor over the workflows and the Dependabot
+  configuration, and refuses an exception that does not give its reason on its
+  own line. `--fix`, which `tools/verify.py` runs before its checks, applies
+  zizmor's safe fixes and keeps them only when a second audit has fewer
+  findings and the other workflow guards still pass.
+
+codespell and zizmor are pinned by hash in `tools/audit/requirements.txt`,
+which Dependabot now watches, and CI fails when either is missing rather than
+skipping the check.
+
+The four findings zizmor still reports at its default level were each read and
+are kept, with the reason beside them: `pages.yml` and `wiki.yml` run after a
+release through `workflow_run`, which only the release workflow can trigger;
+`rewrite.yml` and `signing.yml` keep the checkout's token because they push,
+which `tools/audit/checkout_tokens.py` already records; and the release still
+publishes through a pinned `softprops/action-gh-release`, because replacing the
+step that publishes needs a test release of its own.
+
+### F-286: the changelog and roadmap had doubled words, and the roadmap cut its tooltips mid-word
+
+**Where:** `CHANGELOG.md`, `ROADMAP.md` and `tools/site/roadmap.py`.
+
+**What happened:** the changelog and the roadmap each said
+`a roadmap roadmap item`, the roadmap said `the still still served`, and the
+changelog had `defects , none` and a sentence whose full stop sat alone on the next line.
+Each was copied into the website's releases and roadmap pages. Separately, the
+roadmap picture gave every square a tooltip of the item's first ninety
+characters, cut wherever the ninetieth fell, so screen readers and hover text
+read `off by defaul`, `reads thi` and `witho`.
+
+**Fix:** the five sentences are corrected, and the tooltip is cut at the last
+space that fits, with an ellipsis to show that the sentence goes on.
+
+**Regression test:** `tools/audit/wording.py` fails on a doubled word, a space
+before punctuation, and a word cut short in front of a roadmap status, and it
+reads the generated roadmap page, so a generator that cuts mid-word again fails
+verify. Its `--self-test` holds an example of each.
+
+### F-287: Dependabot proposed a new release on the day it was published
+
+**Where:** `.github/dependabot.yml`.
+
+**What happened:** no entry set a cooldown, so a version of a crate or an
+action was proposed the day it appeared. Most hijacked releases are found and
+pulled within days, and a project that takes a release on its first day is the
+one that takes the hijacked one. zizmor reported three of the entries.
+
+**Fix:** every entry, including the new one for the audit's Python tools, waits
+seven days. Security updates are not held back by a cooldown.
+
+**Regression test:** `tools/audit/dependabot.py` now fails on any entry without
+a cooldown, and its `--self-test` checks that the reader sees a missing one and
+is not fooled by a cooldown nested inside another block. zizmor alone was not
+enough: once the first entry had a cooldown it stopped reporting the others.
+
 ## The thirty-sixth round: every code scanning alert, read one at a time
 
 The repository's own CodeQL workflow replaced GitHub's default setup on

@@ -942,7 +942,7 @@ jobs:
       # get a different answer and correctly conclude that the release does not
       # reproduce. The claim is the product here, so this line is the product.
       - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
-        if: steps.gate.outputs.publish == 'true'
+        if: steps.gate.outputs.publish == 'true'  # zizmor: ignore[superfluous-actions] pinned by hash and reviewed; it is the step that publishes, so replacing it waits for a test release
         with:
           tag_name: ${{ env.VERSION_TAG }}
           target_commitish: ${{ github.sha }}

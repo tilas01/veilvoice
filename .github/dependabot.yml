@@ -156,6 +156,11 @@ updates:
     labels:
       - dependencies
       - rust
+    # A new version waits a week before it is proposed. Most hijacked
+    # releases are noticed and pulled within days, and a week keeps one out
+    # of this tree. Security updates are not held back by this.
+    cooldown:
+      default-days: 7
 
   # ---- Cargo, the fuzzing package ----
   #
@@ -176,6 +181,8 @@ updates:
       - dependencies
       - rust
       - fuzzing
+    cooldown:
+      default-days: 7
 
   # ---- GitHub Actions ----
   #
@@ -208,3 +215,27 @@ updates:
     labels:
       - dependencies
       - ci
+    cooldown:
+      default-days: 7
+
+  # ---- Python, the audit's two borrowed programs ----
+  #
+  # `tools/audit/requirements.txt` pins codespell and zizmor by hash, and CI
+  # installs them with `--require-hashes`. Everything else in `tools/` is the
+  # standard library, so this is the whole of the Python supply chain.
+  - package-ecosystem: pip
+    directory: "/tools/audit"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "ci"
+      include: scope
+    labels:
+      - dependencies
+      - ci
+    cooldown:
+      default-days: 7

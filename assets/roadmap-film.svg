@@ -924,7 +924,7 @@
 <text x="48.0" y="11510.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--fg, #c0caf5)">The banner moves on the no-JavaScript page too: that edition showed the</text>
 <text x="48.0" y="11527.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">still while the main site animated the same artwork, both drawn by</text>
 <text x="48.0" y="11544.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">assets/generate.py from the same source. It shows the animation now, with</text>
-<text x="48.0" y="11561.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">the still still served to anybody who has asked their system for less</text>
+<text x="48.0" y="11561.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">the still image still served to anybody who has asked their system for less</text>
 <text x="48.0" y="11578.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">movement, chosen by markup rather than by a script because that page runs</text>
 <text x="48.0" y="11595.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="var(--muted, #737aa2)">none</text>
 <rect x="20.0" y="11609.5" width="20" height="12" rx="3" fill="var(--ok, #9ece6a)"/>

@@ -2606,7 +2606,7 @@ wiped the instant it has been checked.
 
 ### Getting the tree ready for a release audit
 
-The work that a roadmap roadmap item does not cover, and that a deploy needs.
+The work that a roadmap item does not cover, and that a deploy needs.
 
 **Manual pages.** `lintian` reported `no-manual-page` for all three binaries,
 and it was right: `man veilvoice` produced nothing.
@@ -3980,7 +3980,7 @@ It now answers the harder one: **is the published build the one this source
 produces**. A signature says who made a file. Only a build says what it is made
 of.
 
-**The eighth audit round found seven defects , none of them
+**The eighth audit round found seven defects, none of them
 shipped.** Two were found by continuous integration rather than by anybody's
 judgement, and both had been watched to pass on the machine they failed on.
 Three more were found by running a command and reading what it printed. Not one
@@ -5823,8 +5823,7 @@ write-ups, one per finding, are in [`docs/AUDIT.md`](docs/AUDIT.md).
 - **The Markdown renderer could freeze the reader's tab.** Two independent
   quadratics, measured rather than guessed: 128 000 characters on one line took
   **eight seconds**, and a second shape took **fourteen**. That is on the main
-  thread, on text the page fetches over the network. Both are now linear
-.
+  thread, on text the page fetches over the network. Both are now linear.
 - **A deeply nested blockquote crashed the render** and the reader was told the
   network had failed.
 - **Download links from the GitHub API were assigned with no scheme check**

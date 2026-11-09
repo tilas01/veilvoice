@@ -747,6 +747,41 @@ jobs:
       - name: That guard must fire on the sentences that shipped
         run: python tools/audit/network_wording.py --self-test
 
+      # The central audit's borrowed programs, installed by hash from the one
+      # file Dependabot watches for them. Locally each guard says so and passes
+      # when its program is missing; here a missing one is a failure, because
+      # a check that silently did not run is the same as no check.
+      - name: Install the audit's spelling and workflow auditors
+        run: python -m pip install --require-hashes -r tools/audit/requirements.txt
+
+      # zizmor reads the workflows for the attacks published against GitHub
+      # Actions, and every reviewed exception must give its reason.
+      - name: The workflows must pass zizmor
+        env:
+          VEILVOICE_REQUIRE_ZIZMOR: "1"
+        run: |
+          python tools/audit/workflows.py
+          python tools/audit/workflows.py --self-test
+
+      # Trojan Source, zero-width characters and invisible tag characters:
+      # text a reviewer cannot see but a compiler or a program reading the
+      # file can.
+      - name: No tracked file may hide text from its reader
+        run: |
+          python tools/audit/hidden_text.py
+          python tools/audit/hidden_text.py --self-test
+
+      # Spelling (British, and codespell), grammar, tone and text cut off by a
+      # generator, in every document, page, doc comment and the commit message
+      # being built.
+      - name: The prose must be spelt, worded and finished properly
+        env:
+          VEILVOICE_REQUIRE_CODESPELL: "1"
+          WORDING_COMMITS: "-1 HEAD"
+        run: |
+          python tools/audit/wording.py
+          python tools/audit/wording.py --self-test
+
   # The site's Markdown renderer decides what `js/repo.js` is allowed to put
   # into the page via `innerHTML`, so it is a security boundary and is tested
   # like one. No framework and no package.json: a test suite that pulls a

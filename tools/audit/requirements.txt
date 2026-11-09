@@ -1,0 +1,18 @@
+# The two programs the central audit borrows, pinned to exact versions and
+# hashes so that CI installs what was reviewed and nothing else:
+#
+#     python -m pip install --require-hashes -r tools/audit/requirements.txt
+#
+# codespell finds misspelt words in prose (tools/audit/wording.py), and zizmor
+# audits the GitHub workflows (tools/audit/workflows.py). zizmor has a hash for
+# each platform a contributor is likely to run: Linux (glibc and musl), macOS
+# (Intel and Apple silicon) and Windows. Dependabot proposes new versions here,
+# a week after they are published.
+codespell==2.4.3 \
+    --hash=sha256:af2505b335e8573dbd2d384d1c4ef498f4006f4ba2d6fceca01e55b91f52628a
+zizmor==1.31.1 \
+    --hash=sha256:58e878eb2dbd2c6183c105e1ac28c14f7dd1eca44a783f1fe2a69647d012c410 \
+    --hash=sha256:e7fdf82d31cc67eb1d5030bf2372b25ee2a1c3ad05017e18da70ed138c4accd6 \
+    --hash=sha256:9696d3c10919a3a2eb086c102f1bc10717f53ef3700a0d6c55a709c274995476 \
+    --hash=sha256:4a70ee3c2721122aff04d5bbad5e448d15384f45de2ecb3c9493fe9dac2bc95f \
+    --hash=sha256:3b35b393e8d437e275c7e399047c9892ccc290f3fc5e6aeb9f65a5d3b2a470e0

@@ -247,6 +247,23 @@ def plain(markup):
     return re.sub(r"\s+", " ", text).strip()
 
 
+def clip(text, limit=90):
+    """At most `limit` characters of `text`, cut between words.
+
+    A plain slice left tooltips reading "off by defaul" and "reads thi". The
+    cut now falls on the last space that fits, and an ellipsis says the
+    sentence goes on. A single word longer than the limit is still sliced,
+    because there is no better place to cut it.
+    """
+    if len(text) <= limit:
+        return text
+    head = text[:limit - 1]
+    space = head.rfind(" ")
+    if space > 0:
+        head = head[:space]
+    return head.rstrip(" ,;:-") + "\u2026"
+
+
 # --- the picture -------------------------------------------------------------
 
 SQUARE = 22.0
@@ -358,7 +375,7 @@ def graphic(colours, groups, counts):
                 'x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="4" '
                 'fill="var(--%s, %s)"/></g>'
                 % ("1" if row["status"] == "done" else "0.85",
-                   docs.esc(plain(row["item"])[:90]), row["status"],
+                   docs.esc(clip(plain(row["item"]))), row["status"],
                    # Staggered along each row, and capped: ninety-six squares
                    # at 12 ms each would take a second and a quarter to
                    # finish, which is a page that looks slow rather than one

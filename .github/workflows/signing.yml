@@ -35,6 +35,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: true  # Kept on purpose: pushes a signed test commit through origin; the one artefact is the public key from runner.temp
       - name: Sign one commit and ask GitHub whether it verifies
         env:
           KEY: ${{ secrets.GPG_PRIVATE_KEY }}

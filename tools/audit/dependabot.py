@@ -127,7 +127,7 @@ def read_entries(text):
                 found.append(current)
             ecosystem = stripped.split("package-ecosystem:", 1)[1].strip().strip("\"'")
             current = {"ecosystem": ecosystem, "directory": None,
-                       "target_branch": None}
+                       "target_branch": None, "cooldown": False}
             keys_at = indent + 2
             continue
         if current is None or indent != keys_at:
@@ -139,6 +139,9 @@ def read_entries(text):
         target = value(stripped, "target-branch")
         if target is not None:
             current["target_branch"] = target
+            continue
+        if stripped.startswith("cooldown:"):
+            current["cooldown"] = True
     if current is not None:
         found.append(current)
     return found
@@ -430,6 +433,18 @@ def main():
                 "%s names %s, which is not in this tree any more" % (ecosystem, where)
             )
 
+    # And how long each entry waits before proposing a release. A hijacked
+    # version is usually found and pulled within days, so an entry with no
+    # cooldown is the one that can bring it in on the day it is published.
+    # zizmor audits this too, but it stops reporting once one entry has a
+    # cooldown, so a single entry losing its own would pass there unnoticed.
+    for entry in declared:
+        if not entry.get("cooldown"):
+            gaps.append(
+                "the %s entry for %s has no cooldown, so it proposes a release "
+                "the day it is published" % (entry["ecosystem"], entry["directory"])
+            )
+
     # And where each entry's pull requests land, and whether `ci.yml` builds
     # that branch, which it reads rather than takes from a name written here:
     # see the note at the top about why.
@@ -643,8 +658,24 @@ def self_test():
         print("the branch check is wrong on %d case(s):" % len(wrong))
         print("\n".join(wrong))
         return 1
-    print("  the branch check is right on all %d cases, and reads ci.yml's "
-          "push branches in all %d forms"
+    # The cooldown is read from the entry's own keys, never from a block
+    # nested inside it, and an entry without one is noticed.
+    cooled = read_entries(
+        "updates:\n"
+        "  - package-ecosystem: cargo\n"
+        "    directory: \"/\"\n"
+        "    cooldown:\n"
+        "      default-days: 7\n"
+        "  - package-ecosystem: pip\n"
+        "    directory: \"/tools\"\n"
+        "    groups:\n"
+        "      all:\n"
+        "        cooldown:\n")
+    if [e["cooldown"] for e in cooled] != [True, False]:
+        print("  the cooldown reader is wrong: %r" % (cooled,))
+        return 1
+    print("  the branch check is right on all %d cases, reads ci.yml's "
+          "push branches in all %d forms, and sees a missing cooldown"
           % (len(CASES) + len(BUILT_CASES), len(CI_READINGS)))
     return 0
 
