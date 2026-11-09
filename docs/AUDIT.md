@@ -787,6 +787,28 @@ it, and requires the failure to name the first program as already replaced and
 not to claim that nothing was. `what_was_already_replaced_reads_as_a_sentence`
 covers the three shapes the sentence takes.
 
+### F-NNN: no dry run of a release got past the technical document
+
+**Where:** `.github/workflows/release.yml`, the publishing job's technical
+document step.
+
+**What happened:** a release dispatched with no version is a dry run. It
+builds, compares, hashes and signs everything and publishes nothing. The run is
+named after its branch, and no changelog entry is called `## main`, so the notes
+tool refuses unless it is told the run is a dry one. The release notes step
+tells it. The technical document step, added with roadmap item 180, does not,
+so every dry run since then stopped there, before the checksums, the signature
+and the notes it exists to rehearse. Found by dispatching one after F-276: all
+eleven builds passed and the publishing job failed on its first script.
+
+**Fix:** the technical document step passes the same waiver on the same
+condition as the release notes step.
+
+**Regression test:** `tools/audit/publishing.py` finds every step that runs the
+notes tool and fails on one without the dry-run waiver. Checked both ways: it
+names the technical document step against the workflow before the fix, and
+passes after it.
+
 ## The thirty-fourth round: the fixes since v0.1.22, re-checked rather than believed
 
 The round before 0.1.23, and it is a different kind of round from the three

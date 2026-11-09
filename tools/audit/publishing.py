@@ -62,6 +62,31 @@ NOTES = os.path.join(ROOT, "tools", "release", "notes.py")
 PUBLISHER = "softprops/action-gh-release"
 
 
+def notes_steps(lines):
+    """Each step whose script runs the notes tool, as (line index, step text).
+
+    A step runs from its `- name:` or `- uses:` line to the next line at that
+    indentation or less. Comment lines that mention the tool are not a run.
+    """
+    found = []
+    for i, line in enumerate(lines):
+        if "tools/release/notes.py" not in line or line.strip().startswith("#"):
+            continue
+        start = i
+        while start > 0 and not re.match(r"^\s*- (name|uses):", lines[start]):
+            start -= 1
+        indent = len(lines[start]) - len(lines[start].lstrip())
+        end = start + 1
+        while end < len(lines) and not (
+                lines[end].strip()
+                and len(lines[end]) - len(lines[end].lstrip()) <= indent):
+            end += 1
+        step = (start, "\n".join(lines[start:end]))
+        if step not in found:
+            found.append(step)
+    return found
+
+
 def main():
     if not os.path.isfile(WORKFLOW):
         print("there is no .github/workflows/release.yml, so nothing publishes.")
@@ -158,6 +183,24 @@ def main():
                 "release.yml passes --allow-missing to the notes tool without "
                 "tying it to the dry run, so a publishing release could go "
                 "out with no notes"
+            )
+
+    # ---- and every step that asks it honours the dry run --------------------
+    #
+    # The notes tool runs twice, once for the technical document staged before
+    # the checksums and once for the notes. Each refuses a missing entry unless
+    # told it is a dry run, and a dry run is named after its branch, which no
+    # changelog entry is. So a step that runs the tool without the waiver ends
+    # every dry run there, before the steps it exists to rehearse. That is
+    # F-NNN: the technical document step was added without it, and no dry run
+    # had reached the checksums since.
+    for at in notes_steps(lines):
+        start, block = at
+        if 'allow=""' not in block or "$allow" not in block:
+            gaps.append(
+                "the step at line %d runs tools/release/notes.py without the "
+                "dry-run waiver, so a dry run stops there instead of "
+                "reporting the missing entry and carrying on" % (start + 1)
             )
 
     if gaps:

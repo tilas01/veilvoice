@@ -737,11 +737,23 @@ jobs:
       - name: The technical document
         run: |
           set -euo pipefail
+
+          # The same waiver as the release notes below, on the same condition.
+          # A dry run is named after the branch, and no changelog entry is
+          # called `## main`, so without it every dry run stopped here, before
+          # the checksums, the signature and the notes it exists to rehearse.
+          allow=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] \
+             && [ -z "$INPUT_TAG" ]; then
+            allow="--allow-missing"
+          fi
+
           python tools/release/notes.py \
             --tag "$VERSION_TAG" \
             --repro staging \
             --built-on "${{ runner.os }}" \
-            --technical staging/TECHNICAL.md
+            --technical staging/TECHNICAL.md \
+            $allow
 
       - name: Checksums
         run: |
