@@ -45,8 +45,10 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const PLACES = [
   "assets/diagrams",
   "assets/banners",
+  "assets/graphs",
   "assets/screenshots",
   "website/assets/banners",
+  "website/assets/graphs",
   "website/assets/screenshots"
 ];
 const SINGLES = [

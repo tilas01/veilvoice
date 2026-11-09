@@ -186,6 +186,11 @@ GENERATORS = [
     # own title and description and writes the addresses from them. Before
     # the index, which walks the result.
     ("addresses and the sitemap", [sys.executable, "tools/site/seo.py"]),
+    # A picture of every crate and every source file, from the recorded
+    # history and ROADMAP.md. Reads only sources, so it can go anywhere before
+    # the index, which walks the README it writes beside them. `--record`, which
+    # reads git, is a separate step: see the file.
+    ("per-file graphs", [sys.executable, "tools/graphs/generate.py"]),
     ("search index", [sys.executable, "tools/search-index/generate.py"]),
 ]
 
@@ -212,6 +217,8 @@ MUST_RUN_BEFORE = [
      "takes out of index.html"),
     ("addresses and the sitemap", "search index",
      "the index walks the pages the addresses step has finished writing"),
+    ("per-file graphs", "search index",
+     "the index walks assets/graphs/README.md, which the graphs step writes"),
 ]
 
 
@@ -536,6 +543,10 @@ CHECKS = [
      [sys.executable, "tools/site/releases.py", "--check"]),
     ("every page says where it lives, and the sitemap lists it",
      [sys.executable, "tools/site/seo.py", "--check"]),
+    ("every crate's and file's graph is current",
+     [sys.executable, "tools/graphs/generate.py", "--check"]),
+    ("the graphs read renames, fixes and releases right",
+     [sys.executable, "tools/graphs/generate.py", "--self-test"]),
     ("search index matches the tree", [sys.executable, "tools/search-index/generate.py", "--check"]),
     ("measured numbers match the tree",
      [sys.executable, "tools/measured/generate.py", "--check"]),
