@@ -43,6 +43,9 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+/// A call, recorded one track per side. **Roadmap item 188.**
+#[cfg(feature = "live")]
+pub mod call;
 #[cfg(feature = "live")]
 pub mod devices;
 pub mod io;
@@ -76,7 +79,7 @@ pub mod meter;
 #[cfg(not(feature = "live"))]
 pub mod absent;
 #[cfg(not(feature = "live"))]
-pub use absent::{devices, live, playback, record, room};
+pub use absent::{call, devices, live, playback, record, room};
 
 /// Whether this build can capture and play sound.
 ///
@@ -102,8 +105,10 @@ pub const WHY_NO_CAPTURE: Option<&str> = None;
 #[cfg(not(feature = "live"))]
 pub const WHY_NO_CAPTURE: Option<&str> = Some(absent::REASON);
 
+pub use call::{CallSession, KeptCall, Party};
 pub use devices::{DeviceInfo, Direction};
 pub use io::Audio;
+pub use kinds::Capture;
 pub use live::{Interference, Keeping, Kept, LiveSession, LiveStats, Side};
 pub use record::{Recorder, Sink};
 pub use room::{Guest, GuestStats, KeptRoom, RoomSession, RoomStats, MAX_GUESTS};

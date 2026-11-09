@@ -119,6 +119,20 @@ impl Keeping {
     }
 }
 
+/// How one side of a call reaches this computer. **Roadmap item 188.**
+///
+/// Kept beside the device rather than guessed from it, because one name can be
+/// both: a headset is a microphone and an output called the same thing, and
+/// which of the two a side is decides how it is opened.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Capture {
+    /// An input: a microphone, or a line in that a splitter cable feeds.
+    Microphone,
+    /// An output, recorded as it plays: the other side of a call that is
+    /// running on this computer.
+    Playback,
+}
+
 /// The most microphones one room will open at once.
 ///
 /// A bound on the arithmetic rather than a claim about any machine: what a

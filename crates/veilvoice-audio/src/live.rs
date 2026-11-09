@@ -196,7 +196,7 @@ impl Troubles {
 /// each microphone's in turn. `None` means no rate every device will accept,
 /// which is a thing to refuse rather than to work around, because nothing in
 /// this crate resamples.
-fn rate_they_agree_on(
+pub(crate) fn rate_they_agree_on(
     output_default: u32,
     output_ranges: &[(u32, u32)],
     inputs: &[(u32, Vec<(u32, u32)>)],
@@ -243,7 +243,7 @@ pub(crate) fn input_ranges(device: &cpal::Device) -> Result<Vec<(u32, u32)>, Err
 /// the right rate is returned rather than nothing, so that cpal refuses with
 /// its own words about the format instead of this refusing with a sentence
 /// about the rate, which would be the wrong reason.
-fn at_rate(
+pub(crate) fn at_rate(
     ranges: impl Iterator<Item = cpal::SupportedStreamConfigRange>,
     rate: u32,
 ) -> Option<cpal::SupportedStreamConfig> {

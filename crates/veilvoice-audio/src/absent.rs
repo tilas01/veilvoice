@@ -225,6 +225,61 @@ pub mod live {
     }
 }
 
+/// A call, which cannot be recorded in this build. **Roadmap item 188.**
+pub mod call {
+    pub use crate::kinds::{Capture, GuestStats, RoomStats, MAX_GUESTS};
+
+    use super::devices::Device;
+    use super::{refused, Infallible};
+    use crate::live::{Keeping, Kept};
+    use crate::Error;
+    use veilvoice_core::DeidConfig;
+
+    /// One side of a call, described the same way as in the live build.
+    pub struct Party<'a> {
+        /// Where their voice arrives.
+        pub device: &'a Device,
+        /// Whether that is a microphone or this computer's own output.
+        pub capture: Capture,
+        /// Their engine's settings.
+        pub config: DeidConfig,
+        /// What to keep of them.
+        pub keeping: Keeping,
+        /// Whether they are played to the listening device.
+        pub heard: bool,
+    }
+
+    /// The recorders a call was asked for. Always empty in this build.
+    #[derive(Default)]
+    pub struct KeptCall {
+        /// One per party. Never filled.
+        pub parties: Vec<Kept>,
+    }
+
+    /// A running call. None can exist in this build.
+    pub struct CallSession(Infallible);
+
+    impl CallSession {
+        /// Refuses: nothing can be captured.
+        pub fn start(
+            _parties: &[Party<'_>],
+            _listen: Option<&Device>,
+        ) -> Result<(Self, KeptCall), Error> {
+            refused()
+        }
+
+        /// Never called.
+        pub fn stats(&self) -> RoomStats {
+            match self.0 {}
+        }
+
+        /// Never called.
+        pub fn interference(&self) -> Option<crate::live::Interference> {
+            match self.0 {}
+        }
+    }
+}
+
 /// Several microphones at once, which cannot start in this build.
 pub mod room {
     pub use crate::kinds::{GuestStats, RoomStats, MAX_GUESTS};
