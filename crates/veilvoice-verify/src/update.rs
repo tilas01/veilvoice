@@ -835,7 +835,7 @@ fn tar_program() -> Option<PathBuf> {
 /// reasoning for all of that, and the two findings behind it, are in its own
 /// documentation.
 ///
-/// This function had a third copy of that routine until F-NNN, and the copy
+/// This function had a third copy of that routine until F-286, and the copy
 /// staged with `std::fs::copy` after a `remove_file`, so a program appearing at
 /// the staged name in between was written through rather than refused. Folding
 /// it in was written down as worth doing when F-266 removed the second copy.
@@ -885,7 +885,7 @@ fn put_in_place(root: &Path, into: &Path) -> Result<(Vec<String>, Vec<PathBuf>),
 
 /// Say what an update had already put in place when it stopped.
 ///
-/// **F-NNN+1.** The failures inside [`put_in_place`] said "Nothing has been
+/// **F-287.** The failures inside [`put_in_place`] said "Nothing has been
 /// replaced" and "nothing was replaced", which is true of the first program the
 /// loop reaches and false of every one after it. A release carries a command
 /// line and a window, so an update that replaced the command line and then
@@ -1359,7 +1359,7 @@ mod tests {
     /// crate's own tests, including the link and hard-link cases a plain copy
     /// got wrong. What this test holds down is the thing those tests cannot
     /// see, which is that the updater still goes through it rather than growing
-    /// a copy of it again. It grew one twice: F-261 and F-NNN.
+    /// a copy of it again. It grew one twice: F-261 and F-286.
     ///
     /// Asserted against the source rather than by racing a thread, because the
     /// window is a few milliseconds wide and a test that has to catch it is a
@@ -1380,17 +1380,17 @@ mod tests {
             body.contains("veilvoice_setup::install::replace_with_copy(&from, &target)"),
             "an update no longer replaces programs through \
              install::replace_with_copy, so whatever it does instead is a second \
-             implementation of replacing a running program. That is F-NNN."
+             implementation of replacing a running program. That is F-286."
         );
         assert!(
             !body.contains("std::fs::copy("),
             "an update copies a program into place itself again. A copy opens the \
              destination and truncates it, which is F-237, and staging with a copy \
-             after a remove_file is the window F-NNN closed."
+             after a remove_file is the window F-286 closed."
         );
     }
 
-    /// F-NNN+1. A failure partway through says what it had already replaced.
+    /// F-287. A failure partway through says what it had already replaced.
     ///
     /// The second program cannot be replaced, because the name it goes at is a
     /// directory and no rename will go over one. The first one has already been

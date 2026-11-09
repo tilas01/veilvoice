@@ -38,7 +38,7 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
-## The thirty-seventh round: the reset, read against what it promises
+## The thirty-eighth round: the reset, read against what it promises
 
 `veilvoice reset` and the window's **Start again** are the only things in this
 project that delete somebody's recordings on purpose. Everything else about
@@ -50,7 +50,7 @@ Three of the three answers were no, and all three failed in the same direction:
 the plan on the screen was right and the disk was wrong. One of them had also
 been protected by a test for half a year, which is the part worth reading.
 
-### F-286: the command line and the window disagreed about what a reset means
+### F-291: the command line and the window disagreed about what a reset means
 
 Found by reading the two front ends next to each other, which is not how either
 had been read before.
@@ -86,10 +86,10 @@ The shape, and it is the same one as F-178 and F-278: **two front ends to one
 library is two defaults unless the library holds the default.** Neither front
 end was wrong about what it was doing. They were wrong about each other.
 
-### F-287: keeping the keys removed the decoy passphrase, and on an older machine the lock itself
+### F-292: keeping the keys removed the decoy passphrase, and on an older machine the lock itself
 
 Found by building a reset plan against a **real** app lock for the first time.
-See F-288 for why that had never happened.
+See F-293 for why that had never happened.
 
 `reset::key_paths` named three files: the vault's index and the two copies of
 the lock it derives. The app lock is kept in more than three:
@@ -129,9 +129,9 @@ unknown file is still removed, and that is right; what it needs, and now has, is
 for every file that is part of the lock to be named by the one module that
 derives those names.
 
-### F-288: a test that had only ever exercised the branch where nothing works
+### F-293: a test that had only ever exercised the branch where nothing works
 
-Found while writing F-287's test, and it is the reason F-287 survived six
+Found while writing F-292's test, and it is the reason F-292 survived six
 releases.
 
 `reset::tests::folder()` builds a folder with one of everything in it, and
@@ -188,7 +188,7 @@ Every generated picture should carry its own key, and each Mermaid chart the
 same key, since either can be the only one a reader sees. Reading every drawing under `assets/diagrams/` and `assets/sources/` for
 that turned up one finding.
 
-### F-286: a crate's map of its files, and the website's script charts, had no key
+### F-290: a crate's map of its files, and the website's script charts, had no key
 
 **Where:** `tools/docs/generate.py` (`diagram_svg`, `mermaid`, `OWNED`) and
 `tools/docs/sources.py`.
@@ -268,7 +268,7 @@ Scorecard's Token-Permissions check marks a workflow down for exactly this.
 whose top-level block grants a write, or that has no top-level block at all, and
 its `--self-test` covers the inline, mapped and missing shapes.
 
-### F-287: the build without live audio did not offer what the live build offers, and its tests never ran
+### F-288: the build without live audio did not offer what the live build offers, and its tests never ran
 
 **Where:** `crates/veilvoice-audio/src/absent.rs`, the stand-ins a build
 without `cpal` uses, and `.github/workflows/ci.yml`. Found by the audit thread
@@ -299,7 +299,7 @@ only without `live`, a selection CI built but never tested.
   for the window's device pickers, which still show an empty list on the BSDs.
   That side belongs to `app.rs` and is not part of this fix.
 
-### F-286: exporting from the window followed links, deleted files it had not made, and lost the first of two exports
+### F-289: exporting from the window followed links, deleted files it had not made, and lost the first of two exports
 
 **Where:** `crates/veilvoice-gui/src/exporting.rs` and the Studio's export
 controls in `crates/veilvoice-gui/src/studio.rs`, both new since v0.1.22 and
@@ -732,7 +732,7 @@ and read and wrote each as a file.
 builds every command with those names and requires each to arrive prefixed,
 and a name that is not UTF-8 to be refused.
 
-### F-NNN: the updater kept its own way of replacing a running program
+### F-286: the updater kept its own way of replacing a running program
 
 **Where:** `crates/veilvoice-verify/src/update.rs`, `put_in_place`.
 
@@ -764,7 +764,7 @@ of its own. `the_copy_reaches_the_destination_only_by_a_rename`, in
 `veilvoice-setup`, holds the order down where the code now lives: the staged
 file is created fresh, given its permissions, and only then renamed.
 
-### F-NNN+1: a part-finished update said nothing had been replaced
+### F-287: a part-finished update said nothing had been replaced
 
 **Where:** `crates/veilvoice-verify/src/update.rs`, `put_in_place`.
 
@@ -12343,8 +12343,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and eighty-eight defects found and fixed (F-1 to F-288), across
-thirty-seven rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Two hundred and ninety-three defects found and fixed (F-1 to F-293), across
+thirty-eight rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

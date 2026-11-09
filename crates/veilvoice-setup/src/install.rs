@@ -335,7 +335,7 @@ fn copy_programs(into: &Path) -> Result<(Vec<String>, Vec<PathBuf>), String> {
 ///
 /// Public because `veilvoice verify install --from` and `veilvoice update` both
 /// put binaries where somebody may be running them, and both carried a copy of
-/// this with a defect of its own: F-266 and F-NNN. One implementation rather
+/// this with a defect of its own: F-266 and F-286. One implementation rather
 /// than three, so the next thing learned about replacing a running program is
 /// learned once.
 pub fn replace_with_copy(from: &Path, to: &Path) -> std::io::Result<Option<PathBuf>> {
