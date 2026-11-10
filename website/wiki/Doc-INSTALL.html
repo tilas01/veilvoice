@@ -94,14 +94,14 @@
 <p>If the fingerprint you see anywhere disagrees with the one above, stop.</p>
 <hr>
 <h2 id="1-by-hand">1. By hand</h2>
-<p>Four commands, on any platform with GnuPG and a SHA-256 tool. Replace <code>v0.1.22</code> and the archive name with the release and build you want; the <a href="https://github.com/tilas01/veilvoice/releases" rel="noopener noreferrer">releases page</a> lists them.</p>
+<p>Four commands, on any platform with GnuPG and a SHA-256 tool. Replace <code>v0.1.23</code> and the archive name with the release and build you want; the <a href="https://github.com/tilas01/veilvoice/releases" rel="noopener noreferrer">releases page</a> lists them.</p>
 <pre><code><span class="tok-com"># 1. Get the key, and check its fingerprint against the value above.</span>
 <span class="tok-kw">curl</span> -fsSLO https://tilas01.github.io/veilvoice/assets/veilvoice-signing-key.asc
 <span class="tok-kw">gpg</span> --import veilvoice-signing-key.asc
 <span class="tok-kw">gpg</span> --fingerprint tilas01</code></pre>
 <p>Compare what that prints against the fingerprint above, <strong>character by character</strong>. This is the only step that anchors any of the others, and it is the one step nothing can do for you.</p>
 <pre><code><span class="tok-com"># 2. Get the release, the hash list, and the signature over it.</span>
-V=v0.<span class="tok-num">1.22</span>
+V=v0.<span class="tok-num">1.23</span>
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 <span class="tok-kw">curl</span> -fsSLO $B/veilvoice-$V-linux-x86_64.<span class="tok-kw">tar</span>.gz
 <span class="tok-kw">curl</span> -fsSLO $B/SHA256SUMS
@@ -113,7 +113,7 @@ B=https://github.com/tilas01/veilvoice/releases/download/$V
 <span class="tok-com"># 4. Verify the download against the now-trusted hash list.</span>
 <span class="tok-kw">sha256sum</span> -c SHA256SUMS --ignore-missing</code></pre>
 <p>On macOS use <code>shasum -a 256 -c SHA256SUMS --ignore-missing</code>. On Windows, in PowerShell:</p>
-<pre><code>Get-FileHash -Algorithm SHA256 .\veilvoice-v0.<span class="tok-num">1.22</span>-windows-x86_64.zip
+<pre><code>Get-FileHash -Algorithm SHA256 .\veilvoice-v0.<span class="tok-num">1.23</span>-windows-x86_64.zip
 # then compare that hash against the matching line in SHA256SUMS</code></pre>
 <h3 id="why-that-order-and-not-the-other-one">Why that order, and not the other one</h3>
 <p>Step 3 before step 4, always.</p>
@@ -136,13 +136,13 @@ gpg: WARNING: This key is not certified with a trusted signature!</code></pre>
 <pre><code><span class="tok-kw">curl</span> -fsSLO https://raw.githubusercontent.com/tilas01/veilvoice/main/install/install.sh
 less install.sh          <span class="tok-com"># it is 400 lines and it is meant to be read</span>
 sh install.sh</code></pre>
-<table><thead><tr><th>Option</th><th>Effect</th></tr></thead><tbody><tr><td><code>--yes</code></td><td>no prompts, and <strong>no</strong> optional components</td></tr><tr><td><code>--version v0.1.22</code></td><td>a specific release rather than the latest</td></tr><tr><td><code>--prefix ~/.local</code></td><td>where to install (default <code>~/.local</code>)</td></tr><tr><td><code>--with-audacity</code></td><td>install Audacity too</td></tr><tr><td><code>--with-gpg</code></td><td>install GnuPG if it is missing</td></tr></tbody></table>
+<table><thead><tr><th>Option</th><th>Effect</th></tr></thead><tbody><tr><td><code>--yes</code></td><td>no prompts, and <strong>no</strong> optional components</td></tr><tr><td><code>--version v0.1.23</code></td><td>a specific release rather than the latest</td></tr><tr><td><code>--prefix ~/.local</code></td><td>where to install (default <code>~/.local</code>)</td></tr><tr><td><code>--with-audacity</code></td><td>install Audacity too</td></tr><tr><td><code>--with-gpg</code></td><td>install GnuPG if it is missing</td></tr></tbody></table>
 <h3 id="windows">Windows</h3>
 <pre><code>irm https://raw.githubusercontent.com/tilas01/veilvoice/main/install/install.ps1 -OutFile install.ps1
 notepad install.ps1      # read it first
 powershell -ExecutionPolicy Bypass -File install.ps1</code></pre>
 <p><code>install.bat</code> is a wrapper for people who would rather double-click; it passes its arguments straight through to <code>install.ps1</code> and contains no logic of its own, deliberately, because two implementations of a verification routine means one of them is the stale one, and the stale one is the one that will be running when it matters.</p>
-<table><thead><tr><th>Option</th><th>Effect</th></tr></thead><tbody><tr><td><code>-Yes</code></td><td>no prompts, and <strong>no</strong> optional components</td></tr><tr><td><code>-Version v0.1.22</code></td><td>a specific release</td></tr><tr><td><code>-Prefix &quot;D:\Tools\VeilVoice&quot;</code></td><td>where to install</td></tr><tr><td><code>-WithVBCable</code></td><td>open the VB-CABLE download page</td></tr><tr><td><code>-WithAudacity</code></td><td>install Audacity through winget</td></tr></tbody></table>
+<table><thead><tr><th>Option</th><th>Effect</th></tr></thead><tbody><tr><td><code>-Yes</code></td><td>no prompts, and <strong>no</strong> optional components</td></tr><tr><td><code>-Version v0.1.23</code></td><td>a specific release</td></tr><tr><td><code>-Prefix &quot;D:\Tools\VeilVoice&quot;</code></td><td>where to install</td></tr><tr><td><code>-WithVBCable</code></td><td>open the VB-CABLE download page</td></tr><tr><td><code>-WithAudacity</code></td><td>install Audacity through winget</td></tr></tbody></table>
 <h3 id="the-optional-extras-and-why-they-are-questions">The optional extras, and why they are questions</h3>
 <p>VeilVoice needs none of them. Each is offered <strong>once</strong>, as a question that <strong>defaults to no</strong>, and <code>--yes</code> / <code>-Yes</code> installs none of them at all: <code>--yes</code> means &quot;do not ask me&quot;, and answering an unasked question by installing software on somebody's machine is precisely the behaviour that makes install scripts untrustworthy.</p>
 <ul><li><strong>VB-CABLE</strong> (Windows) is what lets live mode feed a veiled microphone into a call. It is <strong>proprietary donationware</strong> by VB-Audio, not free software. The script only <em>opens their download page</em>: it will not silently fetch and run a third-party installer, which would be a strange thing to do inside a script whose whole subject is verifying what you run.</li><li><strong>Audacity</strong> is a free audio editor, useful for <em>editing</em> a recording before veiling it: trimming silence, cutting a section, joining takes. Recording is what the Recording Studio does, and it does it because a take made in another program is a plaintext file sitting on your disk until you remember to shred it. Audacity is not bundled because it is GPL-2.0-or-later, which cannot be combined with this project's GPL-3.0-or-later.</li><li><strong>GnuPG</strong>, where missing, because without it the signature cannot be checked at all. If you decline it, the script stops rather than falling back to &quot;the hash matched&quot;, because a hash checked against an unverified list is not a security check.</li></ul>
@@ -174,13 +174,13 @@ Nothing has been installed.</code></pre>
 <pre><code>veilvoice verify key
     <span class="tok-com"># prints the fingerprint it carries. Compare it against the one above.</span>
 
-veilvoice verify file veilvoice-v0.<span class="tok-num">1.22</span>-linux-x86_64.<span class="tok-kw">tar</span>.gz     --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
+veilvoice verify file veilvoice-v0.<span class="tok-num">1.23</span>-linux-x86_64.<span class="tok-kw">tar</span>.gz     --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
 <h3 id="the-one-thing-it-cannot-carry">The one thing it cannot carry</h3>
 <p>It cannot embed the expected hash of the file it is checking: a file cannot contain its own digest, because writing the digest in changes the file. So the hash comes from outside, and <strong>where it came from decides what a match proves</strong>. The tool keeps these apart and refuses to run both at once and report one answer.</p>
 <table><thead><tr><th>Hash from</th><th>Proves</th><th>Rests on trusting</th></tr></thead><tbody><tr><td>the published <code>SHA256SUMS</code></td><td>the download is <strong>intact</strong></td><td>whoever signed the release</td></tr><tr><td>somebody else's own build of the same tag</td><td>the release is <strong>reproducible</strong></td><td>nobody in particular</td></tr></tbody></table>
 <p>The first is what most people want. The second is what makes the first worth anything: it closes the gap that a signed binary could contain something the source does not. It needs a build by somebody who is not the author, which is why this project cannot perform it for you.</p>
 <pre><code><span class="tok-com"># the stronger check, once somebody else has published a hash from their build</span>
-veilvoice verify file veilvoice-v0.<span class="tok-num">1.22</span>-linux-x86_64.<span class="tok-kw">tar</span>.gz --sha256 &lt;their hash&gt;
+veilvoice verify file veilvoice-v0.<span class="tok-num">1.23</span>-linux-x86_64.<span class="tok-kw">tar</span>.gz --sha256 &lt;their hash&gt;
 
 veilvoice verify --explain     <span class="tok-com"># the difference, at length</span></code></pre>
 <p>VeilVoice's own releases are built twice, in separate directories, and compared before they ship. That is the publisher checking their own work -- worth something, and not the same as somebody else checking it.</p>

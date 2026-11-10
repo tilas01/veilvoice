@@ -15,7 +15,7 @@ depends on something outside this project, such as a platform's rules or a
 decision that has not been taken, that is written down rather than absorbed
 into a number.
 
-**Where we are now:** **v0.1.22 is released**, signed and published for
+**Where we are now:** **v0.1.23 is released**, signed and published for
 eleven platforms -- OpenBSD included since v0.1.11. Everything below the line
 marked *shipped* is work in progress.
 
@@ -1523,16 +1523,18 @@ rest are built on before the rest.
    none does, the resolved motion setting reaches every panel that draws, and a
    guard refuses the next spinner rather than trusting the sweep to have been
    thorough.
-4. **184**, which is the first thing those two are good for: the two panels
+4. 184, which is the first thing those two are good for: the two panels
    that still wait to be asked can only look by themselves once there is a
-   worker to look on and an indicator to say so.
+   worker to look on and an indicator to say so. The Verify tab's half is done
+   and ships here; the companion probe and the volume scan **move to v0.1.24**,
+   so this release is not held for them.
 5. **168**, the alignment pass, with the guard that keeps it. Roadmap item 160 did this
    for two buttons and the method is now known. **Done**, and the guard was
    written before the fix rather than after it, which is why the pass took one
    change instead of thirty: the measurement said the thirty rows had one cause.
-6. **170** and **176**, which are the same decision made twice: what should
-   already be true on a first run. **170 is done**; 176 waits on 167 for the
-   worker that generates a key pair without stopping the window.
+6. **170** and 176, which are the same decision made twice: what should
+   already be true on a first run. **170 is done**. 176 has the worker it was
+   waiting for, since 167 is done, and **moves to v0.1.24** with 184.
 7. **171**, the tour as an overlay. **Done.** It went ahead of 169 rather than
    after it: the one stop that waits on anything, the app lock, says so in a
    line of its own and moves on by itself when the worker answers, so a shared
@@ -1556,6 +1558,9 @@ up. That release is the one that carries the alignment work, the channels and
 the documentation pair already committed.
 
 ### After that: v0.1.24, the parts that touch a file
+
+**176** and **184** come first, moved from v0.1.23 when it was cut: the key
+pair offered on a first run, and the last two panels that wait to be asked.
 
 **173**, **185**, **174** and **175**: the decoy passphrase and convincing
 decoys, the vault under the integrity record, the stealth toggles, and the

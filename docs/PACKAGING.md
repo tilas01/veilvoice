@@ -221,13 +221,13 @@ install it.**
 :: Windows: both MSIs, then the Store's MSIX. The folder is the Windows zip,
 :: unpacked. Needs the WiX Toolset 5 (see the script) and, for the MSIX, the
 :: Windows SDK.
-python tools\package\msi.py veilvoice-v0.1.22-windows-x86_64 dist --version 0.1.22
-python tools\package\msix.py veilvoice-v0.1.22-windows-x86_64 dist --version 0.1.22 ^
+python tools\package\msi.py veilvoice-v0.1.23-windows-x86_64 dist --version 0.1.22
+python tools\package\msix.py veilvoice-v0.1.23-windows-x86_64 dist --version 0.1.22 ^
     --identity-name <from Partner Center> --publisher <from Partner Center> ^
     --publisher-display-name <from Partner Center>
 ```
 
-`msi.py` runs `wix build packaging/wix/veilvoice.wxs -d Version=0.1.22` once
+`msi.py` runs `wix build packaging/wix/veilvoice.wxs -d Version=0.1.23` once
 per scope, with the product code it derives from the version and the licence
 converted to RTF on the way, so neither is a file somebody has to keep in step
 by hand.
@@ -256,7 +256,7 @@ dpkg-buildpackage -us -uc -b
 
 # Fedora / RHEL / openSUSE
 rpmbuild -ba packaging/rpm/veilvoice.spec \
-    --define "_sourcedir $PWD/dist" --define "vv_version 0.1.22"
+    --define "_sourcedir $PWD/dist" --define "vv_version 0.1.23"
 
 # Flatpak  (regenerate cargo-sources.json from Cargo.lock first)
 python flatpak-cargo-generator.py Cargo.lock -o packaging/flatpak/cargo-sources.json

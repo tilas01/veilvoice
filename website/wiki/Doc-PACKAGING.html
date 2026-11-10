@@ -126,11 +126,11 @@
 <pre><code>:: Windows: both MSIs, then the Store's MSIX. The folder is the Windows zip,
 :: unpacked. Needs the WiX Toolset <span class="tok-num">5</span> (see the script) and, for the MSIX, the
 :: Windows SDK.
-python tools\package\msi.py veilvoice-v0.<span class="tok-num">1.22</span>-windows-x86_64 dist --version <span class="tok-num">0.1</span>.<span class="tok-num">22</span>
-python tools\package\msix.py veilvoice-v0.<span class="tok-num">1.22</span>-windows-x86_64 dist --version <span class="tok-num">0.1</span>.<span class="tok-num">22</span> ^
+python tools\package\msi.py veilvoice-v0.<span class="tok-num">1.23</span>-windows-x86_64 dist --version <span class="tok-num">0.1</span>.<span class="tok-num">22</span>
+python tools\package\msix.py veilvoice-v0.<span class="tok-num">1.23</span>-windows-x86_64 dist --version <span class="tok-num">0.1</span>.<span class="tok-num">22</span> ^
     --identity-name &lt;from Partner Center&gt; --publisher &lt;from Partner Center&gt; ^
     --publisher-display-name &lt;from Partner Center&gt;</code></pre>
-<p><code>msi.py</code> runs <code>wix build packaging/wix/veilvoice.wxs -d Version=0.1.22</code> once per scope, with the product code it derives from the version and the licence converted to RTF on the way, so neither is a file somebody has to keep in step by hand.</p>
+<p><code>msi.py</code> runs <code>wix build packaging/wix/veilvoice.wxs -d Version=0.1.23</code> once per scope, with the product code it derives from the version and the licence converted to RTF on the way, so neither is a file somebody has to keep in step by hand.</p>
 <pre><code><span class="tok-com"># The AppImage, from two programs built on the oldest Linux it should run on.</span>
 <span class="tok-com"># appimagetool and the runtime are the AppImage project's own; packages.yml</span>
 <span class="tok-com"># pins both by hash.</span>
@@ -151,7 +151,7 @@ dpkg-buildpackage -us -uc -b
 
 <span class="tok-com"># Fedora / RHEL / openSUSE</span>
 rpmbuild -ba packaging/rpm/veilvoice.spec \
-    --define <span class="tok-str">&quot;_sourcedir $PWD/dist&quot;</span> --define <span class="tok-str">&quot;vv_version 0.1.22&quot;</span>
+    --define <span class="tok-str">&quot;_sourcedir $PWD/dist&quot;</span> --define <span class="tok-str">&quot;vv_version 0.1.23&quot;</span>
 
 <span class="tok-com"># Flatpak  (regenerate cargo-sources.json from Cargo.lock first)</span>
 <span class="tok-kw">python</span> flatpak-<span class="tok-kw">cargo</span>-generator.py Cargo.lock -o packaging/flatpak/<span class="tok-kw">cargo</span>-sources.json

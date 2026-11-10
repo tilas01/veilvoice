@@ -162,7 +162,7 @@ veilvoice verify --script --system bsd     <span class="tok-com"># or name it: l
 <h3 id="the-strongest-check-which-no-program-here-can-do-for-you">The strongest check, which no program here can do for you</h3>
 <p>Rebuild the release from source and compare:</p>
 <pre><code>veilvoice verify --build-script &gt; reproduce-veilvoice.sh
-sh reproduce-veilvoice.sh v0.<span class="tok-num">1.22</span></code></pre>
+sh reproduce-veilvoice.sh v0.<span class="tok-num">1.23</span></code></pre>
 <p>A hash proves the file is the one whose hash was signed, and says nothing about what is inside it, because the same person signed both. Rebuilding moves the question from &quot;do I trust the publisher&quot; to &quot;do I trust the source&quot;, and the source is here to read.</p>
 <h3 id="what-a-pass-proves-and-what-it-does-not">What a pass proves, and what it does not</h3>
 <p>A good signature and a matching hash prove the file is the one the holder of that key published. They do <strong>not</strong> prove it is safe, that the source compiles to it, or that the key belongs to anybody in particular. Compare the fingerprint against the website and this README, from somewhere other than the download you are checking:</p>

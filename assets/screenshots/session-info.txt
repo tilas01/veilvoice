@@ -1,12 +1,12 @@
 $ veilvoice info
 VeilVoice
-  Version                0.1.22
+  Version                0.1.23
   Release channel        stable (cut from main, signed, and what the download page offers)
-  Engine                 0.1.22
-  Crypto                 0.1.22
-  Audio                  0.1.22
-  Metadata               0.1.22
-  Monitor                0.1.22
+  Engine                 0.1.23
+  Crypto                 0.1.23
+  Audio                  0.1.23
+  Metadata               0.1.23
+  Monitor                0.1.23
   Licence                GPL-3.0-or-later
   Network access         none, by construction
   Live audio             available
