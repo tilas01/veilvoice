@@ -18,6 +18,707 @@ a fold, on GitHub and on the website both, from this one source. An entry with
 no such heading is read as all of it being what is new, which is how every
 entry below was published and is why none of them has been rewritten.
 
+## v0.1.23
+
+This release keeps the window responsive and fixes a sealing fault. Slow work,
+from unlocking the Studio to exporting a video, now happens in the background
+with a progress bar beside it, so the window no longer stops while it waits.
+The release also brings an updater that checks everything it downloads, a decoy
+passphrase you can set up, video export from the Browser and a reset that tells
+you what it will remove. It also fixes a fault in versions 0.1.15 to 0.1.22 that
+could seal recordings under an empty passphrase, and adds a command line tool,
+`veilvoice reseal`, that finds those files and seals them properly.
+
+### New features
+
+- **A repair for recordings sealed under an empty passphrase.** If you used an
+  app lock with VeilVoice 0.1.15 to 0.1.22, some recordings may have been sealed
+  under a blank passphrase, which means anybody with a copy of the file can open
+  it. `veilvoice reseal` finds those files and seals them again under your
+  app-lock passphrase. **In this release it is available from the command line
+  only.** The window has no button for it yet, so open a terminal to run it.
+
+To see what it would repair without changing anything, run the first line
+below. To repair, run the second. On its own it checks the folder VeilVoice
+keeps its own files in; if you keep recordings anywhere else, name that folder
+after the command, as in the third line.
+
+```
+veilvoice reseal --dry-run
+veilvoice reseal
+veilvoice reseal ~/my-recordings
+```
+
+It lists every file it checked before it asks for anything, including the ones
+that were sealed properly. It never changes a file that was sealed properly, so
+it is safe to run on a whole folder and safe to run twice. It checks your
+passphrase against your app lock before it touches a file; if you no longer have
+an app lock, it asks for the new passphrase twice instead. Resealing protects a
+file from now on, but it cannot undo a copy somebody already has.
+
+- **An updater.** `veilvoice update` downloads the newest release for your
+  computer, checks its signature and every file inside it, and only then
+  replaces the copy you are running. `veilvoice update --check` only tells you
+  whether a newer version exists. Nothing is checked or downloaded unless you
+  ask.
+- **Checking a download all the way through.** `veilvoice verify` now opens an
+  archive and checks every file inside it against the signed list, and it never
+  trusts a key that arrived with the download. `veilvoice verify install` finds
+  every copy of VeilVoice on your computer and checks each one.
+- **A decoy passphrase.** You can set a second passphrase that opens VeilVoice
+  to an empty folder, in Settings under Lock or with `veilvoice decoy`. Nothing
+  on the lock screen shows that a decoy exists, and `veilvoice decoy status`
+  tells you whether yours still works. It protects you from somebody watching
+  the screen, not from somebody who has a copy of the disk.
+- **Video export from the Browser.** Each recording in the Browser shows a small
+  picture of its sound. Export lets you choose sound, video or both, MP4, MKV or
+  MOV, the quality and the look of a moving waveform. The sound is always kept
+  lossless.
+- **A reset that shows what it will remove.** Settings, under Storage, and
+  `veilvoice reset` list everything they would delete, with sizes, before doing
+  anything. Where something cannot be replaced, such as recordings, you have to
+  type RESET to continue. `veilvoice reset --dry-run` shows the list and stops.
+- **Missing companions are mentioned once, at launch.** VeilVoice tells you when
+  it starts if ffmpeg or GnuPG is missing, and remembers if you say no.
+  `veilvoice companions --no ffmpeg` and `veilvoice companions --ask-again`
+  change that answer. `veilvoice record` now tells you before a recording, not
+  after it, what turning it into a video will need.
+- **Early builds.** Newer work can now be published between releases as an
+  early build, marked as a prerelease with a version such as 0.1.23-beta.1. A
+  copy shows which channel it came from in the About tab and in
+  `veilvoice info`, and its update check stays on that channel. The download
+  page never offers an early build by default.
+
+### Bug fixes
+
+- **Recordings sealed under an empty passphrase (0.1.15 to 0.1.22).** Unlocking
+  VeilVoice kept an empty passphrase instead of the one you typed, so recordings
+  sealed with the app lock, and VeilVoice's record of its own files, were sealed
+  under nothing. They looked sealed but would open for anybody. Unlocking now
+  keeps the passphrase you typed. Files written by the older versions stay as
+  they are until you run `veilvoice reseal`, described above, and
+  `veilvoice lock status` reminds you of this.
+- **The window no longer freezes while it works.** Unlocking the Studio, the
+  first unlock after setting an app lock, exporting a take, creating decoy
+  vaults and the last card of the setup tour all used to stop the window until
+  they had finished.
+- **Installing put the programs somewhere that was not on your path** on Linux
+  and macOS, so typing `veilvoice` afterwards did not work. They now go to the
+  folder that is added to your path. Uninstalling now removes only the programs
+  it installed, one file at a time, and never deletes a folder.
+- **Installing from a linked copy could empty it.** If a link in your programs
+  folder pointed at a portable copy, installing wrote through the link and left
+  an empty file. Installing, and `veilvoice verify install`, now replace the
+  link instead. Installing also checks whether the folder really is on your
+  path, and gives you the line to add if it is not.
+- **Asking for help made a network request.** `veilvoice verify release --help`
+  read `--help` as a version number and tried to download it. Help is now
+  answered wherever it appears in a command.
+- **A console window flashed on Windows** while a take or a group conversation
+  was turned into a video, and in the setup program.
+- **The list of allowed screen recorders could be read by every account** on the
+  computer. It is now private to you, and an existing one is tightened.
+- **Controls changed size when the pointer reached them.** Every row of options
+  grew slightly on hover and pushed its neighbours along. Options, the lock and
+  unlock buttons, and the two answers in the dialog about writing recordings
+  unencrypted now keep one size.
+- **A 360 Hz display was treated as a 240 Hz one,** both when the rate was
+  measured and when the window was drawn.
+- **The instructions for building from source did not work on a fresh Linux
+  machine,** because they named no system packages. They now go from cloning to
+  a working program on Debian, Fedora and Arch, and say what macOS and Windows
+  need.
+- **Several pages were wrong about the program.** The manual said that the
+  static and Raspberry Pi downloads include the window, which they never have.
+  The page listing every command said no command uses the network.
+  The crash log and the crash report panel said VeilVoice never uses the
+  network. Each now says what is true: nothing sends a crash report, and the
+  network is used only by the commands you run for that purpose.
+- **On the website, following the same link twice** highlighted where you landed
+  only the first time.
+- **The decoy passphrase could be told apart by how long it took.** The real
+  passphrase took one more key derivation than the decoy, which somebody timing
+  the unlock could measure. Both now cost the same. The real passphrase also can no longer be
+  changed to match the decoy.
+- **The updater did not ask for the app-lock passphrase** when the lock was kept
+  in the vault, so an update could not reseal what it changed. It finds the lock
+  wherever it is kept now.
+- **Locking the window while a vault was still opening** handed that vault to
+  whoever unlocked next. A vault that is still opening when the window locks is
+  now dropped.
+- **The moving waveform drifted away from the sound** in recordings made at
+  44.1 kHz, by about eight seconds over an hour. It now stays with the sound at
+  every rate.
+- **Cleaning metadata did not work on MP3, FLAC, Ogg or M4A files,** only on
+  WAV. It works on all of them now, and it writes a fresh file and swaps it in,
+  so a crash part way through leaves the original untouched.
+- **A file whose name began with a dash could be read by ffmpeg as an option.**
+  Every path now reaches ffmpeg as a file, whatever its name.
+- **A file near the size limit could stop the program** instead of giving an
+  error, and a conversation plan whose last turn ended absurdly late could make
+  the video export hang. Both are refused with a message now.
+- **On the website, four kinds of document froze the page** that rendered them,
+  and the questions page told readers to delete the file that holds their
+  recordings' key. Both are fixed.
+
+### Additions and improvements
+
+- **One progress indicator for everything that takes time.** It shows an
+  estimate only where one can be measured, says why when it cannot, and stays
+  still if your system asks for reduced motion.
+- **The welcome tour sets VeilVoice up** rather than only describing it: a
+  password on the window, encryption at rest, the decoy passphrase, whether this
+  copy is installed, and a walk through Settings. It is drawn over the window it
+  describes, and leaves out steps that are already done.
+- **A first run suited to the computer.** VeilVoice checks whether there is
+  graphics hardware and starts on the software drawing path if there is none.
+  Sealing recordings with the app lock is on from the start, and takes effect
+  as soon as you set a lock.
+- **VeilVoice now says that it checks its own files.** It has recorded its own
+  files at the first launch and checked them at every launch since 0.1.15. The
+  tour and the command reference now say so, including that the record is kept
+  unencrypted when there is no app lock.
+- **The Verify tab looks for GnuPG as soon as it opens,** including inside WSL on
+  Windows, instead of waiting for a button.
+- **The headings in Settings are written as titles:** Appearance, Motion,
+  Interface, Security and Storage.
+- **The sound library VeilVoice uses has been updated.** Device names printed by
+  0.1.22 still work with `--input` and `--output`, and where two devices share a
+  name the list now tells them apart.
+- **The About tab lists everything VeilVoice keeps between runs,** with what
+  each item is and whether it can be recreated, from the same list the program
+  itself uses.
+- **Builds that cannot record say so first.** Where VeilVoice has no access to
+  the sound hardware, the Studio says so at the top and the Browser explains why
+  playback is unavailable. The FreeBSD download is now built with the window as
+  well as the command line, and falls back to the command line alone if the
+  window does not build.
+- **The wiki is the whole manual, and it is published.** It now covers what to
+  do first, what a report of a changed file means and how to update, and it is
+  published with each release. The website carries a copy of every wiki page.
+- **The website's banner no longer freezes for readers who ask for less
+  motion.** It keeps a slow, calm sweep instead, and those readers get a button
+  to pause it. Everyone else sees it as before.
+- **Release notes start with what you need:** which file to download and how to
+  check it, then what changed, with the technical detail folded away. Each
+  release also has a picture of its own for link previews.
+- **More of the program is documented.** Every command and every tab of the
+  window has its own entry, every item in the generated reference has a
+  description, and the screenshots now include the lock screen and every page of
+  Settings. A security policy explains how to report a vulnerability privately.
+- **Releases are made from one branch, in one checked step.** All work now goes
+  to a single branch, `main`. A release is made by a workflow that first checks
+  the version, the notes, the roadmap and the audit, and then builds only the
+  exact commit it checked. The website and the wiki are updated when a release
+  is published, not on every change.
+- **Groundwork for running VeilVoice in a web browser.** Everything except the
+  window can now be built for the web, and this is checked on every change.
+
+```mermaid
+flowchart LR
+    root(("VeilVoice 0.1.23"))
+
+    root --> privacy["Recordings and privacy"]
+    root --> media["Recording and export"]
+    root --> window["The window"]
+    root --> setup["Install, update and verify"]
+    root --> docs["Documentation and website"]
+    root --> releases["How releases are made"]
+
+    privacy --> p1(["Reseal tool, command line only"])
+    privacy --> p2(["Decoy passphrase"])
+    privacy --> p3(["Reset that lists what it removes"])
+    privacy --> p4{{"Sealing under an empty passphrase"}}
+    privacy --> p6{{"Allowlist readable by other accounts"}}
+
+    media --> m1(["Video export from the Browser"])
+    media --> m2("Sound library updated, old device names kept")
+    media --> m4{{"Console flash on Windows"}}
+
+    window --> w1{{"Freezes while working"}}
+    window --> w2{{"Controls resizing on hover"}}
+    window --> w3{{"360 Hz shown as 240 Hz"}}
+    window --> w4("One progress indicator")
+    window --> w5("Tour that sets things up")
+    window --> w6("Titles in Settings")
+    window --> w7("Kept files listed in About")
+
+    setup --> s1(["Updater"])
+    setup --> s2(["Archive and whole computer checks"])
+    setup --> s3(["Companions asked about once"])
+    setup --> s4{{"Install path and uninstall"}}
+    setup --> s5{{"Installing over a link"}}
+    setup --> s6{{"Help that made a request"}}
+
+    docs --> d2{{"Build instructions"}}
+    docs --> d3{{"Wrong statements in the manual"}}
+    docs --> d4("Wiki as the whole manual")
+    docs --> d5("Reader-first release notes")
+    docs --> d6("A calmer banner under reduced motion")
+
+    releases --> r1(["Early builds"])
+    releases --> r2("One branch and a checked release")
+    releases --> r3("Web build groundwork")
+
+    subgraph chart_key ["Key"]
+        direction LR
+        key_area["Grey box: an area of VeilVoice"]
+        key_feature(["Blue pill: a new feature"])
+        key_fix{{"Red hexagon: a bug fix"}}
+        key_improvement("Green box: an addition or improvement")
+    end
+
+    classDef area fill:#e5e7eb,stroke:#4b5563,color:#111827
+    classDef feature fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
+    classDef fix fill:#fee2e2,stroke:#b91c1c,color:#1f0a0a
+    classDef improvement fill:#dcfce7,stroke:#15803d,color:#052e16
+    class root,privacy,media,window,setup,docs,releases,key_area area
+    class p1,p2,p3,m1,s1,s2,s3,r1,key_feature feature
+    class p4,p6,m4,w1,w2,w3,s4,s5,s6,d2,d3,key_fix fix
+    class m2,w4,w5,w6,w7,d4,d5,d6,r2,r3,key_improvement improvement
+```
+
+Read the graph from left to right: each grey box is an area of VeilVoice, and
+the shapes beside it are the changes in that area. The key in the chart says
+what each shape means.
+
+### Technical detail
+
+**New features**
+
+- **`veilvoice reseal` (F-231).** `veilvoice_crypto::reseal` finds a container
+  that opens with an empty passphrase and seals it again under a real one; the
+  command line in `crates/veilvoice-cli/src/reseal.rs` prints, asks and counts.
+  A file is sealed again only when the empty passphrase opened it. The new
+  container is opened again with the new passphrase and compared against the old
+  one's plaintext before `privatefile::replace_owner_only` puts it in place, so
+  an interrupted repair leaves the original. The sweep caps its key derivation at
+  `kdf::KdfParams::UNATTENDED_MAX_M_COST`, since it is handed whatever is in the
+  folder rather than a file somebody chose, and it neither follows nor descends
+  into a symbolic link. The passphrase is proved through the rate-limited
+  `LockStore::unlock` before any file is touched. Usage is
+  `veilvoice reseal [FOLDER]... [--dry-run]`, defaulting to `layout::dir()`.
+  `veilvoice lock status` prints `reseal::NOTICE`. The window does not call the
+  repair in this release. Commit: "A tool that finds what was sealed under an
+  empty passphrase, and seals it again".
+- **The updater (roadmap 179).** The order of checks is the design: the
+  signature over `SHA256SUMS` against the key compiled into the running binary,
+  then the archive against that list, then `CONTENTS.sha256` against that list,
+  then every file inside the archive, hashed in place without unpacking, and
+  finally what comes out of the extractor, hashed again. All of it is
+  `veilvoice-verify`'s existing code. The download goes beside the running copy
+  rather than into the system temporary directory, and the integrity record is
+  re-taken after the signature check. Commit: "Roadmap 179: an updater that does
+  the update". Within this release the updater's own audit found and fixed seven
+  defects: the integrity record was resealed with a passphrase nobody had
+  checked, which now goes through `LockStore::unlock` before the first byte is
+  fetched (F-260); the name people run was briefly missing during replacement,
+  now written to `name.new` and moved by a rename (F-261); an update dropped every
+  recorded file it had not replaced, fixed by `Manifest::refresh` in
+  `veilvoice-guard` (F-262); the restart path was read after the program had
+  moved (F-263); the archive check claimed a per-file check where no contents
+  list was published (F-264); one screen contradicted itself about installing
+  (F-265); and `verify install` wrote through a link at the destination (F-266).
+  F-213 corrected the wording that said the command line talks to no servers.
+- **Verifying inside an archive, and every copy on the machine (roadmap 164).**
+  The chain now runs from `SHA256SUMS.asc` to `SHA256SUMS` to `CONTENTS.sha256`
+  to every file inside the archive. A key shipped inside a download has its
+  fingerprint compared against the compiled-in one and is never used to decide
+  the answer. `veilvoice verify install` walks the machine for copies. Commits:
+  "Roadmap 164: check what is inside an archive, and never trust the key it came
+  with" and "Roadmap 164: every copy of VeilVoice on this computer, found and
+  checked". The test fixture the first of these added was matched by a
+  `.gitignore` rule and never committed (F-206).
+- **The decoy passphrase (roadmap 173).** `decoy::Store` keeps one record beside
+  the app lock under a derived name, and `Store::judge` is the one place an
+  unlock goes through: it derives the decoy first and unconditionally, so the
+  time an unlock takes does not reveal whether a decoy exists. `decoy::Pair`,
+  which held a second verifier for the real passphrase, is gone. Front ends:
+  `veilvoice decoy status|set|change|remove` and a section under Settings, Lock.
+  Findings fixed before release: the tour stored a stop it had never shown
+  (F-249); setting a decoy was an unthrottled way to guess the real passphrase,
+  now counted through `LockStore::unlock` (F-252); the app lock's cooldown told
+  the decoy apart from the real passphrase, now reported identically for every
+  passphrase (F-253); and a decoy unlock migrated the plain records into a store
+  only the decoy key could read, destroying them for the real passphrase, now
+  prevented by `vault_store::Plain::Leave` (F-268). What a decoy cannot hide from
+  somebody holding the disk is written down beside the code.
+- **Browser export and thumbnails (roadmap 175).** `veilvoice-video` gained an
+  `export` module (MP4, MKV or MOV; H.264, H.265, AV1, VP9, FFV1 or ProRes) and a
+  `motion` module with sixteen templates. Audio is always FLAC, ALAC or WAV, and
+  a test walks every combination to prove no lossy audio encoder is named. WebM
+  is not offered because it carries no lossless audio. Frames go to ffmpeg as raw
+  RGB on standard input. Every offered combination was encoded with ffmpeg 6.1,
+  and the decoded audio matched the input bit for bit. Commits: "Roadmap 175, the
+  library half", "Roadmap 175, the Browser half's engine" and "Roadmap 175 done".
+- **Reset (roadmap 172).** A `reset` module in `veilvoice-crypto` plans and
+  removes in separate calls, and works by exclusion so a state file added in a
+  later release is still removed. `--confirm RESET` carries the word for a
+  machine with no terminal, and `--yes` is refused where anything is
+  irreplaceable. An administrator's copy of the app lock under `/etc` is named as
+  out of reach. Commit: "Start again, properly: a reset that names what it is
+  about to remove".
+- **Companions (roadmap 163).** `veilvoice_setup::needs` answers once whether
+  ffmpeg and GnuPG are present and whether this copy is installed or portable. A
+  no is stored in `companions-declined.txt`, registered in
+  `veilvoice_crypto::layout`. The fetch-and-verify half of the item is still to
+  come. The URL rule the fetch will rely on was a string prefix, so
+  `https://github.com.example.invalid` passed; it now requires a known origin
+  followed by a slash (F-226). That path was not reachable from user input.
+- **Release channels (roadmap 165).** The channel is read from the version a
+  build carries, so a binary stays a pure function of its source. The version
+  comparison implements semantic versioning's precedence rules, and an early
+  build reads the full releases list rather than `/releases/latest`. Commit:
+  "Two channels, and a build that knows which one it came from".
+
+**Bug fixes**
+
+- **The empty passphrase (F-231).** The unlock button moved the typed passphrase
+  out of the field before the worker ran, and `poll` then read the field, so
+  every successful unlock kept an empty string. App-lock sealing and the
+  integrity record used it. The worker now gets a copy, and the field keeps the
+  original until `poll` collects the answer. Present from v0.1.15 to v0.1.22.
+  Commit: "Every unlock kept an empty passphrase, and app-lock sealing sealed
+  with it".
+- **The freezes (roadmap 167).** A shared `offthread::Answer` replaces machine
+  queries made while drawing, such as `df` spawned every frame on the tour's last
+  card (F-216). The first unlock's migration of plain records now runs on
+  `VaultStore::start_unlocking` (F-218). Export runs as an `ExportJob` on a worker
+  that drops the vault key as soon as the recording is read (F-219). The
+  crate-wide guard `the_drawing_thread_never_waits_on_anything` now reads every
+  module, and found the decoy panel and the vault unlock waiting as well (F-220).
+  A headless frame-timing test fails any panel above 25 milliseconds.
+- **Install (F-214, F-237, F-238, F-239).** The binaries now go to the directory
+  added to `PATH`, and uninstall removes the files it wrote by name rather than
+  deleting the directory recursively (commit "Install put the programs in one
+  directory and added a different one to the path"). Each program is written to
+  a new file created with `create_new` and renamed over the destination instead
+  of `std::fs::copy`, which followed links (F-237). The Unix `add_to_path` now
+  looks before it says a directory is on `PATH` (F-238). An empty or relative
+  `HOME` or `LOCALAPPDATA` now counts as no home at all (F-239).
+- **Help that opened a connection (F-228).** `veilvoice_verify::run` read
+  `--help`, `-h`, `--explain`, `--version` and `--exit-status` only at the first
+  argument. `Asked::in_args` now reads them anywhere, and
+  `tools/audit/network_claims.py` compares the commands the program says reach
+  the network with the ones the manual names.
+- **The Windows console (F-210, F-212).** Two features written after v0.1.10
+  spawned `ffmpeg` without the wrapper that hides the console, and so did the
+  setup program. The guards that should have caught this read part of each crate
+  and now read all of it. Commit: "Roadmap 167, the console half".
+- **The screen-recorder allowlist (F-240).** Created with mode 0600 in
+  `crates/veilvoice-watch`, and a readable one left by an earlier build is
+  tightened.
+- **Control sizes (F-196, F-233, F-257).** The lock and unlock buttons share
+  `layout::LOCK_WIDTH` (F-196). The toolkit lays an unselected
+  `Button::selectable` out without its frame, so it grew on hover;
+  `layout::chip` and `layout::chip_value` now allocate the frame in every state,
+  across thirty option controls (F-233).
+  Twelve buttons were sized by padding their labels with spaces, including the
+  unencrypted-recordings dialog, whose two answers were 184.4 and 176.5 points
+  wide; `layout::choice_width` now measures from the longest label (F-257).
+- **The frame-rate ceiling.** One cap limited both what the measurement could
+  report and what "match the display" could request. Commit: "Frame rate: a
+  ceiling at 240 was a ceiling in the wrong place".
+- **Build instructions (F-234).** Measured on a fresh machine, only
+  `libasound2-dev` and `pkg-config` are needed to build both binaries;
+  `libxkbcommon-x11-0` is named separately as what the window loads at startup.
+  `tools/audit/build_prerequisites.py` holds the workflows, both guides and the
+  pinned toolchain to each other.
+- **Wrong statements (F-236, F-246, F-256).** Corrected: the platform table for
+  the static and Raspberry Pi archives, now checked by
+  `tools/audit/platform_table.py` (F-236); the generated commands page (F-246);
+  and four remaining copies of the network claim, in the crash log, the
+  crash-report panel, a test and the verifier's module documentation, now held
+  by `tools/audit/network_wording.py` (F-256).
+- **The website's landing highlight (F-205).** A click on a link naming the
+  fragment already in the address bar fires no `hashchange`, so
+  `js/teleport.js` now cues that case from its click handler.
+
+**Additions and improvements**
+
+- **The progress indicator (roadmap 167 and 169, F-221, F-223).**
+  `progress::Reach` holds progress in two atomics. `counting(total)` draws a bar
+  with a real fraction. `unmeasurable(because)` draws a bar with a travelling
+  highlight, or a still one under reduced motion, and puts the reason on screen.
+  `progress::strip` is the only thing in `veilvoice-gui` that draws work in
+  progress, and a guard refuses `ui.spinner()` or `egui::ProgressBar::new`
+  anywhere else. A bar with a real fraction keeps
+  filling under reduced motion, because the setting concerns decoration.
+- **The tour (roadmap 171).** It is drawn as an overlay rather than replacing the
+  central panel, reads its Settings walk from the menu's own list, drops stops
+  with nothing left to offer, and wipes password fields on every way out of a
+  stop. Commits: "The tour is drawn over the window it is a tour of" and "The
+  tour sets VeilVoice up rather than only describing it".
+- **First run (roadmap 170).** A new `probe` module reads the graphics devices
+  the system reports, once, on the run that finds no settings file, and a machine
+  with no hardware starts on the software path. Commit: "The first run asks this
+  machine rather than opening on constants". Making app-lock sealing the default
+  exposed F-202: the window mirrored the live sealing mode into the preference
+  every frame, which wrote `false` whenever no lock existed yet. `Security` now
+  remembers the preference and applies it when a lock appears.
+- **The integrity record.** Behaviour unchanged since roadmap item 75; the tour's
+  lock card and `docs/COMMANDS.md` now describe it, and a test holds the card to
+  the code. Commit: "The integrity record was already automatic, and nothing said
+  so".
+- **GnuPG detection** runs on a worker when the Verify tab opens, WSL included,
+  rather than when a button is pressed. It is the commit whose subject begins
+  "verify: look for GnuPG at launch".
+- **Settings headings (roadmap 181).** The heading and the deep-link name are now
+  separate fields, so `--settings-page appearance` and the published capture
+  addresses are unchanged. Found on the way: a verification ordering that made a
+  generator publish the previous demonstration and looked like a flaky test
+  (F-209).
+- **The sound library (F-244, F-245).** The `cpal` 0.18 migration named every
+  device on one ALSA card identically, so `open` took the first; a name shared
+  within the list now carries the platform identifier in brackets, and `open`
+  also accepts the bare identifier v0.1.22 printed (F-244). The error callback
+  printed and took a mutex on the backend's audio worker; a glitch is now two
+  atomic stores, and an invalidated stream counts as ended (F-245). Both were
+  introduced and fixed within this release.
+- **What VeilVoice keeps.** `veilvoice_crypto::layout` names every state file
+  and folder once, and the About tab takes its labels from it. Commit: "One list
+  of what VeilVoice keeps between runs".
+- **Builds without live audio (roadmap 162).** `veilvoice-gui` gained a `live`
+  feature, on by default. With it off, `veilvoice-audio` offers the same modules
+  through an `absent` module whose constructors refuse with `NoLiveAudio`, and
+  `WHY_NO_CAPTURE` supplies the sentence the Studio shows. The FreeBSD release
+  job builds the window beside the command line. OpenBSD and NetBSD remain
+  command line only.
+- **The wiki (roadmap 159 and 178, F-198, F-199, F-259).** The wiki is now the
+  documentation, with its coverage checked. Its contents page decided what a
+  document was by counting lines (F-198). The publishing workflow had failed on
+  every run, because a GitHub wiki repository exists only after a first page is
+  saved through the web interface (F-199); it now skips with a warning until
+  then (F-259). `tools/site/wiki_site.py` publishes every wiki page on the
+  website. `tools/docs/wiki.py` rewrote relative links in two passes, and the
+  second turned 86 finished links into repository URLs that never existed; it
+  is one pass now, guarded by `rewritten_twice()` (F-247). The manual's sentence
+  that the command line cannot update was corrected in the week the updater
+  landed (F-222).
+- **Release notes and cards (roadmap 180 and 183).** `tools/release/notes.py`
+  builds the notes from this file and splits each entry at the `### Technical
+  detail` heading. It also fails a release whose signing key differs from the
+  fingerprint compiled into the verifier (F-203). `tools/release/card.py` draws
+  one card per release from the same entry.
+- **Documentation.** Eighty-two published items had no doc comment;
+  `tools/audit/documented.py` now fails the build rather than reporting. The
+  generator read `const fn rgb` as an item called `fn` (F-215). The search index
+  silently skipped files above 512 KB, which excluded `docs/AUDIT.md`; the limit
+  is now 2 MB and exceeding it is a refusal (F-224). `docs/SECURITY.md` is the
+  disclosure policy.
+- **The release process (roadmap 186, F-208, F-230, F-255).** See the chart
+  below. The procedure used to be a paragraph of the contributing guide whose
+  only enforced clause ran in the last step of the build (F-208). The release
+  gate found the previous release by a range that, when the
+  release tag is not an ancestor of the branch, covered far more than that release's work, so
+  its audit-round question could only pass. `release_point()` now locates a
+  release by its tree (F-255). The gate once checked one commit and merged
+  another; it now hands the checked commit to `release.yml`, which refuses to
+  publish any other (F-230). Commits: "Roadmap 186: a version is cut by the
+  repository, not by remembering how" and "One branch: work is committed to main
+  and releases are cut from it".
+- **The browser build (roadmap 177).** Every crate but `veilvoice-gui` compiles
+  for `wasm32-unknown-unknown`, and CI checks it. `region` is declared only off
+  `wasm32`, so `Secret` locks no pages there, and `docs/WHITEPAPER.md` says so.
+  `tools/site/window.py` builds the window bundle and checks it against a hash of
+  its sources; the window itself does not build for the web yet.
+
+**The audit, and the guards it added**
+
+- The thirty-fourth round re-checked every finding written up between v0.1.22
+  and its start, F-196 to F-215, by breaking each guard and watching it fail.
+  Five did not hold, F-254 to F-258. Besides F-255, F-256 and F-257 above, both
+  crate-wide guards in `veilvoice-gui` cut each module at its first
+  `#[cfg(test)]`, so they read 53% of `studio.rs`; `crate::shipped()` is now one
+  shared cut (F-258).
+- The code written since v0.1.22 was read for defects as well, which is where
+  F-237 to F-245 and F-260 to F-266 come from. Besides those above:
+  `tools/shots/gui.ps1` now fails on a broken capture (F-241), the branch tidier
+  works on a fresh clone (F-242), and the Dependabot guard fails when it cannot
+  read `ci.yml` (F-243).
+- Checks added or widened: CI had stopped running on the branch where the work
+  was (F-197); Dependabot was aimed at the wrong branch (F-200); a recorded
+  terminal output stopped matching the program (F-201) and the check that runs
+  the program used whichever build was present (F-217); four of six `.gitignore`
+  negation rules had never matched (F-204); CI could be green over a tree that
+  `tools/verify.py` fails (F-207); nothing compared the screenshots with the
+  window (F-211); a test knew only GNU tar's name for a format (F-225); the
+  mutation baseline covered four of ten files and named survivors by line number
+  (F-227, F-250); a base-91 boundary decision was untested (F-232); a test timed
+  the panic hook (F-229); and a finding number written up twice counted as one
+  (F-251).
+- Asked about and not a defect: a repeated roll interval after about eighty
+  thousand launches is the birthday bound for a 32-bit draw. It was widened to
+  eight bytes anyway, and `tools/audit/randomness.py` holds the rule. Commit:
+  "Randomness: the answer to the eighty-thousand question, and a guard".
+- Security in CI: `ci.yml` runs with `contents: read`, every action is pinned to
+  a commit, and `tools/audit/actions.py` refuses an unpinned one. Commit:
+  "Security: a disclosure policy, least privilege in CI, and pinned actions".
+
+- The thirty-fifth round read the whole project again after the history was
+  signed and made one branch. Thirteen findings were fixed, F-271 to F-283:
+  the decoy's timing and the passphrase change (F-272, F-273), the updater and
+  the vault lock (F-271), a vault opening across a lock (F-274), waveform drift
+  (F-275), the release workflow's write token (F-276), the website renderer
+  (F-277), the questions page (F-278), plan length (F-279), decode memory
+  (F-280), metadata cleaning (F-281, F-282) and ffmpeg paths (F-283).
+- Supply chain: every workflow now runs read only except where it publishes or
+  pushes, no checkout keeps its token unless its workflow says why
+  (`tools/audit/checkout_tokens.py`), the release version reaches scripts only
+  through the environment, and CodeQL, the OpenSSF Scorecard and an
+  `osv-scanner.toml` that matches the other two advisory lists were added.
+- Every commit in the history is now authored and committed by tilas01 and
+  signed with the release key, and the release tag is signed by the same key.
+- The thirty-sixth round read every code scanning alert one at a time, 373 of
+  them at the time. Two were real: two workflows granted a write to every job
+  they might ever have (F-284), and the website's tests stripped tags in a way
+  a crafted page could slip past (F-285). The reasons for treating the rest as
+  false positives are written down, so a dismissal can point at them. CodeQL
+  now runs the security-extended queries, and every workflow lists its
+  findings in its own run.
+- Found and fixed before they shipped, in code new since v0.1.22: the updater
+  had its own way of replacing a running program, and now shares the one the
+  installer uses (F-286); a part-finished update said nothing had been
+  replaced (F-287); the build without live audio did not offer what the live
+  build offers, and its tests never ran in CI (F-288); exporting from the
+  window followed links, deleted files it had not made and lost the first of
+  two exports (F-289); the command line's reset removed the app lock unless
+  told not to, while the window kept it (F-291); keeping the keys still
+  removed the decoy passphrase, and on a machine set up with 0.1.17 the lock
+  itself (F-292); and the test meant to catch that had only ever exercised the
+  branch where nothing works (F-293).
+- The thirty-seventh and thirty-eighth rounds read the prose, hidden text, the
+  workflows and every drawing. The changelog and roadmap had doubled words and
+  the roadmap cut its tooltips mid-word (F-296); Dependabot proposed releases
+  on the day they appeared, and now waits seven days (F-297); a crate's map of
+  its files and the website's script charts had no key (F-290); no dry run of
+  a release got past the technical document, which is the failed release run
+  of 26 October (F-294); and the mutation and fuzz jobs built whichever tool
+  release was newest (F-295).
+- The fortieth round walked the path from `main` to a published release
+  before this one was cut by it. The release gate asked for a recording of a
+  release that could not exist yet, so it failed on every new version
+  (F-298); the window did not compile on Windows over an unused `mut` (F-299);
+  the AppImage tools were pinned to a placeholder (F-300); the RPM build was
+  killed while linking, from Fedora's debugging flags on top of fat LTO
+  (F-301); and a failed second FreeBSD build would have cost the release its
+  FreeBSD archive (F-302).
+- Roadmap items 176 and 184's remaining half move to v0.1.24, so this release
+  is not held for them.
+
+**Also new in the source, not yet in a release download**
+
+- Two Windows installers (per user and per machine), an AppImage and an RPM
+  are built, installed, run and removed in CI on every change to the
+  packaging (`packages.yml`, roadmap rows 193 to 203). They are not attached
+  to releases yet.
+- `veilvoice_audio::call` records a phone call one track per side, the
+  microphone and the computer's own output (roadmap item 188). The window and
+  the command line do not offer it yet.
+
+**Dependencies**
+
+- `cpal` 0.15.3 to 0.18.2, a migration rather than a bump. It brings `alsa`
+  0.11.0, `alsa-sys` 0.4.0, `coreaudio-rs` 0.14.2 and `windows` 0.62.2, and
+  removes `oboe`, `coreaudio-sys` and the `bindgen` and `clang-sys` build chain
+  from the lockfile.
+- `clap` 4.6.6 to 4.6.7, `rfd` 0.15.4 to 0.16.0, `lofty` 0.25.2 to 0.25.5
+  (which brings `ogg_pager` 0.8), `ringbuf` 0.5.2 to 0.6.0, `realfft` 3.5.0
+  to 3.5.1 and `zeroize` 1.9.0 to 1.9.1.
+- `miniz_oxide` 0.8 to 0.9 in `veilvoice-video`; 0.8 stays in the tree through
+  `img-parts` and `png`.
+- `getrandom` takes its `js` feature in the workspace table, which is what makes
+  it reach the verifier.
+- `egui` and `eframe` 0.36 to 0.37. The clipboard is named as a feature,
+  because 0.37 moved it behind one and the copy buttons would otherwise do
+  nothing. `pgp` 0.20 to 0.21, `img-parts` 0.4.1, which fixes panics on
+  malformed images, `winresource` 0.1.34, `clipboard-win` 5.4.3 in place of the
+  yanked 5.4.1, `rfd` 0.16.1 and `tokio` 1.53.3.
+- Accepted with their reasons in both advisory policies: `crypto-bigint`
+  (RUSTSEC-2026-0387), reached only by signature checking, which has no secret
+  to leak, and `zvariant`, `zvariant_derive` and `zbus_names`
+  (RUSTSEC-2026-0370 to 0372), unmaintained crates behind the Linux file dialog.
+- `region` is held at 3 on purpose: version 4 made `region::unlock` unsafe, and
+  `veilvoice-crypto` forbids unsafe code. The reason is written beside the
+  dependency and the Dependabot ignore rule covers majors only.
+- Actions: `actions/setup-node` v7.1.0, `actions/upload-artifact` v7.0.2,
+  `actions/download-artifact` v8.0.2, `vmactions/freebsd-vm` v1.5.9,
+  `vmactions/openbsd-vm` v1.4.8 and `vmactions/netbsd-vm` v1.5.2. Each was
+  checked against the upstream tag it claims and applied to `main` by hand.
+
+**How a release is made and published**
+
+```mermaid
+flowchart TD
+    push[/"A commit is pushed to main"/]
+    bot[/"Dependabot opens a pull request against main"/]
+    person[/"A person runs promote.yml with a version"/]
+    halt(["Stop and say why"])
+
+    subgraph ciwf["ci.yml"]
+        ci["Build, test and check every generated file"]
+    end
+
+    subgraph promotewf["promote.yml"]
+        fresh["Check out the tip of main afresh"]
+        ready{"readiness.py: version, notes, roadmap and audit agree"}
+        verify{"cargo build, then verify.py passes whole and leaves the tree clean"}
+        green{"ci.yml succeeded on this commit"}
+        ask{"Publish chosen"}
+        report(["Report what the release still needs"])
+        moved{"main still at the checked commit"}
+        dispatch["Dispatch release.yml with the tag and the checked commit"]
+    end
+
+    subgraph releasewf["release.yml"]
+        build["Build every platform twice and compare, BSDs in VMs"]
+        stage["Write CONTENTS.sha256, TECHNICAL.md and SHA256SUMS"]
+        sign["Sign SHA256SUMS, write NOTES.md from CHANGELOG.md"]
+        gate{"Built commit and Cargo.toml version match the request"}
+        publish(["Sign the tag at the built commit, then publish the release"])
+    end
+
+    subgraph sitewf["pages.yml and wiki.yml"]
+        wikicheck["wiki.yml checks the wiki pages, publishing nothing"]
+        tag["Find the release tag on the commit release.yml built"]
+        site(["Publish the website and the wiki from that tag"])
+    end
+
+    push --> ci
+    push -.-> wikicheck
+    bot --> ci
+    bot -.->|"bump applied by hand, pull request closed"| push
+    person --> fresh --> ready
+    ready -->|yes| verify
+    verify -->|yes| green
+    green -->|yes| ask
+    ask -->|no| report
+    ask -->|yes| moved
+    moved -->|yes| dispatch
+    ready -->|no| halt
+    verify -->|no| halt
+    green -->|no| halt
+    moved -->|no| halt
+    dispatch --> build --> stage --> sign --> gate
+    gate -->|yes| publish
+    gate -->|no| halt
+    publish -->|"run succeeded"| tag --> site
+
+    subgraph chart_key ["Key"]
+        direction LR
+        key_start[/"Slanted: what starts the work"/]
+        key_step["Plain: a step"]
+        key_check{"Diamond: a check"}
+        key_end(["Rounded: where a run ends"])
+    end
+```
+
+The key in the chart names the four shapes. Solid lines are the path a
+release takes. Dotted lines mark a check that publishes nothing and a
+Dependabot change that reaches `main` by hand. Each frame is one workflow file.
+A failed check stops the run with the reason, and a stop after `main` has moved
+means running `promote.yml` again on the new tip.
+
 ## v0.1.22
 
 **Twenty-seven crates became thirteen**

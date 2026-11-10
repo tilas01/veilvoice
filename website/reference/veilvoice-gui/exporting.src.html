@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-gui/src/exporting.rs</code></h1>
-<p style="color:var(--muted)"><a href="exporting.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1163 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="exporting.html">what this file is for</a> &middot; <a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1168 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -459,838 +459,843 @@
 <span class="ln" id="L356">    <span class="tok-com">/// Makes a folder only this user can enter, beside `beside`, under a name</span></span>
 <span class="ln" id="L357">    <span class="tok-com">/// no other folder there has.</span></span>
 <span class="ln" id="L358">    <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(beside: &amp;Path) -&gt; std::io::Result&lt;Self&gt; {</span>
-<span class="ln" id="L359">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> builder = std::fs::DirBuilder::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L360">        <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L361">        {</span>
-<span class="ln" id="L362">            <span class="tok-kw">use</span> std::os::unix::fs::DirBuilderExt;</span>
-<span class="ln" id="L363">            builder.<span class="tok-fn">mode</span>(0o700);</span>
-<span class="ln" id="L364">        }</span>
-<span class="ln" id="L365">        <span class="tok-kw">for</span> attempt <span class="tok-kw">in</span> <span class="tok-num">0</span>..100u32 {</span>
-<span class="ln" id="L366">            <span class="tok-kw">let</span> path = beside.<span class="tok-fn">join</span>(format!(</span>
-<span class="ln" id="L367">                <span class="tok-str">&quot;.veilvoice-export-{}-{attempt}&quot;</span>,</span>
-<span class="ln" id="L368">                std::process::<span class="tok-fn">id</span>()</span>
-<span class="ln" id="L369">            ));</span>
-<span class="ln" id="L370">            <span class="tok-kw">match</span> builder.<span class="tok-fn">create</span>(&amp;path) {</span>
-<span class="ln" id="L371">                <span class="tok-fn">Ok</span>(()) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(<span class="tok-fn">Self</span>(path)),</span>
-<span class="ln" id="L372">                <span class="tok-fn">Err</span>(error) <span class="tok-kw">if</span> error.<span class="tok-fn">kind</span>() == std::io::ErrorKind::AlreadyExists =&gt; continue,</span>
-<span class="ln" id="L373">                <span class="tok-fn">Err</span>(error) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(error),</span>
-<span class="ln" id="L374">            }</span>
-<span class="ln" id="L375">        }</span>
-<span class="ln" id="L376">        <span class="tok-fn">Err</span>(std::io::Error::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L377">            std::io::ErrorKind::AlreadyExists,</span>
-<span class="ln" id="L378">            <span class="tok-str">&quot;a hundred folders from earlier exports are in the way&quot;</span>,</span>
-<span class="ln" id="L379">        ))</span>
-<span class="ln" id="L380">    }</span>
-</span>
-<span class="ln" id="L381"></span>
-<span class="src-item" id="fn-workroom-path">
-<span class="ln" id="L382">    <span class="tok-com">/// Where the folder is, to write the job&#x27;s files into.</span></span>
-<span class="ln" id="L383">    <span class="tok-kw">fn</span> <span class="tok-fn">path</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;Path {</span>
-<span class="ln" id="L384">        &amp;<span class="tok-kw">self</span>.<span class="tok-num">0</span></span>
+<span class="ln" id="L359">        <span class="tok-com">// Only Unix has a mode to set, so the builder is only mutable there;</span></span>
+<span class="ln" id="L360">        <span class="tok-com">// a `let mut` shared by both is an unused-mut error on Windows.</span></span>
+<span class="ln" id="L361">        <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L362">        <span class="tok-kw">let</span> builder = {</span>
+<span class="ln" id="L363">            <span class="tok-kw">use</span> std::os::unix::fs::DirBuilderExt;</span>
+<span class="ln" id="L364">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> builder = std::fs::DirBuilder::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L365">            builder.<span class="tok-fn">mode</span>(0o700);</span>
+<span class="ln" id="L366">            builder</span>
+<span class="ln" id="L367">        };</span>
+<span class="ln" id="L368">        <span class="tok-attr">#[cfg</span>(<span class="tok-fn">not</span>(unix))]</span>
+<span class="ln" id="L369">        <span class="tok-kw">let</span> builder = std::fs::DirBuilder::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L370">        <span class="tok-kw">for</span> attempt <span class="tok-kw">in</span> <span class="tok-num">0</span>..100u32 {</span>
+<span class="ln" id="L371">            <span class="tok-kw">let</span> path = beside.<span class="tok-fn">join</span>(format!(</span>
+<span class="ln" id="L372">                <span class="tok-str">&quot;.veilvoice-export-{}-{attempt}&quot;</span>,</span>
+<span class="ln" id="L373">                std::process::<span class="tok-fn">id</span>()</span>
+<span class="ln" id="L374">            ));</span>
+<span class="ln" id="L375">            <span class="tok-kw">match</span> builder.<span class="tok-fn">create</span>(&amp;path) {</span>
+<span class="ln" id="L376">                <span class="tok-fn">Ok</span>(()) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(<span class="tok-fn">Self</span>(path)),</span>
+<span class="ln" id="L377">                <span class="tok-fn">Err</span>(error) <span class="tok-kw">if</span> error.<span class="tok-fn">kind</span>() == std::io::ErrorKind::AlreadyExists =&gt; continue,</span>
+<span class="ln" id="L378">                <span class="tok-fn">Err</span>(error) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(error),</span>
+<span class="ln" id="L379">            }</span>
+<span class="ln" id="L380">        }</span>
+<span class="ln" id="L381">        <span class="tok-fn">Err</span>(std::io::Error::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L382">            std::io::ErrorKind::AlreadyExists,</span>
+<span class="ln" id="L383">            <span class="tok-str">&quot;a hundred folders from earlier exports are in the way&quot;</span>,</span>
+<span class="ln" id="L384">        ))</span>
 <span class="ln" id="L385">    }</span>
 </span>
-<span class="ln" id="L386">}</span>
-<span class="ln" id="L387"></span>
-<span class="ln" id="L388"><span class="tok-kw">impl</span> Drop <span class="tok-kw">for</span> Workroom {</span>
+<span class="ln" id="L386"></span>
+<span class="src-item" id="fn-workroom-path">
+<span class="ln" id="L387">    <span class="tok-com">/// Where the folder is, to write the job&#x27;s files into.</span></span>
+<span class="ln" id="L388">    <span class="tok-kw">fn</span> <span class="tok-fn">path</span>(&amp;<span class="tok-kw">self</span>) -&gt; &amp;Path {</span>
+<span class="ln" id="L389">        &amp;<span class="tok-kw">self</span>.<span class="tok-num">0</span></span>
+<span class="ln" id="L390">    }</span>
+</span>
+<span class="ln" id="L391">}</span>
+<span class="ln" id="L392"></span>
+<span class="ln" id="L393"><span class="tok-kw">impl</span> Drop <span class="tok-kw">for</span> Workroom {</span>
 <span class="src-item" id="fn-workroom-drop">
-<span class="ln" id="L389">    <span class="tok-kw">fn</span> <span class="tok-fn">drop</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L390">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;<span class="tok-kw">self</span>.<span class="tok-num">0</span>);</span>
-<span class="ln" id="L391">    }</span>
+<span class="ln" id="L394">    <span class="tok-kw">fn</span> <span class="tok-fn">drop</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L395">        <span class="tok-kw">let</span> _ = std::fs::<span class="tok-fn">remove_dir_all</span>(&amp;<span class="tok-kw">self</span>.<span class="tok-num">0</span>);</span>
+<span class="ln" id="L396">    }</span>
 </span>
-<span class="ln" id="L392">}</span>
-<span class="ln" id="L393"></span>
+<span class="ln" id="L397">}</span>
+<span class="ln" id="L398"></span>
 <span class="src-item" id="fn-wrote">
-<span class="ln" id="L394"><span class="tok-com">/// What a successful export says.</span></span>
-<span class="ln" id="L395"><span class="tok-kw">fn</span> <span class="tok-fn">wrote</span>(output: &amp;Path) -&gt; String {</span>
-<span class="ln" id="L396">    format!(</span>
-<span class="ln" id="L397">        <span class="tok-str">&quot;Wrote {}. It is not sealed: what leaves the vault is an ordinary file, and the \</span></span>
-<span class="ln" id="L398"><span class="tok-str">         voice in it is still a voice nobody owns.&quot;</span>,</span>
-<span class="ln" id="L399">        output.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L400">    )</span>
-<span class="ln" id="L401">}</span>
+<span class="ln" id="L399"><span class="tok-com">/// What a successful export says.</span></span>
+<span class="ln" id="L400"><span class="tok-kw">fn</span> <span class="tok-fn">wrote</span>(output: &amp;Path) -&gt; String {</span>
+<span class="ln" id="L401">    format!(</span>
+<span class="ln" id="L402">        <span class="tok-str">&quot;Wrote {}. It is not sealed: what leaves the vault is an ordinary file, and the \</span></span>
+<span class="ln" id="L403"><span class="tok-str">         voice in it is still a voice nobody owns.&quot;</span>,</span>
+<span class="ln" id="L404">        output.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L405">    )</span>
+<span class="ln" id="L406">}</span>
 </span>
-<span class="ln" id="L402"></span>
+<span class="ln" id="L407"></span>
 <span class="src-item" id="fn-render">
-<span class="ln" id="L403"><span class="tok-com">/// Run ffmpeg, drawing and piping the frames when there is a picture.</span></span>
-<span class="ln" id="L404"><span class="tok-attr">#[allow</span>(clippy::too_many_arguments)]</span>
-<span class="ln" id="L405"><span class="tok-kw">fn</span> <span class="tok-fn">render</span>(</span>
-<span class="ln" id="L406">    program: &amp;Path,</span>
-<span class="ln" id="L407">    choice: &amp;Choice,</span>
-<span class="ln" id="L408">    title: &amp;str,</span>
-<span class="ln" id="L409">    samples: &amp;[f32],</span>
-<span class="ln" id="L410">    rate: u32,</span>
-<span class="ln" id="L411">    sound: &amp;Path,</span>
-<span class="ln" id="L412">    output: &amp;Path,</span>
-<span class="ln" id="L413">    reach: &amp;<span class="tok-kw">crate</span>::progress::Reach,</span>
-<span class="ln" id="L414">) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L415">    <span class="tok-kw">let</span> argv = choice</span>
-<span class="ln" id="L416">        .export</span>
-<span class="ln" id="L417">        .<span class="tok-fn">command</span>(sound, output)</span>
-<span class="ln" id="L418">        .<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L419">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> child = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(program)</span>
-<span class="ln" id="L420">        .<span class="tok-fn">args</span>(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(<span class="tok-num">1</span>))</span>
-<span class="ln" id="L421">        .<span class="tok-fn">stdin</span>(std::process::Stdio::<span class="tok-fn">piped</span>())</span>
-<span class="ln" id="L422">        .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
-<span class="ln" id="L423">        .<span class="tok-fn">stderr</span>(std::process::Stdio::<span class="tok-fn">piped</span>())</span>
-<span class="ln" id="L424">        .<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L425">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;ffmpeg could not be started: {error}&quot;</span>))?;</span>
-<span class="ln" id="L426"></span>
-<span class="ln" id="L427">    <span class="tok-com">// Drained on a thread of its own, so a complaint longer than a pipe holds</span></span>
-<span class="ln" id="L428">    <span class="tok-com">// cannot stop ffmpeg while this is still feeding it frames.</span></span>
-<span class="ln" id="L429">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stderr = child.stderr.<span class="tok-fn">take</span>();</span>
-<span class="ln" id="L430">    <span class="tok-kw">let</span> complaints = std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
-<span class="ln" id="L431">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> said = String::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L432">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(stream) = stderr.<span class="tok-fn">as_mut</span>() {</span>
-<span class="ln" id="L433">            <span class="tok-kw">let</span> _ = stream.<span class="tok-fn">read_to_string</span>(&amp;<span class="tok-kw">mut</span> said);</span>
-<span class="ln" id="L434">        }</span>
-<span class="ln" id="L435">        said</span>
-<span class="ln" id="L436">    });</span>
-<span class="ln" id="L437"></span>
-<span class="ln" id="L438">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stdin = child.stdin.<span class="tok-fn">take</span>();</span>
-<span class="ln" id="L439">    <span class="tok-kw">if</span> choice.export.content.<span class="tok-fn">wants_picture</span>() {</span>
-<span class="ln" id="L440">        <span class="tok-kw">let</span> levels = motion::<span class="tok-fn">levels</span>(samples, rate, &amp;choice.motion);</span>
-<span class="ln" id="L441">        <span class="tok-kw">let</span> renderer = motion::Renderer::<span class="tok-fn">new</span>(</span>
-<span class="ln" id="L442">            &amp;choice.motion,</span>
-<span class="ln" id="L443">            choice.export.plan.size,</span>
-<span class="ln" id="L444">            choice.export.plan.fps.<span class="tok-fn">get</span>(),</span>
-<span class="ln" id="L445">            levels,</span>
-<span class="ln" id="L446">            <span class="tok-fn">Some</span>(title),</span>
-<span class="ln" id="L447">        )</span>
-<span class="ln" id="L448">        .<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L449">        reach.<span class="tok-fn">set_total</span>(renderer.<span class="tok-fn">frames</span>());</span>
-<span class="ln" id="L450">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> frame = Vec::<span class="tok-fn">with_capacity</span>(renderer.<span class="tok-fn">frame_bytes</span>());</span>
-<span class="ln" id="L451">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(pipe) = stdin.<span class="tok-fn">as_mut</span>() {</span>
-<span class="ln" id="L452">            <span class="tok-kw">for</span> index <span class="tok-kw">in</span> <span class="tok-num">0</span>..renderer.<span class="tok-fn">frames</span>() {</span>
-<span class="ln" id="L453">                renderer.<span class="tok-fn">frame</span>(index, &amp;<span class="tok-kw">mut</span> frame);</span>
-<span class="ln" id="L454">                <span class="tok-kw">if</span> pipe.<span class="tok-fn">write_all</span>(&amp;frame).<span class="tok-fn">is_err</span>() {</span>
-<span class="ln" id="L455">                    <span class="tok-com">// ffmpeg stopped reading, which means it stopped. Its own</span></span>
-<span class="ln" id="L456">                    <span class="tok-com">// words, collected below, say why.</span></span>
-<span class="ln" id="L457">                    break;</span>
-<span class="ln" id="L458">                }</span>
-<span class="ln" id="L459">                reach.<span class="tok-fn">advance</span>(<span class="tok-num">1</span>);</span>
-<span class="ln" id="L460">            }</span>
-<span class="ln" id="L461">        }</span>
-<span class="ln" id="L462">    }</span>
-<span class="ln" id="L463">    <span class="tok-fn">drop</span>(stdin);</span>
-<span class="ln" id="L464"></span>
-<span class="ln" id="L465">    <span class="tok-kw">let</span> status = child.<span class="tok-fn">wait</span>().<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L466">    <span class="tok-kw">let</span> said = complaints.<span class="tok-fn">join</span>().<span class="tok-fn">unwrap_or_default</span>();</span>
-<span class="ln" id="L467">    <span class="tok-kw">if</span> status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L468">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L469">    }</span>
-<span class="ln" id="L470">    <span class="tok-kw">let</span> last = said.<span class="tok-fn">lines</span>().<span class="tok-fn">rev</span>().<span class="tok-fn">find</span>(|line| !line.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L471">    <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L472">        <span class="tok-str">&quot;ffmpeg refused: {}&quot;</span>,</span>
-<span class="ln" id="L473">        last.<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;it gave no reason&quot;</span>).<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L474">    ))</span>
-<span class="ln" id="L475">}</span>
+<span class="ln" id="L408"><span class="tok-com">/// Run ffmpeg, drawing and piping the frames when there is a picture.</span></span>
+<span class="ln" id="L409"><span class="tok-attr">#[allow</span>(clippy::too_many_arguments)]</span>
+<span class="ln" id="L410"><span class="tok-kw">fn</span> <span class="tok-fn">render</span>(</span>
+<span class="ln" id="L411">    program: &amp;Path,</span>
+<span class="ln" id="L412">    choice: &amp;Choice,</span>
+<span class="ln" id="L413">    title: &amp;str,</span>
+<span class="ln" id="L414">    samples: &amp;[f32],</span>
+<span class="ln" id="L415">    rate: u32,</span>
+<span class="ln" id="L416">    sound: &amp;Path,</span>
+<span class="ln" id="L417">    output: &amp;Path,</span>
+<span class="ln" id="L418">    reach: &amp;<span class="tok-kw">crate</span>::progress::Reach,</span>
+<span class="ln" id="L419">) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L420">    <span class="tok-kw">let</span> argv = choice</span>
+<span class="ln" id="L421">        .export</span>
+<span class="ln" id="L422">        .<span class="tok-fn">command</span>(sound, output)</span>
+<span class="ln" id="L423">        .<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L424">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> child = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(program)</span>
+<span class="ln" id="L425">        .<span class="tok-fn">args</span>(argv.<span class="tok-fn">iter</span>().<span class="tok-fn">skip</span>(<span class="tok-num">1</span>))</span>
+<span class="ln" id="L426">        .<span class="tok-fn">stdin</span>(std::process::Stdio::<span class="tok-fn">piped</span>())</span>
+<span class="ln" id="L427">        .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L428">        .<span class="tok-fn">stderr</span>(std::process::Stdio::<span class="tok-fn">piped</span>())</span>
+<span class="ln" id="L429">        .<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L430">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;ffmpeg could not be started: {error}&quot;</span>))?;</span>
+<span class="ln" id="L431"></span>
+<span class="ln" id="L432">    <span class="tok-com">// Drained on a thread of its own, so a complaint longer than a pipe holds</span></span>
+<span class="ln" id="L433">    <span class="tok-com">// cannot stop ffmpeg while this is still feeding it frames.</span></span>
+<span class="ln" id="L434">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stderr = child.stderr.<span class="tok-fn">take</span>();</span>
+<span class="ln" id="L435">    <span class="tok-kw">let</span> complaints = std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || {</span>
+<span class="ln" id="L436">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> said = String::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L437">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(stream) = stderr.<span class="tok-fn">as_mut</span>() {</span>
+<span class="ln" id="L438">            <span class="tok-kw">let</span> _ = stream.<span class="tok-fn">read_to_string</span>(&amp;<span class="tok-kw">mut</span> said);</span>
+<span class="ln" id="L439">        }</span>
+<span class="ln" id="L440">        said</span>
+<span class="ln" id="L441">    });</span>
+<span class="ln" id="L442"></span>
+<span class="ln" id="L443">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> stdin = child.stdin.<span class="tok-fn">take</span>();</span>
+<span class="ln" id="L444">    <span class="tok-kw">if</span> choice.export.content.<span class="tok-fn">wants_picture</span>() {</span>
+<span class="ln" id="L445">        <span class="tok-kw">let</span> levels = motion::<span class="tok-fn">levels</span>(samples, rate, &amp;choice.motion);</span>
+<span class="ln" id="L446">        <span class="tok-kw">let</span> renderer = motion::Renderer::<span class="tok-fn">new</span>(</span>
+<span class="ln" id="L447">            &amp;choice.motion,</span>
+<span class="ln" id="L448">            choice.export.plan.size,</span>
+<span class="ln" id="L449">            choice.export.plan.fps.<span class="tok-fn">get</span>(),</span>
+<span class="ln" id="L450">            levels,</span>
+<span class="ln" id="L451">            <span class="tok-fn">Some</span>(title),</span>
+<span class="ln" id="L452">        )</span>
+<span class="ln" id="L453">        .<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L454">        reach.<span class="tok-fn">set_total</span>(renderer.<span class="tok-fn">frames</span>());</span>
+<span class="ln" id="L455">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> frame = Vec::<span class="tok-fn">with_capacity</span>(renderer.<span class="tok-fn">frame_bytes</span>());</span>
+<span class="ln" id="L456">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(pipe) = stdin.<span class="tok-fn">as_mut</span>() {</span>
+<span class="ln" id="L457">            <span class="tok-kw">for</span> index <span class="tok-kw">in</span> <span class="tok-num">0</span>..renderer.<span class="tok-fn">frames</span>() {</span>
+<span class="ln" id="L458">                renderer.<span class="tok-fn">frame</span>(index, &amp;<span class="tok-kw">mut</span> frame);</span>
+<span class="ln" id="L459">                <span class="tok-kw">if</span> pipe.<span class="tok-fn">write_all</span>(&amp;frame).<span class="tok-fn">is_err</span>() {</span>
+<span class="ln" id="L460">                    <span class="tok-com">// ffmpeg stopped reading, which means it stopped. Its own</span></span>
+<span class="ln" id="L461">                    <span class="tok-com">// words, collected below, say why.</span></span>
+<span class="ln" id="L462">                    break;</span>
+<span class="ln" id="L463">                }</span>
+<span class="ln" id="L464">                reach.<span class="tok-fn">advance</span>(<span class="tok-num">1</span>);</span>
+<span class="ln" id="L465">            }</span>
+<span class="ln" id="L466">        }</span>
+<span class="ln" id="L467">    }</span>
+<span class="ln" id="L468">    <span class="tok-fn">drop</span>(stdin);</span>
+<span class="ln" id="L469"></span>
+<span class="ln" id="L470">    <span class="tok-kw">let</span> status = child.<span class="tok-fn">wait</span>().<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L471">    <span class="tok-kw">let</span> said = complaints.<span class="tok-fn">join</span>().<span class="tok-fn">unwrap_or_default</span>();</span>
+<span class="ln" id="L472">    <span class="tok-kw">if</span> status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L473">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L474">    }</span>
+<span class="ln" id="L475">    <span class="tok-kw">let</span> last = said.<span class="tok-fn">lines</span>().<span class="tok-fn">rev</span>().<span class="tok-fn">find</span>(|line| !line.<span class="tok-fn">trim</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L476">    <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L477">        <span class="tok-str">&quot;ffmpeg refused: {}&quot;</span>,</span>
+<span class="ln" id="L478">        last.<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;it gave no reason&quot;</span>).<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L479">    ))</span>
+<span class="ln" id="L480">}</span>
 </span>
-<span class="ln" id="L476"></span>
+<span class="ln" id="L481"></span>
 <span class="src-item" id="fn-form">
-<span class="ln" id="L477"><span class="tok-com">/// The export form, drawn under the recording it is for.</span></span>
-<span class="ln" id="L478"><span class="tok-com">///</span></span>
-<span class="ln" id="L479"><span class="tok-com">/// Returns true on the frame the button that asks for a folder is pressed,</span></span>
-<span class="ln" id="L480"><span class="tok-com">/// and only when what is chosen can be written: a combination `ffmpeg` would</span></span>
-<span class="ln" id="L481"><span class="tok-com">/// refuse is named in red and the button is not offered, rather than being</span></span>
-<span class="ln" id="L482"><span class="tok-com">/// found out a render later.</span></span>
+<span class="ln" id="L482"><span class="tok-com">/// The export form, drawn under the recording it is for.</span></span>
 <span class="ln" id="L483"><span class="tok-com">///</span></span>
-<span class="ln" id="L484"><span class="tok-com">/// Reads and writes nothing but `choice`. The folder, the vault and the work</span></span>
-<span class="ln" id="L485"><span class="tok-com">/// are the caller&#x27;s, on a worker.</span></span>
-<span class="ln" id="L486"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">form</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, choice: &amp;<span class="tok-kw">mut</span> Choice) -&gt; bool {</span>
-<span class="ln" id="L487">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::layout::{chip, chip_value};</span>
-<span class="ln" id="L488">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
-<span class="ln" id="L489">    <span class="tok-kw">use</span> egui::RichText;</span>
-<span class="ln" id="L490">    <span class="tok-kw">use</span> veilvoice_video::export::{AudioFile, Container, Quality};</span>
-<span class="ln" id="L491">    <span class="tok-kw">use</span> veilvoice_video::size::{FrameRate, Preset};</span>
-<span class="ln" id="L492"></span>
-<span class="ln" id="L493">    <span class="tok-kw">let</span> heading = |ui: &amp;<span class="tok-kw">mut</span> egui::Ui, text: &amp;str| {</span>
-<span class="ln" id="L494">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L495">    };</span>
-<span class="ln" id="L496"></span>
-<span class="ln" id="L497">    <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;what goes in it&quot;</span>);</span>
-<span class="ln" id="L498">    ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L499">        <span class="tok-kw">for</span> content <span class="tok-kw">in</span> Content::ALL {</span>
-<span class="ln" id="L500">            <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice.export.content, content, content.<span class="tok-fn">label</span>());</span>
-<span class="ln" id="L501">        }</span>
-<span class="ln" id="L502">    });</span>
-<span class="ln" id="L503"></span>
-<span class="ln" id="L504">    <span class="tok-kw">if</span> choice.export.content == Content::Audio {</span>
-<span class="ln" id="L505">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;the file&quot;</span>);</span>
-<span class="ln" id="L506">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L507">            <span class="tok-kw">for</span> file <span class="tok-kw">in</span> [AudioFile::Flac, AudioFile::Wav] {</span>
-<span class="ln" id="L508">                <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice.export.audio_file, file, file.<span class="tok-fn">label</span>());</span>
-<span class="ln" id="L509">            }</span>
-<span class="ln" id="L510">        });</span>
-<span class="ln" id="L511">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L512">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;container&quot;</span>);</span>
-<span class="ln" id="L513">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L514">            <span class="tok-kw">for</span> container <span class="tok-kw">in</span> Container::ALL {</span>
-<span class="ln" id="L515">                <span class="tok-kw">if</span> <span class="tok-fn">chip_value</span>(</span>
-<span class="ln" id="L516">                    ui,</span>
-<span class="ln" id="L517">                    &amp;<span class="tok-kw">mut</span> choice.export.container,</span>
-<span class="ln" id="L518">                    container,</span>
-<span class="ln" id="L519">                    container.<span class="tok-fn">label</span>(),</span>
-<span class="ln" id="L520">                )</span>
-<span class="ln" id="L521">                .<span class="tok-fn">changed</span>()</span>
-<span class="ln" id="L522">                    &amp;&amp; !container.<span class="tok-fn">video_codecs</span>().<span class="tok-fn">contains</span>(&amp;choice.export.codec)</span>
-<span class="ln" id="L523">                {</span>
-<span class="ln" id="L524">                    <span class="tok-com">// The codec follows the container rather than leaving a</span></span>
-<span class="ln" id="L525">                    <span class="tok-com">// combination on screen that the button would refuse.</span></span>
-<span class="ln" id="L526">                    choice.export.codec = container.<span class="tok-fn">video_codecs</span>()[<span class="tok-num">0</span>];</span>
-<span class="ln" id="L527">                }</span>
-<span class="ln" id="L528">            }</span>
-<span class="ln" id="L529">        });</span>
-<span class="ln" id="L530">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;codec&quot;</span>);</span>
-<span class="ln" id="L531">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L532">            <span class="tok-kw">for</span> codec <span class="tok-kw">in</span> choice.export.container.<span class="tok-fn">video_codecs</span>() {</span>
-<span class="ln" id="L533">                <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice.export.codec, *codec, codec.<span class="tok-fn">label</span>());</span>
-<span class="ln" id="L534">            }</span>
-<span class="ln" id="L535">        });</span>
-<span class="ln" id="L536">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;quality&quot;</span>);</span>
-<span class="ln" id="L537">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L538">            <span class="tok-kw">for</span> quality <span class="tok-kw">in</span> Quality::ALL {</span>
-<span class="ln" id="L539">                <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice.export.quality, quality, quality.<span class="tok-fn">label</span>());</span>
-<span class="ln" id="L540">            }</span>
-<span class="ln" id="L541">        });</span>
-<span class="ln" id="L542">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;size and smoothness&quot;</span>);</span>
-<span class="ln" id="L543">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L544">            <span class="tok-kw">for</span> preset <span class="tok-kw">in</span> Preset::ALL {</span>
-<span class="ln" id="L545">                <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L546">                    .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(</span>
-<span class="ln" id="L547">                        choice.export.plan.size == preset.<span class="tok-fn">size</span>(),</span>
-<span class="ln" id="L548">                        preset.<span class="tok-fn">name</span>(),</span>
-<span class="ln" id="L549">                    ))</span>
-<span class="ln" id="L550">                    .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L551">                {</span>
-<span class="ln" id="L552">                    choice.export.plan.size = preset.<span class="tok-fn">size</span>();</span>
-<span class="ln" id="L553">                }</span>
-<span class="ln" id="L554">            }</span>
-<span class="ln" id="L555">            <span class="tok-kw">for</span> fps <span class="tok-kw">in</span> [<span class="tok-num">24</span>, <span class="tok-num">30</span>, <span class="tok-num">60</span>] {</span>
-<span class="ln" id="L556">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(rate) = FrameRate::<span class="tok-fn">new</span>(fps) {</span>
-<span class="ln" id="L557">                    <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L558">                        .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(choice.export.plan.fps == rate, format!(<span class="tok-str">&quot;{fps} fps&quot;</span>)))</span>
-<span class="ln" id="L559">                        .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L560">                    {</span>
-<span class="ln" id="L561">                        choice.export.plan.fps = rate;</span>
-<span class="ln" id="L562">                    }</span>
-<span class="ln" id="L563">                }</span>
-<span class="ln" id="L564">            }</span>
-<span class="ln" id="L565">        });</span>
-<span class="ln" id="L566">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;the look&quot;</span>);</span>
-<span class="ln" id="L567">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L568">            <span class="tok-kw">for</span> template <span class="tok-kw">in</span> motion::<span class="tok-fn">templates</span>() {</span>
-<span class="ln" id="L569">                <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L570">                    .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(choice.template == template.id, template.name))</span>
-<span class="ln" id="L571">                    .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L572">                {</span>
-<span class="ln" id="L573">                    choice.<span class="tok-fn">use_template</span>(template.id);</span>
-<span class="ln" id="L574">                }</span>
-<span class="ln" id="L575">            }</span>
-<span class="ln" id="L576">        });</span>
-<span class="ln" id="L577">        <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L578">            .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(choice.advanced, <span class="tok-str">&quot;the look, in detail&quot;</span>))</span>
-<span class="ln" id="L579">            .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L580">        {</span>
-<span class="ln" id="L581">            choice.advanced = !choice.advanced;</span>
-<span class="ln" id="L582">        }</span>
-<span class="ln" id="L583">        <span class="tok-kw">if</span> choice.advanced {</span>
-<span class="ln" id="L584">            <span class="tok-fn">look</span>(ui, &amp;<span class="tok-kw">mut</span> choice.motion);</span>
-<span class="ln" id="L585">        }</span>
-<span class="ln" id="L586">    }</span>
-<span class="ln" id="L587"></span>
-<span class="ln" id="L588">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
-<span class="ln" id="L589">    ui.<span class="tok-fn">label</span>(</span>
-<span class="ln" id="L590">        RichText::<span class="tok-fn">new</span>(choice.export.<span class="tok-fn">describe</span>())</span>
-<span class="ln" id="L591">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>())</span>
-<span class="ln" id="L592">            .<span class="tok-fn">small</span>(),</span>
-<span class="ln" id="L593">    );</span>
-<span class="ln" id="L594">    <span class="tok-kw">let</span> refused = choice</span>
-<span class="ln" id="L595">        .export</span>
-<span class="ln" id="L596">        .<span class="tok-fn">checked</span>()</span>
-<span class="ln" id="L597">        .<span class="tok-fn">err</span>()</span>
-<span class="ln" id="L598">        .<span class="tok-fn">map</span>(|why| why.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L599">        .<span class="tok-fn">or_else</span>(|| choice.motion.<span class="tok-fn">checked</span>().<span class="tok-fn">err</span>().<span class="tok-fn">map</span>(|why| why.<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L600">    <span class="tok-kw">match</span> refused {</span>
-<span class="ln" id="L601">        <span class="tok-fn">Some</span>(why) =&gt; {</span>
-<span class="ln" id="L602">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(why).<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L603">            false</span>
-<span class="ln" id="L604">        }</span>
-<span class="ln" id="L605">        None =&gt; ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;choose a folder and export&quot;</span>).<span class="tok-fn">clicked</span>(),</span>
-<span class="ln" id="L606">    }</span>
-<span class="ln" id="L607">}</span>
+<span class="ln" id="L484"><span class="tok-com">/// Returns true on the frame the button that asks for a folder is pressed,</span></span>
+<span class="ln" id="L485"><span class="tok-com">/// and only when what is chosen can be written: a combination `ffmpeg` would</span></span>
+<span class="ln" id="L486"><span class="tok-com">/// refuse is named in red and the button is not offered, rather than being</span></span>
+<span class="ln" id="L487"><span class="tok-com">/// found out a render later.</span></span>
+<span class="ln" id="L488"><span class="tok-com">///</span></span>
+<span class="ln" id="L489"><span class="tok-com">/// Reads and writes nothing but `choice`. The folder, the vault and the work</span></span>
+<span class="ln" id="L490"><span class="tok-com">/// are the caller&#x27;s, on a worker.</span></span>
+<span class="ln" id="L491"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">form</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, choice: &amp;<span class="tok-kw">mut</span> Choice) -&gt; bool {</span>
+<span class="ln" id="L492">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::layout::{chip, chip_value};</span>
+<span class="ln" id="L493">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
+<span class="ln" id="L494">    <span class="tok-kw">use</span> egui::RichText;</span>
+<span class="ln" id="L495">    <span class="tok-kw">use</span> veilvoice_video::export::{AudioFile, Container, Quality};</span>
+<span class="ln" id="L496">    <span class="tok-kw">use</span> veilvoice_video::size::{FrameRate, Preset};</span>
+<span class="ln" id="L497"></span>
+<span class="ln" id="L498">    <span class="tok-kw">let</span> heading = |ui: &amp;<span class="tok-kw">mut</span> egui::Ui, text: &amp;str| {</span>
+<span class="ln" id="L499">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(text).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L500">    };</span>
+<span class="ln" id="L501"></span>
+<span class="ln" id="L502">    <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;what goes in it&quot;</span>);</span>
+<span class="ln" id="L503">    ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L504">        <span class="tok-kw">for</span> content <span class="tok-kw">in</span> Content::ALL {</span>
+<span class="ln" id="L505">            <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice.export.content, content, content.<span class="tok-fn">label</span>());</span>
+<span class="ln" id="L506">        }</span>
+<span class="ln" id="L507">    });</span>
+<span class="ln" id="L508"></span>
+<span class="ln" id="L509">    <span class="tok-kw">if</span> choice.export.content == Content::Audio {</span>
+<span class="ln" id="L510">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;the file&quot;</span>);</span>
+<span class="ln" id="L511">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L512">            <span class="tok-kw">for</span> file <span class="tok-kw">in</span> [AudioFile::Flac, AudioFile::Wav] {</span>
+<span class="ln" id="L513">                <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice.export.audio_file, file, file.<span class="tok-fn">label</span>());</span>
+<span class="ln" id="L514">            }</span>
+<span class="ln" id="L515">        });</span>
+<span class="ln" id="L516">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L517">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;container&quot;</span>);</span>
+<span class="ln" id="L518">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L519">            <span class="tok-kw">for</span> container <span class="tok-kw">in</span> Container::ALL {</span>
+<span class="ln" id="L520">                <span class="tok-kw">if</span> <span class="tok-fn">chip_value</span>(</span>
+<span class="ln" id="L521">                    ui,</span>
+<span class="ln" id="L522">                    &amp;<span class="tok-kw">mut</span> choice.export.container,</span>
+<span class="ln" id="L523">                    container,</span>
+<span class="ln" id="L524">                    container.<span class="tok-fn">label</span>(),</span>
+<span class="ln" id="L525">                )</span>
+<span class="ln" id="L526">                .<span class="tok-fn">changed</span>()</span>
+<span class="ln" id="L527">                    &amp;&amp; !container.<span class="tok-fn">video_codecs</span>().<span class="tok-fn">contains</span>(&amp;choice.export.codec)</span>
+<span class="ln" id="L528">                {</span>
+<span class="ln" id="L529">                    <span class="tok-com">// The codec follows the container rather than leaving a</span></span>
+<span class="ln" id="L530">                    <span class="tok-com">// combination on screen that the button would refuse.</span></span>
+<span class="ln" id="L531">                    choice.export.codec = container.<span class="tok-fn">video_codecs</span>()[<span class="tok-num">0</span>];</span>
+<span class="ln" id="L532">                }</span>
+<span class="ln" id="L533">            }</span>
+<span class="ln" id="L534">        });</span>
+<span class="ln" id="L535">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;codec&quot;</span>);</span>
+<span class="ln" id="L536">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L537">            <span class="tok-kw">for</span> codec <span class="tok-kw">in</span> choice.export.container.<span class="tok-fn">video_codecs</span>() {</span>
+<span class="ln" id="L538">                <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice.export.codec, *codec, codec.<span class="tok-fn">label</span>());</span>
+<span class="ln" id="L539">            }</span>
+<span class="ln" id="L540">        });</span>
+<span class="ln" id="L541">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;quality&quot;</span>);</span>
+<span class="ln" id="L542">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L543">            <span class="tok-kw">for</span> quality <span class="tok-kw">in</span> Quality::ALL {</span>
+<span class="ln" id="L544">                <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> choice.export.quality, quality, quality.<span class="tok-fn">label</span>());</span>
+<span class="ln" id="L545">            }</span>
+<span class="ln" id="L546">        });</span>
+<span class="ln" id="L547">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;size and smoothness&quot;</span>);</span>
+<span class="ln" id="L548">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L549">            <span class="tok-kw">for</span> preset <span class="tok-kw">in</span> Preset::ALL {</span>
+<span class="ln" id="L550">                <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L551">                    .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(</span>
+<span class="ln" id="L552">                        choice.export.plan.size == preset.<span class="tok-fn">size</span>(),</span>
+<span class="ln" id="L553">                        preset.<span class="tok-fn">name</span>(),</span>
+<span class="ln" id="L554">                    ))</span>
+<span class="ln" id="L555">                    .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L556">                {</span>
+<span class="ln" id="L557">                    choice.export.plan.size = preset.<span class="tok-fn">size</span>();</span>
+<span class="ln" id="L558">                }</span>
+<span class="ln" id="L559">            }</span>
+<span class="ln" id="L560">            <span class="tok-kw">for</span> fps <span class="tok-kw">in</span> [<span class="tok-num">24</span>, <span class="tok-num">30</span>, <span class="tok-num">60</span>] {</span>
+<span class="ln" id="L561">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(rate) = FrameRate::<span class="tok-fn">new</span>(fps) {</span>
+<span class="ln" id="L562">                    <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L563">                        .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(choice.export.plan.fps == rate, format!(<span class="tok-str">&quot;{fps} fps&quot;</span>)))</span>
+<span class="ln" id="L564">                        .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L565">                    {</span>
+<span class="ln" id="L566">                        choice.export.plan.fps = rate;</span>
+<span class="ln" id="L567">                    }</span>
+<span class="ln" id="L568">                }</span>
+<span class="ln" id="L569">            }</span>
+<span class="ln" id="L570">        });</span>
+<span class="ln" id="L571">        <span class="tok-fn">heading</span>(ui, <span class="tok-str">&quot;the look&quot;</span>);</span>
+<span class="ln" id="L572">        ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L573">            <span class="tok-kw">for</span> template <span class="tok-kw">in</span> motion::<span class="tok-fn">templates</span>() {</span>
+<span class="ln" id="L574">                <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L575">                    .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(choice.template == template.id, template.name))</span>
+<span class="ln" id="L576">                    .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L577">                {</span>
+<span class="ln" id="L578">                    choice.<span class="tok-fn">use_template</span>(template.id);</span>
+<span class="ln" id="L579">                }</span>
+<span class="ln" id="L580">            }</span>
+<span class="ln" id="L581">        });</span>
+<span class="ln" id="L582">        <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L583">            .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(choice.advanced, <span class="tok-str">&quot;the look, in detail&quot;</span>))</span>
+<span class="ln" id="L584">            .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L585">        {</span>
+<span class="ln" id="L586">            choice.advanced = !choice.advanced;</span>
+<span class="ln" id="L587">        }</span>
+<span class="ln" id="L588">        <span class="tok-kw">if</span> choice.advanced {</span>
+<span class="ln" id="L589">            <span class="tok-fn">look</span>(ui, &amp;<span class="tok-kw">mut</span> choice.motion);</span>
+<span class="ln" id="L590">        }</span>
+<span class="ln" id="L591">    }</span>
+<span class="ln" id="L592"></span>
+<span class="ln" id="L593">    ui.<span class="tok-fn">add_space</span>(<span class="tok-num">4.0</span>);</span>
+<span class="ln" id="L594">    ui.<span class="tok-fn">label</span>(</span>
+<span class="ln" id="L595">        RichText::<span class="tok-fn">new</span>(choice.export.<span class="tok-fn">describe</span>())</span>
+<span class="ln" id="L596">            .<span class="tok-fn">color</span>(p::<span class="tok-fn">fg</span>())</span>
+<span class="ln" id="L597">            .<span class="tok-fn">small</span>(),</span>
+<span class="ln" id="L598">    );</span>
+<span class="ln" id="L599">    <span class="tok-kw">let</span> refused = choice</span>
+<span class="ln" id="L600">        .export</span>
+<span class="ln" id="L601">        .<span class="tok-fn">checked</span>()</span>
+<span class="ln" id="L602">        .<span class="tok-fn">err</span>()</span>
+<span class="ln" id="L603">        .<span class="tok-fn">map</span>(|why| why.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L604">        .<span class="tok-fn">or_else</span>(|| choice.motion.<span class="tok-fn">checked</span>().<span class="tok-fn">err</span>().<span class="tok-fn">map</span>(|why| why.<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L605">    <span class="tok-kw">match</span> refused {</span>
+<span class="ln" id="L606">        <span class="tok-fn">Some</span>(why) =&gt; {</span>
+<span class="ln" id="L607">            ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(why).<span class="tok-fn">color</span>(p::<span class="tok-fn">red</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L608">            false</span>
+<span class="ln" id="L609">        }</span>
+<span class="ln" id="L610">        None =&gt; ui.<span class="tok-fn">button</span>(<span class="tok-str">&quot;choose a folder and export&quot;</span>).<span class="tok-fn">clicked</span>(),</span>
+<span class="ln" id="L611">    }</span>
+<span class="ln" id="L612">}</span>
 </span>
-<span class="ln" id="L608"></span>
+<span class="ln" id="L613"></span>
 <span class="src-item" id="fn-look">
-<span class="ln" id="L609"><span class="tok-com">/// The advanced half of the form: the typeface, the colours and the motion.</span></span>
-<span class="ln" id="L610"><span class="tok-com">///</span></span>
-<span class="ln" id="L611"><span class="tok-com">/// One kind of control to a line, so no row mixes a slider with a colour</span></span>
-<span class="ln" id="L612"><span class="tok-com">/// button of a different height; `row_tests` in `lib.rs` measures it.</span></span>
-<span class="ln" id="L613"><span class="tok-kw">fn</span> <span class="tok-fn">look</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, chosen: &amp;<span class="tok-kw">mut</span> Motion) {</span>
-<span class="ln" id="L614">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::layout::chip_value;</span>
-<span class="ln" id="L615">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
-<span class="ln" id="L616">    <span class="tok-kw">use</span> egui::RichText;</span>
-<span class="ln" id="L617">    <span class="tok-kw">use</span> veilvoice_video::motion::{Face, Style, RESPONSE_RANGE, SETTLE_RANGE, WINDOW_RANGE};</span>
-<span class="ln" id="L618"></span>
-<span class="ln" id="L619">    ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L620">        <span class="tok-kw">for</span> face <span class="tok-kw">in</span> Face::ALL {</span>
-<span class="ln" id="L621">            <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> chosen.face, face, face.<span class="tok-fn">label</span>());</span>
-<span class="ln" id="L622">        }</span>
-<span class="ln" id="L623">    });</span>
+<span class="ln" id="L614"><span class="tok-com">/// The advanced half of the form: the typeface, the colours and the motion.</span></span>
+<span class="ln" id="L615"><span class="tok-com">///</span></span>
+<span class="ln" id="L616"><span class="tok-com">/// One kind of control to a line, so no row mixes a slider with a colour</span></span>
+<span class="ln" id="L617"><span class="tok-com">/// button of a different height; `row_tests` in `lib.rs` measures it.</span></span>
+<span class="ln" id="L618"><span class="tok-kw">fn</span> <span class="tok-fn">look</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, chosen: &amp;<span class="tok-kw">mut</span> Motion) {</span>
+<span class="ln" id="L619">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::layout::chip_value;</span>
+<span class="ln" id="L620">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
+<span class="ln" id="L621">    <span class="tok-kw">use</span> egui::RichText;</span>
+<span class="ln" id="L622">    <span class="tok-kw">use</span> veilvoice_video::motion::{Face, Style, RESPONSE_RANGE, SETTLE_RANGE, WINDOW_RANGE};</span>
+<span class="ln" id="L623"></span>
 <span class="ln" id="L624">    ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L625">        <span class="tok-kw">for</span> style <span class="tok-kw">in</span> Style::ALL {</span>
-<span class="ln" id="L626">            <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> chosen.style, style, style.<span class="tok-fn">label</span>());</span>
+<span class="ln" id="L625">        <span class="tok-kw">for</span> face <span class="tok-kw">in</span> Face::ALL {</span>
+<span class="ln" id="L626">            <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> chosen.face, face, face.<span class="tok-fn">label</span>());</span>
 <span class="ln" id="L627">        }</span>
 <span class="ln" id="L628">    });</span>
-<span class="ln" id="L629">    <span class="tok-com">// The value is written into the label rather than shown in the box a</span></span>
-<span class="ln" id="L630">    <span class="tok-com">// slider puts beside itself, which is a control of another height on the</span></span>
-<span class="ln" id="L631">    <span class="tok-com">// same row.</span></span>
-<span class="ln" id="L632">    <span class="tok-kw">let</span> response = chosen.response;</span>
-<span class="ln" id="L633">    ui.<span class="tok-fn">add</span>(</span>
-<span class="ln" id="L634">        egui::Slider::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> chosen.response, RESPONSE_RANGE.<span class="tok-num">0</span>..=RESPONSE_RANGE.<span class="tok-num">1</span>)</span>
-<span class="ln" id="L635">            .<span class="tok-fn">show_value</span>(false)</span>
-<span class="ln" id="L636">            .<span class="tok-fn">text</span>(format!(</span>
-<span class="ln" id="L637">                <span class="tok-str">&quot;how strongly the wave answers the sound, {response:.2}&quot;</span></span>
-<span class="ln" id="L638">            )),</span>
-<span class="ln" id="L639">    );</span>
-<span class="ln" id="L640">    <span class="tok-kw">let</span> window = chosen.window_secs;</span>
-<span class="ln" id="L641">    ui.<span class="tok-fn">add</span>(</span>
-<span class="ln" id="L642">        egui::Slider::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> chosen.window_secs, WINDOW_RANGE.<span class="tok-num">0</span>..=WINDOW_RANGE.<span class="tok-num">1</span>)</span>
-<span class="ln" id="L643">            .<span class="tok-fn">show_value</span>(false)</span>
-<span class="ln" id="L644">            .<span class="tok-fn">text</span>(format!(<span class="tok-str">&quot;seconds shown at once, {window:.1}&quot;</span>)),</span>
-<span class="ln" id="L645">    );</span>
-<span class="ln" id="L646">    <span class="tok-kw">let</span> settle = chosen.settle_secs;</span>
-<span class="ln" id="L647">    ui.<span class="tok-fn">add</span>(</span>
-<span class="ln" id="L648">        egui::Slider::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> chosen.settle_secs, SETTLE_RANGE.<span class="tok-num">0</span>..=SETTLE_RANGE.<span class="tok-num">1</span>)</span>
-<span class="ln" id="L649">            .<span class="tok-fn">show_value</span>(false)</span>
-<span class="ln" id="L650">            .<span class="tok-fn">text</span>(format!(<span class="tok-str">&quot;seconds it takes to settle, {settle:.2}&quot;</span>)),</span>
-<span class="ln" id="L651">    );</span>
-<span class="ln" id="L652">    <span class="tok-fn">fill</span>(ui, <span class="tok-str">&quot;background&quot;</span>, &amp;<span class="tok-kw">mut</span> chosen.background);</span>
-<span class="ln" id="L653">    <span class="tok-fn">fill</span>(ui, <span class="tok-str">&quot;wave&quot;</span>, &amp;<span class="tok-kw">mut</span> chosen.wave);</span>
-<span class="ln" id="L654">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L655">        ui.<span class="tok-fn">color_edit_button_srgb</span>(&amp;<span class="tok-kw">mut</span> chosen.ink);</span>
-<span class="ln" id="L656">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;lettering&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L657">    });</span>
-<span class="ln" id="L658">}</span>
+<span class="ln" id="L629">    ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L630">        <span class="tok-kw">for</span> style <span class="tok-kw">in</span> Style::ALL {</span>
+<span class="ln" id="L631">            <span class="tok-fn">chip_value</span>(ui, &amp;<span class="tok-kw">mut</span> chosen.style, style, style.<span class="tok-fn">label</span>());</span>
+<span class="ln" id="L632">        }</span>
+<span class="ln" id="L633">    });</span>
+<span class="ln" id="L634">    <span class="tok-com">// The value is written into the label rather than shown in the box a</span></span>
+<span class="ln" id="L635">    <span class="tok-com">// slider puts beside itself, which is a control of another height on the</span></span>
+<span class="ln" id="L636">    <span class="tok-com">// same row.</span></span>
+<span class="ln" id="L637">    <span class="tok-kw">let</span> response = chosen.response;</span>
+<span class="ln" id="L638">    ui.<span class="tok-fn">add</span>(</span>
+<span class="ln" id="L639">        egui::Slider::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> chosen.response, RESPONSE_RANGE.<span class="tok-num">0</span>..=RESPONSE_RANGE.<span class="tok-num">1</span>)</span>
+<span class="ln" id="L640">            .<span class="tok-fn">show_value</span>(false)</span>
+<span class="ln" id="L641">            .<span class="tok-fn">text</span>(format!(</span>
+<span class="ln" id="L642">                <span class="tok-str">&quot;how strongly the wave answers the sound, {response:.2}&quot;</span></span>
+<span class="ln" id="L643">            )),</span>
+<span class="ln" id="L644">    );</span>
+<span class="ln" id="L645">    <span class="tok-kw">let</span> window = chosen.window_secs;</span>
+<span class="ln" id="L646">    ui.<span class="tok-fn">add</span>(</span>
+<span class="ln" id="L647">        egui::Slider::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> chosen.window_secs, WINDOW_RANGE.<span class="tok-num">0</span>..=WINDOW_RANGE.<span class="tok-num">1</span>)</span>
+<span class="ln" id="L648">            .<span class="tok-fn">show_value</span>(false)</span>
+<span class="ln" id="L649">            .<span class="tok-fn">text</span>(format!(<span class="tok-str">&quot;seconds shown at once, {window:.1}&quot;</span>)),</span>
+<span class="ln" id="L650">    );</span>
+<span class="ln" id="L651">    <span class="tok-kw">let</span> settle = chosen.settle_secs;</span>
+<span class="ln" id="L652">    ui.<span class="tok-fn">add</span>(</span>
+<span class="ln" id="L653">        egui::Slider::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> chosen.settle_secs, SETTLE_RANGE.<span class="tok-num">0</span>..=SETTLE_RANGE.<span class="tok-num">1</span>)</span>
+<span class="ln" id="L654">            .<span class="tok-fn">show_value</span>(false)</span>
+<span class="ln" id="L655">            .<span class="tok-fn">text</span>(format!(<span class="tok-str">&quot;seconds it takes to settle, {settle:.2}&quot;</span>)),</span>
+<span class="ln" id="L656">    );</span>
+<span class="ln" id="L657">    <span class="tok-fn">fill</span>(ui, <span class="tok-str">&quot;background&quot;</span>, &amp;<span class="tok-kw">mut</span> chosen.background);</span>
+<span class="ln" id="L658">    <span class="tok-fn">fill</span>(ui, <span class="tok-str">&quot;wave&quot;</span>, &amp;<span class="tok-kw">mut</span> chosen.wave);</span>
+<span class="ln" id="L659">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L660">        ui.<span class="tok-fn">color_edit_button_srgb</span>(&amp;<span class="tok-kw">mut</span> chosen.ink);</span>
+<span class="ln" id="L661">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(<span class="tok-str">&quot;lettering&quot;</span>).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L662">    });</span>
+<span class="ln" id="L663">}</span>
 </span>
-<span class="ln" id="L659"></span>
+<span class="ln" id="L664"></span>
 <span class="src-item" id="fn-fill">
-<span class="ln" id="L660"><span class="tok-com">/// One colour, or two with a gradient between them.</span></span>
-<span class="ln" id="L661"><span class="tok-kw">fn</span> <span class="tok-fn">fill</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, what: &amp;str, fill: &amp;<span class="tok-kw">mut</span> motion::Fill) {</span>
-<span class="ln" id="L662">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::layout::chip;</span>
-<span class="ln" id="L663">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
-<span class="ln" id="L664">    <span class="tok-kw">use</span> egui::RichText;</span>
-<span class="ln" id="L665">    <span class="tok-kw">use</span> motion::{Direction, Fill};</span>
-<span class="ln" id="L666"></span>
-<span class="ln" id="L667">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
-<span class="ln" id="L668">        <span class="tok-kw">match</span> fill {</span>
-<span class="ln" id="L669">            Fill::<span class="tok-fn">Solid</span>(colour) =&gt; {</span>
-<span class="ln" id="L670">                ui.<span class="tok-fn">color_edit_button_srgb</span>(colour);</span>
-<span class="ln" id="L671">            }</span>
-<span class="ln" id="L672">            Fill::Gradient { from, to, .. } =&gt; {</span>
-<span class="ln" id="L673">                ui.<span class="tok-fn">color_edit_button_srgb</span>(from);</span>
-<span class="ln" id="L674">                ui.<span class="tok-fn">color_edit_button_srgb</span>(to);</span>
-<span class="ln" id="L675">            }</span>
-<span class="ln" id="L676">        }</span>
-<span class="ln" id="L677">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(what).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
-<span class="ln" id="L678">    });</span>
-<span class="ln" id="L679">    ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
-<span class="ln" id="L680">        <span class="tok-kw">let</span> solid = matches!(fill, Fill::<span class="tok-fn">Solid</span>(_));</span>
-<span class="ln" id="L681">        <span class="tok-kw">if</span> ui.<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(solid, <span class="tok-str">&quot;one colour&quot;</span>)).<span class="tok-fn">clicked</span>() &amp;&amp; !solid {</span>
-<span class="ln" id="L682">            *fill = Fill::<span class="tok-fn">Solid</span>(fill.<span class="tok-fn">middle</span>());</span>
-<span class="ln" id="L683">        }</span>
-<span class="ln" id="L684">        <span class="tok-kw">for</span> direction <span class="tok-kw">in</span> Direction::ALL {</span>
-<span class="ln" id="L685">            <span class="tok-kw">let</span> chosen = matches!(fill, Fill::Gradient { direction: d, .. } <span class="tok-kw">if</span> *d == direction);</span>
-<span class="ln" id="L686">            <span class="tok-kw">if</span> ui</span>
-<span class="ln" id="L687">                .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(</span>
-<span class="ln" id="L688">                    chosen,</span>
-<span class="ln" id="L689">                    format!(<span class="tok-str">&quot;gradient {}&quot;</span>, direction.<span class="tok-fn">label</span>().<span class="tok-fn">to_lowercase</span>()),</span>
-<span class="ln" id="L690">                ))</span>
-<span class="ln" id="L691">                .<span class="tok-fn">clicked</span>()</span>
-<span class="ln" id="L692">            {</span>
-<span class="ln" id="L693">                *fill = <span class="tok-kw">match</span> *fill {</span>
-<span class="ln" id="L694">                    Fill::<span class="tok-fn">Solid</span>(colour) =&gt; Fill::Gradient {</span>
-<span class="ln" id="L695">                        from: colour,</span>
-<span class="ln" id="L696">                        to: [<span class="tok-num">255</span> - colour[<span class="tok-num">0</span>], <span class="tok-num">255</span> - colour[<span class="tok-num">1</span>], <span class="tok-num">255</span> - colour[<span class="tok-num">2</span>]],</span>
-<span class="ln" id="L697">                        direction,</span>
-<span class="ln" id="L698">                    },</span>
-<span class="ln" id="L699">                    Fill::Gradient { from, to, .. } =&gt; Fill::Gradient {</span>
-<span class="ln" id="L700">                        from,</span>
-<span class="ln" id="L701">                        to,</span>
+<span class="ln" id="L665"><span class="tok-com">/// One colour, or two with a gradient between them.</span></span>
+<span class="ln" id="L666"><span class="tok-kw">fn</span> <span class="tok-fn">fill</span>(ui: &amp;<span class="tok-kw">mut</span> egui::Ui, what: &amp;str, fill: &amp;<span class="tok-kw">mut</span> motion::Fill) {</span>
+<span class="ln" id="L667">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::layout::chip;</span>
+<span class="ln" id="L668">    <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::palette <span class="tok-kw">as</span> p;</span>
+<span class="ln" id="L669">    <span class="tok-kw">use</span> egui::RichText;</span>
+<span class="ln" id="L670">    <span class="tok-kw">use</span> motion::{Direction, Fill};</span>
+<span class="ln" id="L671"></span>
+<span class="ln" id="L672">    ui.<span class="tok-fn">horizontal</span>(|ui| {</span>
+<span class="ln" id="L673">        <span class="tok-kw">match</span> fill {</span>
+<span class="ln" id="L674">            Fill::<span class="tok-fn">Solid</span>(colour) =&gt; {</span>
+<span class="ln" id="L675">                ui.<span class="tok-fn">color_edit_button_srgb</span>(colour);</span>
+<span class="ln" id="L676">            }</span>
+<span class="ln" id="L677">            Fill::Gradient { from, to, .. } =&gt; {</span>
+<span class="ln" id="L678">                ui.<span class="tok-fn">color_edit_button_srgb</span>(from);</span>
+<span class="ln" id="L679">                ui.<span class="tok-fn">color_edit_button_srgb</span>(to);</span>
+<span class="ln" id="L680">            }</span>
+<span class="ln" id="L681">        }</span>
+<span class="ln" id="L682">        ui.<span class="tok-fn">label</span>(RichText::<span class="tok-fn">new</span>(what).<span class="tok-fn">color</span>(p::<span class="tok-fn">muted</span>()).<span class="tok-fn">small</span>());</span>
+<span class="ln" id="L683">    });</span>
+<span class="ln" id="L684">    ui.<span class="tok-fn">horizontal_wrapped</span>(|ui| {</span>
+<span class="ln" id="L685">        <span class="tok-kw">let</span> solid = matches!(fill, Fill::<span class="tok-fn">Solid</span>(_));</span>
+<span class="ln" id="L686">        <span class="tok-kw">if</span> ui.<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(solid, <span class="tok-str">&quot;one colour&quot;</span>)).<span class="tok-fn">clicked</span>() &amp;&amp; !solid {</span>
+<span class="ln" id="L687">            *fill = Fill::<span class="tok-fn">Solid</span>(fill.<span class="tok-fn">middle</span>());</span>
+<span class="ln" id="L688">        }</span>
+<span class="ln" id="L689">        <span class="tok-kw">for</span> direction <span class="tok-kw">in</span> Direction::ALL {</span>
+<span class="ln" id="L690">            <span class="tok-kw">let</span> chosen = matches!(fill, Fill::Gradient { direction: d, .. } <span class="tok-kw">if</span> *d == direction);</span>
+<span class="ln" id="L691">            <span class="tok-kw">if</span> ui</span>
+<span class="ln" id="L692">                .<span class="tok-fn">add</span>(<span class="tok-fn">chip</span>(</span>
+<span class="ln" id="L693">                    chosen,</span>
+<span class="ln" id="L694">                    format!(<span class="tok-str">&quot;gradient {}&quot;</span>, direction.<span class="tok-fn">label</span>().<span class="tok-fn">to_lowercase</span>()),</span>
+<span class="ln" id="L695">                ))</span>
+<span class="ln" id="L696">                .<span class="tok-fn">clicked</span>()</span>
+<span class="ln" id="L697">            {</span>
+<span class="ln" id="L698">                *fill = <span class="tok-kw">match</span> *fill {</span>
+<span class="ln" id="L699">                    Fill::<span class="tok-fn">Solid</span>(colour) =&gt; Fill::Gradient {</span>
+<span class="ln" id="L700">                        from: colour,</span>
+<span class="ln" id="L701">                        to: [<span class="tok-num">255</span> - colour[<span class="tok-num">0</span>], <span class="tok-num">255</span> - colour[<span class="tok-num">1</span>], <span class="tok-num">255</span> - colour[<span class="tok-num">2</span>]],</span>
 <span class="ln" id="L702">                        direction,</span>
 <span class="ln" id="L703">                    },</span>
-<span class="ln" id="L704">                };</span>
-<span class="ln" id="L705">            }</span>
-<span class="ln" id="L706">        }</span>
-<span class="ln" id="L707">    });</span>
-<span class="ln" id="L708">}</span>
+<span class="ln" id="L704">                    Fill::Gradient { from, to, .. } =&gt; Fill::Gradient {</span>
+<span class="ln" id="L705">                        from,</span>
+<span class="ln" id="L706">                        to,</span>
+<span class="ln" id="L707">                        direction,</span>
+<span class="ln" id="L708">                    },</span>
+<span class="ln" id="L709">                };</span>
+<span class="ln" id="L710">            }</span>
+<span class="ln" id="L711">        }</span>
+<span class="ln" id="L712">    });</span>
+<span class="ln" id="L713">}</span>
 </span>
-<span class="ln" id="L709"></span>
+<span class="ln" id="L714"></span>
 <span class="src-item" id="fn-thumbs">
-<span class="ln" id="L710"><span class="tok-com">/// A small picture of every recording in the list.</span></span>
-<span class="ln" id="L711"><span class="tok-attr">#[derive</span>(Default)]</span>
-<span class="ln" id="L712"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Thumbs {</span>
-<span class="ln" id="L713">    made: HashMap&lt;String, egui::TextureHandle&gt;,</span>
-<span class="ln" id="L714">    asked: HashSet&lt;String&gt;,</span>
-<span class="ln" id="L715">    arriving: Option&lt;mpsc::Receiver&lt;(String, Vec&lt;u8&gt;)&gt;&gt;,</span>
-<span class="ln" id="L716">    drawn_with: Option&lt;Motion&gt;,</span>
-<span class="ln" id="L717">}</span>
+<span class="ln" id="L715"><span class="tok-com">/// A small picture of every recording in the list.</span></span>
+<span class="ln" id="L716"><span class="tok-attr">#[derive</span>(Default)]</span>
+<span class="ln" id="L717"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Thumbs {</span>
+<span class="ln" id="L718">    made: HashMap&lt;String, egui::TextureHandle&gt;,</span>
+<span class="ln" id="L719">    asked: HashSet&lt;String&gt;,</span>
+<span class="ln" id="L720">    arriving: Option&lt;mpsc::Receiver&lt;(String, Vec&lt;u8&gt;)&gt;&gt;,</span>
+<span class="ln" id="L721">    drawn_with: Option&lt;Motion&gt;,</span>
+<span class="ln" id="L722">}</span>
 </span>
-<span class="ln" id="L718"></span>
-<span class="ln" id="L719"><span class="tok-kw">impl</span> Thumbs {</span>
+<span class="ln" id="L723"></span>
+<span class="ln" id="L724"><span class="tok-kw">impl</span> Thumbs {</span>
 <span class="src-item" id="fn-thumbs-get">
-<span class="ln" id="L720">    <span class="tok-com">/// The picture for a recording, once it has been drawn.</span></span>
-<span class="ln" id="L721">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">get</span>(&amp;<span class="tok-kw">self</span>, id: &amp;str) -&gt; Option&lt;&amp;egui::TextureHandle&gt; {</span>
-<span class="ln" id="L722">        <span class="tok-kw">self</span>.made.<span class="tok-fn">get</span>(id)</span>
-<span class="ln" id="L723">    }</span>
+<span class="ln" id="L725">    <span class="tok-com">/// The picture for a recording, once it has been drawn.</span></span>
+<span class="ln" id="L726">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">get</span>(&amp;<span class="tok-kw">self</span>, id: &amp;str) -&gt; Option&lt;&amp;egui::TextureHandle&gt; {</span>
+<span class="ln" id="L727">        <span class="tok-kw">self</span>.made.<span class="tok-fn">get</span>(id)</span>
+<span class="ln" id="L728">    }</span>
 </span>
-<span class="ln" id="L724"></span>
+<span class="ln" id="L729"></span>
 <span class="src-item" id="fn-thumbs-clear">
-<span class="ln" id="L725">    <span class="tok-com">/// Forget every picture. Called when the vault shuts, and when the</span></span>
-<span class="ln" id="L726">    <span class="tok-com">/// template they were drawn with changes.</span></span>
-<span class="ln" id="L727">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">clear</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
-<span class="ln" id="L728">        <span class="tok-kw">self</span>.made.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L729">        <span class="tok-kw">self</span>.asked.<span class="tok-fn">clear</span>();</span>
-<span class="ln" id="L730">        <span class="tok-kw">self</span>.arriving = None;</span>
-<span class="ln" id="L731">        <span class="tok-kw">self</span>.drawn_with = None;</span>
-<span class="ln" id="L732">    }</span>
+<span class="ln" id="L730">    <span class="tok-com">/// Forget every picture. Called when the vault shuts, and when the</span></span>
+<span class="ln" id="L731">    <span class="tok-com">/// template they were drawn with changes.</span></span>
+<span class="ln" id="L732">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">clear</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) {</span>
+<span class="ln" id="L733">        <span class="tok-kw">self</span>.made.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L734">        <span class="tok-kw">self</span>.asked.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L735">        <span class="tok-kw">self</span>.arriving = None;</span>
+<span class="ln" id="L736">        <span class="tok-kw">self</span>.drawn_with = None;</span>
+<span class="ln" id="L737">    }</span>
 </span>
-<span class="ln" id="L733"></span>
+<span class="ln" id="L738"></span>
 <span class="src-item" id="fn-thumbs-poll">
-<span class="ln" id="L734">    <span class="tok-com">/// Take whatever pictures have arrived. Never waits.</span></span>
-<span class="ln" id="L735">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">poll</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context) {</span>
-<span class="ln" id="L736">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rx) = &amp;<span class="tok-kw">self</span>.arriving <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
-<span class="ln" id="L737">        loop {</span>
-<span class="ln" id="L738">            <span class="tok-kw">match</span> rx.<span class="tok-fn">try_recv</span>() {</span>
-<span class="ln" id="L739">                <span class="tok-fn">Ok</span>((id, rgb)) =&gt; {</span>
-<span class="ln" id="L740">                    <span class="tok-kw">let</span> image = egui::ColorImage::<span class="tok-fn">from_rgb</span>([THUMB_WIDTH, THUMB_HEIGHT], &amp;rgb);</span>
-<span class="ln" id="L741">                    <span class="tok-kw">let</span> texture = ctx.<span class="tok-fn">load_texture</span>(</span>
-<span class="ln" id="L742">                        format!(<span class="tok-str">&quot;thumb-{id}&quot;</span>),</span>
-<span class="ln" id="L743">                        image,</span>
-<span class="ln" id="L744">                        egui::TextureOptions::LINEAR,</span>
-<span class="ln" id="L745">                    );</span>
-<span class="ln" id="L746">                    <span class="tok-kw">self</span>.made.<span class="tok-fn">insert</span>(id, texture);</span>
-<span class="ln" id="L747">                }</span>
-<span class="ln" id="L748">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; break,</span>
-<span class="ln" id="L749">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; {</span>
-<span class="ln" id="L750">                    <span class="tok-kw">self</span>.arriving = None;</span>
-<span class="ln" id="L751">                    break;</span>
+<span class="ln" id="L739">    <span class="tok-com">/// Take whatever pictures have arrived. Never waits.</span></span>
+<span class="ln" id="L740">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">poll</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context) {</span>
+<span class="ln" id="L741">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(rx) = &amp;<span class="tok-kw">self</span>.arriving <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
+<span class="ln" id="L742">        loop {</span>
+<span class="ln" id="L743">            <span class="tok-kw">match</span> rx.<span class="tok-fn">try_recv</span>() {</span>
+<span class="ln" id="L744">                <span class="tok-fn">Ok</span>((id, rgb)) =&gt; {</span>
+<span class="ln" id="L745">                    <span class="tok-kw">let</span> image = egui::ColorImage::<span class="tok-fn">from_rgb</span>([THUMB_WIDTH, THUMB_HEIGHT], &amp;rgb);</span>
+<span class="ln" id="L746">                    <span class="tok-kw">let</span> texture = ctx.<span class="tok-fn">load_texture</span>(</span>
+<span class="ln" id="L747">                        format!(<span class="tok-str">&quot;thumb-{id}&quot;</span>),</span>
+<span class="ln" id="L748">                        image,</span>
+<span class="ln" id="L749">                        egui::TextureOptions::LINEAR,</span>
+<span class="ln" id="L750">                    );</span>
+<span class="ln" id="L751">                    <span class="tok-kw">self</span>.made.<span class="tok-fn">insert</span>(id, texture);</span>
 <span class="ln" id="L752">                }</span>
-<span class="ln" id="L753">            }</span>
-<span class="ln" id="L754">        }</span>
-<span class="ln" id="L755">    }</span>
+<span class="ln" id="L753">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Empty) =&gt; break,</span>
+<span class="ln" id="L754">                <span class="tok-fn">Err</span>(mpsc::TryRecvError::Disconnected) =&gt; {</span>
+<span class="ln" id="L755">                    <span class="tok-kw">self</span>.arriving = None;</span>
+<span class="ln" id="L756">                    break;</span>
+<span class="ln" id="L757">                }</span>
+<span class="ln" id="L758">            }</span>
+<span class="ln" id="L759">        }</span>
+<span class="ln" id="L760">    }</span>
 </span>
-<span class="ln" id="L756"></span>
+<span class="ln" id="L761"></span>
 <span class="src-item" id="fn-thumbs-ask">
-<span class="ln" id="L757">    <span class="tok-com">/// Draw the pictures nobody has asked for yet, on a worker.</span></span>
-<span class="ln" id="L758">    <span class="tok-com">///</span></span>
-<span class="ln" id="L759">    <span class="tok-com">/// Does nothing while a batch is still arriving, so a list drawn sixty</span></span>
-<span class="ln" id="L760">    <span class="tok-com">/// times a second starts one worker rather than sixty.</span></span>
-<span class="ln" id="L761">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ask</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context, vault: &amp;Arc&lt;Vault&gt;, ids: &amp;[String], look: &amp;Motion) {</span>
-<span class="ln" id="L762">        <span class="tok-com">// One batch at a time, so a slider being dragged starts one worker</span></span>
-<span class="ln" id="L763">        <span class="tok-com">// and not one a frame. The look is compared whole, not by template:</span></span>
-<span class="ln" id="L764">        <span class="tok-com">// the advanced half changes a look without changing its template.</span></span>
-<span class="ln" id="L765">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.arriving.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L766">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L767">        }</span>
-<span class="ln" id="L768">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.drawn_with.<span class="tok-fn">is_some_and</span>(|drawn| drawn != *look) {</span>
-<span class="ln" id="L769">            <span class="tok-com">// Asked again, and the old pictures stay until the new ones land,</span></span>
-<span class="ln" id="L770">            <span class="tok-com">// so the list does not blink empty.</span></span>
-<span class="ln" id="L771">            <span class="tok-kw">self</span>.asked.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L762">    <span class="tok-com">/// Draw the pictures nobody has asked for yet, on a worker.</span></span>
+<span class="ln" id="L763">    <span class="tok-com">///</span></span>
+<span class="ln" id="L764">    <span class="tok-com">/// Does nothing while a batch is still arriving, so a list drawn sixty</span></span>
+<span class="ln" id="L765">    <span class="tok-com">/// times a second starts one worker rather than sixty.</span></span>
+<span class="ln" id="L766">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ask</span>(&amp;<span class="tok-kw">mut</span> <span class="tok-kw">self</span>, ctx: &amp;egui::Context, vault: &amp;Arc&lt;Vault&gt;, ids: &amp;[String], look: &amp;Motion) {</span>
+<span class="ln" id="L767">        <span class="tok-com">// One batch at a time, so a slider being dragged starts one worker</span></span>
+<span class="ln" id="L768">        <span class="tok-com">// and not one a frame. The look is compared whole, not by template:</span></span>
+<span class="ln" id="L769">        <span class="tok-com">// the advanced half changes a look without changing its template.</span></span>
+<span class="ln" id="L770">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.arriving.<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L771">            <span class="tok-kw">return</span>;</span>
 <span class="ln" id="L772">        }</span>
-<span class="ln" id="L773">        <span class="tok-kw">let</span> wanted: Vec&lt;String&gt; = ids</span>
-<span class="ln" id="L774">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L775">            .<span class="tok-fn">filter</span>(|id| !<span class="tok-kw">self</span>.asked.<span class="tok-fn">contains</span>(*id))</span>
-<span class="ln" id="L776">            .<span class="tok-fn">cloned</span>()</span>
-<span class="ln" id="L777">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L778">        <span class="tok-kw">if</span> wanted.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L779">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L780">        }</span>
-<span class="ln" id="L781">        <span class="tok-kw">self</span>.asked.<span class="tok-fn">extend</span>(wanted.<span class="tok-fn">iter</span>().<span class="tok-fn">cloned</span>());</span>
-<span class="ln" id="L782">        <span class="tok-kw">self</span>.drawn_with = <span class="tok-fn">Some</span>(*look);</span>
-<span class="ln" id="L783">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L784">        <span class="tok-kw">self</span>.arriving = <span class="tok-fn">Some</span>(rx);</span>
-<span class="ln" id="L785">        <span class="tok-kw">let</span> weak: Weak&lt;Vault&gt; = Arc::<span class="tok-fn">downgrade</span>(vault);</span>
-<span class="ln" id="L786">        <span class="tok-kw">let</span> look = *look;</span>
-<span class="ln" id="L787">        <span class="tok-kw">let</span> ctx = ctx.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L788">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || <span class="tok-fn">draw_thumbnails</span>(weak, wanted, look, tx, ctx));</span>
-<span class="ln" id="L789">    }</span>
+<span class="ln" id="L773">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.drawn_with.<span class="tok-fn">is_some_and</span>(|drawn| drawn != *look) {</span>
+<span class="ln" id="L774">            <span class="tok-com">// Asked again, and the old pictures stay until the new ones land,</span></span>
+<span class="ln" id="L775">            <span class="tok-com">// so the list does not blink empty.</span></span>
+<span class="ln" id="L776">            <span class="tok-kw">self</span>.asked.<span class="tok-fn">clear</span>();</span>
+<span class="ln" id="L777">        }</span>
+<span class="ln" id="L778">        <span class="tok-kw">let</span> wanted: Vec&lt;String&gt; = ids</span>
+<span class="ln" id="L779">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L780">            .<span class="tok-fn">filter</span>(|id| !<span class="tok-kw">self</span>.asked.<span class="tok-fn">contains</span>(*id))</span>
+<span class="ln" id="L781">            .<span class="tok-fn">cloned</span>()</span>
+<span class="ln" id="L782">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L783">        <span class="tok-kw">if</span> wanted.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L784">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L785">        }</span>
+<span class="ln" id="L786">        <span class="tok-kw">self</span>.asked.<span class="tok-fn">extend</span>(wanted.<span class="tok-fn">iter</span>().<span class="tok-fn">cloned</span>());</span>
+<span class="ln" id="L787">        <span class="tok-kw">self</span>.drawn_with = <span class="tok-fn">Some</span>(*look);</span>
+<span class="ln" id="L788">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L789">        <span class="tok-kw">self</span>.arriving = <span class="tok-fn">Some</span>(rx);</span>
+<span class="ln" id="L790">        <span class="tok-kw">let</span> weak: Weak&lt;Vault&gt; = Arc::<span class="tok-fn">downgrade</span>(vault);</span>
+<span class="ln" id="L791">        <span class="tok-kw">let</span> look = *look;</span>
+<span class="ln" id="L792">        <span class="tok-kw">let</span> ctx = ctx.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L793">        std::thread::<span class="tok-fn">spawn</span>(<span class="tok-kw">move</span> || <span class="tok-fn">draw_thumbnails</span>(weak, wanted, look, tx, ctx));</span>
+<span class="ln" id="L794">    }</span>
 </span>
-<span class="ln" id="L790">}</span>
-<span class="ln" id="L791"></span>
+<span class="ln" id="L795">}</span>
+<span class="ln" id="L796"></span>
 <span class="src-item" id="fn-draw_thumbnails">
-<span class="ln" id="L792"><span class="tok-com">/// The worker behind [`Thumbs::ask`].</span></span>
-<span class="ln" id="L793"><span class="tok-kw">fn</span> <span class="tok-fn">draw_thumbnails</span>(</span>
-<span class="ln" id="L794">    weak: Weak&lt;Vault&gt;,</span>
-<span class="ln" id="L795">    ids: Vec&lt;String&gt;,</span>
-<span class="ln" id="L796">    look: Motion,</span>
-<span class="ln" id="L797">    tx: mpsc::Sender&lt;(String, Vec&lt;u8&gt;)&gt;,</span>
-<span class="ln" id="L798">    ctx: egui::Context,</span>
-<span class="ln" id="L799">) {</span>
-<span class="ln" id="L800">    <span class="tok-kw">for</span> id <span class="tok-kw">in</span> ids {</span>
-<span class="ln" id="L801">        <span class="tok-com">// A strong reference for one load and no longer. If the vault has been</span></span>
-<span class="ln" id="L802">        <span class="tok-com">// shut this fails, and the rest of the list is not drawn.</span></span>
-<span class="ln" id="L803">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(vault) = weak.<span class="tok-fn">upgrade</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
-<span class="ln" id="L804">        <span class="tok-kw">let</span> loaded = vault.<span class="tok-fn">load</span>(&amp;id);</span>
-<span class="ln" id="L805">        <span class="tok-fn">drop</span>(vault);</span>
-<span class="ln" id="L806">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(wav) = loaded <span class="tok-kw">else</span> { continue };</span>
-<span class="ln" id="L807">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((samples, _)) = <span class="tok-fn">samples_of</span>(wav.<span class="tok-fn">expose</span>()) <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L808">            continue;</span>
-<span class="ln" id="L809">        };</span>
-<span class="ln" id="L810">        <span class="tok-fn">drop</span>(wav);</span>
-<span class="ln" id="L811">        <span class="tok-kw">let</span> picture = motion::<span class="tok-fn">thumbnail</span>(&amp;samples, &amp;look, THUMB_WIDTH, THUMB_HEIGHT);</span>
-<span class="ln" id="L812">        <span class="tok-kw">if</span> tx.<span class="tok-fn">send</span>((id, picture.<span class="tok-fn">rgb</span>().<span class="tok-fn">to_vec</span>())).<span class="tok-fn">is_err</span>() {</span>
-<span class="ln" id="L813">            <span class="tok-kw">return</span>;</span>
-<span class="ln" id="L814">        }</span>
-<span class="ln" id="L815">        ctx.<span class="tok-fn">request_repaint</span>();</span>
-<span class="ln" id="L816">    }</span>
-<span class="ln" id="L817">}</span>
+<span class="ln" id="L797"><span class="tok-com">/// The worker behind [`Thumbs::ask`].</span></span>
+<span class="ln" id="L798"><span class="tok-kw">fn</span> <span class="tok-fn">draw_thumbnails</span>(</span>
+<span class="ln" id="L799">    weak: Weak&lt;Vault&gt;,</span>
+<span class="ln" id="L800">    ids: Vec&lt;String&gt;,</span>
+<span class="ln" id="L801">    look: Motion,</span>
+<span class="ln" id="L802">    tx: mpsc::Sender&lt;(String, Vec&lt;u8&gt;)&gt;,</span>
+<span class="ln" id="L803">    ctx: egui::Context,</span>
+<span class="ln" id="L804">) {</span>
+<span class="ln" id="L805">    <span class="tok-kw">for</span> id <span class="tok-kw">in</span> ids {</span>
+<span class="ln" id="L806">        <span class="tok-com">// A strong reference for one load and no longer. If the vault has been</span></span>
+<span class="ln" id="L807">        <span class="tok-com">// shut this fails, and the rest of the list is not drawn.</span></span>
+<span class="ln" id="L808">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(vault) = weak.<span class="tok-fn">upgrade</span>() <span class="tok-kw">else</span> { <span class="tok-kw">return</span> };</span>
+<span class="ln" id="L809">        <span class="tok-kw">let</span> loaded = vault.<span class="tok-fn">load</span>(&amp;id);</span>
+<span class="ln" id="L810">        <span class="tok-fn">drop</span>(vault);</span>
+<span class="ln" id="L811">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(wav) = loaded <span class="tok-kw">else</span> { continue };</span>
+<span class="ln" id="L812">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((samples, _)) = <span class="tok-fn">samples_of</span>(wav.<span class="tok-fn">expose</span>()) <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L813">            continue;</span>
+<span class="ln" id="L814">        };</span>
+<span class="ln" id="L815">        <span class="tok-fn">drop</span>(wav);</span>
+<span class="ln" id="L816">        <span class="tok-kw">let</span> picture = motion::<span class="tok-fn">thumbnail</span>(&amp;samples, &amp;look, THUMB_WIDTH, THUMB_HEIGHT);</span>
+<span class="ln" id="L817">        <span class="tok-kw">if</span> tx.<span class="tok-fn">send</span>((id, picture.<span class="tok-fn">rgb</span>().<span class="tok-fn">to_vec</span>())).<span class="tok-fn">is_err</span>() {</span>
+<span class="ln" id="L818">            <span class="tok-kw">return</span>;</span>
+<span class="ln" id="L819">        }</span>
+<span class="ln" id="L820">        ctx.<span class="tok-fn">request_repaint</span>();</span>
+<span class="ln" id="L821">    }</span>
+<span class="ln" id="L822">}</span>
 </span>
-<span class="ln" id="L818"></span>
-<span class="ln" id="L819"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L820"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L821">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L822"></span>
-<span class="ln" id="L823">    <span class="tok-kw">fn</span> <span class="tok-fn">wav</span>(samples: &amp;[i16], channels: u16, rate: u32) -&gt; Vec&lt;u8&gt; {</span>
-<span class="ln" id="L824">        <span class="tok-kw">let</span> data = (samples.<span class="tok-fn">len</span>() * <span class="tok-num">2</span>) <span class="tok-kw">as</span> u32;</span>
-<span class="ln" id="L825">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L826">        out.<span class="tok-fn">extend</span>(b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L827">        out.<span class="tok-fn">extend</span>((<span class="tok-num">36</span> + data).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L828">        out.<span class="tok-fn">extend</span>(b<span class="tok-str">&quot;WAVEfmt &quot;</span>);</span>
-<span class="ln" id="L829">        out.<span class="tok-fn">extend</span>(16u32.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L830">        out.<span class="tok-fn">extend</span>(1u16.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L831">        out.<span class="tok-fn">extend</span>(channels.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L832">        out.<span class="tok-fn">extend</span>(rate.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L833">        out.<span class="tok-fn">extend</span>((rate * <span class="tok-num">2</span> * channels <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L834">        out.<span class="tok-fn">extend</span>((<span class="tok-num">2</span> * channels).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L835">        out.<span class="tok-fn">extend</span>(16u16.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L836">        out.<span class="tok-fn">extend</span>(b<span class="tok-str">&quot;data&quot;</span>);</span>
-<span class="ln" id="L837">        out.<span class="tok-fn">extend</span>(data.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L838">        <span class="tok-kw">for</span> s <span class="tok-kw">in</span> samples {</span>
-<span class="ln" id="L839">            out.<span class="tok-fn">extend</span>(s.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L840">        }</span>
-<span class="ln" id="L841">        out</span>
-<span class="ln" id="L842">    }</span>
-<span class="ln" id="L843"></span>
-<span class="ln" id="L844">    <span class="tok-com">/// Sound alone admits it cannot be measured; a picture counts its frames.</span></span>
-<span class="ln" id="L845">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L846">    <span class="tok-kw">fn</span> <span class="tok-fn">only_a_picture_draws_a_bar</span>() {</span>
-<span class="ln" id="L847">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> choice = Choice::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L848">        assert_eq!(<span class="tok-fn">reach_for</span>(&amp;choice).<span class="tok-fn">because</span>(), None);</span>
-<span class="ln" id="L849">        choice.export.content = Content::Audio;</span>
-<span class="ln" id="L850">        assert_eq!(<span class="tok-fn">reach_for</span>(&amp;choice).<span class="tok-fn">because</span>(), <span class="tok-fn">Some</span>(NO_FRAMES));</span>
-<span class="ln" id="L851">    }</span>
-<span class="ln" id="L852"></span>
-<span class="ln" id="L853">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L854">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stereo_recording_is_mixed_to_one_channel</span>() {</span>
-<span class="ln" id="L855">        <span class="tok-kw">let</span> (samples, rate) = <span class="tok-fn">samples_of</span>(&amp;<span class="tok-fn">wav</span>(&amp;[<span class="tok-num">16_384</span>, <span class="tok-num">0</span>, -<span class="tok-num">16_384</span>, <span class="tok-num">0</span>], <span class="tok-num">2</span>, <span class="tok-num">44_100</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L856">        assert_eq!(rate, <span class="tok-num">44_100</span>);</span>
-<span class="ln" id="L857">        assert_eq!(samples, vec![<span class="tok-num">0.25</span>, -<span class="tok-num">0.25</span>]);</span>
-<span class="ln" id="L858">        assert!(<span class="tok-fn">samples_of</span>(b<span class="tok-str">&quot;not a wav at all, and far too short&quot;</span>).<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L859">    }</span>
-<span class="ln" id="L860"></span>
-<span class="ln" id="L861">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L862">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_cannot_reach_outside_the_folder</span>() {</span>
-<span class="ln" id="L863">        assert_eq!(<span class="tok-fn">safe_stem</span>(<span class="tok-str">&quot;../../etc/passwd&quot;</span>), <span class="tok-str">&quot;etc-passwd&quot;</span>);</span>
-<span class="ln" id="L864">        assert_eq!(<span class="tok-fn">safe_stem</span>(<span class="tok-str">&quot;///&quot;</span>), <span class="tok-str">&quot;take&quot;</span>);</span>
-<span class="ln" id="L865">        assert_eq!(<span class="tok-fn">safe_stem</span>(<span class="tok-str">&quot;Interview 2&quot;</span>), <span class="tok-str">&quot;Interview-2&quot;</span>);</span>
-<span class="ln" id="L866">    }</span>
-<span class="ln" id="L867"></span>
-<span class="ln" id="L868">    <span class="tok-com">/// A name Windows keeps for a device is not used as a file name.</span></span>
-<span class="ln" id="L869">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L870">    <span class="tok-kw">fn</span> <span class="tok-fn">a_device_name_is_not_a_file_name</span>() {</span>
-<span class="ln" id="L871">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;con&quot;</span>, <span class="tok-str">&quot;CON&quot;</span>, <span class="tok-str">&quot;nul&quot;</span>, <span class="tok-str">&quot;Aux&quot;</span>, <span class="tok-str">&quot;prn&quot;</span>, <span class="tok-str">&quot;com1&quot;</span>, <span class="tok-str">&quot;LPT9&quot;</span>] {</span>
-<span class="ln" id="L872">            assert_eq!(<span class="tok-fn">safe_stem</span>(name), format!(<span class="tok-str">&quot;take-{name}&quot;</span>));</span>
-<span class="ln" id="L873">        }</span>
-<span class="ln" id="L874">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;console&quot;</span>, <span class="tok-str">&quot;com&quot;</span>, <span class="tok-str">&quot;com0&quot;</span>, <span class="tok-str">&quot;lpt10&quot;</span>, <span class="tok-str">&quot;nulled&quot;</span>] {</span>
-<span class="ln" id="L875">            assert_eq!(<span class="tok-fn">safe_stem</span>(name), name, <span class="tok-str">&quot;{name} is an ordinary name&quot;</span>);</span>
-<span class="ln" id="L876">        }</span>
-<span class="ln" id="L877">    }</span>
-<span class="ln" id="L878"></span>
-<span class="ln" id="L879">    <span class="tok-com">/// A stand-in for ffmpeg: reads the frames, then writes its last argument,</span></span>
-<span class="ln" id="L880">    <span class="tok-com">/// or fails after doing what `script` says.</span></span>
-<span class="ln" id="L881">    <span class="tok-com">/// `$last` has the `file:` prefix every path is given (F-283) taken off.</span></span>
-<span class="ln" id="L882">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L883">    <span class="tok-kw">fn</span> <span class="tok-fn">fake_ffmpeg</span>(dir: &amp;Path, script: &amp;str) -&gt; PathBuf {</span>
-<span class="ln" id="L884">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
-<span class="ln" id="L885">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;ffmpeg&quot;</span>);</span>
-<span class="ln" id="L886">        std::fs::<span class="tok-fn">write</span>(</span>
-<span class="ln" id="L887">            &amp;path,</span>
-<span class="ln" id="L888">            format!(</span>
-<span class="ln" id="L889">                <span class="tok-str">&quot;#!/bin/sh\ncat &gt; /dev/null\nfor last; do :; done\nlast=\&quot;${{last#file:}}\&quot;\n{script}\n&quot;</span></span>
-<span class="ln" id="L890">            ),</span>
-<span class="ln" id="L891">        )</span>
-<span class="ln" id="L892">        .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L893">        std::fs::<span class="tok-fn">set_permissions</span>(&amp;path, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o755)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L894">        path</span>
-<span class="ln" id="L895">    }</span>
-<span class="ln" id="L896"></span>
-<span class="ln" id="L897">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L898">    <span class="tok-kw">fn</span> <span class="tok-fn">small_video</span>() -&gt; Choice {</span>
-<span class="ln" id="L899">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> choice = Choice::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L900">        choice.export.plan.size = veilvoice_video::size::Preset::Hd720.<span class="tok-fn">size</span>();</span>
-<span class="ln" id="L901">        choice</span>
-<span class="ln" id="L902">    }</span>
-<span class="ln" id="L903"></span>
-<span class="ln" id="L904">    <span class="tok-com">/// Only the export&#x27;s own folder and the finished file are left behind.</span></span>
-<span class="ln" id="L905">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L906">    <span class="tok-kw">fn</span> <span class="tok-fn">leftovers</span>(dir: &amp;Path) -&gt; Vec&lt;String&gt; {</span>
-<span class="ln" id="L907">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> names: Vec&lt;String&gt; = std::fs::<span class="tok-fn">read_dir</span>(dir)</span>
-<span class="ln" id="L908">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L909">            .<span class="tok-fn">map</span>(|e| e.<span class="tok-fn">unwrap</span>().<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>())</span>
-<span class="ln" id="L910">            .<span class="tok-fn">filter</span>(|n| n != <span class="tok-str">&quot;vault&quot;</span> &amp;&amp; n != <span class="tok-str">&quot;tools&quot;</span>)</span>
-<span class="ln" id="L911">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L912">        names.<span class="tok-fn">sort</span>();</span>
-<span class="ln" id="L913">        names</span>
-<span class="ln" id="L914">    }</span>
-<span class="ln" id="L915"></span>
-<span class="ln" id="L916">    <span class="tok-com">/// A render is placed, owner-only, the frames counted, and nothing else</span></span>
-<span class="ln" id="L917">    <span class="tok-com">/// is left in the folder.</span></span>
-<span class="ln" id="L918">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L919">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L920">    <span class="tok-kw">fn</span> <span class="tok-fn">a_render_lands_owner_only_and_leaves_nothing_else</span>() {</span>
-<span class="ln" id="L921">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
-<span class="ln" id="L922">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
-<span class="ln" id="L923">        <span class="tok-kw">let</span> tools = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tools&quot;</span>);</span>
-<span class="ln" id="L924">        std::fs::<span class="tok-fn">create_dir</span>(&amp;tools).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L925">        <span class="tok-kw">let</span> ffmpeg = <span class="tok-fn">fake_ffmpeg</span>(&amp;tools, <span class="tok-str">&quot;umask 022; printf made &gt; \&quot;$last\&quot;&quot;</span>);</span>
-<span class="ln" id="L926">        <span class="tok-kw">let</span> reach = Arc::<span class="tok-fn">new</span>(<span class="tok-kw">crate</span>::progress::Reach::<span class="tok-fn">counting</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L927">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> job = <span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">small_video</span>());</span>
-<span class="ln" id="L928">        job.reach = Arc::<span class="tok-fn">clone</span>(&amp;reach);</span>
-<span class="ln" id="L929">        <span class="tok-kw">let</span> (said, outcome) = <span class="tok-fn">run_with</span>(job, || <span class="tok-fn">Some</span>(ffmpeg));</span>
-<span class="ln" id="L930">        assert_eq!(outcome, Outcome::Good, <span class="tok-str">&quot;{said}&quot;</span>);</span>
-<span class="ln" id="L931">        <span class="tok-kw">let</span> output = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.mp4&quot;</span>);</span>
-<span class="ln" id="L932">        assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;output).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;made&quot;</span>);</span>
-<span class="ln" id="L933">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;output).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
-<span class="ln" id="L934">        assert_eq!(mode, 0o600, <span class="tok-str">&quot;the export is readable by others: {mode:o}&quot;</span>);</span>
-<span class="ln" id="L935">        assert!(reach.<span class="tok-fn">total</span>() &gt; <span class="tok-num">0</span> &amp;&amp; reach.<span class="tok-fn">done</span>() == reach.<span class="tok-fn">total</span>());</span>
-<span class="ln" id="L936">        assert_eq!(<span class="tok-fn">leftovers</span>(dir.<span class="tok-fn">path</span>()), [<span class="tok-str">&quot;take-one.mp4&quot;</span>]);</span>
-<span class="ln" id="L937">    }</span>
-<span class="ln" id="L938"></span>
-<span class="ln" id="L939">    <span class="tok-com">/// A failed render removes only what this run made. A file that turned up</span></span>
-<span class="ln" id="L940">    <span class="tok-com">/// at the destination while it rendered is somebody else&#x27;s and stays.</span></span>
-<span class="ln" id="L941">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L942">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L943">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_render_removes_only_its_own_work</span>() {</span>
-<span class="ln" id="L944">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
-<span class="ln" id="L945">        <span class="tok-kw">let</span> tools = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tools&quot;</span>);</span>
-<span class="ln" id="L946">        std::fs::<span class="tok-fn">create_dir</span>(&amp;tools).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L947">        <span class="tok-kw">let</span> ffmpeg = <span class="tok-fn">fake_ffmpeg</span>(</span>
-<span class="ln" id="L948">            &amp;tools,</span>
-<span class="ln" id="L949">            <span class="tok-str">&quot;room=$(dirname \&quot;$last\&quot;); printf theirs &gt; \&quot;$(dirname \&quot;$room\&quot;)/$(basename \&quot;$last\&quot;)\&quot;; \</span></span>
-<span class="ln" id="L950"><span class="tok-str">             echo &#x27;File exists&#x27; &gt;&amp;2; exit 1&quot;</span>,</span>
-<span class="ln" id="L951">        );</span>
-<span class="ln" id="L952">        <span class="tok-kw">let</span> (said, outcome) =</span>
-<span class="ln" id="L953">            <span class="tok-fn">run_with</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">small_video</span>()), || <span class="tok-fn">Some</span>(ffmpeg));</span>
-<span class="ln" id="L954">        assert_eq!(outcome, Outcome::Bad, <span class="tok-str">&quot;{said}&quot;</span>);</span>
-<span class="ln" id="L955">        assert!(said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;File exists&quot;</span>), <span class="tok-str">&quot;{said}&quot;</span>);</span>
-<span class="ln" id="L956">        assert_eq!(</span>
-<span class="ln" id="L957">            std::fs::<span class="tok-fn">read</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.mp4&quot;</span>)).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L958">            b<span class="tok-str">&quot;theirs&quot;</span>,</span>
-<span class="ln" id="L959">            <span class="tok-str">&quot;the failed render deleted a file it did not make&quot;</span></span>
-<span class="ln" id="L960">        );</span>
-<span class="ln" id="L961">        assert_eq!(<span class="tok-fn">leftovers</span>(dir.<span class="tok-fn">path</span>()), [<span class="tok-str">&quot;take-one.mp4&quot;</span>]);</span>
-<span class="ln" id="L962">    }</span>
-<span class="ln" id="L963"></span>
-<span class="ln" id="L964">    <span class="tok-com">/// A link planted where the file is going is not followed, whether it</span></span>
-<span class="ln" id="L965">    <span class="tok-com">/// points at something or at nothing.</span></span>
-<span class="ln" id="L966">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L967">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L968">    <span class="tok-kw">fn</span> <span class="tok-fn">a_link_at_the_destination_is_not_followed</span>() {</span>
-<span class="ln" id="L969">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
-<span class="ln" id="L970">        <span class="tok-kw">let</span> tools = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tools&quot;</span>);</span>
-<span class="ln" id="L971">        std::fs::<span class="tok-fn">create_dir</span>(&amp;tools).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L972">        <span class="tok-kw">let</span> victim = tools.<span class="tok-fn">join</span>(<span class="tok-str">&quot;victim&quot;</span>);</span>
-<span class="ln" id="L973">        std::fs::<span class="tok-fn">write</span>(&amp;victim, b<span class="tok-str">&quot;precious&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L974">        <span class="tok-kw">let</span> ffmpeg = <span class="tok-fn">fake_ffmpeg</span>(&amp;tools, <span class="tok-str">&quot;printf made &gt; \&quot;$last\&quot;&quot;</span>);</span>
-<span class="ln" id="L975"></span>
-<span class="ln" id="L976">        <span class="tok-kw">for</span> (choice, name) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L977">            (<span class="tok-fn">wav_only</span>(), <span class="tok-str">&quot;take-one.wav&quot;</span>),</span>
-<span class="ln" id="L978">            (<span class="tok-fn">small_video</span>(), <span class="tok-str">&quot;take-one.mp4&quot;</span>),</span>
-<span class="ln" id="L979">        ] {</span>
-<span class="ln" id="L980">            <span class="tok-kw">for</span> target <span class="tok-kw">in</span> [victim.<span class="tok-fn">clone</span>(), tools.<span class="tok-fn">join</span>(<span class="tok-str">&quot;nothing-here&quot;</span>)] {</span>
-<span class="ln" id="L981">                <span class="tok-kw">let</span> link = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(name);</span>
-<span class="ln" id="L982">                std::os::unix::fs::<span class="tok-fn">symlink</span>(&amp;target, &amp;link).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L983">                <span class="tok-kw">let</span> program = ffmpeg.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L984">                <span class="tok-kw">let</span> (said, outcome) =</span>
-<span class="ln" id="L985">                    <span class="tok-fn">run_with</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), choice.<span class="tok-fn">clone</span>()), || {</span>
-<span class="ln" id="L986">                        <span class="tok-fn">Some</span>(program)</span>
-<span class="ln" id="L987">                    });</span>
-<span class="ln" id="L988">                assert_eq!(</span>
-<span class="ln" id="L989">                    outcome,</span>
-<span class="ln" id="L990">                    Outcome::Warn,</span>
-<span class="ln" id="L991">                    <span class="tok-str">&quot;{name} -&gt; {}: {said}&quot;</span>,</span>
-<span class="ln" id="L992">                    target.<span class="tok-fn">display</span>()</span>
-<span class="ln" id="L993">                );</span>
-<span class="ln" id="L994">                assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;victim).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;precious&quot;</span>);</span>
-<span class="ln" id="L995">                assert!(</span>
-<span class="ln" id="L996">                    !tools.<span class="tok-fn">join</span>(<span class="tok-str">&quot;nothing-here&quot;</span>).<span class="tok-fn">exists</span>(),</span>
-<span class="ln" id="L997">                    <span class="tok-str">&quot;a dangling link was followed&quot;</span></span>
+<span class="ln" id="L823"></span>
+<span class="ln" id="L824"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L825"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L826">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L827"></span>
+<span class="ln" id="L828">    <span class="tok-kw">fn</span> <span class="tok-fn">wav</span>(samples: &amp;[i16], channels: u16, rate: u32) -&gt; Vec&lt;u8&gt; {</span>
+<span class="ln" id="L829">        <span class="tok-kw">let</span> data = (samples.<span class="tok-fn">len</span>() * <span class="tok-num">2</span>) <span class="tok-kw">as</span> u32;</span>
+<span class="ln" id="L830">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L831">        out.<span class="tok-fn">extend</span>(b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L832">        out.<span class="tok-fn">extend</span>((<span class="tok-num">36</span> + data).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L833">        out.<span class="tok-fn">extend</span>(b<span class="tok-str">&quot;WAVEfmt &quot;</span>);</span>
+<span class="ln" id="L834">        out.<span class="tok-fn">extend</span>(16u32.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L835">        out.<span class="tok-fn">extend</span>(1u16.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L836">        out.<span class="tok-fn">extend</span>(channels.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L837">        out.<span class="tok-fn">extend</span>(rate.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L838">        out.<span class="tok-fn">extend</span>((rate * <span class="tok-num">2</span> * channels <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L839">        out.<span class="tok-fn">extend</span>((<span class="tok-num">2</span> * channels).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L840">        out.<span class="tok-fn">extend</span>(16u16.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L841">        out.<span class="tok-fn">extend</span>(b<span class="tok-str">&quot;data&quot;</span>);</span>
+<span class="ln" id="L842">        out.<span class="tok-fn">extend</span>(data.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L843">        <span class="tok-kw">for</span> s <span class="tok-kw">in</span> samples {</span>
+<span class="ln" id="L844">            out.<span class="tok-fn">extend</span>(s.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L845">        }</span>
+<span class="ln" id="L846">        out</span>
+<span class="ln" id="L847">    }</span>
+<span class="ln" id="L848"></span>
+<span class="ln" id="L849">    <span class="tok-com">/// Sound alone admits it cannot be measured; a picture counts its frames.</span></span>
+<span class="ln" id="L850">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L851">    <span class="tok-kw">fn</span> <span class="tok-fn">only_a_picture_draws_a_bar</span>() {</span>
+<span class="ln" id="L852">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> choice = Choice::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L853">        assert_eq!(<span class="tok-fn">reach_for</span>(&amp;choice).<span class="tok-fn">because</span>(), None);</span>
+<span class="ln" id="L854">        choice.export.content = Content::Audio;</span>
+<span class="ln" id="L855">        assert_eq!(<span class="tok-fn">reach_for</span>(&amp;choice).<span class="tok-fn">because</span>(), <span class="tok-fn">Some</span>(NO_FRAMES));</span>
+<span class="ln" id="L856">    }</span>
+<span class="ln" id="L857"></span>
+<span class="ln" id="L858">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L859">    <span class="tok-kw">fn</span> <span class="tok-fn">a_stereo_recording_is_mixed_to_one_channel</span>() {</span>
+<span class="ln" id="L860">        <span class="tok-kw">let</span> (samples, rate) = <span class="tok-fn">samples_of</span>(&amp;<span class="tok-fn">wav</span>(&amp;[<span class="tok-num">16_384</span>, <span class="tok-num">0</span>, -<span class="tok-num">16_384</span>, <span class="tok-num">0</span>], <span class="tok-num">2</span>, <span class="tok-num">44_100</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L861">        assert_eq!(rate, <span class="tok-num">44_100</span>);</span>
+<span class="ln" id="L862">        assert_eq!(samples, vec![<span class="tok-num">0.25</span>, -<span class="tok-num">0.25</span>]);</span>
+<span class="ln" id="L863">        assert!(<span class="tok-fn">samples_of</span>(b<span class="tok-str">&quot;not a wav at all, and far too short&quot;</span>).<span class="tok-fn">is_none</span>());</span>
+<span class="ln" id="L864">    }</span>
+<span class="ln" id="L865"></span>
+<span class="ln" id="L866">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L867">    <span class="tok-kw">fn</span> <span class="tok-fn">a_name_cannot_reach_outside_the_folder</span>() {</span>
+<span class="ln" id="L868">        assert_eq!(<span class="tok-fn">safe_stem</span>(<span class="tok-str">&quot;../../etc/passwd&quot;</span>), <span class="tok-str">&quot;etc-passwd&quot;</span>);</span>
+<span class="ln" id="L869">        assert_eq!(<span class="tok-fn">safe_stem</span>(<span class="tok-str">&quot;///&quot;</span>), <span class="tok-str">&quot;take&quot;</span>);</span>
+<span class="ln" id="L870">        assert_eq!(<span class="tok-fn">safe_stem</span>(<span class="tok-str">&quot;Interview 2&quot;</span>), <span class="tok-str">&quot;Interview-2&quot;</span>);</span>
+<span class="ln" id="L871">    }</span>
+<span class="ln" id="L872"></span>
+<span class="ln" id="L873">    <span class="tok-com">/// A name Windows keeps for a device is not used as a file name.</span></span>
+<span class="ln" id="L874">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L875">    <span class="tok-kw">fn</span> <span class="tok-fn">a_device_name_is_not_a_file_name</span>() {</span>
+<span class="ln" id="L876">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;con&quot;</span>, <span class="tok-str">&quot;CON&quot;</span>, <span class="tok-str">&quot;nul&quot;</span>, <span class="tok-str">&quot;Aux&quot;</span>, <span class="tok-str">&quot;prn&quot;</span>, <span class="tok-str">&quot;com1&quot;</span>, <span class="tok-str">&quot;LPT9&quot;</span>] {</span>
+<span class="ln" id="L877">            assert_eq!(<span class="tok-fn">safe_stem</span>(name), format!(<span class="tok-str">&quot;take-{name}&quot;</span>));</span>
+<span class="ln" id="L878">        }</span>
+<span class="ln" id="L879">        <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [<span class="tok-str">&quot;console&quot;</span>, <span class="tok-str">&quot;com&quot;</span>, <span class="tok-str">&quot;com0&quot;</span>, <span class="tok-str">&quot;lpt10&quot;</span>, <span class="tok-str">&quot;nulled&quot;</span>] {</span>
+<span class="ln" id="L880">            assert_eq!(<span class="tok-fn">safe_stem</span>(name), name, <span class="tok-str">&quot;{name} is an ordinary name&quot;</span>);</span>
+<span class="ln" id="L881">        }</span>
+<span class="ln" id="L882">    }</span>
+<span class="ln" id="L883"></span>
+<span class="ln" id="L884">    <span class="tok-com">/// A stand-in for ffmpeg: reads the frames, then writes its last argument,</span></span>
+<span class="ln" id="L885">    <span class="tok-com">/// or fails after doing what `script` says.</span></span>
+<span class="ln" id="L886">    <span class="tok-com">/// `$last` has the `file:` prefix every path is given (F-283) taken off.</span></span>
+<span class="ln" id="L887">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L888">    <span class="tok-kw">fn</span> <span class="tok-fn">fake_ffmpeg</span>(dir: &amp;Path, script: &amp;str) -&gt; PathBuf {</span>
+<span class="ln" id="L889">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L890">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(<span class="tok-str">&quot;ffmpeg&quot;</span>);</span>
+<span class="ln" id="L891">        std::fs::<span class="tok-fn">write</span>(</span>
+<span class="ln" id="L892">            &amp;path,</span>
+<span class="ln" id="L893">            format!(</span>
+<span class="ln" id="L894">                <span class="tok-str">&quot;#!/bin/sh\ncat &gt; /dev/null\nfor last; do :; done\nlast=\&quot;${{last#file:}}\&quot;\n{script}\n&quot;</span></span>
+<span class="ln" id="L895">            ),</span>
+<span class="ln" id="L896">        )</span>
+<span class="ln" id="L897">        .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L898">        std::fs::<span class="tok-fn">set_permissions</span>(&amp;path, std::fs::Permissions::<span class="tok-fn">from_mode</span>(0o755)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L899">        path</span>
+<span class="ln" id="L900">    }</span>
+<span class="ln" id="L901"></span>
+<span class="ln" id="L902">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L903">    <span class="tok-kw">fn</span> <span class="tok-fn">small_video</span>() -&gt; Choice {</span>
+<span class="ln" id="L904">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> choice = Choice::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L905">        choice.export.plan.size = veilvoice_video::size::Preset::Hd720.<span class="tok-fn">size</span>();</span>
+<span class="ln" id="L906">        choice</span>
+<span class="ln" id="L907">    }</span>
+<span class="ln" id="L908"></span>
+<span class="ln" id="L909">    <span class="tok-com">/// Only the export&#x27;s own folder and the finished file are left behind.</span></span>
+<span class="ln" id="L910">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L911">    <span class="tok-kw">fn</span> <span class="tok-fn">leftovers</span>(dir: &amp;Path) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L912">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> names: Vec&lt;String&gt; = std::fs::<span class="tok-fn">read_dir</span>(dir)</span>
+<span class="ln" id="L913">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L914">            .<span class="tok-fn">map</span>(|e| e.<span class="tok-fn">unwrap</span>().<span class="tok-fn">file_name</span>().<span class="tok-fn">to_string_lossy</span>().<span class="tok-fn">into_owned</span>())</span>
+<span class="ln" id="L915">            .<span class="tok-fn">filter</span>(|n| n != <span class="tok-str">&quot;vault&quot;</span> &amp;&amp; n != <span class="tok-str">&quot;tools&quot;</span>)</span>
+<span class="ln" id="L916">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L917">        names.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L918">        names</span>
+<span class="ln" id="L919">    }</span>
+<span class="ln" id="L920"></span>
+<span class="ln" id="L921">    <span class="tok-com">/// A render is placed, owner-only, the frames counted, and nothing else</span></span>
+<span class="ln" id="L922">    <span class="tok-com">/// is left in the folder.</span></span>
+<span class="ln" id="L923">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L924">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L925">    <span class="tok-kw">fn</span> <span class="tok-fn">a_render_lands_owner_only_and_leaves_nothing_else</span>() {</span>
+<span class="ln" id="L926">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L927">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
+<span class="ln" id="L928">        <span class="tok-kw">let</span> tools = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tools&quot;</span>);</span>
+<span class="ln" id="L929">        std::fs::<span class="tok-fn">create_dir</span>(&amp;tools).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L930">        <span class="tok-kw">let</span> ffmpeg = <span class="tok-fn">fake_ffmpeg</span>(&amp;tools, <span class="tok-str">&quot;umask 022; printf made &gt; \&quot;$last\&quot;&quot;</span>);</span>
+<span class="ln" id="L931">        <span class="tok-kw">let</span> reach = Arc::<span class="tok-fn">new</span>(<span class="tok-kw">crate</span>::progress::Reach::<span class="tok-fn">counting</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L932">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> job = <span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">small_video</span>());</span>
+<span class="ln" id="L933">        job.reach = Arc::<span class="tok-fn">clone</span>(&amp;reach);</span>
+<span class="ln" id="L934">        <span class="tok-kw">let</span> (said, outcome) = <span class="tok-fn">run_with</span>(job, || <span class="tok-fn">Some</span>(ffmpeg));</span>
+<span class="ln" id="L935">        assert_eq!(outcome, Outcome::Good, <span class="tok-str">&quot;{said}&quot;</span>);</span>
+<span class="ln" id="L936">        <span class="tok-kw">let</span> output = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.mp4&quot;</span>);</span>
+<span class="ln" id="L937">        assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;output).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;made&quot;</span>);</span>
+<span class="ln" id="L938">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;output).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
+<span class="ln" id="L939">        assert_eq!(mode, 0o600, <span class="tok-str">&quot;the export is readable by others: {mode:o}&quot;</span>);</span>
+<span class="ln" id="L940">        assert!(reach.<span class="tok-fn">total</span>() &gt; <span class="tok-num">0</span> &amp;&amp; reach.<span class="tok-fn">done</span>() == reach.<span class="tok-fn">total</span>());</span>
+<span class="ln" id="L941">        assert_eq!(<span class="tok-fn">leftovers</span>(dir.<span class="tok-fn">path</span>()), [<span class="tok-str">&quot;take-one.mp4&quot;</span>]);</span>
+<span class="ln" id="L942">    }</span>
+<span class="ln" id="L943"></span>
+<span class="ln" id="L944">    <span class="tok-com">/// A failed render removes only what this run made. A file that turned up</span></span>
+<span class="ln" id="L945">    <span class="tok-com">/// at the destination while it rendered is somebody else&#x27;s and stays.</span></span>
+<span class="ln" id="L946">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L947">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L948">    <span class="tok-kw">fn</span> <span class="tok-fn">a_failed_render_removes_only_its_own_work</span>() {</span>
+<span class="ln" id="L949">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
+<span class="ln" id="L950">        <span class="tok-kw">let</span> tools = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tools&quot;</span>);</span>
+<span class="ln" id="L951">        std::fs::<span class="tok-fn">create_dir</span>(&amp;tools).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L952">        <span class="tok-kw">let</span> ffmpeg = <span class="tok-fn">fake_ffmpeg</span>(</span>
+<span class="ln" id="L953">            &amp;tools,</span>
+<span class="ln" id="L954">            <span class="tok-str">&quot;room=$(dirname \&quot;$last\&quot;); printf theirs &gt; \&quot;$(dirname \&quot;$room\&quot;)/$(basename \&quot;$last\&quot;)\&quot;; \</span></span>
+<span class="ln" id="L955"><span class="tok-str">             echo &#x27;File exists&#x27; &gt;&amp;2; exit 1&quot;</span>,</span>
+<span class="ln" id="L956">        );</span>
+<span class="ln" id="L957">        <span class="tok-kw">let</span> (said, outcome) =</span>
+<span class="ln" id="L958">            <span class="tok-fn">run_with</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">small_video</span>()), || <span class="tok-fn">Some</span>(ffmpeg));</span>
+<span class="ln" id="L959">        assert_eq!(outcome, Outcome::Bad, <span class="tok-str">&quot;{said}&quot;</span>);</span>
+<span class="ln" id="L960">        assert!(said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;File exists&quot;</span>), <span class="tok-str">&quot;{said}&quot;</span>);</span>
+<span class="ln" id="L961">        assert_eq!(</span>
+<span class="ln" id="L962">            std::fs::<span class="tok-fn">read</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.mp4&quot;</span>)).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L963">            b<span class="tok-str">&quot;theirs&quot;</span>,</span>
+<span class="ln" id="L964">            <span class="tok-str">&quot;the failed render deleted a file it did not make&quot;</span></span>
+<span class="ln" id="L965">        );</span>
+<span class="ln" id="L966">        assert_eq!(<span class="tok-fn">leftovers</span>(dir.<span class="tok-fn">path</span>()), [<span class="tok-str">&quot;take-one.mp4&quot;</span>]);</span>
+<span class="ln" id="L967">    }</span>
+<span class="ln" id="L968"></span>
+<span class="ln" id="L969">    <span class="tok-com">/// A link planted where the file is going is not followed, whether it</span></span>
+<span class="ln" id="L970">    <span class="tok-com">/// points at something or at nothing.</span></span>
+<span class="ln" id="L971">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L972">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L973">    <span class="tok-kw">fn</span> <span class="tok-fn">a_link_at_the_destination_is_not_followed</span>() {</span>
+<span class="ln" id="L974">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
+<span class="ln" id="L975">        <span class="tok-kw">let</span> tools = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tools&quot;</span>);</span>
+<span class="ln" id="L976">        std::fs::<span class="tok-fn">create_dir</span>(&amp;tools).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L977">        <span class="tok-kw">let</span> victim = tools.<span class="tok-fn">join</span>(<span class="tok-str">&quot;victim&quot;</span>);</span>
+<span class="ln" id="L978">        std::fs::<span class="tok-fn">write</span>(&amp;victim, b<span class="tok-str">&quot;precious&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L979">        <span class="tok-kw">let</span> ffmpeg = <span class="tok-fn">fake_ffmpeg</span>(&amp;tools, <span class="tok-str">&quot;printf made &gt; \&quot;$last\&quot;&quot;</span>);</span>
+<span class="ln" id="L980"></span>
+<span class="ln" id="L981">        <span class="tok-kw">for</span> (choice, name) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L982">            (<span class="tok-fn">wav_only</span>(), <span class="tok-str">&quot;take-one.wav&quot;</span>),</span>
+<span class="ln" id="L983">            (<span class="tok-fn">small_video</span>(), <span class="tok-str">&quot;take-one.mp4&quot;</span>),</span>
+<span class="ln" id="L984">        ] {</span>
+<span class="ln" id="L985">            <span class="tok-kw">for</span> target <span class="tok-kw">in</span> [victim.<span class="tok-fn">clone</span>(), tools.<span class="tok-fn">join</span>(<span class="tok-str">&quot;nothing-here&quot;</span>)] {</span>
+<span class="ln" id="L986">                <span class="tok-kw">let</span> link = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L987">                std::os::unix::fs::<span class="tok-fn">symlink</span>(&amp;target, &amp;link).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L988">                <span class="tok-kw">let</span> program = ffmpeg.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L989">                <span class="tok-kw">let</span> (said, outcome) =</span>
+<span class="ln" id="L990">                    <span class="tok-fn">run_with</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), choice.<span class="tok-fn">clone</span>()), || {</span>
+<span class="ln" id="L991">                        <span class="tok-fn">Some</span>(program)</span>
+<span class="ln" id="L992">                    });</span>
+<span class="ln" id="L993">                assert_eq!(</span>
+<span class="ln" id="L994">                    outcome,</span>
+<span class="ln" id="L995">                    Outcome::Warn,</span>
+<span class="ln" id="L996">                    <span class="tok-str">&quot;{name} -&gt; {}: {said}&quot;</span>,</span>
+<span class="ln" id="L997">                    target.<span class="tok-fn">display</span>()</span>
 <span class="ln" id="L998">                );</span>
-<span class="ln" id="L999">                std::fs::<span class="tok-fn">remove_file</span>(&amp;link).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1000">            }</span>
-<span class="ln" id="L1001">        }</span>
-<span class="ln" id="L1002">        assert!(</span>
-<span class="ln" id="L1003">            <span class="tok-fn">leftovers</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1004">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
-<span class="ln" id="L1005">            <span class="tok-fn">leftovers</span>(dir.<span class="tok-fn">path</span>())</span>
-<span class="ln" id="L1006">        );</span>
-<span class="ln" id="L1007">    }</span>
-<span class="ln" id="L1008"></span>
-<span class="ln" id="L1009">    <span class="tok-com">/// The thumbnails are drawn again when the look changes, not only when</span></span>
-<span class="ln" id="L1010">    <span class="tok-com">/// the template does, and one batch runs at a time.</span></span>
-<span class="ln" id="L1011">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1012">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_look_redraws_the_thumbnails</span>() {</span>
-<span class="ln" id="L1013">        <span class="tok-kw">let</span> (_dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
-<span class="ln" id="L1014">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1015">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> thumbs = Thumbs::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1016">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> look = Motion::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1017">        <span class="tok-kw">let</span> ids = vec![id.<span class="tok-fn">clone</span>()];</span>
-<span class="ln" id="L1018">        thumbs.<span class="tok-fn">ask</span>(&amp;ctx, &amp;vault, &amp;ids, &amp;look);</span>
-<span class="ln" id="L1019">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">30</span>);</span>
-<span class="ln" id="L1020">        while thumbs.arriving.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L1021">            thumbs.<span class="tok-fn">poll</span>(&amp;ctx);</span>
-<span class="ln" id="L1022">            assert!(</span>
-<span class="ln" id="L1023">                std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline,</span>
-<span class="ln" id="L1024">                <span class="tok-str">&quot;the picture never came&quot;</span></span>
-<span class="ln" id="L1025">            );</span>
-<span class="ln" id="L1026">        }</span>
-<span class="ln" id="L1027">        assert!(thumbs.<span class="tok-fn">get</span>(&amp;id).<span class="tok-fn">is_some</span>());</span>
-<span class="ln" id="L1028"></span>
-<span class="ln" id="L1029">        thumbs.<span class="tok-fn">ask</span>(&amp;ctx, &amp;vault, &amp;ids, &amp;look);</span>
-<span class="ln" id="L1030">        assert!(thumbs.arriving.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;the same look was drawn twice&quot;</span>);</span>
-<span class="ln" id="L1031"></span>
-<span class="ln" id="L1032">        look.response *= <span class="tok-num">2.0</span>;</span>
-<span class="ln" id="L1033">        thumbs.<span class="tok-fn">ask</span>(&amp;ctx, &amp;vault, &amp;ids, &amp;look);</span>
-<span class="ln" id="L1034">        assert!(thumbs.arriving.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;a new look did not redraw&quot;</span>);</span>
-<span class="ln" id="L1035">        assert!(</span>
-<span class="ln" id="L1036">            thumbs.<span class="tok-fn">get</span>(&amp;id).<span class="tok-fn">is_some</span>(),</span>
-<span class="ln" id="L1037">            <span class="tok-str">&quot;the old picture went before the new one came&quot;</span></span>
-<span class="ln" id="L1038">        );</span>
-<span class="ln" id="L1039">        look.response *= <span class="tok-num">2.0</span>;</span>
-<span class="ln" id="L1040">        <span class="tok-kw">let</span> before = thumbs.drawn_with;</span>
-<span class="ln" id="L1041">        thumbs.<span class="tok-fn">ask</span>(&amp;ctx, &amp;vault, &amp;ids, &amp;look);</span>
-<span class="ln" id="L1042">        assert_eq!(</span>
-<span class="ln" id="L1043">            thumbs.drawn_with, before,</span>
-<span class="ln" id="L1044">            <span class="tok-str">&quot;a second batch started over the first&quot;</span></span>
-<span class="ln" id="L1045">        );</span>
-<span class="ln" id="L1046">    }</span>
-<span class="ln" id="L1047"></span>
-<span class="ln" id="L1048">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1049">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_is_the_default_theme_and_a_valid_export</span>() {</span>
-<span class="ln" id="L1050">        <span class="tok-kw">let</span> choice = Choice::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1051">        assert_eq!(choice.template, veilvoice_video::palette::DEFAULT_ID);</span>
-<span class="ln" id="L1052">        assert!(choice.export.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L1053">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = choice.<span class="tok-fn">clone</span>();</span>
-<span class="ln" id="L1054">        changed.<span class="tok-fn">use_template</span>(<span class="tok-str">&quot;neon&quot;</span>);</span>
-<span class="ln" id="L1055">        assert_eq!(changed.template, <span class="tok-str">&quot;neon&quot;</span>);</span>
-<span class="ln" id="L1056">        assert_eq!(</span>
-<span class="ln" id="L1057">            changed.export, choice.export,</span>
-<span class="ln" id="L1058">            <span class="tok-str">&quot;a template changes the look only&quot;</span></span>
-<span class="ln" id="L1059">        );</span>
-<span class="ln" id="L1060">        changed.<span class="tok-fn">use_template</span>(<span class="tok-str">&quot;no-such-template&quot;</span>);</span>
-<span class="ln" id="L1061">        assert_eq!(changed.template, <span class="tok-str">&quot;neon&quot;</span>);</span>
-<span class="ln" id="L1062">    }</span>
-<span class="ln" id="L1063"></span>
-<span class="ln" id="L1064">    <span class="tok-kw">fn</span> <span class="tok-fn">vault_with</span>(samples: &amp;[i16]) -&gt; (tempfile::TempDir, Arc&lt;Vault&gt;, String) {</span>
-<span class="ln" id="L1065">        <span class="tok-kw">use</span> veilvoice_crypto::studio::StudioKey;</span>
-<span class="ln" id="L1066">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1067">        <span class="tok-kw">let</span> secret = |b: &amp;[u8]| {</span>
-<span class="ln" id="L1068">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> copy = b.<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L1069">            veilvoice_crypto::Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> copy)</span>
-<span class="ln" id="L1070">        };</span>
-<span class="ln" id="L1071">        <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1072">        <span class="tok-kw">let</span> vault = Vault::<span class="tok-fn">open</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;vault&quot;</span>), key).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1073">        <span class="tok-kw">let</span> id = vault</span>
-<span class="ln" id="L1074">            .<span class="tok-fn">store</span>(<span class="tok-str">&quot;take one&quot;</span>, <span class="tok-num">1_700_000_000</span>, &amp;<span class="tok-fn">wav</span>(samples, <span class="tok-num">1</span>, <span class="tok-num">8_000</span>))</span>
-<span class="ln" id="L1075">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L1076">            .id;</span>
-<span class="ln" id="L1077">        (dir, Arc::<span class="tok-fn">new</span>(vault), id)</span>
-<span class="ln" id="L1078">    }</span>
-<span class="ln" id="L1079"></span>
-<span class="ln" id="L1080">    <span class="tok-kw">fn</span> <span class="tok-fn">job</span>(vault: &amp;Arc&lt;Vault&gt;, id: &amp;str, into: &amp;Path, choice: Choice) -&gt; Job {</span>
-<span class="ln" id="L1081">        Job {</span>
-<span class="ln" id="L1082">            vault: Arc::<span class="tok-fn">clone</span>(vault),</span>
-<span class="ln" id="L1083">            id: id.<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L1084">            name: <span class="tok-str">&quot;take one&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L1085">            choice,</span>
-<span class="ln" id="L1086">            into: into.<span class="tok-fn">to_path_buf</span>(),</span>
-<span class="ln" id="L1087">            reach: Arc::<span class="tok-fn">new</span>(<span class="tok-kw">crate</span>::progress::Reach::<span class="tok-fn">counting</span>(<span class="tok-num">0</span>)),</span>
-<span class="ln" id="L1088">        }</span>
-<span class="ln" id="L1089">    }</span>
-<span class="ln" id="L1090"></span>
-<span class="ln" id="L1091">    <span class="tok-kw">fn</span> <span class="tok-fn">wav_only</span>() -&gt; Choice {</span>
-<span class="ln" id="L1092">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> choice = Choice::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1093">        choice.export.content = Content::Audio;</span>
-<span class="ln" id="L1094">        choice.export.audio_file = veilvoice_video::export::AudioFile::Wav;</span>
-<span class="ln" id="L1095">        choice</span>
-<span class="ln" id="L1096">    }</span>
-<span class="ln" id="L1097"></span>
-<span class="ln" id="L1098">    <span class="tok-com">/// The sound alone as a WAV needs no ffmpeg, and is the stored bytes.</span></span>
-<span class="ln" id="L1099">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1100">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wav_on_its_own_is_the_recording_bit_for_bit</span>() {</span>
-<span class="ln" id="L1101">        <span class="tok-kw">let</span> samples: Vec&lt;i16&gt; = (<span class="tok-num">0</span>..<span class="tok-num">800</span>).<span class="tok-fn">map</span>(|i| (i * <span class="tok-num">37</span> % <span class="tok-num">2000</span>) <span class="tok-kw">as</span> i16).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1102">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;samples);</span>
-<span class="ln" id="L1103">        <span class="tok-kw">let</span> (said, outcome) = <span class="tok-fn">run</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">wav_only</span>()));</span>
-<span class="ln" id="L1104">        assert_eq!(outcome, Outcome::Good, <span class="tok-str">&quot;{said}&quot;</span>);</span>
-<span class="ln" id="L1105">        <span class="tok-kw">let</span> written = std::fs::<span class="tok-fn">read</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.wav&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1106">        assert_eq!(written, <span class="tok-fn">wav</span>(&amp;samples, <span class="tok-num">1</span>, <span class="tok-num">8_000</span>));</span>
-<span class="ln" id="L1107">    }</span>
-<span class="ln" id="L1108"></span>
-<span class="ln" id="L1109">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1110">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_is_written_over</span>() {</span>
-<span class="ln" id="L1111">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">0</span>; <span class="tok-num">80</span>]);</span>
-<span class="ln" id="L1112">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.wav&quot;</span>), b<span class="tok-str">&quot;somebody&#x27;s file&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1113">        <span class="tok-kw">let</span> (said, outcome) = <span class="tok-fn">run</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">wav_only</span>()));</span>
-<span class="ln" id="L1114">        assert_eq!(outcome, Outcome::Warn, <span class="tok-str">&quot;{said}&quot;</span>);</span>
-<span class="ln" id="L1115">        assert_eq!(</span>
-<span class="ln" id="L1116">            std::fs::<span class="tok-fn">read</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.wav&quot;</span>)).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L1117">            b<span class="tok-str">&quot;somebody&#x27;s file&quot;</span></span>
-<span class="ln" id="L1118">        );</span>
-<span class="ln" id="L1119">    }</span>
-<span class="ln" id="L1120"></span>
-<span class="ln" id="L1121">    <span class="tok-com">/// The render lets go of the vault before it does anything else.</span></span>
-<span class="ln" id="L1122">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1123">    <span class="tok-kw">fn</span> <span class="tok-fn">the_render_does_not_keep_the_vault</span>() {</span>
-<span class="ln" id="L1124">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">0</span>; <span class="tok-num">80</span>]);</span>
-<span class="ln" id="L1125">        <span class="tok-kw">let</span> _ = <span class="tok-fn">run</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">wav_only</span>()));</span>
-<span class="ln" id="L1126">        assert_eq!(Arc::<span class="tok-fn">strong_count</span>(&amp;vault), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L1127">    }</span>
-<span class="ln" id="L1128"></span>
-<span class="ln" id="L1129">    <span class="tok-com">/// A shut vault stops the thumbnails: the worker holds a weak reference</span></span>
-<span class="ln" id="L1130">    <span class="tok-com">/// and nothing it draws outlives the vault.</span></span>
-<span class="ln" id="L1131">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1132">    <span class="tok-kw">fn</span> <span class="tok-fn">thumbnails_stop_when_the_vault_is_shut</span>() {</span>
-<span class="ln" id="L1133">        <span class="tok-kw">let</span> (_dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
-<span class="ln" id="L1134">        <span class="tok-kw">let</span> weak = Arc::<span class="tok-fn">downgrade</span>(&amp;vault);</span>
-<span class="ln" id="L1135">        <span class="tok-fn">drop</span>(vault);</span>
-<span class="ln" id="L1136">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L1137">        <span class="tok-fn">draw_thumbnails</span>(</span>
-<span class="ln" id="L1138">            weak,</span>
-<span class="ln" id="L1139">            vec![id],</span>
-<span class="ln" id="L1140">            Motion::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1141">            tx,</span>
-<span class="ln" id="L1142">            egui::Context::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1143">        );</span>
-<span class="ln" id="L1144">        assert!(rx.<span class="tok-fn">try_recv</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;nothing drawn from a shut vault&quot;</span>);</span>
-<span class="ln" id="L1145">    }</span>
-<span class="ln" id="L1146"></span>
-<span class="ln" id="L1147">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1148">    <span class="tok-kw">fn</span> <span class="tok-fn">a_thumbnail_is_drawn_for_an_open_vault_at_the_promised_size</span>() {</span>
-<span class="ln" id="L1149">        <span class="tok-kw">let</span> (_dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
-<span class="ln" id="L1150">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
-<span class="ln" id="L1151">        <span class="tok-fn">draw_thumbnails</span>(</span>
-<span class="ln" id="L1152">            Arc::<span class="tok-fn">downgrade</span>(&amp;vault),</span>
-<span class="ln" id="L1153">            vec![id.<span class="tok-fn">clone</span>()],</span>
-<span class="ln" id="L1154">            Motion::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1155">            tx,</span>
-<span class="ln" id="L1156">            egui::Context::<span class="tok-fn">default</span>(),</span>
-<span class="ln" id="L1157">        );</span>
-<span class="ln" id="L1158">        <span class="tok-kw">let</span> (got, rgb) = rx.<span class="tok-fn">try_recv</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1159">        assert_eq!(got, id);</span>
-<span class="ln" id="L1160">        assert_eq!(rgb.<span class="tok-fn">len</span>(), THUMB_WIDTH * THUMB_HEIGHT * <span class="tok-num">3</span>);</span>
-<span class="ln" id="L1161">        assert_eq!(Arc::<span class="tok-fn">strong_count</span>(&amp;vault), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L1162">    }</span>
-<span class="ln" id="L1163">}</span>
+<span class="ln" id="L999">                assert_eq!(std::fs::<span class="tok-fn">read</span>(&amp;victim).<span class="tok-fn">unwrap</span>(), b<span class="tok-str">&quot;precious&quot;</span>);</span>
+<span class="ln" id="L1000">                assert!(</span>
+<span class="ln" id="L1001">                    !tools.<span class="tok-fn">join</span>(<span class="tok-str">&quot;nothing-here&quot;</span>).<span class="tok-fn">exists</span>(),</span>
+<span class="ln" id="L1002">                    <span class="tok-str">&quot;a dangling link was followed&quot;</span></span>
+<span class="ln" id="L1003">                );</span>
+<span class="ln" id="L1004">                std::fs::<span class="tok-fn">remove_file</span>(&amp;link).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1005">            }</span>
+<span class="ln" id="L1006">        }</span>
+<span class="ln" id="L1007">        assert!(</span>
+<span class="ln" id="L1008">            <span class="tok-fn">leftovers</span>(dir.<span class="tok-fn">path</span>()).<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1009">            <span class="tok-str">&quot;{:?}&quot;</span>,</span>
+<span class="ln" id="L1010">            <span class="tok-fn">leftovers</span>(dir.<span class="tok-fn">path</span>())</span>
+<span class="ln" id="L1011">        );</span>
+<span class="ln" id="L1012">    }</span>
+<span class="ln" id="L1013"></span>
+<span class="ln" id="L1014">    <span class="tok-com">/// The thumbnails are drawn again when the look changes, not only when</span></span>
+<span class="ln" id="L1015">    <span class="tok-com">/// the template does, and one batch runs at a time.</span></span>
+<span class="ln" id="L1016">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1017">    <span class="tok-kw">fn</span> <span class="tok-fn">a_new_look_redraws_the_thumbnails</span>() {</span>
+<span class="ln" id="L1018">        <span class="tok-kw">let</span> (_dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
+<span class="ln" id="L1019">        <span class="tok-kw">let</span> ctx = egui::Context::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1020">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> thumbs = Thumbs::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1021">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> look = Motion::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1022">        <span class="tok-kw">let</span> ids = vec![id.<span class="tok-fn">clone</span>()];</span>
+<span class="ln" id="L1023">        thumbs.<span class="tok-fn">ask</span>(&amp;ctx, &amp;vault, &amp;ids, &amp;look);</span>
+<span class="ln" id="L1024">        <span class="tok-kw">let</span> deadline = std::time::Instant::<span class="tok-fn">now</span>() + std::time::Duration::<span class="tok-fn">from_secs</span>(<span class="tok-num">30</span>);</span>
+<span class="ln" id="L1025">        while thumbs.arriving.<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L1026">            thumbs.<span class="tok-fn">poll</span>(&amp;ctx);</span>
+<span class="ln" id="L1027">            assert!(</span>
+<span class="ln" id="L1028">                std::time::Instant::<span class="tok-fn">now</span>() &lt; deadline,</span>
+<span class="ln" id="L1029">                <span class="tok-str">&quot;the picture never came&quot;</span></span>
+<span class="ln" id="L1030">            );</span>
+<span class="ln" id="L1031">        }</span>
+<span class="ln" id="L1032">        assert!(thumbs.<span class="tok-fn">get</span>(&amp;id).<span class="tok-fn">is_some</span>());</span>
+<span class="ln" id="L1033"></span>
+<span class="ln" id="L1034">        thumbs.<span class="tok-fn">ask</span>(&amp;ctx, &amp;vault, &amp;ids, &amp;look);</span>
+<span class="ln" id="L1035">        assert!(thumbs.arriving.<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;the same look was drawn twice&quot;</span>);</span>
+<span class="ln" id="L1036"></span>
+<span class="ln" id="L1037">        look.response *= <span class="tok-num">2.0</span>;</span>
+<span class="ln" id="L1038">        thumbs.<span class="tok-fn">ask</span>(&amp;ctx, &amp;vault, &amp;ids, &amp;look);</span>
+<span class="ln" id="L1039">        assert!(thumbs.arriving.<span class="tok-fn">is_some</span>(), <span class="tok-str">&quot;a new look did not redraw&quot;</span>);</span>
+<span class="ln" id="L1040">        assert!(</span>
+<span class="ln" id="L1041">            thumbs.<span class="tok-fn">get</span>(&amp;id).<span class="tok-fn">is_some</span>(),</span>
+<span class="ln" id="L1042">            <span class="tok-str">&quot;the old picture went before the new one came&quot;</span></span>
+<span class="ln" id="L1043">        );</span>
+<span class="ln" id="L1044">        look.response *= <span class="tok-num">2.0</span>;</span>
+<span class="ln" id="L1045">        <span class="tok-kw">let</span> before = thumbs.drawn_with;</span>
+<span class="ln" id="L1046">        thumbs.<span class="tok-fn">ask</span>(&amp;ctx, &amp;vault, &amp;ids, &amp;look);</span>
+<span class="ln" id="L1047">        assert_eq!(</span>
+<span class="ln" id="L1048">            thumbs.drawn_with, before,</span>
+<span class="ln" id="L1049">            <span class="tok-str">&quot;a second batch started over the first&quot;</span></span>
+<span class="ln" id="L1050">        );</span>
+<span class="ln" id="L1051">    }</span>
+<span class="ln" id="L1052"></span>
+<span class="ln" id="L1053">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1054">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_is_the_default_theme_and_a_valid_export</span>() {</span>
+<span class="ln" id="L1055">        <span class="tok-kw">let</span> choice = Choice::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1056">        assert_eq!(choice.template, veilvoice_video::palette::DEFAULT_ID);</span>
+<span class="ln" id="L1057">        assert!(choice.export.<span class="tok-fn">checked</span>().<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L1058">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> changed = choice.<span class="tok-fn">clone</span>();</span>
+<span class="ln" id="L1059">        changed.<span class="tok-fn">use_template</span>(<span class="tok-str">&quot;neon&quot;</span>);</span>
+<span class="ln" id="L1060">        assert_eq!(changed.template, <span class="tok-str">&quot;neon&quot;</span>);</span>
+<span class="ln" id="L1061">        assert_eq!(</span>
+<span class="ln" id="L1062">            changed.export, choice.export,</span>
+<span class="ln" id="L1063">            <span class="tok-str">&quot;a template changes the look only&quot;</span></span>
+<span class="ln" id="L1064">        );</span>
+<span class="ln" id="L1065">        changed.<span class="tok-fn">use_template</span>(<span class="tok-str">&quot;no-such-template&quot;</span>);</span>
+<span class="ln" id="L1066">        assert_eq!(changed.template, <span class="tok-str">&quot;neon&quot;</span>);</span>
+<span class="ln" id="L1067">    }</span>
+<span class="ln" id="L1068"></span>
+<span class="ln" id="L1069">    <span class="tok-kw">fn</span> <span class="tok-fn">vault_with</span>(samples: &amp;[i16]) -&gt; (tempfile::TempDir, Arc&lt;Vault&gt;, String) {</span>
+<span class="ln" id="L1070">        <span class="tok-kw">use</span> veilvoice_crypto::studio::StudioKey;</span>
+<span class="ln" id="L1071">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1072">        <span class="tok-kw">let</span> secret = |b: &amp;[u8]| {</span>
+<span class="ln" id="L1073">            <span class="tok-kw">let</span> <span class="tok-kw">mut</span> copy = b.<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L1074">            veilvoice_crypto::Secret::<span class="tok-fn">new</span>(&amp;<span class="tok-kw">mut</span> copy)</span>
+<span class="ln" id="L1075">        };</span>
+<span class="ln" id="L1076">        <span class="tok-kw">let</span> key = StudioKey::<span class="tok-fn">derive</span>(&amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;app-lock&quot;</span>), &amp;<span class="tok-fn">secret</span>(b<span class="tok-str">&quot;at-rest&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1077">        <span class="tok-kw">let</span> vault = Vault::<span class="tok-fn">open</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;vault&quot;</span>), key).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1078">        <span class="tok-kw">let</span> id = vault</span>
+<span class="ln" id="L1079">            .<span class="tok-fn">store</span>(<span class="tok-str">&quot;take one&quot;</span>, <span class="tok-num">1_700_000_000</span>, &amp;<span class="tok-fn">wav</span>(samples, <span class="tok-num">1</span>, <span class="tok-num">8_000</span>))</span>
+<span class="ln" id="L1080">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L1081">            .id;</span>
+<span class="ln" id="L1082">        (dir, Arc::<span class="tok-fn">new</span>(vault), id)</span>
+<span class="ln" id="L1083">    }</span>
+<span class="ln" id="L1084"></span>
+<span class="ln" id="L1085">    <span class="tok-kw">fn</span> <span class="tok-fn">job</span>(vault: &amp;Arc&lt;Vault&gt;, id: &amp;str, into: &amp;Path, choice: Choice) -&gt; Job {</span>
+<span class="ln" id="L1086">        Job {</span>
+<span class="ln" id="L1087">            vault: Arc::<span class="tok-fn">clone</span>(vault),</span>
+<span class="ln" id="L1088">            id: id.<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L1089">            name: <span class="tok-str">&quot;take one&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L1090">            choice,</span>
+<span class="ln" id="L1091">            into: into.<span class="tok-fn">to_path_buf</span>(),</span>
+<span class="ln" id="L1092">            reach: Arc::<span class="tok-fn">new</span>(<span class="tok-kw">crate</span>::progress::Reach::<span class="tok-fn">counting</span>(<span class="tok-num">0</span>)),</span>
+<span class="ln" id="L1093">        }</span>
+<span class="ln" id="L1094">    }</span>
+<span class="ln" id="L1095"></span>
+<span class="ln" id="L1096">    <span class="tok-kw">fn</span> <span class="tok-fn">wav_only</span>() -&gt; Choice {</span>
+<span class="ln" id="L1097">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> choice = Choice::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1098">        choice.export.content = Content::Audio;</span>
+<span class="ln" id="L1099">        choice.export.audio_file = veilvoice_video::export::AudioFile::Wav;</span>
+<span class="ln" id="L1100">        choice</span>
+<span class="ln" id="L1101">    }</span>
+<span class="ln" id="L1102"></span>
+<span class="ln" id="L1103">    <span class="tok-com">/// The sound alone as a WAV needs no ffmpeg, and is the stored bytes.</span></span>
+<span class="ln" id="L1104">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1105">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wav_on_its_own_is_the_recording_bit_for_bit</span>() {</span>
+<span class="ln" id="L1106">        <span class="tok-kw">let</span> samples: Vec&lt;i16&gt; = (<span class="tok-num">0</span>..<span class="tok-num">800</span>).<span class="tok-fn">map</span>(|i| (i * <span class="tok-num">37</span> % <span class="tok-num">2000</span>) <span class="tok-kw">as</span> i16).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1107">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;samples);</span>
+<span class="ln" id="L1108">        <span class="tok-kw">let</span> (said, outcome) = <span class="tok-fn">run</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">wav_only</span>()));</span>
+<span class="ln" id="L1109">        assert_eq!(outcome, Outcome::Good, <span class="tok-str">&quot;{said}&quot;</span>);</span>
+<span class="ln" id="L1110">        <span class="tok-kw">let</span> written = std::fs::<span class="tok-fn">read</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.wav&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1111">        assert_eq!(written, <span class="tok-fn">wav</span>(&amp;samples, <span class="tok-num">1</span>, <span class="tok-num">8_000</span>));</span>
+<span class="ln" id="L1112">    }</span>
+<span class="ln" id="L1113"></span>
+<span class="ln" id="L1114">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1115">    <span class="tok-kw">fn</span> <span class="tok-fn">nothing_is_written_over</span>() {</span>
+<span class="ln" id="L1116">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">0</span>; <span class="tok-num">80</span>]);</span>
+<span class="ln" id="L1117">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.wav&quot;</span>), b<span class="tok-str">&quot;somebody&#x27;s file&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1118">        <span class="tok-kw">let</span> (said, outcome) = <span class="tok-fn">run</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">wav_only</span>()));</span>
+<span class="ln" id="L1119">        assert_eq!(outcome, Outcome::Warn, <span class="tok-str">&quot;{said}&quot;</span>);</span>
+<span class="ln" id="L1120">        assert_eq!(</span>
+<span class="ln" id="L1121">            std::fs::<span class="tok-fn">read</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;take-one.wav&quot;</span>)).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L1122">            b<span class="tok-str">&quot;somebody&#x27;s file&quot;</span></span>
+<span class="ln" id="L1123">        );</span>
+<span class="ln" id="L1124">    }</span>
+<span class="ln" id="L1125"></span>
+<span class="ln" id="L1126">    <span class="tok-com">/// The render lets go of the vault before it does anything else.</span></span>
+<span class="ln" id="L1127">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1128">    <span class="tok-kw">fn</span> <span class="tok-fn">the_render_does_not_keep_the_vault</span>() {</span>
+<span class="ln" id="L1129">        <span class="tok-kw">let</span> (dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">0</span>; <span class="tok-num">80</span>]);</span>
+<span class="ln" id="L1130">        <span class="tok-kw">let</span> _ = <span class="tok-fn">run</span>(<span class="tok-fn">job</span>(&amp;vault, &amp;id, dir.<span class="tok-fn">path</span>(), <span class="tok-fn">wav_only</span>()));</span>
+<span class="ln" id="L1131">        assert_eq!(Arc::<span class="tok-fn">strong_count</span>(&amp;vault), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L1132">    }</span>
+<span class="ln" id="L1133"></span>
+<span class="ln" id="L1134">    <span class="tok-com">/// A shut vault stops the thumbnails: the worker holds a weak reference</span></span>
+<span class="ln" id="L1135">    <span class="tok-com">/// and nothing it draws outlives the vault.</span></span>
+<span class="ln" id="L1136">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1137">    <span class="tok-kw">fn</span> <span class="tok-fn">thumbnails_stop_when_the_vault_is_shut</span>() {</span>
+<span class="ln" id="L1138">        <span class="tok-kw">let</span> (_dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
+<span class="ln" id="L1139">        <span class="tok-kw">let</span> weak = Arc::<span class="tok-fn">downgrade</span>(&amp;vault);</span>
+<span class="ln" id="L1140">        <span class="tok-fn">drop</span>(vault);</span>
+<span class="ln" id="L1141">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L1142">        <span class="tok-fn">draw_thumbnails</span>(</span>
+<span class="ln" id="L1143">            weak,</span>
+<span class="ln" id="L1144">            vec![id],</span>
+<span class="ln" id="L1145">            Motion::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1146">            tx,</span>
+<span class="ln" id="L1147">            egui::Context::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1148">        );</span>
+<span class="ln" id="L1149">        assert!(rx.<span class="tok-fn">try_recv</span>().<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;nothing drawn from a shut vault&quot;</span>);</span>
+<span class="ln" id="L1150">    }</span>
+<span class="ln" id="L1151"></span>
+<span class="ln" id="L1152">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1153">    <span class="tok-kw">fn</span> <span class="tok-fn">a_thumbnail_is_drawn_for_an_open_vault_at_the_promised_size</span>() {</span>
+<span class="ln" id="L1154">        <span class="tok-kw">let</span> (_dir, vault, id) = <span class="tok-fn">vault_with</span>(&amp;[<span class="tok-num">1000</span>; <span class="tok-num">800</span>]);</span>
+<span class="ln" id="L1155">        <span class="tok-kw">let</span> (tx, rx) = mpsc::<span class="tok-fn">channel</span>();</span>
+<span class="ln" id="L1156">        <span class="tok-fn">draw_thumbnails</span>(</span>
+<span class="ln" id="L1157">            Arc::<span class="tok-fn">downgrade</span>(&amp;vault),</span>
+<span class="ln" id="L1158">            vec![id.<span class="tok-fn">clone</span>()],</span>
+<span class="ln" id="L1159">            Motion::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1160">            tx,</span>
+<span class="ln" id="L1161">            egui::Context::<span class="tok-fn">default</span>(),</span>
+<span class="ln" id="L1162">        );</span>
+<span class="ln" id="L1163">        <span class="tok-kw">let</span> (got, rgb) = rx.<span class="tok-fn">try_recv</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1164">        assert_eq!(got, id);</span>
+<span class="ln" id="L1165">        assert_eq!(rgb.<span class="tok-fn">len</span>(), THUMB_WIDTH * THUMB_HEIGHT * <span class="tok-num">3</span>);</span>
+<span class="ln" id="L1166">        assert_eq!(Arc::<span class="tok-fn">strong_count</span>(&amp;vault), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L1167">    }</span>
+<span class="ln" id="L1168">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

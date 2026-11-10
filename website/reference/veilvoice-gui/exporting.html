@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-gui/exporting.svg" alt="exporting.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-gui/src/exporting.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1163 lines &middot; <a href="exporting.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-gui.html">veilvoice-gui</a> &middot; 1168 lines &middot; <a href="exporting.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#nothing-here-runs-on-the-thread-that-draws">Nothing here runs on the thread that draws</a>
@@ -90,13 +90,13 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1163 lines defining <strong>23 functions</strong> (10 public), <strong>5 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1168 lines defining <strong>23 functions</strong> (10 public), <strong>5 types</strong> and <strong>3 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Choice</code> <span style="color:var(--muted)">line 55</span> &middot; Everything the person has chosen about an export.</li>
 <li><code>enum Outcome</code> <span style="color:var(--muted)">line 93</span> &middot; How a finished export reads: good, worth a second look, or failed.</li>
 <li><code>struct Job</code> <span style="color:var(--muted)">line 103</span> &middot; Everything one export needs, taken at the moment the folder was chosen.</li>
 <li><code>struct Workroom</code> <span style="color:var(--muted)">line 353</span> &middot; A folder of one export&#x27;s own, beside where its file is going, removed with everything in it when the export is done, however it ended.</li>
-<li><code>struct Thumbs</code> <span style="color:var(--muted)">line 712</span> &middot; A small picture of every recording in the list.</li>
+<li><code>struct Thumbs</code> <span style="color:var(--muted)">line 717</span> &middot; A small picture of every recording in the list.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>Choice::use_template</code> <span style="color:var(--muted)">line 83</span> &middot; Start again from a template, keeping the file settings.
@@ -106,16 +106,16 @@
 <li><code>run</code> <span style="color:var(--muted)">line 200</span> &middot; Do the export.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>run_with</code>, <code>already_there</code>, <code>drop</code>, <code>new</code>, <code>place</code>, <code>render</code>, <code>safe_stem</code>, <code>samples_of</code>, <code>wrote</code>, <code>reserved_on_windows</code></span>
 </li>
-<li><code>form</code> <span style="color:var(--muted)">line 486</span> &middot; The export form, drawn under the recording it is for.
+<li><code>form</code> <span style="color:var(--muted)">line 491</span> &middot; The export form, drawn under the recording it is for.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>look</code>, <code>fill</code></span>
 </li>
-<li><code>Thumbs::get</code> <span style="color:var(--muted)">line 721</span> &middot; The picture for a recording, once it has been drawn.
+<li><code>Thumbs::get</code> <span style="color:var(--muted)">line 726</span> &middot; The picture for a recording, once it has been drawn.
 </li>
-<li><code>Thumbs::clear</code> <span style="color:var(--muted)">line 727</span> &middot; Forget every picture.
+<li><code>Thumbs::clear</code> <span style="color:var(--muted)">line 732</span> &middot; Forget every picture.
 </li>
-<li><code>Thumbs::poll</code> <span style="color:var(--muted)">line 735</span> &middot; Take whatever pictures have arrived.
+<li><code>Thumbs::poll</code> <span style="color:var(--muted)">line 740</span> &middot; Take whatever pictures have arrived.
 </li>
-<li><code>Thumbs::ask</code> <span style="color:var(--muted)">line 761</span> &middot; Draw the pictures nobody has asked for yet, on a worker.
+<li><code>Thumbs::ask</code> <span style="color:var(--muted)">line 766</span> &middot; Draw the pictures nobody has asked for yet, on a worker.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>draw_thumbnails</code>, <code>drop</code>, <code>samples_of</code></span>
 </li>
 </ul>
@@ -208,57 +208,57 @@
 <a href="exporting.src.html#fn-workroom-drop">
 <rect x="472.1" y="420.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="542.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Workroom::drop</text>
-<text x="542.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 389</text>
+<text x="542.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 394</text>
 </a>
 <a href="exporting.src.html#fn-wrote">
 <rect x="159.8" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="206.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">wrote</text>
-<text x="206.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 395</text>
+<text x="206.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 400</text>
 </a>
 <a href="exporting.src.html#fn-render">
 <rect x="278.3" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="324.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">render</text>
-<text x="324.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 405</text>
+<text x="324.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 410</text>
 </a>
 <a href="exporting.src.html#fn-form">
 <rect x="468.1" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="514.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">form</text>
-<text x="514.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 486</text>
+<text x="514.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 491</text>
 </a>
 <a href="exporting.src.html#fn-look">
 <rect x="353.6" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="399.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">look</text>
-<text x="399.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 613</text>
+<text x="399.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 618</text>
 </a>
 <a href="exporting.src.html#fn-fill">
 <rect x="396.7" y="520.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="443.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fill</text>
-<text x="443.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 661</text>
+<text x="443.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 666</text>
 </a>
 <a href="exporting.src.html#fn-thumbs-get">
 <rect x="40.1" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="98.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Thumbs::get</text>
-<text x="98.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 721</text>
+<text x="98.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 726</text>
 </a>
 <a href="exporting.src.html#fn-thumbs-clear">
 <rect x="182.8" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="249.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Thumbs::clear</text>
-<text x="249.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 727</text>
+<text x="249.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 732</text>
 </a>
 <a href="exporting.src.html#fn-thumbs-poll">
 <rect x="341.5" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="403.9" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Thumbs::poll</text>
-<text x="403.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 735</text>
+<text x="403.9" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 740</text>
 </a>
 <a href="exporting.src.html#fn-thumbs-ask">
 <rect x="492.2" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="550.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Thumbs::ask</text>
-<text x="550.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 761</text>
+<text x="550.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 766</text>
 </a>
 <a href="exporting.src.html#fn-draw_thumbnails">
 <rect x="472.1" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="546.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">draw_thumbnails</text>
-<text x="546.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 793</text>
+<text x="546.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 798</text>
 </a>
 <rect x="20.0" y="604.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="613.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -289,17 +289,17 @@ flowchart TD
     n_already_there[&quot;already_there&lt;br/&gt;line 312&quot;]
     n_place[&quot;place&lt;br/&gt;line 330&quot;]
     n_new[&quot;Workroom::new&lt;br/&gt;line 358&quot;]
-    n_drop[&quot;Workroom::drop&lt;br/&gt;line 389&quot;]
-    n_wrote[&quot;wrote&lt;br/&gt;line 395&quot;]
-    n_render[&quot;render&lt;br/&gt;line 405&quot;]
-    n_form([&quot;form&lt;br/&gt;line 486&quot;])
-    n_look[&quot;look&lt;br/&gt;line 613&quot;]
-    n_fill[&quot;fill&lt;br/&gt;line 661&quot;]
-    n_get([&quot;Thumbs::get&lt;br/&gt;line 721&quot;])
-    n_clear([&quot;Thumbs::clear&lt;br/&gt;line 727&quot;])
-    n_poll([&quot;Thumbs::poll&lt;br/&gt;line 735&quot;])
-    n_ask([&quot;Thumbs::ask&lt;br/&gt;line 761&quot;])
-    n_draw_thumbnails[&quot;draw_thumbnails&lt;br/&gt;line 793&quot;]
+    n_drop[&quot;Workroom::drop&lt;br/&gt;line 394&quot;]
+    n_wrote[&quot;wrote&lt;br/&gt;line 400&quot;]
+    n_render[&quot;render&lt;br/&gt;line 410&quot;]
+    n_form([&quot;form&lt;br/&gt;line 491&quot;])
+    n_look[&quot;look&lt;br/&gt;line 618&quot;]
+    n_fill[&quot;fill&lt;br/&gt;line 666&quot;]
+    n_get([&quot;Thumbs::get&lt;br/&gt;line 726&quot;])
+    n_clear([&quot;Thumbs::clear&lt;br/&gt;line 732&quot;])
+    n_poll([&quot;Thumbs::poll&lt;br/&gt;line 740&quot;])
+    n_ask([&quot;Thumbs::ask&lt;br/&gt;line 766&quot;])
+    n_draw_thumbnails[&quot;draw_thumbnails&lt;br/&gt;line 798&quot;]
     n_ask --&gt; n_draw_thumbnails
     n_draw_thumbnails --&gt; n_drop
     n_draw_thumbnails --&gt; n_samples_of
@@ -328,17 +328,17 @@ flowchart TD
     click n_already_there href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L312&quot; &quot;open the source&quot;
     click n_place href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L330&quot; &quot;open the source&quot;
     click n_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L358&quot; &quot;open the source&quot;
-    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L389&quot; &quot;open the source&quot;
-    click n_wrote href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L395&quot; &quot;open the source&quot;
-    click n_render href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L405&quot; &quot;open the source&quot;
-    click n_form href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L486&quot; &quot;open the source&quot;
-    click n_look href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L613&quot; &quot;open the source&quot;
-    click n_fill href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L661&quot; &quot;open the source&quot;
-    click n_get href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L721&quot; &quot;open the source&quot;
-    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L727&quot; &quot;open the source&quot;
-    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L735&quot; &quot;open the source&quot;
-    click n_ask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L761&quot; &quot;open the source&quot;
-    click n_draw_thumbnails href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L793&quot; &quot;open the source&quot;
+    click n_drop href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L394&quot; &quot;open the source&quot;
+    click n_wrote href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L400&quot; &quot;open the source&quot;
+    click n_render href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L410&quot; &quot;open the source&quot;
+    click n_form href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L491&quot; &quot;open the source&quot;
+    click n_look href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L618&quot; &quot;open the source&quot;
+    click n_fill href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L666&quot; &quot;open the source&quot;
+    click n_get href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L726&quot; &quot;open the source&quot;
+    click n_clear href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L732&quot; &quot;open the source&quot;
+    click n_poll href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L740&quot; &quot;open the source&quot;
+    click n_ask href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L766&quot; &quot;open the source&quot;
+    click n_draw_thumbnails href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/exporting.rs#L798&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_use_template,n_reach_for,n_run,n_form,n_get,n_clear,n_poll,n_ask entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -378,19 +378,19 @@ flowchart TD
 <tr><td><code>place</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-place">330</a></td><td>Put the finished file where it was asked for, if nothing is there.</td></tr>
 <tr><td><code>Workroom</code> <sub>struct</sub></td><td><a href="exporting.src.html#fn-workroom">353</a></td><td>A folder of one export&#x27;s own, beside where its file is going, removed with everything in it when the export is done, however it ended.</td></tr>
 <tr><td><code>Workroom::new</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-workroom-new">358</a></td><td>Makes a folder only this user can enter, beside beside, under a name no other folder there has.</td></tr>
-<tr><td><code>Workroom::path</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-workroom-path">383</a></td><td>Where the folder is, to write the job&#x27;s files into.</td></tr>
-<tr><td><code>Workroom::drop</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-workroom-drop">389</a></td><td></td></tr>
-<tr><td><code>wrote</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-wrote">395</a></td><td>What a successful export says.</td></tr>
-<tr><td><code>render</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-render">405</a></td><td>Run ffmpeg, drawing and piping the frames when there is a picture.</td></tr>
-<tr><td><code>form</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-form">486</a></td><td>The export form, drawn under the recording it is for.</td></tr>
-<tr><td><code>look</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-look">613</a></td><td>The advanced half of the form: the typeface, the colours and the motion.</td></tr>
-<tr><td><code>fill</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-fill">661</a></td><td>One colour, or two with a gradient between them.</td></tr>
-<tr><td><code>Thumbs</code> <sub>pub struct</sub></td><td><a href="exporting.src.html#fn-thumbs">712</a></td><td>A small picture of every recording in the list.</td></tr>
-<tr><td><code>Thumbs::get</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-thumbs-get">721</a></td><td>The picture for a recording, once it has been drawn.</td></tr>
-<tr><td><code>Thumbs::clear</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-thumbs-clear">727</a></td><td>Forget every picture.</td></tr>
-<tr><td><code>Thumbs::poll</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-thumbs-poll">735</a></td><td>Take whatever pictures have arrived.</td></tr>
-<tr><td><code>Thumbs::ask</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-thumbs-ask">761</a></td><td>Draw the pictures nobody has asked for yet, on a worker.</td></tr>
-<tr><td><code>draw_thumbnails</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-draw_thumbnails">793</a></td><td>The worker behind Thumbs::ask.</td></tr>
+<tr><td><code>Workroom::path</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-workroom-path">388</a></td><td>Where the folder is, to write the job&#x27;s files into.</td></tr>
+<tr><td><code>Workroom::drop</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-workroom-drop">394</a></td><td></td></tr>
+<tr><td><code>wrote</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-wrote">400</a></td><td>What a successful export says.</td></tr>
+<tr><td><code>render</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-render">410</a></td><td>Run ffmpeg, drawing and piping the frames when there is a picture.</td></tr>
+<tr><td><code>form</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-form">491</a></td><td>The export form, drawn under the recording it is for.</td></tr>
+<tr><td><code>look</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-look">618</a></td><td>The advanced half of the form: the typeface, the colours and the motion.</td></tr>
+<tr><td><code>fill</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-fill">666</a></td><td>One colour, or two with a gradient between them.</td></tr>
+<tr><td><code>Thumbs</code> <sub>pub struct</sub></td><td><a href="exporting.src.html#fn-thumbs">717</a></td><td>A small picture of every recording in the list.</td></tr>
+<tr><td><code>Thumbs::get</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-thumbs-get">726</a></td><td>The picture for a recording, once it has been drawn.</td></tr>
+<tr><td><code>Thumbs::clear</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-thumbs-clear">732</a></td><td>Forget every picture.</td></tr>
+<tr><td><code>Thumbs::poll</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-thumbs-poll">740</a></td><td>Take whatever pictures have arrived.</td></tr>
+<tr><td><code>Thumbs::ask</code> <sub>pub fn</sub></td><td><a href="exporting.src.html#fn-thumbs-ask">766</a></td><td>Draw the pictures nobody has asked for yet, on a worker.</td></tr>
+<tr><td><code>draw_thumbnails</code> <sub>fn</sub></td><td><a href="exporting.src.html#fn-draw_thumbnails">798</a></td><td>The worker behind Thumbs::ask.</td></tr>
 </tbody></table>
 </section>
 </div></div>

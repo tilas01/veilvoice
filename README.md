@@ -214,7 +214,7 @@ on faith.
 
 ```bash
 # 1. Download the archive, the hash list and the signature.
-V=v0.1.22
+V=v0.1.23
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 curl -fsSLO $B/veilvoice-$V-linux-x86_64.tar.gz
 curl -fsSLO $B/SHA256SUMS
@@ -255,7 +255,7 @@ the `musl-static` archive: it needs no system libraries at all.
 <summary><b>macOS</b> (Intel and Apple Silicon)</summary>
 
 ```bash
-V=v0.1.22
+V=v0.1.23
 B=https://github.com/tilas01/veilvoice/releases/download/$V
 # arm64 for Apple Silicon, x86_64 for Intel.
 curl -fsSLO $B/veilvoice-$V-macos-arm64.tar.gz
@@ -278,7 +278,7 @@ and choose Open, rather than turning Gatekeeper off.
 <summary><b>Windows</b> (10 and 11)</summary>
 
 ```powershell
-$V = "v0.1.22"
+$V = "v0.1.23"
 $B = "https://github.com/tilas01/veilvoice/releases/download/$V"
 curl.exe -fsSLO "$B/veilvoice-$V-windows-x86_64.zip"
 curl.exe -fsSLO "$B/SHA256SUMS"
@@ -316,7 +316,7 @@ cannot work and the window is not shipped. Everything that operates on a file
 runs exactly as it does elsewhere.
 
 ```sh
-V=v0.1.22
+V=v0.1.23
 fetch https://github.com/tilas01/veilvoice/releases/download/$V/veilvoice-$V-freebsd-x86_64.tar.gz
 tar xzf veilvoice-$V-freebsd-x86_64.tar.gz
 cd veilvoice-$V-freebsd-x86_64
@@ -339,7 +339,7 @@ To prove your build is the published one, byte for byte:
 
 ```bash
 veilvoice verify --build-script > reproduce-veilvoice.sh
-sh reproduce-veilvoice.sh v0.1.22
+sh reproduce-veilvoice.sh v0.1.23
 ```
 
 That clones the tag, builds it with the committed lockfile and the commit's own
@@ -688,7 +688,7 @@ writes with no extra work.
 - **Offline by construction.** Zero servers, enforced in CI.
 - **No `unsafe` anywhere.** Every crate carries `#![forbid(unsafe_code)]`,
   including the page-locking path.
-- **78166 functional lines of Rust**, across 28 crates. A *functional line* is
+- **78169 functional lines of Rust**, across 28 crates. A *functional line* is
   a line holding code: blank lines and lines holding only a comment are not
   counted, and a line with code and a trailing comment counts once. Each
   crate's own README states its share of that total under **The files**.
@@ -748,7 +748,7 @@ Artwork is **generated, not committed as opaque blobs**:
 
 ## Status
 
-**v0.1.22: early but real.** The engine, cryptography, audio path, metadata
+**v0.1.23: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
 destinations, CLI and GUI are implemented and tested (1962 tests across 13
 crates plus doctests, and 21 website suites, clippy clean, no `unsafe`), with
@@ -765,7 +765,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Thirty-seven audit rounds have found and fixed **297 defects**.
+Thirty-seven audit rounds have found and fixed **302 defects**.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a

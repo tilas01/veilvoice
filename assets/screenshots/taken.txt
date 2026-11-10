@@ -9,7 +9,7 @@
 # older window. See the module note in that file for why this is a version
 # rather than a comparison against a fresh capture.
 
-version 0.1.22
+version 0.1.23
 
 gui-about.png
 gui-browser.png

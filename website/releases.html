@@ -115,13 +115,13 @@ Every release, newest first. Open one to read what changed in it; its files are 
 <pre><code>veilvoice verify sums SHA256SUMS SHA256SUMS.asc</code></pre>
 <p>This is the step everything else rests on. <code>SHA256SUMS</code> is a list of numbers; <code>SHA256SUMS.asc</code> is the detached OpenPGP signature over it. Until that signature checks out against the signing key, the list is just numbers somebody sent you.</p>
 <p><strong>One file, against the signed list</strong></p>
-<pre><code>veilvoice verify file veilvoice-v0.1.22-linux-x86_64.tar.gz --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
+<pre><code>veilvoice verify file veilvoice-v0.1.23-linux-x86_64.tar.gz --sums SHA256SUMS --sig SHA256SUMS.asc</code></pre>
 <p>The signature is verified <strong>first</strong>, and the file is compared against the list only after that passes. A pass means the download is <strong>INTACT</strong>: byte for byte the file that was published, signed by the VeilVoice key.</p>
 <p><strong>One file, with no hash list at all</strong></p>
-<pre><code>veilvoice verify file veilvoice-v0.1.22-linux-x86_64.tar.gz --sha256 THE_HASH_YOU_WERE_GIVEN</code></pre>
+<pre><code>veilvoice verify file veilvoice-v0.1.23-linux-x86_64.tar.gz --sha256 THE_HASH_YOU_WERE_GIVEN</code></pre>
 <p>For when you have a hash rather than a signed list. What a match proves depends entirely on where that hash came from, and only you know that, so the tool says so instead of guessing. If it came from somebody else&#x27;s independent build of the same tag, a match means the release is <strong>REPRODUCIBLE</strong>, which is the stronger claim.</p>
 <p><strong>Just the hash, verifying nothing</strong></p>
-<pre><code>veilvoice verify hash veilvoice-v0.1.22-linux-x86_64.tar.gz</code></pre>
+<pre><code>veilvoice verify hash veilvoice-v0.1.23-linux-x86_64.tar.gz</code></pre>
 <p>Prints the SHA-256 and checks nothing, for when you want to compare it against something yourself.</p>
 <p><strong>The same check through your own GnuPG</strong></p>
 <pre><code>veilvoice verify gnupg</code></pre>
@@ -184,6 +184,300 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 </tbody></table>
 <p class="muted">The generated reference for every crate and every source file is under <a href="wiki.html">the reference</a>, and the same pages are in <a href="https://github.com/tilas01/veilvoice/wiki" rel="noopener noreferrer">the wiki</a>.</p>
 </details>
+<details class="release" id="v0.1.23">
+<summary><strong>v0.1.23</strong> <span class="muted">This release keeps the window responsive and fixes a sealing fault.</span></summary>
+<img class="release-card" src="assets/changelog/v0.1.23.png" alt="A card for v0.1.23, carrying the version and the changes it led with" width="1280" height="640" loading="lazy">
+<div class="release-files">
+<h4>Files</h4>
+<ul>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-windows-x86_64.zip" rel="noopener noreferrer">Windows, 64-bit</a> <span class="muted">veilvoice-v0.1.23-windows-x86_64.zip</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-macos-arm64.tar.gz" rel="noopener noreferrer">macOS, Apple silicon</a> <span class="muted">veilvoice-v0.1.23-macos-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-macos-x86_64.tar.gz" rel="noopener noreferrer">macOS, Intel</a> <span class="muted">veilvoice-v0.1.23-macos-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-linux-x86_64.tar.gz" rel="noopener noreferrer">Linux, 64-bit</a> <span class="muted">veilvoice-v0.1.23-linux-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-linux-arm64.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit</a> <span class="muted">veilvoice-v0.1.23-linux-arm64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.23-linux-armv7-pi.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.23-linux-x86_64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.23-linux-arm64-musl-static.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.23-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.23-openbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-v0.1.23-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.23-netbsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/CONTENTS.sha256" rel="noopener noreferrer">CONTENTS.sha256</a> <span class="muted">the hash of every file inside those archives</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/SHA256SUMS.asc" rel="noopener noreferrer">SHA256SUMS.asc</a> <span class="muted">the signature over that list</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.23/veilvoice-signing-key.asc" rel="noopener noreferrer">veilvoice-signing-key.asc</a> <span class="muted">the public key it was signed with</span></li>
+</ul>
+<p class="muted">These links are worked out from the version number rather than fetched, so this page builds with no network. A release that did not build for a platform answers with a not-found; <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.23" rel="noopener noreferrer">the release page</a> is the definitive list.</p>
+</div>
+<details class="notes">
+<summary><strong>Release notes</strong> <span class="muted">what is new and what was fixed in v0.1.23</span></summary>
+<p>This release keeps the window responsive and fixes a sealing fault. Slow work, from unlocking the Studio to exporting a video, now happens in the background with a progress bar beside it, so the window no longer stops while it waits. The release also brings an updater that checks everything it downloads, a decoy passphrase you can set up, video export from the Browser and a reset that tells you what it will remove. It also fixes a fault in versions 0.1.15 to 0.1.22 that could seal recordings under an empty passphrase, and adds a command line tool, <code>veilvoice reseal</code>, that finds those files and seals them properly.</p>
+<h4 id="new-features">New features</h4>
+<ul>
+<li><strong>A repair for recordings sealed under an empty passphrase.</strong> If you used an app lock with VeilVoice 0.1.15 to 0.1.22, some recordings may have been sealed under a blank passphrase, which means anybody with a copy of the file can open it. <code>veilvoice reseal</code> finds those files and seals them again under your app-lock passphrase. <strong>In this release it is available from the command line only.</strong> The window has no button for it yet, so open a terminal to run it.</li>
+</ul>
+<p>To see what it would repair without changing anything, run the first line below. To repair, run the second. On its own it checks the folder VeilVoice keeps its own files in; if you keep recordings anywhere else, name that folder after the command, as in the third line.</p>
+<pre><code>veilvoice reseal --dry-run
+veilvoice reseal
+veilvoice reseal ~/my-recordings</code></pre>
+<p>It lists every file it checked before it asks for anything, including the ones that were sealed properly. It never changes a file that was sealed properly, so it is safe to run on a whole folder and safe to run twice. It checks your passphrase against your app lock before it touches a file; if you no longer have an app lock, it asks for the new passphrase twice instead. Resealing protects a file from now on, but it cannot undo a copy somebody already has.</p>
+<ul>
+<li><strong>An updater.</strong> <code>veilvoice update</code> downloads the newest release for your computer, checks its signature and every file inside it, and only then replaces the copy you are running. <code>veilvoice update --check</code> only tells you whether a newer version exists. Nothing is checked or downloaded unless you ask.</li>
+<li><strong>Checking a download all the way through.</strong> <code>veilvoice verify</code> now opens an archive and checks every file inside it against the signed list, and it never trusts a key that arrived with the download. <code>veilvoice verify install</code> finds every copy of VeilVoice on your computer and checks each one.</li>
+<li><strong>A decoy passphrase.</strong> You can set a second passphrase that opens VeilVoice to an empty folder, in Settings under Lock or with <code>veilvoice decoy</code>. Nothing on the lock screen shows that a decoy exists, and <code>veilvoice decoy status</code> tells you whether yours still works. It protects you from somebody watching the screen, not from somebody who has a copy of the disk.</li>
+<li><strong>Video export from the Browser.</strong> Each recording in the Browser shows a small picture of its sound. Export lets you choose sound, video or both, MP4, MKV or MOV, the quality and the look of a moving waveform. The sound is always kept lossless.</li>
+<li><strong>A reset that shows what it will remove.</strong> Settings, under Storage, and <code>veilvoice reset</code> list everything they would delete, with sizes, before doing anything. Where something cannot be replaced, such as recordings, you have to type RESET to continue. <code>veilvoice reset --dry-run</code> shows the list and stops.</li>
+<li><strong>Missing companions are mentioned once, at launch.</strong> VeilVoice tells you when it starts if ffmpeg or GnuPG is missing, and remembers if you say no. <code>veilvoice companions --no ffmpeg</code> and <code>veilvoice companions --ask-again</code> change that answer. <code>veilvoice record</code> now tells you before a recording, not after it, what turning it into a video will need.</li>
+<li><strong>Early builds.</strong> Newer work can now be published between releases as an early build, marked as a prerelease with a version such as 0.1.23-beta.1. A copy shows which channel it came from in the About tab and in <code>veilvoice info</code>, and its update check stays on that channel. The download page never offers an early build by default.</li>
+</ul>
+<h4 id="bug-fixes">Bug fixes</h4>
+<ul>
+<li><strong>Recordings sealed under an empty passphrase (0.1.15 to 0.1.22).</strong> Unlocking VeilVoice kept an empty passphrase instead of the one you typed, so recordings sealed with the app lock, and VeilVoice&#x27;s record of its own files, were sealed under nothing. They looked sealed but would open for anybody. Unlocking now keeps the passphrase you typed. Files written by the older versions stay as they are until you run <code>veilvoice reseal</code>, described above, and <code>veilvoice lock status</code> reminds you of this.</li>
+<li><strong>The window no longer freezes while it works.</strong> Unlocking the Studio, the first unlock after setting an app lock, exporting a take, creating decoy vaults and the last card of the setup tour all used to stop the window until they had finished.</li>
+<li><strong>Installing put the programs somewhere that was not on your path</strong> on Linux and macOS, so typing <code>veilvoice</code> afterwards did not work. They now go to the folder that is added to your path. Uninstalling now removes only the programs it installed, one file at a time, and never deletes a folder.</li>
+<li><strong>Installing from a linked copy could empty it.</strong> If a link in your programs folder pointed at a portable copy, installing wrote through the link and left an empty file. Installing, and <code>veilvoice verify install</code>, now replace the link instead. Installing also checks whether the folder really is on your path, and gives you the line to add if it is not.</li>
+<li><strong>Asking for help made a network request.</strong> <code>veilvoice verify release --help</code> read <code>--help</code> as a version number and tried to download it. Help is now answered wherever it appears in a command.</li>
+<li><strong>A console window flashed on Windows</strong> while a take or a group conversation was turned into a video, and in the setup program.</li>
+<li><strong>The list of allowed screen recorders could be read by every account</strong> on the computer. It is now private to you, and an existing one is tightened.</li>
+<li><strong>Controls changed size when the pointer reached them.</strong> Every row of options grew slightly on hover and pushed its neighbours along. Options, the lock and unlock buttons, and the two answers in the dialog about writing recordings unencrypted now keep one size.</li>
+<li><strong>A 360 Hz display was treated as a 240 Hz one,</strong> both when the rate was measured and when the window was drawn.</li>
+<li><strong>The instructions for building from source did not work on a fresh Linux machine,</strong> because they named no system packages. They now go from cloning to a working program on Debian, Fedora and Arch, and say what macOS and Windows need.</li>
+<li><strong>Several pages were wrong about the program.</strong> The manual said that the static and Raspberry Pi downloads include the window, which they never have. The page listing every command said no command uses the network. The crash log and the crash report panel said VeilVoice never uses the network. Each now says what is true: nothing sends a crash report, and the network is used only by the commands you run for that purpose.</li>
+<li><strong>On the website, following the same link twice</strong> highlighted where you landed only the first time.</li>
+<li><strong>The decoy passphrase could be told apart by how long it took.</strong> The real passphrase took one more key derivation than the decoy, which somebody timing the unlock could measure. Both now cost the same. The real passphrase also can no longer be changed to match the decoy.</li>
+<li><strong>The updater did not ask for the app-lock passphrase</strong> when the lock was kept in the vault, so an update could not reseal what it changed. It finds the lock wherever it is kept now.</li>
+<li><strong>Locking the window while a vault was still opening</strong> handed that vault to whoever unlocked next. A vault that is still opening when the window locks is now dropped.</li>
+<li><strong>The moving waveform drifted away from the sound</strong> in recordings made at 44.1 kHz, by about eight seconds over an hour. It now stays with the sound at every rate.</li>
+<li><strong>Cleaning metadata did not work on MP3, FLAC, Ogg or M4A files,</strong> only on WAV. It works on all of them now, and it writes a fresh file and swaps it in, so a crash part way through leaves the original untouched.</li>
+<li><strong>A file whose name began with a dash could be read by ffmpeg as an option.</strong> Every path now reaches ffmpeg as a file, whatever its name.</li>
+<li><strong>A file near the size limit could stop the program</strong> instead of giving an error, and a conversation plan whose last turn ended absurdly late could make the video export hang. Both are refused with a message now.</li>
+<li><strong>On the website, four kinds of document froze the page</strong> that rendered them, and the questions page told readers to delete the file that holds their recordings&#x27; key. Both are fixed.</li>
+</ul>
+<h4 id="additions-and-improvements">Additions and improvements</h4>
+<ul>
+<li><strong>One progress indicator for everything that takes time.</strong> It shows an estimate only where one can be measured, says why when it cannot, and stays still if your system asks for reduced motion.</li>
+<li><strong>The welcome tour sets VeilVoice up</strong> rather than only describing it: a password on the window, encryption at rest, the decoy passphrase, whether this copy is installed, and a walk through Settings. It is drawn over the window it describes, and leaves out steps that are already done.</li>
+<li><strong>A first run suited to the computer.</strong> VeilVoice checks whether there is graphics hardware and starts on the software drawing path if there is none. Sealing recordings with the app lock is on from the start, and takes effect as soon as you set a lock.</li>
+<li><strong>VeilVoice now says that it checks its own files.</strong> It has recorded its own files at the first launch and checked them at every launch since 0.1.15. The tour and the command reference now say so, including that the record is kept unencrypted when there is no app lock.</li>
+<li><strong>The Verify tab looks for GnuPG as soon as it opens,</strong> including inside WSL on Windows, instead of waiting for a button.</li>
+<li><strong>The headings in Settings are written as titles:</strong> Appearance, Motion, Interface, Security and Storage.</li>
+<li><strong>The sound library VeilVoice uses has been updated.</strong> Device names printed by 0.1.22 still work with <code>--input</code> and <code>--output</code>, and where two devices share a name the list now tells them apart.</li>
+<li><strong>The About tab lists everything VeilVoice keeps between runs,</strong> with what each item is and whether it can be recreated, from the same list the program itself uses.</li>
+<li><strong>Builds that cannot record say so first.</strong> Where VeilVoice has no access to the sound hardware, the Studio says so at the top and the Browser explains why playback is unavailable. The FreeBSD download is now built with the window as well as the command line, and falls back to the command line alone if the window does not build.</li>
+<li><strong>The wiki is the whole manual, and it is published.</strong> It now covers what to do first, what a report of a changed file means and how to update, and it is published with each release. The website carries a copy of every wiki page.</li>
+<li><strong>The website&#x27;s banner no longer freezes for readers who ask for less motion.</strong> It keeps a slow, calm sweep instead, and those readers get a button to pause it. Everyone else sees it as before.</li>
+<li><strong>Release notes start with what you need:</strong> which file to download and how to check it, then what changed, with the technical detail folded away. Each release also has a picture of its own for link previews.</li>
+<li><strong>More of the program is documented.</strong> Every command and every tab of the window has its own entry, every item in the generated reference has a description, and the screenshots now include the lock screen and every page of Settings. A security policy explains how to report a vulnerability privately.</li>
+<li><strong>Releases are made from one branch, in one checked step.</strong> All work now goes to a single branch, <code>main</code>. A release is made by a workflow that first checks the version, the notes, the roadmap and the audit, and then builds only the exact commit it checked. The website and the wiki are updated when a release is published, not on every change.</li>
+<li><strong>Groundwork for running VeilVoice in a web browser.</strong> Everything except the window can now be built for the web, and this is checked on every change.</li>
+</ul>
+<pre><code>flowchart LR
+    root((&quot;VeilVoice 0.1.23&quot;))
+
+    root --&gt; privacy[&quot;Recordings and privacy&quot;]
+    root --&gt; media[&quot;Recording and export&quot;]
+    root --&gt; window[&quot;The window&quot;]
+    root --&gt; setup[&quot;Install, update and verify&quot;]
+    root --&gt; docs[&quot;Documentation and website&quot;]
+    root --&gt; releases[&quot;How releases are made&quot;]
+
+    privacy --&gt; p1([&quot;Reseal tool, command line only&quot;])
+    privacy --&gt; p2([&quot;Decoy passphrase&quot;])
+    privacy --&gt; p3([&quot;Reset that lists what it removes&quot;])
+    privacy --&gt; p4{{&quot;Sealing under an empty passphrase&quot;}}
+    privacy --&gt; p6{{&quot;Allowlist readable by other accounts&quot;}}
+
+    media --&gt; m1([&quot;Video export from the Browser&quot;])
+    media --&gt; m2(&quot;Sound library updated, old device names kept&quot;)
+    media --&gt; m4{{&quot;Console flash on Windows&quot;}}
+
+    window --&gt; w1{{&quot;Freezes while working&quot;}}
+    window --&gt; w2{{&quot;Controls resizing on hover&quot;}}
+    window --&gt; w3{{&quot;360 Hz shown as 240 Hz&quot;}}
+    window --&gt; w4(&quot;One progress indicator&quot;)
+    window --&gt; w5(&quot;Tour that sets things up&quot;)
+    window --&gt; w6(&quot;Titles in Settings&quot;)
+    window --&gt; w7(&quot;Kept files listed in About&quot;)
+
+    setup --&gt; s1([&quot;Updater&quot;])
+    setup --&gt; s2([&quot;Archive and whole computer checks&quot;])
+    setup --&gt; s3([&quot;Companions asked about once&quot;])
+    setup --&gt; s4{{&quot;Install path and uninstall&quot;}}
+    setup --&gt; s5{{&quot;Installing over a link&quot;}}
+    setup --&gt; s6{{&quot;Help that made a request&quot;}}
+
+    docs --&gt; d2{{&quot;Build instructions&quot;}}
+    docs --&gt; d3{{&quot;Wrong statements in the manual&quot;}}
+    docs --&gt; d4(&quot;Wiki as the whole manual&quot;)
+    docs --&gt; d5(&quot;Reader-first release notes&quot;)
+    docs --&gt; d6(&quot;A calmer banner under reduced motion&quot;)
+
+    releases --&gt; r1([&quot;Early builds&quot;])
+    releases --&gt; r2(&quot;One branch and a checked release&quot;)
+    releases --&gt; r3(&quot;Web build groundwork&quot;)
+
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_area[&quot;Grey box: an area of VeilVoice&quot;]
+        key_feature([&quot;Blue pill: a new feature&quot;])
+        key_fix{{&quot;Red hexagon: a bug fix&quot;}}
+        key_improvement(&quot;Green box: an addition or improvement&quot;)
+    end
+
+    classDef area fill:#e5e7eb,stroke:#4b5563,color:#111827
+    classDef feature fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
+    classDef fix fill:#fee2e2,stroke:#b91c1c,color:#1f0a0a
+    classDef improvement fill:#dcfce7,stroke:#15803d,color:#052e16
+    class root,privacy,media,window,setup,docs,releases,key_area area
+    class p1,p2,p3,m1,s1,s2,s3,r1,key_feature feature
+    class p4,p6,m4,w1,w2,w3,s4,s5,s6,d2,d3,key_fix fix
+    class m2,w4,w5,w6,w7,d4,d5,d6,r2,r3,key_improvement improvement</code></pre>
+<p>Read the graph from left to right: each grey box is an area of VeilVoice, and the shapes beside it are the changes in that area. The key in the chart says what each shape means.</p>
+<details class="notes">
+<summary><strong>The technical detail</strong> <span class="muted">reproducibility per platform, the audit findings, the dependency changes and the measurements</span></summary>
+<p><strong>New features</strong></p>
+<ul>
+<li><strong><code>veilvoice reseal</code> (F-231).</strong> <code>veilvoice_crypto::reseal</code> finds a container that opens with an empty passphrase and seals it again under a real one; the command line in <code>crates/veilvoice-cli/src/reseal.rs</code> prints, asks and counts. A file is sealed again only when the empty passphrase opened it. The new container is opened again with the new passphrase and compared against the old one&#x27;s plaintext before <code>privatefile::replace_owner_only</code> puts it in place, so an interrupted repair leaves the original. The sweep caps its key derivation at <code>kdf::KdfParams::UNATTENDED_MAX_M_COST</code>, since it is handed whatever is in the folder rather than a file somebody chose, and it neither follows nor descends into a symbolic link. The passphrase is proved through the rate-limited <code>LockStore::unlock</code> before any file is touched. Usage is <code>veilvoice reseal [FOLDER]... [--dry-run]</code>, defaulting to <code>layout::dir()</code>. <code>veilvoice lock status</code> prints <code>reseal::NOTICE</code>. The window does not call the repair in this release. Commit: &quot;A tool that finds what was sealed under an empty passphrase, and seals it again&quot;.</li>
+<li><strong>The updater (roadmap 179).</strong> The order of checks is the design: the signature over <code>SHA256SUMS</code> against the key compiled into the running binary, then the archive against that list, then <code>CONTENTS.sha256</code> against that list, then every file inside the archive, hashed in place without unpacking, and finally what comes out of the extractor, hashed again. All of it is <code>veilvoice-verify</code>&#x27;s existing code. The download goes beside the running copy rather than into the system temporary directory, and the integrity record is re-taken after the signature check. Commit: &quot;Roadmap 179: an updater that does the update&quot;. Within this release the updater&#x27;s own audit found and fixed seven defects: the integrity record was resealed with a passphrase nobody had checked, which now goes through <code>LockStore::unlock</code> before the first byte is fetched (F-260); the name people run was briefly missing during replacement, now written to <code>name.new</code> and moved by a rename (F-261); an update dropped every recorded file it had not replaced, fixed by <code>Manifest::refresh</code> in <code>veilvoice-guard</code> (F-262); the restart path was read after the program had moved (F-263); the archive check claimed a per-file check where no contents list was published (F-264); one screen contradicted itself about installing (F-265); and <code>verify install</code> wrote through a link at the destination (F-266). F-213 corrected the wording that said the command line talks to no servers.</li>
+<li><strong>Verifying inside an archive, and every copy on the machine (roadmap 164).</strong> The chain now runs from <code>SHA256SUMS.asc</code> to <code>SHA256SUMS</code> to <code>CONTENTS.sha256</code> to every file inside the archive. A key shipped inside a download has its fingerprint compared against the compiled-in one and is never used to decide the answer. <code>veilvoice verify install</code> walks the machine for copies. Commits: &quot;Roadmap 164: check what is inside an archive, and never trust the key it came with&quot; and &quot;Roadmap 164: every copy of VeilVoice on this computer, found and checked&quot;. The test fixture the first of these added was matched by a <code>.gitignore</code> rule and never committed (F-206).</li>
+<li><strong>The decoy passphrase (roadmap 173).</strong> <code>decoy::Store</code> keeps one record beside the app lock under a derived name, and <code>Store::judge</code> is the one place an unlock goes through: it derives the decoy first and unconditionally, so the time an unlock takes does not reveal whether a decoy exists. <code>decoy::Pair</code>, which held a second verifier for the real passphrase, is gone. Front ends: <code>veilvoice decoy status|set|change|remove</code> and a section under Settings, Lock. Findings fixed before release: the tour stored a stop it had never shown (F-249); setting a decoy was an unthrottled way to guess the real passphrase, now counted through <code>LockStore::unlock</code> (F-252); the app lock&#x27;s cooldown told the decoy apart from the real passphrase, now reported identically for every passphrase (F-253); and a decoy unlock migrated the plain records into a store only the decoy key could read, destroying them for the real passphrase, now prevented by <code>vault_store::Plain::Leave</code> (F-268). What a decoy cannot hide from somebody holding the disk is written down beside the code.</li>
+<li><strong>Browser export and thumbnails (roadmap 175).</strong> <code>veilvoice-video</code> gained an <code>export</code> module (MP4, MKV or MOV; H.264, H.265, AV1, VP9, FFV1 or ProRes) and a <code>motion</code> module with sixteen templates. Audio is always FLAC, ALAC or WAV, and a test walks every combination to prove no lossy audio encoder is named. WebM is not offered because it carries no lossless audio. Frames go to ffmpeg as raw RGB on standard input. Every offered combination was encoded with ffmpeg 6.1, and the decoded audio matched the input bit for bit. Commits: &quot;Roadmap 175, the library half&quot;, &quot;Roadmap 175, the Browser half&#x27;s engine&quot; and &quot;Roadmap 175 done&quot;.</li>
+<li><strong>Reset (roadmap 172).</strong> A <code>reset</code> module in <code>veilvoice-crypto</code> plans and removes in separate calls, and works by exclusion so a state file added in a later release is still removed. <code>--confirm RESET</code> carries the word for a machine with no terminal, and <code>--yes</code> is refused where anything is irreplaceable. An administrator&#x27;s copy of the app lock under <code>/etc</code> is named as out of reach. Commit: &quot;Start again, properly: a reset that names what it is about to remove&quot;.</li>
+<li><strong>Companions (roadmap 163).</strong> <code>veilvoice_setup::needs</code> answers once whether ffmpeg and GnuPG are present and whether this copy is installed or portable. A no is stored in <code>companions-declined.txt</code>, registered in <code>veilvoice_crypto::layout</code>. The fetch-and-verify half of the item is still to come. The URL rule the fetch will rely on was a string prefix, so <code>https://github.com.example.invalid</code> passed; it now requires a known origin followed by a slash (F-226). That path was not reachable from user input.</li>
+<li><strong>Release channels (roadmap 165).</strong> The channel is read from the version a build carries, so a binary stays a pure function of its source. The version comparison implements semantic versioning&#x27;s precedence rules, and an early build reads the full releases list rather than <code>/releases/latest</code>. Commit: &quot;Two channels, and a build that knows which one it came from&quot;.</li>
+</ul>
+<p><strong>Bug fixes</strong></p>
+<ul>
+<li><strong>The empty passphrase (F-231).</strong> The unlock button moved the typed passphrase out of the field before the worker ran, and <code>poll</code> then read the field, so every successful unlock kept an empty string. App-lock sealing and the integrity record used it. The worker now gets a copy, and the field keeps the original until <code>poll</code> collects the answer. Present from v0.1.15 to v0.1.22. Commit: &quot;Every unlock kept an empty passphrase, and app-lock sealing sealed with it&quot;.</li>
+<li><strong>The freezes (roadmap 167).</strong> A shared <code>offthread::Answer</code> replaces machine queries made while drawing, such as <code>df</code> spawned every frame on the tour&#x27;s last card (F-216). The first unlock&#x27;s migration of plain records now runs on <code>VaultStore::start_unlocking</code> (F-218). Export runs as an <code>ExportJob</code> on a worker that drops the vault key as soon as the recording is read (F-219). The crate-wide guard <code>the_drawing_thread_never_waits_on_anything</code> now reads every module, and found the decoy panel and the vault unlock waiting as well (F-220). A headless frame-timing test fails any panel above 25 milliseconds.</li>
+<li><strong>Install (F-214, F-237, F-238, F-239).</strong> The binaries now go to the directory added to <code>PATH</code>, and uninstall removes the files it wrote by name rather than deleting the directory recursively (commit &quot;Install put the programs in one directory and added a different one to the path&quot;). Each program is written to a new file created with <code>create_new</code> and renamed over the destination instead of <code>std::fs::copy</code>, which followed links (F-237). The Unix <code>add_to_path</code> now looks before it says a directory is on <code>PATH</code> (F-238). An empty or relative <code>HOME</code> or <code>LOCALAPPDATA</code> now counts as no home at all (F-239).</li>
+<li><strong>Help that opened a connection (F-228).</strong> <code>veilvoice_verify::run</code> read <code>--help</code>, <code>-h</code>, <code>--explain</code>, <code>--version</code> and <code>--exit-status</code> only at the first argument. <code>Asked::in_args</code> now reads them anywhere, and <code>tools/audit/network_claims.py</code> compares the commands the program says reach the network with the ones the manual names.</li>
+<li><strong>The Windows console (F-210, F-212).</strong> Two features written after v0.1.10 spawned <code>ffmpeg</code> without the wrapper that hides the console, and so did the setup program. The guards that should have caught this read part of each crate and now read all of it. Commit: &quot;Roadmap 167, the console half&quot;.</li>
+<li><strong>The screen-recorder allowlist (F-240).</strong> Created with mode 0600 in <code>crates/veilvoice-watch</code>, and a readable one left by an earlier build is tightened.</li>
+<li><strong>Control sizes (F-196, F-233, F-257).</strong> The lock and unlock buttons share <code>layout::LOCK_WIDTH</code> (F-196). The toolkit lays an unselected <code>Button::selectable</code> out without its frame, so it grew on hover; <code>layout::chip</code> and <code>layout::chip_value</code> now allocate the frame in every state, across thirty option controls (F-233). Twelve buttons were sized by padding their labels with spaces, including the unencrypted-recordings dialog, whose two answers were 184.4 and 176.5 points wide; <code>layout::choice_width</code> now measures from the longest label (F-257).</li>
+<li><strong>The frame-rate ceiling.</strong> One cap limited both what the measurement could report and what &quot;match the display&quot; could request. Commit: &quot;Frame rate: a ceiling at 240 was a ceiling in the wrong place&quot;.</li>
+<li><strong>Build instructions (F-234).</strong> Measured on a fresh machine, only <code>libasound2-dev</code> and <code>pkg-config</code> are needed to build both binaries; <code>libxkbcommon-x11-0</code> is named separately as what the window loads at startup. <code>tools/audit/build_prerequisites.py</code> holds the workflows, both guides and the pinned toolchain to each other.</li>
+<li><strong>Wrong statements (F-236, F-246, F-256).</strong> Corrected: the platform table for the static and Raspberry Pi archives, now checked by <code>tools/audit/platform_table.py</code> (F-236); the generated commands page (F-246); and four remaining copies of the network claim, in the crash log, the crash-report panel, a test and the verifier&#x27;s module documentation, now held by <code>tools/audit/network_wording.py</code> (F-256).</li>
+<li><strong>The website&#x27;s landing highlight (F-205).</strong> A click on a link naming the fragment already in the address bar fires no <code>hashchange</code>, so <code>js/teleport.js</code> now cues that case from its click handler.</li>
+</ul>
+<p><strong>Additions and improvements</strong></p>
+<ul>
+<li><strong>The progress indicator (roadmap 167 and 169, F-221, F-223).</strong> <code>progress::Reach</code> holds progress in two atomics. <code>counting(total)</code> draws a bar with a real fraction. <code>unmeasurable(because)</code> draws a bar with a travelling highlight, or a still one under reduced motion, and puts the reason on screen. <code>progress::strip</code> is the only thing in <code>veilvoice-gui</code> that draws work in progress, and a guard refuses <code>ui.spinner()</code> or <code>egui::ProgressBar::new</code> anywhere else. A bar with a real fraction keeps filling under reduced motion, because the setting concerns decoration.</li>
+<li><strong>The tour (roadmap 171).</strong> It is drawn as an overlay rather than replacing the central panel, reads its Settings walk from the menu&#x27;s own list, drops stops with nothing left to offer, and wipes password fields on every way out of a stop. Commits: &quot;The tour is drawn over the window it is a tour of&quot; and &quot;The tour sets VeilVoice up rather than only describing it&quot;.</li>
+<li><strong>First run (roadmap 170).</strong> A new <code>probe</code> module reads the graphics devices the system reports, once, on the run that finds no settings file, and a machine with no hardware starts on the software path. Commit: &quot;The first run asks this machine rather than opening on constants&quot;. Making app-lock sealing the default exposed F-202: the window mirrored the live sealing mode into the preference every frame, which wrote <code>false</code> whenever no lock existed yet. <code>Security</code> now remembers the preference and applies it when a lock appears.</li>
+<li><strong>The integrity record.</strong> Behaviour unchanged since roadmap item 75; the tour&#x27;s lock card and <code>docs/COMMANDS.md</code> now describe it, and a test holds the card to the code. Commit: &quot;The integrity record was already automatic, and nothing said so&quot;.</li>
+<li><strong>GnuPG detection</strong> runs on a worker when the Verify tab opens, WSL included, rather than when a button is pressed. It is the commit whose subject begins &quot;verify: look for GnuPG at launch&quot;.</li>
+<li><strong>Settings headings (roadmap 181).</strong> The heading and the deep-link name are now separate fields, so <code>--settings-page appearance</code> and the published capture addresses are unchanged. Found on the way: a verification ordering that made a generator publish the previous demonstration and looked like a flaky test (F-209).</li>
+<li><strong>The sound library (F-244, F-245).</strong> The <code>cpal</code> 0.18 migration named every device on one ALSA card identically, so <code>open</code> took the first; a name shared within the list now carries the platform identifier in brackets, and <code>open</code> also accepts the bare identifier v0.1.22 printed (F-244). The error callback printed and took a mutex on the backend&#x27;s audio worker; a glitch is now two atomic stores, and an invalidated stream counts as ended (F-245). Both were introduced and fixed within this release.</li>
+<li><strong>What VeilVoice keeps.</strong> <code>veilvoice_crypto::layout</code> names every state file and folder once, and the About tab takes its labels from it. Commit: &quot;One list of what VeilVoice keeps between runs&quot;.</li>
+<li><strong>Builds without live audio (roadmap 162).</strong> <code>veilvoice-gui</code> gained a <code>live</code> feature, on by default. With it off, <code>veilvoice-audio</code> offers the same modules through an <code>absent</code> module whose constructors refuse with <code>NoLiveAudio</code>, and <code>WHY_NO_CAPTURE</code> supplies the sentence the Studio shows. The FreeBSD release job builds the window beside the command line. OpenBSD and NetBSD remain command line only.</li>
+<li><strong>The wiki (roadmap 159 and 178, F-198, F-199, F-259).</strong> The wiki is now the documentation, with its coverage checked. Its contents page decided what a document was by counting lines (F-198). The publishing workflow had failed on every run, because a GitHub wiki repository exists only after a first page is saved through the web interface (F-199); it now skips with a warning until then (F-259). <code>tools/site/wiki_site.py</code> publishes every wiki page on the website. <code>tools/docs/wiki.py</code> rewrote relative links in two passes, and the second turned 86 finished links into repository URLs that never existed; it is one pass now, guarded by <code>rewritten_twice()</code> (F-247). The manual&#x27;s sentence that the command line cannot update was corrected in the week the updater landed (F-222).</li>
+<li><strong>Release notes and cards (roadmap 180 and 183).</strong> <code>tools/release/notes.py</code> builds the notes from this file and splits each entry at the <code>### Technical detail</code> heading. It also fails a release whose signing key differs from the fingerprint compiled into the verifier (F-203). <code>tools/release/card.py</code> draws one card per release from the same entry.</li>
+<li><strong>Documentation.</strong> Eighty-two published items had no doc comment; <code>tools/audit/documented.py</code> now fails the build rather than reporting. The generator read <code>const fn rgb</code> as an item called <code>fn</code> (F-215). The search index silently skipped files above 512 KB, which excluded <code>docs/AUDIT.md</code>; the limit is now 2 MB and exceeding it is a refusal (F-224). <code>docs/SECURITY.md</code> is the disclosure policy.</li>
+<li><strong>The release process (roadmap 186, F-208, F-230, F-255).</strong> See the chart below. The procedure used to be a paragraph of the contributing guide whose only enforced clause ran in the last step of the build (F-208). The release gate found the previous release by a range that, when the release tag is not an ancestor of the branch, covered far more than that release&#x27;s work, so its audit-round question could only pass. <code>release_point()</code> now locates a release by its tree (F-255). The gate once checked one commit and merged another; it now hands the checked commit to <code>release.yml</code>, which refuses to publish any other (F-230). Commits: &quot;Roadmap 186: a version is cut by the repository, not by remembering how&quot; and &quot;One branch: work is committed to main and releases are cut from it&quot;.</li>
+<li><strong>The browser build (roadmap 177).</strong> Every crate but <code>veilvoice-gui</code> compiles for <code>wasm32-unknown-unknown</code>, and CI checks it. <code>region</code> is declared only off <code>wasm32</code>, so <code>Secret</code> locks no pages there, and <code>docs/WHITEPAPER.md</code> says so. <code>tools/site/window.py</code> builds the window bundle and checks it against a hash of its sources; the window itself does not build for the web yet.</li>
+</ul>
+<p><strong>The audit, and the guards it added</strong></p>
+<ul>
+<li>The thirty-fourth round re-checked every finding written up between v0.1.22 and its start, F-196 to F-215, by breaking each guard and watching it fail. Five did not hold, F-254 to F-258. Besides F-255, F-256 and F-257 above, both crate-wide guards in <code>veilvoice-gui</code> cut each module at its first <code>#[cfg(test)]</code>, so they read 53% of <code>studio.rs</code>; <code>crate::shipped()</code> is now one shared cut (F-258).</li>
+<li>The code written since v0.1.22 was read for defects as well, which is where F-237 to F-245 and F-260 to F-266 come from. Besides those above: <code>tools/shots/gui.ps1</code> now fails on a broken capture (F-241), the branch tidier works on a fresh clone (F-242), and the Dependabot guard fails when it cannot read <code>ci.yml</code> (F-243).</li>
+<li>Checks added or widened: CI had stopped running on the branch where the work was (F-197); Dependabot was aimed at the wrong branch (F-200); a recorded terminal output stopped matching the program (F-201) and the check that runs the program used whichever build was present (F-217); four of six <code>.gitignore</code> negation rules had never matched (F-204); CI could be green over a tree that <code>tools/verify.py</code> fails (F-207); nothing compared the screenshots with the window (F-211); a test knew only GNU tar&#x27;s name for a format (F-225); the mutation baseline covered four of ten files and named survivors by line number (F-227, F-250); a base-91 boundary decision was untested (F-232); a test timed the panic hook (F-229); and a finding number written up twice counted as one (F-251).</li>
+<li>Asked about and not a defect: a repeated roll interval after about eighty thousand launches is the birthday bound for a 32-bit draw. It was widened to eight bytes anyway, and <code>tools/audit/randomness.py</code> holds the rule. Commit: &quot;Randomness: the answer to the eighty-thousand question, and a guard&quot;.</li>
+<li>Security in CI: <code>ci.yml</code> runs with <code>contents: read</code>, every action is pinned to a commit, and <code>tools/audit/actions.py</code> refuses an unpinned one. Commit: &quot;Security: a disclosure policy, least privilege in CI, and pinned actions&quot;.</li>
+</ul>
+<ul>
+<li>The thirty-fifth round read the whole project again after the history was signed and made one branch. Thirteen findings were fixed, F-271 to F-283: the decoy&#x27;s timing and the passphrase change (F-272, F-273), the updater and the vault lock (F-271), a vault opening across a lock (F-274), waveform drift (F-275), the release workflow&#x27;s write token (F-276), the website renderer (F-277), the questions page (F-278), plan length (F-279), decode memory (F-280), metadata cleaning (F-281, F-282) and ffmpeg paths (F-283).</li>
+<li>Supply chain: every workflow now runs read only except where it publishes or pushes, no checkout keeps its token unless its workflow says why (<code>tools/audit/checkout_tokens.py</code>), the release version reaches scripts only through the environment, and CodeQL, the OpenSSF Scorecard and an <code>osv-scanner.toml</code> that matches the other two advisory lists were added.</li>
+<li>Every commit in the history is now authored and committed by tilas01 and signed with the release key, and the release tag is signed by the same key.</li>
+<li>The thirty-sixth round read every code scanning alert one at a time, 373 of them at the time. Two were real: two workflows granted a write to every job they might ever have (F-284), and the website&#x27;s tests stripped tags in a way a crafted page could slip past (F-285). The reasons for treating the rest as false positives are written down, so a dismissal can point at them. CodeQL now runs the security-extended queries, and every workflow lists its findings in its own run.</li>
+<li>Found and fixed before they shipped, in code new since v0.1.22: the updater had its own way of replacing a running program, and now shares the one the installer uses (F-286); a part-finished update said nothing had been replaced (F-287); the build without live audio did not offer what the live build offers, and its tests never ran in CI (F-288); exporting from the window followed links, deleted files it had not made and lost the first of two exports (F-289); the command line&#x27;s reset removed the app lock unless told not to, while the window kept it (F-291); keeping the keys still removed the decoy passphrase, and on a machine set up with 0.1.17 the lock itself (F-292); and the test meant to catch that had only ever exercised the branch where nothing works (F-293).</li>
+<li>The thirty-seventh and thirty-eighth rounds read the prose, hidden text, the workflows and every drawing. The changelog and roadmap had doubled words and the roadmap cut its tooltips mid-word (F-296); Dependabot proposed releases on the day they appeared, and now waits seven days (F-297); a crate&#x27;s map of its files and the website&#x27;s script charts had no key (F-290); no dry run of a release got past the technical document, which is the failed release run of 26 October (F-294); and the mutation and fuzz jobs built whichever tool release was newest (F-295).</li>
+<li>The fortieth round walked the path from <code>main</code> to a published release before this one was cut by it. The release gate asked for a recording of a release that could not exist yet, so it failed on every new version (F-298); the window did not compile on Windows over an unused <code>mut</code> (F-299); the AppImage tools were pinned to a placeholder (F-300); the RPM build was killed while linking, from Fedora&#x27;s debugging flags on top of fat LTO (F-301); and a failed second FreeBSD build would have cost the release its FreeBSD archive (F-302).</li>
+<li>Roadmap items 176 and 184&#x27;s remaining half move to v0.1.24, so this release is not held for them.</li>
+</ul>
+<p><strong>Also new in the source, not yet in a release download</strong></p>
+<ul>
+<li>Two Windows installers (per user and per machine), an AppImage and an RPM are built, installed, run and removed in CI on every change to the packaging (<code>packages.yml</code>, roadmap rows 193 to 203). They are not attached to releases yet.</li>
+<li><code>veilvoice_audio::call</code> records a phone call one track per side, the microphone and the computer&#x27;s own output (roadmap item 188). The window and the command line do not offer it yet.</li>
+</ul>
+<p><strong>Dependencies</strong></p>
+<ul>
+<li><code>cpal</code> 0.15.3 to 0.18.2, a migration rather than a bump. It brings <code>alsa</code> 0.11.0, <code>alsa-sys</code> 0.4.0, <code>coreaudio-rs</code> 0.14.2 and <code>windows</code> 0.62.2, and removes <code>oboe</code>, <code>coreaudio-sys</code> and the <code>bindgen</code> and <code>clang-sys</code> build chain from the lockfile.</li>
+<li><code>clap</code> 4.6.6 to 4.6.7, <code>rfd</code> 0.15.4 to 0.16.0, <code>lofty</code> 0.25.2 to 0.25.5 (which brings <code>ogg_pager</code> 0.8), <code>ringbuf</code> 0.5.2 to 0.6.0, <code>realfft</code> 3.5.0 to 3.5.1 and <code>zeroize</code> 1.9.0 to 1.9.1.</li>
+<li><code>miniz_oxide</code> 0.8 to 0.9 in <code>veilvoice-video</code>; 0.8 stays in the tree through <code>img-parts</code> and <code>png</code>.</li>
+<li><code>getrandom</code> takes its <code>js</code> feature in the workspace table, which is what makes it reach the verifier.</li>
+<li><code>egui</code> and <code>eframe</code> 0.36 to 0.37. The clipboard is named as a feature, because 0.37 moved it behind one and the copy buttons would otherwise do nothing. <code>pgp</code> 0.20 to 0.21, <code>img-parts</code> 0.4.1, which fixes panics on malformed images, <code>winresource</code> 0.1.34, <code>clipboard-win</code> 5.4.3 in place of the yanked 5.4.1, <code>rfd</code> 0.16.1 and <code>tokio</code> 1.53.3.</li>
+<li>Accepted with their reasons in both advisory policies: <code>crypto-bigint</code> (RUSTSEC-2026-0387), reached only by signature checking, which has no secret to leak, and <code>zvariant</code>, <code>zvariant_derive</code> and <code>zbus_names</code> (RUSTSEC-2026-0370 to 0372), unmaintained crates behind the Linux file dialog.</li>
+<li><code>region</code> is held at 3 on purpose: version 4 made <code>region::unlock</code> unsafe, and <code>veilvoice-crypto</code> forbids unsafe code. The reason is written beside the dependency and the Dependabot ignore rule covers majors only.</li>
+<li>Actions: <code>actions/setup-node</code> v7.1.0, <code>actions/upload-artifact</code> v7.0.2, <code>actions/download-artifact</code> v8.0.2, <code>vmactions/freebsd-vm</code> v1.5.9, <code>vmactions/openbsd-vm</code> v1.4.8 and <code>vmactions/netbsd-vm</code> v1.5.2. Each was checked against the upstream tag it claims and applied to <code>main</code> by hand.</li>
+</ul>
+<p><strong>How a release is made and published</strong></p>
+<pre><code>flowchart TD
+    push[/&quot;A commit is pushed to main&quot;/]
+    bot[/&quot;Dependabot opens a pull request against main&quot;/]
+    person[/&quot;A person runs promote.yml with a version&quot;/]
+    halt([&quot;Stop and say why&quot;])
+
+    subgraph ciwf[&quot;ci.yml&quot;]
+        ci[&quot;Build, test and check every generated file&quot;]
+    end
+
+    subgraph promotewf[&quot;promote.yml&quot;]
+        fresh[&quot;Check out the tip of main afresh&quot;]
+        ready{&quot;readiness.py: version, notes, roadmap and audit agree&quot;}
+        verify{&quot;cargo build, then verify.py passes whole and leaves the tree clean&quot;}
+        green{&quot;ci.yml succeeded on this commit&quot;}
+        ask{&quot;Publish chosen&quot;}
+        report([&quot;Report what the release still needs&quot;])
+        moved{&quot;main still at the checked commit&quot;}
+        dispatch[&quot;Dispatch release.yml with the tag and the checked commit&quot;]
+    end
+
+    subgraph releasewf[&quot;release.yml&quot;]
+        build[&quot;Build every platform twice and compare, BSDs in VMs&quot;]
+        stage[&quot;Write CONTENTS.sha256, TECHNICAL.md and SHA256SUMS&quot;]
+        sign[&quot;Sign SHA256SUMS, write NOTES.md from CHANGELOG.md&quot;]
+        gate{&quot;Built commit and Cargo.toml version match the request&quot;}
+        publish([&quot;Sign the tag at the built commit, then publish the release&quot;])
+    end
+
+    subgraph sitewf[&quot;pages.yml and wiki.yml&quot;]
+        wikicheck[&quot;wiki.yml checks the wiki pages, publishing nothing&quot;]
+        tag[&quot;Find the release tag on the commit release.yml built&quot;]
+        site([&quot;Publish the website and the wiki from that tag&quot;])
+    end
+
+    push --&gt; ci
+    push -.-&gt; wikicheck
+    bot --&gt; ci
+    bot -.-&gt;|&quot;bump applied by hand, pull request closed&quot;| push
+    person --&gt; fresh --&gt; ready
+    ready --&gt;|yes| verify
+    verify --&gt;|yes| green
+    green --&gt;|yes| ask
+    ask --&gt;|no| report
+    ask --&gt;|yes| moved
+    moved --&gt;|yes| dispatch
+    ready --&gt;|no| halt
+    verify --&gt;|no| halt
+    green --&gt;|no| halt
+    moved --&gt;|no| halt
+    dispatch --&gt; build --&gt; stage --&gt; sign --&gt; gate
+    gate --&gt;|yes| publish
+    gate --&gt;|no| halt
+    publish --&gt;|&quot;run succeeded&quot;| tag --&gt; site
+
+    subgraph chart_key [&quot;Key&quot;]
+        direction LR
+        key_start[/&quot;Slanted: what starts the work&quot;/]
+        key_step[&quot;Plain: a step&quot;]
+        key_check{&quot;Diamond: a check&quot;}
+        key_end([&quot;Rounded: where a run ends&quot;])
+    end</code></pre>
+<p>The key in the chart names the four shapes. Solid lines are the path a release takes. Dotted lines mark a check that publishes nothing and a Dependabot change that reaches <code>main</code> by hand. Each frame is one workflow file. A failed check stops the run with the reason, and a stop after <code>main</code> has moved means running <code>promote.yml</code> again on the new tip.</p>
+</details>
+<p class="muted">The same notes are in <a href="https://github.com/tilas01/veilvoice/blob/main/CHANGELOG.md" rel="noopener noreferrer"><code>CHANGELOG.md</code></a>, where they are written, and at the top of <a href="https://github.com/tilas01/veilvoice/releases/tag/v0.1.23" rel="noopener noreferrer">this release on GitHub</a>.</p>
+</details>
+</details>
 <details class="release" id="v0.1.22">
 <summary><strong>v0.1.22</strong> <span class="muted">VeilVoice was split into twenty-seven separate libraries.</span></summary>
 <img class="release-card" src="assets/changelog/v0.1.22.png" alt="A card for v0.1.22, carrying the version and the changes it led with" width="1280" height="640" loading="lazy">
@@ -198,7 +492,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.22/veilvoice-v0.1.22-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.22-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.22/veilvoice-v0.1.22-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.22-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.22/veilvoice-v0.1.22-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.22-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.22/veilvoice-v0.1.22-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.22-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.22/veilvoice-v0.1.22-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.22-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.22/veilvoice-v0.1.22-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.22-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.22/veilvoice-v0.1.22-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.22-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.22/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -420,7 +714,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.21-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.21-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.21-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.21-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.21-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.21-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/veilvoice-v0.1.21-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.21-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.21/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -725,7 +1019,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.20-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.20-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.20-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.20-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.20-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.20-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/veilvoice-v0.1.20-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.20-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.20/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -818,7 +1112,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.19/veilvoice-v0.1.19-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.19-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.19/veilvoice-v0.1.19-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.19-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.19/veilvoice-v0.1.19-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.19-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.19/veilvoice-v0.1.19-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.19-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.19/veilvoice-v0.1.19-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.19-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.19/veilvoice-v0.1.19-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.19-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.19/veilvoice-v0.1.19-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.19-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.19/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -881,7 +1175,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.18-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.18-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.18-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.18-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.18-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.18-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/veilvoice-v0.1.18-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.18-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.18/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -1035,7 +1329,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.17-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.17-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.17-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.17-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.17-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.17-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/veilvoice-v0.1.17-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.17-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.17/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -1093,7 +1387,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.16-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.16-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.16-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.16-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.16-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.16-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/veilvoice-v0.1.16-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.16-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.16/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -1273,7 +1567,7 @@ sha256sum -c SHA256SUMS --ignore-missing</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.15-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.15-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.15-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.15-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.15-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.15-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/veilvoice-v0.1.15-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.15-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.15/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -1553,7 +1847,7 @@ curl: (22) The requested URL returned error: 403
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.14-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.14-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.14-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.14-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.14-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.14-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/veilvoice-v0.1.14-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.14-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.14/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -1691,7 +1985,7 @@ veilvoice input known</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.13-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.13-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.13-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.13-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.13-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.13-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/veilvoice-v0.1.13-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.13-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.13/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2080,7 +2374,7 @@ veilvoice capture check          exits non-zero if something unallowed is runnin
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.12-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.12-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.12-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.12-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.12-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.12-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/veilvoice-v0.1.12-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.12-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.12/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2132,7 +2426,7 @@ veilvoice gui              # open the desktop application</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.11-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.11-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.11-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.11-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.11-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.11-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/veilvoice-v0.1.11-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.11-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.11/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2176,7 +2470,7 @@ veilvoice gui              # open the desktop application</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.10-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.10-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.10-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.10-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.10-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.10-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/veilvoice-v0.1.10-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.10-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.10/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2224,7 +2518,7 @@ veilvoice gui              # open the desktop application</code></pre>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.9-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.9-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.9-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.9-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.9-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.9-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/veilvoice-v0.1.9-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.9-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.9/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2294,7 +2588,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.8-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.8-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.8-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.8-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.8-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.8-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/veilvoice-v0.1.8-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.8-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.8/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2357,7 +2651,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.7-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.7-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.7-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.7-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.7-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.7-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/veilvoice-v0.1.7-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.7-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.7/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2396,7 +2690,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.6-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.6-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.6-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.6-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.6-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.6-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/veilvoice-v0.1.6-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.6-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.6/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2470,7 +2764,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.5-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.5-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.5-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.5-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.5-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.5-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/veilvoice-v0.1.5-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.5-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.5/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2494,7 +2788,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.4-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.4-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.4-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.4-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.4-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.4-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/veilvoice-v0.1.4-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.4-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.4/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2518,7 +2812,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.3-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.3-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.3-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.3-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.3-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.3-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/veilvoice-v0.1.3-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.3-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.3/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2542,7 +2836,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.2-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.2-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.2-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.2-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.2-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.2-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/veilvoice-v0.1.2-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.2-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.2/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2566,7 +2860,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.1-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.1-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.1-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.1-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.1-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.1-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/veilvoice-v0.1.1-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.1-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.1/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
@@ -2590,7 +2884,7 @@ veilvoice-verify file veilvoice-v0.1.9-linux-x86_64.tar.gz \
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-linux-armv7-pi.tar.gz" rel="noopener noreferrer">Raspberry Pi OS, 32-bit (command line only)</a> <span class="muted">veilvoice-v0.1.0-linux-armv7-pi.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-linux-x86_64-musl-static.tar.gz" rel="noopener noreferrer">Linux, 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.0-linux-x86_64-musl-static.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-linux-arm64-musl-static.tar.gz" rel="noopener noreferrer">Linux, ARM 64-bit, static (command line only)</a> <span class="muted">veilvoice-v0.1.0-linux-arm64-musl-static.tar.gz</span></li>
-<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.0-freebsd-x86_64.tar.gz</span></li>
+<li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-freebsd-x86_64.tar.gz" rel="noopener noreferrer">FreeBSD, 64-bit (no live audio)</a> <span class="muted">veilvoice-v0.1.0-freebsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-openbsd-x86_64.tar.gz" rel="noopener noreferrer">OpenBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.0-openbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/veilvoice-v0.1.0-netbsd-x86_64.tar.gz" rel="noopener noreferrer">NetBSD, 64-bit (command line only)</a> <span class="muted">veilvoice-v0.1.0-netbsd-x86_64.tar.gz</span></li>
 <li><a href="https://github.com/tilas01/veilvoice/releases/download/v0.1.0/SHA256SUMS" rel="noopener noreferrer">SHA256SUMS</a> <span class="muted">the hash of every file above</span></li>
