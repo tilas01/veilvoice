@@ -38,6 +38,107 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The fortieth round: the path from main to a published release
+
+v0.1.23 is the first release cut by `promote.yml`, so this round walked the
+whole path once before trusting it: every workflow that runs on `main`, the
+release gate, the release build and the packages. Everything since the
+thirty-ninth round was read as well. Five findings, all in that path, and none
+in the programs themselves.
+
+### F-298: the release gate always failed on a new version
+
+**Where:** `tools/shots/sessions.py`, `check_witnessed`.
+
+**What happened:** the witnessed session is a recording of the verifier
+checking a *published* release, and the check required it to name the
+workspace version. `promote.yml` runs `tools/verify.py` whole before the
+release exists, so after any version bump the transcript could only name the
+previous release and the gate refused. The comment beside the check said the
+gate was where the question became answerable, which was true only after the
+release the gate exists to start.
+
+**Fix:** the version required is the newest published one: the workspace
+version once it has a `vX.Y.Z` tag, the highest such tag before that, and the
+workspace version when there are no tags at all. Early-build tags are not
+releases and are left out. The version is matched as a whole, so `0.1.2` is no
+longer found inside `0.1.22`.
+
+**Regression test:** `tools/shots/sessions.py --self-test`, run by
+`tools/verify.py`, holds the rule against tag lists with known answers,
+including the case of a bumped but untagged workspace, ordering by version
+rather than by text, and a prerelease tag.
+
+### F-299: the window did not compile on Windows
+
+**Where:** `crates/veilvoice-gui/src/exporting.rs`, `Workroom::new`.
+
+**What happened:** the export folder's `DirBuilder` was declared `mut` for
+both platforms and only changed on Unix, where it sets the folder's mode. On
+Windows that is an unused `mut`, which the workspace's `-D warnings` makes an
+error, so `main` failed CI on Windows and the Windows installers could not be
+built. Linux, where every local check runs, never saw it.
+
+**Fix:** the builder is made separately for Unix and for everything else, so
+neither declaration carries a `mut` it does not use.
+
+**Regression test:** the Windows Clippy job in `ci.yml`, which is what found
+it. A Linux-only check cannot see a `cfg(unix)` difference, and this one now
+passes there.
+
+### F-300: the AppImage tools were pinned to a placeholder
+
+**Where:** `.github/workflows/packages.yml`, the `appimage` job.
+
+**What happened:** `APPIMAGETOOL_SHA256` and `RUNTIME_SHA256` read
+`discover`, a placeholder left from when the job was written. The hash check
+did its job and refused both downloads, so the AppImage job could not pass,
+but the pin it was meant to hold had never been written down.
+
+**Fix:** both are pinned to the SHA-256 digests GitHub publishes for those
+release assets, which match what the first run downloaded.
+
+**Regression test:** the job's own hash check, which fails on any value but
+the right one, placeholder included.
+
+### F-301: the RPM build was killed before it finished
+
+**Where:** `packaging/rpm/veilvoice.spec`, `%build`.
+
+**What happened:** rpmbuild on Fedora passes its own `RUSTFLAGS`, which ask
+for full debugging information. Combined with the workspace's fat LTO, the two
+programs' final links, which run at the same time, needed more than the runner
+had, and the job ended with exit code 137 while linking. The spec already says
+there is no debugging package to fill, so the information was built only to be
+stripped.
+
+**Fix:** `%build` adds `-Cdebuginfo=0` after Fedora's flags, which wins over
+the earlier request and leaves the rest of Fedora's flags in place.
+
+**Regression test:** the `rpm` job in `packages.yml`, which builds, lints,
+installs, runs and removes the packages.
+
+### F-302: a failed second FreeBSD build cost the release its FreeBSD archive
+
+**Where:** `.github/workflows/release.yml`, the `freebsd` job.
+
+**What happened:** the job builds each program twice to check that the builds
+match. The first window build was allowed to fail, but the second builds ran
+under `set -e`, so a failure there ended the whole step after the archive's
+own binaries had already been built. The job is allowed to fail, so the
+release would have shipped without FreeBSD over a check rather than a build.
+The job's comment also still called the archive command line only, which it
+has not been since roadmap item 162.
+
+**Fix:** a second build that fails is reported in the archive's
+reproducibility line as not verified, with a warning, and the archive still
+ships. The comment and the download page's label for FreeBSD say what is true
+of every FreeBSD archive: no live audio.
+
+**Regression test:** none that can run outside a FreeBSD VM. The verdict line
+is written on every path and the release notes print it, so a release shows
+which one it took.
+
 ## The thirty-ninth round: the reset, read against what it promises
 
 `veilvoice reset` and the window's **Start again** are the only things in this
@@ -12461,8 +12562,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Two hundred and ninety-seven defects found and fixed (F-1 to F-297), across
-thirty-nine rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Three hundred and two defects found and fixed (F-1 to F-302), across
+forty rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

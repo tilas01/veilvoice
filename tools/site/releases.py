@@ -85,7 +85,9 @@ PLATFORMS = {
     "linux-armv7-pi": "Raspberry Pi OS, 32-bit (command line only)",
     "linux-x86_64-musl-static": "Linux, 64-bit, static (command line only)",
     "linux-arm64-musl-static": "Linux, ARM 64-bit, static (command line only)",
-    "freebsd-x86_64": "FreeBSD, 64-bit (command line only)",
+    # The window ships beside the command line from v0.1.23 when it builds
+    # (roadmap item 162), so what is true of every FreeBSD archive is this.
+    "freebsd-x86_64": "FreeBSD, 64-bit (no live audio)",
     "openbsd-x86_64": "OpenBSD, 64-bit (command line only)",
     "netbsd-x86_64": "NetBSD, 64-bit (command line only)",
 }

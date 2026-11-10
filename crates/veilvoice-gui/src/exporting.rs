@@ -356,12 +356,17 @@ impl Workroom {
     /// Makes a folder only this user can enter, beside `beside`, under a name
     /// no other folder there has.
     fn new(beside: &Path) -> std::io::Result<Self> {
-        let mut builder = std::fs::DirBuilder::new();
+        // Only Unix has a mode to set, so the builder is only mutable there;
+        // a `let mut` shared by both is an unused-mut error on Windows.
         #[cfg(unix)]
-        {
+        let builder = {
             use std::os::unix::fs::DirBuilderExt;
+            let mut builder = std::fs::DirBuilder::new();
             builder.mode(0o700);
-        }
+            builder
+        };
+        #[cfg(not(unix))]
+        let builder = std::fs::DirBuilder::new();
         for attempt in 0..100u32 {
             let path = beside.join(format!(
                 ".veilvoice-export-{}-{attempt}",

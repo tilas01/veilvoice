@@ -49,18 +49,23 @@ The verifier session checks a published release, which means the archive, the
 hash list and the signature have to exist and be downloaded. That is a
 maintainer step and it needs the network, so `--check` does not re-run it.
 
-That gives the release one ordering rule, and it is written here because the
-check that enforces it cannot state it at the moment it fails. This transcript
-records the verifier checking a release that is **already published**, so it
-cannot be made until the release exists. The order is bump, tag, publish,
-re-record, commit, and between the bump and the publication this check is
-expected to fail. `tools/verify.py` is the only thing that runs it, so a
-release commit still goes through CI green.
+This transcript records the verifier checking a release that is **already
+published**, so it cannot be made until the release exists. The order is bump,
+tag, publish, re-record, commit.
+
 Instead it holds the transcript to what the repository can prove about it: the
 fingerprint in it must be the fingerprint of the signing key committed here,
-the version in it must be the workspace version, and it must contain the
-verdict lines the verifier is documented to print. A stale or invented
+the version in it must be the newest *published* version, and it must contain
+the verdict lines the verifier is documented to print. A stale or invented
 transcript fails all three.
+
+The newest published version is the highest `vX.Y.Z` tag. Once the workspace
+version has a tag of its own, that is the one required. Between a bump and the
+publication it is the previous release, which is the only one a transcript can
+name by then. This check used to ask for the workspace version outright, and
+`promote.yml` runs it before the tag exists, so every new version failed the
+release gate on a question that could not yet have an answer (F-298). With no
+tags at all, as in a shallow clone, it falls back to the workspace version.
 
 Pure standard library.
 """
@@ -374,37 +379,65 @@ def signing_fingerprint():
     return found.group(1) if found else None
 
 
-def check_witnessed(name, transcript):
+RELEASE_TAG = re.compile(r"^v([0-9]+)\.([0-9]+)\.([0-9]+)$")
+
+
+def release_tags():
+    """The `vX.Y.Z` tags in this clone. Early builds such as `v0.1.23-beta.1`
+    are left out: the transcript records the verifier on a release."""
+    try:
+        listed = subprocess.run(
+            ["git", "tag", "--list", "v*"], cwd=ROOT, capture_output=True,
+            text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return []
+    return [tag for tag in listed.split() if RELEASE_TAG.match(tag)]
+
+
+def published_version(workspace, tags):
+    """The version the witnessed transcript can name, from the workspace
+    version and the release tags.
+
+    The workspace version once it has a tag, since a transcript of the release
+    being cut is then possible and required. Before that, the highest tag,
+    because the newest release anybody can have downloaded is the newest one
+    published. With no tags, the workspace version, so a clone without tags
+    still asks the question rather than silently passing it.
+    """
+    versions = []
+    for tag in tags:
+        found = RELEASE_TAG.match(tag)
+        if found:
+            versions.append(tuple(int(part) for part in found.groups()))
+    if not versions or ("v%s" % workspace) in tags:
+        return workspace
+    return "%d.%d.%d" % max(versions)
+
+
+def names_version(transcript, version):
+    """Whether `version` appears as a whole version, so 0.1.2 is not found
+    inside 0.1.22."""
+    pattern = r"(?<![0-9.])" + re.escape(version) + r"(?![0-9]|\.[0-9])"
+    return re.search(pattern, transcript) is not None
+
+
+def check_witnessed(name, transcript, tags=None):
     """What this repository can prove about a transcript it cannot re-run."""
     problems = []
     fingerprint = signing_fingerprint()
-    version = workspace_version()
+    workspace = workspace_version()
+    version = published_version(workspace, release_tags() if tags is None else tags) if workspace else None
     if not fingerprint:
         problems.append("no 40-character fingerprint found in README.md to compare against")
     elif fingerprint not in transcript:
         problems.append("does not name the signing key %s that README.md publishes" % fingerprint)
-    if version and version not in transcript:
-        # Expected between a version bump and the publication of that version,
-        # and the message says so rather than leaving a maintainer to work out
-        # whether they have broken something. This transcript is a recording of
-        # the verifier checking a *published* release, so it cannot be made
-        # until the release exists. The order is: bump, tag, publish, re-record
-        # here, commit.
-        #
-        # That window used to be harmless because `tools/verify.py` was the
-        # only thing that ran this, and it is run by a person. CI runs the
-        # re-runnable sessions now (F-207), which would otherwise mean `main`
-        # goes red for the days between a bump and a publication, for a state
-        # this very message calls expected. So CI passes `--rerun-only` and
-        # skips this one: a check that fires on something legitimate is a
-        # finding in itself, and the honest fix is to not ask the question
-        # where it cannot yet have an answer. The release gate in
-        # `promote.yml` runs `tools/verify.py` whole, which does ask it, and
-        # by then the answer is knowable.
+    if version and not names_version(transcript, version):
+        # CI passes `--rerun-only` and skips this one, because a clone there
+        # may have no tags. The release gate in `promote.yml` fetches the tags
+        # and runs `tools/verify.py` whole, so it is asked there.
         problems.append(
-            "does not mention the workspace version %s, so it is from an older "
-            "release. If %s has not been published yet, this is the expected "
-            "state: download the release and re-record with\n"
+            "does not mention %s, the newest published version, so it is from "
+            "an older release. Download %s and re-record with\n"
             "      python tools/shots/sessions.py --record --release <folder>"
             % (version, version))
     for required in ("ok    signature over the hash list is good",
@@ -490,6 +523,42 @@ def check(rerun_only=False):
     return 0
 
 
+def self_test():
+    """The version rule, against tag lists where the answer is known (F-298)."""
+    problems = []
+    cases = [
+        # Between the bump and the tag: the previous release, not the bump.
+        ("0.1.23", ["v0.1.21", "v0.1.22"], "0.1.22"),
+        # Once the new version is tagged, it is the one required.
+        ("0.1.23", ["v0.1.22", "v0.1.23"], "0.1.23"),
+        # By version, not by name: v0.1.9 sorts after v0.1.10 as text.
+        ("0.1.11", ["v0.1.9", "v0.1.10"], "0.1.10"),
+        # An early build is not a release.
+        ("0.1.23", ["v0.1.22", "v0.1.23-beta.1"], "0.1.22"),
+        # No tags, as in a shallow clone: the workspace version.
+        ("0.1.23", [], "0.1.23"),
+    ]
+    for workspace, tags, want in cases:
+        got = published_version(workspace, tags)
+        if got != want:
+            problems.append("published_version(%r, %r) is %r, want %r" % (workspace, tags, got, want))
+    for transcript, version, want in [
+        ("veilvoice-v0.1.22-linux", "0.1.22", True),
+        ("veilvoice-v0.1.22-linux", "0.1.2", False),
+        ("version 0.1.220", "0.1.22", False),
+        ("version 10.1.22", "0.1.22", False),
+        ("version 0.1.22.", "0.1.22", True),
+    ]:
+        if names_version(transcript, version) != want:
+            problems.append("names_version(%r, %r) should be %r" % (transcript, version, want))
+    for problem in problems:
+        print("  " + problem, file=sys.stderr)
+    if problems:
+        return 1
+    print("  the witnessed session's version rule holds in %d cases" % (len(cases) + 5))
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--record", action="store_true", help="run the sessions and write them down")
@@ -499,7 +568,11 @@ def main():
     parser.add_argument("--rerun-only", action="store_true",
                         help="check only the sessions that can be re-run here, "
                              "skipping the one that records a published release")
+    parser.add_argument("--self-test", action="store_true",
+                        help="check the version rule for the witnessed session")
     args = parser.parse_args()
+    if args.self_test:
+        return self_test()
     if args.record:
         return record(args.release)
     return check(rerun_only=args.rerun_only)

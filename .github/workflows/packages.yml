@@ -271,9 +271,11 @@ jobs:
       # The AppImage project's own builder and runtime, by tag and by hash.
       # A tag can be moved; the hash cannot, and a mismatch stops the build.
       APPIMAGETOOL_URL: https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage
-      APPIMAGETOOL_SHA256: discover
+      # Both hashes are the digests GitHub publishes for these release assets,
+      # and match what the first run of this job downloaded.
+      APPIMAGETOOL_SHA256: ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0
       RUNTIME_URL: https://github.com/AppImage/type2-runtime/releases/download/20251108/runtime-x86_64
-      RUNTIME_SHA256: discover
+      RUNTIME_SHA256: 2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d
       # No FUSE inside a container: the tools unpack themselves instead.
       APPIMAGE_EXTRACT_AND_RUN: 1
     steps:

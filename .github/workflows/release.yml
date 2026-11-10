@@ -345,11 +345,12 @@ jobs:
 
   # FreeBSD has no GitHub runner, so this builds inside a VM on a Linux one.
   #
-  # It is CLI-only and deliberately so: `cpal` has no backend for the BSDs, so
-  # live capture cannot work there. Everything else, meaning file
-  # de-identification, encryption and metadata cleaning, is pure Rust and runs
-  # fine, which is why the `live` feature exists to be turned off rather than
-  # the whole build failing.
+  # It builds without live audio: `cpal` has no backend for the BSDs, so live
+  # capture cannot work there. Everything else, meaning file de-identification,
+  # encryption and metadata cleaning, is pure Rust and runs fine, which is why
+  # the `live` feature exists to be turned off rather than the whole build
+  # failing. The command line always ships; the window ships beside it when it
+  # builds (roadmap item 162), and its reproducibility is checked the same way.
   #
   # Marked continue-on-error: a third-party VM action failing should not hold up
   # a release for the four first-class platforms. When it fails, the release
@@ -410,9 +411,17 @@ jobs:
             cd "$rebuild"
             src_b="$(pwd -P)"
             export RUSTFLAGS="--remap-path-prefix=$src_b=/veilvoice --remap-path-prefix=$HOME/.cargo=/cargo"
-            cargo build --release --locked -p veilvoice-cli --no-default-features
-            if [ -f "$HOME/vvg-first" ]; then
-              cargo build --release --locked -p veilvoice-gui --no-default-features
+            # The second builds may fail as the first window build may: under
+            # `set -e` a failure here used to end the step, and with it the
+            # FreeBSD archive, over a check of a build that had already
+            # succeeded. A rebuild that fails is reported, not fatal.
+            rebuilt=yes
+            if ! cargo build --release --locked -p veilvoice-cli --no-default-features; then
+              rebuilt=no
+            fi
+            if [ -f "$HOME/vvg-first" ] \
+               && ! cargo build --release --locked -p veilvoice-gui --no-default-features; then
+              rebuilt=no
             fi
 
             # Both programs are compared when both were built: a reproducible
@@ -422,7 +431,10 @@ jobs:
             if [ -f "$HOME/vvg-first" ] && ! cmp -s "$HOME/vvg-first" target/release/veilvoice-gui; then
               window_same=no
             fi
-            if cmp -s "$HOME/vv-first" target/release/veilvoice && [ "$window_same" = yes ]; then
+            if [ "$rebuilt" = no ]; then
+              echo "not-verified (the second build failed)" > "$src_a/.repro-verdict"
+              echo "::warning::the second build failed, so reproducibility was not checked"
+            elif cmp -s "$HOME/vv-first" target/release/veilvoice && [ "$window_same" = yes ]; then
               echo reproducible > "$src_a/.repro-verdict"
             else
               # Said in as many words rather than dropped: a platform that stops

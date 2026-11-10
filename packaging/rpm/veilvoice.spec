@@ -70,6 +70,13 @@ The VeilVoice desktop application.
 # --locked: build exactly the dependency versions the project tested, rather
 # than whatever resolves today. A package that silently drifts from the tested
 # graph is not the software that was audited.
+#
+# Fedora's build flags reach cargo through RUSTFLAGS and ask for full debugging
+# information (-Cdebuginfo=2). With the workspace's fat LTO that made the final
+# links of the two programs, which run side by side, too large for a CI runner,
+# and the build was killed (exit 137). There is no -debuginfo package to fill
+# (see debug_package above), so the request is withdrawn; a later flag wins.
+export RUSTFLAGS="${RUSTFLAGS:-} -Cdebuginfo=0"
 cargo build --release --locked --workspace
 
 %install

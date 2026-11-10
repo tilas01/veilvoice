@@ -514,6 +514,10 @@ CHECKS = [
     # The recorded sessions, re-run and compared. This is the check that would
     # have caught the demonstration inventing the verifier's output, and it is
     # the only one here that runs the programs rather than reading about them.
+    # The witnessed session names the newest published release, so its rule
+    # is held against tag lists where the answer is known (F-298).
+    ("the witnessed session asks for a version that exists",
+     [sys.executable, "tools/shots/sessions.py", "--self-test"]),
     ("recorded sessions match the programs",
      [sys.executable, "tools/shots/sessions.py", "--check"]),
     # Every check above this one is about the pictures as pictures: no capture
