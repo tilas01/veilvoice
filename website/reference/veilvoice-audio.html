@@ -153,7 +153,7 @@
 <a href="veilvoice-audio/live.src.html">
 <rect x="277.1" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="327.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">live.rs</text>
-<text x="327.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">867 lines</text>
+<text x="327.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">876 lines</text>
 </a>
 <a href="veilvoice-audio/meter.src.html">
 <rect x="75.2" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -173,7 +173,7 @@
 <a href="veilvoice-audio/room.src.html">
 <rect x="344.4" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="394.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">room.rs</text>
-<text x="394.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">556 lines</text>
+<text x="394.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">560 lines</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">box: a file in this crate, with how many lines it holds</text>
@@ -193,11 +193,11 @@ flowchart TD
     n_devices[&quot;devices.rs&lt;br/&gt;390 lines&quot;]
     n_io[&quot;io.rs&lt;br/&gt;608 lines&quot;]
     n_kinds[&quot;kinds.rs&lt;br/&gt;204 lines&quot;]
-    n_live[&quot;live.rs&lt;br/&gt;867 lines&quot;]
+    n_live[&quot;live.rs&lt;br/&gt;876 lines&quot;]
     n_meter[&quot;meter.rs&lt;br/&gt;166 lines&quot;]
     n_playback[&quot;playback.rs&lt;br/&gt;219 lines&quot;]
     n_record[&quot;record.rs&lt;br/&gt;543 lines&quot;]
-    n_room[&quot;room.rs&lt;br/&gt;556 lines&quot;]
+    n_room[&quot;room.rs&lt;br/&gt;560 lines&quot;]
     n_absent --&gt; n_devices
     n_absent --&gt; n_kinds
     n_absent --&gt; n_live
@@ -241,11 +241,11 @@ flowchart TD
 <tr><td><a href="veilvoice-audio/io.html"><code>io.rs</code></a></td><td>608</td><td>Reading and writing audio files.</td></tr>
 <tr><td><a href="veilvoice-audio/kinds.html"><code>kinds.rs</code></a></td><td>204</td><td>What the live path reports, kept apart from the live path itself.</td></tr>
 <tr><td><a href="veilvoice-audio/lib.html"><code>lib.rs</code></a></td><td>431</td><td>Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture &#8594; de-identify &#8594; playback path.</td></tr>
-<tr><td><a href="veilvoice-audio/live.html"><code>live.rs</code></a></td><td>867</td><td>Live microphone scrambling.</td></tr>
+<tr><td><a href="veilvoice-audio/live.html"><code>live.rs</code></a></td><td>876</td><td>Live microphone scrambling.</td></tr>
 <tr><td><a href="veilvoice-audio/meter.html"><code>meter.rs</code></a></td><td>166</td><td>The scale a level meter is drawn on.</td></tr>
 <tr><td><a href="veilvoice-audio/playback.html"><code>playback.rs</code></a></td><td>219</td><td>Playing a recording that is only in memory, and never on disk.</td></tr>
 <tr><td><a href="veilvoice-audio/record.html"><code>record.rs</code></a></td><td>543</td><td>Recording the veiled voice without it ever reaching unprotected memory.</td></tr>
-<tr><td><a href="veilvoice-audio/room.html"><code>room.rs</code></a></td><td>556</td><td>Roadmap item 147.</td></tr>
+<tr><td><a href="veilvoice-audio/room.html"><code>room.rs</code></a></td><td>560</td><td>Roadmap item 147.</td></tr>
 </tbody></table>
 </section>
 </div></div>

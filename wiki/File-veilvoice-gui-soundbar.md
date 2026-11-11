@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/soundbar.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 782 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 796 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/soundbar.rs)
 
 ## Contents
 
@@ -90,7 +90,7 @@ ignores it is animation that makes an application unusable for them.
 
 ## What this file contains
 
-782 lines defining **6 functions** (2 public), **0 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+796 lines defining **6 functions** (2 public), **0 types** and **5 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 

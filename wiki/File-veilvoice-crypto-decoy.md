@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/decoy.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1065 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs)
+[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 1097 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs)
 
 ## Contents
 
@@ -115,7 +115,7 @@ that claimed to would be lying to you at the worst possible moment.
 
 ## What this file contains
 
-1065 lines defining **17 functions** (9 public), **6 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1097 lines defining **17 functions** (9 public), **6 types** and **6 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -123,21 +123,21 @@ that claimed to would be lying to you at the worst possible moment.
 - `struct Verifier` (line 114) -- One passphrase's stored form.
 - `enum Refused` (line 164) -- Why a pair was refused.
 - `struct Decoy` (line 248) -- A decoy passphrase's stored form, on its own.
-- `enum State` (line 385) -- Whether this machine has a decoy passphrase, and whether it can be read.
-- `struct Store` (line 405) -- The decoy passphrase as this machine keeps it.
+- `enum State` (line 397) -- Whether this machine has a decoy passphrase, and whether it can be read.
+- `struct Store` (line 417) -- The decoy passphrase as this machine keeps it.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `Decoy::to_bytes` (line 318) -- The record, for writing.
-- `Decoy::parse` (line 341) -- Read a record.
-- `Store::here` (line 421) -- The store for this copy of VeilVoice.
+- `Decoy::to_bytes` (line 323) -- The record, for writing: its fields, then random bytes up to the app lock's own length.
+- `Decoy::parse` (line 351) -- Read a record.
+- `Store::here` (line 433) -- The store for this copy of VeilVoice.
   - reaches: `at`
-- `Store::state` (line 427) -- Whether a decoy is set, and whether it reads.
-- `Store::set` (line 445) -- Set or replace the decoy passphrase.
+- `Store::state` (line 439) -- Whether a decoy is set, and whether it reads.
+- `Store::set` (line 457) -- Set or replace the decoy passphrase.
   - reaches: `create`, `prove`
-- `Store::remove` (line 463) -- Remove the decoy passphrase, after proving the real one.
+- `Store::remove` (line 475) -- Remove the decoy passphrase, after proving the real one.
   - reaches: `prove`
-- `Store::judge` (line 528) -- Which passphrase was typed.
+- `Store::judge` (line 540) -- Which passphrase was typed.
   - reaches: `nothing`
 
 ## What calls what
@@ -162,15 +162,15 @@ flowchart TD
     n_create["Decoy::create<br/>line 273"]
     n_nothing["Decoy::nothing<br/>line 300"]
     n_matches["Decoy::matches<br/>line 313"]
-    n_to_bytes(["Decoy::to_bytes<br/>line 318"])
-    n_parse(["Decoy::parse<br/>line 341"])
-    n_at["Store::at<br/>line 414"]
-    n_here(["Store::here<br/>line 421"])
-    n_state(["Store::state<br/>line 427"])
-    n_set(["Store::set<br/>line 445"])
-    n_remove(["Store::remove<br/>line 463"])
-    n_prove["Store::prove<br/>line 480"]
-    n_judge(["Store::judge<br/>line 528"])
+    n_to_bytes(["Decoy::to_bytes<br/>line 323"])
+    n_parse(["Decoy::parse<br/>line 351"])
+    n_at["Store::at<br/>line 426"]
+    n_here(["Store::here<br/>line 433"])
+    n_state(["Store::state<br/>line 439"])
+    n_set(["Store::set<br/>line 457"])
+    n_remove(["Store::remove<br/>line 475"])
+    n_prove["Store::prove<br/>line 492"]
+    n_judge(["Store::judge<br/>line 540"])
     n_here --> n_at
     n_judge --> n_nothing
     n_matches --> n_constant_time_eq
@@ -185,15 +185,15 @@ flowchart TD
     click n_create href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L273" "open the source"
     click n_nothing href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L300" "open the source"
     click n_matches href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L313" "open the source"
-    click n_to_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L318" "open the source"
-    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L341" "open the source"
-    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L414" "open the source"
-    click n_here href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L421" "open the source"
-    click n_state href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L427" "open the source"
-    click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L445" "open the source"
-    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L463" "open the source"
-    click n_prove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L480" "open the source"
-    click n_judge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L528" "open the source"
+    click n_to_bytes href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L323" "open the source"
+    click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L351" "open the source"
+    click n_at href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L426" "open the source"
+    click n_here href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L433" "open the source"
+    click n_state href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L439" "open the source"
+    click n_set href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L457" "open the source"
+    click n_remove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L475" "open the source"
+    click n_prove href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L492" "open the source"
+    click n_judge href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L540" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_to_bytes,n_parse,n_here,n_state,n_set,n_remove,n_judge entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -233,16 +233,16 @@ flowchart TD
 | `Decoy::create` <sub>pub fn</sub> | [273](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L273) | Make a decoy from the real passphrase and the decoy one. |
 | `Decoy::nothing` <sub>fn</sub> | [300](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L300) | A record no passphrase opens, for the sake of taking the same time. |
 | `Decoy::matches` <sub>pub(crate) fn</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L313) | Derive and compare. |
-| `Decoy::to_bytes` <sub>pub fn</sub> | [318](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L318) | The record, for writing. |
-| `Decoy::parse` <sub>pub fn</sub> | [341](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L341) | Read a record. |
-| `State` <sub>pub enum</sub> | [385](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L385) | Whether this machine has a decoy passphrase, and whether it can be read. |
-| `Store` <sub>pub struct</sub> | [405](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L405) | The decoy passphrase as this machine keeps it. |
-| `Store::at` <sub>pub fn</sub> | [414](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L414) | The store under base, which is the folder the app lock lives in. |
-| `Store::here` <sub>pub fn</sub> | [421](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L421) | The store for this copy of VeilVoice. |
-| `Store::state` <sub>pub fn</sub> | [427](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L427) | Whether a decoy is set, and whether it reads. |
-| `Store::set` <sub>pub fn</sub> | [445](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L445) | Set or replace the decoy passphrase. |
-| `Store::remove` <sub>pub fn</sub> | [463](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L463) | Remove the decoy passphrase, after proving the real one. |
-| `Store::prove` <sub>fn</sub> | [480](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L480) | That real really is this machine's passphrase. |
-| `Store::judge` <sub>pub fn</sub> | [528](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L528) | Which passphrase was typed. |
-| `SCOPE` <sub>pub const</sub> | [566](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L566) | What a decoy is worth, in the words a front end must show. |
-| `WHY_NO_DESTRUCTION` <sub>pub const</sub> | [579](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L579) | Why no passphrase destroys anything, and why that is the honest choice. |
+| `Decoy::to_bytes` <sub>pub fn</sub> | [323](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L323) | The record, for writing: its fields, then random bytes up to the app lock's own length. |
+| `Decoy::parse` <sub>pub fn</sub> | [351](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L351) | Read a record. |
+| `State` <sub>pub enum</sub> | [397](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L397) | Whether this machine has a decoy passphrase, and whether it can be read. |
+| `Store` <sub>pub struct</sub> | [417](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L417) | The decoy passphrase as this machine keeps it. |
+| `Store::at` <sub>pub fn</sub> | [426](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L426) | The store under base, which is the folder the app lock lives in. |
+| `Store::here` <sub>pub fn</sub> | [433](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L433) | The store for this copy of VeilVoice. |
+| `Store::state` <sub>pub fn</sub> | [439](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L439) | Whether a decoy is set, and whether it reads. |
+| `Store::set` <sub>pub fn</sub> | [457](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L457) | Set or replace the decoy passphrase. |
+| `Store::remove` <sub>pub fn</sub> | [475](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L475) | Remove the decoy passphrase, after proving the real one. |
+| `Store::prove` <sub>fn</sub> | [492](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L492) | That real really is this machine's passphrase. |
+| `Store::judge` <sub>pub fn</sub> | [540](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L540) | Which passphrase was typed. |
+| `SCOPE` <sub>pub const</sub> | [578](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L578) | What a decoy is worth, in the words a front end must show. |
+| `WHY_NO_DESTRUCTION` <sub>pub const</sub> | [591](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/decoy.rs#L591) | Why no passphrase destroys anything, and why that is the honest choice. |

@@ -96,7 +96,7 @@ file is written.
 flowchart TD
     n_lib(["lib.rs<br/>1824 lines"])
     n_main(["main.rs<br/>281 lines"])
-    n_app["app.rs<br/>3697 lines"]
+    n_app["app.rs<br/>3700 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>305 lines"]
     n_crashlog["crashlog.rs<br/>450 lines"]
@@ -107,12 +107,12 @@ flowchart TD
     n_firstrun["firstrun.rs<br/>871 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
     n_group["group.rs<br/>2129 lines"]
-    n_integrity["integrity.rs<br/>397 lines"]
+    n_integrity["integrity.rs<br/>514 lines"]
     n_layout["layout.rs<br/>632 lines"]
     n_monitor["monitor.rs<br/>579 lines"]
     n_notify["notify.rs<br/>460 lines"]
     n_offthread["offthread.rs<br/>280 lines"]
-    n_pace["pace.rs<br/>509 lines"]
+    n_pace["pace.rs<br/>537 lines"]
     n_palettes["palettes.rs<br/>714 lines"]
     n_paths["paths.rs<br/>248 lines"]
     n_policy["policy.rs<br/>320 lines"]
@@ -124,7 +124,7 @@ flowchart TD
     n_security["security.rs<br/>3258 lines"]
     n_settings["settings.rs<br/>1686 lines"]
     n_setup["setup.rs<br/>1144 lines"]
-    n_soundbar["soundbar.rs<br/>782 lines"]
+    n_soundbar["soundbar.rs<br/>796 lines"]
     n_storage["storage.rs<br/>661 lines"]
     n_studio["studio.rs<br/>2845 lines"]
     n_theme["theme.rs<br/>813 lines"]
@@ -327,7 +327,7 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3697 | The VeilVoice desktop application: seven tabs, one window, no menus. |
+| [`app.rs`](../../docs/files/veilvoice-gui/app.md) | 3700 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](../../docs/files/veilvoice-gui/autolock.md) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](../../docs/files/veilvoice-gui/avnotice.md) | 305 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
 | [`crashlog.rs`](../../docs/files/veilvoice-gui/crashlog.md) | 450 | Make a failure that produces no output produce some. |
@@ -338,14 +338,14 @@ flowchart TD
 | [`firstrun.rs`](../../docs/files/veilvoice-gui/firstrun.md) | 871 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](../../docs/files/veilvoice-gui/graphics.md) | 214 | What the window is drawn with, asked for explicitly and then reported. |
 | [`group.rs`](../../docs/files/veilvoice-gui/group.md) | 2129 | Group mode: several people in one recording, each with a name and a colour. |
-| [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 397 | The integrity record, taken and checked by the window rather than by hand. |
+| [`integrity.rs`](../../docs/files/veilvoice-gui/integrity.md) | 514 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](../../docs/files/veilvoice-gui/layout.md) | 632 | Centring a row of widgets, which egui does not do by nesting. |
 | [`lib.rs`](../../docs/files/veilvoice-gui/lib.md) | 1824 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](../../docs/files/veilvoice-gui/main.md) | 281 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
 | [`monitor.rs`](../../docs/files/veilvoice-gui/monitor.md) | 579 | The live monitor: what is going in, and what is coming out, wherever you are. |
 | [`notify.rs`](../../docs/files/veilvoice-gui/notify.md) | 460 | How the application tells you something, and the three ways to be told. |
 | [`offthread.rs`](../../docs/files/veilvoice-gui/offthread.md) | 280 | One answer, worked out somewhere that is not the thread drawing the window. |
-| [`pace.rs`](../../docs/files/veilvoice-gui/pace.md) | 509 | How often the window draws while something in it is moving, and what that actually came to. |
+| [`pace.rs`](../../docs/files/veilvoice-gui/pace.md) | 537 | How often the window draws while something in it is moving, and what that actually came to. |
 | [`palettes.rs`](../../docs/files/veilvoice-gui/palettes.md) | 714 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`paths.rs`](../../docs/files/veilvoice-gui/paths.md) | 248 | Exactly where this copy of VeilVoice is keeping things. |
 | [`policy.rs`](../../docs/files/veilvoice-gui/policy.md) | 320 | The policy in force, and what the interface does about it. |
@@ -357,7 +357,7 @@ flowchart TD
 | [`security.rs`](../../docs/files/veilvoice-gui/security.md) | 3258 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](../../docs/files/veilvoice-gui/settings.md) | 1686 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](../../docs/files/veilvoice-gui/setup.md) | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
-| [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 782 | The animated mark: a row of bars that rise and fall. |
+| [`soundbar.rs`](../../docs/files/veilvoice-gui/soundbar.md) | 796 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](../../docs/files/veilvoice-gui/storage.md) | 661 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`studio.rs`](../../docs/files/veilvoice-gui/studio.md) | 2845 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](../../docs/files/veilvoice-gui/theme.md) | 813 | Colour schemes for the desktop app. |
@@ -368,7 +368,7 @@ flowchart TD
 | [`watchfeed.rs`](../../docs/files/veilvoice-gui/watchfeed.md) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](../../docs/files/veilvoice-gui/window.md) | 249 | How big the window opens, and why it is not a constant. |
 
-**24,502 functional lines of Rust** in this crate. A functional line is a line
+**24,627 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

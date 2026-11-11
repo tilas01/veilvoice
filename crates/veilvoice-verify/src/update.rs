@@ -1412,6 +1412,14 @@ mod tests {
         let second = crate::builder::with_platform_extension(crate::extracted::PROGRAMS[1]);
         std::fs::write(into.join(&first), b"the old one").unwrap();
         std::fs::create_dir_all(into.join(&second)).unwrap();
+        // On Windows the routine first moves what is at the name aside, to
+        // `<name>.old`, and a directory moves aside as readily as a file, so
+        // the directory alone blocks nothing there (F-303). A non-empty
+        // directory at the aside name does: no file removal clears it and no
+        // rename goes over it. Elsewhere the routine never looks at that name.
+        let aside = into.join(format!("{second}.old"));
+        std::fs::create_dir_all(&aside).unwrap();
+        std::fs::write(aside.join("keep"), b"in the way").unwrap();
 
         let error = put_in_place(&from, &into).expect_err("the second one cannot go in");
         let said = error.to_string();

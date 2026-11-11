@@ -178,7 +178,11 @@ function run() {
   }
 
   // And it applies it to the one landing that writes no hash. F-205.
-  const handler = js.slice(js.indexOf('a[href^="#"]'));
+  // Only the click handler: from its selector to the next listener. Reading to
+  // the end of the file let the test pass on code outside the handler.
+  const from = js.indexOf('a[href^="#"]');
+  const next = js.indexOf("addEventListener(", from);
+  const handler = js.slice(from, next === -1 ? undefined : next);
   if (!/named\(\)\s*===\s*id/.test(handler) || !/teleport\(id,\s*true\)/.test(handler)) {
     fail("js/teleport.js cues a landing only when the hash changes, so a " +
          "click on a link naming the fragment already in the address bar " +

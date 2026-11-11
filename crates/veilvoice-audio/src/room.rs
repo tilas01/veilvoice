@@ -223,22 +223,26 @@ impl RoomSession {
                     move |data: &[f32], _| {
                         let mut peak = 0.0f32;
                         let mut dropped = 0u64;
-                        let mut kept_here = 0usize;
-                        for frame in data.chunks(in_channels) {
-                            let mono = frame.iter().sum::<f32>() / in_channels as f32;
-                            peak = peak.max(mono.abs());
-                            // The real voice, at the one moment it exists in
-                            // this process, and only where it was asked for.
-                            if plain_sink.is_some() && kept_here < mono_scratch.len() {
-                                mono_scratch[kept_here] = mono;
-                                kept_here += 1;
+                        // A block the size of the scratch at a time, so the
+                        // kept copy never stops short. F-305, as in `live`.
+                        for block in data.chunks(in_channels * mono_scratch.len().max(1)) {
+                            let mut kept_here = 0usize;
+                            for frame in block.chunks(in_channels) {
+                                let mono = frame.iter().sum::<f32>() / in_channels as f32;
+                                peak = peak.max(mono.abs());
+                                // The real voice, at the one moment it exists
+                                // in this process, and only where it was asked for.
+                                if plain_sink.is_some() && kept_here < mono_scratch.len() {
+                                    mono_scratch[kept_here] = mono;
+                                    kept_here += 1;
+                                }
+                                if producer.try_push(mono).is_err() {
+                                    dropped += 1;
+                                }
                             }
-                            if producer.try_push(mono).is_err() {
-                                dropped += 1;
+                            if let Some(sink) = plain_sink.as_mut() {
+                                sink.write(&mono_scratch[..kept_here]);
                             }
-                        }
-                        if let Some(sink) = plain_sink.as_mut() {
-                            sink.write(&mono_scratch[..kept_here]);
                         }
                         // Never block the callback for a statistics update.
                         if let Ok(mut stats) = capture_shared.stats.try_lock() {

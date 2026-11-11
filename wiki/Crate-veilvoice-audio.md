@@ -73,11 +73,11 @@ flowchart TD
     n_devices["devices.rs<br/>390 lines"]
     n_io["io.rs<br/>608 lines"]
     n_kinds["kinds.rs<br/>204 lines"]
-    n_live["live.rs<br/>867 lines"]
+    n_live["live.rs<br/>876 lines"]
     n_meter["meter.rs<br/>166 lines"]
     n_playback["playback.rs<br/>219 lines"]
     n_record["record.rs<br/>543 lines"]
-    n_room["room.rs<br/>556 lines"]
+    n_room["room.rs<br/>560 lines"]
     n_absent --> n_devices
     n_absent --> n_kinds
     n_absent --> n_live
@@ -123,13 +123,13 @@ flowchart TD
 | [`io.rs`](File-veilvoice-audio-io) | 608 | Reading and writing audio files. |
 | [`kinds.rs`](File-veilvoice-audio-kinds) | 204 | What the live path reports, kept apart from the live path itself. |
 | [`lib.rs`](File-veilvoice-audio-lib) | 431 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
-| [`live.rs`](File-veilvoice-audio-live) | 867 | Live microphone scrambling. |
+| [`live.rs`](File-veilvoice-audio-live) | 876 | Live microphone scrambling. |
 | [`meter.rs`](File-veilvoice-audio-meter) | 166 | The scale a level meter is drawn on. |
 | [`playback.rs`](File-veilvoice-audio-playback) | 219 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](File-veilvoice-audio-record) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
-| [`room.rs`](File-veilvoice-audio-room) | 556 | Roadmap item 147. |
+| [`room.rs`](File-veilvoice-audio-room) | 560 | Roadmap item 147. |
 
-**3,091 functional lines of Rust** in this crate. A functional line is a line
+**3,096 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

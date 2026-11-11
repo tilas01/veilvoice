@@ -46,8 +46,10 @@ longer offered as the explanation for anything.
 v0.1.23 is the first release cut by `promote.yml`, so this round walked the
 whole path once before trusting it: every workflow that runs on `main`, the
 release gate, the release build and the packages. Everything since the
-thirty-ninth round was read as well. Five findings, all in that path, and none
-in the programs themselves.
+thirty-ninth round was read as well. Six findings came from that path, F-298
+to F-303. Five more, F-304 to F-308, came from the one-time audit and were
+taken into this release because two of them concern the decoy passphrase and
+one can fail the release's own verify run.
 
 ### F-298: the release gate always failed on a new version
 
@@ -116,10 +118,14 @@ there is no debugging package to fill, so the information was built only to be
 stripped.
 
 **Fix:** `%build` adds `-Cdebuginfo=0` after Fedora's flags, which wins over
-the earlier request and leaves the rest of Fedora's flags in place.
+the earlier request and leaves the rest of Fedora's flags in place. That alone
+was not enough: the next run was killed at the same point. So the two programs
+are now built one after the other, and `%check` runs two jobs, since every
+test program is a fat-LTO link too.
 
 **Regression test:** the `rpm` job in `packages.yml`, which builds, lints,
-installs, runs and removes the packages.
+installs, runs and removes the packages. The job is not part of the release
+gate, and the release does not ship an RPM yet.
 
 ### F-302: a failed second FreeBSD build cost the release its FreeBSD archive
 
@@ -141,6 +147,108 @@ of every FreeBSD archive: no live audio.
 **Regression test:** none that can run outside a FreeBSD VM. The verdict line
 is written on every path and the release notes print it, so a release shows
 which one it took.
+
+### F-303: a test of a part-finished update could not fail on Windows
+
+**Where:** `crates/veilvoice-verify/src/update.rs`,
+`a_failure_partway_through_names_what_it_had_already_replaced`.
+
+**What happened:** the test made the second program impossible to replace by
+putting a directory at its name, because no rename goes over a directory. On
+Windows the shared routine first moves whatever is at the name aside to
+`<name>.old`, and a directory moves aside as readily as a file, so the update
+succeeded and the test failed on the Windows CI job. The behaviour under test
+was right on every platform; the test only knew how to cause the failure on
+Unix.
+
+**Fix:** a non-empty directory also sits at `<name>.old`. Removing a file
+cannot clear it and no rename goes over it, so the move aside fails on
+Windows, and elsewhere the routine never looks at that name.
+
+**Regression test:** the test itself, now failing for the same reason on all
+three platforms CI runs.
+
+### F-304: a decoy session's integrity panel said which passphrase had been typed
+
+**Where:** `crates/veilvoice-gui/src/integrity.rs` and the unlock handling in
+`crates/veilvoice-gui/src/app.rs`.
+
+**What happened:** a real unlock hands the passphrase to the integrity check,
+and the panel shows its result. A decoy unlock handed nothing over, so the
+panel stayed at "not checked this session", which a real session never shows
+once it is unlocked. Anybody looking over the shoulder could tell the two
+apart.
+
+**Fix:** a decoy unlock runs `check_decoy` on a worker. It checks the plain
+record if there is one, and otherwise hashes the files as they are and reports
+them the way a clean real session does, sealed or not as the folder shows. It
+writes nothing, so it cannot leave a plain record beside a sealed one or touch
+the real session's evidence.
+
+**Regression test:** `a_decoy_session_reads_like_a_real_one_and_writes_nothing`
+and `a_decoy_session_checks_a_plain_record`.
+
+### F-305: a long audio callback cut the kept plain voice short
+
+**Where:** the input callbacks in `crates/veilvoice-audio/src/live.rs` and
+`room.rs`.
+
+**What happened:** when the user asked to keep their plain voice, it was
+gathered into a fixed scratch buffer during each callback and written once at
+the end. A callback with more frames than the buffer holds filled it and kept
+nothing more, so the kept recording lost audio without saying so.
+
+**Fix:** each callback is taken one buffer-sized block at a time, and each
+block is written as it completes. Nothing allocates on the audio thread, and
+the plain voice is still written from exactly one place in each callback.
+
+**Regression test:** `the_recorder_is_fed_from_the_engine_and_from_nowhere_else`
+now also requires the block-wise loop, beside its existing check that the
+plain voice has one write site.
+
+### F-306: the decoy record's size said that a decoy was set
+
+**Where:** `Decoy::to_bytes` and `Decoy::parse` in
+`crates/veilvoice-crypto/src/decoy.rs`.
+
+**What happened:** the decoy record was a 72-byte file beside two app-lock
+copies of 125 bytes. Its names are meaningless by design, but its size alone
+gave it away.
+
+**Fix:** it is written padded with random bytes to the lock's length, so the
+three files match. A record written unpadded by an older build still reads,
+and any other length is refused.
+
+**Regression test:** `a_decoy_record_is_the_size_of_a_lock_record`, and
+`a_record_reads_back_as_what_was_written` expects the padded length.
+
+### F-307: two window tests failed in a full run and passed alone
+
+**Where:** the tests in `crates/veilvoice-gui/src/pace.rs` and `soundbar.rs`.
+
+**What happened:** the frame pace lives in two process-wide statics. Tests
+that set a 30 fps target ran beside tests expecting the display's pace, and
+one that finished with a fixed target left it behind for the next. They failed
+about one run in ten, which also failed `tools/verify.py --quick`, including
+while this release was being prepared.
+
+**Fix:** a test-only lock, `pace::statics_held`, is held by every test in both
+modules and resets the statics when it is taken.
+
+**Regression test:** the race is the test: 25 parallel runs of both modules,
+and 15 of the whole window suite, passed after the fix.
+
+### F-308: the anchor test read past the handler it was about
+
+**Where:** `tools/site-tests/anchors.test.js`.
+
+**What happened:** it sliced the script from the click handler to the end of
+the file, so its checks could pass on code that is not in the handler.
+
+**Fix:** it reads from the handler's selector to the next listener.
+
+**Regression test:** the test itself, which still passes against the real
+handler.
 
 ## The thirty-ninth round: the reset, read against what it promises
 
@@ -10895,7 +11003,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1962 tests across 13 crates, plus doctests and 21 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1965 tests across 13 crates, plus doctests and 21 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -12565,7 +12673,7 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Three hundred and two defects found and fixed (F-1 to F-302), across
+**Three hundred and eight defects found and fixed (F-1 to F-308), across
 forty rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the

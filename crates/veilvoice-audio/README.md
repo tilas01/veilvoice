@@ -86,11 +86,11 @@ flowchart TD
     n_devices["devices.rs<br/>390 lines"]
     n_io["io.rs<br/>608 lines"]
     n_kinds["kinds.rs<br/>204 lines"]
-    n_live["live.rs<br/>867 lines"]
+    n_live["live.rs<br/>876 lines"]
     n_meter["meter.rs<br/>166 lines"]
     n_playback["playback.rs<br/>219 lines"]
     n_record["record.rs<br/>543 lines"]
-    n_room["room.rs<br/>556 lines"]
+    n_room["room.rs<br/>560 lines"]
     n_absent --> n_devices
     n_absent --> n_kinds
     n_absent --> n_live
@@ -136,13 +136,13 @@ flowchart TD
 | [`io.rs`](../../docs/files/veilvoice-audio/io.md) | 608 | Reading and writing audio files. |
 | [`kinds.rs`](../../docs/files/veilvoice-audio/kinds.md) | 204 | What the live path reports, kept apart from the live path itself. |
 | [`lib.rs`](../../docs/files/veilvoice-audio/lib.md) | 431 | Everything between the sound hardware and veilvoice_core: device enumeration, file import and export, and the real-time capture → de-identify → playback path. |
-| [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 867 | Live microphone scrambling. |
+| [`live.rs`](../../docs/files/veilvoice-audio/live.md) | 876 | Live microphone scrambling. |
 | [`meter.rs`](../../docs/files/veilvoice-audio/meter.md) | 166 | The scale a level meter is drawn on. |
 | [`playback.rs`](../../docs/files/veilvoice-audio/playback.md) | 219 | Playing a recording that is only in memory, and never on disk. |
 | [`record.rs`](../../docs/files/veilvoice-audio/record.md) | 543 | Recording the veiled voice without it ever reaching unprotected memory. |
-| [`room.rs`](../../docs/files/veilvoice-audio/room.md) | 556 | Roadmap item 147. |
+| [`room.rs`](../../docs/files/veilvoice-audio/room.md) | 560 | Roadmap item 147. |
 
-**3,091 functional lines of Rust** in this crate. A functional line is a line
+**3,096 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

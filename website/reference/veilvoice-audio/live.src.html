@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-audio/src/live.rs</code></h1>
-<p style="color:var(--muted)"><a href="live.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 867 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="live.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 876 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -574,401 +574,410 @@
 <span class="ln" id="L475">                <span class="tok-kw">move</span> |data: &amp;[f32], _| {</span>
 <span class="ln" id="L476">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> peak = <span class="tok-num">0</span>.0f32;</span>
 <span class="ln" id="L477">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> dropped = 0u64;</span>
-<span class="ln" id="L478">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> kept = 0usize;</span>
-<span class="ln" id="L479">                    <span class="tok-com">// Downmix to mono: the engine is single channel, and a</span></span>
-<span class="ln" id="L480">                    <span class="tok-com">// stereo image is itself a recording-setup fingerprint.</span></span>
-<span class="ln" id="L481">                    <span class="tok-kw">for</span> frame <span class="tok-kw">in</span> data.<span class="tok-fn">chunks</span>(in_channels) {</span>
-<span class="ln" id="L482">                        <span class="tok-kw">let</span> mono = frame.<span class="tok-fn">iter</span>().sum::&lt;f32&gt;() / in_channels <span class="tok-kw">as</span> f32;</span>
-<span class="ln" id="L483">                        peak = peak.<span class="tok-fn">max</span>(mono.<span class="tok-fn">abs</span>());</span>
-<span class="ln" id="L484">                        <span class="tok-com">// The real voice, at the one moment it exists in this</span></span>
-<span class="ln" id="L485">                        <span class="tok-com">// process, and only where it was asked for.</span></span>
-<span class="ln" id="L486">                        <span class="tok-kw">if</span> plain.<span class="tok-fn">is_some</span>() &amp;&amp; kept &lt; mono_scratch.<span class="tok-fn">len</span>() {</span>
-<span class="ln" id="L487">                            mono_scratch[kept] = mono;</span>
-<span class="ln" id="L488">                            kept += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L489">                        }</span>
-<span class="ln" id="L490">                        <span class="tok-kw">if</span> producer.<span class="tok-fn">try_push</span>(mono).<span class="tok-fn">is_err</span>() {</span>
-<span class="ln" id="L491">                            dropped += <span class="tok-num">1</span>;</span>
-<span class="ln" id="L492">                        }</span>
-<span class="ln" id="L493">                    }</span>
-<span class="ln" id="L494">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(sink) = plain.<span class="tok-fn">as_mut</span>() {</span>
-<span class="ln" id="L495">                        sink.<span class="tok-fn">write</span>(&amp;mono_scratch[..kept]);</span>
-<span class="ln" id="L496">                    }</span>
-<span class="ln" id="L497">                    <span class="tok-kw">if</span> dropped &gt; <span class="tok-num">0</span> {</span>
-<span class="ln" id="L498">                        cap_shared.dropped.<span class="tok-fn">fetch_add</span>(dropped, Ordering::Relaxed);</span>
-<span class="ln" id="L499">                    }</span>
-<span class="ln" id="L500">                    <span class="tok-com">// Never block the callback for a statistics update.</span></span>
-<span class="ln" id="L501">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> s) = cap_shared.stats.<span class="tok-fn">try_lock</span>() {</span>
-<span class="ln" id="L502">                        s.input_peak = s.input_peak.<span class="tok-fn">max</span>(peak);</span>
+<span class="ln" id="L478">                    <span class="tok-com">// Downmix to mono: the engine is single channel, and a</span></span>
+<span class="ln" id="L479">                    <span class="tok-com">// stereo image is itself a recording-setup fingerprint.</span></span>
+<span class="ln" id="L480">                    <span class="tok-com">//</span></span>
+<span class="ln" id="L481">                    <span class="tok-com">// A block the size of the scratch at a time, so the kept</span></span>
+<span class="ln" id="L482">                    <span class="tok-com">// copy is written out each time the scratch fills. F-305:</span></span>
+<span class="ln" id="L483">                    <span class="tok-com">// a long callback used to fill it and keep nothing more,</span></span>
+<span class="ln" id="L484">                    <span class="tok-com">// which cut the kept recording short without a word.</span></span>
+<span class="ln" id="L485">                    <span class="tok-kw">for</span> block <span class="tok-kw">in</span> data.<span class="tok-fn">chunks</span>(in_channels * mono_scratch.<span class="tok-fn">len</span>().<span class="tok-fn">max</span>(<span class="tok-num">1</span>)) {</span>
+<span class="ln" id="L486">                        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> kept = 0usize;</span>
+<span class="ln" id="L487">                        <span class="tok-kw">for</span> frame <span class="tok-kw">in</span> block.<span class="tok-fn">chunks</span>(in_channels) {</span>
+<span class="ln" id="L488">                            <span class="tok-kw">let</span> mono = frame.<span class="tok-fn">iter</span>().sum::&lt;f32&gt;() / in_channels <span class="tok-kw">as</span> f32;</span>
+<span class="ln" id="L489">                            peak = peak.<span class="tok-fn">max</span>(mono.<span class="tok-fn">abs</span>());</span>
+<span class="ln" id="L490">                            <span class="tok-com">// The real voice, at the one moment it exists in</span></span>
+<span class="ln" id="L491">                            <span class="tok-com">// this process, and only where it was asked for.</span></span>
+<span class="ln" id="L492">                            <span class="tok-kw">if</span> plain.<span class="tok-fn">is_some</span>() &amp;&amp; kept &lt; mono_scratch.<span class="tok-fn">len</span>() {</span>
+<span class="ln" id="L493">                                mono_scratch[kept] = mono;</span>
+<span class="ln" id="L494">                                kept += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L495">                            }</span>
+<span class="ln" id="L496">                            <span class="tok-kw">if</span> producer.<span class="tok-fn">try_push</span>(mono).<span class="tok-fn">is_err</span>() {</span>
+<span class="ln" id="L497">                                dropped += <span class="tok-num">1</span>;</span>
+<span class="ln" id="L498">                            }</span>
+<span class="ln" id="L499">                        }</span>
+<span class="ln" id="L500">                        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(sink) = plain.<span class="tok-fn">as_mut</span>() {</span>
+<span class="ln" id="L501">                            sink.<span class="tok-fn">write</span>(&amp;mono_scratch[..kept]);</span>
+<span class="ln" id="L502">                        }</span>
 <span class="ln" id="L503">                    }</span>
-<span class="ln" id="L504">                },</span>
-<span class="ln" id="L505">                {</span>
-<span class="ln" id="L506">                    <span class="tok-kw">let</span> shared = Arc::<span class="tok-fn">clone</span>(&amp;shared);</span>
-<span class="ln" id="L507">                    <span class="tok-kw">move</span> |e| shared.troubles.<span class="tok-fn">report</span>(Side::Input, &amp;e)</span>
-<span class="ln" id="L508">                },</span>
-<span class="ln" id="L509">                None,</span>
-<span class="ln" id="L510">            )</span>
-<span class="ln" id="L511">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
-<span class="ln" id="L512"></span>
-<span class="ln" id="L513">        <span class="tok-com">// Scratch buffers, sized once here so the callback never allocates.</span></span>
-<span class="ln" id="L514">        <span class="tok-kw">let</span> max_frames = capacity;</span>
-<span class="ln" id="L515">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> scratch_in = vec![<span class="tok-num">0</span>.0f32; max_frames];</span>
-<span class="ln" id="L516">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> scratch_out = vec![<span class="tok-num">0</span>.0f32; max_frames];</span>
-<span class="ln" id="L517"></span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> output_stream = output</span>
-<span class="ln" id="L519">            .<span class="tok-fn">build_output_stream</span>(</span>
-<span class="ln" id="L520">                out_cfg.<span class="tok-fn">config</span>(),</span>
-<span class="ln" id="L521">                <span class="tok-kw">move</span> |data: &amp;<span class="tok-kw">mut</span> [f32], _| {</span>
-<span class="ln" id="L522">                    <span class="tok-kw">let</span> frames = data.<span class="tok-fn">len</span>() / out_channels.<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
-<span class="ln" id="L523">                    <span class="tok-kw">let</span> frames = frames.<span class="tok-fn">min</span>(max_frames);</span>
+<span class="ln" id="L504">                    <span class="tok-kw">if</span> dropped &gt; <span class="tok-num">0</span> {</span>
+<span class="ln" id="L505">                        cap_shared.dropped.<span class="tok-fn">fetch_add</span>(dropped, Ordering::Relaxed);</span>
+<span class="ln" id="L506">                    }</span>
+<span class="ln" id="L507">                    <span class="tok-com">// Never block the callback for a statistics update.</span></span>
+<span class="ln" id="L508">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> s) = cap_shared.stats.<span class="tok-fn">try_lock</span>() {</span>
+<span class="ln" id="L509">                        s.input_peak = s.input_peak.<span class="tok-fn">max</span>(peak);</span>
+<span class="ln" id="L510">                    }</span>
+<span class="ln" id="L511">                },</span>
+<span class="ln" id="L512">                {</span>
+<span class="ln" id="L513">                    <span class="tok-kw">let</span> shared = Arc::<span class="tok-fn">clone</span>(&amp;shared);</span>
+<span class="ln" id="L514">                    <span class="tok-kw">move</span> |e| shared.troubles.<span class="tok-fn">report</span>(Side::Input, &amp;e)</span>
+<span class="ln" id="L515">                },</span>
+<span class="ln" id="L516">                None,</span>
+<span class="ln" id="L517">            )</span>
+<span class="ln" id="L518">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
+<span class="ln" id="L519"></span>
+<span class="ln" id="L520">        <span class="tok-com">// Scratch buffers, sized once here so the callback never allocates.</span></span>
+<span class="ln" id="L521">        <span class="tok-kw">let</span> max_frames = capacity;</span>
+<span class="ln" id="L522">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> scratch_in = vec![<span class="tok-num">0</span>.0f32; max_frames];</span>
+<span class="ln" id="L523">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> scratch_out = vec![<span class="tok-num">0</span>.0f32; max_frames];</span>
 <span class="ln" id="L524"></span>
-<span class="ln" id="L525">                    <span class="tok-kw">let</span> got = consumer.<span class="tok-fn">pop_slice</span>(&amp;<span class="tok-kw">mut</span> scratch_in[..frames]);</span>
-<span class="ln" id="L526">                    <span class="tok-kw">if</span> got &lt; frames {</span>
-<span class="ln" id="L527">                        <span class="tok-com">// Underrun: pad with silence rather than repeating old</span></span>
-<span class="ln" id="L528">                        <span class="tok-com">// audio, which would be an audible stutter.</span></span>
-<span class="ln" id="L529">                        scratch_in[got..frames].<span class="tok-fn">fill</span>(<span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L530">                        play_shared.starved.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::Relaxed);</span>
-<span class="ln" id="L531">                    }</span>
-<span class="ln" id="L532"></span>
-<span class="ln" id="L533">                    deid.<span class="tok-fn">process</span>(&amp;scratch_in[..frames], &amp;<span class="tok-kw">mut</span> scratch_out[..frames]);</span>
-<span class="ln" id="L534"></span>
-<span class="ln" id="L535">                    <span class="tok-com">// The veiled voice, at the one moment it exists. Copied</span></span>
-<span class="ln" id="L536">                    <span class="tok-com">// into the recorder&#x27;s ring here rather than read back from</span></span>
-<span class="ln" id="L537">                    <span class="tok-com">// the device, which would be a second unprotected copy.</span></span>
-<span class="ln" id="L538">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(sink) = veiled.<span class="tok-fn">as_mut</span>() {</span>
-<span class="ln" id="L539">                        sink.<span class="tok-fn">write</span>(&amp;scratch_out[..frames]);</span>
-<span class="ln" id="L540">                    }</span>
+<span class="ln" id="L525">        <span class="tok-kw">let</span> output_stream = output</span>
+<span class="ln" id="L526">            .<span class="tok-fn">build_output_stream</span>(</span>
+<span class="ln" id="L527">                out_cfg.<span class="tok-fn">config</span>(),</span>
+<span class="ln" id="L528">                <span class="tok-kw">move</span> |data: &amp;<span class="tok-kw">mut</span> [f32], _| {</span>
+<span class="ln" id="L529">                    <span class="tok-kw">let</span> frames = data.<span class="tok-fn">len</span>() / out_channels.<span class="tok-fn">max</span>(<span class="tok-num">1</span>);</span>
+<span class="ln" id="L530">                    <span class="tok-kw">let</span> frames = frames.<span class="tok-fn">min</span>(max_frames);</span>
+<span class="ln" id="L531"></span>
+<span class="ln" id="L532">                    <span class="tok-kw">let</span> got = consumer.<span class="tok-fn">pop_slice</span>(&amp;<span class="tok-kw">mut</span> scratch_in[..frames]);</span>
+<span class="ln" id="L533">                    <span class="tok-kw">if</span> got &lt; frames {</span>
+<span class="ln" id="L534">                        <span class="tok-com">// Underrun: pad with silence rather than repeating old</span></span>
+<span class="ln" id="L535">                        <span class="tok-com">// audio, which would be an audible stutter.</span></span>
+<span class="ln" id="L536">                        scratch_in[got..frames].<span class="tok-fn">fill</span>(<span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L537">                        play_shared.starved.<span class="tok-fn">fetch_add</span>(<span class="tok-num">1</span>, Ordering::Relaxed);</span>
+<span class="ln" id="L538">                    }</span>
+<span class="ln" id="L539"></span>
+<span class="ln" id="L540">                    deid.<span class="tok-fn">process</span>(&amp;scratch_in[..frames], &amp;<span class="tok-kw">mut</span> scratch_out[..frames]);</span>
 <span class="ln" id="L541"></span>
-<span class="ln" id="L542">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> peak = <span class="tok-num">0</span>.0f32;</span>
-<span class="ln" id="L543">                    <span class="tok-kw">for</span> (frame, &amp;s) <span class="tok-kw">in</span> data.<span class="tok-fn">chunks_mut</span>(out_channels).<span class="tok-fn">zip</span>(&amp;scratch_out[..frames]) {</span>
-<span class="ln" id="L544">                        <span class="tok-kw">let</span> v = s.<span class="tok-fn">clamp</span>(-<span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L545">                        peak = peak.<span class="tok-fn">max</span>(v.<span class="tok-fn">abs</span>());</span>
-<span class="ln" id="L546">                        <span class="tok-com">// The same mono signal to every output channel.</span></span>
-<span class="ln" id="L547">                        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> frame.<span class="tok-fn">iter_mut</span>() {</span>
-<span class="ln" id="L548">                            *slot = v;</span>
-<span class="ln" id="L549">                        }</span>
-<span class="ln" id="L550">                    }</span>
-<span class="ln" id="L551">                    <span class="tok-com">// Any tail beyond `frames` (only when the device asks for</span></span>
-<span class="ln" id="L552">                    <span class="tok-com">// more than the ring can hold) stays silent.</span></span>
-<span class="ln" id="L553">                    <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> data.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">skip</span>(frames * out_channels) {</span>
-<span class="ln" id="L554">                        *slot = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L555">                    }</span>
-<span class="ln" id="L556"></span>
-<span class="ln" id="L557">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> st) = play_shared.stats.<span class="tok-fn">try_lock</span>() {</span>
-<span class="ln" id="L558">                        st.process = deid.<span class="tok-fn">stats</span>();</span>
-<span class="ln" id="L559">                        st.output_peak = st.output_peak.<span class="tok-fn">max</span>(peak);</span>
-<span class="ln" id="L560">                        st.dropped = play_shared.dropped.<span class="tok-fn">load</span>(Ordering::Relaxed);</span>
-<span class="ln" id="L561">                        st.starved = play_shared.starved.<span class="tok-fn">load</span>(Ordering::Relaxed);</span>
+<span class="ln" id="L542">                    <span class="tok-com">// The veiled voice, at the one moment it exists. Copied</span></span>
+<span class="ln" id="L543">                    <span class="tok-com">// into the recorder&#x27;s ring here rather than read back from</span></span>
+<span class="ln" id="L544">                    <span class="tok-com">// the device, which would be a second unprotected copy.</span></span>
+<span class="ln" id="L545">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(sink) = veiled.<span class="tok-fn">as_mut</span>() {</span>
+<span class="ln" id="L546">                        sink.<span class="tok-fn">write</span>(&amp;scratch_out[..frames]);</span>
+<span class="ln" id="L547">                    }</span>
+<span class="ln" id="L548"></span>
+<span class="ln" id="L549">                    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> peak = <span class="tok-num">0</span>.0f32;</span>
+<span class="ln" id="L550">                    <span class="tok-kw">for</span> (frame, &amp;s) <span class="tok-kw">in</span> data.<span class="tok-fn">chunks_mut</span>(out_channels).<span class="tok-fn">zip</span>(&amp;scratch_out[..frames]) {</span>
+<span class="ln" id="L551">                        <span class="tok-kw">let</span> v = s.<span class="tok-fn">clamp</span>(-<span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L552">                        peak = peak.<span class="tok-fn">max</span>(v.<span class="tok-fn">abs</span>());</span>
+<span class="ln" id="L553">                        <span class="tok-com">// The same mono signal to every output channel.</span></span>
+<span class="ln" id="L554">                        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> frame.<span class="tok-fn">iter_mut</span>() {</span>
+<span class="ln" id="L555">                            *slot = v;</span>
+<span class="ln" id="L556">                        }</span>
+<span class="ln" id="L557">                    }</span>
+<span class="ln" id="L558">                    <span class="tok-com">// Any tail beyond `frames` (only when the device asks for</span></span>
+<span class="ln" id="L559">                    <span class="tok-com">// more than the ring can hold) stays silent.</span></span>
+<span class="ln" id="L560">                    <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> data.<span class="tok-fn">iter_mut</span>().<span class="tok-fn">skip</span>(frames * out_channels) {</span>
+<span class="ln" id="L561">                        *slot = <span class="tok-num">0.0</span>;</span>
 <span class="ln" id="L562">                    }</span>
-<span class="ln" id="L563">                },</span>
-<span class="ln" id="L564">                {</span>
-<span class="ln" id="L565">                    <span class="tok-kw">let</span> shared = Arc::<span class="tok-fn">clone</span>(&amp;shared);</span>
-<span class="ln" id="L566">                    <span class="tok-kw">move</span> |e| shared.troubles.<span class="tok-fn">report</span>(Side::Output, &amp;e)</span>
-<span class="ln" id="L567">                },</span>
-<span class="ln" id="L568">                None,</span>
-<span class="ln" id="L569">            )</span>
-<span class="ln" id="L570">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
-<span class="ln" id="L571"></span>
-<span class="ln" id="L572">        input_stream</span>
-<span class="ln" id="L573">            .<span class="tok-fn">play</span>()</span>
-<span class="ln" id="L574">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
-<span class="ln" id="L575">        output_stream</span>
-<span class="ln" id="L576">            .<span class="tok-fn">play</span>()</span>
+<span class="ln" id="L563"></span>
+<span class="ln" id="L564">                    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> st) = play_shared.stats.<span class="tok-fn">try_lock</span>() {</span>
+<span class="ln" id="L565">                        st.process = deid.<span class="tok-fn">stats</span>();</span>
+<span class="ln" id="L566">                        st.output_peak = st.output_peak.<span class="tok-fn">max</span>(peak);</span>
+<span class="ln" id="L567">                        st.dropped = play_shared.dropped.<span class="tok-fn">load</span>(Ordering::Relaxed);</span>
+<span class="ln" id="L568">                        st.starved = play_shared.starved.<span class="tok-fn">load</span>(Ordering::Relaxed);</span>
+<span class="ln" id="L569">                    }</span>
+<span class="ln" id="L570">                },</span>
+<span class="ln" id="L571">                {</span>
+<span class="ln" id="L572">                    <span class="tok-kw">let</span> shared = Arc::<span class="tok-fn">clone</span>(&amp;shared);</span>
+<span class="ln" id="L573">                    <span class="tok-kw">move</span> |e| shared.troubles.<span class="tok-fn">report</span>(Side::Output, &amp;e)</span>
+<span class="ln" id="L574">                },</span>
+<span class="ln" id="L575">                None,</span>
+<span class="ln" id="L576">            )</span>
 <span class="ln" id="L577">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
 <span class="ln" id="L578"></span>
-<span class="ln" id="L579">        <span class="tok-fn">Ok</span>((</span>
-<span class="ln" id="L580">            Self {</span>
-<span class="ln" id="L581">                _input: input_stream,</span>
-<span class="ln" id="L582">                _output: output_stream,</span>
-<span class="ln" id="L583">                shared,</span>
-<span class="ln" id="L584">            },</span>
-<span class="ln" id="L585">            Kept {</span>
-<span class="ln" id="L586">                veiled: veiled_recorder,</span>
-<span class="ln" id="L587">                plain: plain_recorder,</span>
-<span class="ln" id="L588">            },</span>
-<span class="ln" id="L589">        ))</span>
-<span class="ln" id="L590">    }</span>
+<span class="ln" id="L579">        input_stream</span>
+<span class="ln" id="L580">            .<span class="tok-fn">play</span>()</span>
+<span class="ln" id="L581">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
+<span class="ln" id="L582">        output_stream</span>
+<span class="ln" id="L583">            .<span class="tok-fn">play</span>()</span>
+<span class="ln" id="L584">            .<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Stream</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
+<span class="ln" id="L585"></span>
+<span class="ln" id="L586">        <span class="tok-fn">Ok</span>((</span>
+<span class="ln" id="L587">            Self {</span>
+<span class="ln" id="L588">                _input: input_stream,</span>
+<span class="ln" id="L589">                _output: output_stream,</span>
+<span class="ln" id="L590">                shared,</span>
+<span class="ln" id="L591">            },</span>
+<span class="ln" id="L592">            Kept {</span>
+<span class="ln" id="L593">                veiled: veiled_recorder,</span>
+<span class="ln" id="L594">                plain: plain_recorder,</span>
+<span class="ln" id="L595">            },</span>
+<span class="ln" id="L596">        ))</span>
+<span class="ln" id="L597">    }</span>
 </span>
-<span class="ln" id="L591"></span>
+<span class="ln" id="L598"></span>
 <span class="src-item" id="fn-livesession-stats">
-<span class="ln" id="L592">    <span class="tok-com">/// Read the current statistics, resetting the peak meters.</span></span>
-<span class="ln" id="L593">    <span class="tok-com">///</span></span>
-<span class="ln" id="L594">    <span class="tok-com">/// Peaks reset on read so a meter shows the level since the last frame</span></span>
-<span class="ln" id="L595">    <span class="tok-com">/// rather than the loudest moment since the session began.</span></span>
-<span class="ln" id="L596">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">stats</span>(&amp;<span class="tok-kw">self</span>) -&gt; LiveStats {</span>
-<span class="ln" id="L597">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> s) = <span class="tok-kw">self</span>.shared.stats.<span class="tok-fn">lock</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L598">            <span class="tok-kw">return</span> LiveStats::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L599">        };</span>
-<span class="ln" id="L600">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> snapshot = *s;</span>
-<span class="ln" id="L601">        s.input_peak = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L602">        s.output_peak = <span class="tok-num">0.0</span>;</span>
-<span class="ln" id="L603">        <span class="tok-com">// Read here rather than written by the output callback, which is where</span></span>
-<span class="ln" id="L604">        <span class="tok-com">// `dropped` and `starved` come from. A device that has gone stops</span></span>
-<span class="ln" id="L605">        <span class="tok-com">// calling that callback, and the one number that has to survive a</span></span>
-<span class="ln" id="L606">        <span class="tok-com">// stream which is no longer running is the one saying it stopped.</span></span>
-<span class="ln" id="L607">        snapshot.interfered = <span class="tok-kw">self</span>.shared.troubles.<span class="tok-fn">count</span>();</span>
-<span class="ln" id="L608">        snapshot</span>
-<span class="ln" id="L609">    }</span>
+<span class="ln" id="L599">    <span class="tok-com">/// Read the current statistics, resetting the peak meters.</span></span>
+<span class="ln" id="L600">    <span class="tok-com">///</span></span>
+<span class="ln" id="L601">    <span class="tok-com">/// Peaks reset on read so a meter shows the level since the last frame</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// rather than the loudest moment since the session began.</span></span>
+<span class="ln" id="L603">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">stats</span>(&amp;<span class="tok-kw">self</span>) -&gt; LiveStats {</span>
+<span class="ln" id="L604">        <span class="tok-kw">let</span> <span class="tok-fn">Ok</span>(<span class="tok-kw">mut</span> s) = <span class="tok-kw">self</span>.shared.stats.<span class="tok-fn">lock</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L605">            <span class="tok-kw">return</span> LiveStats::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L606">        };</span>
+<span class="ln" id="L607">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> snapshot = *s;</span>
+<span class="ln" id="L608">        s.input_peak = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L609">        s.output_peak = <span class="tok-num">0.0</span>;</span>
+<span class="ln" id="L610">        <span class="tok-com">// Read here rather than written by the output callback, which is where</span></span>
+<span class="ln" id="L611">        <span class="tok-com">// `dropped` and `starved` come from. A device that has gone stops</span></span>
+<span class="ln" id="L612">        <span class="tok-com">// calling that callback, and the one number that has to survive a</span></span>
+<span class="ln" id="L613">        <span class="tok-com">// stream which is no longer running is the one saying it stopped.</span></span>
+<span class="ln" id="L614">        snapshot.interfered = <span class="tok-kw">self</span>.shared.troubles.<span class="tok-fn">count</span>();</span>
+<span class="ln" id="L615">        snapshot</span>
+<span class="ln" id="L616">    }</span>
 </span>
-<span class="ln" id="L610"></span>
+<span class="ln" id="L617"></span>
 <span class="src-item" id="fn-livesession-interference">
-<span class="ln" id="L611">    <span class="tok-com">/// What the platform last reported about either stream.</span></span>
-<span class="ln" id="L612">    <span class="tok-com">///</span></span>
-<span class="ln" id="L613">    <span class="tok-com">/// `None` until something goes wrong. Asked when [`LiveStats::interfered`]</span></span>
-<span class="ln" id="L614">    <span class="tok-com">/// moves, rather than every frame: this clones a `String`.</span></span>
-<span class="ln" id="L615">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">interference</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;Interference&gt; {</span>
-<span class="ln" id="L616">        <span class="tok-kw">self</span>.shared.troubles.<span class="tok-fn">latest</span>()</span>
-<span class="ln" id="L617">    }</span>
+<span class="ln" id="L618">    <span class="tok-com">/// What the platform last reported about either stream.</span></span>
+<span class="ln" id="L619">    <span class="tok-com">///</span></span>
+<span class="ln" id="L620">    <span class="tok-com">/// `None` until something goes wrong. Asked when [`LiveStats::interfered`]</span></span>
+<span class="ln" id="L621">    <span class="tok-com">/// moves, rather than every frame: this clones a `String`.</span></span>
+<span class="ln" id="L622">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">interference</span>(&amp;<span class="tok-kw">self</span>) -&gt; Option&lt;Interference&gt; {</span>
+<span class="ln" id="L623">        <span class="tok-kw">self</span>.shared.troubles.<span class="tok-fn">latest</span>()</span>
+<span class="ln" id="L624">    }</span>
 </span>
-<span class="ln" id="L618">}</span>
-<span class="ln" id="L619"></span>
-<span class="ln" id="L620"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L621"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L622">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L623"></span>
-<span class="ln" id="L624">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L625">    <span class="tok-kw">fn</span> <span class="tok-fn">stats_start_empty</span>() {</span>
-<span class="ln" id="L626">        <span class="tok-kw">let</span> s = LiveStats::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L627">        assert_eq!(s.dropped, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L628">        assert_eq!(s.starved, <span class="tok-num">0</span>);</span>
-<span class="ln" id="L629">        assert_eq!(s.input_peak, <span class="tok-num">0.0</span>);</span>
-<span class="ln" id="L630">    }</span>
-<span class="ln" id="L631"></span>
-<span class="ln" id="L632">    <span class="tok-com">/// The ring must be long enough to absorb a typical device buffer, but not</span></span>
-<span class="ln" id="L633">    <span class="tok-com">/// so long that it becomes an audible delay on its own.</span></span>
-<span class="ln" id="L634">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L635">    <span class="tok-kw">fn</span> <span class="tok-fn">ring_length_is_a_sane_compromise</span>() {</span>
-<span class="ln" id="L636">        <span class="tok-kw">for</span> rate <span class="tok-kw">in</span> [16_000u32, <span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>, <span class="tok-num">96_000</span>] {</span>
-<span class="ln" id="L637">            <span class="tok-kw">let</span> capacity = ((rate <span class="tok-kw">as</span> f32 * RING_MILLIS / <span class="tok-num">1000.0</span>) <span class="tok-kw">as</span> usize).<span class="tok-fn">max</span>(<span class="tok-num">2048</span>);</span>
-<span class="ln" id="L638">            <span class="tok-kw">let</span> millis = capacity <span class="tok-kw">as</span> f32 / rate <span class="tok-kw">as</span> f32 * <span class="tok-num">1000.0</span>;</span>
-<span class="ln" id="L639">            assert!(</span>
-<span class="ln" id="L640">                millis &gt;= <span class="tok-num">40.0</span>,</span>
-<span class="ln" id="L641">                <span class="tok-str">&quot;{rate} Hz: {millis:.0} ms is too little jitter room&quot;</span></span>
-<span class="ln" id="L642">            );</span>
-<span class="ln" id="L643">            assert!(</span>
-<span class="ln" id="L644">                millis &lt;= <span class="tok-num">200.0</span>,</span>
-<span class="ln" id="L645">                <span class="tok-str">&quot;{rate} Hz: {millis:.0} ms of latency is too much&quot;</span></span>
-<span class="ln" id="L646">            );</span>
-<span class="ln" id="L647">        }</span>
-<span class="ln" id="L648">    }</span>
-<span class="ln" id="L649"></span>
-<span class="ln" id="L650">    <span class="tok-com">/// **Roadmap item 132.** What the recorder is given is what the engine produced.</span></span>
-<span class="ln" id="L651">    <span class="tok-com">///</span></span>
-<span class="ln" id="L652">    <span class="tok-com">/// The row this comes from asked for the samples reaching the recorder to</span></span>
-<span class="ln" id="L653">    <span class="tok-com">/// be *checked* against the engine&#x27;s output. They cannot differ, and a</span></span>
-<span class="ln" id="L654">    <span class="tok-com">/// check would be a buffer compared with itself: the veiled sink is</span></span>
-<span class="ln" id="L655">    <span class="tok-com">/// written from inside the output callback, from the same slice</span></span>
-<span class="ln" id="L656">    <span class="tok-com">/// `Deidentifier::process` has just written into, and there is nothing</span></span>
-<span class="ln" id="L657">    <span class="tok-com">/// between the two to interfere with.</span></span>
+<span class="ln" id="L625">}</span>
+<span class="ln" id="L626"></span>
+<span class="ln" id="L627"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L628"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L629">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L630"></span>
+<span class="ln" id="L631">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L632">    <span class="tok-kw">fn</span> <span class="tok-fn">stats_start_empty</span>() {</span>
+<span class="ln" id="L633">        <span class="tok-kw">let</span> s = LiveStats::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L634">        assert_eq!(s.dropped, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L635">        assert_eq!(s.starved, <span class="tok-num">0</span>);</span>
+<span class="ln" id="L636">        assert_eq!(s.input_peak, <span class="tok-num">0.0</span>);</span>
+<span class="ln" id="L637">    }</span>
+<span class="ln" id="L638"></span>
+<span class="ln" id="L639">    <span class="tok-com">/// The ring must be long enough to absorb a typical device buffer, but not</span></span>
+<span class="ln" id="L640">    <span class="tok-com">/// so long that it becomes an audible delay on its own.</span></span>
+<span class="ln" id="L641">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L642">    <span class="tok-kw">fn</span> <span class="tok-fn">ring_length_is_a_sane_compromise</span>() {</span>
+<span class="ln" id="L643">        <span class="tok-kw">for</span> rate <span class="tok-kw">in</span> [16_000u32, <span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>, <span class="tok-num">96_000</span>] {</span>
+<span class="ln" id="L644">            <span class="tok-kw">let</span> capacity = ((rate <span class="tok-kw">as</span> f32 * RING_MILLIS / <span class="tok-num">1000.0</span>) <span class="tok-kw">as</span> usize).<span class="tok-fn">max</span>(<span class="tok-num">2048</span>);</span>
+<span class="ln" id="L645">            <span class="tok-kw">let</span> millis = capacity <span class="tok-kw">as</span> f32 / rate <span class="tok-kw">as</span> f32 * <span class="tok-num">1000.0</span>;</span>
+<span class="ln" id="L646">            assert!(</span>
+<span class="ln" id="L647">                millis &gt;= <span class="tok-num">40.0</span>,</span>
+<span class="ln" id="L648">                <span class="tok-str">&quot;{rate} Hz: {millis:.0} ms is too little jitter room&quot;</span></span>
+<span class="ln" id="L649">            );</span>
+<span class="ln" id="L650">            assert!(</span>
+<span class="ln" id="L651">                millis &lt;= <span class="tok-num">200.0</span>,</span>
+<span class="ln" id="L652">                <span class="tok-str">&quot;{rate} Hz: {millis:.0} ms of latency is too much&quot;</span></span>
+<span class="ln" id="L653">            );</span>
+<span class="ln" id="L654">        }</span>
+<span class="ln" id="L655">    }</span>
+<span class="ln" id="L656"></span>
+<span class="ln" id="L657">    <span class="tok-com">/// **Roadmap item 132.** What the recorder is given is what the engine produced.</span></span>
 <span class="ln" id="L658">    <span class="tok-com">///</span></span>
-<span class="ln" id="L659">    <span class="tok-com">/// That is a property worth keeping rather than one worth measuring, so it</span></span>
-<span class="ln" id="L660">    <span class="tok-com">/// is read out of the source. A change that took the recorder&#x27;s samples</span></span>
-<span class="ln" id="L661">    <span class="tok-com">/// from anywhere else, the device being the obvious candidate, would be a</span></span>
-<span class="ln" id="L662">    <span class="tok-com">/// second unprotected copy of the audio and would fail here.</span></span>
-<span class="ln" id="L663">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L664">    <span class="tok-kw">fn</span> <span class="tok-fn">the_recorder_is_fed_from_the_engine_and_from_nowhere_else</span>() {</span>
-<span class="ln" id="L665">        <span class="tok-com">// The code, not this module. The needles below appear in this test&#x27;s</span></span>
-<span class="ln" id="L666">        <span class="tok-com">// own assertion messages, and a guard that counts the strings it is</span></span>
-<span class="ln" id="L667">        <span class="tok-com">// looking for is counting itself: `dialog.rs`&#x27;s guard hit exactly this</span></span>
-<span class="ln" id="L668">        <span class="tok-com">// and it is recorded in the audit.</span></span>
-<span class="ln" id="L669">        <span class="tok-kw">let</span> whole = include_str!(<span class="tok-str">&quot;live.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L670">        <span class="tok-kw">let</span> source = whole</span>
-<span class="ln" id="L671">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>)</span>
-<span class="ln" id="L672">            .<span class="tok-fn">next</span>()</span>
-<span class="ln" id="L673">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the code above the tests&quot;</span>);</span>
-<span class="ln" id="L674"></span>
-<span class="ln" id="L675">        <span class="tok-com">// The engine writes into `scratch_out` and the veiled sink is written</span></span>
-<span class="ln" id="L676">        <span class="tok-com">// from it, adjacent, inside the output callback.</span></span>
-<span class="ln" id="L677">        assert!(</span>
-<span class="ln" id="L678">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;deid.process(&amp;scratch_in[..frames], &amp;mut scratch_out[..frames]);&quot;</span>),</span>
-<span class="ln" id="L679">            <span class="tok-str">&quot;the engine no longer writes into `scratch_out`, so the assertion \</span></span>
-<span class="ln" id="L680"><span class="tok-str">             below is about a buffer that has moved&quot;</span></span>
-<span class="ln" id="L681">        );</span>
-<span class="ln" id="L682">        assert!(</span>
-<span class="ln" id="L683">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sink.write(&amp;scratch_out[..frames]);&quot;</span>),</span>
-<span class="ln" id="L684">            <span class="tok-str">&quot;the veiled recorder is no longer fed from the engine&#x27;s own output \</span></span>
-<span class="ln" id="L685"><span class="tok-str">             buffer. Whatever it is fed from now is a second copy of the audio, \</span></span>
-<span class="ln" id="L686"><span class="tok-str">             and roadmap item 132 is the claim that there is not one&quot;</span></span>
-<span class="ln" id="L687">        );</span>
-<span class="ln" id="L688"></span>
-<span class="ln" id="L689">        <span class="tok-com">// The microphone side, the same way: from the downmix inside the input</span></span>
-<span class="ln" id="L690">        <span class="tok-com">// callback, not from anything the platform hands back afterwards.</span></span>
-<span class="ln" id="L691">        assert!(</span>
-<span class="ln" id="L692">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sink.write(&amp;mono_scratch[..kept]);&quot;</span>),</span>
-<span class="ln" id="L693">            <span class="tok-str">&quot;the plain recorder is no longer fed from the downmix in the input \</span></span>
-<span class="ln" id="L694"><span class="tok-str">             callback. That is the one moment the real voice exists in this \</span></span>
-<span class="ln" id="L695"><span class="tok-str">             process, and taking it anywhere else means it exists twice&quot;</span></span>
-<span class="ln" id="L696">        );</span>
-<span class="ln" id="L697">        assert_eq!(</span>
-<span class="ln" id="L698">            source.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;sink.write(&quot;</span>).<span class="tok-fn">count</span>(),</span>
-<span class="ln" id="L699">            <span class="tok-num">2</span>,</span>
-<span class="ln" id="L700">            <span class="tok-str">&quot;there are exactly two sinks and two places they are written. A \</span></span>
-<span class="ln" id="L701"><span class="tok-str">             third write is a third copy of somebody&#x27;s voice&quot;</span></span>
-<span class="ln" id="L702">        );</span>
-<span class="ln" id="L703">    }</span>
-<span class="ln" id="L704"></span>
-<span class="ln" id="L705">    <span class="tok-com">/// **F-168.** Two devices, one rate, or a refusal that says why.</span></span>
-<span class="ln" id="L706">    <span class="tok-com">///</span></span>
-<span class="ln" id="L707">    <span class="tok-com">/// The decision, without a sound card: this is arithmetic over what the</span></span>
-<span class="ln" id="L708">    <span class="tok-com">/// platform reported, and the whole reason it is a separate function is</span></span>
-<span class="ln" id="L709">    <span class="tok-com">/// that a test can reach it. F-163 and F-165 are why nothing here opens a</span></span>
-<span class="ln" id="L710">    <span class="tok-com">/// device to answer a question that does not need one.</span></span>
-<span class="ln" id="L711">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L712">    <span class="tok-kw">fn</span> <span class="tok-fn">devices_agree_on_a_rate_or_there_is_none_to_agree_on</span>() {</span>
-<span class="ln" id="L713">        <span class="tok-com">// Already the same. Answered without consulting the ranges at all,</span></span>
-<span class="ln" id="L714">        <span class="tok-com">// because a device that under-reports what it supports is common and</span></span>
-<span class="ln" id="L715">        <span class="tok-com">// this case does not need the report.</span></span>
-<span class="ln" id="L716">        assert_eq!(</span>
-<span class="ln" id="L717">            <span class="tok-fn">rate_they_agree_on</span>(<span class="tok-num">48_000</span>, &amp;[], &amp;[(<span class="tok-num">48_000</span>, vec![])]),</span>
-<span class="ln" id="L718">            <span class="tok-fn">Some</span>(<span class="tok-num">48_000</span>)</span>
-<span class="ln" id="L719">        );</span>
-<span class="ln" id="L720"></span>
-<span class="ln" id="L721">        <span class="tok-com">// The microphone defaults to 44.1 and will take 48. The output&#x27;s rate</span></span>
-<span class="ln" id="L722">        <span class="tok-com">// wins, because that is what the person hears through and what anything</span></span>
-<span class="ln" id="L723">        <span class="tok-com">// on a virtual cable expects.</span></span>
-<span class="ln" id="L724">        assert_eq!(</span>
-<span class="ln" id="L725">            <span class="tok-fn">rate_they_agree_on</span>(</span>
-<span class="ln" id="L726">                <span class="tok-num">48_000</span>,</span>
-<span class="ln" id="L727">                &amp;[(<span class="tok-num">48_000</span>, <span class="tok-num">48_000</span>)],</span>
-<span class="ln" id="L728">                &amp;[(<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)])]</span>
-<span class="ln" id="L729">            ),</span>
-<span class="ln" id="L730">            <span class="tok-fn">Some</span>(<span class="tok-num">48_000</span>)</span>
-<span class="ln" id="L731">        );</span>
-<span class="ln" id="L732"></span>
-<span class="ln" id="L733">        <span class="tok-com">// The microphone will not move and the output will. Then the</span></span>
-<span class="ln" id="L734">        <span class="tok-com">// microphone&#x27;s rate is the one, rather than a refusal.</span></span>
-<span class="ln" id="L735">        assert_eq!(</span>
-<span class="ln" id="L736">            <span class="tok-fn">rate_they_agree_on</span>(</span>
-<span class="ln" id="L737">                <span class="tok-num">48_000</span>,</span>
-<span class="ln" id="L738">                &amp;[(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)],</span>
-<span class="ln" id="L739">                &amp;[(<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">44_100</span>)])]</span>
-<span class="ln" id="L740">            ),</span>
-<span class="ln" id="L741">            <span class="tok-fn">Some</span>(<span class="tok-num">44_100</span>)</span>
-<span class="ln" id="L742">        );</span>
-<span class="ln" id="L743"></span>
-<span class="ln" id="L744">        <span class="tok-com">// Neither will move. This is the case that has to be refused rather</span></span>
-<span class="ln" id="L745">        <span class="tok-com">// than worked around: running them together is a ring that starves for</span></span>
-<span class="ln" id="L746">        <span class="tok-com">// ever and a voice shifted up by nine per cent.</span></span>
-<span class="ln" id="L747">        assert_eq!(</span>
-<span class="ln" id="L748">            <span class="tok-fn">rate_they_agree_on</span>(</span>
-<span class="ln" id="L749">                <span class="tok-num">48_000</span>,</span>
-<span class="ln" id="L750">                &amp;[(<span class="tok-num">48_000</span>, <span class="tok-num">48_000</span>)],</span>
-<span class="ln" id="L751">                &amp;[(<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">44_100</span>)])]</span>
-<span class="ln" id="L752">            ),</span>
-<span class="ln" id="L753">            None</span>
-<span class="ln" id="L754">        );</span>
-<span class="ln" id="L755"></span>
-<span class="ln" id="L756">        <span class="tok-com">// Several microphones, which is what roadmap item 147 opens. One rate has to</span></span>
-<span class="ln" id="L757">        <span class="tok-com">// suit every one of them and the output.</span></span>
-<span class="ln" id="L758">        assert_eq!(</span>
-<span class="ln" id="L759">            <span class="tok-fn">rate_they_agree_on</span>(</span>
-<span class="ln" id="L760">                <span class="tok-num">48_000</span>,</span>
-<span class="ln" id="L761">                &amp;[(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)],</span>
-<span class="ln" id="L762">                &amp;[</span>
-<span class="ln" id="L763">                    (<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)]),</span>
-<span class="ln" id="L764">                    (<span class="tok-num">48_000</span>, vec![(<span class="tok-num">48_000</span>, <span class="tok-num">48_000</span>)]),</span>
-<span class="ln" id="L765">                ]</span>
-<span class="ln" id="L766">            ),</span>
-<span class="ln" id="L767">            <span class="tok-fn">Some</span>(<span class="tok-num">48_000</span>)</span>
-<span class="ln" id="L768">        );</span>
-<span class="ln" id="L769">        assert_eq!(</span>
-<span class="ln" id="L770">            <span class="tok-fn">rate_they_agree_on</span>(</span>
-<span class="ln" id="L771">                <span class="tok-num">48_000</span>,</span>
-<span class="ln" id="L772">                &amp;[(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)],</span>
-<span class="ln" id="L773">                &amp;[</span>
-<span class="ln" id="L774">                    (<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">44_100</span>)]),</span>
-<span class="ln" id="L775">                    (<span class="tok-num">48_000</span>, vec![(<span class="tok-num">48_000</span>, <span class="tok-num">48_000</span>)]),</span>
-<span class="ln" id="L776">                ],</span>
-<span class="ln" id="L777">            ),</span>
-<span class="ln" id="L778">            None,</span>
-<span class="ln" id="L779">            <span class="tok-str">&quot;one microphone that will only do 44.1 and one that will only do 48 \</span></span>
-<span class="ln" id="L780"><span class="tok-str">             cannot be run together, and saying so is the answer&quot;</span></span>
-<span class="ln" id="L781">        );</span>
-<span class="ln" id="L782">    }</span>
-<span class="ln" id="L783"></span>
-<span class="ln" id="L784">    <span class="tok-com">/// A stream error becomes something a caller can show.</span></span>
-<span class="ln" id="L785">    <span class="tok-com">///</span></span>
-<span class="ln" id="L786">    <span class="tok-com">/// **Roadmap item 132.** Before this, both error callbacks were `eprintln!` and</span></span>
-<span class="ln" id="L787">    <span class="tok-com">/// nothing else: on Windows the desktop application has no console, so a</span></span>
-<span class="ln" id="L788">    <span class="tok-com">/// device unplugged mid-call was silent and the recording carried on.</span></span>
-<span class="ln" id="L789">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L790">    <span class="tok-kw">fn</span> <span class="tok-fn">trouble_is_recorded_rather_than_only_printed</span>() {</span>
-<span class="ln" id="L791">        <span class="tok-kw">let</span> troubles = Troubles::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L792">        assert!(troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">is_none</span>());</span>
-<span class="ln" id="L793"></span>
-<span class="ln" id="L794">        troubles.<span class="tok-fn">report</span>(</span>
-<span class="ln" id="L795">            Side::Input,</span>
-<span class="ln" id="L796">            &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::DeviceNotAvailable),</span>
-<span class="ln" id="L797">        );</span>
-<span class="ln" id="L798">        <span class="tok-kw">let</span> first = troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the report was kept&quot;</span>);</span>
-<span class="ln" id="L799">        assert_eq!(first.side, Side::Input);</span>
-<span class="ln" id="L800">        assert!(first.device_gone, <span class="tok-str">&quot;a device that has gone says so&quot;</span>);</span>
-<span class="ln" id="L801">        assert_eq!(first.count, <span class="tok-num">1</span>);</span>
+<span class="ln" id="L659">    <span class="tok-com">/// The row this comes from asked for the samples reaching the recorder to</span></span>
+<span class="ln" id="L660">    <span class="tok-com">/// be *checked* against the engine&#x27;s output. They cannot differ, and a</span></span>
+<span class="ln" id="L661">    <span class="tok-com">/// check would be a buffer compared with itself: the veiled sink is</span></span>
+<span class="ln" id="L662">    <span class="tok-com">/// written from inside the output callback, from the same slice</span></span>
+<span class="ln" id="L663">    <span class="tok-com">/// `Deidentifier::process` has just written into, and there is nothing</span></span>
+<span class="ln" id="L664">    <span class="tok-com">/// between the two to interfere with.</span></span>
+<span class="ln" id="L665">    <span class="tok-com">///</span></span>
+<span class="ln" id="L666">    <span class="tok-com">/// That is a property worth keeping rather than one worth measuring, so it</span></span>
+<span class="ln" id="L667">    <span class="tok-com">/// is read out of the source. A change that took the recorder&#x27;s samples</span></span>
+<span class="ln" id="L668">    <span class="tok-com">/// from anywhere else, the device being the obvious candidate, would be a</span></span>
+<span class="ln" id="L669">    <span class="tok-com">/// second unprotected copy of the audio and would fail here.</span></span>
+<span class="ln" id="L670">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L671">    <span class="tok-kw">fn</span> <span class="tok-fn">the_recorder_is_fed_from_the_engine_and_from_nowhere_else</span>() {</span>
+<span class="ln" id="L672">        <span class="tok-com">// The code, not this module. The needles below appear in this test&#x27;s</span></span>
+<span class="ln" id="L673">        <span class="tok-com">// own assertion messages, and a guard that counts the strings it is</span></span>
+<span class="ln" id="L674">        <span class="tok-com">// looking for is counting itself: `dialog.rs`&#x27;s guard hit exactly this</span></span>
+<span class="ln" id="L675">        <span class="tok-com">// and it is recorded in the audit.</span></span>
+<span class="ln" id="L676">        <span class="tok-kw">let</span> whole = include_str!(<span class="tok-str">&quot;live.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L677">        <span class="tok-kw">let</span> source = whole</span>
+<span class="ln" id="L678">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n#[cfg(test)]&quot;</span>)</span>
+<span class="ln" id="L679">            .<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L680">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the code above the tests&quot;</span>);</span>
+<span class="ln" id="L681"></span>
+<span class="ln" id="L682">        <span class="tok-com">// The engine writes into `scratch_out` and the veiled sink is written</span></span>
+<span class="ln" id="L683">        <span class="tok-com">// from it, adjacent, inside the output callback.</span></span>
+<span class="ln" id="L684">        assert!(</span>
+<span class="ln" id="L685">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;deid.process(&amp;scratch_in[..frames], &amp;mut scratch_out[..frames]);&quot;</span>),</span>
+<span class="ln" id="L686">            <span class="tok-str">&quot;the engine no longer writes into `scratch_out`, so the assertion \</span></span>
+<span class="ln" id="L687"><span class="tok-str">             below is about a buffer that has moved&quot;</span></span>
+<span class="ln" id="L688">        );</span>
+<span class="ln" id="L689">        assert!(</span>
+<span class="ln" id="L690">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sink.write(&amp;scratch_out[..frames]);&quot;</span>),</span>
+<span class="ln" id="L691">            <span class="tok-str">&quot;the veiled recorder is no longer fed from the engine&#x27;s own output \</span></span>
+<span class="ln" id="L692"><span class="tok-str">             buffer. Whatever it is fed from now is a second copy of the audio, \</span></span>
+<span class="ln" id="L693"><span class="tok-str">             and roadmap item 132 is the claim that there is not one&quot;</span></span>
+<span class="ln" id="L694">        );</span>
+<span class="ln" id="L695"></span>
+<span class="ln" id="L696">        <span class="tok-com">// The microphone side, the same way: from the downmix inside the input</span></span>
+<span class="ln" id="L697">        <span class="tok-com">// callback, not from anything the platform hands back afterwards.</span></span>
+<span class="ln" id="L698">        assert!(</span>
+<span class="ln" id="L699">            source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sink.write(&amp;mono_scratch[..kept]);&quot;</span>)</span>
+<span class="ln" id="L700">                <span class="tok-com">// F-305: and a block at a time, so the scratch never overflows.</span></span>
+<span class="ln" id="L701">                &amp;&amp; source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;data.chunks(in_channels * mono_scratch.len().max(1))&quot;</span>),</span>
+<span class="ln" id="L702">            <span class="tok-str">&quot;the plain recorder is no longer fed from the downmix in the input \</span></span>
+<span class="ln" id="L703"><span class="tok-str">             callback. That is the one moment the real voice exists in this \</span></span>
+<span class="ln" id="L704"><span class="tok-str">             process, and taking it anywhere else means it exists twice&quot;</span></span>
+<span class="ln" id="L705">        );</span>
+<span class="ln" id="L706">        assert_eq!(</span>
+<span class="ln" id="L707">            source.<span class="tok-fn">matches</span>(<span class="tok-str">&quot;sink.write(&quot;</span>).<span class="tok-fn">count</span>(),</span>
+<span class="ln" id="L708">            <span class="tok-num">2</span>,</span>
+<span class="ln" id="L709">            <span class="tok-str">&quot;there are exactly two sinks and two places they are written. A \</span></span>
+<span class="ln" id="L710"><span class="tok-str">             third write is a third copy of somebody&#x27;s voice&quot;</span></span>
+<span class="ln" id="L711">        );</span>
+<span class="ln" id="L712">    }</span>
+<span class="ln" id="L713"></span>
+<span class="ln" id="L714">    <span class="tok-com">/// **F-168.** Two devices, one rate, or a refusal that says why.</span></span>
+<span class="ln" id="L715">    <span class="tok-com">///</span></span>
+<span class="ln" id="L716">    <span class="tok-com">/// The decision, without a sound card: this is arithmetic over what the</span></span>
+<span class="ln" id="L717">    <span class="tok-com">/// platform reported, and the whole reason it is a separate function is</span></span>
+<span class="ln" id="L718">    <span class="tok-com">/// that a test can reach it. F-163 and F-165 are why nothing here opens a</span></span>
+<span class="ln" id="L719">    <span class="tok-com">/// device to answer a question that does not need one.</span></span>
+<span class="ln" id="L720">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L721">    <span class="tok-kw">fn</span> <span class="tok-fn">devices_agree_on_a_rate_or_there_is_none_to_agree_on</span>() {</span>
+<span class="ln" id="L722">        <span class="tok-com">// Already the same. Answered without consulting the ranges at all,</span></span>
+<span class="ln" id="L723">        <span class="tok-com">// because a device that under-reports what it supports is common and</span></span>
+<span class="ln" id="L724">        <span class="tok-com">// this case does not need the report.</span></span>
+<span class="ln" id="L725">        assert_eq!(</span>
+<span class="ln" id="L726">            <span class="tok-fn">rate_they_agree_on</span>(<span class="tok-num">48_000</span>, &amp;[], &amp;[(<span class="tok-num">48_000</span>, vec![])]),</span>
+<span class="ln" id="L727">            <span class="tok-fn">Some</span>(<span class="tok-num">48_000</span>)</span>
+<span class="ln" id="L728">        );</span>
+<span class="ln" id="L729"></span>
+<span class="ln" id="L730">        <span class="tok-com">// The microphone defaults to 44.1 and will take 48. The output&#x27;s rate</span></span>
+<span class="ln" id="L731">        <span class="tok-com">// wins, because that is what the person hears through and what anything</span></span>
+<span class="ln" id="L732">        <span class="tok-com">// on a virtual cable expects.</span></span>
+<span class="ln" id="L733">        assert_eq!(</span>
+<span class="ln" id="L734">            <span class="tok-fn">rate_they_agree_on</span>(</span>
+<span class="ln" id="L735">                <span class="tok-num">48_000</span>,</span>
+<span class="ln" id="L736">                &amp;[(<span class="tok-num">48_000</span>, <span class="tok-num">48_000</span>)],</span>
+<span class="ln" id="L737">                &amp;[(<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)])]</span>
+<span class="ln" id="L738">            ),</span>
+<span class="ln" id="L739">            <span class="tok-fn">Some</span>(<span class="tok-num">48_000</span>)</span>
+<span class="ln" id="L740">        );</span>
+<span class="ln" id="L741"></span>
+<span class="ln" id="L742">        <span class="tok-com">// The microphone will not move and the output will. Then the</span></span>
+<span class="ln" id="L743">        <span class="tok-com">// microphone&#x27;s rate is the one, rather than a refusal.</span></span>
+<span class="ln" id="L744">        assert_eq!(</span>
+<span class="ln" id="L745">            <span class="tok-fn">rate_they_agree_on</span>(</span>
+<span class="ln" id="L746">                <span class="tok-num">48_000</span>,</span>
+<span class="ln" id="L747">                &amp;[(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)],</span>
+<span class="ln" id="L748">                &amp;[(<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">44_100</span>)])]</span>
+<span class="ln" id="L749">            ),</span>
+<span class="ln" id="L750">            <span class="tok-fn">Some</span>(<span class="tok-num">44_100</span>)</span>
+<span class="ln" id="L751">        );</span>
+<span class="ln" id="L752"></span>
+<span class="ln" id="L753">        <span class="tok-com">// Neither will move. This is the case that has to be refused rather</span></span>
+<span class="ln" id="L754">        <span class="tok-com">// than worked around: running them together is a ring that starves for</span></span>
+<span class="ln" id="L755">        <span class="tok-com">// ever and a voice shifted up by nine per cent.</span></span>
+<span class="ln" id="L756">        assert_eq!(</span>
+<span class="ln" id="L757">            <span class="tok-fn">rate_they_agree_on</span>(</span>
+<span class="ln" id="L758">                <span class="tok-num">48_000</span>,</span>
+<span class="ln" id="L759">                &amp;[(<span class="tok-num">48_000</span>, <span class="tok-num">48_000</span>)],</span>
+<span class="ln" id="L760">                &amp;[(<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">44_100</span>)])]</span>
+<span class="ln" id="L761">            ),</span>
+<span class="ln" id="L762">            None</span>
+<span class="ln" id="L763">        );</span>
+<span class="ln" id="L764"></span>
+<span class="ln" id="L765">        <span class="tok-com">// Several microphones, which is what roadmap item 147 opens. One rate has to</span></span>
+<span class="ln" id="L766">        <span class="tok-com">// suit every one of them and the output.</span></span>
+<span class="ln" id="L767">        assert_eq!(</span>
+<span class="ln" id="L768">            <span class="tok-fn">rate_they_agree_on</span>(</span>
+<span class="ln" id="L769">                <span class="tok-num">48_000</span>,</span>
+<span class="ln" id="L770">                &amp;[(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)],</span>
+<span class="ln" id="L771">                &amp;[</span>
+<span class="ln" id="L772">                    (<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)]),</span>
+<span class="ln" id="L773">                    (<span class="tok-num">48_000</span>, vec![(<span class="tok-num">48_000</span>, <span class="tok-num">48_000</span>)]),</span>
+<span class="ln" id="L774">                ]</span>
+<span class="ln" id="L775">            ),</span>
+<span class="ln" id="L776">            <span class="tok-fn">Some</span>(<span class="tok-num">48_000</span>)</span>
+<span class="ln" id="L777">        );</span>
+<span class="ln" id="L778">        assert_eq!(</span>
+<span class="ln" id="L779">            <span class="tok-fn">rate_they_agree_on</span>(</span>
+<span class="ln" id="L780">                <span class="tok-num">48_000</span>,</span>
+<span class="ln" id="L781">                &amp;[(<span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>)],</span>
+<span class="ln" id="L782">                &amp;[</span>
+<span class="ln" id="L783">                    (<span class="tok-num">44_100</span>, vec![(<span class="tok-num">44_100</span>, <span class="tok-num">44_100</span>)]),</span>
+<span class="ln" id="L784">                    (<span class="tok-num">48_000</span>, vec![(<span class="tok-num">48_000</span>, <span class="tok-num">48_000</span>)]),</span>
+<span class="ln" id="L785">                ],</span>
+<span class="ln" id="L786">            ),</span>
+<span class="ln" id="L787">            None,</span>
+<span class="ln" id="L788">            <span class="tok-str">&quot;one microphone that will only do 44.1 and one that will only do 48 \</span></span>
+<span class="ln" id="L789"><span class="tok-str">             cannot be run together, and saying so is the answer&quot;</span></span>
+<span class="ln" id="L790">        );</span>
+<span class="ln" id="L791">    }</span>
+<span class="ln" id="L792"></span>
+<span class="ln" id="L793">    <span class="tok-com">/// A stream error becomes something a caller can show.</span></span>
+<span class="ln" id="L794">    <span class="tok-com">///</span></span>
+<span class="ln" id="L795">    <span class="tok-com">/// **Roadmap item 132.** Before this, both error callbacks were `eprintln!` and</span></span>
+<span class="ln" id="L796">    <span class="tok-com">/// nothing else: on Windows the desktop application has no console, so a</span></span>
+<span class="ln" id="L797">    <span class="tok-com">/// device unplugged mid-call was silent and the recording carried on.</span></span>
+<span class="ln" id="L798">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L799">    <span class="tok-kw">fn</span> <span class="tok-fn">trouble_is_recorded_rather_than_only_printed</span>() {</span>
+<span class="ln" id="L800">        <span class="tok-kw">let</span> troubles = Troubles::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L801">        assert!(troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">is_none</span>());</span>
 <span class="ln" id="L802"></span>
 <span class="ln" id="L803">        troubles.<span class="tok-fn">report</span>(</span>
-<span class="ln" id="L804">            Side::Output,</span>
-<span class="ln" id="L805">            &amp;cpal::Error::<span class="tok-fn">with_message</span>(cpal::ErrorKind::Other, <span class="tok-str">&quot;the mixer said no&quot;</span>),</span>
+<span class="ln" id="L804">            Side::Input,</span>
+<span class="ln" id="L805">            &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::DeviceNotAvailable),</span>
 <span class="ln" id="L806">        );</span>
-<span class="ln" id="L807">        <span class="tok-kw">let</span> second = troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the report was kept&quot;</span>);</span>
-<span class="ln" id="L808">        assert_eq!(second.side, Side::Output);</span>
-<span class="ln" id="L809">        assert!(</span>
-<span class="ln" id="L810">            !second.device_gone,</span>
-<span class="ln" id="L811">            <span class="tok-str">&quot;only a stream that has ended is a stream that has ended&quot;</span></span>
-<span class="ln" id="L812">        );</span>
-<span class="ln" id="L813">        assert!(</span>
-<span class="ln" id="L814">            second.said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;the mixer said no&quot;</span>),</span>
-<span class="ln" id="L815">            <span class="tok-str">&quot;what the platform said is passed through rather than summarised, \</span></span>
-<span class="ln" id="L816"><span class="tok-str">             and it said {:?}&quot;</span>,</span>
-<span class="ln" id="L817">            second.said</span>
-<span class="ln" id="L818">        );</span>
-<span class="ln" id="L819">        assert_eq!(second.count, <span class="tok-num">2</span>, <span class="tok-str">&quot;the count is of both streams together&quot;</span>);</span>
-<span class="ln" id="L820">    }</span>
-<span class="ln" id="L821"></span>
-<span class="ln" id="L822">    <span class="tok-com">/// F-245. A stream the platform has invalidated is over, as a device that</span></span>
-<span class="ln" id="L823">    <span class="tok-com">/// has gone is: no further sample arrives on either.</span></span>
-<span class="ln" id="L824">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L825">    <span class="tok-kw">fn</span> <span class="tok-fn">an_invalidated_stream_is_a_stream_that_has_ended</span>() {</span>
-<span class="ln" id="L826">        <span class="tok-kw">let</span> troubles = Troubles::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L827">        troubles.<span class="tok-fn">report</span>(</span>
-<span class="ln" id="L828">            Side::Input,</span>
-<span class="ln" id="L829">            &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::StreamInvalidated),</span>
-<span class="ln" id="L830">        );</span>
-<span class="ln" id="L831">        assert!(troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;kept&quot;</span>).device_gone);</span>
-<span class="ln" id="L832">        troubles.<span class="tok-fn">report</span>(Side::Input, &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::DeviceBusy));</span>
-<span class="ln" id="L833">        assert!(</span>
-<span class="ln" id="L834">            !troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;kept&quot;</span>).device_gone,</span>
-<span class="ln" id="L835">            <span class="tok-str">&quot;a busy device comes back, and must not end a take&quot;</span></span>
-<span class="ln" id="L836">        );</span>
-<span class="ln" id="L837">    }</span>
-<span class="ln" id="L838"></span>
-<span class="ln" id="L839">    <span class="tok-com">/// F-245. A glitch touches nothing but two atomics, is counted, and is</span></span>
-<span class="ln" id="L840">    <span class="tok-com">/// still described to whoever asks, without hiding a report older than</span></span>
-<span class="ln" id="L841">    <span class="tok-com">/// it or being hidden by one newer.</span></span>
-<span class="ln" id="L842">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L843">    <span class="tok-kw">fn</span> <span class="tok-fn">a_glitch_is_counted_and_described_without_taking_the_lock</span>() {</span>
-<span class="ln" id="L844">        <span class="tok-kw">let</span> troubles = Troubles::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L845">        <span class="tok-com">// Held for the whole report: a glitch that tried to take it would wait</span></span>
-<span class="ln" id="L846">        <span class="tok-com">// here for ever, which is the stall on the audio thread this is about.</span></span>
-<span class="ln" id="L847">        {</span>
-<span class="ln" id="L848">            <span class="tok-kw">let</span> _held = troubles.kept.<span class="tok-fn">lock</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a fresh lock&quot;</span>);</span>
-<span class="ln" id="L849">            troubles.<span class="tok-fn">report</span>(Side::Output, &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::Xrun));</span>
-<span class="ln" id="L850">        }</span>
-<span class="ln" id="L851">        assert_eq!(troubles.<span class="tok-fn">count</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L852">        <span class="tok-kw">let</span> glitch = troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the glitch is described&quot;</span>);</span>
-<span class="ln" id="L853">        assert_eq!(glitch.side, Side::Output);</span>
-<span class="ln" id="L854">        assert!(!glitch.device_gone, <span class="tok-str">&quot;a glitch does not end a take&quot;</span>);</span>
-<span class="ln" id="L855">        assert_eq!(glitch.said, GLITCH);</span>
-<span class="ln" id="L856"></span>
-<span class="ln" id="L857">        troubles.<span class="tok-fn">report</span>(</span>
-<span class="ln" id="L858">            Side::Input,</span>
-<span class="ln" id="L859">            &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::DeviceNotAvailable),</span>
-<span class="ln" id="L860">        );</span>
-<span class="ln" id="L861">        assert!(troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;kept&quot;</span>).device_gone, <span class="tok-str">&quot;newer wins&quot;</span>);</span>
-<span class="ln" id="L862"></span>
-<span class="ln" id="L863">        troubles.<span class="tok-fn">report</span>(Side::Input, &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::Xrun));</span>
-<span class="ln" id="L864">        <span class="tok-kw">let</span> newest = troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;described&quot;</span>);</span>
-<span class="ln" id="L865">        assert_eq!((newest.said.<span class="tok-fn">as_str</span>(), newest.count), (GLITCH, <span class="tok-num">3</span>));</span>
-<span class="ln" id="L866">    }</span>
-<span class="ln" id="L867">}</span>
+<span class="ln" id="L807">        <span class="tok-kw">let</span> first = troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the report was kept&quot;</span>);</span>
+<span class="ln" id="L808">        assert_eq!(first.side, Side::Input);</span>
+<span class="ln" id="L809">        assert!(first.device_gone, <span class="tok-str">&quot;a device that has gone says so&quot;</span>);</span>
+<span class="ln" id="L810">        assert_eq!(first.count, <span class="tok-num">1</span>);</span>
+<span class="ln" id="L811"></span>
+<span class="ln" id="L812">        troubles.<span class="tok-fn">report</span>(</span>
+<span class="ln" id="L813">            Side::Output,</span>
+<span class="ln" id="L814">            &amp;cpal::Error::<span class="tok-fn">with_message</span>(cpal::ErrorKind::Other, <span class="tok-str">&quot;the mixer said no&quot;</span>),</span>
+<span class="ln" id="L815">        );</span>
+<span class="ln" id="L816">        <span class="tok-kw">let</span> second = troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the report was kept&quot;</span>);</span>
+<span class="ln" id="L817">        assert_eq!(second.side, Side::Output);</span>
+<span class="ln" id="L818">        assert!(</span>
+<span class="ln" id="L819">            !second.device_gone,</span>
+<span class="ln" id="L820">            <span class="tok-str">&quot;only a stream that has ended is a stream that has ended&quot;</span></span>
+<span class="ln" id="L821">        );</span>
+<span class="ln" id="L822">        assert!(</span>
+<span class="ln" id="L823">            second.said.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;the mixer said no&quot;</span>),</span>
+<span class="ln" id="L824">            <span class="tok-str">&quot;what the platform said is passed through rather than summarised, \</span></span>
+<span class="ln" id="L825"><span class="tok-str">             and it said {:?}&quot;</span>,</span>
+<span class="ln" id="L826">            second.said</span>
+<span class="ln" id="L827">        );</span>
+<span class="ln" id="L828">        assert_eq!(second.count, <span class="tok-num">2</span>, <span class="tok-str">&quot;the count is of both streams together&quot;</span>);</span>
+<span class="ln" id="L829">    }</span>
+<span class="ln" id="L830"></span>
+<span class="ln" id="L831">    <span class="tok-com">/// F-245. A stream the platform has invalidated is over, as a device that</span></span>
+<span class="ln" id="L832">    <span class="tok-com">/// has gone is: no further sample arrives on either.</span></span>
+<span class="ln" id="L833">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L834">    <span class="tok-kw">fn</span> <span class="tok-fn">an_invalidated_stream_is_a_stream_that_has_ended</span>() {</span>
+<span class="ln" id="L835">        <span class="tok-kw">let</span> troubles = Troubles::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L836">        troubles.<span class="tok-fn">report</span>(</span>
+<span class="ln" id="L837">            Side::Input,</span>
+<span class="ln" id="L838">            &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::StreamInvalidated),</span>
+<span class="ln" id="L839">        );</span>
+<span class="ln" id="L840">        assert!(troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;kept&quot;</span>).device_gone);</span>
+<span class="ln" id="L841">        troubles.<span class="tok-fn">report</span>(Side::Input, &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::DeviceBusy));</span>
+<span class="ln" id="L842">        assert!(</span>
+<span class="ln" id="L843">            !troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;kept&quot;</span>).device_gone,</span>
+<span class="ln" id="L844">            <span class="tok-str">&quot;a busy device comes back, and must not end a take&quot;</span></span>
+<span class="ln" id="L845">        );</span>
+<span class="ln" id="L846">    }</span>
+<span class="ln" id="L847"></span>
+<span class="ln" id="L848">    <span class="tok-com">/// F-245. A glitch touches nothing but two atomics, is counted, and is</span></span>
+<span class="ln" id="L849">    <span class="tok-com">/// still described to whoever asks, without hiding a report older than</span></span>
+<span class="ln" id="L850">    <span class="tok-com">/// it or being hidden by one newer.</span></span>
+<span class="ln" id="L851">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L852">    <span class="tok-kw">fn</span> <span class="tok-fn">a_glitch_is_counted_and_described_without_taking_the_lock</span>() {</span>
+<span class="ln" id="L853">        <span class="tok-kw">let</span> troubles = Troubles::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L854">        <span class="tok-com">// Held for the whole report: a glitch that tried to take it would wait</span></span>
+<span class="ln" id="L855">        <span class="tok-com">// here for ever, which is the stall on the audio thread this is about.</span></span>
+<span class="ln" id="L856">        {</span>
+<span class="ln" id="L857">            <span class="tok-kw">let</span> _held = troubles.kept.<span class="tok-fn">lock</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a fresh lock&quot;</span>);</span>
+<span class="ln" id="L858">            troubles.<span class="tok-fn">report</span>(Side::Output, &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::Xrun));</span>
+<span class="ln" id="L859">        }</span>
+<span class="ln" id="L860">        assert_eq!(troubles.<span class="tok-fn">count</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L861">        <span class="tok-kw">let</span> glitch = troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the glitch is described&quot;</span>);</span>
+<span class="ln" id="L862">        assert_eq!(glitch.side, Side::Output);</span>
+<span class="ln" id="L863">        assert!(!glitch.device_gone, <span class="tok-str">&quot;a glitch does not end a take&quot;</span>);</span>
+<span class="ln" id="L864">        assert_eq!(glitch.said, GLITCH);</span>
+<span class="ln" id="L865"></span>
+<span class="ln" id="L866">        troubles.<span class="tok-fn">report</span>(</span>
+<span class="ln" id="L867">            Side::Input,</span>
+<span class="ln" id="L868">            &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::DeviceNotAvailable),</span>
+<span class="ln" id="L869">        );</span>
+<span class="ln" id="L870">        assert!(troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;kept&quot;</span>).device_gone, <span class="tok-str">&quot;newer wins&quot;</span>);</span>
+<span class="ln" id="L871"></span>
+<span class="ln" id="L872">        troubles.<span class="tok-fn">report</span>(Side::Input, &amp;cpal::Error::<span class="tok-fn">new</span>(cpal::ErrorKind::Xrun));</span>
+<span class="ln" id="L873">        <span class="tok-kw">let</span> newest = troubles.<span class="tok-fn">latest</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;described&quot;</span>);</span>
+<span class="ln" id="L874">        assert_eq!((newest.said.<span class="tok-fn">as_str</span>(), newest.count), (GLITCH, <span class="tok-num">3</span>));</span>
+<span class="ln" id="L875">    }</span>
+<span class="ln" id="L876">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

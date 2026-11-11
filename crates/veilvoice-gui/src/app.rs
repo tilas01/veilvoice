@@ -1077,6 +1077,9 @@ impl eframe::App for VeilVoiceApp {
             // promises that typing it by mistake costs a relaunch and nothing
             // else, and that promise is the feature.
             let plain = if self.security.opened_with_decoy() {
+                // And its own files are checked the decoy's way, so the
+                // panel does not stay at "not checked this session". F-304.
+                self.integrity.start_decoy();
                 crate::vault_store::Plain::Leave
             } else {
                 crate::vault_store::Plain::MoveIn

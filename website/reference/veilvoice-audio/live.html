@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/live.svg" alt="live.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/live.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 867 lines &middot; <a href="live.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 876 lines &middot; <a href="live.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#structure">Structure</a>
@@ -91,7 +91,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>867 lines defining <strong>12 functions</strong> (4 public), <strong>4 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>876 lines defining <strong>12 functions</strong> (4 public), <strong>4 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Kept</code> <span style="color:var(--muted)">line 63</span> &middot; The recorders a session was asked for, one per side of Keeping.</li>
 <li><code>struct LiveSession</code> <span style="color:var(--muted)">line 71</span> &middot; A running live-scramble session.</li>
@@ -102,9 +102,9 @@
 <li><code>LiveSession::start</code> <span style="color:var(--muted)">line 386</span> &middot; Start scrambling from input into output.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>start_recording</code>, <code>agree_on_a_rate</code>, <code>agree_on_a_rate_for</code>, <code>at_rate</code>, <code>input_ranges</code>, <code>rate_they_agree_on</code></span>
 </li>
-<li><code>LiveSession::stats</code> <span style="color:var(--muted)">line 596</span> &middot; Read the current statistics, resetting the peak meters.
+<li><code>LiveSession::stats</code> <span style="color:var(--muted)">line 603</span> &middot; Read the current statistics, resetting the peak meters.
 </li>
-<li><code>LiveSession::interference</code> <span style="color:var(--muted)">line 615</span> &middot; What the platform last reported about either stream.
+<li><code>LiveSession::interference</code> <span style="color:var(--muted)">line 622</span> &middot; What the platform last reported about either stream.
 </li>
 </ul>
 </section>
@@ -181,12 +181,12 @@
 <a href="live.src.html#fn-livesession-stats">
 <rect x="394.0" y="220.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="480.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LiveSession::stats</text>
-<text x="480.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 596</text>
+<text x="480.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 603</text>
 </a>
 <a href="live.src.html#fn-livesession-interference">
 <rect x="178.8" y="320.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="293.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">LiveSession::interference</text>
-<text x="293.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 615</text>
+<text x="293.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 622</text>
 </a>
 <rect x="20.0" y="504.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="513.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -215,8 +215,8 @@ flowchart TD
     n_agree_on_a_rate_for[&quot;agree_on_a_rate_for&lt;br/&gt;line 291&quot;]
     n_start([&quot;LiveSession::start&lt;br/&gt;line 386&quot;])
     n_start_recording[&quot;LiveSession::start_recording&lt;br/&gt;line 424&quot;]
-    n_stats([&quot;LiveSession::stats&lt;br/&gt;line 596&quot;])
-    n_interference([&quot;LiveSession::interference&lt;br/&gt;line 615&quot;])
+    n_stats([&quot;LiveSession::stats&lt;br/&gt;line 603&quot;])
+    n_interference([&quot;LiveSession::interference&lt;br/&gt;line 622&quot;])
     n_agree_on_a_rate --&gt; n_agree_on_a_rate_for
     n_agree_on_a_rate_for --&gt; n_at_rate
     n_agree_on_a_rate_for --&gt; n_input_ranges
@@ -234,8 +234,8 @@ flowchart TD
     click n_agree_on_a_rate_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L291&quot; &quot;open the source&quot;
     click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L386&quot; &quot;open the source&quot;
     click n_start_recording href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L424&quot; &quot;open the source&quot;
-    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L596&quot; &quot;open the source&quot;
-    click n_interference href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L615&quot; &quot;open the source&quot;
+    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L603&quot; &quot;open the source&quot;
+    click n_interference href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/live.rs#L622&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_stats,n_interference entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -273,8 +273,8 @@ flowchart TD
 <tr><td><code>agree_on_a_rate_for</code> <sub>pub(crate) fn</sub></td><td><a href="live.src.html#fn-agree_on_a_rate_for">291</a></td><td>The same, for any number of microphones.</td></tr>
 <tr><td><code>LiveSession::start</code> <sub>pub fn</sub></td><td><a href="live.src.html#fn-livesession-start">386</a></td><td>Start scrambling from input into output.</td></tr>
 <tr><td><code>LiveSession::start_recording</code> <sub>pub fn</sub></td><td><a href="live.src.html#fn-livesession-start_recording">424</a></td><td>Start scrambling, keeping the sides of it Keeping asks for.</td></tr>
-<tr><td><code>LiveSession::stats</code> <sub>pub fn</sub></td><td><a href="live.src.html#fn-livesession-stats">596</a></td><td>Read the current statistics, resetting the peak meters.</td></tr>
-<tr><td><code>LiveSession::interference</code> <sub>pub fn</sub></td><td><a href="live.src.html#fn-livesession-interference">615</a></td><td>What the platform last reported about either stream.</td></tr>
+<tr><td><code>LiveSession::stats</code> <sub>pub fn</sub></td><td><a href="live.src.html#fn-livesession-stats">603</a></td><td>Read the current statistics, resetting the peak meters.</td></tr>
+<tr><td><code>LiveSession::interference</code> <sub>pub fn</sub></td><td><a href="live.src.html#fn-livesession-interference">622</a></td><td>What the platform last reported about either stream.</td></tr>
 </tbody></table>
 </section>
 </div></div>

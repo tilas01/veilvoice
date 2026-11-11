@@ -380,6 +380,7 @@ mod tests {
 
     #[test]
     fn a_bar_stays_inside_the_documented_height_range() {
+        let _statics = crate::pace::statics_held();
         // Walk several periods at a fine step: nothing may leave 16%..82%,
         // because a bar taller than its box is a bar drawn over the text
         // beside it.
@@ -409,6 +410,7 @@ mod tests {
 
     #[test]
     fn the_cycle_repeats_exactly_once_per_period() {
+        let _statics = crate::pace::statics_held();
         for delay in DELAYS {
             for t in [0.0f32, 0.3, 1.1, 7.7] {
                 let a = height_fraction(t, delay);
@@ -422,6 +424,7 @@ mod tests {
     /// block instead of rippling.
     #[test]
     fn the_bars_are_out_of_phase_with_each_other() {
+        let _statics = crate::pace::statics_held();
         let heights: Vec<f32> = DELAYS.iter().map(|d| height_fraction(0.0, *d)).collect();
         let spread = heights.iter().cloned().fold(f32::MIN, f32::max)
             - heights.iter().cloned().fold(f32::MAX, f32::min);
@@ -431,6 +434,7 @@ mod tests {
     /// A negative clock must not produce a negative phase.
     #[test]
     fn a_negative_time_is_handled() {
+        let _statics = crate::pace::statics_held();
         for t in [-0.5f32, -100.0] {
             let f = height_fraction(t, 0.0);
             assert!((MIN_FRACTION..=MAX_FRACTION).contains(&f), "t={t} gave {f}");
@@ -442,6 +446,7 @@ mod tests {
     /// the switch had not actually turned anything off.
     #[test]
     fn a_stilled_mark_is_the_same_at_every_moment() {
+        let _statics = crate::pace::statics_held();
         let ctx = egui::Context::default();
         let a = render_heights(&ctx, still(), 0.0);
         let b = render_heights(&ctx, still(), 12.34);
@@ -461,6 +466,7 @@ mod tests {
     /// egui uses to mean "nothing pending" is its business and not a contract.
     #[test]
     fn a_stilled_mark_requests_no_repaint() {
+        let _statics = crate::pace::statics_held();
         // Measured from a *settled* context. egui asks for an immediate
         // repaint on the first frames whatever is drawn, because layout needs
         // a second pass to converge -- so a single `run` reports zero for the
@@ -507,6 +513,7 @@ mod tests {
     /// can genuinely produce while a window is being resized.
     #[test]
     fn any_size_can_be_drawn() {
+        let _statics = crate::pace::statics_held();
         let ctx = egui::Context::default();
         for size in [
             egui::vec2(0.0, 0.0),
@@ -527,6 +534,7 @@ mod tests {
 
     #[test]
     fn an_unfocused_window_does_not_animate() {
+        let _statics = crate::pace::statics_held();
         // The case that makes a laptop warm: the application is open behind
         // something else and nobody can see the mark at all.
         let ctx = egui::Context::default();
@@ -558,6 +566,7 @@ mod tests {
 
     #[test]
     fn a_window_being_dragged_does_not_animate() {
+        let _statics = crate::pace::statics_held();
         // The reported symptom: dragging the window is jerky. Every frame of
         // a drag delivers a new rectangle, and each one used to come with a
         // full redraw this animation had asked for.
@@ -600,6 +609,7 @@ mod tests {
 
     #[test]
     fn the_mark_starts_again_once_the_window_stops() {
+        let _statics = crate::pace::statics_held();
         // Pausing during a drag is only correct if it resumes afterwards. A
         // permanently frozen logo is a different bug, not a fix.
         let ctx = egui::Context::default();
@@ -630,6 +640,7 @@ mod tests {
 
     #[test]
     fn a_paused_mark_keeps_the_shape_it_had() {
+        let _statics = crate::pace::statics_held();
         // Freezing at the resting midpoint would make every click into another
         // window snap the row flat, which is a new visible glitch traded for
         // the old invisible one.
@@ -654,6 +665,7 @@ mod tests {
 
     #[test]
     fn a_platform_that_reports_nothing_still_animates() {
+        let _statics = crate::pace::statics_held();
         // No focus and no window rectangle: a mark frozen for ever there would
         // be a worse failure than one that animates when it need not.
         let ctx = egui::Context::default();
@@ -674,6 +686,7 @@ mod tests {
 
     #[test]
     fn the_mark_is_paced_by_the_window_and_not_by_a_number_of_its_own() {
+        let _statics = crate::pace::statics_held();
         let ctx = egui::Context::default();
         let rect = SOMEWHERE();
 
@@ -730,6 +743,7 @@ mod tests {
 
     #[test]
     fn the_delays_match_the_website_markup() {
+        let _statics = crate::pace::statics_held();
         let html = std::fs::read_to_string(
             std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../website/index.html"),
         )

@@ -121,6 +121,26 @@ static INTERVAL_MICROS: AtomicU32 = AtomicU32::new(0);
 /// the application in hand; this way it counts like everything else.
 static ANIMATING: AtomicBool = AtomicBool::new(false);
 
+/// Hold this in any test that reads or writes the frame-pace statics.
+///
+/// **F-307.** The statics are process-wide and the test harness runs tests on
+/// several threads, so a test here setting a 30 fps target could land in the
+/// middle of a soundbar test expecting the display's pace, and both failed in
+/// a full run while passing alone. Each holder also starts from the values a
+/// fresh process has, because a test that set a fixed target and finished left
+/// it behind for whichever test ran next. A poisoned lock is taken anyway: one
+/// failed test should not fail every test after it.
+#[cfg(test)]
+pub(crate) fn statics_held() -> std::sync::MutexGuard<'static, ()> {
+    static HELD: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    let held = HELD
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    INTERVAL_MICROS.store(0, Ordering::Relaxed);
+    ANIMATING.store(false, Ordering::Relaxed);
+    held
+}
+
 /// Ask for the next frame the way the current target wants it asked for.
 ///
 /// The one call an animation makes. With the target on the display, this is
@@ -407,6 +427,7 @@ mod tests {
 
     #[test]
     fn the_display_is_measured_from_the_frames_it_paced() {
+        let _statics = crate::pace::statics_held();
         for hz in [60.0, 120.0, 144.0, 165.0, 240.0, 360.0, 500.0, 1000.0] {
             let mut pace = Pace::new(Target::Display);
             run(&mut pace, hz, WINDOW + 2);
@@ -417,6 +438,7 @@ mod tests {
 
     #[test]
     fn one_slow_frame_does_not_move_the_measurement() {
+        let _statics = crate::pace::statics_held();
         let mut pace = Pace::new(Target::Display);
         run(&mut pace, 144.0, WINDOW);
         let t = WINDOW as f64 / 144.0;
@@ -428,6 +450,7 @@ mod tests {
 
     #[test]
     fn a_fixed_target_paces_by_its_own_interval_and_measures_nothing() {
+        let _statics = crate::pace::statics_held();
         let mut pace = Pace::new(Target::Fixed(30));
         assert_eq!(pace.interval(), Some(Duration::from_micros(33_333)));
         run(&mut pace, 30.0, WINDOW + 2);
@@ -438,6 +461,7 @@ mod tests {
 
     #[test]
     fn the_setting_round_trips_and_is_clamped() {
+        let _statics = crate::pace::statics_held();
         assert_eq!(Target::from_setting(0), Target::Display);
         assert_eq!(Target::from_setting(144), Target::Fixed(144));
         assert_eq!(Target::from_setting(1), Target::Fixed(DISPLAY_FLOOR));
@@ -450,6 +474,7 @@ mod tests {
 
     #[test]
     fn idle_gaps_are_not_dropped_frames() {
+        let _statics = crate::pace::statics_held();
         let mut pace = Pace::new(Target::Display);
         run(&mut pace, 60.0, 8);
         // The window sat idle for a while, then drew because the mouse moved.
@@ -459,6 +484,7 @@ mod tests {
 
     #[test]
     fn a_second_of_late_frames_is_worth_saying() {
+        let _statics = crate::pace::statics_held();
         let mut pace = Pace::new(Target::Fixed(60));
         let mut t = 0.0;
         // Every frame at half the rate asked for, for more than two seconds:
@@ -478,6 +504,7 @@ mod tests {
 
     #[test]
     fn one_bad_second_at_launch_is_not_an_alarm() {
+        let _statics = crate::pace::statics_held();
         // Opening a window costs a hitch. One second of it must not tell
         // somebody their machine is struggling.
         let mut pace = Pace::new(Target::Fixed(60));
@@ -499,6 +526,7 @@ mod tests {
 
     #[test]
     fn the_published_interval_follows_the_target() {
+        let _statics = crate::pace::statics_held();
         let mut pace = Pace::new(Target::Display);
         assert_eq!(INTERVAL_MICROS.load(Ordering::Relaxed), 0);
         pace.set_target(Target::Fixed(120));

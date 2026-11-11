@@ -314,9 +314,14 @@ impl Decoy {
         self.verifier.matches(given.as_bytes(), self.params)
     }
 
-    /// The record, for writing.
+    /// The record, for writing: its fields, then random bytes up to the app
+    /// lock's own length.
+    ///
+    /// **F-306.** Unpadded it was a 72-byte file beside two lock copies of 125
+    /// bytes, so its size alone said that a decoy was set. Padded, the three
+    /// files in the folder are the same size.
     pub fn to_bytes(&self) -> Vec<u8> {
-        let mut out = Vec::with_capacity(RECORD_LEN);
+        let mut out = Vec::with_capacity(crate::lock::LOCK_LEN);
         out.extend_from_slice(MAGIC);
         out.push(FORMAT_VERSION);
         out.extend_from_slice(&[0u8; 3]);
@@ -326,6 +331,11 @@ impl Decoy {
         out.extend_from_slice(&self.verifier.salt);
         out.extend_from_slice(&self.verifier.expected);
         debug_assert_eq!(out.len(), RECORD_LEN);
+        // Random rather than zero, so the padding looks like the rest. If the
+        // system cannot provide it, zeroes still hide the length.
+        let mut tail = [0u8; crate::lock::LOCK_LEN - RECORD_LEN];
+        let _ = getrandom::getrandom(&mut tail);
+        out.extend_from_slice(&tail);
         out
     }
 
@@ -357,7 +367,9 @@ impl Decoy {
         if bytes.len() < RECORD_LEN {
             return Err(Error::Truncated);
         }
-        if bytes.len() > RECORD_LEN {
+        // A record written since F-306 is padded to the lock's length; one
+        // written before it is exactly `RECORD_LEN`. Anything else is not one.
+        if bytes.len() != RECORD_LEN && bytes.len() != crate::lock::LOCK_LEN {
             return Err(Error::BadHeader);
         }
         let u32_at =
@@ -727,6 +739,25 @@ mod tests {
         assert!(Decoy::create("hunter2", "totally different", params()).is_ok());
     }
 
+    /// **F-306.** A decoy record is written at a lock record's length, reads
+    /// back, and one written unpadded by an older build still reads.
+    #[test]
+    fn a_decoy_record_is_the_size_of_a_lock_record() {
+        let record = Decoy::create("the real one", "something else", params()).unwrap();
+        let bytes = record.to_bytes();
+        assert_eq!(bytes.len(), crate::lock::LOCK_LEN);
+        assert!(Decoy::parse(&bytes)
+            .unwrap()
+            .matches("something else")
+            .unwrap());
+        let older = &bytes[..RECORD_LEN];
+        assert!(Decoy::parse(older)
+            .unwrap()
+            .matches("something else")
+            .unwrap());
+        assert!(Decoy::parse(&bytes[..RECORD_LEN + 1]).is_err());
+    }
+
     /// Setting a decoy takes the real passphrase, and it is checked.
     ///
     /// Two things fail without this. The too-alike rule is a rule about the pair,
@@ -800,7 +831,8 @@ mod tests {
     fn a_record_reads_back_as_what_was_written() {
         let decoy = Decoy::create("the real one", "the decoy", params()).unwrap();
         let bytes = decoy.to_bytes();
-        assert_eq!(bytes.len(), RECORD_LEN);
+        // Padded to the lock's length since F-306.
+        assert_eq!(bytes.len(), crate::lock::LOCK_LEN);
         assert_eq!(&bytes[..8], MAGIC);
         assert_eq!(Decoy::parse(&bytes).unwrap(), decoy);
         assert!(Decoy::parse(&bytes).unwrap().matches("the decoy").unwrap());

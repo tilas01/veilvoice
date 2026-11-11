@@ -137,6 +137,31 @@ impl Integrity {
         });
     }
 
+    /// Run the check a decoy session shows, on a worker.
+    ///
+    /// **F-304.** A decoy session used to leave this panel at "not checked
+    /// this session", which a real session never shows once it is unlocked,
+    /// so the panel alone said which passphrase had been typed. It now runs
+    /// [`check_decoy`]: the plain record if there is one, and otherwise the
+    /// files as they are, reported the way a clean real session reports them.
+    /// It writes nothing, so it cannot leave a plain record beside a sealed
+    /// one or touch the real session's evidence.
+    pub fn start_decoy(&mut self) {
+        if self.pending.is_some() {
+            return;
+        }
+        let (tx, rx) = mpsc::channel();
+        self.pending = Some(rx);
+        self.state = State::Working;
+        std::thread::spawn(move || {
+            let state = match record_path() {
+                Some(plain) => check_decoy(&plain, &sealed_path(&plain), &targets()),
+                None => State::Failed("no configuration directory on this platform".into()),
+            };
+            let _ = tx.send(state);
+        });
+    }
+
     /// Collect a finished check. Returns true when the state changed, which is
     /// the window's cue to repaint.
     pub fn poll(&mut self) -> bool {
@@ -188,6 +213,36 @@ fn targets() -> Vec<PathBuf> {
         out.push(exe);
     }
     out
+}
+
+/// The decoy session's check. Reads, and never writes.
+///
+/// A plain record, where there is one, is checked as a real session would
+/// check it. A sealed record cannot be opened without the real passphrase, so
+/// the files are hashed as they are and reported as a clean real session
+/// reports them. That is the point of a decoy: it looks like the ordinary
+/// program, and the real session is where the real answer is.
+fn check_decoy(plain: &std::path::Path, sealed: &std::path::Path, files: &[PathBuf]) -> State {
+    if files.is_empty() {
+        return State::Failed("cannot find this program's own file".into());
+    }
+    if let Ok(manifest) = Manifest::load(plain) {
+        let report = manifest.check::<PathBuf>(&[]);
+        if !report.is_clean() {
+            return State::Changed(report.changes.iter().map(|c| c.describe()).collect());
+        }
+        return State::Clean {
+            files: report.unchanged,
+            sealed: false,
+        };
+    }
+    match Manifest::of(files) {
+        Ok(manifest) => State::Clean {
+            files: manifest.len(),
+            sealed: sealed.exists(),
+        },
+        Err(e) => State::Failed(e.to_string()),
+    }
 }
 
 /// The whole of the work, on the worker thread.
@@ -303,6 +358,68 @@ fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-304.** With only a sealed record, the decoy reports what a clean
+    /// real session reports, and writes nothing beside it.
+    #[test]
+    fn a_decoy_session_reads_like_a_real_one_and_writes_nothing() {
+        let dir = tempfile::tempdir().unwrap();
+        let program = dir.path().join("veilvoice-gui");
+        std::fs::write(&program, b"the program").unwrap();
+        let plain = dir.path().join("integrity.manifest");
+        let sealed = dir.path().join("integrity.manifest.veil");
+        std::fs::write(&sealed, b"sealed under the real passphrase").unwrap();
+        let before: Vec<_> = std::fs::read_dir(dir.path())
+            .unwrap()
+            .map(|e| e.unwrap().file_name())
+            .collect();
+
+        let state = check_decoy(&plain, &sealed, std::slice::from_ref(&program));
+        assert_eq!(
+            state,
+            State::Clean {
+                files: 1,
+                sealed: true
+            }
+        );
+
+        let after: Vec<_> = std::fs::read_dir(dir.path())
+            .unwrap()
+            .map(|e| e.unwrap().file_name())
+            .collect();
+        assert_eq!(before.len(), after.len(), "the decoy wrote a file");
+        assert!(
+            !plain.exists(),
+            "a plain record beside a sealed one is a downgrade"
+        );
+    }
+
+    /// **F-304.** A plain record is checked, and a changed file is reported.
+    #[test]
+    fn a_decoy_session_checks_a_plain_record() {
+        let dir = tempfile::tempdir().unwrap();
+        let program = dir.path().join("veilvoice-gui");
+        std::fs::write(&program, b"the program").unwrap();
+        let plain = dir.path().join("integrity.manifest");
+        Manifest::of(std::slice::from_ref(&program))
+            .unwrap()
+            .save(&plain)
+            .unwrap();
+        let sealed = dir.path().join("integrity.manifest.veil");
+        let files = [program.clone()];
+        assert_eq!(
+            check_decoy(&plain, &sealed, &files),
+            State::Clean {
+                files: 1,
+                sealed: false
+            }
+        );
+        std::fs::write(&program, b"a different program").unwrap();
+        assert!(matches!(
+            check_decoy(&plain, &sealed, &files),
+            State::Changed(_)
+        ));
+    }
 
     #[test]
     fn a_fresh_record_is_idle_and_not_busy() {

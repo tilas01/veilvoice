@@ -71,13 +71,15 @@ The VeilVoice desktop application.
 # than whatever resolves today. A package that silently drifts from the tested
 # graph is not the software that was audited.
 #
-# Fedora's build flags reach cargo through RUSTFLAGS and ask for full debugging
-# information (-Cdebuginfo=2). With the workspace's fat LTO that made the final
-# links of the two programs, which run side by side, too large for a CI runner,
-# and the build was killed (exit 137). There is no -debuginfo package to fill
-# (see debug_package above), so the request is withdrawn; a later flag wins.
+# The workspace's release profile links each program with fat LTO and one
+# codegen unit, and two of those links side by side were more than a CI runner
+# could hold: the build was killed (exit 137) while linking. So the two
+# programs are built one after the other. Fedora's request for full debugging
+# information (-Cdebuginfo=2) is withdrawn as well, since there is no
+# -debuginfo package to fill (see debug_package above); a later flag wins.
 export RUSTFLAGS="${RUSTFLAGS:-} -Cdebuginfo=0"
-cargo build --release --locked --workspace
+cargo build --release --locked -p veilvoice-cli
+cargo build --release --locked -p veilvoice-gui
 
 %install
 install -Dpm 0755 target/release/veilvoice        %{buildroot}%{_bindir}/veilvoice
@@ -95,7 +97,8 @@ python3 tools/release/manpage.py target/release/veilvoice-gui \
     --summary "the VeilVoice desktop application"
 
 %check
-cargo test --release --locked --workspace
+# Two jobs, for the same reason as above: every test program is a fat-LTO link.
+cargo test --release --locked --workspace -j 2
 
 %files
 %license LICENSE

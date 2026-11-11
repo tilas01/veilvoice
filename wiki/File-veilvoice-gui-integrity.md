@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/integrity.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 397 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs)
+[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 514 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs)
 
 ## Contents
 
@@ -64,7 +64,7 @@ accident but not one changed by somebody covering their tracks.
 
 ## What this file contains
 
-397 lines defining **11 functions** (6 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+514 lines defining **13 functions** (7 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -78,7 +78,9 @@ accident but not one changed by somebody covering their tracks.
 - `Integrity::changed` (line 107) -- Whether the record found a difference worth showing the user.
 - `Integrity::start` (line 120) -- Take or check the record, off the drawing thread.
   - reaches: `run`, `record_path`, `sealed_path`, `targets`, `write_private`
-- `Integrity::poll` (line 142) -- Collect a finished check.
+- `Integrity::start_decoy` (line 149) -- Run the check a decoy session shows, on a worker.
+  - reaches: `check_decoy`, `record_path`, `sealed_path`, `targets`
+- `Integrity::poll` (line 167) -- Collect a finished check.
 
 ## What calls what
 
@@ -99,34 +101,42 @@ flowchart TD
     n_is_busy(["Integrity::is_busy<br/>line 102"])
     n_changed(["Integrity::changed<br/>line 107"])
     n_start(["Integrity::start<br/>line 120"])
-    n_poll(["Integrity::poll<br/>line 142"])
-    n_record_path["record_path<br/>line 170"]
-    n_sealed_path["sealed_path<br/>line 175"]
-    n_targets["targets<br/>line 185"]
-    n_run["run<br/>line 194"]
-    n_write_private["write_private<br/>line 294"]
+    n_start_decoy(["Integrity::start_decoy<br/>line 149"])
+    n_poll(["Integrity::poll<br/>line 167"])
+    n_record_path["record_path<br/>line 195"]
+    n_sealed_path["sealed_path<br/>line 200"]
+    n_targets["targets<br/>line 210"]
+    n_check_decoy["check_decoy<br/>line 225"]
+    n_run["run<br/>line 249"]
+    n_write_private["write_private<br/>line 349"]
     n_run --> n_record_path
     n_run --> n_sealed_path
     n_run --> n_targets
     n_run --> n_write_private
     n_start --> n_run
+    n_start_decoy --> n_check_decoy
+    n_start_decoy --> n_record_path
+    n_start_decoy --> n_sealed_path
+    n_start_decoy --> n_targets
     click n_default href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L87" "open the source"
     click n_state href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L97" "open the source"
     click n_is_busy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L102" "open the source"
     click n_changed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L107" "open the source"
     click n_start href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L120" "open the source"
-    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L142" "open the source"
-    click n_record_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L170" "open the source"
-    click n_sealed_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L175" "open the source"
-    click n_targets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L185" "open the source"
-    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L194" "open the source"
-    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L294" "open the source"
+    click n_start_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L149" "open the source"
+    click n_poll href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L167" "open the source"
+    click n_record_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L195" "open the source"
+    click n_sealed_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L200" "open the source"
+    click n_targets href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L210" "open the source"
+    click n_check_decoy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L225" "open the source"
+    click n_run href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L249" "open the source"
+    click n_write_private href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L349" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_state,n_is_busy,n_changed,n_start,n_poll entry
+    class n_state,n_is_busy,n_changed,n_start,n_start_decoy,n_poll entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_record_path api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_default,n_sealed_path,n_targets,n_run,n_write_private helper
+    class n_default,n_sealed_path,n_targets,n_check_decoy,n_run,n_write_private helper
     subgraph chart_key ["Key"]
         direction LR
         key_entry["entry: a way in: public, and nothing in this file calls it"]
@@ -151,9 +161,11 @@ flowchart TD
 | `Integrity::is_busy` <sub>pub fn</sub> | [102](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L102) | Whether a check is running, so the window keeps repainting while it is. |
 | `Integrity::changed` <sub>pub fn</sub> | [107](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L107) | Whether the record found a difference worth showing the user. |
 | `Integrity::start` <sub>pub fn</sub> | [120](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L120) | Take or check the record, off the drawing thread. |
-| `Integrity::poll` <sub>pub fn</sub> | [142](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L142) | Collect a finished check. |
-| `record_path` <sub>pub fn</sub> | [170](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L170) | Where the record is kept, beside the app lock and under the same rules. |
-| `sealed_path` <sub>fn</sub> | [175](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L175) | The sealed record sits beside the plain one under the container suffix. |
-| `targets` <sub>fn</sub> | [185](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L185) | The files worth watching: the running program, and nothing assumed. |
-| `run` <sub>fn</sub> | [194](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L194) | The whole of the work, on the worker thread. |
-| `write_private` <sub>fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L294) | Write bytes to path, readable by this account and no other, creating the directory if it is not there. |
+| `Integrity::start_decoy` <sub>pub fn</sub> | [149](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L149) | Run the check a decoy session shows, on a worker. |
+| `Integrity::poll` <sub>pub fn</sub> | [167](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L167) | Collect a finished check. |
+| `record_path` <sub>pub fn</sub> | [195](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L195) | Where the record is kept, beside the app lock and under the same rules. |
+| `sealed_path` <sub>fn</sub> | [200](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L200) | The sealed record sits beside the plain one under the container suffix. |
+| `targets` <sub>fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L210) | The files worth watching: the running program, and nothing assumed. |
+| `check_decoy` <sub>fn</sub> | [225](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L225) | The decoy session's check. |
+| `run` <sub>fn</sub> | [249](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L249) | The whole of the work, on the worker thread. |
+| `write_private` <sub>fn</sub> | [349](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs#L349) | Write bytes to path, readable by this account and no other, creating the directory if it is not there. |

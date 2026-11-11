@@ -166,7 +166,7 @@ file from now on, but it cannot undo a copy somebody already has.
 - **One progress indicator for everything that takes time.** It shows an
   estimate only where one can be measured, says why when it cannot, and stays
   still if your system asks for reduced motion.
-- **The welcome tour sets VeilVoice up** rather than only describing it: a
+- **The welcome tour now sets VeilVoice up** as it goes: a
   password on the window, encryption at rest, the decoy passphrase, whether this
   copy is installed, and a walk through Settings. It is drawn over the window it
   describes, and leaves out steps that are already done.
@@ -600,9 +600,17 @@ what each shape means.
   release that could not exist yet, so it failed on every new version
   (F-298); the window did not compile on Windows over an unused `mut` (F-299);
   the AppImage tools were pinned to a placeholder (F-300); the RPM build was
-  killed while linking, from Fedora's debugging flags on top of fat LTO
-  (F-301); and a failed second FreeBSD build would have cost the release its
-  FreeBSD archive (F-302).
+  killed while linking two fat-LTO programs at once (F-301); a failed second
+  FreeBSD build would have cost the release its FreeBSD archive (F-302); and a
+  test of a part-finished update could not fail on Windows (F-303).
+- Taken from the one-time audit into this release: a decoy session's
+  integrity panel stayed at "not checked this session", which a real session
+  never shows, and now reads the way a real one does without writing anything
+  (F-304); a long audio callback cut the kept plain voice short (F-305); the
+  decoy record's size gave away that a decoy was set, and it is now padded to
+  the lock's length (F-306); two window tests shared the frame-pace statics
+  and failed about one run in ten (F-307); and the website's anchor test read
+  past the handler it was about (F-308).
 - Roadmap items 176 and 184's remaining half move to v0.1.24, so this release
   is not held for them.
 

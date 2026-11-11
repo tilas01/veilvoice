@@ -94,7 +94,7 @@ flowchart TD
     n_fetch["fetch.rs<br/>382 lines"]
     n_report["report.rs<br/>385 lines"]
     n_tests["tests.rs<br/>1907 lines"]
-    n_update["update.rs<br/>1642 lines"]
+    n_update["update.rs<br/>1650 lines"]
     n_builder --> n_deps
     n_builder --> n_extracted
     n_builder --> n_report
@@ -131,11 +131,11 @@ flowchart TD
 | [`lib.rs`](File-veilvoice-verify-lib) | 2639 | The portable verifier: check a VeilVoice release without GnuPG installed. |
 | [`report.rs`](File-veilvoice-verify-report) | 385 | How much this program says, and what it returns when it says nothing. |
 | [`tests.rs`](File-veilvoice-verify-tests) | 1907 | The verifier's own tests. |
-| [`update.rs`](File-veilvoice-verify-update) | 1642 | The update that does the update. |
+| [`update.rs`](File-veilvoice-verify-update) | 1650 | The update that does the update. |
 | [`inside_the_archive.rs`](File-veilvoice-verify-tests-inside_the_archive) | 498 | Roadmap item 164. |
 | [`release_manifest.rs`](File-veilvoice-verify-tests-release_manifest) | 208 | Roadmap item 97. |
 
-**9,948 functional lines of Rust** in this crate. A functional line is a line
+**9,951 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-audio/room.svg" alt="room.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-audio/src/room.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 556 lines &middot; <a href="room.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 560 lines &middot; <a href="room.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-for">What this is for</a>
@@ -97,7 +97,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>556 lines defining <strong>4 functions</strong> (4 public), <strong>5 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>560 lines defining <strong>4 functions</strong> (4 public), <strong>5 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>struct Guest</code> <span style="color:var(--muted)">line 78</span> &middot; One guest: the microphone they speak into and the voice they become.</li>
 <li><code>struct KeptRoom</code> <span style="color:var(--muted)">line 97</span> &middot; The recorders a room was asked for.</li>
@@ -108,11 +108,11 @@
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
 <li><code>RoomSession::start</code> <span style="color:var(--muted)">line 150</span> &middot; Open every guest&#x27;s microphone, veil each, and mix into output.
 </li>
-<li><code>RoomSession::guests</code> <span style="color:var(--muted)">line 390</span> &middot; How many guests this room opened.
+<li><code>RoomSession::guests</code> <span style="color:var(--muted)">line 394</span> &middot; How many guests this room opened.
 </li>
-<li><code>RoomSession::stats</code> <span style="color:var(--muted)">line 402</span> &middot; Read the counters, resetting the peak meters.
+<li><code>RoomSession::stats</code> <span style="color:var(--muted)">line 406</span> &middot; Read the counters, resetting the peak meters.
 </li>
-<li><code>RoomSession::interference</code> <span style="color:var(--muted)">line 425</span> &middot; What the platform last reported about any of the streams.
+<li><code>RoomSession::interference</code> <span style="color:var(--muted)">line 429</span> &middot; What the platform last reported about any of the streams.
 </li>
 </ul>
 </section>
@@ -137,17 +137,17 @@
 <a href="room.src.html#fn-roomsession-guests">
 <rect x="219.1" y="20.0" width="181.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="309.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">RoomSession::guests</text>
-<text x="309.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
+<text x="309.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 394</text>
 </a>
 <a href="room.src.html#fn-roomsession-stats">
 <rect x="426.2" y="20.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="512.8" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">RoomSession::stats</text>
-<text x="512.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 402</text>
+<text x="512.8" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 406</text>
 </a>
 <a href="room.src.html#fn-roomsession-interference">
 <rect x="194.9" y="120.0" width="229.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="309.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">RoomSession::interference</text>
-<text x="309.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 425</text>
+<text x="309.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 429</text>
 </a>
 <rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -163,13 +163,13 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_start([&quot;RoomSession::start&lt;br/&gt;line 150&quot;])
-    n_guests([&quot;RoomSession::guests&lt;br/&gt;line 390&quot;])
-    n_stats([&quot;RoomSession::stats&lt;br/&gt;line 402&quot;])
-    n_interference([&quot;RoomSession::interference&lt;br/&gt;line 425&quot;])
+    n_guests([&quot;RoomSession::guests&lt;br/&gt;line 394&quot;])
+    n_stats([&quot;RoomSession::stats&lt;br/&gt;line 406&quot;])
+    n_interference([&quot;RoomSession::interference&lt;br/&gt;line 429&quot;])
     click n_start href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L150&quot; &quot;open the source&quot;
-    click n_guests href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L390&quot; &quot;open the source&quot;
-    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L402&quot; &quot;open the source&quot;
-    click n_interference href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L425&quot; &quot;open the source&quot;
+    click n_guests href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L394&quot; &quot;open the source&quot;
+    click n_stats href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L406&quot; &quot;open the source&quot;
+    click n_interference href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/room.rs#L429&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_start,n_guests,n_stats,n_interference entry
     subgraph chart_key [&quot;Key&quot;]
@@ -189,9 +189,9 @@ flowchart TD
 <tr><td><code>Shared</code> <sub>struct</sub></td><td><a href="room.src.html#fn-shared">119</a></td><td>The same arrangement as crate::live::Shared, for a room rather than one voice: counted in the audio callbacks, read by the caller.</td></tr>
 <tr><td><code>Voice</code> <sub>struct</sub></td><td><a href="room.src.html#fn-voice">134</a></td><td>Everything one guest&#x27;s engine needs, owned by the output callback.</td></tr>
 <tr><td><code>RoomSession::start</code> <sub>pub fn</sub></td><td><a href="room.src.html#fn-roomsession-start">150</a></td><td>Open every guest&#x27;s microphone, veil each, and mix into output.</td></tr>
-<tr><td><code>RoomSession::guests</code> <sub>pub fn</sub></td><td><a href="room.src.html#fn-roomsession-guests">390</a></td><td>How many guests this room opened.</td></tr>
-<tr><td><code>RoomSession::stats</code> <sub>pub fn</sub></td><td><a href="room.src.html#fn-roomsession-stats">402</a></td><td>Read the counters, resetting the peak meters.</td></tr>
-<tr><td><code>RoomSession::interference</code> <sub>pub fn</sub></td><td><a href="room.src.html#fn-roomsession-interference">425</a></td><td>What the platform last reported about any of the streams.</td></tr>
+<tr><td><code>RoomSession::guests</code> <sub>pub fn</sub></td><td><a href="room.src.html#fn-roomsession-guests">394</a></td><td>How many guests this room opened.</td></tr>
+<tr><td><code>RoomSession::stats</code> <sub>pub fn</sub></td><td><a href="room.src.html#fn-roomsession-stats">406</a></td><td>Read the counters, resetting the peak meters.</td></tr>
+<tr><td><code>RoomSession::interference</code> <sub>pub fn</sub></td><td><a href="room.src.html#fn-roomsession-interference">429</a></td><td>What the platform last reported about any of the streams.</td></tr>
 </tbody></table>
 </section>
 </div></div>

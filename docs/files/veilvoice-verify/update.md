@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-verify/src/update.rs`
 
-[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 1642 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs)
+[`veilvoice-verify`](../../../crates/veilvoice-verify/README.md) &middot; 1650 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs)
 
 ## Contents
 
@@ -144,7 +144,7 @@ that record is locked with the same passphrase.
 
 ## What this file contains
 
-1642 lines defining **22 functions** (7 public), **5 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1650 lines defining **22 functions** (7 public), **5 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

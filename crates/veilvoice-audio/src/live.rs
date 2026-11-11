@@ -475,24 +475,31 @@ impl LiveSession {
                 move |data: &[f32], _| {
                     let mut peak = 0.0f32;
                     let mut dropped = 0u64;
-                    let mut kept = 0usize;
                     // Downmix to mono: the engine is single channel, and a
                     // stereo image is itself a recording-setup fingerprint.
-                    for frame in data.chunks(in_channels) {
-                        let mono = frame.iter().sum::<f32>() / in_channels as f32;
-                        peak = peak.max(mono.abs());
-                        // The real voice, at the one moment it exists in this
-                        // process, and only where it was asked for.
-                        if plain.is_some() && kept < mono_scratch.len() {
-                            mono_scratch[kept] = mono;
-                            kept += 1;
+                    //
+                    // A block the size of the scratch at a time, so the kept
+                    // copy is written out each time the scratch fills. F-305:
+                    // a long callback used to fill it and keep nothing more,
+                    // which cut the kept recording short without a word.
+                    for block in data.chunks(in_channels * mono_scratch.len().max(1)) {
+                        let mut kept = 0usize;
+                        for frame in block.chunks(in_channels) {
+                            let mono = frame.iter().sum::<f32>() / in_channels as f32;
+                            peak = peak.max(mono.abs());
+                            // The real voice, at the one moment it exists in
+                            // this process, and only where it was asked for.
+                            if plain.is_some() && kept < mono_scratch.len() {
+                                mono_scratch[kept] = mono;
+                                kept += 1;
+                            }
+                            if producer.try_push(mono).is_err() {
+                                dropped += 1;
+                            }
                         }
-                        if producer.try_push(mono).is_err() {
-                            dropped += 1;
+                        if let Some(sink) = plain.as_mut() {
+                            sink.write(&mono_scratch[..kept]);
                         }
-                    }
-                    if let Some(sink) = plain.as_mut() {
-                        sink.write(&mono_scratch[..kept]);
                     }
                     if dropped > 0 {
                         cap_shared.dropped.fetch_add(dropped, Ordering::Relaxed);
@@ -689,7 +696,9 @@ mod tests {
         // The microphone side, the same way: from the downmix inside the input
         // callback, not from anything the platform hands back afterwards.
         assert!(
-            source.contains("sink.write(&mono_scratch[..kept]);"),
+            source.contains("sink.write(&mono_scratch[..kept]);")
+                // F-305: and a block at a time, so the scratch never overflows.
+                && source.contains("data.chunks(in_channels * mono_scratch.len().max(1))"),
             "the plain recorder is no longer fed from the downmix in the input \
              callback. That is the one moment the real voice exists in this \
              process, and taking it anywhere else means it exists twice"
