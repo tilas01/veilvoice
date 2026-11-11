@@ -200,8 +200,10 @@ file from now on, but it cannot undo a copy somebody already has.
   motion.** It keeps a slow, calm sweep instead, and those readers get a button
   to pause it. Everyone else sees it as before.
 - **Release notes start with what you need:** which file to download and how to
-  check it, then what changed, with the technical detail folded away. Each
-  release also has a picture of its own for link previews.
+  check it, then what changed. New features, bug fixes and improvements each
+  have a heading and a dropdown listing every change, and the technical detail
+  is folded away too. Each release also has a picture of its own for link
+  previews.
 - **More of the program is documented.** Every command and every tab of the
   window has its own entry, every item in the generated reference has a
   description, and the screenshots now include the lock screen and every page of

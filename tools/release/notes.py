@@ -285,6 +285,98 @@ def technical_document(tag, half, repro, built_on):
     return "\n".join(out).rstrip("\n") + "\n"
 
 
+def folded(lines):
+    """The changelog's half of what changed, with each section in a fold.
+
+    Every `### ` section (new features, bug fixes, additions and so on) keeps
+    its heading and puts its list in a `<details>` dropdown, so the notes open
+    as a short row of headings and a reader opens the ones they want. The
+    summary counts the top-level items, which is the number a reader can
+    check. A chart and its explanation close the last section in this file's
+    entries, and they describe the whole release, so a ```` ```mermaid ````
+    fence ends the fold and everything from it stays outside. Text above the
+    first heading, the release's opening paragraph, is left as it is.
+    """
+    out, body, heading = [], [], None
+
+    def close():
+        if heading is None:
+            return
+        while body and not body[-1].strip():
+            body.pop()
+        count = sum(1 for line in body if line.startswith("- "))
+        out.append(heading)
+        out.append("")
+        if count:
+            out.append("<details>")
+            out.append("<summary>%d %s</summary>"
+                       % (count, "change" if count == 1 else "changes"))
+            out.append("")
+            out.extend(body)
+            out.append("")
+            out.append("</details>")
+        else:
+            out.extend(body)
+        out.append("")
+
+    outside = False
+    for line in lines:
+        if line.startswith("### "):
+            close()
+            heading, body, outside = line, [], False
+        elif heading is not None and not outside and line.startswith("```mermaid"):
+            close()
+            heading, outside = None, True
+            out.append(line)
+        elif heading is not None and not outside:
+            body.append(line)
+        else:
+            out.append(line)
+    close()
+    return out
+
+
+def folded_self_test():
+    """`folded` against an entry shaped like the real ones (no file read)."""
+    sample = [
+        "Opening paragraph.",
+        "",
+        "### New features",
+        "",
+        "- **One.** First.",
+        "  Continued.",
+        "- **Two.** Second.",
+        "",
+        "### Bug fixes",
+        "",
+        "- **Three.** Third.",
+        "",
+        "```mermaid",
+        "flowchart LR",
+        "```",
+        "",
+        "Read the graph.",
+    ]
+    got = folded(sample)
+    problems = []
+    if got[:2] != ["Opening paragraph.", ""]:
+        problems.append("the opening paragraph moved")
+    if "<summary>2 changes</summary>" not in got:
+        problems.append("the first section's fold does not count its two items")
+    if "<summary>1 change</summary>" not in got:
+        problems.append("a single item is not counted as one change")
+    if got.count("<details>") != 2 or got.count("</details>") != 2:
+        problems.append("each section should have exactly one fold")
+    fence = got.index("```mermaid")
+    if "</details>" not in got[:fence] or "<details>" in got[fence:]:
+        problems.append("the chart ended up inside a fold")
+    if "  Continued." not in got:
+        problems.append("a continuation line was lost")
+    for problem in problems:
+        print("  folded: " + problem)
+    return 1 if problems else 0
+
+
 def notes_document(tag, version, new, has_technical, fingerprint, signed):
     """The release body: the files, checking them, then what changed."""
     # Roadmap item 183. The card is committed, so it is addressed at this
@@ -311,7 +403,7 @@ def notes_document(tag, version, new, has_technical, fingerprint, signed):
     out += checking_section(fingerprint, signed)
     out += ["", "---", ""]
     out += ["### What is new and what was fixed", ""]
-    out += new if new else ["No changelog entry was written for this release."]
+    out += folded(new) if new else ["No changelog entry was written for this release."]
     out += ["", "---", ""]
     where = ("[`%s`](https://github.com/%s/releases/download/%s/%s), attached "
              "to this release" % (TECHNICAL_NAME, site.docs.REPO, tag,
@@ -361,6 +453,8 @@ def check():
     rather than at the moment of publishing, when the answer arrives as a
     failed release or, worse, as a published one nobody can read.
     """
+    if folded_self_test():
+        return 1
     text = read(CHANGELOG)
     tags = re.findall(r"^## (v\d+\.\d+\.\d+)\s*$", text, re.M)
     if not tags:

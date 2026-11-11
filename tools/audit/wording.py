@@ -178,6 +178,7 @@ CODESPELL_ALLOWED = [
     "unparseable",
     "pre-selected",
     "thi",         # reported separately, as a cut word
+    "statics",     # Rust's static variables, as in "the frame-pace statics"
 ]
 
 
