@@ -33,7 +33,8 @@ const SUITES = [
   require("./images.test.js"),
   require("./audit.test.js"),
   require("./alignment.test.js"),
-  require("./scripts.test.js")
+  require("./scripts.test.js"),
+  require("./redirect.test.js")
 ];
 
 // `run` may be synchronous or return a promise: the repository-panel suite

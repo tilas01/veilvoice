@@ -97,7 +97,7 @@ The changes come from the commit history, recorded through 10 Nov 2026 by `pytho
 - [`fuzz.yml`](files/dot-github/workflows/fuzz.yml.svg): The seven coverage-guided fuzz targets, run from the committed corpus.
 - [`mutants.yml`](files/dot-github/workflows/mutants.yml.svg): Mutation testing over the cryptography, weekly.
 - [`packages.yml`](files/dot-github/workflows/packages.yml.svg): The installer packages: two Windows MSIs, the Microsoft Store MSIX, the AppImage and the RPMs.
-- [`pages.yml`](files/dot-github/workflows/pages.yml.svg): Publish website/ to GitHub Pages.
+- [`pages.yml`](files/dot-github/workflows/pages.yml.svg): Keep the old website address answering.
 - [`promote.yml`](files/dot-github/workflows/promote.yml.svg): Cut a release: prove the tip of main is ready, and start the build.
 - [`release.yml`](files/dot-github/workflows/release.yml.svg): Build, verify and publish release artefacts for a v* tag.
 - [`rewrite.yml`](files/dot-github/workflows/rewrite.yml.svg): Builds the signed rewrite of main with the key in the repository's secrets, GPG_PRIVATE_KEY and GPG_PASSPHRASE, and hands it over as a bundle in a commit of its own, because the run's token may not push a rewrite of commits that touch workflow files.
@@ -694,6 +694,7 @@ The changes come from the commit history, recorded through 10 Nov 2026 by `pytho
 - [`markdown.render.test.js`](files/tools/site-tests/markdown.render.test.js.svg): Rendering-correctness tests for the site's Markdown renderer.
 - [`nav.test.js`](files/tools/site-tests/nav.test.js.svg): Every page on the site carries the same header navigation, and every link in it points at something that exists.
 - [`packaging.test.js`](files/tools/site-tests/packaging.test.js.svg): The package definitions, against the version the workspace is actually at.
+- [`redirect.test.js`](files/tools/site-tests/redirect.test.js.svg): The old address must land every reader on the same page at the new one.
 - [`render-probe.js`](files/tools/site-tests/render-probe.js.svg): Renders every document in the hostile corpus, naming each one before it starts, and exits.
 - [`repo.test.js`](files/tools/site-tests/repo.test.js.svg): repo.js is the only module on this site that puts data from a *third party* into the page.
 - [`reveal.test.js`](files/tools/site-tests/reveal.test.js.svg): Behaviour tests for the scroll-reveal effect.
@@ -706,6 +707,7 @@ The changes come from the commit history, recorded through 10 Nov 2026 by `pytho
 
 - [`demo.py`](files/tools/site/demo.py.svg): The facts the website's interactive demonstration is drawn from.
 - [`faq.py`](files/tools/site/faq.py.svg): The questions page, rendered from the document that holds the answers.
+- [`redirect.py`](files/tools/site/redirect.py.svg): Build what the old address serves now that the website has moved.
 - [`releases.py`](files/tools/site/releases.py.svg): The releases page: every version, its notes, and its files.
 - [`render_markdown.js`](files/tools/site/render_markdown.js.svg): Render Markdown to HTML with the renderer the website already has.
 - [`roadmap.py`](files/tools/site/roadmap.py.svg): The roadmap, as a page anybody can read and a picture of where it has got to.
