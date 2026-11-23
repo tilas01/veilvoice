@@ -370,7 +370,7 @@ jobs:
       - name: Pin the build timestamp for the VM
         run: git log -1 --pretty=%ct > .source-date-epoch
       - name: Build the CLI and the window in a FreeBSD VM
-        uses: vmactions/freebsd-vm@c46abacb49f09938ca4e1702d15d836285d694cc # v1
+        uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1
         with:
           usesh: true
           # The window's libraries as well as the compiler: roadmap item 162
@@ -602,7 +602,7 @@ jobs:
       - name: Pin the build timestamp for the VM
         run: git log -1 --pretty=%ct > .source-date-epoch
       - name: Build the CLI in a Netbsd VM
-        uses: vmactions/netbsd-vm@c8a0d7ddb84619a7a8cc4e652efa7950b3fd9f92 # v1
+        uses: vmactions/netbsd-vm@5957cf330aef2e6ddc63c604364c99ce2e02b91d # v1
         with:
           usesh: true
           prepare: /usr/sbin/pkg_add rust
@@ -953,7 +953,7 @@ jobs:
       # this source and compare; a tag pointing at different source means they
       # get a different answer and correctly conclude that the release does not
       # reproduce. The claim is the product here, so this line is the product.
-      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
+      - uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3
         if: steps.gate.outputs.publish == 'true'  # zizmor: ignore[superfluous-actions] pinned by hash and reviewed; it is the step that publishes, so replacing it waits for a test release
         with:
           tag_name: ${{ env.VERSION_TAG }}
