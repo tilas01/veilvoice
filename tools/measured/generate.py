@@ -88,7 +88,7 @@ fails the build instead of ageing quietly.
 
 **The test count is a number about one machine.** Some tests are compiled only
 on one operating system, so running the same tree on another gives a different
-total: this tree measures 996 on Windows and 988 on Linux. The row below says
+total. The row below says
 which machine produced the number in it, because a count with no platform
 beside it reads as a fact about the tree and is a fact about a computer. See
 F-77 in `docs/AUDIT.md`.
@@ -102,7 +102,7 @@ left exactly as they are: this project is written with a high comment-to-code
 ratio, so the two numbers are far apart, and quietly redefining one to match
 the other would alter every page and link that carries it.
 
-The line count covers **28 crates**, one more than the workspace row above:
+The line count covers one crate more than the workspace row above:
 `fuzz/` is a separate Cargo project at the root holding the fuzzing harnesses,
 and it is Rust written and maintained here. `tools/docs/generate.py` documents
 it beside the workspace members for the same reason.
@@ -308,6 +308,8 @@ CLAIMS = [
     ("README.md", r"\(\d+ tests across (\d+)\ncrates", "crates"),
     ("README.md", r"and (\d+) website suites", "suites"),
     ("README.md", r"\*\*(\d+) functional lines of Rust\*\*", "lines"),
+    # F-330: this one said 28 for a workspace of 13, and nothing read it.
+    ("README.md", r"across the (\d+) crates of the workspace", "crates"),
     # The defect count, in the two places that state it outside the audit. Its
     # measurement is `audit_findings`, which counts entries rather than
     # mentions, because F-93 and F-94 were fixed, described in their commits,
@@ -326,6 +328,11 @@ CLAIMS = [
     # thirty-seven. Its measurement is `audit_rounds`, which reads the verdict
     # rather than counting anything, and the reasoning is there.
     ("website/index.html", r"\d+ defects found and fixed across ([a-z-]+) audit rounds",
+     "rounds"),
+    # The README's round count was typed as a word at the start of a sentence,
+    # so nothing here could write it, and it said thirty-seven while the front
+    # page said forty. The sentence now has the count where this can reach it.
+    ("README.md", r"defects\*\* have been found and fixed across ([a-z-]+) audit rounds",
      "rounds"),
 ]
 

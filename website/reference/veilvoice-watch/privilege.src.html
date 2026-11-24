@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-watch/src/privilege.rs</code></h1>
-<p style="color:var(--muted)"><a href="privilege.html">what this file is for</a> &middot; <a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 404 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="privilege.html">what this file is for</a> &middot; <a href="../veilvoice-watch.html">veilvoice-watch</a> &middot; 407 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -296,204 +296,207 @@
 <span class="ln" id="L213"><span class="tok-kw">fn</span> <span class="tok-fn">unix_level</span>() -&gt; Level {</span>
 <span class="ln" id="L214">    <span class="tok-kw">let</span> output = <span class="tok-kw">match</span> Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/usr/bin/id&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-u&quot;</span>).<span class="tok-fn">output</span>() {</span>
 <span class="ln" id="L215">        <span class="tok-fn">Ok</span>(output) <span class="tok-kw">if</span> output.status.<span class="tok-fn">success</span>() =&gt; output,</span>
-<span class="ln" id="L216">        <span class="tok-com">// Not every system puts it there. One fallback, through PATH, and then</span></span>
-<span class="ln" id="L217">        <span class="tok-com">// the answer is that this does not know.</span></span>
-<span class="ln" id="L218">        _ =&gt; <span class="tok-kw">match</span> Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;id&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-u&quot;</span>).<span class="tok-fn">output</span>() {</span>
-<span class="ln" id="L219">            <span class="tok-fn">Ok</span>(output) <span class="tok-kw">if</span> output.status.<span class="tok-fn">success</span>() =&gt; output,</span>
-<span class="ln" id="L220">            _ =&gt; <span class="tok-kw">return</span> Level::Unknown,</span>
-<span class="ln" id="L221">        },</span>
-<span class="ln" id="L222">    };</span>
-<span class="ln" id="L223">    <span class="tok-kw">match</span> String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout)</span>
-<span class="ln" id="L224">        .<span class="tok-fn">trim</span>()</span>
-<span class="ln" id="L225">        .parse::&lt;u32&gt;()</span>
-<span class="ln" id="L226">    {</span>
-<span class="ln" id="L227">        <span class="tok-fn">Ok</span>(<span class="tok-num">0</span>) =&gt; Level::Elevated,</span>
-<span class="ln" id="L228">        <span class="tok-fn">Ok</span>(_) =&gt; Level::User,</span>
-<span class="ln" id="L229">        <span class="tok-fn">Err</span>(_) =&gt; Level::Unknown,</span>
-<span class="ln" id="L230">    }</span>
-<span class="ln" id="L231">}</span>
+<span class="ln" id="L216">        <span class="tok-com">// Not every system puts it there. One fallback, `/bin/id`, and then</span></span>
+<span class="ln" id="L217">        <span class="tok-com">// the answer is that this does not know. **F-333.** The fallback used</span></span>
+<span class="ln" id="L218">        <span class="tok-com">// to be a bare `id` through PATH, where a relative entry finds one in</span></span>
+<span class="ln" id="L219">        <span class="tok-com">// the starting folder, and a fake one answering 0 would make an</span></span>
+<span class="ln" id="L220">        <span class="tok-com">// ordinary account read as root: the dangerous direction.</span></span>
+<span class="ln" id="L221">        _ =&gt; <span class="tok-kw">match</span> Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;/bin/id&quot;</span>).<span class="tok-fn">arg</span>(<span class="tok-str">&quot;-u&quot;</span>).<span class="tok-fn">output</span>() {</span>
+<span class="ln" id="L222">            <span class="tok-fn">Ok</span>(output) <span class="tok-kw">if</span> output.status.<span class="tok-fn">success</span>() =&gt; output,</span>
+<span class="ln" id="L223">            _ =&gt; <span class="tok-kw">return</span> Level::Unknown,</span>
+<span class="ln" id="L224">        },</span>
+<span class="ln" id="L225">    };</span>
+<span class="ln" id="L226">    <span class="tok-kw">match</span> String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout)</span>
+<span class="ln" id="L227">        .<span class="tok-fn">trim</span>()</span>
+<span class="ln" id="L228">        .parse::&lt;u32&gt;()</span>
+<span class="ln" id="L229">    {</span>
+<span class="ln" id="L230">        <span class="tok-fn">Ok</span>(<span class="tok-num">0</span>) =&gt; Level::Elevated,</span>
+<span class="ln" id="L231">        <span class="tok-fn">Ok</span>(_) =&gt; Level::User,</span>
+<span class="ln" id="L232">        <span class="tok-fn">Err</span>(_) =&gt; Level::Unknown,</span>
+<span class="ln" id="L233">    }</span>
+<span class="ln" id="L234">}</span>
 </span>
-<span class="ln" id="L232"></span>
+<span class="ln" id="L235"></span>
 <span class="src-item" id="fn-service_installed">
-<span class="ln" id="L233"><span class="tok-com">/// Whether a background service is installed.</span></span>
-<span class="ln" id="L234"><span class="tok-com">///</span></span>
-<span class="ln" id="L235"><span class="tok-com">/// Always `false`, and the function exists so that a front end asking</span></span>
-<span class="ln" id="L236"><span class="tok-com">/// the question gets an answer rather than a missing feature: **VeilVoice does</span></span>
-<span class="ln" id="L237"><span class="tok-com">/// not install a service.** [`NO_SERVICE`] is why.</span></span>
-<span class="ln" id="L238"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">service_installed</span>() -&gt; bool {</span>
-<span class="ln" id="L239">    false</span>
-<span class="ln" id="L240">}</span>
+<span class="ln" id="L236"><span class="tok-com">/// Whether a background service is installed.</span></span>
+<span class="ln" id="L237"><span class="tok-com">///</span></span>
+<span class="ln" id="L238"><span class="tok-com">/// Always `false`, and the function exists so that a front end asking</span></span>
+<span class="ln" id="L239"><span class="tok-com">/// the question gets an answer rather than a missing feature: **VeilVoice does</span></span>
+<span class="ln" id="L240"><span class="tok-com">/// not install a service.** [`NO_SERVICE`] is why.</span></span>
+<span class="ln" id="L241"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">service_installed</span>() -&gt; bool {</span>
+<span class="ln" id="L242">    false</span>
+<span class="ln" id="L243">}</span>
 </span>
-<span class="ln" id="L241"></span>
+<span class="ln" id="L244"></span>
 <span class="src-item" id="fn-no_service">
-<span class="ln" id="L242"><span class="tok-com">/// Why the opt-in service is not shipped, in the words to show.</span></span>
-<span class="ln" id="L243"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> NO_SERVICE: &amp;str = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L244"><span class="tok-str">VeilVoice does not install a background service. A service outlives the window \</span></span>
-<span class="ln" id="L245"><span class="tok-str">it was started from, starts itself at boot, and runs whether or not anybody is \</span></span>
-<span class="ln" id="L246"><span class="tok-str">using the program -- so somebody who tried VeilVoice once should not find it \</span></span>
-<span class="ln" id="L247"><span class="tok-str">still running next month. Where continuous monitoring is wanted, run VeilVoice \</span></span>
-<span class="ln" id="L248"><span class="tok-str">and leave it open: what it can see is then exactly what it says it can see, and \</span></span>
-<span class="ln" id="L249"><span class="tok-str">closing the window ends it.&quot;</span>;</span>
+<span class="ln" id="L245"><span class="tok-com">/// Why the opt-in service is not shipped, in the words to show.</span></span>
+<span class="ln" id="L246"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> NO_SERVICE: &amp;str = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L247"><span class="tok-str">VeilVoice does not install a background service. A service outlives the window \</span></span>
+<span class="ln" id="L248"><span class="tok-str">it was started from, starts itself at boot, and runs whether or not anybody is \</span></span>
+<span class="ln" id="L249"><span class="tok-str">using the program -- so somebody who tried VeilVoice once should not find it \</span></span>
+<span class="ln" id="L250"><span class="tok-str">still running next month. Where continuous monitoring is wanted, run VeilVoice \</span></span>
+<span class="ln" id="L251"><span class="tok-str">and leave it open: what it can see is then exactly what it says it can see, and \</span></span>
+<span class="ln" id="L252"><span class="tok-str">closing the window ends it.&quot;</span>;</span>
 </span>
-<span class="ln" id="L250"></span>
+<span class="ln" id="L253"></span>
 <span class="src-item" id="fn-no_kernel">
-<span class="ln" id="L251"><span class="tok-com">/// What kernel level would need, and why it is not here.</span></span>
-<span class="ln" id="L252"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> NO_KERNEL: &amp;str = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L253"><span class="tok-str">VeilVoice does not reach inside the operating system, and cannot. A kernel \</span></span>
-<span class="ln" id="L254"><span class="tok-str">driver on 64-bit Windows needs an EV code-signing certificate issued to a \</span></span>
-<span class="ln" id="L255"><span class="tok-str">verified legal entity and then Microsoft&#x27;s attestation signing; macOS needs an \</span></span>
-<span class="ln" id="L256"><span class="tok-str">Apple Developer ID and an entitlement Apple grants case by case. Both are \</span></span>
-<span class="ln" id="L257"><span class="tok-str">identity checks on a named legal person, and this project is published under a \</span></span>
-<span class="ln" id="L258"><span class="tok-str">pseudonym on purpose. So the monitoring here is what a program running as you, \</span></span>
-<span class="ln" id="L259"><span class="tok-str">or as an administrator, can observe from outside -- which is real, and is less \</span></span>
-<span class="ln" id="L260"><span class="tok-str">than a driver would see.&quot;</span>;</span>
+<span class="ln" id="L254"><span class="tok-com">/// What kernel level would need, and why it is not here.</span></span>
+<span class="ln" id="L255"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> NO_KERNEL: &amp;str = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L256"><span class="tok-str">VeilVoice does not reach inside the operating system, and cannot. A kernel \</span></span>
+<span class="ln" id="L257"><span class="tok-str">driver on 64-bit Windows needs an EV code-signing certificate issued to a \</span></span>
+<span class="ln" id="L258"><span class="tok-str">verified legal entity and then Microsoft&#x27;s attestation signing; macOS needs an \</span></span>
+<span class="ln" id="L259"><span class="tok-str">Apple Developer ID and an entitlement Apple grants case by case. Both are \</span></span>
+<span class="ln" id="L260"><span class="tok-str">identity checks on a named legal person, and this project is published under a \</span></span>
+<span class="ln" id="L261"><span class="tok-str">pseudonym on purpose. So the monitoring here is what a program running as you, \</span></span>
+<span class="ln" id="L262"><span class="tok-str">or as an administrator, can observe from outside -- which is real, and is less \</span></span>
+<span class="ln" id="L263"><span class="tok-str">than a driver would see.&quot;</span>;</span>
 </span>
-<span class="ln" id="L261"></span>
+<span class="ln" id="L264"></span>
 <span class="src-item" id="fn-never_elevates">
-<span class="ln" id="L262"><span class="tok-com">/// What this crate will not do, and why that is deliberate.</span></span>
-<span class="ln" id="L263"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> NEVER_ELEVATES: &amp;str = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L264"><span class="tok-str">This never raises its own privileges, installs anything, or asks for a \</span></span>
-<span class="ln" id="L265"><span class="tok-str">password. It reports what VeilVoice is running with and prints the command that \</span></span>
-<span class="ln" id="L266"><span class="tok-str">would run it differently. A privacy tool that silently acquires administrator \</span></span>
-<span class="ln" id="L267"><span class="tok-str">rights is a privacy tool nobody can reason about.&quot;</span>;</span>
+<span class="ln" id="L265"><span class="tok-com">/// What this crate will not do, and why that is deliberate.</span></span>
+<span class="ln" id="L266"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> NEVER_ELEVATES: &amp;str = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L267"><span class="tok-str">This never raises its own privileges, installs anything, or asks for a \</span></span>
+<span class="ln" id="L268"><span class="tok-str">password. It reports what VeilVoice is running with and prints the command that \</span></span>
+<span class="ln" id="L269"><span class="tok-str">would run it differently. A privacy tool that silently acquires administrator \</span></span>
+<span class="ln" id="L270"><span class="tok-str">rights is a privacy tool nobody can reason about.&quot;</span>;</span>
 </span>
-<span class="ln" id="L268"></span>
-<span class="ln" id="L269"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L270"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L271">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L272"></span>
-<span class="ln" id="L273">    <span class="tok-com">/// &quot;I could not tell&quot; must never be reported as &quot;not elevated&quot;.</span></span>
-<span class="ln" id="L274">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L275">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_is_its_own_answer_and_not_the_unprivileged_one</span>() {</span>
-<span class="ln" id="L276">        assert_ne!(Level::Unknown, Level::User);</span>
-<span class="ln" id="L277">        assert!(!Level::Unknown.<span class="tok-fn">is_full_view</span>());</span>
-<span class="ln" id="L278">        <span class="tok-kw">let</span> words = Level::Unknown.<span class="tok-fn">what_it_sees</span>().<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L279">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not know&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
-<span class="ln" id="L280">        assert!(</span>
-<span class="ln" id="L281">            words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not the same as running unprivileged&quot;</span>),</span>
-<span class="ln" id="L282">            <span class="tok-str">&quot;the distinction has to be stated, not implied: {words}&quot;</span></span>
-<span class="ln" id="L283">        );</span>
-<span class="ln" id="L284">        assert!(</span>
-<span class="ln" id="L285">            words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;do not assume a short list&quot;</span>),</span>
-<span class="ln" id="L286">            <span class="tok-str">&quot;and the action it changes: {words}&quot;</span></span>
-<span class="ln" id="L287">        );</span>
-<span class="ln" id="L288">    }</span>
-<span class="ln" id="L289"></span>
-<span class="ln" id="L290">    <span class="tok-com">/// Every level says what it can see, in enough words to be useful.</span></span>
-<span class="ln" id="L291">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L292">    <span class="tok-kw">fn</span> <span class="tok-fn">every_level_explains_itself</span>() {</span>
-<span class="ln" id="L293">        <span class="tok-kw">for</span> level <span class="tok-kw">in</span> [Level::User, Level::Elevated, Level::Unknown] {</span>
-<span class="ln" id="L294">            assert!(!level.<span class="tok-fn">label</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{level:?}&quot;</span>);</span>
-<span class="ln" id="L295">            assert!(level.<span class="tok-fn">what_it_sees</span>().<span class="tok-fn">len</span>() &gt; <span class="tok-num">80</span>, <span class="tok-str">&quot;{level:?}&quot;</span>);</span>
-<span class="ln" id="L296">        }</span>
-<span class="ln" id="L297">        <span class="tok-com">// And the user level has to say the de-identifier needs nothing more,</span></span>
-<span class="ln" id="L298">        <span class="tok-com">// or somebody runs the whole thing as root for no reason.</span></span>
-<span class="ln" id="L299">        assert!(Level::User.<span class="tok-fn">what_it_sees</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;needs nothing more&quot;</span>));</span>
-<span class="ln" id="L300">        assert!(Level::Elevated</span>
-<span class="ln" id="L301">            .<span class="tok-fn">what_it_sees</span>()</span>
-<span class="ln" id="L302">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;it never needed this&quot;</span>));</span>
-<span class="ln" id="L303">    }</span>
-<span class="ln" id="L304"></span>
-<span class="ln" id="L305">    <span class="tok-com">/// Elevating is a command to print, never an action to take.</span></span>
-<span class="ln" id="L306">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L307">    <span class="tok-kw">fn</span> <span class="tok-fn">raising_privilege_is_something_the_reader_does</span>() {</span>
-<span class="ln" id="L308">        assert_eq!(Level::Elevated.<span class="tok-fn">how_to_raise</span>(), None, <span class="tok-str">&quot;already there&quot;</span>);</span>
-<span class="ln" id="L309">        <span class="tok-kw">for</span> level <span class="tok-kw">in</span> [Level::User, Level::Unknown] {</span>
-<span class="ln" id="L310">            <span class="tok-kw">let</span> how = level.<span class="tok-fn">how_to_raise</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a command to print&quot;</span>);</span>
-<span class="ln" id="L311">            assert!(how.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>, <span class="tok-str">&quot;{how}&quot;</span>);</span>
-<span class="ln" id="L312">        }</span>
-<span class="ln" id="L313"></span>
-<span class="ln" id="L314">        <span class="tok-com">// Nothing in this module *runs* an elevation. Checked by naming every</span></span>
-<span class="ln" id="L315">        <span class="tok-com">// subprocess it starts rather than by searching for words: the strings</span></span>
-<span class="ln" id="L316">        <span class="tok-com">// above legitimately contain &quot;RunAs&quot; and &quot;sudo&quot; because they are the</span></span>
-<span class="ln" id="L317">        <span class="tok-com">// commands a reader is told to type, and the first version of this test</span></span>
-<span class="ln" id="L318">        <span class="tok-com">// flagged them. An honest failure, and the wrong question -- what</span></span>
-<span class="ln" id="L319">        <span class="tok-com">// matters is what is executed, so that is what is counted.</span></span>
-<span class="ln" id="L320">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;privilege.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L321">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L322">        <span class="tok-kw">let</span> marker = <span class="tok-str">&quot;Command::new(&quot;</span>;</span>
-<span class="ln" id="L323">        <span class="tok-kw">let</span> started: Vec&lt;String&gt; = body</span>
-<span class="ln" id="L324">            .<span class="tok-fn">match_indices</span>(marker)</span>
-<span class="ln" id="L325">            .<span class="tok-fn">map</span>(|(at, _)| {</span>
-<span class="ln" id="L326">                <span class="tok-kw">let</span> rest = &amp;body[at + marker.<span class="tok-fn">len</span>()..];</span>
-<span class="ln" id="L327">                rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;)&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L328">            })</span>
-<span class="ln" id="L329">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L330">        assert!(!started.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the probe has to run something&quot;</span>);</span>
-<span class="ln" id="L331">        <span class="tok-kw">for</span> program <span class="tok-kw">in</span> &amp;started {</span>
-<span class="ln" id="L332">            assert!(</span>
-<span class="ln" id="L333">                program == <span class="tok-str">&quot;&amp;program&quot;</span> || program.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;id&quot;</span>),</span>
-<span class="ln" id="L334">                <span class="tok-str">&quot;this module starts {program}, which is neither of the two probes&quot;</span></span>
-<span class="ln" id="L335">            );</span>
-<span class="ln" id="L336">        }</span>
-<span class="ln" id="L337">    }</span>
-<span class="ln" id="L338"></span>
-<span class="ln" id="L339">    <span class="tok-com">/// The three scope notes each say the thing outright rather than hinting.</span></span>
-<span class="ln" id="L340">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L341">    <span class="tok-kw">fn</span> <span class="tok-fn">the_limits_are_stated_rather_than_implied</span>() {</span>
-<span class="ln" id="L342">        <span class="tok-kw">let</span> kernel = NO_KERNEL.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L343">        assert!(kernel.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not reach inside&quot;</span>), <span class="tok-str">&quot;{kernel}&quot;</span>);</span>
-<span class="ln" id="L344">        assert!(kernel.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;pseudonym&quot;</span>), <span class="tok-str">&quot;{kernel}&quot;</span>);</span>
-<span class="ln" id="L345">        assert!(</span>
-<span class="ln" id="L346">            kernel.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;less than a driver would see&quot;</span>),</span>
-<span class="ln" id="L347">            <span class="tok-str">&quot;the comparison a reader needs: {kernel}&quot;</span></span>
-<span class="ln" id="L348">        );</span>
-<span class="ln" id="L349"></span>
-<span class="ln" id="L350">        <span class="tok-kw">let</span> service = NO_SERVICE.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L351">        assert!(service.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not install a background service&quot;</span>));</span>
-<span class="ln" id="L352">        assert!(</span>
-<span class="ln" id="L353">            service.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;still running next month&quot;</span>),</span>
-<span class="ln" id="L354">            <span class="tok-str">&quot;the concrete case: {service}&quot;</span></span>
-<span class="ln" id="L355">        );</span>
-<span class="ln" id="L356">        assert!(service.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;closing the window ends it&quot;</span>));</span>
-<span class="ln" id="L357"></span>
-<span class="ln" id="L358">        <span class="tok-kw">let</span> never = NEVER_ELEVATES.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L359">        assert!(never.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;never raises its own privileges&quot;</span>));</span>
-<span class="ln" id="L360">        assert!(never.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nobody can reason about&quot;</span>));</span>
-<span class="ln" id="L361">    }</span>
-<span class="ln" id="L362"></span>
-<span class="ln" id="L363">    <span class="tok-com">/// No service is installed, and the function that says so is honest about</span></span>
-<span class="ln" id="L364">    <span class="tok-com">/// it rather than absent.</span></span>
-<span class="ln" id="L365">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L366">    <span class="tok-kw">fn</span> <span class="tok-fn">there_is_no_service_and_the_answer_says_so</span>() {</span>
-<span class="ln" id="L367">        assert!(!<span class="tok-fn">service_installed</span>());</span>
-<span class="ln" id="L368">    }</span>
-<span class="ln" id="L369"></span>
-<span class="ln" id="L370">    <span class="tok-com">/// Asking the real machine must not panic, hang, prompt, or change</span></span>
-<span class="ln" id="L371">    <span class="tok-com">/// anything.</span></span>
-<span class="ln" id="L372">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L373">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_is_safe_wherever_this_runs</span>() {</span>
-<span class="ln" id="L374">        <span class="tok-kw">let</span> level = <span class="tok-fn">level</span>();</span>
-<span class="ln" id="L375">        assert!(!level.<span class="tok-fn">label</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L376">        assert!(!level.<span class="tok-fn">what_it_sees</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L377">        <span class="tok-com">// Whatever it is, the two that mean &quot;not the full view&quot; agree about it.</span></span>
-<span class="ln" id="L378">        assert_eq!(level.<span class="tok-fn">is_full_view</span>(), level == Level::Elevated);</span>
-<span class="ln" id="L379">    }</span>
-<span class="ln" id="L380"></span>
-<span class="ln" id="L381">    <span class="tok-com">/// The Windows probe keys on the well-known SID, not the group&#x27;s name.</span></span>
-<span class="ln" id="L382">    <span class="tok-com">///</span></span>
-<span class="ln" id="L383">    <span class="tok-com">/// The name is translated on a localised system, so matching &quot;Administrators&quot;</span></span>
-<span class="ln" id="L384">    <span class="tok-com">/// would report every non-English machine as unprivileged -- a wrong answer</span></span>
-<span class="ln" id="L385">    <span class="tok-com">/// that would only ever be seen by people this project is unlikely to hear</span></span>
-<span class="ln" id="L386">    <span class="tok-com">/// from.</span></span>
-<span class="ln" id="L387">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L388">    <span class="tok-kw">fn</span> <span class="tok-fn">the_windows_probe_uses_the_sid_rather_than_a_translated_name</span>() {</span>
-<span class="ln" id="L389">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;privilege.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L390">        assert!(source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;S-1-5-32-544&quot;</span>));</span>
-<span class="ln" id="L391">        <span class="tok-kw">let</span> code: String = source</span>
-<span class="ln" id="L392">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L393">            .<span class="tok-fn">filter</span>(|line| {</span>
-<span class="ln" id="L394">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L395">                !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>)</span>
-<span class="ln" id="L396">            })</span>
-<span class="ln" id="L397">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L398">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L399">        assert!(</span>
-<span class="ln" id="L400">            !code.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;contains(\&quot;Administrators\&quot;)&quot;</span>),</span>
-<span class="ln" id="L401">            <span class="tok-str">&quot;the group name is localised; the SID is not&quot;</span></span>
-<span class="ln" id="L402">        );</span>
-<span class="ln" id="L403">    }</span>
-<span class="ln" id="L404">}</span>
+<span class="ln" id="L271"></span>
+<span class="ln" id="L272"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L273"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L274">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L275"></span>
+<span class="ln" id="L276">    <span class="tok-com">/// &quot;I could not tell&quot; must never be reported as &quot;not elevated&quot;.</span></span>
+<span class="ln" id="L277">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L278">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_is_its_own_answer_and_not_the_unprivileged_one</span>() {</span>
+<span class="ln" id="L279">        assert_ne!(Level::Unknown, Level::User);</span>
+<span class="ln" id="L280">        assert!(!Level::Unknown.<span class="tok-fn">is_full_view</span>());</span>
+<span class="ln" id="L281">        <span class="tok-kw">let</span> words = Level::Unknown.<span class="tok-fn">what_it_sees</span>().<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L282">        assert!(words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not know&quot;</span>), <span class="tok-str">&quot;{words}&quot;</span>);</span>
+<span class="ln" id="L283">        assert!(</span>
+<span class="ln" id="L284">            words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not the same as running unprivileged&quot;</span>),</span>
+<span class="ln" id="L285">            <span class="tok-str">&quot;the distinction has to be stated, not implied: {words}&quot;</span></span>
+<span class="ln" id="L286">        );</span>
+<span class="ln" id="L287">        assert!(</span>
+<span class="ln" id="L288">            words.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;do not assume a short list&quot;</span>),</span>
+<span class="ln" id="L289">            <span class="tok-str">&quot;and the action it changes: {words}&quot;</span></span>
+<span class="ln" id="L290">        );</span>
+<span class="ln" id="L291">    }</span>
+<span class="ln" id="L292"></span>
+<span class="ln" id="L293">    <span class="tok-com">/// Every level says what it can see, in enough words to be useful.</span></span>
+<span class="ln" id="L294">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L295">    <span class="tok-kw">fn</span> <span class="tok-fn">every_level_explains_itself</span>() {</span>
+<span class="ln" id="L296">        <span class="tok-kw">for</span> level <span class="tok-kw">in</span> [Level::User, Level::Elevated, Level::Unknown] {</span>
+<span class="ln" id="L297">            assert!(!level.<span class="tok-fn">label</span>().<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;{level:?}&quot;</span>);</span>
+<span class="ln" id="L298">            assert!(level.<span class="tok-fn">what_it_sees</span>().<span class="tok-fn">len</span>() &gt; <span class="tok-num">80</span>, <span class="tok-str">&quot;{level:?}&quot;</span>);</span>
+<span class="ln" id="L299">        }</span>
+<span class="ln" id="L300">        <span class="tok-com">// And the user level has to say the de-identifier needs nothing more,</span></span>
+<span class="ln" id="L301">        <span class="tok-com">// or somebody runs the whole thing as root for no reason.</span></span>
+<span class="ln" id="L302">        assert!(Level::User.<span class="tok-fn">what_it_sees</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;needs nothing more&quot;</span>));</span>
+<span class="ln" id="L303">        assert!(Level::Elevated</span>
+<span class="ln" id="L304">            .<span class="tok-fn">what_it_sees</span>()</span>
+<span class="ln" id="L305">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;it never needed this&quot;</span>));</span>
+<span class="ln" id="L306">    }</span>
+<span class="ln" id="L307"></span>
+<span class="ln" id="L308">    <span class="tok-com">/// Elevating is a command to print, never an action to take.</span></span>
+<span class="ln" id="L309">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L310">    <span class="tok-kw">fn</span> <span class="tok-fn">raising_privilege_is_something_the_reader_does</span>() {</span>
+<span class="ln" id="L311">        assert_eq!(Level::Elevated.<span class="tok-fn">how_to_raise</span>(), None, <span class="tok-str">&quot;already there&quot;</span>);</span>
+<span class="ln" id="L312">        <span class="tok-kw">for</span> level <span class="tok-kw">in</span> [Level::User, Level::Unknown] {</span>
+<span class="ln" id="L313">            <span class="tok-kw">let</span> how = level.<span class="tok-fn">how_to_raise</span>().<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a command to print&quot;</span>);</span>
+<span class="ln" id="L314">            assert!(how.<span class="tok-fn">len</span>() &gt; <span class="tok-num">20</span>, <span class="tok-str">&quot;{how}&quot;</span>);</span>
+<span class="ln" id="L315">        }</span>
+<span class="ln" id="L316"></span>
+<span class="ln" id="L317">        <span class="tok-com">// Nothing in this module *runs* an elevation. Checked by naming every</span></span>
+<span class="ln" id="L318">        <span class="tok-com">// subprocess it starts rather than by searching for words: the strings</span></span>
+<span class="ln" id="L319">        <span class="tok-com">// above legitimately contain &quot;RunAs&quot; and &quot;sudo&quot; because they are the</span></span>
+<span class="ln" id="L320">        <span class="tok-com">// commands a reader is told to type, and the first version of this test</span></span>
+<span class="ln" id="L321">        <span class="tok-com">// flagged them. An honest failure, and the wrong question -- what</span></span>
+<span class="ln" id="L322">        <span class="tok-com">// matters is what is executed, so that is what is counted.</span></span>
+<span class="ln" id="L323">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;privilege.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L324">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L325">        <span class="tok-kw">let</span> marker = <span class="tok-str">&quot;Command::new(&quot;</span>;</span>
+<span class="ln" id="L326">        <span class="tok-kw">let</span> started: Vec&lt;String&gt; = body</span>
+<span class="ln" id="L327">            .<span class="tok-fn">match_indices</span>(marker)</span>
+<span class="ln" id="L328">            .<span class="tok-fn">map</span>(|(at, _)| {</span>
+<span class="ln" id="L329">                <span class="tok-kw">let</span> rest = &amp;body[at + marker.<span class="tok-fn">len</span>()..];</span>
+<span class="ln" id="L330">                rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;)&#x27;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L331">            })</span>
+<span class="ln" id="L332">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L333">        assert!(!started.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the probe has to run something&quot;</span>);</span>
+<span class="ln" id="L334">        <span class="tok-kw">for</span> program <span class="tok-kw">in</span> &amp;started {</span>
+<span class="ln" id="L335">            assert!(</span>
+<span class="ln" id="L336">                program == <span class="tok-str">&quot;&amp;program&quot;</span> || program.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;id&quot;</span>),</span>
+<span class="ln" id="L337">                <span class="tok-str">&quot;this module starts {program}, which is neither of the two probes&quot;</span></span>
+<span class="ln" id="L338">            );</span>
+<span class="ln" id="L339">        }</span>
+<span class="ln" id="L340">    }</span>
+<span class="ln" id="L341"></span>
+<span class="ln" id="L342">    <span class="tok-com">/// The three scope notes each say the thing outright rather than hinting.</span></span>
+<span class="ln" id="L343">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L344">    <span class="tok-kw">fn</span> <span class="tok-fn">the_limits_are_stated_rather_than_implied</span>() {</span>
+<span class="ln" id="L345">        <span class="tok-kw">let</span> kernel = NO_KERNEL.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L346">        assert!(kernel.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not reach inside&quot;</span>), <span class="tok-str">&quot;{kernel}&quot;</span>);</span>
+<span class="ln" id="L347">        assert!(kernel.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;pseudonym&quot;</span>), <span class="tok-str">&quot;{kernel}&quot;</span>);</span>
+<span class="ln" id="L348">        assert!(</span>
+<span class="ln" id="L349">            kernel.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;less than a driver would see&quot;</span>),</span>
+<span class="ln" id="L350">            <span class="tok-str">&quot;the comparison a reader needs: {kernel}&quot;</span></span>
+<span class="ln" id="L351">        );</span>
+<span class="ln" id="L352"></span>
+<span class="ln" id="L353">        <span class="tok-kw">let</span> service = NO_SERVICE.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L354">        assert!(service.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;does not install a background service&quot;</span>));</span>
+<span class="ln" id="L355">        assert!(</span>
+<span class="ln" id="L356">            service.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;still running next month&quot;</span>),</span>
+<span class="ln" id="L357">            <span class="tok-str">&quot;the concrete case: {service}&quot;</span></span>
+<span class="ln" id="L358">        );</span>
+<span class="ln" id="L359">        assert!(service.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;closing the window ends it&quot;</span>));</span>
+<span class="ln" id="L360"></span>
+<span class="ln" id="L361">        <span class="tok-kw">let</span> never = NEVER_ELEVATES.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L362">        assert!(never.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;never raises its own privileges&quot;</span>));</span>
+<span class="ln" id="L363">        assert!(never.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;nobody can reason about&quot;</span>));</span>
+<span class="ln" id="L364">    }</span>
+<span class="ln" id="L365"></span>
+<span class="ln" id="L366">    <span class="tok-com">/// No service is installed, and the function that says so is honest about</span></span>
+<span class="ln" id="L367">    <span class="tok-com">/// it rather than absent.</span></span>
+<span class="ln" id="L368">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L369">    <span class="tok-kw">fn</span> <span class="tok-fn">there_is_no_service_and_the_answer_says_so</span>() {</span>
+<span class="ln" id="L370">        assert!(!<span class="tok-fn">service_installed</span>());</span>
+<span class="ln" id="L371">    }</span>
+<span class="ln" id="L372"></span>
+<span class="ln" id="L373">    <span class="tok-com">/// Asking the real machine must not panic, hang, prompt, or change</span></span>
+<span class="ln" id="L374">    <span class="tok-com">/// anything.</span></span>
+<span class="ln" id="L375">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L376">    <span class="tok-kw">fn</span> <span class="tok-fn">asking_is_safe_wherever_this_runs</span>() {</span>
+<span class="ln" id="L377">        <span class="tok-kw">let</span> level = <span class="tok-fn">level</span>();</span>
+<span class="ln" id="L378">        assert!(!level.<span class="tok-fn">label</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L379">        assert!(!level.<span class="tok-fn">what_it_sees</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L380">        <span class="tok-com">// Whatever it is, the two that mean &quot;not the full view&quot; agree about it.</span></span>
+<span class="ln" id="L381">        assert_eq!(level.<span class="tok-fn">is_full_view</span>(), level == Level::Elevated);</span>
+<span class="ln" id="L382">    }</span>
+<span class="ln" id="L383"></span>
+<span class="ln" id="L384">    <span class="tok-com">/// The Windows probe keys on the well-known SID, not the group&#x27;s name.</span></span>
+<span class="ln" id="L385">    <span class="tok-com">///</span></span>
+<span class="ln" id="L386">    <span class="tok-com">/// The name is translated on a localised system, so matching &quot;Administrators&quot;</span></span>
+<span class="ln" id="L387">    <span class="tok-com">/// would report every non-English machine as unprivileged -- a wrong answer</span></span>
+<span class="ln" id="L388">    <span class="tok-com">/// that would only ever be seen by people this project is unlikely to hear</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// from.</span></span>
+<span class="ln" id="L390">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L391">    <span class="tok-kw">fn</span> <span class="tok-fn">the_windows_probe_uses_the_sid_rather_than_a_translated_name</span>() {</span>
+<span class="ln" id="L392">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;privilege.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L393">        assert!(source.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;S-1-5-32-544&quot;</span>));</span>
+<span class="ln" id="L394">        <span class="tok-kw">let</span> code: String = source</span>
+<span class="ln" id="L395">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L396">            .<span class="tok-fn">filter</span>(|line| {</span>
+<span class="ln" id="L397">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L398">                !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>)</span>
+<span class="ln" id="L399">            })</span>
+<span class="ln" id="L400">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L401">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L402">        assert!(</span>
+<span class="ln" id="L403">            !code.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;contains(\&quot;Administrators\&quot;)&quot;</span>),</span>
+<span class="ln" id="L404">            <span class="tok-str">&quot;the group name is localised; the SID is not&quot;</span></span>
+<span class="ln" id="L405">        );</span>
+<span class="ln" id="L406">    }</span>
+<span class="ln" id="L407">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

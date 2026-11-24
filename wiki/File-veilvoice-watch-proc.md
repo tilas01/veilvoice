@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-watch/src/proc.rs`
 
-[[veilvoice-watch|Crate-veilvoice-watch]] &middot; 274 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/proc.rs)
+[veilvoice-watch](Crate-veilvoice-watch) &middot; 274 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/proc.rs)
 
 ## Contents
 

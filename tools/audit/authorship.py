@@ -55,8 +55,8 @@ the title, and a body run on beneath it becomes one enormous title (F-248).
 `SIGNING_KEYS`: keys registered to tilas01's GitHub account, which is what
 makes GitHub show a commit Verified. The key is read out of the signature
 itself, so this needs neither GnuPG nor the public key, and it names the key
-it found when it is the wrong one. While `SIGNATURES_REQUIRED` is off, an
-unsigned or wrongly signed commit is reported and does not fail.
+it found when it is the wrong one. `SIGNATURES_REQUIRED` is on, so an
+unsigned or wrongly signed commit fails.
 
 # Which commits
 
@@ -111,17 +111,19 @@ GITHUB_COMMITTER = "noreply@github.com"
 # Keys registered to tilas01's GitHub account as signing keys, by the
 # fingerprint a signature names. The comment says where each one lives.
 SIGNING_KEYS = {
-    # OpenPGP, RSA 4096. On his own computer. GitHub verifies 0c6dde9 and the
-    # fifteen commits before it by this key.
+    # OpenPGP, RSA 4096. His older key, still registered and still accepted.
+    # Since the history was rewritten nothing on `main` is signed with it.
     "openpgp:DB74FC8D4C7E94AA2CF74B53F8ADBAB7A4FB333C": "tilas01's own key",
     # OpenPGP, GitHub's own key, for the commits it makes for him in the
     # website. Its signatures carry only the key ID, B5690EEEBB952194, which
     # is what `accepted` matches against the tail of this.
     "openpgp:968479A1AFF927E37D1A566BB5690EEEBB952194": "GitHub, for its website",
     # OpenPGP, RSA 4096, primary 8101FB3BB28D02FB239E0CDF9CC1C7E7A9B5833A: the
-    # release key, held in the repository's GPG_PRIVATE_KEY secret. This is its
-    # signing subkey, which is the fingerprint a signature carries. Workflows
-    # sign with it; .github/workflows/signing.yml asks GitHub for its verdict.
+    # release key, held in the repository's GPG_PRIVATE_KEY secret and on his
+    # own computer. This is its signing subkey, which is the fingerprint a
+    # signature carries. Every commit on `main` is signed with it, by his
+    # computer or by a workflow; .github/workflows/signing.yml asks GitHub for
+    # its verdict.
     "openpgp:83ABD67A93772B3FA15D2642BD752A144704C231": "tilas01's release key, in Actions",
 }
 
@@ -133,9 +135,11 @@ KNOWN_ELSEWHERE = {
         "the cloud container's own key, registered to another account",
 }
 
-# Off until every place a commit is made from can sign with a key above. While
-# off, signature findings are printed and do not fail.
-SIGNATURES_REQUIRED = False
+# On: every place a commit is made from now signs with a key above, and every
+# commit on `main` carries a signature by one of them. Turned on by the
+# one-time audit, F-326. Turning it off again makes a signature finding a
+# printed note that does not fail.
+SIGNATURES_REQUIRED = True
 
 # Trailer and footer lines a tool adds when it writes a commit for somebody.
 # Matched a line at a time.
@@ -151,7 +155,10 @@ TRAILER = re.compile(
 # "Opus" is also the audio codec this program handles, and "Opus 48 kHz" or
 # "Opus 1.5" is about the codec.
 ASSISTANT = re.compile(
-    r"\bclaude\b|\banthropic\b|\b(?:opus|sonnet|haiku|fable)[ -]?[3-9](?:\.\d)?\b",
+    # A bitrate after it is the Opus audio codec, which VeilVoice talks about,
+    # and not a model: "Opus 6 kbps" used to be refused. F-327.
+    r"\bclaude\b|\banthropic\b"
+    r"|\b(?:opus|sonnet|haiku|fable)[ -]?[3-9](?:\.\d)?\b(?!\s*k?bps)",
     re.IGNORECASE)
 
 
@@ -634,6 +641,19 @@ def self_test():
             print("    MISSED: an unsigned commit should fail once required")
         else:
             print("    caught: an unsigned commit, once signatures are required")
+        # F-326: and required is the default, so CI fails on one.
+        failed, _ = audit(where, [sha], look_ahead=False)
+        if not any("unsigned" in line for line in failed):
+            failures += 1
+            print("    MISSED: an unsigned commit should fail by default")
+        else:
+            print("    caught: an unsigned commit, by default")
+        # F-327: the codec at a bitrate is not a model.
+        if ASSISTANT.search("Opus 6 kbps") or not ASSISTANT.search("Opus 5.5"):
+            failures += 1
+            print("    MISSED: Opus the codec read as a model, or a model missed")
+        else:
+            print("    told apart: Opus at 6 kbps, and a model by name")
 
         # Which commits a push would carry. With no remote at all, every one.
         everything = git(["rev-list", "--reverse", "HEAD"], where).split()

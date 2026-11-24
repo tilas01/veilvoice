@@ -453,24 +453,23 @@ impl DeidConfig {
     /// over the *ratchet* -- which is forward secrecy, not irreversibility --
     /// would be trading the whole feature for a nicety.
     pub fn with_random_reseed_range(mut self) -> Self {
-        // Eight bytes, four per end, rather than the two per end this used to
-        // take. Two gave each end 16 bits and the pair 32, so two launches drew
-        // the same interval after about eighty thousand of them: that is the
-        // birthday bound for 32 bits and it is exactly what a uniform draw
-        // looks like, not a defect.
+        // Eight bytes, four per end. The draw is not what limits how many
+        // intervals there can be, though: both ends are rounded to whole
+        // frames before they are used, and between one frame and two seconds
+        // there are only a few hundred frame counts (about 190 with 10.7 ms
+        // frames, 375 with 5.3 ms ones). The ordered pair takes at most a few
+        // tens of thousands of values, about 2^16, so two launches share an
+        // interval after a few hundred of them. That was as true of the two
+        // bytes per end this used to take, and widening the draw did not
+        // change it. **F-322** corrects the 2^32 and 2^64 this used to give.
         //
-        // It is widened anyway, and the reason is worth being exact about,
-        // because it is *not* that the old draw was crackable. The seed that
-        // does the veiling is 256 bits and is drawn separately in
-        // `Deidentifier::new`; nothing here feeds it. What this sets is the
-        // roll interval, which VeilVoice prints on purpose in `veilvoice info`
-        // and which is therefore not a secret at all.
-        //
-        // What a shared interval is, is a weak session fingerprint: two
+        // None of that weakens the veiling. The seed that does the veiling is
+        // 256 bits and is drawn separately in `Deidentifier::new`; nothing
+        // here feeds it. What this sets is the roll interval, which VeilVoice
+        // prints on purpose in `veilvoice info` and which is therefore not a
+        // secret at all. A shared interval is a weak session fingerprint: two
         // sessions carrying the same one are marginally more linkable by
-        // somebody watching both. Four more bytes, once, at launch, moves that
-        // collision from 2^32 to 2^64 and costs nothing measurable. A cheap
-        // removal of a weak signal, not a repair.
+        // somebody watching both.
         let mut bytes = [0u8; 8];
         if getrandom::getrandom(&mut bytes).is_err() {
             return self;
@@ -749,7 +748,8 @@ impl Deidentifier {
         let accent = AccentNeutralizer::new(config.accent, config.sample_rate, n, hop, half);
         let pitch = PitchTracker::new(config.sample_rate);
 
-        // Rolls are counted in frames so the audio thread never touches a clock.
+        // Rolls are counted in frames, so deciding when to roll never reads a
+        // clock on the audio thread.
         let reseed_span = config
             .reseed_range_ms
             .map(|(lo, hi)| (config.frames_for_ms(lo), config.frames_for_ms(hi)));

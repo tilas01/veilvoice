@@ -41,7 +41,7 @@ Not published on crates.io yet, so point Cargo at the repository and pin a tag:
 
 ```toml
 [dependencies]
-veilvoice-core = { git = "https://github.com/tilas01/veilvoice", tag = "v0.1.9" }
+veilvoice-core = { git = "https://github.com/tilas01/veilvoice", tag = "v0.1.23" }
 ```
 
 Pin a **tag**, not a branch. A branch moves under you, and this project's whole
@@ -145,7 +145,9 @@ assert_eq!(plain, wav);
 
 Full runnable version: `cargo run -p veilvoice-crypto --example seal_and_open`.
 
-Argon2id with the RFC 9106 profile, XChaCha20-Poly1305 payload, and a header
+Argon2id at 256 MiB, three passes and four lanes (RFC 9106's second
+recommended profile with four times its memory), XChaCha20-Poly1305 payload,
+and a header
 authenticated as associated data so nobody can downgrade the KDF cost without
 the open failing. The cost parameters travel *in* the file, which is what lets
 an old container still open after the defaults rise, and is why they are

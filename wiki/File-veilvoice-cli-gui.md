@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/gui.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 247 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs)
+[veilvoice-cli](Crate-veilvoice-cli) &middot; 267 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs)
 
 ## Contents
 
@@ -51,12 +51,12 @@ it anywhere, it tells you exactly where it looked.
 
 ## What this file contains
 
-247 lines defining **5 functions** (3 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+267 lines defining **6 functions** (3 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `open` (line 125) -- Open the window.
-  - reaches: `find`, `candidates`, `gui_name`, `on_path`
+- `open` (line 118) -- Open the window.
+  - reaches: `find`, `candidates`, `gui_name`, `on_path`, `find_in`
 
 ## What calls what
 
@@ -75,25 +75,28 @@ flowchart TD
     n_gui_name["gui_name<br/>line 42"]
     n_candidates["candidates<br/>line 54"]
     n_find["find<br/>line 72"]
-    n_on_path["on_path<br/>line 99"]
-    n_open(["open<br/>line 125"])
+    n_on_path["on_path<br/>line 105"]
+    n_find_in["find_in<br/>line 110"]
+    n_open(["open<br/>line 118"])
     n_candidates --> n_gui_name
     n_find --> n_candidates
     n_find --> n_gui_name
     n_find --> n_on_path
+    n_on_path --> n_find_in
     n_on_path --> n_gui_name
     n_open --> n_find
     click n_gui_name href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L42" "open the source"
     click n_candidates href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L54" "open the source"
     click n_find href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L72" "open the source"
-    click n_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L99" "open the source"
-    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L125" "open the source"
+    click n_on_path href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L105" "open the source"
+    click n_find_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L110" "open the source"
+    click n_open href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L118" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_open entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_candidates,n_find api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_gui_name,n_on_path helper
+    class n_gui_name,n_on_path,n_find_in helper
     subgraph chart_key ["Key"]
         direction LR
         key_entry["entry: a way in: public, and nothing in this file calls it"]
@@ -114,5 +117,6 @@ flowchart TD
 | `gui_name` <sub>fn</sub> | [42](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L42) | The executable's name on this platform. |
 | `candidates` <sub>pub fn</sub> | [54](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L54) | Everywhere this looks, in order, and whether each had it. |
 | `find` <sub>pub fn</sub> | [72](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L72) | The desktop application, wherever it is. |
-| `on_path` <sub>fn</sub> | [99](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L99) | Ask the system where the program is, if anywhere. |
-| `open` <sub>pub fn</sub> | [125](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L125) | Open the window. |
+| `on_path` <sub>fn</sub> | [105](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L105) | Where the window's program is on PATH, if it is there. |
+| `find_in` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L110) | name in the first absolute entry of path, a PATH value, that has it. |
+| `open` <sub>pub fn</sub> | [118](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs#L118) | Open the window. |

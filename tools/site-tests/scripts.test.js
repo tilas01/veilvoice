@@ -238,6 +238,37 @@ function run() {
     }
   }
 
+  // --- the licence gate says only what the licence says --------------------
+  // F-328. It once repeated half a sentence, read as a non-commercial limit
+  // the GPL does not have, and credited the AI help a fourth time. That
+  // credit lives in the README, the FAQ and the footer, and nowhere else.
+  {
+    const said = read("website/js/legal.js").replace(/\/\/[^\n]*/g, "");
+    if (/non-?commercially/i.test(said)) {
+      fail("legal.js says \"non-commercially\", which the GPL does not");
+    } else if (/\b(claude|anthropic)\b/i.test(said)) {
+      fail("legal.js credits the AI help, which belongs in the README, the FAQ and the footer");
+    } else if (/provided with[\s\S]{0,80}provided with/.test(said)) {
+      fail("legal.js says \"provided with\" twice in one sentence");
+    } else {
+      pass("the licence gate says only what the licence says");
+    }
+  }
+
+  // --- a fragment that is not valid percent-encoding is not a crash --------
+  // F-332. `decodeURIComponent` throws on `#%E0`. `named()` caught that and
+  // the click handler did not, so one malformed link stopped its own landing.
+  {
+    const js = read("website/js/teleport.js");
+    const all = (js.match(/decodeURIComponent\(/g) || []).length;
+    const guarded = (js.match(/try\s*\{\s*(?:return\s+|id\s*=\s*)decodeURIComponent\(/g) || []).length;
+    if (all !== guarded) {
+      fail("teleport.js decodes " + (all - guarded) + " fragment(s) outside a try");
+    } else {
+      pass("every fragment teleport.js decodes is decoded inside a try");
+    }
+  }
+
   return failures;
 }
 

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-crypto/src/privatefile.rs`
 
-[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 313 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs)
+[`veilvoice-crypto`](../../../crates/veilvoice-crypto/README.md) &middot; 411 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs)
 
 ## Contents
 
@@ -23,6 +23,9 @@
   - [Items](#items)
 
 Writing a file that only its owner can read.
+
+It also holds `replace`, the same all-or-nothing replacement for a file
+that is not secret, so the workspace has one way of doing that and not two.
 
 Returns `std::io::Result` rather than this crate's [`Error`](crate::Error),
 which is `Copy` and therefore cannot carry the underlying reason. A caller
@@ -71,17 +74,23 @@ When it cannot manage that, it says exactly why rather than just failing, since
 
 ## What this file contains
 
-313 lines defining **5 functions** (4 public), **0 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+411 lines defining **8 functions** (5 public), **1 type** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+
+**The types it owns.**
+
+- `enum Access` (line 161) -- Who may read a file this module writes.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
-- `write_owner_only` (line 56) -- Create path containing bytes, readable only by the current user.
+- `write_owner_only` (line 59) -- Create path containing bytes, readable only by the current user.
   - reaches: `write_inner`
-- `write_owner_only_new` (line 67) -- As write_owner_only, but fail if anything is already at path.
+- `write_owner_only_new` (line 70) -- As write_owner_only, but fail if anything is already at path.
   - reaches: `write_inner`
-- `replace_owner_only` (line 86) -- Replace path with bytes in one step, or leave what was there.
-  - reaches: `write_inner`
-- `tighten` (line 130) -- Make an existing file readable only by its owner.
+- `replace_owner_only` (line 94) -- Replace path with bytes in one step, or leave what was there.
+  - reaches: `replace_inner`, `sync_folder`, `write_inner`
+- `replace` (line 104) -- As replace_owner_only, for a file anybody on the machine may read.
+  - reaches: `replace_inner`, `sync_folder`, `write_inner`
+- `tighten` (line 188) -- Make an existing file readable only by its owner.
 
 ## What calls what
 
@@ -103,23 +112,32 @@ _Colour key: **entry** -- a way in: public, and nothing in this file calls it; *
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
-    n_write_owner_only(["write_owner_only<br/>line 56"])
-    n_write_owner_only_new(["write_owner_only_new<br/>line 67"])
-    n_replace_owner_only(["replace_owner_only<br/>line 86"])
-    n_tighten(["tighten<br/>line 130"])
-    n_write_inner["write_inner<br/>line 148"]
-    n_replace_owner_only --> n_write_inner
+    n_write_owner_only(["write_owner_only<br/>line 59"])
+    n_write_owner_only_new(["write_owner_only_new<br/>line 70"])
+    n_replace_owner_only(["replace_owner_only<br/>line 94"])
+    n_replace(["replace<br/>line 104"])
+    n_replace_inner["replace_inner<br/>line 110"]
+    n_sync_folder["sync_folder<br/>line 150"]
+    n_tighten(["tighten<br/>line 188"])
+    n_write_inner["write_inner<br/>line 210"]
+    n_replace --> n_replace_inner
+    n_replace_inner --> n_sync_folder
+    n_replace_inner --> n_write_inner
+    n_replace_owner_only --> n_replace_inner
     n_write_owner_only --> n_write_inner
     n_write_owner_only_new --> n_write_inner
-    click n_write_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56" "open the source"
-    click n_write_owner_only_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67" "open the source"
-    click n_replace_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L86" "open the source"
-    click n_tighten href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L130" "open the source"
-    click n_write_inner href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L148" "open the source"
+    click n_write_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59" "open the source"
+    click n_write_owner_only_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L70" "open the source"
+    click n_replace_owner_only href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L94" "open the source"
+    click n_replace href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L104" "open the source"
+    click n_replace_inner href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L110" "open the source"
+    click n_sync_folder href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L150" "open the source"
+    click n_tighten href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L188" "open the source"
+    click n_write_inner href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L210" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_write_owner_only,n_write_owner_only_new,n_replace_owner_only,n_tighten entry
+    class n_write_owner_only,n_write_owner_only_new,n_replace_owner_only,n_replace,n_tighten entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_write_inner helper
+    class n_replace_inner,n_sync_folder,n_write_inner helper
     subgraph chart_key ["Key"]
         direction LR
         key_entry["entry: a way in: public, and nothing in this file calls it"]
@@ -135,11 +153,15 @@ flowchart TD
 
 | Item | Line | Documentation |
 |---|---:|---|
-| `write_owner_only` <sub>pub fn</sub> | [56](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56) | Create path containing bytes, readable only by the current user. |
-| `write_owner_only_new` <sub>pub fn</sub> | [67](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67) | As write_owner_only, but fail if anything is already at path. |
-| `replace_owner_only` <sub>pub fn</sub> | [86](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L86) | Replace path with bytes in one step, or leave what was there. |
-| `tighten` <sub>pub fn</sub> | [130](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L130) | Make an existing file readable only by its owner. |
-| `write_inner` <sub>fn</sub> | [148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L148) | Create or replace a file that only its owner can read. |
+| `write_owner_only` <sub>pub fn</sub> | [59](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59) | Create path containing bytes, readable only by the current user. |
+| `write_owner_only_new` <sub>pub fn</sub> | [70](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L70) | As write_owner_only, but fail if anything is already at path. |
+| `replace_owner_only` <sub>pub fn</sub> | [94](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L94) | Replace path with bytes in one step, or leave what was there. |
+| `replace` <sub>pub fn</sub> | [104](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L104) | As replace_owner_only, for a file anybody on the machine may read. |
+| `replace_inner` <sub>fn</sub> | [110](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L110) | The replacement both public functions make, with the permissions access asks for. |
+| `sync_folder` <sub>fn</sub> | [150](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L150) | Make a rename in folder survive a power cut, where the system allows it. |
+| `Access` <sub>enum</sub> | [161](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L161) | Who may read a file this module writes. |
+| `tighten` <sub>pub fn</sub> | [188](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L188) | Make an existing file readable only by its owner. |
+| `write_inner` <sub>fn</sub> | [210](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L210) | Create or replace a file that only its owner can read. |
 
 ---
 

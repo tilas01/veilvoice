@@ -3,7 +3,7 @@
 
 # `fuzz/fuzz_targets/release_contents.rs`
 
-[[fuzz|Crate-fuzz]] &middot; 86 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/release_contents.rs)
+[fuzz](Crate-fuzz) &middot; 86 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/release_contents.rs)
 
 ## Contents
 

@@ -5,7 +5,7 @@
 
 > Per-user installation and companion-software detection, shared by the command line and the desktop app.
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/README.md)
 
 ## Contents
 
@@ -96,12 +96,12 @@ you who makes each one, and installs none of them unless you say so.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>226 lines"])
-    n_companions["companions.rs<br/>1100 lines"]
+    n_companions["companions.rs<br/>1131 lines"]
     n_install["install.rs<br/>1248 lines"]
     n_needs["needs.rs<br/>565 lines"]
     n_space["space.rs<br/>170 lines"]
-    n_update["update.rs<br/>908 lines"]
-    n_volumes["volumes.rs<br/>580 lines"]
+    n_update["update.rs<br/>945 lines"]
+    n_volumes["volumes.rs<br/>642 lines"]
     n_needs --> n_companions
     n_needs --> n_install
     n_volumes --> n_companions
@@ -124,15 +124,15 @@ flowchart TD
 
 | File | Lines | What it is |
 |---|---:|---|
-| [`companions.rs`](File-veilvoice-setup-companions) | 1100 | Optional third-party software, detected rather than assumed. |
+| [`companions.rs`](File-veilvoice-setup-companions) | 1131 | Optional third-party software, detected rather than assumed. |
 | [`install.rs`](File-veilvoice-setup-install) | 1248 | Put this program somewhere the system can find it. |
 | [`lib.rs`](File-veilvoice-setup-lib) | 226 | Everything that puts VeilVoice on a machine, and everything that reports what is already on it. |
 | [`needs.rs`](File-veilvoice-setup-needs) | 565 | What this machine is missing, asked once and at the right moment. |
 | [`space.rs`](File-veilvoice-setup-space) | 170 | How much room is actually free where VeilVoice keeps things. |
-| [`update.rs`](File-veilvoice-setup-update) | 908 | Ask, only when told to, whether a newer VeilVoice release exists. |
-| [`volumes.rs`](File-veilvoice-setup-volumes) | 580 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
+| [`update.rs`](File-veilvoice-setup-update) | 945 | Ask, only when told to, whether a newer VeilVoice release exists. |
+| [`volumes.rs`](File-veilvoice-setup-volumes) | 642 | Encrypted volumes this machine already has: Cryptomator and VeraCrypt. |
 
-**3,033 functional lines of Rust** in this crate. A functional line is a line
+**3,121 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

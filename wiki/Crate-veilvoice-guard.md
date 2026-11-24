@@ -5,7 +5,7 @@
 
 > Integrity manifest and tamper detection for VeilVoice's own files, with best-effort attribution of what changed them.
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/README.md)
 
 ## Contents
 
@@ -96,7 +96,7 @@ change the list too. What it catches is a change nobody was hiding.
 flowchart TD
     n_lib(["lib.rs<br/>165 lines"])
     n_blame["blame.rs<br/>433 lines"]
-    n_manifest["manifest.rs<br/>764 lines"]
+    n_manifest["manifest.rs<br/>814 lines"]
     n_record["record.rs<br/>94 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/lib.rs" "open the source"
     click n_blame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/blame.rs" "open the source"
@@ -116,10 +116,10 @@ flowchart TD
 |---|---:|---|
 | [`blame.rs`](File-veilvoice-guard-blame) | 433 | Best-effort attribution: which program changed a file. |
 | [`lib.rs`](File-veilvoice-guard-lib) | 165 | Tamper detection for VeilVoice's own files: a manifest of what they should be, a check of what they are, and a best-effort answer to "what changed them". |
-| [`manifest.rs`](File-veilvoice-guard-manifest) | 764 | The integrity manifest: what the files were, and what they are now. |
+| [`manifest.rs`](File-veilvoice-guard-manifest) | 814 | The integrity manifest: what the files were, and what they are now. |
 | [`record.rs`](File-veilvoice-guard-record) | 94 | Where the integrity record is kept. |
 
-**2,955 functional lines of Rust** in this crate. A functional line is a line
+**3,003 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

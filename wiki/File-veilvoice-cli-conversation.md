@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/conversation.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 1096 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs)
+[veilvoice-cli](Crate-veilvoice-cli) &middot; 1096 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/conversation.rs)
 
 ## Contents
 

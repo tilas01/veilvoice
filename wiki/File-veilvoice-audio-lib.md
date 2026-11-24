@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/lib.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 431 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs)
+[veilvoice-audio](Crate-veilvoice-audio) &middot; 431 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/lib.rs)
 
 ## Contents
 
@@ -14,7 +14,7 @@
   - [Items](#items)
 
 Everything between the sound hardware and
-[[`veilvoice_core`|Crate-veilvoice-core]]: device enumeration, file
+[`veilvoice_core`](Crate-veilvoice-core): device enumeration, file
 import and export, and the real-time capture → de-identify → playback path.
 
 - `io`, to decode any common audio file to mono `f32`, write 16-bit WAV, or

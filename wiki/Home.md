@@ -9,46 +9,46 @@ This wiki is generated from the repository. Every page here has a source file th
 
 ## Start here
 
-- **[[Start here|Doc-START-HERE]]** · You have just downloaded it and have not run it yet: the order to do things in, and why that order
-- **[[What VeilVoice is|Doc-README]]** · The whole project in one page: what it does, what it refuses to claim, and how to install it
-- **[[User guide|Doc-USER-GUIDE]]** · Every screen and every command, in order
-- **[[Installing|Doc-INSTALL]]** · Per operating system, with the verification step in place rather than bolted on
-- **[[Every command|Doc-COMMANDS]]** · Every one of them, what each is for, and where the same job is in the window
-- **[[Questions|Doc-FAQ]]** · The questions people actually ask
+- **[Start here](Doc-START-HERE)** · You have just downloaded it and have not run it yet: the order to do things in, and why that order
+- **[What VeilVoice is](Doc-README)** · The whole project in one page: what it does, what it refuses to claim, and how to install it
+- **[User guide](Doc-USER-GUIDE)** · Every screen and every command, in order
+- **[Installing](Doc-INSTALL)** · Per operating system, with the verification step in place rather than bolted on
+- **[Every command](Doc-COMMANDS)** · Every one of them, what each is for, and where the same job is in the window
+- **[Questions](Doc-FAQ)** · The questions people actually ask
 
 ## One program at a time
 
-- **[[The command line|Guide-command-line]]** · `veilvoice`, every command with worked examples
-- **[[The desktop application|Guide-desktop-app]]** · `veilvoice-gui`, screen by screen
-- **[[The verifier|Guide-verifier]]** · Checking a download, at length
+- **[The command line](Guide-command-line)** · `veilvoice`, every command with worked examples
+- **[The desktop application](Guide-desktop-app)** · `veilvoice-gui`, screen by screen
+- **[The verifier](Guide-verifier)** · Checking a download, at length
 
 ## After it is installed
 
-- **[[Updating|Doc-UPDATING]]** · Finding out something newer exists, moving to it, and why the window then reports that a file changed
-- **[[When a file changes|Doc-GUARD]]** · What VeilVoice records about its own files, and what a report of a change is and is not evidence of
+- **[Updating](Doc-UPDATING)** · Finding out something newer exists, moving to it, and why the window then reports that a file changed
+- **[When a file changes](Doc-GUARD)** · What VeilVoice records about its own files, and what a report of a change is and is not evidence of
 
 ## Checking it, building it, packaging it
 
-- **[[How the veiling works|Doc-WHITEPAPER]]** · What is done to a voice, why it cannot be undone, and what this is not
-- **[[Checking a download|Doc-GUIDE-VERIFY]]** · The signature chain end to end, and what each verdict is worth
-- **[[Building it yourself|Doc-REPRODUCIBLE-BUILDS]]** · Building from source and comparing the result against what was published
-- **[[The code-signing certificate|Doc-SELF-SIGNING]]** · What it is, and importing it
-- **[[Packaging|Doc-PACKAGING]]** · The deb, the RPM, the AUR recipe and the rest
-- **[[Using it as a library|Doc-USING-THE-CRATES]]** · The crates, and what depending on one commits you to
+- **[How the veiling works](Doc-WHITEPAPER)** · What is done to a voice, why it cannot be undone, and what this is not
+- **[Checking a download](Doc-GUIDE-VERIFY)** · The signature chain end to end, and what each verdict is worth
+- **[Building it yourself](Doc-REPRODUCIBLE-BUILDS)** · Building from source and comparing the result against what was published
+- **[The code-signing certificate](Doc-SELF-SIGNING)** · What it is, and importing it
+- **[Packaging](Doc-PACKAGING)** · The deb, the RPM, the AUR recipe and the rest
+- **[Using it as a library](Doc-USING-THE-CRATES)** · The crates, and what depending on one commits you to
 
 ## Working on it
 
-- **[[The website|Doc-WEBSITE]]** · Both editions, what generates each page, and the twelve scripts
-- **[[Working on the code|Doc-DEVELOPERS]]** · The shape of the repository: the crates, where to start reading, what a build enforces and how to run every check
-- **[[Contributing|Doc-CONTRIBUTING]]** · Building, the standing rules, the house style and what a change has to pass
-- **[[Reporting a vulnerability|Doc-SECURITY]]** · Where to send it, what counts as one, and what does not
-- **[[Audit history|Doc-AUDIT]]** · Every defect found and fixed, in order, including the ones an earlier round had called clean
-- **[[Roadmap|Doc-ROADMAP]]** · What is done, what is being worked on, and what is planned
-- **[[Release notes|Doc-CHANGELOG]]** · Every release, newest first
+- **[The website](Doc-WEBSITE)** · Both editions, what generates each page, and the twelve scripts
+- **[Working on the code](Doc-DEVELOPERS)** · The shape of the repository: the crates, where to start reading, what a build enforces and how to run every check
+- **[Contributing](Doc-CONTRIBUTING)** · Building, the standing rules, the house style and what a change has to pass
+- **[Reporting a vulnerability](Doc-SECURITY)** · Where to send it, what counts as one, and what does not
+- **[Audit history](Doc-AUDIT)** · Every defect found and fixed, in order, including the ones an earlier round had called clean
+- **[Roadmap](Doc-ROADMAP)** · What is done, what is being worked on, and what is planned
+- **[Release notes](Doc-CHANGELOG)** · Every release, newest first
 
 ## Every crate and every file
 
-**[[The reference|Reference]]** is a page for each of the thirteen crates and each source file in them, generated from the doc comments in the code. Each crate page carries its banner, a flowchart of what calls what, and a table of every file in it.
+**[The reference](Reference)** is a page for each of the thirteen crates and each source file in them, generated from the doc comments in the code. Each crate page carries its banner, a flowchart of what calls what, and a table of every file in it.
 
 The same pages are on [the website](https://tilas01.github.io/veilvoice/wiki.html), which additionally shows the syntax-highlighted source beside each one.
 

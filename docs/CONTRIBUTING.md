@@ -306,21 +306,23 @@ trailer, no "generated with" footer or session link, and no assistant, its
 maker or a model named anywhere in a commit message, a tag, a release note or a
 pull request body, including by the name of a file it keeps. That is a rule
 about where credit lives rather than a denial that it is owed: AI assistance is
-credited in the README and in the footer of every page of the website, which is
-where a reader looking for it will look.
+credited in the README's Credits and in the "Who wrote it" answer in the FAQ,
+which is where a reader looking for it will look.
 
 **Every commit is signed by a key GitHub verifies as tilas01's.** An unsigned
 commit shows no badge. A commit signed by a key registered to another account
 shows Unverified, which reads worse than none, and that is what a cloud
 container's own signing produces in his name: twenty-five of his commits read
 that way before it was noticed. The keys that count are `SIGNING_KEYS` in the
-guard, and CI asks GitHub whether it shows each pushed commit Verified. Until
-every place commits are made from can sign with one of those keys, a missing or
-foreign signature is reported rather than failed on; `SIGNATURES_REQUIRED` is
-the switch, and it turns on in the commit that makes that true.
+guard, and CI asks GitHub whether it shows each pushed commit Verified. A
+missing or foreign signature fails the check: `SIGNATURES_REQUIRED` is the
+switch, and it is on now that every commit on `main` is signed by one of them.
 
-Where a commit is made decides which key signs it. On tilas01's own machine it
-is his own key, `F8ADBAB7A4FB333C`. A cloud session cannot hold that one, so it
+Where a commit is made decides which key signs it. On tilas01's own machine,
+and in the workflows, it is the release key, `9CC1C7E7A9B5833A`, through its
+signing subkey `BD752A144704C231`; every commit on `main` is signed that way.
+His older key, `F8ADBAB7A4FB333C`, is still accepted. A cloud session cannot
+hold either, so it
 signs with a key made for the purpose and registered to the same account, held
 base64-encoded in the project's `VEILVOICE_SIGNING_KEY` environment variable.
 `python tools/repo/signing.py` imports it and sets that clone up to sign with

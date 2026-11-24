@@ -257,7 +257,9 @@ fn wsl_program() -> Option<PathBuf> {
         return None;
     }
     let path = std::env::var_os("PATH")?;
-    for dir in std::env::split_paths(&path) {
+    // Absolute entries only: a relative one is the folder this was started
+    // from, and a `wsl.exe` planted there must not be the one run.
+    for dir in std::env::split_paths(&path).filter(|dir| dir.is_absolute()) {
         let candidate = dir.join("wsl.exe");
         if candidate.is_file() {
             return Some(candidate);

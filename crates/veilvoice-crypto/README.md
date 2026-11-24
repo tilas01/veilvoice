@@ -112,20 +112,20 @@ flowchart TD
     n_aead["aead.rs<br/>280 lines"]
     n_amnesia["amnesia.rs<br/>472 lines"]
     n_container["container.rs<br/>627 lines"]
-    n_decoy["decoy.rs<br/>1097 lines"]
-    n_hoard["hoard.rs<br/>1099 lines"]
+    n_decoy["decoy.rs<br/>1096 lines"]
+    n_hoard["hoard.rs<br/>1109 lines"]
     n_hybrid["hybrid.rs<br/>531 lines"]
-    n_kdf["kdf.rs<br/>649 lines"]
+    n_kdf["kdf.rs<br/>650 lines"]
     n_layout["layout.rs<br/>331 lines"]
     n_lock["lock.rs<br/>2384 lines"]
-    n_privatefile["privatefile.rs<br/>313 lines"]
+    n_privatefile["privatefile.rs<br/>411 lines"]
     n_reseal["reseal.rs<br/>538 lines"]
     n_reset["reset.rs<br/>903 lines"]
     n_shred["shred.rs<br/>417 lines"]
     n_studio["studio.rs<br/>1522 lines"]
     n_tape["tape.rs<br/>391 lines"]
-    n_vault["vault.rs<br/>816 lines"]
-    n_weave["weave.rs<br/>1811 lines"]
+    n_vault["vault.rs<br/>904 lines"]
+    n_weave["weave.rs<br/>1818 lines"]
     n_decoy --> n_kdf
     n_decoy --> n_lock
     n_decoy --> n_vault
@@ -181,26 +181,26 @@ flowchart TD
 | [`aead.rs`](../../docs/files/veilvoice-crypto/aead.md) | 280 | Authenticated encryption with XChaCha20-Poly1305. |
 | [`amnesia.rs`](../../docs/files/veilvoice-crypto/amnesia.md) | 472 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [`container.rs`](../../docs/files/veilvoice-crypto/container.md) | 627 | The .veil encrypted container format. |
-| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 1097 | A second passphrase that opens a different, empty VeilVoice. |
-| [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
+| [`decoy.rs`](../../docs/files/veilvoice-crypto/decoy.md) | 1096 | A second passphrase that opens a different, empty VeilVoice. |
+| [`hoard.rs`](../../docs/files/veilvoice-crypto/hoard.md) | 1109 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [`hybrid.rs`](../../docs/files/veilvoice-crypto/hybrid.md) | 531 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
-| [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 649 | Password-based key derivation with Argon2id. |
+| [`kdf.rs`](../../docs/files/veilvoice-crypto/kdf.md) | 650 | Password-based key derivation with Argon2id. |
 | [`layout.rs`](../../docs/files/veilvoice-crypto/layout.md) | 331 | Everything VeilVoice keeps between runs, in one list. |
 | [`lib.rs`](../../docs/files/veilvoice-crypto/lib.md) | 289 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](../../docs/files/veilvoice-crypto/lock.md) | 2384 | The application lock: an Argon2id password verifier with a rate limit. |
-| [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 313 | Writing a file that only its owner can read. |
+| [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | 411 | Writing a file that only its owner can read. |
 | [`reseal.rs`](../../docs/files/veilvoice-crypto/reseal.md) | 538 | Finding files that were sealed under no passphrase at all, and sealing them again under a real one. |
 | [`reset.rs`](../../docs/files/veilvoice-crypto/reset.md) | 903 | Putting this machine back to a new install. |
 | [`shred.rs`](../../docs/files/veilvoice-crypto/shred.md) | 417 | Secure erasure, the self-destruct. |
 | [`studio.rs`](../../docs/files/veilvoice-crypto/studio.md) | 1522 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](../../docs/files/veilvoice-crypto/tape.md) | 391 | A recording held in locked, zeroizing memory while it is still being made. |
-| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 816 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
-| [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1811 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
+| [`vault.rs`](../../docs/files/veilvoice-crypto/vault.md) | 904 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [`weave.rs`](../../docs/files/veilvoice-crypto/weave.md) | 1818 | Kept only to open old records. |
 | [`seal_and_open.rs`](../../docs/files/veilvoice-crypto/examples-seal_and_open.md) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](../../docs/files/veilvoice-crypto/tests-parser_fuzz.md) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](../../docs/files/veilvoice-crypto/tests-timing.md) | 249 | Timing measurement of the password paths. |
 
-**8,830 functional lines of Rust** in this crate. A functional line is a line
+**9,017 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and
@@ -286,6 +286,7 @@ counts blank lines and comments too. Both are produced by
 | `fn write_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Create path containing bytes, readable only by the current user. |
 | `fn write_owner_only_new` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | As write_owner_only, but fail if anything is already at path. |
 | `fn replace_owner_only` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Replace path with bytes in one step, or leave what was there. |
+| `fn replace` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | As replace_owner_only, for a file anybody on the machine may read. |
 | `fn tighten` | [`privatefile.rs`](../../docs/files/veilvoice-crypto/privatefile.md) | Make an existing file readable only by its owner. |
 | `const NOTICE` | [`reseal.rs`](../../docs/files/veilvoice-crypto/reseal.md) | The one line that points at the repair, for somewhere a paragraph does not fit. |
 | `const WARNING` | [`reseal.rs`](../../docs/files/veilvoice-crypto/reseal.md) | What to tell somebody running VeilVoice 0.1.23 for the first time. |

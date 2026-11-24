@@ -563,7 +563,10 @@ impl Prefs {
         // it. Somebody reading this learns that a hidden volume exists, which
         // is the single thing a hidden volume is for concealing, and they
         // learn where to look.
-        veilvoice_crypto::privatefile::write_owner_only(path, self.to_text().as_bytes())
+        //
+        // Replaced in one step, so a crash part-way leaves the old settings
+        // rather than half of new ones. **F-334.**
+        veilvoice_crypto::privatefile::replace_owner_only(path, self.to_text().as_bytes())
             .map_err(|e| e.to_string())
     }
 }

@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/gui.rs</code></h1>
-<p style="color:var(--muted)"><a href="gui.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 247 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="gui.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 267 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/gui.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -170,159 +170,181 @@
 </span>
 <span class="ln" id="L97"></span>
 <span class="src-item" id="fn-on_path">
-<span class="ln" id="L98"><span class="tok-com">/// Ask the system where the program is, if anywhere.</span></span>
-<span class="ln" id="L99"><span class="tok-kw">fn</span> <span class="tok-fn">on_path</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L100">    <span class="tok-kw">let</span> name = <span class="tok-fn">gui_name</span>();</span>
-<span class="ln" id="L101">    <span class="tok-kw">let</span> output = <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L102">        <span class="tok-kw">let</span> root = std::env::<span class="tok-fn">var</span>(<span class="tok-str">&quot;SystemRoot&quot;</span>).<span class="tok-fn">unwrap_or_else</span>(|_| <span class="tok-str">r&quot;C:\Windows&quot;</span>.<span class="tok-fn">to_string</span>());</span>
-<span class="ln" id="L103">        std::process::Command::<span class="tok-fn">new</span>(format!(<span class="tok-str">r&quot;{root}\System32\where.exe&quot;</span>))</span>
-<span class="ln" id="L104">            .<span class="tok-fn">arg</span>(name)</span>
-<span class="ln" id="L105">            .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L106">            .<span class="tok-fn">ok</span>()?</span>
-<span class="ln" id="L107">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L108">        std::process::Command::<span class="tok-fn">new</span>(<span class="tok-str">&quot;sh&quot;</span>)</span>
-<span class="ln" id="L109">            .<span class="tok-fn">args</span>([<span class="tok-str">&quot;-c&quot;</span>, &amp;format!(<span class="tok-str">&quot;command -v {name}&quot;</span>)])</span>
-<span class="ln" id="L110">            .<span class="tok-fn">output</span>()</span>
-<span class="ln" id="L111">            .<span class="tok-fn">ok</span>()?</span>
-<span class="ln" id="L112">    };</span>
-<span class="ln" id="L113">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L114">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L115">    }</span>
-<span class="ln" id="L116">    <span class="tok-kw">let</span> text = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stdout);</span>
-<span class="ln" id="L117">    <span class="tok-kw">let</span> first = text.<span class="tok-fn">lines</span>().<span class="tok-fn">next</span>()?.<span class="tok-fn">trim</span>();</span>
-<span class="ln" id="L118">    <span class="tok-kw">if</span> first.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L119">        <span class="tok-kw">return</span> None;</span>
-<span class="ln" id="L120">    }</span>
-<span class="ln" id="L121">    <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(first))</span>
-<span class="ln" id="L122">}</span>
+<span class="ln" id="L98"><span class="tok-com">/// Where the window&#x27;s program is on `PATH`, if it is there.</span></span>
+<span class="ln" id="L99"><span class="tok-com">///</span></span>
+<span class="ln" id="L100"><span class="tok-com">/// **F-333.** A walk over `PATH`, not a question to the system. `where.exe`</span></span>
+<span class="ln" id="L101"><span class="tok-com">/// looks in the current folder before `PATH`, and `sh -c &quot;command -v&quot;` follows</span></span>
+<span class="ln" id="L102"><span class="tok-com">/// a relative entry, so either could hand back a `veilvoice-gui` planted in the</span></span>
+<span class="ln" id="L103"><span class="tok-com">/// folder this was started from, which [`open`] would then run. Only absolute</span></span>
+<span class="ln" id="L104"><span class="tok-com">/// entries are searched, as everywhere else that VeilVoice finds a program.</span></span>
+<span class="ln" id="L105"><span class="tok-kw">fn</span> <span class="tok-fn">on_path</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L106">    <span class="tok-fn">find_in</span>(&amp;std::env::<span class="tok-fn">var_os</span>(<span class="tok-str">&quot;PATH&quot;</span>)?, <span class="tok-fn">gui_name</span>())</span>
+<span class="ln" id="L107">}</span>
 </span>
-<span class="ln" id="L123"></span>
+<span class="ln" id="L108"></span>
+<span class="src-item" id="fn-find_in">
+<span class="ln" id="L109"><span class="tok-com">/// `name` in the first absolute entry of `path`, a `PATH` value, that has it.</span></span>
+<span class="ln" id="L110"><span class="tok-kw">fn</span> <span class="tok-fn">find_in</span>(path: &amp;std::ffi::OsStr, name: &amp;str) -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L111">    std::env::<span class="tok-fn">split_paths</span>(path)</span>
+<span class="ln" id="L112">        .<span class="tok-fn">filter</span>(|dir| dir.<span class="tok-fn">is_absolute</span>())</span>
+<span class="ln" id="L113">        .<span class="tok-fn">map</span>(|dir| dir.<span class="tok-fn">join</span>(name))</span>
+<span class="ln" id="L114">        .<span class="tok-fn">find</span>(|candidate| candidate.<span class="tok-fn">is_file</span>())</span>
+<span class="ln" id="L115">}</span>
+</span>
+<span class="ln" id="L116"></span>
 <span class="src-item" id="fn-open">
-<span class="ln" id="L124"><span class="tok-com">/// Open the window.</span></span>
-<span class="ln" id="L125"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">open</span>(quiet: bool) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L126">    <span class="tok-kw">let</span> program = <span class="tok-fn">find</span>()?;</span>
-<span class="ln" id="L127"></span>
-<span class="ln" id="L128">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = std::process::Command::<span class="tok-fn">new</span>(&amp;program);</span>
-<span class="ln" id="L129">    <span class="tok-com">// Detached from this terminal&#x27;s streams. Without this the application</span></span>
-<span class="ln" id="L130">    <span class="tok-com">// inherits the console, and anything it writes lands in the middle of</span></span>
-<span class="ln" id="L131">    <span class="tok-com">// whatever the reader does next.</span></span>
-<span class="ln" id="L132">    command</span>
-<span class="ln" id="L133">        .<span class="tok-fn">stdin</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
-<span class="ln" id="L134">        .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
-<span class="ln" id="L135">        .<span class="tok-fn">stderr</span>(std::process::Stdio::<span class="tok-fn">null</span>());</span>
+<span class="ln" id="L117"><span class="tok-com">/// Open the window.</span></span>
+<span class="ln" id="L118"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">open</span>(quiet: bool) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L119">    <span class="tok-kw">let</span> program = <span class="tok-fn">find</span>()?;</span>
+<span class="ln" id="L120"></span>
+<span class="ln" id="L121">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = std::process::Command::<span class="tok-fn">new</span>(&amp;program);</span>
+<span class="ln" id="L122">    <span class="tok-com">// Detached from this terminal&#x27;s streams. Without this the application</span></span>
+<span class="ln" id="L123">    <span class="tok-com">// inherits the console, and anything it writes lands in the middle of</span></span>
+<span class="ln" id="L124">    <span class="tok-com">// whatever the reader does next.</span></span>
+<span class="ln" id="L125">    command</span>
+<span class="ln" id="L126">        .<span class="tok-fn">stdin</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L127">        .<span class="tok-fn">stdout</span>(std::process::Stdio::<span class="tok-fn">null</span>())</span>
+<span class="ln" id="L128">        .<span class="tok-fn">stderr</span>(std::process::Stdio::<span class="tok-fn">null</span>());</span>
+<span class="ln" id="L129"></span>
+<span class="ln" id="L130">    <span class="tok-com">// Started, never waited for. A terminal held open for as long as a desktop</span></span>
+<span class="ln" id="L131">    <span class="tok-com">// application runs is a terminal somebody cannot use, and closing it would</span></span>
+<span class="ln" id="L132">    <span class="tok-com">// then close the window.</span></span>
+<span class="ln" id="L133">    command</span>
+<span class="ln" id="L134">        .<span class="tok-fn">spawn</span>()</span>
+<span class="ln" id="L135">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not start {}: {error}&quot;</span>, program.<span class="tok-fn">display</span>()))?;</span>
 <span class="ln" id="L136"></span>
-<span class="ln" id="L137">    <span class="tok-com">// Started, never waited for. A terminal held open for as long as a desktop</span></span>
-<span class="ln" id="L138">    <span class="tok-com">// application runs is a terminal somebody cannot use, and closing it would</span></span>
-<span class="ln" id="L139">    <span class="tok-com">// then close the window.</span></span>
-<span class="ln" id="L140">    command</span>
-<span class="ln" id="L141">        .<span class="tok-fn">spawn</span>()</span>
-<span class="ln" id="L142">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not start {}: {error}&quot;</span>, program.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L143"></span>
-<span class="ln" id="L144">    <span class="tok-kw">if</span> !quiet {</span>
-<span class="ln" id="L145">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Opening VeilVoice&quot;</span>));</span>
-<span class="ln" id="L146">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;started&quot;</span>, &amp;program.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()));</span>
-<span class="ln" id="L147">        println!(</span>
-<span class="ln" id="L148">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L149">            <span class="tok-fn">paint</span>(</span>
-<span class="ln" id="L150">                colour::MUTED,</span>
-<span class="ln" id="L151">                <span class="tok-str">&quot;  This terminal is yours again; closing it will not close the window.&quot;</span>,</span>
-<span class="ln" id="L152">            )</span>
-<span class="ln" id="L153">        );</span>
-<span class="ln" id="L154">    }</span>
-<span class="ln" id="L155">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L156">}</span>
+<span class="ln" id="L137">    <span class="tok-kw">if</span> !quiet {</span>
+<span class="ln" id="L138">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Opening VeilVoice&quot;</span>));</span>
+<span class="ln" id="L139">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;started&quot;</span>, &amp;program.<span class="tok-fn">display</span>().<span class="tok-fn">to_string</span>()));</span>
+<span class="ln" id="L140">        println!(</span>
+<span class="ln" id="L141">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L142">            <span class="tok-fn">paint</span>(</span>
+<span class="ln" id="L143">                colour::MUTED,</span>
+<span class="ln" id="L144">                <span class="tok-str">&quot;  This terminal is yours again; closing it will not close the window.&quot;</span>,</span>
+<span class="ln" id="L145">            )</span>
+<span class="ln" id="L146">        );</span>
+<span class="ln" id="L147">    }</span>
+<span class="ln" id="L148">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L149">}</span>
 </span>
-<span class="ln" id="L157"></span>
-<span class="ln" id="L158"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L159"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L160">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L161"></span>
-<span class="ln" id="L162">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L163">    <span class="tok-kw">fn</span> <span class="tok-fn">the_name_has_this_platforms_extension</span>() {</span>
-<span class="ln" id="L164">        <span class="tok-kw">if</span> cfg!(windows) {</span>
-<span class="ln" id="L165">            assert_eq!(<span class="tok-fn">gui_name</span>(), <span class="tok-str">&quot;veilvoice-gui.exe&quot;</span>);</span>
-<span class="ln" id="L166">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L167">            assert_eq!(<span class="tok-fn">gui_name</span>(), <span class="tok-str">&quot;veilvoice-gui&quot;</span>);</span>
-<span class="ln" id="L168">        }</span>
-<span class="ln" id="L169">    }</span>
-<span class="ln" id="L170"></span>
-<span class="ln" id="L171">    <span class="tok-com">/// Beside this program comes first. A portable folder holds all three</span></span>
-<span class="ln" id="L172">    <span class="tok-com">/// together, and somebody who unpacked a release means the one they</span></span>
-<span class="ln" id="L173">    <span class="tok-com">/// unpacked -- not an older installed copy.</span></span>
-<span class="ln" id="L174">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L175">    <span class="tok-kw">fn</span> <span class="tok-fn">the_search_order_starts_beside_this_program</span>() {</span>
-<span class="ln" id="L176">        <span class="tok-kw">let</span> places = <span class="tok-fn">candidates</span>();</span>
-<span class="ln" id="L177">        assert!(!places.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L178">        assert_eq!(places[<span class="tok-num">0</span>].<span class="tok-num">0</span>, <span class="tok-str">&quot;beside this program&quot;</span>);</span>
-<span class="ln" id="L179">        <span class="tok-kw">if</span> places.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span> {</span>
-<span class="ln" id="L180">            assert_eq!(places[<span class="tok-num">1</span>].<span class="tok-num">0</span>, <span class="tok-str">&quot;where an install puts it&quot;</span>);</span>
-<span class="ln" id="L181">        }</span>
-<span class="ln" id="L182">    }</span>
-<span class="ln" id="L183"></span>
-<span class="ln" id="L184">    <span class="tok-com">/// **Never a bare name.** `PATH` on Windows searches the current directory</span></span>
-<span class="ln" id="L185">    <span class="tok-com">/// first, so `veilvoice gui` run inside a downloads folder holding</span></span>
-<span class="ln" id="L186">    <span class="tok-com">/// something called `veilvoice-gui.exe` would start that instead. This is</span></span>
-<span class="ln" id="L187">    <span class="tok-com">/// the one command whose entire job is launching another program.</span></span>
+<span class="ln" id="L150"></span>
+<span class="ln" id="L151"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L152"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L153">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L154"></span>
+<span class="ln" id="L155">    <span class="tok-com">/// **F-333.** A relative `PATH` entry is the folder this was started from,</span></span>
+<span class="ln" id="L156">    <span class="tok-com">/// so a window program planted there is never the one opened.</span></span>
+<span class="ln" id="L157">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L158">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L159">    <span class="tok-kw">fn</span> <span class="tok-fn">a_relative_path_entry_is_never_searched</span>() {</span>
+<span class="ln" id="L160">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L161">        <span class="tok-kw">let</span> program = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-fn">gui_name</span>());</span>
+<span class="ln" id="L162">        std::fs::<span class="tok-fn">write</span>(&amp;program, b<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L163">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> relative = PathBuf::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L164">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> std::env::<span class="tok-fn">current_dir</span>().<span class="tok-fn">unwrap</span>().<span class="tok-fn">components</span>().<span class="tok-fn">skip</span>(<span class="tok-num">1</span>) {</span>
+<span class="ln" id="L165">            relative.<span class="tok-fn">push</span>(<span class="tok-str">&quot;..&quot;</span>);</span>
+<span class="ln" id="L166">        }</span>
+<span class="ln" id="L167">        <span class="tok-kw">let</span> relative = relative.<span class="tok-fn">join</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">strip_prefix</span>(<span class="tok-str">&quot;/&quot;</span>).<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L168">        assert!(</span>
+<span class="ln" id="L169">            relative.<span class="tok-fn">join</span>(<span class="tok-fn">gui_name</span>()).<span class="tok-fn">is_file</span>(),</span>
+<span class="ln" id="L170">            <span class="tok-str">&quot;the test&#x27;s own path is wrong&quot;</span></span>
+<span class="ln" id="L171">        );</span>
+<span class="ln" id="L172">        assert_eq!(<span class="tok-fn">find_in</span>(relative.<span class="tok-fn">as_os_str</span>(), <span class="tok-fn">gui_name</span>()), None);</span>
+<span class="ln" id="L173">        assert_eq!(<span class="tok-fn">find_in</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">as_os_str</span>(), <span class="tok-fn">gui_name</span>()), <span class="tok-fn">Some</span>(program));</span>
+<span class="ln" id="L174">    }</span>
+<span class="ln" id="L175"></span>
+<span class="ln" id="L176">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L177">    <span class="tok-kw">fn</span> <span class="tok-fn">the_name_has_this_platforms_extension</span>() {</span>
+<span class="ln" id="L178">        <span class="tok-kw">if</span> cfg!(windows) {</span>
+<span class="ln" id="L179">            assert_eq!(<span class="tok-fn">gui_name</span>(), <span class="tok-str">&quot;veilvoice-gui.exe&quot;</span>);</span>
+<span class="ln" id="L180">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L181">            assert_eq!(<span class="tok-fn">gui_name</span>(), <span class="tok-str">&quot;veilvoice-gui&quot;</span>);</span>
+<span class="ln" id="L182">        }</span>
+<span class="ln" id="L183">    }</span>
+<span class="ln" id="L184"></span>
+<span class="ln" id="L185">    <span class="tok-com">/// Beside this program comes first. A portable folder holds all three</span></span>
+<span class="ln" id="L186">    <span class="tok-com">/// together, and somebody who unpacked a release means the one they</span></span>
+<span class="ln" id="L187">    <span class="tok-com">/// unpacked -- not an older installed copy.</span></span>
 <span class="ln" id="L188">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L189">    <span class="tok-kw">fn</span> <span class="tok-fn">the_application_is_never_started_by_a_bare_name</span>() {</span>
-<span class="ln" id="L190">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;gui.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L191">        <span class="tok-com">// Code only. The module note *quotes* the thing it does not do, and</span></span>
-<span class="ln" id="L192">        <span class="tok-com">// the first version of this test read that explanation and reported it</span></span>
-<span class="ln" id="L193">        <span class="tok-com">// as the offence. Four guards in this repository have now made the</span></span>
-<span class="ln" id="L194">        <span class="tok-com">// same mistake, which is itself worth knowing.</span></span>
-<span class="ln" id="L195">        <span class="tok-kw">let</span> body: String = source</span>
-<span class="ln" id="L196">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>)</span>
-<span class="ln" id="L197">            .<span class="tok-fn">next</span>()</span>
-<span class="ln" id="L198">            .<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L199">            .<span class="tok-fn">lines</span>()</span>
-<span class="ln" id="L200">            .<span class="tok-fn">filter</span>(|line| {</span>
-<span class="ln" id="L201">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
-<span class="ln" id="L202">                !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>)</span>
-<span class="ln" id="L203">            })</span>
-<span class="ln" id="L204">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-<span class="ln" id="L205">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L206">        assert!(</span>
-<span class="ln" id="L207">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new(gui_name())&quot;</span>),</span>
-<span class="ln" id="L208">            <span class="tok-str">&quot;a bare name resolves through the current directory on Windows&quot;</span></span>
-<span class="ln" id="L209">        );</span>
-<span class="ln" id="L210">        assert!(</span>
-<span class="ln" id="L211">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new(\&quot;veilvoice-gui\&quot;)&quot;</span>),</span>
-<span class="ln" id="L212">            <span class="tok-str">&quot;same, spelled out&quot;</span></span>
-<span class="ln" id="L213">        );</span>
-<span class="ln" id="L214">        <span class="tok-com">// What it does start is a path that was found, and the two probes.</span></span>
-<span class="ln" id="L215">        assert!(body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new(&amp;program)&quot;</span>));</span>
-<span class="ln" id="L216">        assert!(body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;where.exe&quot;</span>), <span class="tok-str">&quot;PATH is asked, not walked&quot;</span>);</span>
-<span class="ln" id="L217">    }</span>
-<span class="ln" id="L218"></span>
-<span class="ln" id="L219">    <span class="tok-com">/// A failure names every place that was tried, so somebody is not left</span></span>
-<span class="ln" id="L220">    <span class="tok-com">/// guessing where it should have been.</span></span>
-<span class="ln" id="L221">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L222">    <span class="tok-kw">fn</span> <span class="tok-fn">not_finding_it_says_where_it_looked</span>() {</span>
-<span class="ln" id="L223">        <span class="tok-com">// Reached by asking about a name nothing will have.</span></span>
-<span class="ln" id="L224">        <span class="tok-kw">let</span> places = <span class="tok-fn">candidates</span>();</span>
-<span class="ln" id="L225">        <span class="tok-kw">let</span> listed: Vec&lt;String&gt; = places</span>
-<span class="ln" id="L226">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L227">            .<span class="tok-fn">map</span>(|(what, path, _)| format!(<span class="tok-str">&quot;{what}: {}&quot;</span>, path.<span class="tok-fn">display</span>()))</span>
-<span class="ln" id="L228">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L229">        assert!(!listed.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L230">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> &amp;listed {</span>
-<span class="ln" id="L231">            assert!(line.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;:&#x27;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
-<span class="ln" id="L232">        }</span>
-<span class="ln" id="L233">    }</span>
-<span class="ln" id="L234"></span>
-<span class="ln" id="L235">    <span class="tok-com">/// It starts the window and returns. Waiting would hold the terminal for</span></span>
-<span class="ln" id="L236">    <span class="tok-com">/// as long as the application runs.</span></span>
-<span class="ln" id="L237">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L238">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_is_started_and_not_waited_for</span>() {</span>
-<span class="ln" id="L239">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;gui.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L240">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L241">        assert!(body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.spawn()&quot;</span>), <span class="tok-str">&quot;started&quot;</span>);</span>
-<span class="ln" id="L242">        assert!(!body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.status()&quot;</span>), <span class="tok-str">&quot;not waited for&quot;</span>);</span>
-<span class="ln" id="L243">        assert!(!body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.wait()&quot;</span>), <span class="tok-str">&quot;nor waited for after the fact&quot;</span>);</span>
-<span class="ln" id="L244">        <span class="tok-com">// And detached from this terminal&#x27;s streams.</span></span>
-<span class="ln" id="L245">        assert!(body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Stdio::null()&quot;</span>));</span>
-<span class="ln" id="L246">    }</span>
-<span class="ln" id="L247">}</span>
+<span class="ln" id="L189">    <span class="tok-kw">fn</span> <span class="tok-fn">the_search_order_starts_beside_this_program</span>() {</span>
+<span class="ln" id="L190">        <span class="tok-kw">let</span> places = <span class="tok-fn">candidates</span>();</span>
+<span class="ln" id="L191">        assert!(!places.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L192">        assert_eq!(places[<span class="tok-num">0</span>].<span class="tok-num">0</span>, <span class="tok-str">&quot;beside this program&quot;</span>);</span>
+<span class="ln" id="L193">        <span class="tok-kw">if</span> places.<span class="tok-fn">len</span>() &gt; <span class="tok-num">1</span> {</span>
+<span class="ln" id="L194">            assert_eq!(places[<span class="tok-num">1</span>].<span class="tok-num">0</span>, <span class="tok-str">&quot;where an install puts it&quot;</span>);</span>
+<span class="ln" id="L195">        }</span>
+<span class="ln" id="L196">    }</span>
+<span class="ln" id="L197"></span>
+<span class="ln" id="L198">    <span class="tok-com">/// **Never a bare name.** `PATH` on Windows searches the current directory</span></span>
+<span class="ln" id="L199">    <span class="tok-com">/// first, so `veilvoice gui` run inside a downloads folder holding</span></span>
+<span class="ln" id="L200">    <span class="tok-com">/// something called `veilvoice-gui.exe` would start that instead. This is</span></span>
+<span class="ln" id="L201">    <span class="tok-com">/// the one command whose entire job is launching another program.</span></span>
+<span class="ln" id="L202">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L203">    <span class="tok-kw">fn</span> <span class="tok-fn">the_application_is_never_started_by_a_bare_name</span>() {</span>
+<span class="ln" id="L204">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;gui.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L205">        <span class="tok-com">// Code only. The module note *quotes* the thing it does not do, and</span></span>
+<span class="ln" id="L206">        <span class="tok-com">// the first version of this test read that explanation and reported it</span></span>
+<span class="ln" id="L207">        <span class="tok-com">// as the offence. Four guards in this repository have now made the</span></span>
+<span class="ln" id="L208">        <span class="tok-com">// same mistake, which is itself worth knowing.</span></span>
+<span class="ln" id="L209">        <span class="tok-kw">let</span> body: String = source</span>
+<span class="ln" id="L210">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>)</span>
+<span class="ln" id="L211">            .<span class="tok-fn">next</span>()</span>
+<span class="ln" id="L212">            .<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L213">            .<span class="tok-fn">lines</span>()</span>
+<span class="ln" id="L214">            .<span class="tok-fn">filter</span>(|line| {</span>
+<span class="ln" id="L215">                <span class="tok-kw">let</span> trimmed = line.<span class="tok-fn">trim_start</span>();</span>
+<span class="ln" id="L216">                !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;//&quot;</span>) &amp;&amp; !trimmed.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;///&quot;</span>)</span>
+<span class="ln" id="L217">            })</span>
+<span class="ln" id="L218">            .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="ln" id="L219">            .<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L220">        assert!(</span>
+<span class="ln" id="L221">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new(gui_name())&quot;</span>),</span>
+<span class="ln" id="L222">            <span class="tok-str">&quot;a bare name resolves through the current directory on Windows&quot;</span></span>
+<span class="ln" id="L223">        );</span>
+<span class="ln" id="L224">        assert!(</span>
+<span class="ln" id="L225">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new(\&quot;veilvoice-gui\&quot;)&quot;</span>),</span>
+<span class="ln" id="L226">            <span class="tok-str">&quot;same, spelled out&quot;</span></span>
+<span class="ln" id="L227">        );</span>
+<span class="ln" id="L228">        <span class="tok-com">// What it does start is a path that was found. F-333: and finding it</span></span>
+<span class="ln" id="L229">        <span class="tok-com">// asks no other program, since `where.exe` searches the current folder</span></span>
+<span class="ln" id="L230">        <span class="tok-com">// first and `sh -c &quot;command -v&quot;` follows a relative entry.</span></span>
+<span class="ln" id="L231">        assert!(body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new(&amp;program)&quot;</span>));</span>
+<span class="ln" id="L232">        assert!(!body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;where.exe&quot;</span>), <span class="tok-str">&quot;PATH is walked, not asked&quot;</span>);</span>
+<span class="ln" id="L233">        assert!(</span>
+<span class="ln" id="L234">            !body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Command::new(\&quot;sh\&quot;)&quot;</span>),</span>
+<span class="ln" id="L235">            <span class="tok-str">&quot;PATH is walked, not asked&quot;</span></span>
+<span class="ln" id="L236">        );</span>
+<span class="ln" id="L237">    }</span>
+<span class="ln" id="L238"></span>
+<span class="ln" id="L239">    <span class="tok-com">/// A failure names every place that was tried, so somebody is not left</span></span>
+<span class="ln" id="L240">    <span class="tok-com">/// guessing where it should have been.</span></span>
+<span class="ln" id="L241">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L242">    <span class="tok-kw">fn</span> <span class="tok-fn">not_finding_it_says_where_it_looked</span>() {</span>
+<span class="ln" id="L243">        <span class="tok-com">// Reached by asking about a name nothing will have.</span></span>
+<span class="ln" id="L244">        <span class="tok-kw">let</span> places = <span class="tok-fn">candidates</span>();</span>
+<span class="ln" id="L245">        <span class="tok-kw">let</span> listed: Vec&lt;String&gt; = places</span>
+<span class="ln" id="L246">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L247">            .<span class="tok-fn">map</span>(|(what, path, _)| format!(<span class="tok-str">&quot;{what}: {}&quot;</span>, path.<span class="tok-fn">display</span>()))</span>
+<span class="ln" id="L248">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L249">        assert!(!listed.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L250">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> &amp;listed {</span>
+<span class="ln" id="L251">            assert!(line.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;:&#x27;</span>), <span class="tok-str">&quot;{line}&quot;</span>);</span>
+<span class="ln" id="L252">        }</span>
+<span class="ln" id="L253">    }</span>
+<span class="ln" id="L254"></span>
+<span class="ln" id="L255">    <span class="tok-com">/// It starts the window and returns. Waiting would hold the terminal for</span></span>
+<span class="ln" id="L256">    <span class="tok-com">/// as long as the application runs.</span></span>
+<span class="ln" id="L257">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L258">    <span class="tok-kw">fn</span> <span class="tok-fn">the_window_is_started_and_not_waited_for</span>() {</span>
+<span class="ln" id="L259">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;gui.rs&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L260">        <span class="tok-kw">let</span> body = source.<span class="tok-fn">split</span>(<span class="tok-str">&quot;#[cfg(test)]&quot;</span>).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L261">        assert!(body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.spawn()&quot;</span>), <span class="tok-str">&quot;started&quot;</span>);</span>
+<span class="ln" id="L262">        assert!(!body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.status()&quot;</span>), <span class="tok-str">&quot;not waited for&quot;</span>);</span>
+<span class="ln" id="L263">        assert!(!body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;.wait()&quot;</span>), <span class="tok-str">&quot;nor waited for after the fact&quot;</span>);</span>
+<span class="ln" id="L264">        <span class="tok-com">// And detached from this terminal&#x27;s streams.</span></span>
+<span class="ln" id="L265">        assert!(body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;Stdio::null()&quot;</span>));</span>
+<span class="ln" id="L266">    }</span>
+<span class="ln" id="L267">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

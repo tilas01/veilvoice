@@ -54,6 +54,7 @@ This page is the whole of the command line, in the program's own order, with wha
 | [`veilvoice verify`](#veilvoice-verify) | Check a download, and what does the checking | **Verify** tab |
 | [`veilvoice video`](#veilvoice-video) | Turn a veiled recording into a video with a black picture | **Browser** tab |
 | [`veilvoice import`](#veilvoice-import) | Take the sound out of a recording made somewhere else | **Anonymise file** tab |
+| [`veilvoice studio`](#veilvoice-studio) | The Recording Studio's vault: list, export or remove what it keeps | **Browser** tab |
 | [`veilvoice volumes`](#veilvoice-volumes) | Encrypted volumes this machine has: Cryptomator and VeraCrypt | command line only |
 
 ---
@@ -464,6 +465,18 @@ Pulls the audio out of a recording made somewhere else, such as anything OBS wri
 
 ```bash
 veilvoice import stream.mkv -o stream.wav
+```
+
+## `veilvoice studio`
+
+> The Recording Studio's vault: list, export or remove what it keeps
+
+The Recording Studio's vault from the command line: list what it keeps, export one recording as an ordinary WAV, or remove one. It asks for both passphrases the window asks for, checks the app lock the way the window does, and never makes a vault.
+
+**In the window:** the **Browser**, which lists, plays and exports the same vault.
+
+```bash
+veilvoice studio list
 ```
 
 ## `veilvoice volumes`

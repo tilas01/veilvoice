@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-audio/src/io.rs</code></h1>
-<p style="color:var(--muted)"><a href="io.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 608 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="io.html">what this file is for</a> &middot; <a href="../veilvoice-audio.html">veilvoice-audio</a> &middot; 610 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/io.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -432,268 +432,270 @@
 <span class="src-item" id="fn-save_wav">
 <span class="ln" id="L346"><span class="tok-com">/// Write mono `f32` audio to a 16-bit PCM WAV file.</span></span>
 <span class="ln" id="L347"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">save_wav</span>(path: &amp;Path, audio: &amp;Audio) -&gt; Result&lt;(), Error&gt; {</span>
-<span class="ln" id="L348">    std::fs::<span class="tok-fn">write</span>(path, <span class="tok-fn">wav_bytes</span>(audio)?)?;</span>
-<span class="ln" id="L349">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L350">}</span>
+<span class="ln" id="L348">    <span class="tok-com">// Replaced in one step: a WAV cut short by a crash still parses, as a</span></span>
+<span class="ln" id="L349">    <span class="tok-com">// shorter recording than the one that was asked for. **F-315.**</span></span>
+<span class="ln" id="L350">    veilvoice_crypto::privatefile::<span class="tok-fn">replace</span>(path, &amp;<span class="tok-fn">wav_bytes</span>(audio)?)?;</span>
+<span class="ln" id="L351">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L352">}</span>
 </span>
-<span class="ln" id="L351"></span>
-<span class="ln" id="L352"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L353"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L354">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L355"></span>
-<span class="ln" id="L356">    <span class="tok-kw">fn</span> <span class="tok-fn">tone</span>(sample_rate: u32, secs: f32, hz: f32) -&gt; Audio {</span>
-<span class="ln" id="L357">        <span class="tok-kw">let</span> n = (sample_rate <span class="tok-kw">as</span> f32 * secs) <span class="tok-kw">as</span> usize;</span>
-<span class="ln" id="L358">        <span class="tok-kw">let</span> samples = (<span class="tok-num">0</span>..n)</span>
-<span class="ln" id="L359">            .<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 / sample_rate <span class="tok-kw">as</span> f32 * hz * std::f32::consts::TAU).<span class="tok-fn">sin</span>() * <span class="tok-num">0.5</span>)</span>
-<span class="ln" id="L360">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L361">        Audio {</span>
-<span class="ln" id="L362">            samples,</span>
-<span class="ln" id="L363">            sample_rate,</span>
-<span class="ln" id="L364">        }</span>
-<span class="ln" id="L365">    }</span>
-<span class="ln" id="L366"></span>
-<span class="ln" id="L367">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L368">    <span class="tok-kw">fn</span> <span class="tok-fn">wav_round_trip_preserves_audio</span>() {</span>
-<span class="ln" id="L369">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L370">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tone.wav&quot;</span>);</span>
-<span class="ln" id="L371">        <span class="tok-kw">let</span> original = <span class="tok-fn">tone</span>(<span class="tok-num">48_000</span>, <span class="tok-num">0.25</span>, <span class="tok-num">440.0</span>);</span>
-<span class="ln" id="L372">        <span class="tok-fn">save_wav</span>(&amp;path, &amp;original).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L373"></span>
-<span class="ln" id="L374">        <span class="tok-kw">let</span> loaded = <span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L375">        assert_eq!(loaded.sample_rate, <span class="tok-num">48_000</span>);</span>
-<span class="ln" id="L376">        assert_eq!(loaded.samples.<span class="tok-fn">len</span>(), original.samples.<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L377">        <span class="tok-com">// 16-bit quantisation is the only permitted difference.</span></span>
-<span class="ln" id="L378">        <span class="tok-kw">let</span> worst = original</span>
-<span class="ln" id="L379">            .samples</span>
-<span class="ln" id="L380">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L381">            .<span class="tok-fn">zip</span>(&amp;loaded.samples)</span>
-<span class="ln" id="L382">            .<span class="tok-fn">fold</span>(<span class="tok-num">0</span>.0f32, |m, (a, b)| m.<span class="tok-fn">max</span>((a - b).<span class="tok-fn">abs</span>()));</span>
-<span class="ln" id="L383">        assert!(worst &lt; 1e-<span class="tok-num">3</span>, <span class="tok-str">&quot;round trip error {worst}&quot;</span>);</span>
-<span class="ln" id="L384">    }</span>
-<span class="ln" id="L385"></span>
-<span class="ln" id="L386">    <span class="tok-com">/// The in-memory encoder is what the encrypt-at-rest path uses, so it must</span></span>
-<span class="ln" id="L387">    <span class="tok-com">/// produce exactly the file the on-disk one would.</span></span>
-<span class="ln" id="L388">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L389">    <span class="tok-kw">fn</span> <span class="tok-fn">the_in_memory_encoder_matches_the_file_it_would_have_written</span>() {</span>
-<span class="ln" id="L390">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L391">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tone.wav&quot;</span>);</span>
-<span class="ln" id="L392">        <span class="tok-kw">let</span> original = <span class="tok-fn">tone</span>(<span class="tok-num">44_100</span>, <span class="tok-num">0.2</span>, <span class="tok-num">330.0</span>);</span>
-<span class="ln" id="L393"></span>
-<span class="ln" id="L394">        <span class="tok-fn">save_wav</span>(&amp;path, &amp;original).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L395">        <span class="tok-kw">let</span> on_disk = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L396">        <span class="tok-kw">let</span> in_memory = <span class="tok-fn">wav_bytes</span>(&amp;original).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L397"></span>
-<span class="ln" id="L398">        assert_eq!(&amp;in_memory[..<span class="tok-num">4</span>], b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L399">        assert_eq!(in_memory, on_disk);</span>
-<span class="ln" id="L400">    }</span>
-<span class="ln" id="L401"></span>
-<span class="ln" id="L402">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L403">    <span class="tok-kw">fn</span> <span class="tok-fn">out_of_range_samples_clamp_instead_of_wrapping</span>() {</span>
-<span class="ln" id="L404">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L405">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;hot.wav&quot;</span>);</span>
-<span class="ln" id="L406">        <span class="tok-kw">let</span> hot = Audio {</span>
-<span class="ln" id="L407">            samples: vec![<span class="tok-num">3.0</span>, -<span class="tok-num">3.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>, -<span class="tok-num">1.0</span>],</span>
-<span class="ln" id="L408">            sample_rate: <span class="tok-num">48_000</span>,</span>
-<span class="ln" id="L409">        };</span>
-<span class="ln" id="L410">        <span class="tok-fn">save_wav</span>(&amp;path, &amp;hot).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L411"></span>
-<span class="ln" id="L412">        <span class="tok-kw">let</span> loaded = <span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L413">        assert!(</span>
-<span class="ln" id="L414">            loaded.samples[<span class="tok-num">0</span>] &gt; <span class="tok-num">0.99</span>,</span>
-<span class="ln" id="L415">            <span class="tok-str">&quot;positive overshoot wrapped: {}&quot;</span>,</span>
-<span class="ln" id="L416">            loaded.samples[<span class="tok-num">0</span>]</span>
-<span class="ln" id="L417">        );</span>
-<span class="ln" id="L418">        assert!(</span>
-<span class="ln" id="L419">            loaded.samples[<span class="tok-num">1</span>] &lt; -<span class="tok-num">0.99</span>,</span>
-<span class="ln" id="L420">            <span class="tok-str">&quot;negative overshoot wrapped: {}&quot;</span>,</span>
-<span class="ln" id="L421">            loaded.samples[<span class="tok-num">1</span>]</span>
-<span class="ln" id="L422">        );</span>
-<span class="ln" id="L423">        assert!(loaded.samples.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|s| s.<span class="tok-fn">abs</span>() &lt;= <span class="tok-num">1.0</span>));</span>
-<span class="ln" id="L424">    }</span>
-<span class="ln" id="L425"></span>
-<span class="ln" id="L426">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L427">    <span class="tok-kw">fn</span> <span class="tok-fn">stereo_is_averaged_to_mono</span>() {</span>
-<span class="ln" id="L428">        <span class="tok-com">// Write a stereo WAV by hand, then check both channels contribute.</span></span>
-<span class="ln" id="L429">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L430">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;stereo.wav&quot;</span>);</span>
-<span class="ln" id="L431">        <span class="tok-kw">let</span> spec = hound::WavSpec {</span>
-<span class="ln" id="L432">            channels: <span class="tok-num">2</span>,</span>
-<span class="ln" id="L433">            sample_rate: <span class="tok-num">44_100</span>,</span>
-<span class="ln" id="L434">            bits_per_sample: <span class="tok-num">16</span>,</span>
-<span class="ln" id="L435">            sample_format: hound::SampleFormat::Int,</span>
-<span class="ln" id="L436">        };</span>
-<span class="ln" id="L437">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> w = hound::WavWriter::<span class="tok-fn">create</span>(&amp;path, spec).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L438">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">1_000</span> {</span>
-<span class="ln" id="L439">            w.<span class="tok-fn">write_sample</span>(16_000i16).<span class="tok-fn">unwrap</span>(); <span class="tok-com">// left</span></span>
-<span class="ln" id="L440">            w.<span class="tok-fn">write_sample</span>(-16_000i16).<span class="tok-fn">unwrap</span>(); <span class="tok-com">// right, cancels</span></span>
-<span class="ln" id="L441">        }</span>
-<span class="ln" id="L442">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">1_000</span> {</span>
-<span class="ln" id="L443">            w.<span class="tok-fn">write_sample</span>(16_000i16).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L444">            w.<span class="tok-fn">write_sample</span>(16_000i16).<span class="tok-fn">unwrap</span>(); <span class="tok-com">// both, survives</span></span>
-<span class="ln" id="L445">        }</span>
-<span class="ln" id="L446">        w.<span class="tok-fn">finalize</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L447"></span>
-<span class="ln" id="L448">        <span class="tok-kw">let</span> a = <span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L449">        assert_eq!(a.sample_rate, <span class="tok-num">44_100</span>);</span>
-<span class="ln" id="L450">        assert_eq!(a.samples.<span class="tok-fn">len</span>(), <span class="tok-num">2_000</span>, <span class="tok-str">&quot;one mono sample per frame&quot;</span>);</span>
-<span class="ln" id="L451">        assert!(a.samples[<span class="tok-num">10</span>].<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>, <span class="tok-str">&quot;opposed channels should cancel&quot;</span>);</span>
-<span class="ln" id="L452">        assert!(a.samples[<span class="tok-num">1_500</span>] &gt; <span class="tok-num">0.4</span>, <span class="tok-str">&quot;matched channels should survive&quot;</span>);</span>
-<span class="ln" id="L453">    }</span>
-<span class="ln" id="L454"></span>
-<span class="ln" id="L455">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L456">    <span class="tok-kw">fn</span> <span class="tok-fn">metadata_helpers_are_sane</span>() {</span>
-<span class="ln" id="L457">        <span class="tok-kw">let</span> a = <span class="tok-fn">tone</span>(<span class="tok-num">48_000</span>, <span class="tok-num">0.5</span>, <span class="tok-num">100.0</span>);</span>
-<span class="ln" id="L458">        assert!((a.<span class="tok-fn">duration_secs</span>() - <span class="tok-num">0.5</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>);</span>
-<span class="ln" id="L459">        assert!(a.<span class="tok-fn">peak</span>() &gt; <span class="tok-num">0.49</span> &amp;&amp; a.<span class="tok-fn">peak</span>() &lt;= <span class="tok-num">0.5</span>);</span>
-<span class="ln" id="L460">        assert_eq!(</span>
-<span class="ln" id="L461">            Audio {</span>
-<span class="ln" id="L462">                samples: vec![],</span>
-<span class="ln" id="L463">                sample_rate: <span class="tok-num">0</span></span>
-<span class="ln" id="L464">            }</span>
-<span class="ln" id="L465">            .<span class="tok-fn">duration_secs</span>(),</span>
-<span class="ln" id="L466">            <span class="tok-num">0.0</span></span>
-<span class="ln" id="L467">        );</span>
-<span class="ln" id="L468">    }</span>
-<span class="ln" id="L469"></span>
-<span class="ln" id="L470">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L471">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_file_is_an_io_error</span>() {</span>
-<span class="ln" id="L472">        assert!(matches!(</span>
-<span class="ln" id="L473">            <span class="tok-fn">load</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;does-not-exist.wav&quot;</span>)),</span>
-<span class="ln" id="L474">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Io</span>(_))</span>
-<span class="ln" id="L475">        ));</span>
-<span class="ln" id="L476">    }</span>
-<span class="ln" id="L477"></span>
-<span class="ln" id="L478">    <span class="tok-com">/// Build a WAV by hand so the header can say things `hound` would refuse</span></span>
-<span class="ln" id="L479">    <span class="tok-com">/// to write.</span></span>
-<span class="ln" id="L480">    <span class="tok-kw">fn</span> <span class="tok-fn">handmade_wav</span>(rate: u32, channels: u16, bits: u16) -&gt; Vec&lt;u8&gt; {</span>
-<span class="ln" id="L481">        <span class="tok-kw">let</span> data: Vec&lt;u8&gt; = (<span class="tok-num">0</span>..2_000u32)</span>
-<span class="ln" id="L482">            .<span class="tok-fn">flat_map</span>(|i| ((i <span class="tok-kw">as</span> i16).<span class="tok-fn">wrapping_mul</span>(<span class="tok-num">37</span>)).<span class="tok-fn">to_le_bytes</span>())</span>
-<span class="ln" id="L483">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L484">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fmt = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L485">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;1u16.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// PCM</span></span>
-<span class="ln" id="L486">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;channels.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L487">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;rate.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L488">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;rate.<span class="tok-fn">wrapping_mul</span>(<span class="tok-num">2</span>).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L489">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;2u16.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L490">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;bits.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L491"></span>
-<span class="ln" id="L492">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L493">        body.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;fmt &quot;</span>);</span>
-<span class="ln" id="L494">        body.<span class="tok-fn">extend_from_slice</span>(&amp;(fmt.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L495">        body.<span class="tok-fn">extend_from_slice</span>(&amp;fmt);</span>
-<span class="ln" id="L496">        body.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;data&quot;</span>);</span>
-<span class="ln" id="L497">        body.<span class="tok-fn">extend_from_slice</span>(&amp;(data.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L498">        body.<span class="tok-fn">extend_from_slice</span>(&amp;data);</span>
-<span class="ln" id="L499"></span>
-<span class="ln" id="L500">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L501">        out.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L502">        out.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
-<span class="ln" id="L503">        out.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
-<span class="ln" id="L504">        out</span>
-<span class="ln" id="L505">    }</span>
-<span class="ln" id="L506"></span>
-<span class="ln" id="L507">    <span class="tok-com">/// The regression, and the reason `preflight` exists.</span></span>
-<span class="ln" id="L508">    <span class="tok-com">///</span></span>
-<span class="ln" id="L509">    <span class="tok-com">/// A WAV declaring a sample rate of zero made `symphonia` panic inside</span></span>
-<span class="ln" id="L510">    <span class="tok-com">/// `Probe::format`, at `TimeBase::new`, before this crate saw anything it</span></span>
-<span class="ln" id="L511">    <span class="tok-com">/// could check. Under the shipped `panic = &quot;abort&quot;` profile that is the</span></span>
-<span class="ln" id="L512">    <span class="tok-com">/// process dying, not an error, so `veilvoice anonymise` on a file somebody</span></span>
-<span class="ln" id="L513">    <span class="tok-com">/// sent you was enough to kill it. If this test ever *panics* rather than</span></span>
-<span class="ln" id="L514">    <span class="tok-com">/// failing an assertion, the pre-flight has stopped running.</span></span>
-<span class="ln" id="L515">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L516">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wav_declaring_a_zero_sample_rate_is_refused_rather_than_crashing</span>() {</span>
-<span class="ln" id="L517">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;hostile.wav&quot;</span>);</span>
-<span class="ln" id="L519">        std::fs::<span class="tok-fn">write</span>(&amp;path, <span class="tok-fn">handmade_wav</span>(<span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">16</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L520"></span>
-<span class="ln" id="L521">        <span class="tok-kw">match</span> <span class="tok-fn">load</span>(&amp;path) {</span>
-<span class="ln" id="L522">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Decode</span>(m)) =&gt; assert!(</span>
-<span class="ln" id="L523">                m.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sample rate of zero&quot;</span>),</span>
-<span class="ln" id="L524">                <span class="tok-str">&quot;refused for the wrong reason: {m}&quot;</span></span>
-<span class="ln" id="L525">            ),</span>
-<span class="ln" id="L526">            other =&gt; panic!(<span class="tok-str">&quot;expected a clean refusal, got {other:?}&quot;</span>),</span>
-<span class="ln" id="L527">        }</span>
-<span class="ln" id="L528">    }</span>
-<span class="ln" id="L529"></span>
-<span class="ln" id="L530">    <span class="tok-com">/// The pre-flight must not become a second, divergent WAV parser. Values</span></span>
-<span class="ln" id="L531">    <span class="tok-com">/// `symphonia` already refuses properly are left to it, and ordinary files</span></span>
-<span class="ln" id="L532">    <span class="tok-com">/// must pass straight through.</span></span>
-<span class="ln" id="L533">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L534">    <span class="tok-kw">fn</span> <span class="tok-fn">the_preflight_passes_everything_it_is_not_for</span>() {</span>
-<span class="ln" id="L535">        <span class="tok-com">// Real headers, untouched.</span></span>
-<span class="ln" id="L536">        <span class="tok-kw">for</span> rate <span class="tok-kw">in</span> [8_000u32, <span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>, <span class="tok-num">192_000</span>] {</span>
-<span class="ln" id="L537">            assert!(<span class="tok-fn">preflight</span>(&amp;<span class="tok-fn">handmade_wav</span>(rate, <span class="tok-num">1</span>, <span class="tok-num">16</span>)).<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{rate} Hz&quot;</span>);</span>
-<span class="ln" id="L538">        }</span>
-<span class="ln" id="L539">        <span class="tok-com">// Not a WAV at all: not this function&#x27;s business.</span></span>
-<span class="ln" id="L540">        assert!(<span class="tok-fn">preflight</span>(b<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L541">        assert!(<span class="tok-fn">preflight</span>(b<span class="tok-str">&quot;\xff\xfb\x90\x00 an mp3 frame header&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L542">        assert!(<span class="tok-fn">preflight</span>(b<span class="tok-str">&quot;RIFF____AVI LIST&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L543">        <span class="tok-com">// Truncated inside the header, and a chunk size that would overflow a</span></span>
-<span class="ln" id="L544">        <span class="tok-com">// 32-bit `usize`. Neither may panic or loop.</span></span>
-<span class="ln" id="L545">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> truncated = <span class="tok-fn">handmade_wav</span>(<span class="tok-num">48_000</span>, <span class="tok-num">1</span>, <span class="tok-num">16</span>);</span>
-<span class="ln" id="L546">        <span class="tok-kw">for</span> n <span class="tok-kw">in</span> <span class="tok-num">0</span>..truncated.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">40</span>) {</span>
-<span class="ln" id="L547">            assert!(<span class="tok-fn">preflight</span>(&amp;truncated[..n]).<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;truncated at {n}&quot;</span>);</span>
-<span class="ln" id="L548">        }</span>
-<span class="ln" id="L549">        truncated[<span class="tok-num">16</span>..<span class="tok-num">20</span>].<span class="tok-fn">copy_from_slice</span>(&amp;u32::MAX.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L550">        assert!(<span class="tok-fn">preflight</span>(&amp;truncated).<span class="tok-fn">is_ok</span>());</span>
-<span class="ln" id="L551"></span>
-<span class="ln" id="L552">        <span class="tok-com">// A WAV whose `fmt ` chunk comes after another chunk still gets found.</span></span>
-<span class="ln" id="L553">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> with_junk = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
-<span class="ln" id="L554">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L555">        body.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;JUNK&quot;</span>);</span>
-<span class="ln" id="L556">        body.<span class="tok-fn">extend_from_slice</span>(&amp;4u32.<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L557">        body.<span class="tok-fn">extend_from_slice</span>(&amp;[0u8; <span class="tok-num">4</span>]);</span>
-<span class="ln" id="L558">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">handmade_wav</span>(<span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">16</span>)[<span class="tok-num">12</span>..]);</span>
-<span class="ln" id="L559">        with_junk.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
-<span class="ln" id="L560">        with_junk.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
-<span class="ln" id="L561">        with_junk.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
-<span class="ln" id="L562">        assert!(</span>
-<span class="ln" id="L563">            <span class="tok-fn">preflight</span>(&amp;with_junk).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L564">            <span class="tok-str">&quot;a zero rate behind a JUNK chunk was missed&quot;</span></span>
-<span class="ln" id="L565">        );</span>
-<span class="ln" id="L566">    }</span>
-<span class="ln" id="L567"></span>
-<span class="ln" id="L568">    <span class="tok-com">/// The decode ceiling has to sit far above anything anyone will really</span></span>
-<span class="ln" id="L569">    <span class="tok-com">/// veil, or it stops being a guard against hostile expansion and starts</span></span>
-<span class="ln" id="L570">    <span class="tok-com">/// being a limitation. Checked at compile time so it cannot drift.</span></span>
-<span class="ln" id="L571">    <span class="tok-kw">const</span> _: () = assert!(</span>
-<span class="ln" id="L572">        MAX_DECODED_SAMPLES &gt;= <span class="tok-num">48_000</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
-<span class="ln" id="L573">        <span class="tok-str">&quot;an hour at 48 kHz must fit comfortably inside the decode ceiling&quot;</span></span>
-<span class="ln" id="L574">    );</span>
-<span class="ln" id="L575"></span>
-<span class="ln" id="L576">    <span class="tok-com">/// F-280. Room the machine cannot give is an error, not an abort. Asked</span></span>
-<span class="ln" id="L577">    <span class="tok-com">/// for with a count no allocator can meet, so the test does not depend on</span></span>
-<span class="ln" id="L578">    <span class="tok-com">/// how much memory the machine running it has.</span></span>
-<span class="ln" id="L579">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L580">    <span class="tok-kw">fn</span> <span class="tok-fn">room_the_machine_cannot_give_is_an_error_not_an_abort</span>() {</span>
-<span class="ln" id="L581">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> samples = vec![<span class="tok-num">0</span>.0f32; <span class="tok-num">4</span>];</span>
-<span class="ln" id="L582">        assert!(matches!(</span>
-<span class="ln" id="L583">            <span class="tok-fn">room_for</span>(&amp;<span class="tok-kw">mut</span> samples, usize::MAX),</span>
-<span class="ln" id="L584">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Decode</span>(_))</span>
-<span class="ln" id="L585">        ));</span>
-<span class="ln" id="L586">        assert_eq!(samples.<span class="tok-fn">len</span>(), <span class="tok-num">4</span>, <span class="tok-str">&quot;the samples already decoded are kept&quot;</span>);</span>
-<span class="ln" id="L587">        <span class="tok-fn">room_for</span>(&amp;<span class="tok-kw">mut</span> samples, <span class="tok-num">1024</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;ordinary room is given&quot;</span>);</span>
-<span class="ln" id="L588">        assert!(samples.<span class="tok-fn">capacity</span>() &gt;= <span class="tok-num">4</span> + <span class="tok-num">1024</span>);</span>
-<span class="ln" id="L589">    }</span>
-<span class="ln" id="L590"></span>
-<span class="ln" id="L591">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L592">    <span class="tok-kw">fn</span> <span class="tok-fn">a_non_audio_file_is_rejected</span>() {</span>
-<span class="ln" id="L593">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L594">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;notes.txt&quot;</span>);</span>
-<span class="ln" id="L595">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;absolutely not audio&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L596">        assert!(<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L597">    }</span>
-<span class="ln" id="L598"></span>
-<span class="ln" id="L599">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L600">    <span class="tok-kw">fn</span> <span class="tok-fn">sample_rate_is_preserved_across_rates</span>() {</span>
-<span class="ln" id="L601">        <span class="tok-kw">for</span> rate <span class="tok-kw">in</span> [16_000u32, <span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>] {</span>
-<span class="ln" id="L602">            <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L603">            <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;r.wav&quot;</span>);</span>
-<span class="ln" id="L604">            <span class="tok-fn">save_wav</span>(&amp;path, &amp;<span class="tok-fn">tone</span>(rate, <span class="tok-num">0.1</span>, <span class="tok-num">220.0</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L605">            assert_eq!(<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>().sample_rate, rate);</span>
-<span class="ln" id="L606">        }</span>
-<span class="ln" id="L607">    }</span>
-<span class="ln" id="L608">}</span>
+<span class="ln" id="L353"></span>
+<span class="ln" id="L354"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L355"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L356">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L357"></span>
+<span class="ln" id="L358">    <span class="tok-kw">fn</span> <span class="tok-fn">tone</span>(sample_rate: u32, secs: f32, hz: f32) -&gt; Audio {</span>
+<span class="ln" id="L359">        <span class="tok-kw">let</span> n = (sample_rate <span class="tok-kw">as</span> f32 * secs) <span class="tok-kw">as</span> usize;</span>
+<span class="ln" id="L360">        <span class="tok-kw">let</span> samples = (<span class="tok-num">0</span>..n)</span>
+<span class="ln" id="L361">            .<span class="tok-fn">map</span>(|i| (i <span class="tok-kw">as</span> f32 / sample_rate <span class="tok-kw">as</span> f32 * hz * std::f32::consts::TAU).<span class="tok-fn">sin</span>() * <span class="tok-num">0.5</span>)</span>
+<span class="ln" id="L362">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L363">        Audio {</span>
+<span class="ln" id="L364">            samples,</span>
+<span class="ln" id="L365">            sample_rate,</span>
+<span class="ln" id="L366">        }</span>
+<span class="ln" id="L367">    }</span>
+<span class="ln" id="L368"></span>
+<span class="ln" id="L369">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L370">    <span class="tok-kw">fn</span> <span class="tok-fn">wav_round_trip_preserves_audio</span>() {</span>
+<span class="ln" id="L371">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L372">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tone.wav&quot;</span>);</span>
+<span class="ln" id="L373">        <span class="tok-kw">let</span> original = <span class="tok-fn">tone</span>(<span class="tok-num">48_000</span>, <span class="tok-num">0.25</span>, <span class="tok-num">440.0</span>);</span>
+<span class="ln" id="L374">        <span class="tok-fn">save_wav</span>(&amp;path, &amp;original).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L375"></span>
+<span class="ln" id="L376">        <span class="tok-kw">let</span> loaded = <span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L377">        assert_eq!(loaded.sample_rate, <span class="tok-num">48_000</span>);</span>
+<span class="ln" id="L378">        assert_eq!(loaded.samples.<span class="tok-fn">len</span>(), original.samples.<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L379">        <span class="tok-com">// 16-bit quantisation is the only permitted difference.</span></span>
+<span class="ln" id="L380">        <span class="tok-kw">let</span> worst = original</span>
+<span class="ln" id="L381">            .samples</span>
+<span class="ln" id="L382">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L383">            .<span class="tok-fn">zip</span>(&amp;loaded.samples)</span>
+<span class="ln" id="L384">            .<span class="tok-fn">fold</span>(<span class="tok-num">0</span>.0f32, |m, (a, b)| m.<span class="tok-fn">max</span>((a - b).<span class="tok-fn">abs</span>()));</span>
+<span class="ln" id="L385">        assert!(worst &lt; 1e-<span class="tok-num">3</span>, <span class="tok-str">&quot;round trip error {worst}&quot;</span>);</span>
+<span class="ln" id="L386">    }</span>
+<span class="ln" id="L387"></span>
+<span class="ln" id="L388">    <span class="tok-com">/// The in-memory encoder is what the encrypt-at-rest path uses, so it must</span></span>
+<span class="ln" id="L389">    <span class="tok-com">/// produce exactly the file the on-disk one would.</span></span>
+<span class="ln" id="L390">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L391">    <span class="tok-kw">fn</span> <span class="tok-fn">the_in_memory_encoder_matches_the_file_it_would_have_written</span>() {</span>
+<span class="ln" id="L392">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L393">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;tone.wav&quot;</span>);</span>
+<span class="ln" id="L394">        <span class="tok-kw">let</span> original = <span class="tok-fn">tone</span>(<span class="tok-num">44_100</span>, <span class="tok-num">0.2</span>, <span class="tok-num">330.0</span>);</span>
+<span class="ln" id="L395"></span>
+<span class="ln" id="L396">        <span class="tok-fn">save_wav</span>(&amp;path, &amp;original).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L397">        <span class="tok-kw">let</span> on_disk = std::fs::<span class="tok-fn">read</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L398">        <span class="tok-kw">let</span> in_memory = <span class="tok-fn">wav_bytes</span>(&amp;original).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L399"></span>
+<span class="ln" id="L400">        assert_eq!(&amp;in_memory[..<span class="tok-num">4</span>], b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L401">        assert_eq!(in_memory, on_disk);</span>
+<span class="ln" id="L402">    }</span>
+<span class="ln" id="L403"></span>
+<span class="ln" id="L404">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L405">    <span class="tok-kw">fn</span> <span class="tok-fn">out_of_range_samples_clamp_instead_of_wrapping</span>() {</span>
+<span class="ln" id="L406">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L407">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;hot.wav&quot;</span>);</span>
+<span class="ln" id="L408">        <span class="tok-kw">let</span> hot = Audio {</span>
+<span class="ln" id="L409">            samples: vec![<span class="tok-num">3.0</span>, -<span class="tok-num">3.0</span>, <span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>, -<span class="tok-num">1.0</span>],</span>
+<span class="ln" id="L410">            sample_rate: <span class="tok-num">48_000</span>,</span>
+<span class="ln" id="L411">        };</span>
+<span class="ln" id="L412">        <span class="tok-fn">save_wav</span>(&amp;path, &amp;hot).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L413"></span>
+<span class="ln" id="L414">        <span class="tok-kw">let</span> loaded = <span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L415">        assert!(</span>
+<span class="ln" id="L416">            loaded.samples[<span class="tok-num">0</span>] &gt; <span class="tok-num">0.99</span>,</span>
+<span class="ln" id="L417">            <span class="tok-str">&quot;positive overshoot wrapped: {}&quot;</span>,</span>
+<span class="ln" id="L418">            loaded.samples[<span class="tok-num">0</span>]</span>
+<span class="ln" id="L419">        );</span>
+<span class="ln" id="L420">        assert!(</span>
+<span class="ln" id="L421">            loaded.samples[<span class="tok-num">1</span>] &lt; -<span class="tok-num">0.99</span>,</span>
+<span class="ln" id="L422">            <span class="tok-str">&quot;negative overshoot wrapped: {}&quot;</span>,</span>
+<span class="ln" id="L423">            loaded.samples[<span class="tok-num">1</span>]</span>
+<span class="ln" id="L424">        );</span>
+<span class="ln" id="L425">        assert!(loaded.samples.<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|s| s.<span class="tok-fn">abs</span>() &lt;= <span class="tok-num">1.0</span>));</span>
+<span class="ln" id="L426">    }</span>
+<span class="ln" id="L427"></span>
+<span class="ln" id="L428">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L429">    <span class="tok-kw">fn</span> <span class="tok-fn">stereo_is_averaged_to_mono</span>() {</span>
+<span class="ln" id="L430">        <span class="tok-com">// Write a stereo WAV by hand, then check both channels contribute.</span></span>
+<span class="ln" id="L431">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L432">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;stereo.wav&quot;</span>);</span>
+<span class="ln" id="L433">        <span class="tok-kw">let</span> spec = hound::WavSpec {</span>
+<span class="ln" id="L434">            channels: <span class="tok-num">2</span>,</span>
+<span class="ln" id="L435">            sample_rate: <span class="tok-num">44_100</span>,</span>
+<span class="ln" id="L436">            bits_per_sample: <span class="tok-num">16</span>,</span>
+<span class="ln" id="L437">            sample_format: hound::SampleFormat::Int,</span>
+<span class="ln" id="L438">        };</span>
+<span class="ln" id="L439">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> w = hound::WavWriter::<span class="tok-fn">create</span>(&amp;path, spec).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L440">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">1_000</span> {</span>
+<span class="ln" id="L441">            w.<span class="tok-fn">write_sample</span>(16_000i16).<span class="tok-fn">unwrap</span>(); <span class="tok-com">// left</span></span>
+<span class="ln" id="L442">            w.<span class="tok-fn">write_sample</span>(-16_000i16).<span class="tok-fn">unwrap</span>(); <span class="tok-com">// right, cancels</span></span>
+<span class="ln" id="L443">        }</span>
+<span class="ln" id="L444">        <span class="tok-kw">for</span> _ <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">1_000</span> {</span>
+<span class="ln" id="L445">            w.<span class="tok-fn">write_sample</span>(16_000i16).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L446">            w.<span class="tok-fn">write_sample</span>(16_000i16).<span class="tok-fn">unwrap</span>(); <span class="tok-com">// both, survives</span></span>
+<span class="ln" id="L447">        }</span>
+<span class="ln" id="L448">        w.<span class="tok-fn">finalize</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L449"></span>
+<span class="ln" id="L450">        <span class="tok-kw">let</span> a = <span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L451">        assert_eq!(a.sample_rate, <span class="tok-num">44_100</span>);</span>
+<span class="ln" id="L452">        assert_eq!(a.samples.<span class="tok-fn">len</span>(), <span class="tok-num">2_000</span>, <span class="tok-str">&quot;one mono sample per frame&quot;</span>);</span>
+<span class="ln" id="L453">        assert!(a.samples[<span class="tok-num">10</span>].<span class="tok-fn">abs</span>() &lt; <span class="tok-num">0.01</span>, <span class="tok-str">&quot;opposed channels should cancel&quot;</span>);</span>
+<span class="ln" id="L454">        assert!(a.samples[<span class="tok-num">1_500</span>] &gt; <span class="tok-num">0.4</span>, <span class="tok-str">&quot;matched channels should survive&quot;</span>);</span>
+<span class="ln" id="L455">    }</span>
+<span class="ln" id="L456"></span>
+<span class="ln" id="L457">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L458">    <span class="tok-kw">fn</span> <span class="tok-fn">metadata_helpers_are_sane</span>() {</span>
+<span class="ln" id="L459">        <span class="tok-kw">let</span> a = <span class="tok-fn">tone</span>(<span class="tok-num">48_000</span>, <span class="tok-num">0.5</span>, <span class="tok-num">100.0</span>);</span>
+<span class="ln" id="L460">        assert!((a.<span class="tok-fn">duration_secs</span>() - <span class="tok-num">0.5</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">6</span>);</span>
+<span class="ln" id="L461">        assert!(a.<span class="tok-fn">peak</span>() &gt; <span class="tok-num">0.49</span> &amp;&amp; a.<span class="tok-fn">peak</span>() &lt;= <span class="tok-num">0.5</span>);</span>
+<span class="ln" id="L462">        assert_eq!(</span>
+<span class="ln" id="L463">            Audio {</span>
+<span class="ln" id="L464">                samples: vec![],</span>
+<span class="ln" id="L465">                sample_rate: <span class="tok-num">0</span></span>
+<span class="ln" id="L466">            }</span>
+<span class="ln" id="L467">            .<span class="tok-fn">duration_secs</span>(),</span>
+<span class="ln" id="L468">            <span class="tok-num">0.0</span></span>
+<span class="ln" id="L469">        );</span>
+<span class="ln" id="L470">    }</span>
+<span class="ln" id="L471"></span>
+<span class="ln" id="L472">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L473">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_file_is_an_io_error</span>() {</span>
+<span class="ln" id="L474">        assert!(matches!(</span>
+<span class="ln" id="L475">            <span class="tok-fn">load</span>(Path::<span class="tok-fn">new</span>(<span class="tok-str">&quot;does-not-exist.wav&quot;</span>)),</span>
+<span class="ln" id="L476">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Io</span>(_))</span>
+<span class="ln" id="L477">        ));</span>
+<span class="ln" id="L478">    }</span>
+<span class="ln" id="L479"></span>
+<span class="ln" id="L480">    <span class="tok-com">/// Build a WAV by hand so the header can say things `hound` would refuse</span></span>
+<span class="ln" id="L481">    <span class="tok-com">/// to write.</span></span>
+<span class="ln" id="L482">    <span class="tok-kw">fn</span> <span class="tok-fn">handmade_wav</span>(rate: u32, channels: u16, bits: u16) -&gt; Vec&lt;u8&gt; {</span>
+<span class="ln" id="L483">        <span class="tok-kw">let</span> data: Vec&lt;u8&gt; = (<span class="tok-num">0</span>..2_000u32)</span>
+<span class="ln" id="L484">            .<span class="tok-fn">flat_map</span>(|i| ((i <span class="tok-kw">as</span> i16).<span class="tok-fn">wrapping_mul</span>(<span class="tok-num">37</span>)).<span class="tok-fn">to_le_bytes</span>())</span>
+<span class="ln" id="L485">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L486">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> fmt = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L487">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;1u16.<span class="tok-fn">to_le_bytes</span>()); <span class="tok-com">// PCM</span></span>
+<span class="ln" id="L488">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;channels.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L489">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;rate.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L490">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;rate.<span class="tok-fn">wrapping_mul</span>(<span class="tok-num">2</span>).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L491">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;2u16.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L492">        fmt.<span class="tok-fn">extend_from_slice</span>(&amp;bits.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L493"></span>
+<span class="ln" id="L494">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L495">        body.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;fmt &quot;</span>);</span>
+<span class="ln" id="L496">        body.<span class="tok-fn">extend_from_slice</span>(&amp;(fmt.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L497">        body.<span class="tok-fn">extend_from_slice</span>(&amp;fmt);</span>
+<span class="ln" id="L498">        body.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;data&quot;</span>);</span>
+<span class="ln" id="L499">        body.<span class="tok-fn">extend_from_slice</span>(&amp;(data.<span class="tok-fn">len</span>() <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L500">        body.<span class="tok-fn">extend_from_slice</span>(&amp;data);</span>
+<span class="ln" id="L501"></span>
+<span class="ln" id="L502">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> out = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L503">        out.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L504">        out.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
+<span class="ln" id="L505">        out.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
+<span class="ln" id="L506">        out</span>
+<span class="ln" id="L507">    }</span>
+<span class="ln" id="L508"></span>
+<span class="ln" id="L509">    <span class="tok-com">/// The regression, and the reason `preflight` exists.</span></span>
+<span class="ln" id="L510">    <span class="tok-com">///</span></span>
+<span class="ln" id="L511">    <span class="tok-com">/// A WAV declaring a sample rate of zero made `symphonia` panic inside</span></span>
+<span class="ln" id="L512">    <span class="tok-com">/// `Probe::format`, at `TimeBase::new`, before this crate saw anything it</span></span>
+<span class="ln" id="L513">    <span class="tok-com">/// could check. Under the shipped `panic = &quot;abort&quot;` profile that is the</span></span>
+<span class="ln" id="L514">    <span class="tok-com">/// process dying, not an error, so `veilvoice anonymise` on a file somebody</span></span>
+<span class="ln" id="L515">    <span class="tok-com">/// sent you was enough to kill it. If this test ever *panics* rather than</span></span>
+<span class="ln" id="L516">    <span class="tok-com">/// failing an assertion, the pre-flight has stopped running.</span></span>
+<span class="ln" id="L517">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L518">    <span class="tok-kw">fn</span> <span class="tok-fn">a_wav_declaring_a_zero_sample_rate_is_refused_rather_than_crashing</span>() {</span>
+<span class="ln" id="L519">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L520">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;hostile.wav&quot;</span>);</span>
+<span class="ln" id="L521">        std::fs::<span class="tok-fn">write</span>(&amp;path, <span class="tok-fn">handmade_wav</span>(<span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">16</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L522"></span>
+<span class="ln" id="L523">        <span class="tok-kw">match</span> <span class="tok-fn">load</span>(&amp;path) {</span>
+<span class="ln" id="L524">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Decode</span>(m)) =&gt; assert!(</span>
+<span class="ln" id="L525">                m.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;sample rate of zero&quot;</span>),</span>
+<span class="ln" id="L526">                <span class="tok-str">&quot;refused for the wrong reason: {m}&quot;</span></span>
+<span class="ln" id="L527">            ),</span>
+<span class="ln" id="L528">            other =&gt; panic!(<span class="tok-str">&quot;expected a clean refusal, got {other:?}&quot;</span>),</span>
+<span class="ln" id="L529">        }</span>
+<span class="ln" id="L530">    }</span>
+<span class="ln" id="L531"></span>
+<span class="ln" id="L532">    <span class="tok-com">/// The pre-flight must not become a second, divergent WAV parser. Values</span></span>
+<span class="ln" id="L533">    <span class="tok-com">/// `symphonia` already refuses properly are left to it, and ordinary files</span></span>
+<span class="ln" id="L534">    <span class="tok-com">/// must pass straight through.</span></span>
+<span class="ln" id="L535">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L536">    <span class="tok-kw">fn</span> <span class="tok-fn">the_preflight_passes_everything_it_is_not_for</span>() {</span>
+<span class="ln" id="L537">        <span class="tok-com">// Real headers, untouched.</span></span>
+<span class="ln" id="L538">        <span class="tok-kw">for</span> rate <span class="tok-kw">in</span> [8_000u32, <span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>, <span class="tok-num">192_000</span>] {</span>
+<span class="ln" id="L539">            assert!(<span class="tok-fn">preflight</span>(&amp;<span class="tok-fn">handmade_wav</span>(rate, <span class="tok-num">1</span>, <span class="tok-num">16</span>)).<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;{rate} Hz&quot;</span>);</span>
+<span class="ln" id="L540">        }</span>
+<span class="ln" id="L541">        <span class="tok-com">// Not a WAV at all: not this function&#x27;s business.</span></span>
+<span class="ln" id="L542">        assert!(<span class="tok-fn">preflight</span>(b<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L543">        assert!(<span class="tok-fn">preflight</span>(b<span class="tok-str">&quot;\xff\xfb\x90\x00 an mp3 frame header&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L544">        assert!(<span class="tok-fn">preflight</span>(b<span class="tok-str">&quot;RIFF____AVI LIST&quot;</span>).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L545">        <span class="tok-com">// Truncated inside the header, and a chunk size that would overflow a</span></span>
+<span class="ln" id="L546">        <span class="tok-com">// 32-bit `usize`. Neither may panic or loop.</span></span>
+<span class="ln" id="L547">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> truncated = <span class="tok-fn">handmade_wav</span>(<span class="tok-num">48_000</span>, <span class="tok-num">1</span>, <span class="tok-num">16</span>);</span>
+<span class="ln" id="L548">        <span class="tok-kw">for</span> n <span class="tok-kw">in</span> <span class="tok-num">0</span>..truncated.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(<span class="tok-num">40</span>) {</span>
+<span class="ln" id="L549">            assert!(<span class="tok-fn">preflight</span>(&amp;truncated[..n]).<span class="tok-fn">is_ok</span>(), <span class="tok-str">&quot;truncated at {n}&quot;</span>);</span>
+<span class="ln" id="L550">        }</span>
+<span class="ln" id="L551">        truncated[<span class="tok-num">16</span>..<span class="tok-num">20</span>].<span class="tok-fn">copy_from_slice</span>(&amp;u32::MAX.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L552">        assert!(<span class="tok-fn">preflight</span>(&amp;truncated).<span class="tok-fn">is_ok</span>());</span>
+<span class="ln" id="L553"></span>
+<span class="ln" id="L554">        <span class="tok-com">// A WAV whose `fmt ` chunk comes after another chunk still gets found.</span></span>
+<span class="ln" id="L555">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> with_junk = Vec::<span class="tok-fn">from</span>(*b<span class="tok-str">&quot;RIFF&quot;</span>);</span>
+<span class="ln" id="L556">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> body = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L557">        body.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;JUNK&quot;</span>);</span>
+<span class="ln" id="L558">        body.<span class="tok-fn">extend_from_slice</span>(&amp;4u32.<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L559">        body.<span class="tok-fn">extend_from_slice</span>(&amp;[0u8; <span class="tok-num">4</span>]);</span>
+<span class="ln" id="L560">        body.<span class="tok-fn">extend_from_slice</span>(&amp;<span class="tok-fn">handmade_wav</span>(<span class="tok-num">0</span>, <span class="tok-num">1</span>, <span class="tok-num">16</span>)[<span class="tok-num">12</span>..]);</span>
+<span class="ln" id="L561">        with_junk.<span class="tok-fn">extend_from_slice</span>(&amp;((body.<span class="tok-fn">len</span>() + <span class="tok-num">4</span>) <span class="tok-kw">as</span> u32).<span class="tok-fn">to_le_bytes</span>());</span>
+<span class="ln" id="L562">        with_junk.<span class="tok-fn">extend_from_slice</span>(b<span class="tok-str">&quot;WAVE&quot;</span>);</span>
+<span class="ln" id="L563">        with_junk.<span class="tok-fn">extend_from_slice</span>(&amp;body);</span>
+<span class="ln" id="L564">        assert!(</span>
+<span class="ln" id="L565">            <span class="tok-fn">preflight</span>(&amp;with_junk).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L566">            <span class="tok-str">&quot;a zero rate behind a JUNK chunk was missed&quot;</span></span>
+<span class="ln" id="L567">        );</span>
+<span class="ln" id="L568">    }</span>
+<span class="ln" id="L569"></span>
+<span class="ln" id="L570">    <span class="tok-com">/// The decode ceiling has to sit far above anything anyone will really</span></span>
+<span class="ln" id="L571">    <span class="tok-com">/// veil, or it stops being a guard against hostile expansion and starts</span></span>
+<span class="ln" id="L572">    <span class="tok-com">/// being a limitation. Checked at compile time so it cannot drift.</span></span>
+<span class="ln" id="L573">    <span class="tok-kw">const</span> _: () = assert!(</span>
+<span class="ln" id="L574">        MAX_DECODED_SAMPLES &gt;= <span class="tok-num">48_000</span> * <span class="tok-num">60</span> * <span class="tok-num">60</span>,</span>
+<span class="ln" id="L575">        <span class="tok-str">&quot;an hour at 48 kHz must fit comfortably inside the decode ceiling&quot;</span></span>
+<span class="ln" id="L576">    );</span>
+<span class="ln" id="L577"></span>
+<span class="ln" id="L578">    <span class="tok-com">/// F-280. Room the machine cannot give is an error, not an abort. Asked</span></span>
+<span class="ln" id="L579">    <span class="tok-com">/// for with a count no allocator can meet, so the test does not depend on</span></span>
+<span class="ln" id="L580">    <span class="tok-com">/// how much memory the machine running it has.</span></span>
+<span class="ln" id="L581">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L582">    <span class="tok-kw">fn</span> <span class="tok-fn">room_the_machine_cannot_give_is_an_error_not_an_abort</span>() {</span>
+<span class="ln" id="L583">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> samples = vec![<span class="tok-num">0</span>.0f32; <span class="tok-num">4</span>];</span>
+<span class="ln" id="L584">        assert!(matches!(</span>
+<span class="ln" id="L585">            <span class="tok-fn">room_for</span>(&amp;<span class="tok-kw">mut</span> samples, usize::MAX),</span>
+<span class="ln" id="L586">            <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Decode</span>(_))</span>
+<span class="ln" id="L587">        ));</span>
+<span class="ln" id="L588">        assert_eq!(samples.<span class="tok-fn">len</span>(), <span class="tok-num">4</span>, <span class="tok-str">&quot;the samples already decoded are kept&quot;</span>);</span>
+<span class="ln" id="L589">        <span class="tok-fn">room_for</span>(&amp;<span class="tok-kw">mut</span> samples, <span class="tok-num">1024</span>).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;ordinary room is given&quot;</span>);</span>
+<span class="ln" id="L590">        assert!(samples.<span class="tok-fn">capacity</span>() &gt;= <span class="tok-num">4</span> + <span class="tok-num">1024</span>);</span>
+<span class="ln" id="L591">    }</span>
+<span class="ln" id="L592"></span>
+<span class="ln" id="L593">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L594">    <span class="tok-kw">fn</span> <span class="tok-fn">a_non_audio_file_is_rejected</span>() {</span>
+<span class="ln" id="L595">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L596">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;notes.txt&quot;</span>);</span>
+<span class="ln" id="L597">        std::fs::<span class="tok-fn">write</span>(&amp;path, b<span class="tok-str">&quot;absolutely not audio&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L598">        assert!(<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L599">    }</span>
+<span class="ln" id="L600"></span>
+<span class="ln" id="L601">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L602">    <span class="tok-kw">fn</span> <span class="tok-fn">sample_rate_is_preserved_across_rates</span>() {</span>
+<span class="ln" id="L603">        <span class="tok-kw">for</span> rate <span class="tok-kw">in</span> [16_000u32, <span class="tok-num">44_100</span>, <span class="tok-num">48_000</span>] {</span>
+<span class="ln" id="L604">            <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L605">            <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;r.wav&quot;</span>);</span>
+<span class="ln" id="L606">            <span class="tok-fn">save_wav</span>(&amp;path, &amp;<span class="tok-fn">tone</span>(rate, <span class="tok-num">0.1</span>, <span class="tok-num">220.0</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L607">            assert_eq!(<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>().sample_rate, rate);</span>
+<span class="ln" id="L608">        }</span>
+<span class="ln" id="L609">    }</span>
+<span class="ln" id="L610">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

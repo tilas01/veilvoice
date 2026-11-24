@@ -265,14 +265,21 @@ fn on_path(tool: Tool) -> Option<String> {
         Tool::Cryptomator => "cryptomator",
         Tool::VeraCrypt => "veracrypt",
     };
-    let path = std::env::var_os("PATH")?;
-    for dir in std::env::split_paths(&path) {
-        let candidate = dir.join(name);
-        if candidate.try_exists().unwrap_or(false) {
-            return Some(candidate.display().to_string());
-        }
-    }
-    None
+    find_in(&std::env::var_os("PATH")?, name)
+}
+
+/// `name` in the first absolute entry of `path`, a `PATH` value, that has it.
+///
+/// A relative entry, including the empty one a stray `::` leaves, means the
+/// current folder: wherever this happened to be started. A program planted in
+/// a downloads folder would be found there before the real one, so those
+/// entries are skipped. Shells accept them; this does not.
+fn find_in(path: &std::ffi::OsStr, name: &str) -> Option<String> {
+    std::env::split_paths(path)
+        .filter(|dir| dir.is_absolute())
+        .map(|dir| dir.join(name))
+        .find(|candidate| candidate.try_exists().unwrap_or(false))
+        .map(|candidate| candidate.display().to_string())
 }
 
 /// Every mounted volume either tool is currently offering.
@@ -365,23 +372,39 @@ fn recognise(source: &str, target: &str) -> Option<Tool> {
 }
 
 /// Undo the octal escaping `/proc/mounts` applies to a path.
+///
+/// **F-324.** Worked on bytes and decoded once at the end. It used to push each
+/// byte as a `char`, which reads UTF-8 as Latin-1: a volume mounted at
+/// `/media/ryder/Clé` came out with its é as two Latin-1 characters, a path
+/// that does not exist, so the volume was never found.
 fn unescape_mount(raw: &str) -> String {
     let bytes = raw.as_bytes();
-    let mut out = String::with_capacity(raw.len());
+    let mut out = Vec::with_capacity(bytes.len());
     let mut i = 0;
     while i < bytes.len() {
-        if bytes[i] == b'\\' && i + 3 < bytes.len() {
-            let digits = &raw[i + 1..i + 4];
-            if let Ok(value) = u8::from_str_radix(digits, 8) {
-                out.push(value as char);
+        if bytes[i] == b'\\' {
+            if let Some(value) = bytes.get(i + 1..i + 4).and_then(octal) {
+                out.push(value);
                 i += 4;
                 continue;
             }
         }
-        out.push(bytes[i] as char);
+        out.push(bytes[i]);
         i += 1;
     }
-    out
+    String::from_utf8_lossy(&out).into_owned()
+}
+
+/// Three octal digits as the byte they spell, the way `/proc/mounts` writes a
+/// space, a tab, a line break or a backslash.
+fn octal(digits: &[u8]) -> Option<u8> {
+    if digits.len() != 3 || !digits.iter().all(|d| (b'0'..=b'7').contains(d)) {
+        return None;
+    }
+    let value = digits
+        .iter()
+        .fold(0u16, |value, d| value * 8 + u16::from(d - b'0'));
+    u8::try_from(value).ok()
 }
 
 /// Volumes found by looking in the directories each platform mounts into.
@@ -415,6 +438,33 @@ fn from_mount_directories() -> Vec<Volume> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-312.** A relative `PATH` entry is the folder this was started from,
+    /// so a program planted there is never the one found.
+    #[cfg(unix)]
+    #[test]
+    fn a_relative_path_entry_is_never_searched() {
+        let dir =
+            std::env::temp_dir().join(format!("veilvoice-path-{}-volumes", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let program = dir.join("veracrypt");
+        std::fs::write(&program, b"").unwrap();
+        let mut relative = std::path::PathBuf::new();
+        for _ in std::env::current_dir().unwrap().components().skip(1) {
+            relative.push("..");
+        }
+        let relative = relative.join(dir.strip_prefix("/").unwrap());
+        assert!(
+            relative.join("veracrypt").is_file(),
+            "the test's own path is wrong"
+        );
+        assert_eq!(find_in(relative.as_os_str(), "veracrypt"), None);
+        assert_eq!(
+            find_in(dir.as_os_str(), "veracrypt"),
+            Some(program.display().to_string())
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 
     const SAMPLE: &str = "\
 proc /proc proc rw,nosuid 0 0
@@ -455,6 +505,18 @@ tmpfs /run/user/1000 tmpfs rw,nosuid 0 0
             "/media/holiday photos"
         );
         assert_eq!(unescape_mount("/media/plain"), "/media/plain");
+        // F-324: a name that is not ASCII comes through as itself.
+        assert_eq!(
+            unescape_mount("/media/ryder/Cl\u{e9}"),
+            "/media/ryder/Cl\u{e9}"
+        );
+        assert_eq!(
+            unescape_mount("/media/ryder/Cl\u{e9}\\040s"),
+            "/media/ryder/Cl\u{e9} s"
+        );
+        // Not three octal digits, so not an escape: kept as written.
+        assert_eq!(unescape_mount("/media/a\\9z"), "/media/a\\9z");
+        assert_eq!(unescape_mount("/media/a\\4"), "/media/a\\4");
     }
 
     /// The whole point of `Hidden`. A found volume starts unanswered, and an

@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/update.svg" alt="update.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/update.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1650 lines &middot; <a href="update.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 1651 lines &middot; <a href="update.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-stance-this-changes-and-the-sentence-that-survives-it">The stance this changes, and the sentence that survives it</a>
@@ -116,7 +116,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1650 lines defining <strong>22 functions</strong> (7 public), <strong>5 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1651 lines defining <strong>22 functions</strong> (7 public), <strong>5 types</strong> and <strong>2 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Error</code> <span style="color:var(--muted)">line 216</span> &middot; Everything that can stop an update, in the words the reader is given.</li>
 <li><code>struct Offer</code> <span style="color:var(--muted)">line 281</span> &middot; A newer release, and the file to fetch for it.</li>
@@ -131,7 +131,7 @@
 <li><code>perform</code> <span style="color:var(--muted)">line 454</span> &middot; The whole update, in the one order that is safe.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>check_password</code>, <code>installation</code>, <code>lock_is_set</code>, <code>update_within</code>, <code>workspace</code>, <code>check_password_in</code>, <code>lock_in</code>, <code>open_archive</code>, <code>proved_contents</code>, <code>put_in_place</code>, <code>retake_record</code>, <code>extract</code></span>
 </li>
-<li><code>relaunch</code> <span style="color:var(--muted)">line 991</span> &middot; Start the updated program and return.
+<li><code>relaunch</code> <span style="color:var(--muted)">line 992</span> &middot; Start the updated program and return.
 </li>
 </ul>
 </section>
@@ -275,7 +275,7 @@
 <a href="update.src.html#fn-relaunch">
 <rect x="464.1" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="510.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">relaunch</text>
-<text x="510.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 991</text>
+<text x="510.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 992</text>
 </a>
 <rect x="20.0" y="704.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="713.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -315,7 +315,7 @@ flowchart TD
     n_replaced_so_far[&quot;replaced_so_far&lt;br/&gt;line 899&quot;]
     n_retake_record[&quot;retake_record&lt;br/&gt;line 916&quot;]
     n_write_beside[&quot;write_beside&lt;br/&gt;line 976&quot;]
-    n_relaunch([&quot;relaunch&lt;br/&gt;line 991&quot;])
+    n_relaunch([&quot;relaunch&lt;br/&gt;line 992&quot;])
     n_check_password --&gt; n_check_password_in
     n_check_password_in --&gt; n_lock_in
     n_extract --&gt; n_tar_program
@@ -356,7 +356,7 @@ flowchart TD
     click n_replaced_so_far href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L899&quot; &quot;open the source&quot;
     click n_retake_record href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L916&quot; &quot;open the source&quot;
     click n_write_beside href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L976&quot; &quot;open the source&quot;
-    click n_relaunch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L991&quot; &quot;open the source&quot;
+    click n_relaunch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L992&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_offered,n_perform,n_relaunch entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -406,7 +406,7 @@ flowchart TD
 <tr><td><code>replaced_so_far</code> <sub>fn</sub></td><td><a href="update.src.html#fn-replaced_so_far">899</a></td><td>Say what an update had already put in place when it stopped.</td></tr>
 <tr><td><code>retake_record</code> <sub>fn</sub></td><td><a href="update.src.html#fn-retake_record">916</a></td><td>Re-take the integrity record over the files that were just replaced.</td></tr>
 <tr><td><code>write_beside</code> <sub>fn</sub></td><td><a href="update.src.html#fn-write_beside">976</a></td><td>Write the sealed record, owner-readable, making its directory if needed.</td></tr>
-<tr><td><code>relaunch</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-relaunch">991</a></td><td>Start the updated program and return.</td></tr>
+<tr><td><code>relaunch</code> <sub>pub fn</sub></td><td><a href="update.src.html#fn-relaunch">992</a></td><td>Start the updated program and return.</td></tr>
 </tbody></table>
 </section>
 </div></div>

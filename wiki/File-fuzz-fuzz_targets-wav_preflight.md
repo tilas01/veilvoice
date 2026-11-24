@@ -3,7 +3,7 @@
 
 # `fuzz/fuzz_targets/wav_preflight.rs`
 
-[[fuzz|Crate-fuzz]] &middot; 35 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/wav_preflight.rs)
+[fuzz](Crate-fuzz) &middot; 35 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/wav_preflight.rs)
 
 ## Contents
 

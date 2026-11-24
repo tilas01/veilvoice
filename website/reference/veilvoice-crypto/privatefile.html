@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/privatefile.svg" alt="privatefile.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/privatefile.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 313 lines &middot; <a href="privatefile.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 411 lines &middot; <a href="privatefile.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-this-is-not-stdfswrite-plus-a-chmod">Why this is not std::fs::write plus a chmod</a>
@@ -77,6 +77,7 @@
 <div>
 <section id="s-about">
 <p>Writing a file that only its owner can read.</p>
+<p>It also holds <code>replace</code>, the same all-or-nothing replacement for a file that is not secret, so the workspace has one way of doing that and not two.</p>
 <p>Returns <code>std::io::Result</code> rather than this crate&#x27;s <code>Error</code>(crate::Error), which is <code>Copy</code> and therefore cannot carry the underlying reason. A caller reporting &quot;could not write the key&quot; is far more useful when it can say why.</p>
 <h2 id="why-this-is-not-stdfswrite-plus-a-chmod">Why this is not <code>std::fs::write</code> plus a <code>chmod</code></h2>
 <p><code>std::fs::write</code> creates the file with the process umask, which on almost every Unix system means <code>0644</code> -- world readable. Tightening it afterwards with <code>set_permissions</code> leaves a window, however short, in which any other local user can open the file and read all of it. For a file that exists <em>because</em> its contents are sensitive, that window has no reason to exist: <code>OpenOptions::mode</code> applies the permission at the moment of creation, before any byte is written.</p>
@@ -91,25 +92,31 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>313 lines defining <strong>5 functions</strong> (4 public), <strong>0 types</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>411 lines defining <strong>8 functions</strong> (5 public), <strong>1 type</strong> and <strong>0 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p><strong>The types it owns.</strong></p><ul>
+<li><code>enum Access</code> <span style="color:var(--muted)">line 161</span> &middot; Who may read a file this module writes.</li>
+</ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>write_owner_only</code> <span style="color:var(--muted)">line 56</span> &middot; Create path containing bytes, readable only by the current user.
+<li><code>write_owner_only</code> <span style="color:var(--muted)">line 59</span> &middot; Create path containing bytes, readable only by the current user.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>write_inner</code></span>
 </li>
-<li><code>write_owner_only_new</code> <span style="color:var(--muted)">line 67</span> &middot; As write_owner_only, but fail if anything is already at path.
+<li><code>write_owner_only_new</code> <span style="color:var(--muted)">line 70</span> &middot; As write_owner_only, but fail if anything is already at path.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>write_inner</code></span>
 </li>
-<li><code>replace_owner_only</code> <span style="color:var(--muted)">line 86</span> &middot; Replace path with bytes in one step, or leave what was there.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>write_inner</code></span>
+<li><code>replace_owner_only</code> <span style="color:var(--muted)">line 94</span> &middot; Replace path with bytes in one step, or leave what was there.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>replace_inner</code>, <code>sync_folder</code>, <code>write_inner</code></span>
 </li>
-<li><code>tighten</code> <span style="color:var(--muted)">line 130</span> &middot; Make an existing file readable only by its owner.
+<li><code>replace</code> <span style="color:var(--muted)">line 104</span> &middot; As replace_owner_only, for a file anybody on the machine may read.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>replace_inner</code>, <code>sync_folder</code>, <code>write_inner</code></span>
+</li>
+<li><code>tighten</code> <span style="color:var(--muted)">line 188</span> &middot; Make an existing file readable only by its owner.
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 611 415" width="611" height="415" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 611 515" width="611" height="515" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -118,67 +125,94 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="611" height="415" fill="var(--bg-inset, #16161e)" rx="8"/>
+<rect x="0" y="0" width="611" height="515" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M246.4 174.0 C 246.4 194.0, 305.6 200.0, 305.6 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M305.6 274.0 C 305.6 294.0, 234.3 300.0, 234.3 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M305.6 274.0 C 305.6 294.0, 376.9 300.0, 376.9 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <path d="M504.7 74.0 C 504.7 94.0, 305.6 200.0, 305.6 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M98.5 74.0 C 98.5 94.0, 305.6 200.0, 305.6 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M297.6 74.0 C 297.6 94.0, 305.6 200.0, 305.6 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M98.5 74.0 C 98.5 94.0, 376.9 300.0, 376.9 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M297.6 74.0 C 297.6 94.0, 376.9 300.0, 376.9 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <a href="privatefile.src.html#fn-write_owner_only">
 <rect x="20.0" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="98.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_owner_only</text>
-<text x="98.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 56</text>
+<text x="98.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 59</text>
 </a>
 <a href="privatefile.src.html#fn-write_owner_only_new">
 <rect x="203.0" y="20.0" width="189.2" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="297.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_owner_only_new</text>
-<text x="297.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 67</text>
+<text x="297.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 70</text>
 </a>
 <a href="privatefile.src.html#fn-replace_owner_only">
 <rect x="418.2" y="20.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="504.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">replace_owner_only</text>
-<text x="504.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 86</text>
+<text x="504.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 94</text>
+</a>
+<a href="privatefile.src.html#fn-replace">
+<rect x="200.1" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="246.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">replace</text>
+<text x="246.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 104</text>
+</a>
+<a href="privatefile.src.html#fn-replace_inner">
+<rect x="239.2" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="305.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">replace_inner</text>
+<text x="305.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 110</text>
+</a>
+<a href="privatefile.src.html#fn-sync_folder">
+<rect x="176.0" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="234.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">sync_folder</text>
+<text x="234.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 150</text>
 </a>
 <a href="privatefile.src.html#fn-tighten">
-<rect x="259.4" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="305.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tighten</text>
-<text x="305.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 130</text>
+<rect x="318.6" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="364.9" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">tighten</text>
+<text x="364.9" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 188</text>
 </a>
 <a href="privatefile.src.html#fn-write_inner">
-<rect x="247.3" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="305.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_inner</text>
-<text x="305.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 148</text>
+<rect x="318.6" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="376.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">write_inner</text>
+<text x="376.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 210</text>
 </a>
-<rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="320.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="329.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 340.5 L29.0 340.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="345.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="367.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="382.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="397.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
+<rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="420.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="429.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 440.5 L29.0 440.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="445.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="467.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="482.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="497.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_write_owner_only([&quot;write_owner_only&lt;br/&gt;line 56&quot;])
-    n_write_owner_only_new([&quot;write_owner_only_new&lt;br/&gt;line 67&quot;])
-    n_replace_owner_only([&quot;replace_owner_only&lt;br/&gt;line 86&quot;])
-    n_tighten([&quot;tighten&lt;br/&gt;line 130&quot;])
-    n_write_inner[&quot;write_inner&lt;br/&gt;line 148&quot;]
-    n_replace_owner_only --&gt; n_write_inner
+    n_write_owner_only([&quot;write_owner_only&lt;br/&gt;line 59&quot;])
+    n_write_owner_only_new([&quot;write_owner_only_new&lt;br/&gt;line 70&quot;])
+    n_replace_owner_only([&quot;replace_owner_only&lt;br/&gt;line 94&quot;])
+    n_replace([&quot;replace&lt;br/&gt;line 104&quot;])
+    n_replace_inner[&quot;replace_inner&lt;br/&gt;line 110&quot;]
+    n_sync_folder[&quot;sync_folder&lt;br/&gt;line 150&quot;]
+    n_tighten([&quot;tighten&lt;br/&gt;line 188&quot;])
+    n_write_inner[&quot;write_inner&lt;br/&gt;line 210&quot;]
+    n_replace --&gt; n_replace_inner
+    n_replace_inner --&gt; n_sync_folder
+    n_replace_inner --&gt; n_write_inner
+    n_replace_owner_only --&gt; n_replace_inner
     n_write_owner_only --&gt; n_write_inner
     n_write_owner_only_new --&gt; n_write_inner
-    click n_write_owner_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L56&quot; &quot;open the source&quot;
-    click n_write_owner_only_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L67&quot; &quot;open the source&quot;
-    click n_replace_owner_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L86&quot; &quot;open the source&quot;
-    click n_tighten href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L130&quot; &quot;open the source&quot;
-    click n_write_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L148&quot; &quot;open the source&quot;
+    click n_write_owner_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L59&quot; &quot;open the source&quot;
+    click n_write_owner_only_new href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L70&quot; &quot;open the source&quot;
+    click n_replace_owner_only href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L94&quot; &quot;open the source&quot;
+    click n_replace href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L104&quot; &quot;open the source&quot;
+    click n_replace_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L110&quot; &quot;open the source&quot;
+    click n_sync_folder href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L150&quot; &quot;open the source&quot;
+    click n_tighten href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L188&quot; &quot;open the source&quot;
+    click n_write_inner href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/privatefile.rs#L210&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_write_owner_only,n_write_owner_only_new,n_replace_owner_only,n_tighten entry
+    class n_write_owner_only,n_write_owner_only_new,n_replace_owner_only,n_replace,n_tighten entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_write_inner helper
+    class n_replace_inner,n_sync_folder,n_write_inner helper
     subgraph chart_key [&quot;Key&quot;]
         direction LR
         key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
@@ -192,11 +226,15 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>write_owner_only</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-write_owner_only">56</a></td><td>Create path containing bytes, readable only by the current user.</td></tr>
-<tr><td><code>write_owner_only_new</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-write_owner_only_new">67</a></td><td>As write_owner_only, but fail if anything is already at path.</td></tr>
-<tr><td><code>replace_owner_only</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-replace_owner_only">86</a></td><td>Replace path with bytes in one step, or leave what was there.</td></tr>
-<tr><td><code>tighten</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-tighten">130</a></td><td>Make an existing file readable only by its owner.</td></tr>
-<tr><td><code>write_inner</code> <sub>fn</sub></td><td><a href="privatefile.src.html#fn-write_inner">148</a></td><td>Create or replace a file that only its owner can read.</td></tr>
+<tr><td><code>write_owner_only</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-write_owner_only">59</a></td><td>Create path containing bytes, readable only by the current user.</td></tr>
+<tr><td><code>write_owner_only_new</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-write_owner_only_new">70</a></td><td>As write_owner_only, but fail if anything is already at path.</td></tr>
+<tr><td><code>replace_owner_only</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-replace_owner_only">94</a></td><td>Replace path with bytes in one step, or leave what was there.</td></tr>
+<tr><td><code>replace</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-replace">104</a></td><td>As replace_owner_only, for a file anybody on the machine may read.</td></tr>
+<tr><td><code>replace_inner</code> <sub>fn</sub></td><td><a href="privatefile.src.html#fn-replace_inner">110</a></td><td>The replacement both public functions make, with the permissions access asks for.</td></tr>
+<tr><td><code>sync_folder</code> <sub>fn</sub></td><td><a href="privatefile.src.html#fn-sync_folder">150</a></td><td>Make a rename in folder survive a power cut, where the system allows it.</td></tr>
+<tr><td><code>Access</code> <sub>enum</sub></td><td><a href="privatefile.src.html#fn-access">161</a></td><td>Who may read a file this module writes.</td></tr>
+<tr><td><code>tighten</code> <sub>pub fn</sub></td><td><a href="privatefile.src.html#fn-tighten">188</a></td><td>Make an existing file readable only by its owner.</td></tr>
+<tr><td><code>write_inner</code> <sub>fn</sub></td><td><a href="privatefile.src.html#fn-write_inner">210</a></td><td>Create or replace a file that only its owner can read.</td></tr>
 </tbody></table>
 </section>
 </div></div>

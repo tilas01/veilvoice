@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-setup/update.svg" alt="update.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-setup/src/update.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 908 lines &middot; <a href="update.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 945 lines &middot; <a href="update.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-is-and-the-claim-it-changes">What this is, and the claim it changes</a>
@@ -101,7 +101,7 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>908 lines defining <strong>13 functions</strong> (8 public), <strong>6 types</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>945 lines defining <strong>15 functions</strong> (8 public), <strong>6 types</strong> and <strong>8 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
 <li><code>enum Channel</code> <span style="color:var(--muted)">line 105</span> &middot; Which stream of releases a build came from.</li>
 <li><code>enum Verdict</code> <span style="color:var(--muted)">line 162</span> &middot; How this build&#x27;s version compares with the newest published one.</li>
@@ -120,7 +120,7 @@
 <li><code>Report::caveat</code> <span style="color:var(--muted)">line 196</span> &middot; What this answer is worth, in the words the user should see.
 </li>
 <li><code>check</code> <span style="color:var(--muted)">line 242</span> &middot; Ask whether anything newer than current has been published.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>fetch</code>, <code>find_tool</code>, <code>of</code>, <code>report</code>, <code>tag_in</code>, <code>parse</code>, <code>precedence</code></span>
+<br><span style="color:var(--muted);font-size:12px">reaches <code>fetch</code>, <code>find_tool</code>, <code>of</code>, <code>report</code>, <code>tag_in</code>, <code>fetch_arguments</code>, <code>fetched</code>, <code>parse</code>, <code>precedence</code></span>
 </li>
 </ul>
 </section>
@@ -142,10 +142,12 @@
 <path d="M572.6 147.0 C 594.6 147.0, 594.6 47.0, 182.7 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M526.4 174.0 C 526.4 194.0, 118.6 200.0, 118.6 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M526.4 174.0 C 526.4 194.0, 237.1 200.0, 237.1 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M121.4 74.0 C 121.4 94.0, 233.0 300.0, 233.0 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M482.1 274.0 C 482.1 294.0, 367.6 300.0, 367.6 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M482.1 274.0 C 482.1 294.0, 514.3 300.0, 514.3 317.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M121.4 74.0 C 121.4 94.0, 86.3 300.0, 86.3 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <path d="M164.8 247.0 C 201.7 247.0, 201.7 47.0, 182.7 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M118.6 274.0 C 118.6 294.0, 233.0 300.0, 233.0 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
-<path d="M118.6 274.0 C 118.6 294.0, 359.6 300.0, 359.6 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M118.6 274.0 C 118.6 294.0, 86.3 300.0, 86.3 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M118.6 274.0 C 118.6 294.0, 212.9 300.0, 212.9 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <a href="update.src.html#fn-channel-of">
 <rect x="63.1" y="20.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="121.4" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Channel::of</text>
@@ -187,14 +189,14 @@
 <text x="118.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 258</text>
 </a>
 <a href="update.src.html#fn-parse">
-<rect x="186.8" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="233.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse</text>
-<text x="233.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
+<rect x="40.1" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="86.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">parse</text>
+<text x="86.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 300</text>
 </a>
 <a href="update.src.html#fn-precedence">
-<rect x="305.3" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="359.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">precedence</text>
-<text x="359.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 356</text>
+<rect x="158.6" y="320.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="212.9" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">precedence</text>
+<text x="212.9" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 356</text>
 </a>
 <a href="update.src.html#fn-tag_in">
 <rect x="190.8" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
@@ -210,6 +212,16 @@
 <rect x="435.8" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="482.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fetch</text>
 <text x="482.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
+</a>
+<a href="update.src.html#fn-fetch_arguments">
+<rect x="293.2" y="320.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="367.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fetch_arguments</text>
+<text x="367.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 492</text>
+</a>
+<a href="update.src.html#fn-fetched">
+<rect x="468.1" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="514.3" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fetched</text>
+<text x="514.3" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 558</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -241,11 +253,15 @@ flowchart TD
     n_tag_in[&quot;tag_in&lt;br/&gt;line 406&quot;]
     n_find_tool[&quot;find_tool&lt;br/&gt;line 438&quot;]
     n_fetch[&quot;fetch&lt;br/&gt;line 479&quot;]
+    n_fetch_arguments[&quot;fetch_arguments&lt;br/&gt;line 492&quot;]
+    n_fetched[&quot;fetched&lt;br/&gt;line 558&quot;]
     n_check --&gt; n_fetch
     n_check --&gt; n_find_tool
     n_check --&gt; n_of
     n_check --&gt; n_report
     n_check --&gt; n_tag_in
+    n_fetch --&gt; n_fetch_arguments
+    n_fetch --&gt; n_fetched
     n_of --&gt; n_parse
     n_report --&gt; n_of
     n_report --&gt; n_parse
@@ -263,12 +279,14 @@ flowchart TD
     click n_tag_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L406&quot; &quot;open the source&quot;
     click n_find_tool href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L438&quot; &quot;open the source&quot;
     click n_fetch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L479&quot; &quot;open the source&quot;
+    click n_fetch_arguments href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L492&quot; &quot;open the source&quot;
+    click n_fetched href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L558&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_describe,n_url,n_caveat,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_of,n_report,n_tag_in api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_fmt,n_parse,n_precedence,n_find_tool,n_fetch helper
+    class n_fmt,n_parse,n_precedence,n_find_tool,n_fetch,n_fetch_arguments,n_fetched helper
     subgraph chart_key [&quot;Key&quot;]
         direction LR
         key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
@@ -310,7 +328,9 @@ flowchart TD
 <tr><td><code>Tool</code> <sub>struct</sub></td><td><a href="update.src.html#fn-tool">432</a></td><td>Where a transfer tool was found, and how to drive it.</td></tr>
 <tr><td><code>find_tool</code> <sub>fn</sub></td><td><a href="update.src.html#fn-find_tool">438</a></td><td>Absolute paths only.</td></tr>
 <tr><td><code>fetch</code> <sub>fn</sub></td><td><a href="update.src.html#fn-fetch">479</a></td><td>Run the tool and hand back what it printed.</td></tr>
-<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="update.src.html#fn-scope">567</a></td><td>What the check does and does not do, in one paragraph, for a front end to show beside the button.</td></tr>
+<tr><td><code>fetch_arguments</code> <sub>fn</sub></td><td><a href="update.src.html#fn-fetch_arguments">492</a></td><td>What the downloader is told, to read one page of the releases.</td></tr>
+<tr><td><code>fetched</code> <sub>fn</sub></td><td><a href="update.src.html#fn-fetched">558</a></td><td>What a finished fetch said, or why it failed.</td></tr>
+<tr><td><code>SCOPE</code> <sub>pub const</sub></td><td><a href="update.src.html#fn-scope">587</a></td><td>What the check does and does not do, in one paragraph, for a front end to show beside the button.</td></tr>
 </tbody></table>
 </section>
 </div></div>

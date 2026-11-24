@@ -299,7 +299,7 @@ def home():
         out.append("")
         for source, title, group, blurb in DOCUMENTS:
             if group == key:
-                out.append("- **[[%s|%s]]** \u00b7 %s"
+                out.append("- **[%s](%s)** \u00b7 %s"
                            % (title, page_name(source), blurb))
         out.append("")
         # The per-program guides sit after the first group, where somebody who
@@ -309,12 +309,12 @@ def home():
             out.append("## One program at a time")
             out.append("")
             for page, title, blurb in GUIDES:
-                out.append("- **[[%s|%s]]** \u00b7 %s" % (title, page, blurb))
+                out.append("- **[%s](%s)** \u00b7 %s" % (title, page, blurb))
             out.append("")
 
     out.append("## Every crate and every file")
     out.append("")
-    out.append("**[[The reference|Reference]]** is a page for each of the "
+    out.append("**[The reference](Reference)** is a page for each of the "
                "thirteen crates and each source file in them, generated from "
                "the doc comments in the code. Each crate page carries its "
                "banner, a flowchart of what calls what, and a table of every "
@@ -330,7 +330,7 @@ def home():
 
 def sidebar():
     """The navigation GitHub shows beside every page."""
-    out = [BANNER, "### [[VeilVoice|Home]]", ""]
+    out = [BANNER, "### [VeilVoice](Home)", ""]
     groups = []
     for key, _heading, short in GROUPS:
         groups.append((short, [(page_name(s), t)
@@ -341,11 +341,11 @@ def sidebar():
         out.append("**%s**" % heading)
         out.append("")
         for page, title in entries:
-            out.append("- [[%s|%s]]" % (title, page))
+            out.append("- [%s](%s)" % (title, page))
         out.append("")
     out.append("**Reference**")
     out.append("")
-    out.append("- [[Every crate and file|Reference]]")
+    out.append("- [Every crate and file](Reference)")
     out.append("")
     return "\n".join(out) + "\n"
 
@@ -358,7 +358,14 @@ def build():
 
 
 # A wiki link, in either form GitHub accepts: `[[Page]]` or `[[Title|Page]]`.
+# Nothing here writes one any more, because outside the wiki it shows as plain
+# brackets (`tools/site-tests/links.test.js` refuses them), but a document
+# that quotes one still has to be read correctly.
 WIKI_LINK = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
+
+# A link to a wiki page written the ordinary way, `[text](Page)` or
+# `[text](Page#section)`, which is how every page here links to another.
+PAGE_LINK = re.compile(r"\]\((?!https?:|#|/)([A-Za-z0-9_-]+)(#[^)]*)?\)")
 
 # A fenced block, and an inline code span. Their spans are worked out so a
 # `[[link]]` quoted inside one can be skipped, for the same reason
@@ -381,7 +388,7 @@ def quoted_spans(text):
 
 
 def links_in(text):
-    """Every wiki link that is meant rather than quoted."""
+    """The page named by every link to a wiki page that is meant, not quoted."""
     spans = quoted_spans(text)
     out = []
     for found in WIKI_LINK.finditer(text):
@@ -389,11 +396,16 @@ def links_in(text):
         if any(a <= start and end <= b for a, b in spans):
             continue
         out.append(found.group(2) or found.group(1))
+    for found in PAGE_LINK.finditer(text):
+        start, end = found.span()
+        if any(a <= start and end <= b for a, b in spans):
+            continue
+        out.append(found.group(1))
     return out
 
 
 def dead_links():
-    """Every `[[link]]` in the wiki that names a page which does not exist.
+    """Every link in the wiki that names a page which does not exist.
 
     Worth checking separately from whether the pages are current, because a
     wiki link to a missing page does not fail loudly: GitHub renders it as an
@@ -547,7 +559,30 @@ def misgrouped():
     return problems
 
 
+def self_test():
+    """Show `links_in` the links it must find and the ones it must not."""
+    cases = [
+        ("[Reference](Reference)", ["Reference"]),
+        ("[`edit.rs`](File-a-edit) and [b](Doc-B#part)", ["File-a-edit", "Doc-B"]),
+        ("[[Reference]] and [[The guide|Doc-GUIDE]]", ["Reference", "Doc-GUIDE"]),
+        ("Write `[[Reference]]` or `[a](Page)` for a link.", []),
+        ("[site](https://example.org) [top](#top) [root](/x)", []),
+    ]
+    failed = 0
+    for text, expected in cases:
+        found = sorted(links_in(text))
+        if found != sorted(expected):
+            print("  FAIL %r: found %r, expected %r" % (text, found, expected))
+            failed += 1
+    if failed:
+        return 1
+    print("  links_in reads all %d cases as it should" % len(cases))
+    return 0
+
+
 def main():
+    if "--self-test" in sys.argv[1:]:
+        return self_test()
     check = "--check" in sys.argv[1:]
 
     problems = misgrouped()
@@ -614,9 +649,12 @@ def main():
             print("    output. `rewrite` in this file must stay one pass.")
             return 1
 
-        total = sum(len(links_in(
-            io.open(os.path.join(WIKI, n), encoding="utf-8").read()))
-            for n in os.listdir(WIKI) if n.endswith(".md"))
+        total = 0
+        for name in os.listdir(WIKI):
+            if name.endswith(".md"):
+                with io.open(os.path.join(WIKI, name),
+                             encoding="utf-8") as handle:
+                    total += len(links_in(handle.read()))
         print("  %d wiki page(s) current, from %d document(s); "
               "%d internal link(s), all resolving, and none rewritten twice"
               % (len(pages), len(DOCUMENTS), total))

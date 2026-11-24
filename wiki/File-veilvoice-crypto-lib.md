@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/lib.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 289 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs)
+[veilvoice-crypto](Crate-veilvoice-crypto) &middot; 289 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/lib.rs)
 
 ## Contents
 
@@ -19,7 +19,7 @@ and amnesic secret storage for VeilVoice.
 
 ## What this crate is for
 
-[[`veilvoice_core`|Crate-veilvoice-core]] makes a voice
+[`veilvoice_core`](Crate-veilvoice-core) makes a voice
 unrecognisable; it does not hide the *words*, and it is not meant to. When a
 recording needs to stay secret as well, at rest on disk or in transit to
 someone else, that is this crate's job.

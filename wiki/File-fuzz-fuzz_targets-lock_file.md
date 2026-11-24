@@ -3,7 +3,7 @@
 
 # `fuzz/fuzz_targets/lock_file.rs`
 
-[[fuzz|Crate-fuzz]] &middot; 37 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/lock_file.rs)
+[fuzz](Crate-fuzz) &middot; 37 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/lock_file.rs)
 
 ## Contents
 

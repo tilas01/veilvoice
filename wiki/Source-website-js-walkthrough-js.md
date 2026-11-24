@@ -3,7 +3,7 @@
 
 # `website/js/walkthrough.js`
 
-[[The website's source|Source-index]] &middot; 162 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/walkthrough.js)
+[The website's source](Source-index) &middot; 162 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/walkthrough.js)
 
 ## What it does
 

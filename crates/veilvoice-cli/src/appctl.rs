@@ -68,7 +68,8 @@ fn save(path: &Path, baseline: &Baseline) -> Result<(), String> {
     // than afterwards: a file that exists for even a moment with the wrong
     // permissions is a file somebody else's program may have read in that
     // moment.
-    veilvoice_crypto::privatefile::write_owner_only(path, baseline.to_text().as_bytes())
+    // Replaced in one step, so a crash part-way leaves the old record. F-335.
+    veilvoice_crypto::privatefile::replace_owner_only(path, baseline.to_text().as_bytes())
         .map_err(|e| format!("{}: {e}", path.display()))
 }
 

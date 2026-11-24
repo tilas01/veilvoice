@@ -356,9 +356,10 @@ THE NETWORK
   contains no HTTP client: VeilVoice has no networking crate anywhere in
   its dependency graph, which you can check yourself with `cargo tree`.
 
-  Only one host is ever contacted and it is compiled in. There is no way to
-  point this at another, no update check, and nothing is fetched unless you
-  asked for it on this command line.
+  Only one address is ever asked for, and it is compiled in. GitHub sends a
+  release file on to its own download host, which is followed over HTTPS only.
+  There is no way to point this at another address, no update check, and
+  nothing is fetched unless you asked for it on this command line.
 ";
 
 /// The longer explanation, printed when a reader asks for it.

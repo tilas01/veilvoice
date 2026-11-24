@@ -104,7 +104,7 @@ flowchart TD
     n_lib(["lib.rs<br/>180 lines"])
     n_accel["accel.rs<br/>652 lines"]
     n_export["export.rs<br/>942 lines"]
-    n_ffmpeg["ffmpeg.rs<br/>792 lines"]
+    n_ffmpeg["ffmpeg.rs<br/>818 lines"]
     n_font["font.rs<br/>418 lines"]
     n_frames["frames.rs<br/>695 lines"]
     n_motion["motion.rs<br/>1162 lines"]
@@ -156,7 +156,7 @@ flowchart TD
 |---|---:|---|
 | [`accel.rs`](../../docs/files/veilvoice-video/accel.md) | 652 | What hardware this machine has, and the one place VeilVoice can use it. |
 | [`export.rs`](../../docs/files/veilvoice-video/export.md) | 942 | What an export asks, and the ffmpeg command each answer turns into. |
-| [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 792 | The video file, which needs a codec this project does not ship. |
+| [`ffmpeg.rs`](../../docs/files/veilvoice-video/ffmpeg.md) | 818 | The video file, which needs a codec this project does not ship. |
 | [`font.rs`](../../docs/files/veilvoice-video/font.md) | 418 | A monospace face, five pixels by seven, drawn here. |
 | [`frames.rs`](../../docs/files/veilvoice-video/frames.md) | 695 | The video's pictures, and how many of them there really are. |
 | [`lib.rs`](../../docs/files/veilvoice-video/lib.md) | 180 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
@@ -167,7 +167,7 @@ flowchart TD
 | [`size.rs`](../../docs/files/veilvoice-video/size.md) | 732 | The size and frame rate a video is rendered at. |
 | [`waveform.rs`](../../docs/files/veilvoice-video/waveform.md) | 298 | The shape of the audio, reduced to something a page can draw. |
 
-**6,138 functional lines of Rust** in this crate. A functional line is a line
+**6,154 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/src/container.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 627 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs)
+[veilvoice-crypto](Crate-veilvoice-crypto) &middot; 627 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/container.rs)
 
 ## Contents
 

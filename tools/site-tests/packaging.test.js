@@ -210,6 +210,32 @@ function run() {
     }
   }
 
+  // ---- a launcher entry only beside the window it starts --------------------
+  //
+  // F-342. The OpenBSD and NetBSD archives carried the freedesktop launcher
+  // entry and its icons with no veilvoice-gui to start, so a desktop showed a
+  // VeilVoice menu item that did nothing. Each BSD job is read on its own: one
+  // that copies `assets/linux` must also stage the window, and must copy the
+  // launcher only when the window is there.
+  for (const os of ["freebsd", "openbsd", "netbsd"]) {
+    const job = workflow.match(
+      new RegExp(`^  ${os}:\\n[\\s\\S]*?(?=^  [a-z][a-z0-9_-]*:\\n|(?![\\s\\S]))`, "m")
+    );
+    if (!job) {
+      fail(`no ${os} job could be read out of release.yml`);
+      continue;
+    }
+    const body = job[0];
+    if (!body.includes("assets/linux")) {
+      pass(`the ${os} archive ships no launcher entry, so none is left without a window`);
+    } else if (/if \[ -f "dist\/\$out\/veilvoice-gui" \]; then\s*\n\s*cp -r assets\/linux/.test(body)) {
+      pass(`the ${os} archive ships its launcher entry only beside the window`);
+    } else {
+      fail(`the ${os} archive copies the launcher entry whether or not ` +
+           "veilvoice-gui is in it");
+    }
+  }
+
   // ---- the two things dpkg-buildpackage needs before it will start --------
   const index = execFileSync("git", ["ls-files", "-s", "packaging/debian/"], {
     cwd: ROOT, encoding: "utf8", maxBuffer: 16 * 1024 * 1024

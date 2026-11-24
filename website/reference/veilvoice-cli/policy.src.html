@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-cli/src/policy.rs</code></h1>
-<p style="color:var(--muted)"><a href="policy.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 249 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="policy.html">what this file is for</a> &middot; <a href="../veilvoice-cli.html">veilvoice-cli</a> &middot; 378 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/policy.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -104,7 +104,7 @@
 <span class="ln" id="L36"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::atrest::{prompt_secret, read_new_password};</span>
 <span class="ln" id="L37"><span class="tok-kw">use</span> <span class="tok-kw">crate</span>::theme::{colour, err, field, heading, ok, paint, warn};</span>
 <span class="ln" id="L38"><span class="tok-kw">use</span> std::path::PathBuf;</span>
-<span class="ln" id="L39"><span class="tok-kw">use</span> veilvoice_policy::{Policy, Requirement, Verification};</span>
+<span class="ln" id="L39"><span class="tok-kw">use</span> veilvoice_policy::{Policy, Posture, Requirement, Verification};</span>
 <span class="ln" id="L40"></span>
 <span class="src-item" id="fn-policy_dir">
 <span class="ln" id="L41"><span class="tok-com">/// Where the policy files live.</span></span>
@@ -132,201 +132,336 @@
 <span class="ln" id="L61">}</span>
 </span>
 <span class="ln" id="L62"></span>
-<span class="src-item" id="fn-status">
-<span class="ln" id="L63"><span class="tok-com">/// What is in force, and what is known about the seal.</span></span>
-<span class="ln" id="L64"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">status</span>() -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L65">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Policy&quot;</span>));</span>
-<span class="ln" id="L66">    <span class="tok-kw">let</span> dir = <span class="tok-fn">dir</span>()?;</span>
-<span class="ln" id="L67">    <span class="tok-kw">let</span> policy = Policy::<span class="tok-fn">load</span>(&amp;dir).<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;{}: {error}&quot;</span>, dir.<span class="tok-fn">display</span>()))?;</span>
-<span class="ln" id="L68"></span>
-<span class="ln" id="L69">    <span class="tok-kw">match</span> &amp;policy {</span>
-<span class="ln" id="L70">        None =&gt; {</span>
-<span class="ln" id="L71">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;in force&quot;</span>, <span class="tok-str">&quot;nothing&quot;</span>));</span>
-<span class="ln" id="L72">            println!();</span>
-<span class="ln" id="L73">            println!(<span class="tok-str">&quot;  A policy fixes some of VeilVoice&#x27;s settings so they cannot be&quot;</span>);</span>
-<span class="ln" id="L74">            println!(<span class="tok-str">&quot;  turned off from the interface. Every setting it can reach makes&quot;</span>);</span>
-<span class="ln" id="L75">            println!(<span class="tok-str">&quot;  VeilVoice stricter; there is nothing here that loosens anything.&quot;</span>);</span>
-<span class="ln" id="L76">            println!();</span>
-<span class="ln" id="L77">            println!(<span class="tok-str">&quot;    veilvoice policy seal --encrypt-recordings --clean-metadata&quot;</span>);</span>
-<span class="ln" id="L78">            println!();</span>
-<span class="ln" id="L79">        }</span>
-<span class="ln" id="L80">        <span class="tok-fn">Some</span>(policy) =&gt; {</span>
-<span class="ln" id="L81">            println!(</span>
-<span class="ln" id="L82">                <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L83">                <span class="tok-fn">field</span>(<span class="tok-str">&quot;in force&quot;</span>, &amp;format!(<span class="tok-str">&quot;{} requirement(s)&quot;</span>, policy.<span class="tok-fn">len</span>()))</span>
-<span class="ln" id="L84">            );</span>
-<span class="ln" id="L85">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(note) = policy.<span class="tok-fn">note</span>() {</span>
-<span class="ln" id="L86">                println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;note&quot;</span>, note));</span>
-<span class="ln" id="L87">            }</span>
-<span class="ln" id="L88">            println!();</span>
-<span class="ln" id="L89">            <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> policy.<span class="tok-fn">requirements</span>() {</span>
-<span class="ln" id="L90">                println!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-fn">paint</span>(colour::CYAN, requirement.<span class="tok-fn">keyword</span>()));</span>
-<span class="ln" id="L91">                println!(<span class="tok-str">&quot;    {}&quot;</span>, requirement.<span class="tok-fn">describe</span>());</span>
-<span class="ln" id="L92">            }</span>
-<span class="ln" id="L93">            println!();</span>
-<span class="ln" id="L94">            <span class="tok-com">// Loading never asks for a passphrase, so this is all that is</span></span>
-<span class="ln" id="L95">            <span class="tok-com">// known without one -- and it says exactly that rather than</span></span>
-<span class="ln" id="L96">            <span class="tok-com">// implying the seal was checked.</span></span>
-<span class="ln" id="L97">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;seal&quot;</span>, &amp;Verification::Unchecked.<span class="tok-fn">describe</span>()));</span>
-<span class="ln" id="L98">            println!(<span class="tok-str">&quot;  `veilvoice policy verify` checks it, and needs the passphrase.&quot;</span>);</span>
-<span class="ln" id="L99">            println!();</span>
-<span class="ln" id="L100">        }</span>
-<span class="ln" id="L101">    }</span>
-<span class="ln" id="L102"></span>
-<span class="ln" id="L103">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS IS WORTH&quot;</span>));</span>
-<span class="ln" id="L104">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_policy::SCOPE, <span class="tok-num">72</span>) {</span>
-<span class="ln" id="L105">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
-<span class="ln" id="L106">    }</span>
-<span class="ln" id="L107">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L108">}</span>
+<span class="src-item" id="fn-apply">
+<span class="ln" id="L63"><span class="tok-com">/// The settings a command will run with, once this machine&#x27;s policy is applied.</span></span>
+<span class="ln" id="L64"><span class="tok-com">///</span></span>
+<span class="ln" id="L65"><span class="tok-com">/// **F-338.** Only the window used to apply the policy. Every command here</span></span>
+<span class="ln" id="L66"><span class="tok-com">/// that processes a recording ignored it, so a policy requiring encryption at</span></span>
+<span class="ln" id="L67"><span class="tok-com">/// rest, metadata cleaning, accent neutralisation or a minimum intensity was</span></span>
+<span class="ln" id="L68"><span class="tok-com">/// no obstacle to anybody with a terminal. Now each one passes its flags</span></span>
+<span class="ln" id="L69"><span class="tok-com">/// through here first.</span></span>
+<span class="ln" id="L70"><span class="tok-com">///</span></span>
+<span class="ln" id="L71"><span class="tok-com">/// As in the window, this only ever tightens, and it never changes the</span></span>
+<span class="ln" id="L72"><span class="tok-com">/// policy. Anything it overruled is said on standard error, so a flag that</span></span>
+<span class="ln" id="L73"><span class="tok-com">/// did not take effect is not a surprise. A policy that cannot be read is</span></span>
+<span class="ln" id="L74"><span class="tok-com">/// reported and not applied, which is also what the window does.</span></span>
+<span class="ln" id="L75"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">apply</span>(posture: Posture) -&gt; Posture {</span>
+<span class="ln" id="L76">    <span class="tok-fn">apply_from</span>(<span class="tok-fn">policy_dir</span>(), posture)</span>
+<span class="ln" id="L77">}</span>
 </span>
-<span class="ln" id="L109"></span>
-<span class="src-item" id="fn-seal">
-<span class="ln" id="L110"><span class="tok-com">/// Write a policy and seal it.</span></span>
-<span class="ln" id="L111"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">seal</span>(</span>
-<span class="ln" id="L112">    requirements: Vec&lt;Requirement&gt;,</span>
-<span class="ln" id="L113">    note: Option&lt;String&gt;,</span>
-<span class="ln" id="L114">    replace: bool,</span>
-<span class="ln" id="L115">) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L116">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Seal a policy&quot;</span>));</span>
-<span class="ln" id="L117">    <span class="tok-kw">let</span> dir = <span class="tok-fn">dir</span>()?;</span>
-<span class="ln" id="L118"></span>
-<span class="ln" id="L119">    <span class="tok-kw">if</span> requirements.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L120">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(</span>
-<span class="ln" id="L121">            <span class="tok-str">&quot;a policy with no requirements would fix nothing. Name at least one, for \</span></span>
-<span class="ln" id="L122"><span class="tok-str">             example --encrypt-recordings.&quot;</span></span>
-<span class="ln" id="L123">                .<span class="tok-fn">to_string</span>(),</span>
-<span class="ln" id="L124">        );</span>
-<span class="ln" id="L125">    }</span>
+<span class="ln" id="L78"></span>
+<span class="src-item" id="fn-apply_from">
+<span class="ln" id="L79"><span class="tok-com">/// [`apply`], with the policy folder passed in so a test can choose it.</span></span>
+<span class="ln" id="L80"><span class="tok-kw">fn</span> <span class="tok-fn">apply_from</span>(dir: Option&lt;PathBuf&gt;, posture: Posture) -&gt; Posture {</span>
+<span class="ln" id="L81">    <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dir) = dir <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L82">        <span class="tok-kw">return</span> posture;</span>
+<span class="ln" id="L83">    };</span>
+<span class="ln" id="L84">    <span class="tok-kw">match</span> Policy::<span class="tok-fn">load</span>(&amp;dir) {</span>
+<span class="ln" id="L85">        <span class="tok-fn">Ok</span>(<span class="tok-fn">Some</span>(policy)) =&gt; {</span>
+<span class="ln" id="L86">            <span class="tok-kw">let</span> applied = policy.<span class="tok-fn">constrain</span>(posture);</span>
+<span class="ln" id="L87">            <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-fn">overruled</span>(&amp;posture, &amp;applied) {</span>
+<span class="ln" id="L88">                eprintln!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">warn</span>(&amp;line));</span>
+<span class="ln" id="L89">            }</span>
+<span class="ln" id="L90">            applied</span>
+<span class="ln" id="L91">        }</span>
+<span class="ln" id="L92">        <span class="tok-fn">Ok</span>(None) =&gt; posture,</span>
+<span class="ln" id="L93">        <span class="tok-fn">Err</span>(error) =&gt; {</span>
+<span class="ln" id="L94">            eprintln!(</span>
+<span class="ln" id="L95">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L96">                <span class="tok-fn">warn</span>(&amp;format!(</span>
+<span class="ln" id="L97">                    <span class="tok-str">&quot;the policy in {} could not be read, so it was not applied: {error}&quot;</span>,</span>
+<span class="ln" id="L98">                    dir.<span class="tok-fn">display</span>()</span>
+<span class="ln" id="L99">                ))</span>
+<span class="ln" id="L100">            );</span>
+<span class="ln" id="L101">            posture</span>
+<span class="ln" id="L102">        }</span>
+<span class="ln" id="L103">    }</span>
+<span class="ln" id="L104">}</span>
+</span>
+<span class="ln" id="L105"></span>
+<span class="src-item" id="fn-overruled">
+<span class="ln" id="L106"><span class="tok-com">/// What a policy changed, one sentence for each thing.</span></span>
+<span class="ln" id="L107"><span class="tok-kw">fn</span> <span class="tok-fn">overruled</span>(asked: &amp;Posture, applied: &amp;Posture) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L108">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> said = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L109">    <span class="tok-kw">if</span> applied.encrypt_recordings &amp;&amp; !asked.encrypt_recordings {</span>
+<span class="ln" id="L110">        said.<span class="tok-fn">push</span>(<span class="tok-str">&quot;the policy requires encryption at rest, so the result is encrypted&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L111">    }</span>
+<span class="ln" id="L112">    <span class="tok-kw">if</span> applied.clean_metadata &amp;&amp; !asked.clean_metadata {</span>
+<span class="ln" id="L113">        said.<span class="tok-fn">push</span>(<span class="tok-str">&quot;the policy requires metadata cleaning, so the result is cleaned&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L114">    }</span>
+<span class="ln" id="L115">    <span class="tok-kw">if</span> applied.neutralise_accent &amp;&amp; !asked.neutralise_accent {</span>
+<span class="ln" id="L116">        said.<span class="tok-fn">push</span>(<span class="tok-str">&quot;the policy requires accent neutralisation, so --keep-accent is ignored&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L117">    }</span>
+<span class="ln" id="L118">    <span class="tok-kw">if</span> applied.intensity &gt; asked.intensity {</span>
+<span class="ln" id="L119">        said.<span class="tok-fn">push</span>(format!(</span>
+<span class="ln" id="L120">            <span class="tok-str">&quot;the policy sets a minimum intensity of {:.2}, so {:.2} was raised to it&quot;</span>,</span>
+<span class="ln" id="L121">            applied.intensity, asked.intensity</span>
+<span class="ln" id="L122">        ));</span>
+<span class="ln" id="L123">    }</span>
+<span class="ln" id="L124">    said</span>
+<span class="ln" id="L125">}</span>
+</span>
 <span class="ln" id="L126"></span>
-<span class="ln" id="L127">    <span class="tok-com">// Replacing a policy somebody else sealed is the one destructive thing</span></span>
-<span class="ln" id="L128">    <span class="tok-com">// here, so it is not done without being asked for. The passphrase would</span></span>
-<span class="ln" id="L129">    <span class="tok-com">// not have prevented it -- the files can be deleted by hand -- so the</span></span>
-<span class="ln" id="L130">    <span class="tok-com">// guard is a flag and an honest sentence rather than a lock.</span></span>
-<span class="ln" id="L131">    <span class="tok-kw">if</span> !replace &amp;&amp; Policy::<span class="tok-fn">load</span>(&amp;dir).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?.<span class="tok-fn">is_some</span>() {</span>
-<span class="ln" id="L132">        println!(</span>
-<span class="ln" id="L133">            <span class="tok-str">&quot;{}&quot;</span>,</span>
-<span class="ln" id="L134">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;a policy is already in force. Pass --replace to write over it.&quot;</span>)</span>
-<span class="ln" id="L135">        );</span>
-<span class="ln" id="L136">        println!(<span class="tok-str">&quot;  `veilvoice policy status` shows what is there now.&quot;</span>);</span>
-<span class="ln" id="L137">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L138">    }</span>
-<span class="ln" id="L139"></span>
-<span class="ln" id="L140">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L141">    <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> requirements {</span>
-<span class="ln" id="L142">        policy.<span class="tok-fn">require</span>(requirement);</span>
-<span class="ln" id="L143">    }</span>
-<span class="ln" id="L144">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(note) = note {</span>
-<span class="ln" id="L145">        policy = policy.<span class="tok-fn">with_note</span>(&amp;note).<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
-<span class="ln" id="L146">    }</span>
-<span class="ln" id="L147"></span>
-<span class="ln" id="L148">    println!(<span class="tok-str">&quot;  This will fix:&quot;</span>);</span>
-<span class="ln" id="L149">    <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> policy.<span class="tok-fn">requirements</span>() {</span>
-<span class="ln" id="L150">        println!(<span class="tok-str">&quot;    {}&quot;</span>, requirement.<span class="tok-fn">describe</span>());</span>
-<span class="ln" id="L151">    }</span>
-<span class="ln" id="L152">    println!();</span>
-<span class="ln" id="L153">    println!(<span class="tok-str">&quot;  The passphrase seals a copy, so anybody who has it can prove the&quot;</span>);</span>
-<span class="ln" id="L154">    println!(<span class="tok-str">&quot;  policy in force is the one you wrote. It does not stop the policy&quot;</span>);</span>
-<span class="ln" id="L155">    println!(<span class="tok-str">&quot;  being deleted, and nothing here can.&quot;</span>);</span>
-<span class="ln" id="L156">    println!();</span>
-<span class="ln" id="L157"></span>
-<span class="ln" id="L158">    <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
-<span class="ln" id="L159">    policy</span>
-<span class="ln" id="L160">        .<span class="tok-fn">save</span>(&amp;dir, password.<span class="tok-fn">expose</span>())</span>
-<span class="ln" id="L161">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not write the policy: {error}&quot;</span>))?;</span>
-<span class="ln" id="L162"></span>
-<span class="ln" id="L163">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;sealed into {}&quot;</span>, dir.<span class="tok-fn">display</span>())));</span>
-<span class="ln" id="L164">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L165">}</span>
-</span>
+<span class="src-item" id="fn-status">
+<span class="ln" id="L127"><span class="tok-com">/// What is in force, and what is known about the seal.</span></span>
+<span class="ln" id="L128"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">status</span>() -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L129">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Policy&quot;</span>));</span>
+<span class="ln" id="L130">    <span class="tok-kw">let</span> dir = <span class="tok-fn">dir</span>()?;</span>
+<span class="ln" id="L131">    <span class="tok-kw">let</span> policy = Policy::<span class="tok-fn">load</span>(&amp;dir).<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;{}: {error}&quot;</span>, dir.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L132"></span>
+<span class="ln" id="L133">    <span class="tok-kw">match</span> &amp;policy {</span>
+<span class="ln" id="L134">        None =&gt; {</span>
+<span class="ln" id="L135">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;in force&quot;</span>, <span class="tok-str">&quot;nothing&quot;</span>));</span>
+<span class="ln" id="L136">            println!();</span>
+<span class="ln" id="L137">            println!(<span class="tok-str">&quot;  A policy fixes some of VeilVoice&#x27;s settings so they cannot be&quot;</span>);</span>
+<span class="ln" id="L138">            println!(<span class="tok-str">&quot;  turned off from the interface. Every setting it can reach makes&quot;</span>);</span>
+<span class="ln" id="L139">            println!(<span class="tok-str">&quot;  VeilVoice stricter; there is nothing here that loosens anything.&quot;</span>);</span>
+<span class="ln" id="L140">            println!();</span>
+<span class="ln" id="L141">            println!(<span class="tok-str">&quot;    veilvoice policy seal --encrypt-recordings --clean-metadata&quot;</span>);</span>
+<span class="ln" id="L142">            println!();</span>
+<span class="ln" id="L143">        }</span>
+<span class="ln" id="L144">        <span class="tok-fn">Some</span>(policy) =&gt; {</span>
+<span class="ln" id="L145">            println!(</span>
+<span class="ln" id="L146">                <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L147">                <span class="tok-fn">field</span>(<span class="tok-str">&quot;in force&quot;</span>, &amp;format!(<span class="tok-str">&quot;{} requirement(s)&quot;</span>, policy.<span class="tok-fn">len</span>()))</span>
+<span class="ln" id="L148">            );</span>
+<span class="ln" id="L149">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(note) = policy.<span class="tok-fn">note</span>() {</span>
+<span class="ln" id="L150">                println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;note&quot;</span>, note));</span>
+<span class="ln" id="L151">            }</span>
+<span class="ln" id="L152">            println!();</span>
+<span class="ln" id="L153">            <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> policy.<span class="tok-fn">requirements</span>() {</span>
+<span class="ln" id="L154">                println!(<span class="tok-str">&quot;  {}&quot;</span>, <span class="tok-fn">paint</span>(colour::CYAN, requirement.<span class="tok-fn">keyword</span>()));</span>
+<span class="ln" id="L155">                println!(<span class="tok-str">&quot;    {}&quot;</span>, requirement.<span class="tok-fn">describe</span>());</span>
+<span class="ln" id="L156">            }</span>
+<span class="ln" id="L157">            println!();</span>
+<span class="ln" id="L158">            <span class="tok-com">// Loading never asks for a passphrase, so this is all that is</span></span>
+<span class="ln" id="L159">            <span class="tok-com">// known without one -- and it says exactly that rather than</span></span>
+<span class="ln" id="L160">            <span class="tok-com">// implying the seal was checked.</span></span>
+<span class="ln" id="L161">            println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">field</span>(<span class="tok-str">&quot;seal&quot;</span>, &amp;Verification::Unchecked.<span class="tok-fn">describe</span>()));</span>
+<span class="ln" id="L162">            println!(<span class="tok-str">&quot;  `veilvoice policy verify` checks it, and needs the passphrase.&quot;</span>);</span>
+<span class="ln" id="L163">            println!();</span>
+<span class="ln" id="L164">        }</span>
+<span class="ln" id="L165">    }</span>
 <span class="ln" id="L166"></span>
-<span class="src-item" id="fn-verify">
-<span class="ln" id="L167"><span class="tok-com">/// Check the plain policy against its sealed copy.</span></span>
-<span class="ln" id="L168"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">verify</span>() -&gt; Result&lt;bool, String&gt; {</span>
-<span class="ln" id="L169">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Verify a policy&quot;</span>));</span>
-<span class="ln" id="L170">    <span class="tok-kw">let</span> dir = <span class="tok-fn">dir</span>()?;</span>
-<span class="ln" id="L171">    <span class="tok-kw">let</span> password = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Policy passphrase: &quot;</span>)?;</span>
-<span class="ln" id="L172">    <span class="tok-kw">let</span> checked = veilvoice_policy::<span class="tok-fn">verify</span>(&amp;dir, password.<span class="tok-fn">expose</span>())</span>
-<span class="ln" id="L173">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not check the seal: {error}&quot;</span>))?;</span>
-<span class="ln" id="L174"></span>
-<span class="ln" id="L175">    <span class="tok-kw">let</span> line = checked.<span class="tok-fn">describe</span>();</span>
-<span class="ln" id="L176">    <span class="tok-kw">if</span> checked.<span class="tok-fn">wants_attention</span>() {</span>
-<span class="ln" id="L177">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">err</span>(&amp;line));</span>
-<span class="ln" id="L178">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L179">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;line));</span>
-<span class="ln" id="L180">    }</span>
-<span class="ln" id="L181"></span>
-<span class="ln" id="L182">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> Verification::Differs { sealed } = &amp;checked {</span>
-<span class="ln" id="L183">        println!();</span>
-<span class="ln" id="L184">        println!(<span class="tok-str">&quot;  What was sealed:&quot;</span>);</span>
-<span class="ln" id="L185">        <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> sealed.<span class="tok-fn">requirements</span>() {</span>
-<span class="ln" id="L186">            println!(<span class="tok-str">&quot;    {}&quot;</span>, requirement.<span class="tok-fn">keyword</span>());</span>
-<span class="ln" id="L187">        }</span>
-<span class="ln" id="L188">        println!();</span>
-<span class="ln" id="L189">        println!(<span class="tok-str">&quot;  What is in force is in `veilvoice policy status`.&quot;</span>);</span>
-<span class="ln" id="L190">    }</span>
-<span class="ln" id="L191">    <span class="tok-fn">Ok</span>(checked.<span class="tok-fn">wants_attention</span>())</span>
-<span class="ln" id="L192">}</span>
+<span class="ln" id="L167">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">paint</span>(colour::YELLOW, <span class="tok-str">&quot;WHAT THIS IS WORTH&quot;</span>));</span>
+<span class="ln" id="L168">    <span class="tok-kw">for</span> line <span class="tok-kw">in</span> <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">wrap</span>(veilvoice_policy::SCOPE, <span class="tok-num">72</span>) {</span>
+<span class="ln" id="L169">        println!(<span class="tok-str">&quot;  {line}&quot;</span>);</span>
+<span class="ln" id="L170">    }</span>
+<span class="ln" id="L171">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L172">}</span>
 </span>
-<span class="ln" id="L193"></span>
-<span class="src-item" id="fn-remove">
-<span class="ln" id="L194"><span class="tok-com">/// Delete both files.</span></span>
-<span class="ln" id="L195"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">remove</span>(yes: bool) -&gt; Result&lt;(), String&gt; {</span>
-<span class="ln" id="L196">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Remove the policy&quot;</span>));</span>
-<span class="ln" id="L197">    <span class="tok-kw">let</span> dir = <span class="tok-fn">dir</span>()?;</span>
-<span class="ln" id="L198">    <span class="tok-kw">if</span> Policy::<span class="tok-fn">load</span>(&amp;dir).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?.<span class="tok-fn">is_none</span>()</span>
-<span class="ln" id="L199">        &amp;&amp; !dir.<span class="tok-fn">join</span>(veilvoice_policy::SEALED_FILE).<span class="tok-fn">exists</span>()</span>
-<span class="ln" id="L200">    {</span>
-<span class="ln" id="L201">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">warn</span>(<span class="tok-str">&quot;there is no policy to remove&quot;</span>));</span>
-<span class="ln" id="L202">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
-<span class="ln" id="L203">    }</span>
-<span class="ln" id="L204">    <span class="tok-kw">if</span> !yes {</span>
-<span class="ln" id="L205">        println!();</span>
-<span class="ln" id="L206">        println!(<span class="tok-str">&quot;  This deletes both files, and does not ask for the passphrase.&quot;</span>);</span>
-<span class="ln" id="L207">        println!(<span class="tok-str">&quot;  It could not usefully ask: anybody who can run this command can&quot;</span>);</span>
-<span class="ln" id="L208">        println!(<span class="tok-str">&quot;  delete the same two files with a file manager. The passphrase&quot;</span>);</span>
-<span class="ln" id="L209">        println!(<span class="tok-str">&quot;  proves a policy is the one that was written; it is not a lock on&quot;</span>);</span>
-<span class="ln" id="L210">        println!(<span class="tok-str">&quot;  the folder, and saying otherwise would be a lie about what this&quot;</span>);</span>
-<span class="ln" id="L211">        println!(<span class="tok-str">&quot;  program does.&quot;</span>);</span>
-<span class="ln" id="L212">        println!();</span>
-<span class="ln" id="L213">        println!(<span class="tok-str">&quot;  Re-run with --yes to proceed.&quot;</span>);</span>
-<span class="ln" id="L214">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L173"></span>
+<span class="src-item" id="fn-seal">
+<span class="ln" id="L174"><span class="tok-com">/// Write a policy and seal it.</span></span>
+<span class="ln" id="L175"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">seal</span>(</span>
+<span class="ln" id="L176">    requirements: Vec&lt;Requirement&gt;,</span>
+<span class="ln" id="L177">    note: Option&lt;String&gt;,</span>
+<span class="ln" id="L178">    replace: bool,</span>
+<span class="ln" id="L179">) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L180">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Seal a policy&quot;</span>));</span>
+<span class="ln" id="L181">    <span class="tok-kw">let</span> dir = <span class="tok-fn">dir</span>()?;</span>
+<span class="ln" id="L182"></span>
+<span class="ln" id="L183">    <span class="tok-kw">if</span> requirements.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L184">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(</span>
+<span class="ln" id="L185">            <span class="tok-str">&quot;a policy with no requirements would fix nothing. Name at least one, for \</span></span>
+<span class="ln" id="L186"><span class="tok-str">             example --encrypt-recordings.&quot;</span></span>
+<span class="ln" id="L187">                .<span class="tok-fn">to_string</span>(),</span>
+<span class="ln" id="L188">        );</span>
+<span class="ln" id="L189">    }</span>
+<span class="ln" id="L190"></span>
+<span class="ln" id="L191">    <span class="tok-com">// Replacing a policy somebody else sealed is the one destructive thing</span></span>
+<span class="ln" id="L192">    <span class="tok-com">// here, so it is not done without being asked for. The passphrase would</span></span>
+<span class="ln" id="L193">    <span class="tok-com">// not have prevented it -- the files can be deleted by hand -- so the</span></span>
+<span class="ln" id="L194">    <span class="tok-com">// guard is a flag and an honest sentence rather than a lock.</span></span>
+<span class="ln" id="L195">    <span class="tok-kw">if</span> !replace &amp;&amp; Policy::<span class="tok-fn">load</span>(&amp;dir).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?.<span class="tok-fn">is_some</span>() {</span>
+<span class="ln" id="L196">        println!(</span>
+<span class="ln" id="L197">            <span class="tok-str">&quot;{}&quot;</span>,</span>
+<span class="ln" id="L198">            <span class="tok-fn">warn</span>(<span class="tok-str">&quot;a policy is already in force. Pass --replace to write over it.&quot;</span>)</span>
+<span class="ln" id="L199">        );</span>
+<span class="ln" id="L200">        println!(<span class="tok-str">&quot;  `veilvoice policy status` shows what is there now.&quot;</span>);</span>
+<span class="ln" id="L201">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L202">    }</span>
+<span class="ln" id="L203"></span>
+<span class="ln" id="L204">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L205">    <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> requirements {</span>
+<span class="ln" id="L206">        policy.<span class="tok-fn">require</span>(requirement);</span>
+<span class="ln" id="L207">    }</span>
+<span class="ln" id="L208">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(note) = note {</span>
+<span class="ln" id="L209">        policy = policy.<span class="tok-fn">with_note</span>(&amp;note).<span class="tok-fn">map_err</span>(|error| error.<span class="tok-fn">to_string</span>())?;</span>
+<span class="ln" id="L210">    }</span>
+<span class="ln" id="L211"></span>
+<span class="ln" id="L212">    println!(<span class="tok-str">&quot;  This will fix:&quot;</span>);</span>
+<span class="ln" id="L213">    <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> policy.<span class="tok-fn">requirements</span>() {</span>
+<span class="ln" id="L214">        println!(<span class="tok-str">&quot;    {}&quot;</span>, requirement.<span class="tok-fn">describe</span>());</span>
 <span class="ln" id="L215">    }</span>
-<span class="ln" id="L216">    <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [veilvoice_policy::PLAIN_FILE, veilvoice_policy::SEALED_FILE] {</span>
-<span class="ln" id="L217">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(name);</span>
-<span class="ln" id="L218">        <span class="tok-kw">match</span> std::fs::<span class="tok-fn">remove_file</span>(&amp;path) {</span>
-<span class="ln" id="L219">            <span class="tok-fn">Ok</span>(()) =&gt; println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;removed {}&quot;</span>, path.<span class="tok-fn">display</span>()))),</span>
-<span class="ln" id="L220">            <span class="tok-fn">Err</span>(error) <span class="tok-kw">if</span> error.<span class="tok-fn">kind</span>() == std::io::ErrorKind::NotFound =&gt; {}</span>
-<span class="ln" id="L221">            <span class="tok-fn">Err</span>(error) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;could not remove {}: {error}&quot;</span>, path.<span class="tok-fn">display</span>())),</span>
-<span class="ln" id="L222">        }</span>
-<span class="ln" id="L223">    }</span>
-<span class="ln" id="L224">    <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L225">}</span>
-</span>
+<span class="ln" id="L216">    println!();</span>
+<span class="ln" id="L217">    println!(<span class="tok-str">&quot;  The passphrase seals a copy, so anybody who has it can prove the&quot;</span>);</span>
+<span class="ln" id="L218">    println!(<span class="tok-str">&quot;  policy in force is the one you wrote. It does not stop the policy&quot;</span>);</span>
+<span class="ln" id="L219">    println!(<span class="tok-str">&quot;  being deleted, and nothing here can.&quot;</span>);</span>
+<span class="ln" id="L220">    println!();</span>
+<span class="ln" id="L221"></span>
+<span class="ln" id="L222">    <span class="tok-kw">let</span> password = <span class="tok-fn">read_new_password</span>()?;</span>
+<span class="ln" id="L223">    policy</span>
+<span class="ln" id="L224">        .<span class="tok-fn">save</span>(&amp;dir, password.<span class="tok-fn">expose</span>())</span>
+<span class="ln" id="L225">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not write the policy: {error}&quot;</span>))?;</span>
 <span class="ln" id="L226"></span>
-<span class="ln" id="L227"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L228"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L229">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L227">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;sealed into {}&quot;</span>, dir.<span class="tok-fn">display</span>())));</span>
+<span class="ln" id="L228">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L229">}</span>
+</span>
 <span class="ln" id="L230"></span>
-<span class="ln" id="L231">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L232">    <span class="tok-kw">fn</span> <span class="tok-fn">the_policy_directory_sits_beside_the_app_lock</span>() {</span>
-<span class="ln" id="L233">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dir) = <span class="tok-fn">policy_dir</span>() <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L234">            <span class="tok-kw">return</span>; <span class="tok-com">// a platform with nowhere to keep configuration</span></span>
-<span class="ln" id="L235">        };</span>
-<span class="ln" id="L236">        assert!(dir.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;policy&quot;</span>), <span class="tok-str">&quot;{}&quot;</span>, dir.<span class="tok-fn">display</span>());</span>
-<span class="ln" id="L237">        <span class="tok-kw">let</span> lock = veilvoice_crypto::lock::<span class="tok-fn">default_path</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L238">        assert_eq!(dir.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
-<span class="ln" id="L239">    }</span>
-<span class="ln" id="L240"></span>
-<span class="ln" id="L241">    <span class="tok-com">/// The two state directories must not be the same one, or a canary record</span></span>
-<span class="ln" id="L242">    <span class="tok-com">/// and a policy would share a folder and each other&#x27;s names.</span></span>
-<span class="ln" id="L243">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L244">    <span class="tok-kw">fn</span> <span class="tok-fn">the_policy_and_sentry_directories_are_distinct</span>() {</span>
-<span class="ln" id="L245">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(policy), <span class="tok-fn">Some</span>(sentry)) = (<span class="tok-fn">policy_dir</span>(), <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">state_dir</span>()) {</span>
-<span class="ln" id="L246">            assert_ne!(policy, sentry);</span>
-<span class="ln" id="L247">        }</span>
-<span class="ln" id="L248">    }</span>
-<span class="ln" id="L249">}</span>
+<span class="src-item" id="fn-verify">
+<span class="ln" id="L231"><span class="tok-com">/// Check the plain policy against its sealed copy.</span></span>
+<span class="ln" id="L232"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">verify</span>() -&gt; Result&lt;bool, String&gt; {</span>
+<span class="ln" id="L233">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Verify a policy&quot;</span>));</span>
+<span class="ln" id="L234">    <span class="tok-kw">let</span> dir = <span class="tok-fn">dir</span>()?;</span>
+<span class="ln" id="L235">    <span class="tok-kw">let</span> password = <span class="tok-fn">prompt_secret</span>(<span class="tok-str">&quot;Policy passphrase: &quot;</span>)?;</span>
+<span class="ln" id="L236">    <span class="tok-kw">let</span> checked = veilvoice_policy::<span class="tok-fn">verify</span>(&amp;dir, password.<span class="tok-fn">expose</span>())</span>
+<span class="ln" id="L237">        .<span class="tok-fn">map_err</span>(|error| format!(<span class="tok-str">&quot;could not check the seal: {error}&quot;</span>))?;</span>
+<span class="ln" id="L238"></span>
+<span class="ln" id="L239">    <span class="tok-kw">let</span> line = checked.<span class="tok-fn">describe</span>();</span>
+<span class="ln" id="L240">    <span class="tok-kw">if</span> checked.<span class="tok-fn">wants_attention</span>() {</span>
+<span class="ln" id="L241">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">err</span>(&amp;line));</span>
+<span class="ln" id="L242">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L243">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;line));</span>
+<span class="ln" id="L244">    }</span>
+<span class="ln" id="L245"></span>
+<span class="ln" id="L246">    <span class="tok-kw">if</span> <span class="tok-kw">let</span> Verification::Differs { sealed } = &amp;checked {</span>
+<span class="ln" id="L247">        println!();</span>
+<span class="ln" id="L248">        println!(<span class="tok-str">&quot;  What was sealed:&quot;</span>);</span>
+<span class="ln" id="L249">        <span class="tok-kw">for</span> requirement <span class="tok-kw">in</span> sealed.<span class="tok-fn">requirements</span>() {</span>
+<span class="ln" id="L250">            println!(<span class="tok-str">&quot;    {}&quot;</span>, requirement.<span class="tok-fn">keyword</span>());</span>
+<span class="ln" id="L251">        }</span>
+<span class="ln" id="L252">        println!();</span>
+<span class="ln" id="L253">        println!(<span class="tok-str">&quot;  What is in force is in `veilvoice policy status`.&quot;</span>);</span>
+<span class="ln" id="L254">    }</span>
+<span class="ln" id="L255">    <span class="tok-fn">Ok</span>(checked.<span class="tok-fn">wants_attention</span>())</span>
+<span class="ln" id="L256">}</span>
+</span>
+<span class="ln" id="L257"></span>
+<span class="src-item" id="fn-remove">
+<span class="ln" id="L258"><span class="tok-com">/// Delete both files.</span></span>
+<span class="ln" id="L259"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">remove</span>(yes: bool) -&gt; Result&lt;(), String&gt; {</span>
+<span class="ln" id="L260">    println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">heading</span>(<span class="tok-str">&quot;Remove the policy&quot;</span>));</span>
+<span class="ln" id="L261">    <span class="tok-kw">let</span> dir = <span class="tok-fn">dir</span>()?;</span>
+<span class="ln" id="L262">    <span class="tok-kw">if</span> Policy::<span class="tok-fn">load</span>(&amp;dir).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?.<span class="tok-fn">is_none</span>()</span>
+<span class="ln" id="L263">        &amp;&amp; !dir.<span class="tok-fn">join</span>(veilvoice_policy::SEALED_FILE).<span class="tok-fn">exists</span>()</span>
+<span class="ln" id="L264">    {</span>
+<span class="ln" id="L265">        println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">warn</span>(<span class="tok-str">&quot;there is no policy to remove&quot;</span>));</span>
+<span class="ln" id="L266">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L267">    }</span>
+<span class="ln" id="L268">    <span class="tok-kw">if</span> !yes {</span>
+<span class="ln" id="L269">        println!();</span>
+<span class="ln" id="L270">        println!(<span class="tok-str">&quot;  This deletes both files, and does not ask for the passphrase.&quot;</span>);</span>
+<span class="ln" id="L271">        println!(<span class="tok-str">&quot;  It could not usefully ask: anybody who can run this command can&quot;</span>);</span>
+<span class="ln" id="L272">        println!(<span class="tok-str">&quot;  delete the same two files with a file manager. The passphrase&quot;</span>);</span>
+<span class="ln" id="L273">        println!(<span class="tok-str">&quot;  proves a policy is the one that was written; it is not a lock on&quot;</span>);</span>
+<span class="ln" id="L274">        println!(<span class="tok-str">&quot;  the folder, and saying otherwise would be a lie about what this&quot;</span>);</span>
+<span class="ln" id="L275">        println!(<span class="tok-str">&quot;  program does.&quot;</span>);</span>
+<span class="ln" id="L276">        println!();</span>
+<span class="ln" id="L277">        println!(<span class="tok-str">&quot;  Re-run with --yes to proceed.&quot;</span>);</span>
+<span class="ln" id="L278">        <span class="tok-kw">return</span> <span class="tok-fn">Ok</span>(());</span>
+<span class="ln" id="L279">    }</span>
+<span class="ln" id="L280">    <span class="tok-kw">for</span> name <span class="tok-kw">in</span> [veilvoice_policy::PLAIN_FILE, veilvoice_policy::SEALED_FILE] {</span>
+<span class="ln" id="L281">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">join</span>(name);</span>
+<span class="ln" id="L282">        <span class="tok-kw">match</span> std::fs::<span class="tok-fn">remove_file</span>(&amp;path) {</span>
+<span class="ln" id="L283">            <span class="tok-fn">Ok</span>(()) =&gt; println!(<span class="tok-str">&quot;{}&quot;</span>, <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;removed {}&quot;</span>, path.<span class="tok-fn">display</span>()))),</span>
+<span class="ln" id="L284">            <span class="tok-fn">Err</span>(error) <span class="tok-kw">if</span> error.<span class="tok-fn">kind</span>() == std::io::ErrorKind::NotFound =&gt; {}</span>
+<span class="ln" id="L285">            <span class="tok-fn">Err</span>(error) =&gt; <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;could not remove {}: {error}&quot;</span>, path.<span class="tok-fn">display</span>())),</span>
+<span class="ln" id="L286">        }</span>
+<span class="ln" id="L287">    }</span>
+<span class="ln" id="L288">    <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L289">}</span>
+</span>
+<span class="ln" id="L290"></span>
+<span class="ln" id="L291"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L292"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L293">    <span class="tok-kw">use</span> veilvoice_policy::Posture;</span>
+<span class="ln" id="L294"></span>
+<span class="ln" id="L295">    <span class="tok-kw">fn</span> <span class="tok-fn">loosest</span>() -&gt; Posture {</span>
+<span class="ln" id="L296">        Posture::<span class="tok-fn">most_permissive</span>()</span>
+<span class="ln" id="L297">    }</span>
+<span class="ln" id="L298"></span>
+<span class="ln" id="L299">    <span class="tok-com">/// **F-338.** A policy in the folder tightens what a command asked for.</span></span>
+<span class="ln" id="L300">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L301">    <span class="tok-kw">fn</span> <span class="tok-fn">a_policy_tightens_what_the_command_line_asked_for</span>() {</span>
+<span class="ln" id="L302">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L303">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> policy = veilvoice_policy::Policy::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L304">        policy</span>
+<span class="ln" id="L305">            .<span class="tok-fn">require</span>(veilvoice_policy::Requirement::EncryptRecordings)</span>
+<span class="ln" id="L306">            .<span class="tok-fn">require</span>(veilvoice_policy::Requirement::NeutraliseAccent)</span>
+<span class="ln" id="L307">            .<span class="tok-fn">require</span>(veilvoice_policy::Requirement::<span class="tok-fn">MinimumIntensity</span>(<span class="tok-num">80</span>));</span>
+<span class="ln" id="L308">        std::fs::<span class="tok-fn">write</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;policy.txt&quot;</span>), policy.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L309"></span>
+<span class="ln" id="L310">        <span class="tok-kw">let</span> applied = <span class="tok-kw">super</span>::<span class="tok-fn">apply_from</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()), <span class="tok-fn">loosest</span>());</span>
+<span class="ln" id="L311">        assert!(applied.encrypt_recordings);</span>
+<span class="ln" id="L312">        assert!(applied.neutralise_accent);</span>
+<span class="ln" id="L313">        assert!(!applied.clean_metadata, <span class="tok-str">&quot;nothing required it&quot;</span>);</span>
+<span class="ln" id="L314">        assert!(applied.intensity &gt;= <span class="tok-num">0.8</span> - f32::EPSILON);</span>
+<span class="ln" id="L315">        assert!(applied.<span class="tok-fn">is_at_least_as_strict_as</span>(&amp;<span class="tok-fn">loosest</span>()));</span>
+<span class="ln" id="L316">    }</span>
+<span class="ln" id="L317"></span>
+<span class="ln" id="L318">    <span class="tok-com">/// With no policy, or no folder for one, nothing changes.</span></span>
+<span class="ln" id="L319">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L320">    <span class="tok-kw">fn</span> <span class="tok-fn">without_a_policy_the_flags_stand</span>() {</span>
+<span class="ln" id="L321">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L322">        assert_eq!(</span>
+<span class="ln" id="L323">            <span class="tok-kw">super</span>::<span class="tok-fn">apply_from</span>(<span class="tok-fn">Some</span>(dir.<span class="tok-fn">path</span>().<span class="tok-fn">to_path_buf</span>()), <span class="tok-fn">loosest</span>()),</span>
+<span class="ln" id="L324">            <span class="tok-fn">loosest</span>()</span>
+<span class="ln" id="L325">        );</span>
+<span class="ln" id="L326">        assert_eq!(<span class="tok-kw">super</span>::<span class="tok-fn">apply_from</span>(None, <span class="tok-fn">loosest</span>()), <span class="tok-fn">loosest</span>());</span>
+<span class="ln" id="L327">    }</span>
+<span class="ln" id="L328"></span>
+<span class="ln" id="L329">    <span class="tok-com">/// Every change a policy makes is said, and nothing else is.</span></span>
+<span class="ln" id="L330">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L331">    <span class="tok-kw">fn</span> <span class="tok-fn">what_a_policy_overruled_is_said</span>() {</span>
+<span class="ln" id="L332">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> applied = <span class="tok-fn">loosest</span>();</span>
+<span class="ln" id="L333">        applied.encrypt_recordings = true;</span>
+<span class="ln" id="L334">        applied.intensity = <span class="tok-num">0.5</span>;</span>
+<span class="ln" id="L335">        assert_eq!(<span class="tok-kw">super</span>::<span class="tok-fn">overruled</span>(&amp;<span class="tok-fn">loosest</span>(), &amp;applied).<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L336">        assert!(<span class="tok-kw">super</span>::<span class="tok-fn">overruled</span>(&amp;applied, &amp;applied).<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L337">    }</span>
+<span class="ln" id="L338"></span>
+<span class="ln" id="L339">    <span class="tok-com">/// **F-338.** Every command that processes a recording goes through the</span></span>
+<span class="ln" id="L340">    <span class="tok-com">/// policy before it starts.</span></span>
+<span class="ln" id="L341">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L342">    <span class="tok-kw">fn</span> <span class="tok-fn">every_processing_command_applies_the_policy</span>() {</span>
+<span class="ln" id="L343">        <span class="tok-kw">let</span> main = include_str!(<span class="tok-str">&quot;main.rs&quot;</span>);</span>
+<span class="ln" id="L344">        <span class="tok-kw">for</span> arm <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L345">            <span class="tok-str">&quot;Command::Anonymise {&quot;</span>,</span>
+<span class="ln" id="L346">            <span class="tok-str">&quot;Command::Live {&quot;</span>,</span>
+<span class="ln" id="L347">            <span class="tok-str">&quot;Command::Record {&quot;</span>,</span>
+<span class="ln" id="L348">        ] {</span>
+<span class="ln" id="L349">            <span class="tok-kw">let</span> at = main.<span class="tok-fn">find</span>(arm).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;the command exists&quot;</span>);</span>
+<span class="ln" id="L350">            <span class="tok-kw">let</span> body = &amp;main[at..at + <span class="tok-num">1500</span>.<span class="tok-fn">min</span>(main.<span class="tok-fn">len</span>() - at)];</span>
+<span class="ln" id="L351">            assert!(</span>
+<span class="ln" id="L352">                body.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;policy::apply(&quot;</span>),</span>
+<span class="ln" id="L353">                <span class="tok-str">&quot;{arm} runs without applying the policy&quot;</span></span>
+<span class="ln" id="L354">            );</span>
+<span class="ln" id="L355">        }</span>
+<span class="ln" id="L356">    }</span>
+<span class="ln" id="L357"></span>
+<span class="ln" id="L358">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L359"></span>
+<span class="ln" id="L360">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L361">    <span class="tok-kw">fn</span> <span class="tok-fn">the_policy_directory_sits_beside_the_app_lock</span>() {</span>
+<span class="ln" id="L362">        <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(dir) = <span class="tok-fn">policy_dir</span>() <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L363">            <span class="tok-kw">return</span>; <span class="tok-com">// a platform with nowhere to keep configuration</span></span>
+<span class="ln" id="L364">        };</span>
+<span class="ln" id="L365">        assert!(dir.<span class="tok-fn">ends_with</span>(<span class="tok-str">&quot;policy&quot;</span>), <span class="tok-str">&quot;{}&quot;</span>, dir.<span class="tok-fn">display</span>());</span>
+<span class="ln" id="L366">        <span class="tok-kw">let</span> lock = veilvoice_crypto::lock::<span class="tok-fn">default_path</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L367">        assert_eq!(dir.<span class="tok-fn">parent</span>(), lock.<span class="tok-fn">parent</span>());</span>
+<span class="ln" id="L368">    }</span>
+<span class="ln" id="L369"></span>
+<span class="ln" id="L370">    <span class="tok-com">/// The two state directories must not be the same one, or a canary record</span></span>
+<span class="ln" id="L371">    <span class="tok-com">/// and a policy would share a folder and each other&#x27;s names.</span></span>
+<span class="ln" id="L372">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L373">    <span class="tok-kw">fn</span> <span class="tok-fn">the_policy_and_sentry_directories_are_distinct</span>() {</span>
+<span class="ln" id="L374">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> (<span class="tok-fn">Some</span>(policy), <span class="tok-fn">Some</span>(sentry)) = (<span class="tok-fn">policy_dir</span>(), <span class="tok-kw">crate</span>::sentry::<span class="tok-fn">state_dir</span>()) {</span>
+<span class="ln" id="L375">            assert_ne!(policy, sentry);</span>
+<span class="ln" id="L376">        }</span>
+<span class="ln" id="L377">    }</span>
+<span class="ln" id="L378">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

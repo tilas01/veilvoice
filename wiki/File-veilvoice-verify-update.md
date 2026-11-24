@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/update.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 1650 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs)
+[veilvoice-verify](Crate-veilvoice-verify) &middot; 1651 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs)
 
 ## Contents
 
@@ -135,7 +135,7 @@ that record is locked with the same passphrase.
 
 ## What this file contains
 
-1650 lines defining **22 functions** (7 public), **5 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1651 lines defining **22 functions** (7 public), **5 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -151,7 +151,7 @@ that record is locked with the same passphrase.
   - reaches: `archive_for`
 - `perform` (line 454) -- The whole update, in the one order that is safe.
   - reaches: `check_password`, `installation`, `lock_is_set`, `update_within`, `workspace`, `check_password_in`, `lock_in`, `open_archive`, `proved_contents`, `put_in_place`, `retake_record`, `extract`
-- `relaunch` (line 991) -- Start the updated program and return.
+- `relaunch` (line 992) -- Start the updated program and return.
 
 ## What calls what
 
@@ -188,7 +188,7 @@ flowchart TD
     n_replaced_so_far["replaced_so_far<br/>line 899"]
     n_retake_record["retake_record<br/>line 916"]
     n_write_beside["write_beside<br/>line 976"]
-    n_relaunch(["relaunch<br/>line 991"])
+    n_relaunch(["relaunch<br/>line 992"])
     n_check_password --> n_check_password_in
     n_check_password_in --> n_lock_in
     n_extract --> n_tar_program
@@ -229,7 +229,7 @@ flowchart TD
     click n_replaced_so_far href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L899" "open the source"
     click n_retake_record href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L916" "open the source"
     click n_write_beside href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L976" "open the source"
-    click n_relaunch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L991" "open the source"
+    click n_relaunch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L992" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_offered,n_perform,n_relaunch entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -281,4 +281,4 @@ flowchart TD
 | `replaced_so_far` <sub>fn</sub> | [899](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L899) | Say what an update had already put in place when it stopped. |
 | `retake_record` <sub>fn</sub> | [916](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L916) | Re-take the integrity record over the files that were just replaced. |
 | `write_beside` <sub>fn</sub> | [976](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L976) | Write the sealed record, owner-readable, making its directory if needed. |
-| `relaunch` <sub>pub fn</sub> | [991](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L991) | Start the updated program and return. |
+| `relaunch` <sub>pub fn</sub> | [992](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/update.rs#L992) | Start the updated program and return. |

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-guard/src/record.rs`
 
-[[veilvoice-guard|Crate-veilvoice-guard]] &middot; 94 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/record.rs)
+[veilvoice-guard](Crate-veilvoice-guard) &middot; 94 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-guard/src/record.rs)
 
 ## Contents
 

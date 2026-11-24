@@ -3,7 +3,7 @@
 
 # `website/js/verify.js`
 
-[[The website's source|Source-index]] &middot; 211 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/verify.js)
+[The website's source](Source-index) &middot; 211 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/verify.js)
 
 ## What it does
 

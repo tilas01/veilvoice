@@ -95,30 +95,23 @@ pub fn find() -> Result<PathBuf, String> {
     ))
 }
 
-/// Ask the system where the program is, if anywhere.
+/// Where the window's program is on `PATH`, if it is there.
+///
+/// **F-333.** A walk over `PATH`, not a question to the system. `where.exe`
+/// looks in the current folder before `PATH`, and `sh -c "command -v"` follows
+/// a relative entry, so either could hand back a `veilvoice-gui` planted in the
+/// folder this was started from, which [`open`] would then run. Only absolute
+/// entries are searched, as everywhere else that VeilVoice finds a program.
 fn on_path() -> Option<PathBuf> {
-    let name = gui_name();
-    let output = if cfg!(windows) {
-        let root = std::env::var("SystemRoot").unwrap_or_else(|_| r"C:\Windows".to_string());
-        std::process::Command::new(format!(r"{root}\System32\where.exe"))
-            .arg(name)
-            .output()
-            .ok()?
-    } else {
-        std::process::Command::new("sh")
-            .args(["-c", &format!("command -v {name}")])
-            .output()
-            .ok()?
-    };
-    if !output.status.success() {
-        return None;
-    }
-    let text = String::from_utf8_lossy(&output.stdout);
-    let first = text.lines().next()?.trim();
-    if first.is_empty() {
-        return None;
-    }
-    Some(PathBuf::from(first))
+    find_in(&std::env::var_os("PATH")?, gui_name())
+}
+
+/// `name` in the first absolute entry of `path`, a `PATH` value, that has it.
+fn find_in(path: &std::ffi::OsStr, name: &str) -> Option<PathBuf> {
+    std::env::split_paths(path)
+        .filter(|dir| dir.is_absolute())
+        .map(|dir| dir.join(name))
+        .find(|candidate| candidate.is_file())
 }
 
 /// Open the window.
@@ -158,6 +151,27 @@ pub fn open(quiet: bool) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-333.** A relative `PATH` entry is the folder this was started from,
+    /// so a window program planted there is never the one opened.
+    #[cfg(unix)]
+    #[test]
+    fn a_relative_path_entry_is_never_searched() {
+        let dir = tempfile::tempdir().unwrap();
+        let program = dir.path().join(gui_name());
+        std::fs::write(&program, b"").unwrap();
+        let mut relative = PathBuf::new();
+        for _ in std::env::current_dir().unwrap().components().skip(1) {
+            relative.push("..");
+        }
+        let relative = relative.join(dir.path().strip_prefix("/").unwrap());
+        assert!(
+            relative.join(gui_name()).is_file(),
+            "the test's own path is wrong"
+        );
+        assert_eq!(find_in(relative.as_os_str(), gui_name()), None);
+        assert_eq!(find_in(dir.path().as_os_str(), gui_name()), Some(program));
+    }
 
     #[test]
     fn the_name_has_this_platforms_extension() {
@@ -211,9 +225,15 @@ mod tests {
             !body.contains("Command::new(\"veilvoice-gui\")"),
             "same, spelled out"
         );
-        // What it does start is a path that was found, and the two probes.
+        // What it does start is a path that was found. F-333: and finding it
+        // asks no other program, since `where.exe` searches the current folder
+        // first and `sh -c "command -v"` follows a relative entry.
         assert!(body.contains("Command::new(&program)"));
-        assert!(body.contains("where.exe"), "PATH is asked, not walked");
+        assert!(!body.contains("where.exe"), "PATH is walked, not asked");
+        assert!(
+            !body.contains("Command::new(\"sh\")"),
+            "PATH is walked, not asked"
+        );
     }
 
     /// A failure names every place that was tried, so somebody is not left

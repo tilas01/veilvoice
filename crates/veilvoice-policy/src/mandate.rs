@@ -295,7 +295,8 @@ impl Mandate {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         }
-        veilvoice_crypto::privatefile::write_owner_only(path, self.to_text().as_bytes())
+        // Replaced in one step, so a crash part-way leaves the old record. F-335.
+        veilvoice_crypto::privatefile::replace_owner_only(path, self.to_text().as_bytes())
             .map_err(|e| e.to_string())
     }
 }

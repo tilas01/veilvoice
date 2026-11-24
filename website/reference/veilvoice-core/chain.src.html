@@ -546,329 +546,329 @@
 <span class="ln" id="L453">    <span class="tok-com">/// over the *ratchet* -- which is forward secrecy, not irreversibility --</span></span>
 <span class="ln" id="L454">    <span class="tok-com">/// would be trading the whole feature for a nicety.</span></span>
 <span class="ln" id="L455">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">with_random_reseed_range</span>(<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Self {</span>
-<span class="ln" id="L456">        <span class="tok-com">// Eight bytes, four per end, rather than the two per end this used to</span></span>
-<span class="ln" id="L457">        <span class="tok-com">// take. Two gave each end 16 bits and the pair 32, so two launches drew</span></span>
-<span class="ln" id="L458">        <span class="tok-com">// the same interval after about eighty thousand of them: that is the</span></span>
-<span class="ln" id="L459">        <span class="tok-com">// birthday bound for 32 bits and it is exactly what a uniform draw</span></span>
-<span class="ln" id="L460">        <span class="tok-com">// looks like, not a defect.</span></span>
-<span class="ln" id="L461">        <span class="tok-com">//</span></span>
-<span class="ln" id="L462">        <span class="tok-com">// It is widened anyway, and the reason is worth being exact about,</span></span>
-<span class="ln" id="L463">        <span class="tok-com">// because it is *not* that the old draw was crackable. The seed that</span></span>
-<span class="ln" id="L464">        <span class="tok-com">// does the veiling is 256 bits and is drawn separately in</span></span>
-<span class="ln" id="L465">        <span class="tok-com">// `Deidentifier::new`; nothing here feeds it. What this sets is the</span></span>
-<span class="ln" id="L466">        <span class="tok-com">// roll interval, which VeilVoice prints on purpose in `veilvoice info`</span></span>
-<span class="ln" id="L467">        <span class="tok-com">// and which is therefore not a secret at all.</span></span>
-<span class="ln" id="L468">        <span class="tok-com">//</span></span>
-<span class="ln" id="L469">        <span class="tok-com">// What a shared interval is, is a weak session fingerprint: two</span></span>
-<span class="ln" id="L470">        <span class="tok-com">// sessions carrying the same one are marginally more linkable by</span></span>
-<span class="ln" id="L471">        <span class="tok-com">// somebody watching both. Four more bytes, once, at launch, moves that</span></span>
-<span class="ln" id="L472">        <span class="tok-com">// collision from 2^32 to 2^64 and costs nothing measurable. A cheap</span></span>
-<span class="ln" id="L473">        <span class="tok-com">// removal of a weak signal, not a repair.</span></span>
-<span class="ln" id="L474">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = [0u8; <span class="tok-num">8</span>];</span>
-<span class="ln" id="L475">        <span class="tok-kw">if</span> getrandom::<span class="tok-fn">getrandom</span>(&amp;<span class="tok-kw">mut</span> bytes).<span class="tok-fn">is_err</span>() {</span>
-<span class="ln" id="L476">            <span class="tok-kw">return</span> <span class="tok-kw">self</span>;</span>
-<span class="ln" id="L477">        }</span>
-<span class="ln" id="L478">        <span class="tok-kw">let</span> a =</span>
-<span class="ln" id="L479">            u32::<span class="tok-fn">from_le_bytes</span>([bytes[<span class="tok-num">0</span>], bytes[<span class="tok-num">1</span>], bytes[<span class="tok-num">2</span>], bytes[<span class="tok-num">3</span>]]) <span class="tok-kw">as</span> f64 / u32::MAX <span class="tok-kw">as</span> f64;</span>
-<span class="ln" id="L480">        <span class="tok-kw">let</span> b =</span>
-<span class="ln" id="L481">            u32::<span class="tok-fn">from_le_bytes</span>([bytes[<span class="tok-num">4</span>], bytes[<span class="tok-num">5</span>], bytes[<span class="tok-num">6</span>], bytes[<span class="tok-num">7</span>]]) <span class="tok-kw">as</span> f64 / u32::MAX <span class="tok-kw">as</span> f64;</span>
-<span class="ln" id="L482">        <span class="tok-kw">self</span>.reseed_range_ms = <span class="tok-fn">Some</span>(<span class="tok-fn">reseed_range_from</span>(a <span class="tok-kw">as</span> f32, b <span class="tok-kw">as</span> f32, <span class="tok-kw">self</span>.<span class="tok-fn">frame_ms</span>()));</span>
-<span class="ln" id="L483">        <span class="tok-kw">self</span></span>
-<span class="ln" id="L484">    }</span>
+<span class="ln" id="L456">        <span class="tok-com">// Eight bytes, four per end. The draw is not what limits how many</span></span>
+<span class="ln" id="L457">        <span class="tok-com">// intervals there can be, though: both ends are rounded to whole</span></span>
+<span class="ln" id="L458">        <span class="tok-com">// frames before they are used, and between one frame and two seconds</span></span>
+<span class="ln" id="L459">        <span class="tok-com">// there are only a few hundred frame counts (about 190 with 10.7 ms</span></span>
+<span class="ln" id="L460">        <span class="tok-com">// frames, 375 with 5.3 ms ones). The ordered pair takes at most a few</span></span>
+<span class="ln" id="L461">        <span class="tok-com">// tens of thousands of values, about 2^16, so two launches share an</span></span>
+<span class="ln" id="L462">        <span class="tok-com">// interval after a few hundred of them. That was as true of the two</span></span>
+<span class="ln" id="L463">        <span class="tok-com">// bytes per end this used to take, and widening the draw did not</span></span>
+<span class="ln" id="L464">        <span class="tok-com">// change it. **F-322** corrects the 2^32 and 2^64 this used to give.</span></span>
+<span class="ln" id="L465">        <span class="tok-com">//</span></span>
+<span class="ln" id="L466">        <span class="tok-com">// None of that weakens the veiling. The seed that does the veiling is</span></span>
+<span class="ln" id="L467">        <span class="tok-com">// 256 bits and is drawn separately in `Deidentifier::new`; nothing</span></span>
+<span class="ln" id="L468">        <span class="tok-com">// here feeds it. What this sets is the roll interval, which VeilVoice</span></span>
+<span class="ln" id="L469">        <span class="tok-com">// prints on purpose in `veilvoice info` and which is therefore not a</span></span>
+<span class="ln" id="L470">        <span class="tok-com">// secret at all. A shared interval is a weak session fingerprint: two</span></span>
+<span class="ln" id="L471">        <span class="tok-com">// sessions carrying the same one are marginally more linkable by</span></span>
+<span class="ln" id="L472">        <span class="tok-com">// somebody watching both.</span></span>
+<span class="ln" id="L473">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> bytes = [0u8; <span class="tok-num">8</span>];</span>
+<span class="ln" id="L474">        <span class="tok-kw">if</span> getrandom::<span class="tok-fn">getrandom</span>(&amp;<span class="tok-kw">mut</span> bytes).<span class="tok-fn">is_err</span>() {</span>
+<span class="ln" id="L475">            <span class="tok-kw">return</span> <span class="tok-kw">self</span>;</span>
+<span class="ln" id="L476">        }</span>
+<span class="ln" id="L477">        <span class="tok-kw">let</span> a =</span>
+<span class="ln" id="L478">            u32::<span class="tok-fn">from_le_bytes</span>([bytes[<span class="tok-num">0</span>], bytes[<span class="tok-num">1</span>], bytes[<span class="tok-num">2</span>], bytes[<span class="tok-num">3</span>]]) <span class="tok-kw">as</span> f64 / u32::MAX <span class="tok-kw">as</span> f64;</span>
+<span class="ln" id="L479">        <span class="tok-kw">let</span> b =</span>
+<span class="ln" id="L480">            u32::<span class="tok-fn">from_le_bytes</span>([bytes[<span class="tok-num">4</span>], bytes[<span class="tok-num">5</span>], bytes[<span class="tok-num">6</span>], bytes[<span class="tok-num">7</span>]]) <span class="tok-kw">as</span> f64 / u32::MAX <span class="tok-kw">as</span> f64;</span>
+<span class="ln" id="L481">        <span class="tok-kw">self</span>.reseed_range_ms = <span class="tok-fn">Some</span>(<span class="tok-fn">reseed_range_from</span>(a <span class="tok-kw">as</span> f32, b <span class="tok-kw">as</span> f32, <span class="tok-kw">self</span>.<span class="tok-fn">frame_ms</span>()));</span>
+<span class="ln" id="L482">        <span class="tok-kw">self</span></span>
+<span class="ln" id="L483">    }</span>
 </span>
-<span class="ln" id="L485"></span>
+<span class="ln" id="L484"></span>
 <span class="src-item" id="fn-deidconfig-scaled">
-<span class="ln" id="L486">    <span class="tok-com">/// Scale a `(lo, hi)` ratio range toward 1.0 by `intensity`.</span></span>
-<span class="ln" id="L487">    <span class="tok-kw">fn</span> <span class="tok-fn">scaled</span>(&amp;<span class="tok-kw">self</span>, bounds: (f32, f32)) -&gt; (f32, f32) {</span>
-<span class="ln" id="L488">        <span class="tok-kw">let</span> s = <span class="tok-kw">self</span>.intensity.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L489">        (<span class="tok-num">1.0</span> + (bounds.<span class="tok-num">0</span> - <span class="tok-num">1.0</span>) * s, <span class="tok-num">1.0</span> + (bounds.<span class="tok-num">1</span> - <span class="tok-num">1.0</span>) * s)</span>
-<span class="ln" id="L490">    }</span>
+<span class="ln" id="L485">    <span class="tok-com">/// Scale a `(lo, hi)` ratio range toward 1.0 by `intensity`.</span></span>
+<span class="ln" id="L486">    <span class="tok-kw">fn</span> <span class="tok-fn">scaled</span>(&amp;<span class="tok-kw">self</span>, bounds: (f32, f32)) -&gt; (f32, f32) {</span>
+<span class="ln" id="L487">        <span class="tok-kw">let</span> s = <span class="tok-kw">self</span>.intensity.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L488">        (<span class="tok-num">1.0</span> + (bounds.<span class="tok-num">0</span> - <span class="tok-num">1.0</span>) * s, <span class="tok-num">1.0</span> + (bounds.<span class="tok-num">1</span> - <span class="tok-num">1.0</span>) * s)</span>
+<span class="ln" id="L489">    }</span>
 </span>
-<span class="ln" id="L491"></span>
+<span class="ln" id="L490"></span>
 <span class="src-item" id="fn-deidconfig-max_sample_rate">
-<span class="ln" id="L492">    <span class="tok-com">/// The largest sample rate this engine will build for, in Hz.</span></span>
-<span class="ln" id="L493">    <span class="tok-com">///</span></span>
-<span class="ln" id="L494">    <span class="tok-com">/// Every value in here is reachable from a file: a WAV&#x27;s `fmt ` chunk</span></span>
-<span class="ln" id="L495">    <span class="tok-com">/// carries a **`u32`** sample rate, and `symphonia` passes whatever it</span></span>
-<span class="ln" id="L496">    <span class="tok-com">/// finds straight through. That number then sizes the delay lines in</span></span>
-<span class="ln" id="L497">    <span class="tok-com">/// `effects.rs`, where `Reverb`&#x27;s comb is `0.0297 &#215; sample_rate` samples and</span></span>
-<span class="ln" id="L498">    <span class="tok-com">/// the chorus voices are similar, so a four-kilobyte file declaring</span></span>
-<span class="ln" id="L499">    <span class="tok-com">/// `u32::MAX` asks for roughly two gigabytes of buffers before a single</span></span>
-<span class="ln" id="L500">    <span class="tok-com">/// sample is processed. A failed allocation in Rust aborts the process,</span></span>
-<span class="ln" id="L501">    <span class="tok-com">/// which is the same shape as F-3: opening a hostile file kills the</span></span>
-<span class="ln" id="L502">    <span class="tok-com">/// program.</span></span>
-<span class="ln" id="L503">    <span class="tok-com">///</span></span>
-<span class="ln" id="L504">    <span class="tok-com">/// 768 kHz is chosen well above anything real. Professional converters top</span></span>
-<span class="ln" id="L505">    <span class="tok-com">/// out at 384 kHz and DSD-rate PCM at 705.6 kHz; nothing legitimate asks</span></span>
-<span class="ln" id="L506">    <span class="tok-com">/// for more, and the largest buffer this permits is a few megabytes.</span></span>
-<span class="ln" id="L507">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_SAMPLE_RATE: f32 = <span class="tok-num">768_000.0</span>;</span>
+<span class="ln" id="L491">    <span class="tok-com">/// The largest sample rate this engine will build for, in Hz.</span></span>
+<span class="ln" id="L492">    <span class="tok-com">///</span></span>
+<span class="ln" id="L493">    <span class="tok-com">/// Every value in here is reachable from a file: a WAV&#x27;s `fmt ` chunk</span></span>
+<span class="ln" id="L494">    <span class="tok-com">/// carries a **`u32`** sample rate, and `symphonia` passes whatever it</span></span>
+<span class="ln" id="L495">    <span class="tok-com">/// finds straight through. That number then sizes the delay lines in</span></span>
+<span class="ln" id="L496">    <span class="tok-com">/// `effects.rs`, where `Reverb`&#x27;s comb is `0.0297 &#215; sample_rate` samples and</span></span>
+<span class="ln" id="L497">    <span class="tok-com">/// the chorus voices are similar, so a four-kilobyte file declaring</span></span>
+<span class="ln" id="L498">    <span class="tok-com">/// `u32::MAX` asks for roughly two gigabytes of buffers before a single</span></span>
+<span class="ln" id="L499">    <span class="tok-com">/// sample is processed. A failed allocation in Rust aborts the process,</span></span>
+<span class="ln" id="L500">    <span class="tok-com">/// which is the same shape as F-3: opening a hostile file kills the</span></span>
+<span class="ln" id="L501">    <span class="tok-com">/// program.</span></span>
+<span class="ln" id="L502">    <span class="tok-com">///</span></span>
+<span class="ln" id="L503">    <span class="tok-com">/// 768 kHz is chosen well above anything real. Professional converters top</span></span>
+<span class="ln" id="L504">    <span class="tok-com">/// out at 384 kHz and DSD-rate PCM at 705.6 kHz; nothing legitimate asks</span></span>
+<span class="ln" id="L505">    <span class="tok-com">/// for more, and the largest buffer this permits is a few megabytes.</span></span>
+<span class="ln" id="L506">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_SAMPLE_RATE: f32 = <span class="tok-num">768_000.0</span>;</span>
 </span>
-<span class="ln" id="L508"></span>
+<span class="ln" id="L507"></span>
 <span class="src-item" id="fn-deidconfig-max_frame_size">
-<span class="ln" id="L509">    <span class="tok-com">/// The largest FFT size this engine will build for.</span></span>
-<span class="ln" id="L510">    <span class="tok-com">///</span></span>
-<span class="ln" id="L511">    <span class="tok-com">/// Bounded for the same reason as the sample rate: `frame_size` sizes every</span></span>
-<span class="ln" id="L512">    <span class="tok-com">/// internal buffer and the FFT plan, and there was previously no upper</span></span>
-<span class="ln" id="L513">    <span class="tok-com">/// limit at all, so a caller could ask for a `usize::MAX / 2` transform.</span></span>
-<span class="ln" id="L514">    <span class="tok-com">/// 65536 is eight times the largest size anyone uses for speech.</span></span>
-<span class="ln" id="L515">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_FRAME_SIZE: usize = <span class="tok-num">1</span> &lt;&lt; <span class="tok-num">16</span>;</span>
+<span class="ln" id="L508">    <span class="tok-com">/// The largest FFT size this engine will build for.</span></span>
+<span class="ln" id="L509">    <span class="tok-com">///</span></span>
+<span class="ln" id="L510">    <span class="tok-com">/// Bounded for the same reason as the sample rate: `frame_size` sizes every</span></span>
+<span class="ln" id="L511">    <span class="tok-com">/// internal buffer and the FFT plan, and there was previously no upper</span></span>
+<span class="ln" id="L512">    <span class="tok-com">/// limit at all, so a caller could ask for a `usize::MAX / 2` transform.</span></span>
+<span class="ln" id="L513">    <span class="tok-com">/// 65536 is eight times the largest size anyone uses for speech.</span></span>
+<span class="ln" id="L514">    <span class="tok-kw">pub</span> <span class="tok-kw">const</span> MAX_FRAME_SIZE: usize = <span class="tok-num">1</span> &lt;&lt; <span class="tok-num">16</span>;</span>
 </span>
-<span class="ln" id="L516"></span>
+<span class="ln" id="L515"></span>
 <span class="src-item" id="fn-deidconfig-checked">
-<span class="ln" id="L517">    <span class="tok-com">/// Validate and normalise; returns an error string on impossible values.</span></span>
-<span class="ln" id="L518">    <span class="tok-com">///</span></span>
-<span class="ln" id="L519">    <span class="tok-com">/// Every float is checked for finiteness, not merely for range. A `NaN`</span></span>
-<span class="ln" id="L520">    <span class="tok-com">/// compares false against every bound, so a bare `self.sample_rate &lt;</span></span>
-<span class="ln" id="L521">    <span class="tok-com">/// 8_000.0` test *passes* `NaN`, and an engine built at a `NaN` sample</span></span>
-<span class="ln" id="L522">    <span class="tok-com">/// rate produced `NaN` for every output sample, for the whole session,</span></span>
-<span class="ln" id="L523">    <span class="tok-com">/// with nothing reported. That is F-5 arriving through a second door: F-5</span></span>
-<span class="ln" id="L524">    <span class="tok-com">/// sanitised the samples, and nothing sanitised the configuration they were</span></span>
-<span class="ln" id="L525">    <span class="tok-com">/// processed under.</span></span>
-<span class="ln" id="L526">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">checked</span>(<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Result&lt;Self, String&gt; {</span>
-<span class="ln" id="L527">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.frame_size &lt; <span class="tok-num">64</span> || !<span class="tok-kw">self</span>.frame_size.<span class="tok-fn">is_multiple_of</span>(<span class="tok-num">2</span>) {</span>
-<span class="ln" id="L528">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;frame_size must be even and &gt;= 64&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L529">        }</span>
-<span class="ln" id="L530">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.frame_size &gt; Self::MAX_FRAME_SIZE {</span>
-<span class="ln" id="L531">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L532">                <span class="tok-str">&quot;frame_size must be at most {}&quot;</span>,</span>
-<span class="ln" id="L533">                Self::MAX_FRAME_SIZE</span>
-<span class="ln" id="L534">            ));</span>
-<span class="ln" id="L535">        }</span>
-<span class="ln" id="L536">        <span class="tok-kw">if</span> !(<span class="tok-num">2</span>..=<span class="tok-num">16</span>).<span class="tok-fn">contains</span>(&amp;<span class="tok-kw">self</span>.overlap) {</span>
-<span class="ln" id="L537">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;overlap must be in 2..=16&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L538">        }</span>
-<span class="ln" id="L539">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.frame_size.<span class="tok-fn">is_multiple_of</span>(<span class="tok-kw">self</span>.overlap) {</span>
-<span class="ln" id="L540">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;frame_size must be divisible by overlap&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L541">        }</span>
-<span class="ln" id="L542">        <span class="tok-com">// `is_finite` first: `NaN &lt; 8_000.0` is false, so a range test alone</span></span>
-<span class="ln" id="L543">        <span class="tok-com">// lets it through.</span></span>
-<span class="ln" id="L544">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.sample_rate.<span class="tok-fn">is_finite</span>() {</span>
-<span class="ln" id="L545">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;sample_rate must be a real number&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L546">        }</span>
-<span class="ln" id="L547">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.sample_rate &lt; <span class="tok-num">8_000.0</span> {</span>
-<span class="ln" id="L548">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;sample_rate too low&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L549">        }</span>
-<span class="ln" id="L550">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.sample_rate &gt; Self::MAX_SAMPLE_RATE {</span>
-<span class="ln" id="L551">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L552">                <span class="tok-str">&quot;sample_rate {} Hz is above the {} Hz this engine will build for&quot;</span>,</span>
-<span class="ln" id="L553">                <span class="tok-kw">self</span>.sample_rate,</span>
-<span class="ln" id="L554">                Self::MAX_SAMPLE_RATE</span>
-<span class="ln" id="L555">            ));</span>
-<span class="ln" id="L556">        }</span>
-<span class="ln" id="L557">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.reseed_secs.<span class="tok-fn">is_finite</span>() || <span class="tok-kw">self</span>.reseed_secs &lt; <span class="tok-num">0.0</span> {</span>
-<span class="ln" id="L558">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;reseed_secs must be zero or a positive number of seconds&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L559">        }</span>
-<span class="ln" id="L560">        <span class="tok-com">// Refused rather than clamped, and refused rather than silently</span></span>
-<span class="ln" id="L561">        <span class="tok-com">// reordered. A reversed range is a typo, and a caller who wrote one</span></span>
-<span class="ln" id="L562">        <span class="tok-com">// believes something about what their recording is doing.</span></span>
-<span class="ln" id="L563">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((lo, hi)) = <span class="tok-kw">self</span>.reseed_range_ms {</span>
-<span class="ln" id="L564">            <span class="tok-kw">if</span> !lo.<span class="tok-fn">is_finite</span>() || !hi.<span class="tok-fn">is_finite</span>() {</span>
-<span class="ln" id="L565">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;reseed_range_ms must be two real numbers&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L566">            }</span>
-<span class="ln" id="L567">            <span class="tok-kw">if</span> lo &gt; hi {</span>
-<span class="ln" id="L568">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L569">                    <span class="tok-str">&quot;reseed_range_ms is {lo} to {hi} ms, which is backwards. Give the \</span></span>
-<span class="ln" id="L570"><span class="tok-str">                     shorter interval first.&quot;</span></span>
-<span class="ln" id="L571">                ));</span>
-<span class="ln" id="L572">            }</span>
-<span class="ln" id="L573">            <span class="tok-kw">if</span> lo &lt; MIN_RESEED_MS || hi &gt; MAX_RESEED_MS {</span>
-<span class="ln" id="L574">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
-<span class="ln" id="L575">                    <span class="tok-str">&quot;reseed_range_ms {lo} to {hi} ms is outside {MIN_RESEED_MS} to \</span></span>
-<span class="ln" id="L576"><span class="tok-str">                     {MAX_RESEED_MS} ms&quot;</span></span>
-<span class="ln" id="L577">                ));</span>
-<span class="ln" id="L578">            }</span>
-<span class="ln" id="L579">        }</span>
-<span class="ln" id="L580">        <span class="tok-com">// The remaining floats are all clamped rather than refused, because</span></span>
-<span class="ln" id="L581">        <span class="tok-com">// every one of them has a meaningful nearest legal value. A `NaN`</span></span>
-<span class="ln" id="L582">        <span class="tok-com">// does not clamp, it propagates, so it is refused by name.</span></span>
-<span class="ln" id="L583">        <span class="tok-kw">for</span> (name, value) <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L584">            (<span class="tok-str">&quot;intensity&quot;</span>, <span class="tok-kw">self</span>.intensity),</span>
-<span class="ln" id="L585">            (<span class="tok-str">&quot;mod_smooth&quot;</span>, <span class="tok-kw">self</span>.mod_smooth),</span>
-<span class="ln" id="L586">            (<span class="tok-str">&quot;distortion_drive&quot;</span>, <span class="tok-kw">self</span>.distortion_drive),</span>
-<span class="ln" id="L587">            (<span class="tok-str">&quot;distortion_mix&quot;</span>, <span class="tok-kw">self</span>.distortion_mix),</span>
-<span class="ln" id="L588">            (<span class="tok-str">&quot;chorus_mix&quot;</span>, <span class="tok-kw">self</span>.chorus_mix),</span>
-<span class="ln" id="L589">            (<span class="tok-str">&quot;reverb_mix&quot;</span>, <span class="tok-kw">self</span>.reverb_mix),</span>
-<span class="ln" id="L590">            (<span class="tok-str">&quot;pitch_bounds.0&quot;</span>, <span class="tok-kw">self</span>.pitch_bounds.<span class="tok-num">0</span>),</span>
-<span class="ln" id="L591">            (<span class="tok-str">&quot;pitch_bounds.1&quot;</span>, <span class="tok-kw">self</span>.pitch_bounds.<span class="tok-num">1</span>),</span>
-<span class="ln" id="L592">            (<span class="tok-str">&quot;formant_bounds.0&quot;</span>, <span class="tok-kw">self</span>.formant_bounds.<span class="tok-num">0</span>),</span>
-<span class="ln" id="L593">            (<span class="tok-str">&quot;formant_bounds.1&quot;</span>, <span class="tok-kw">self</span>.formant_bounds.<span class="tok-num">1</span>),</span>
-<span class="ln" id="L594">        ] {</span>
-<span class="ln" id="L595">            <span class="tok-kw">if</span> !value.<span class="tok-fn">is_finite</span>() {</span>
-<span class="ln" id="L596">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;{name} must be a real number&quot;</span>));</span>
-<span class="ln" id="L597">            }</span>
-<span class="ln" id="L598">        }</span>
-<span class="ln" id="L599">        <span class="tok-kw">self</span>.intensity = <span class="tok-kw">self</span>.intensity.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L600">        <span class="tok-kw">self</span>.mod_smooth = <span class="tok-kw">self</span>.mod_smooth.<span class="tok-fn">clamp</span>(1e-<span class="tok-num">6</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L601">        <span class="tok-kw">self</span>.distortion_mix = <span class="tok-kw">self</span>.distortion_mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L602">        <span class="tok-kw">self</span>.chorus_mix = <span class="tok-kw">self</span>.chorus_mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L603">        <span class="tok-kw">self</span>.reverb_mix = <span class="tok-kw">self</span>.reverb_mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
-<span class="ln" id="L604">        <span class="tok-kw">self</span>.distortion_drive = <span class="tok-kw">self</span>.distortion_drive.<span class="tok-fn">clamp</span>(<span class="tok-num">0.01</span>, <span class="tok-num">64.0</span>);</span>
-<span class="ln" id="L605">        <span class="tok-com">// Ratios outside this are not a transform, they are a resampler with a</span></span>
-<span class="ln" id="L606">        <span class="tok-com">// pathological factor; `resample_linear` already substitutes 1.0 for</span></span>
-<span class="ln" id="L607">        <span class="tok-com">// anything non-finite, and this stops the merely absurd as well.</span></span>
-<span class="ln" id="L608">        <span class="tok-kw">self</span>.pitch_bounds = <span class="tok-fn">clamp_ratio_bounds</span>(<span class="tok-kw">self</span>.pitch_bounds);</span>
-<span class="ln" id="L609">        <span class="tok-kw">self</span>.formant_bounds = <span class="tok-fn">clamp_ratio_bounds</span>(<span class="tok-kw">self</span>.formant_bounds);</span>
-<span class="ln" id="L610">        <span class="tok-fn">Ok</span>(<span class="tok-kw">self</span>)</span>
-<span class="ln" id="L611">    }</span>
+<span class="ln" id="L516">    <span class="tok-com">/// Validate and normalise; returns an error string on impossible values.</span></span>
+<span class="ln" id="L517">    <span class="tok-com">///</span></span>
+<span class="ln" id="L518">    <span class="tok-com">/// Every float is checked for finiteness, not merely for range. A `NaN`</span></span>
+<span class="ln" id="L519">    <span class="tok-com">/// compares false against every bound, so a bare `self.sample_rate &lt;</span></span>
+<span class="ln" id="L520">    <span class="tok-com">/// 8_000.0` test *passes* `NaN`, and an engine built at a `NaN` sample</span></span>
+<span class="ln" id="L521">    <span class="tok-com">/// rate produced `NaN` for every output sample, for the whole session,</span></span>
+<span class="ln" id="L522">    <span class="tok-com">/// with nothing reported. That is F-5 arriving through a second door: F-5</span></span>
+<span class="ln" id="L523">    <span class="tok-com">/// sanitised the samples, and nothing sanitised the configuration they were</span></span>
+<span class="ln" id="L524">    <span class="tok-com">/// processed under.</span></span>
+<span class="ln" id="L525">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">checked</span>(<span class="tok-kw">mut</span> <span class="tok-kw">self</span>) -&gt; Result&lt;Self, String&gt; {</span>
+<span class="ln" id="L526">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.frame_size &lt; <span class="tok-num">64</span> || !<span class="tok-kw">self</span>.frame_size.<span class="tok-fn">is_multiple_of</span>(<span class="tok-num">2</span>) {</span>
+<span class="ln" id="L527">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;frame_size must be even and &gt;= 64&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L528">        }</span>
+<span class="ln" id="L529">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.frame_size &gt; Self::MAX_FRAME_SIZE {</span>
+<span class="ln" id="L530">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L531">                <span class="tok-str">&quot;frame_size must be at most {}&quot;</span>,</span>
+<span class="ln" id="L532">                Self::MAX_FRAME_SIZE</span>
+<span class="ln" id="L533">            ));</span>
+<span class="ln" id="L534">        }</span>
+<span class="ln" id="L535">        <span class="tok-kw">if</span> !(<span class="tok-num">2</span>..=<span class="tok-num">16</span>).<span class="tok-fn">contains</span>(&amp;<span class="tok-kw">self</span>.overlap) {</span>
+<span class="ln" id="L536">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;overlap must be in 2..=16&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L537">        }</span>
+<span class="ln" id="L538">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.frame_size.<span class="tok-fn">is_multiple_of</span>(<span class="tok-kw">self</span>.overlap) {</span>
+<span class="ln" id="L539">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;frame_size must be divisible by overlap&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L540">        }</span>
+<span class="ln" id="L541">        <span class="tok-com">// `is_finite` first: `NaN &lt; 8_000.0` is false, so a range test alone</span></span>
+<span class="ln" id="L542">        <span class="tok-com">// lets it through.</span></span>
+<span class="ln" id="L543">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.sample_rate.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L544">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;sample_rate must be a real number&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L545">        }</span>
+<span class="ln" id="L546">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.sample_rate &lt; <span class="tok-num">8_000.0</span> {</span>
+<span class="ln" id="L547">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;sample_rate too low&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L548">        }</span>
+<span class="ln" id="L549">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.sample_rate &gt; Self::MAX_SAMPLE_RATE {</span>
+<span class="ln" id="L550">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L551">                <span class="tok-str">&quot;sample_rate {} Hz is above the {} Hz this engine will build for&quot;</span>,</span>
+<span class="ln" id="L552">                <span class="tok-kw">self</span>.sample_rate,</span>
+<span class="ln" id="L553">                Self::MAX_SAMPLE_RATE</span>
+<span class="ln" id="L554">            ));</span>
+<span class="ln" id="L555">        }</span>
+<span class="ln" id="L556">        <span class="tok-kw">if</span> !<span class="tok-kw">self</span>.reseed_secs.<span class="tok-fn">is_finite</span>() || <span class="tok-kw">self</span>.reseed_secs &lt; <span class="tok-num">0.0</span> {</span>
+<span class="ln" id="L557">            <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;reseed_secs must be zero or a positive number of seconds&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L558">        }</span>
+<span class="ln" id="L559">        <span class="tok-com">// Refused rather than clamped, and refused rather than silently</span></span>
+<span class="ln" id="L560">        <span class="tok-com">// reordered. A reversed range is a typo, and a caller who wrote one</span></span>
+<span class="ln" id="L561">        <span class="tok-com">// believes something about what their recording is doing.</span></span>
+<span class="ln" id="L562">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>((lo, hi)) = <span class="tok-kw">self</span>.reseed_range_ms {</span>
+<span class="ln" id="L563">            <span class="tok-kw">if</span> !lo.<span class="tok-fn">is_finite</span>() || !hi.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L564">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(<span class="tok-str">&quot;reseed_range_ms must be two real numbers&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L565">            }</span>
+<span class="ln" id="L566">            <span class="tok-kw">if</span> lo &gt; hi {</span>
+<span class="ln" id="L567">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L568">                    <span class="tok-str">&quot;reseed_range_ms is {lo} to {hi} ms, which is backwards. Give the \</span></span>
+<span class="ln" id="L569"><span class="tok-str">                     shorter interval first.&quot;</span></span>
+<span class="ln" id="L570">                ));</span>
+<span class="ln" id="L571">            }</span>
+<span class="ln" id="L572">            <span class="tok-kw">if</span> lo &lt; MIN_RESEED_MS || hi &gt; MAX_RESEED_MS {</span>
+<span class="ln" id="L573">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(</span>
+<span class="ln" id="L574">                    <span class="tok-str">&quot;reseed_range_ms {lo} to {hi} ms is outside {MIN_RESEED_MS} to \</span></span>
+<span class="ln" id="L575"><span class="tok-str">                     {MAX_RESEED_MS} ms&quot;</span></span>
+<span class="ln" id="L576">                ));</span>
+<span class="ln" id="L577">            }</span>
+<span class="ln" id="L578">        }</span>
+<span class="ln" id="L579">        <span class="tok-com">// The remaining floats are all clamped rather than refused, because</span></span>
+<span class="ln" id="L580">        <span class="tok-com">// every one of them has a meaningful nearest legal value. A `NaN`</span></span>
+<span class="ln" id="L581">        <span class="tok-com">// does not clamp, it propagates, so it is refused by name.</span></span>
+<span class="ln" id="L582">        <span class="tok-kw">for</span> (name, value) <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L583">            (<span class="tok-str">&quot;intensity&quot;</span>, <span class="tok-kw">self</span>.intensity),</span>
+<span class="ln" id="L584">            (<span class="tok-str">&quot;mod_smooth&quot;</span>, <span class="tok-kw">self</span>.mod_smooth),</span>
+<span class="ln" id="L585">            (<span class="tok-str">&quot;distortion_drive&quot;</span>, <span class="tok-kw">self</span>.distortion_drive),</span>
+<span class="ln" id="L586">            (<span class="tok-str">&quot;distortion_mix&quot;</span>, <span class="tok-kw">self</span>.distortion_mix),</span>
+<span class="ln" id="L587">            (<span class="tok-str">&quot;chorus_mix&quot;</span>, <span class="tok-kw">self</span>.chorus_mix),</span>
+<span class="ln" id="L588">            (<span class="tok-str">&quot;reverb_mix&quot;</span>, <span class="tok-kw">self</span>.reverb_mix),</span>
+<span class="ln" id="L589">            (<span class="tok-str">&quot;pitch_bounds.0&quot;</span>, <span class="tok-kw">self</span>.pitch_bounds.<span class="tok-num">0</span>),</span>
+<span class="ln" id="L590">            (<span class="tok-str">&quot;pitch_bounds.1&quot;</span>, <span class="tok-kw">self</span>.pitch_bounds.<span class="tok-num">1</span>),</span>
+<span class="ln" id="L591">            (<span class="tok-str">&quot;formant_bounds.0&quot;</span>, <span class="tok-kw">self</span>.formant_bounds.<span class="tok-num">0</span>),</span>
+<span class="ln" id="L592">            (<span class="tok-str">&quot;formant_bounds.1&quot;</span>, <span class="tok-kw">self</span>.formant_bounds.<span class="tok-num">1</span>),</span>
+<span class="ln" id="L593">        ] {</span>
+<span class="ln" id="L594">            <span class="tok-kw">if</span> !value.<span class="tok-fn">is_finite</span>() {</span>
+<span class="ln" id="L595">                <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(format!(<span class="tok-str">&quot;{name} must be a real number&quot;</span>));</span>
+<span class="ln" id="L596">            }</span>
+<span class="ln" id="L597">        }</span>
+<span class="ln" id="L598">        <span class="tok-kw">self</span>.intensity = <span class="tok-kw">self</span>.intensity.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L599">        <span class="tok-kw">self</span>.mod_smooth = <span class="tok-kw">self</span>.mod_smooth.<span class="tok-fn">clamp</span>(1e-<span class="tok-num">6</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L600">        <span class="tok-kw">self</span>.distortion_mix = <span class="tok-kw">self</span>.distortion_mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L601">        <span class="tok-kw">self</span>.chorus_mix = <span class="tok-kw">self</span>.chorus_mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L602">        <span class="tok-kw">self</span>.reverb_mix = <span class="tok-kw">self</span>.reverb_mix.<span class="tok-fn">clamp</span>(<span class="tok-num">0.0</span>, <span class="tok-num">1.0</span>);</span>
+<span class="ln" id="L603">        <span class="tok-kw">self</span>.distortion_drive = <span class="tok-kw">self</span>.distortion_drive.<span class="tok-fn">clamp</span>(<span class="tok-num">0.01</span>, <span class="tok-num">64.0</span>);</span>
+<span class="ln" id="L604">        <span class="tok-com">// Ratios outside this are not a transform, they are a resampler with a</span></span>
+<span class="ln" id="L605">        <span class="tok-com">// pathological factor; `resample_linear` already substitutes 1.0 for</span></span>
+<span class="ln" id="L606">        <span class="tok-com">// anything non-finite, and this stops the merely absurd as well.</span></span>
+<span class="ln" id="L607">        <span class="tok-kw">self</span>.pitch_bounds = <span class="tok-fn">clamp_ratio_bounds</span>(<span class="tok-kw">self</span>.pitch_bounds);</span>
+<span class="ln" id="L608">        <span class="tok-kw">self</span>.formant_bounds = <span class="tok-fn">clamp_ratio_bounds</span>(<span class="tok-kw">self</span>.formant_bounds);</span>
+<span class="ln" id="L609">        <span class="tok-fn">Ok</span>(<span class="tok-kw">self</span>)</span>
+<span class="ln" id="L610">    }</span>
 </span>
-<span class="ln" id="L612">}</span>
-<span class="ln" id="L613"></span>
+<span class="ln" id="L611">}</span>
+<span class="ln" id="L612"></span>
 <span class="src-item" id="fn-clamp_ratio_bounds">
-<span class="ln" id="L614"><span class="tok-com">/// Keep a `(lo, hi)` ratio pair inside a range a resampler can act on, and in</span></span>
-<span class="ln" id="L615"><span class="tok-com">/// the right order.</span></span>
-<span class="ln" id="L616"><span class="tok-kw">fn</span> <span class="tok-fn">clamp_ratio_bounds</span>((lo, hi): (f32, f32)) -&gt; (f32, f32) {</span>
-<span class="ln" id="L617">    <span class="tok-kw">const</span> MIN: f32 = <span class="tok-num">0.05</span>;</span>
-<span class="ln" id="L618">    <span class="tok-kw">const</span> MAX: f32 = <span class="tok-num">20.0</span>;</span>
-<span class="ln" id="L619">    <span class="tok-kw">let</span> lo = lo.<span class="tok-fn">clamp</span>(MIN, MAX);</span>
-<span class="ln" id="L620">    <span class="tok-kw">let</span> hi = hi.<span class="tok-fn">clamp</span>(MIN, MAX);</span>
-<span class="ln" id="L621">    <span class="tok-kw">if</span> lo &lt;= hi {</span>
-<span class="ln" id="L622">        (lo, hi)</span>
-<span class="ln" id="L623">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L624">        (hi, lo)</span>
-<span class="ln" id="L625">    }</span>
-<span class="ln" id="L626">}</span>
+<span class="ln" id="L613"><span class="tok-com">/// Keep a `(lo, hi)` ratio pair inside a range a resampler can act on, and in</span></span>
+<span class="ln" id="L614"><span class="tok-com">/// the right order.</span></span>
+<span class="ln" id="L615"><span class="tok-kw">fn</span> <span class="tok-fn">clamp_ratio_bounds</span>((lo, hi): (f32, f32)) -&gt; (f32, f32) {</span>
+<span class="ln" id="L616">    <span class="tok-kw">const</span> MIN: f32 = <span class="tok-num">0.05</span>;</span>
+<span class="ln" id="L617">    <span class="tok-kw">const</span> MAX: f32 = <span class="tok-num">20.0</span>;</span>
+<span class="ln" id="L618">    <span class="tok-kw">let</span> lo = lo.<span class="tok-fn">clamp</span>(MIN, MAX);</span>
+<span class="ln" id="L619">    <span class="tok-kw">let</span> hi = hi.<span class="tok-fn">clamp</span>(MIN, MAX);</span>
+<span class="ln" id="L620">    <span class="tok-kw">if</span> lo &lt;= hi {</span>
+<span class="ln" id="L621">        (lo, hi)</span>
+<span class="ln" id="L622">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L623">        (hi, lo)</span>
+<span class="ln" id="L624">    }</span>
+<span class="ln" id="L625">}</span>
 </span>
-<span class="ln" id="L627"></span>
+<span class="ln" id="L626"></span>
 <span class="src-item" id="fn-processstats">
-<span class="ln" id="L628"><span class="tok-com">/// Rolling performance statistics, surfaced live to the UI.</span></span>
-<span class="ln" id="L629"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, Default)]</span>
-<span class="ln" id="L630"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> ProcessStats {</span>
-<span class="ln" id="L631">    <span class="tok-com">/// Total blocks processed.</span></span>
-<span class="ln" id="L632">    <span class="tok-kw">pub</span> blocks: u64,</span>
-<span class="ln" id="L633">    <span class="tok-com">/// Total input samples processed.</span></span>
-<span class="ln" id="L634">    <span class="tok-kw">pub</span> samples: u64,</span>
-<span class="ln" id="L635">    <span class="tok-com">/// Wall-clock microseconds for the most recent block.</span></span>
-<span class="ln" id="L636">    <span class="tok-kw">pub</span> last_block_us: f64,</span>
-<span class="ln" id="L637">    <span class="tok-com">/// Worst (maximum) block time observed, microseconds.</span></span>
-<span class="ln" id="L638">    <span class="tok-kw">pub</span> worst_block_us: f64,</span>
-<span class="ln" id="L639">    <span class="tok-com">/// Exponential moving average of block time, microseconds.</span></span>
-<span class="ln" id="L640">    <span class="tok-kw">pub</span> ema_block_us: f64,</span>
-<span class="ln" id="L641">    <span class="tok-com">/// Sample count of the most recent block.</span></span>
-<span class="ln" id="L642">    <span class="tok-kw">pub</span> last_block_samples: usize,</span>
-<span class="ln" id="L643">    <span class="tok-com">/// Sample rate (for realtime-factor computation).</span></span>
-<span class="ln" id="L644">    <span class="tok-kw">pub</span> sample_rate: f32,</span>
-<span class="ln" id="L645">    <span class="tok-com">/// Fixed algorithmic latency of the STFT, milliseconds.</span></span>
-<span class="ln" id="L646">    <span class="tok-kw">pub</span> algorithmic_latency_ms: f64,</span>
-<span class="ln" id="L647">    <span class="tok-com">/// Frames until the next seed roll, as last drawn.</span></span>
-<span class="ln" id="L648">    <span class="tok-com">///</span></span>
-<span class="ln" id="L649">    <span class="tok-com">/// With a randomised range this changes at every roll; with a fixed</span></span>
-<span class="ln" id="L650">    <span class="tok-com">/// interval it is constant, and it is zero when rolling is off.</span></span>
-<span class="ln" id="L651">    <span class="tok-kw">pub</span> reseed_frames: u32,</span>
-<span class="ln" id="L652">    <span class="tok-com">/// The same figure in milliseconds -- the interval **actually** in force.</span></span>
-<span class="ln" id="L653">    <span class="tok-com">///</span></span>
-<span class="ln" id="L654">    <span class="tok-com">/// This is the number to show a user, not the one they typed: the request</span></span>
-<span class="ln" id="L655">    <span class="tok-com">/// is quantised to whole frames, and at the default frame size a frame is</span></span>
-<span class="ln" id="L656">    <span class="tok-com">/// 5.33 ms.</span></span>
-<span class="ln" id="L657">    <span class="tok-kw">pub</span> reseed_interval_ms: f64,</span>
-<span class="ln" id="L658">}</span>
+<span class="ln" id="L627"><span class="tok-com">/// Rolling performance statistics, surfaced live to the UI.</span></span>
+<span class="ln" id="L628"><span class="tok-attr">#[derive</span>(Clone, Copy, Debug, Default)]</span>
+<span class="ln" id="L629"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> ProcessStats {</span>
+<span class="ln" id="L630">    <span class="tok-com">/// Total blocks processed.</span></span>
+<span class="ln" id="L631">    <span class="tok-kw">pub</span> blocks: u64,</span>
+<span class="ln" id="L632">    <span class="tok-com">/// Total input samples processed.</span></span>
+<span class="ln" id="L633">    <span class="tok-kw">pub</span> samples: u64,</span>
+<span class="ln" id="L634">    <span class="tok-com">/// Wall-clock microseconds for the most recent block.</span></span>
+<span class="ln" id="L635">    <span class="tok-kw">pub</span> last_block_us: f64,</span>
+<span class="ln" id="L636">    <span class="tok-com">/// Worst (maximum) block time observed, microseconds.</span></span>
+<span class="ln" id="L637">    <span class="tok-kw">pub</span> worst_block_us: f64,</span>
+<span class="ln" id="L638">    <span class="tok-com">/// Exponential moving average of block time, microseconds.</span></span>
+<span class="ln" id="L639">    <span class="tok-kw">pub</span> ema_block_us: f64,</span>
+<span class="ln" id="L640">    <span class="tok-com">/// Sample count of the most recent block.</span></span>
+<span class="ln" id="L641">    <span class="tok-kw">pub</span> last_block_samples: usize,</span>
+<span class="ln" id="L642">    <span class="tok-com">/// Sample rate (for realtime-factor computation).</span></span>
+<span class="ln" id="L643">    <span class="tok-kw">pub</span> sample_rate: f32,</span>
+<span class="ln" id="L644">    <span class="tok-com">/// Fixed algorithmic latency of the STFT, milliseconds.</span></span>
+<span class="ln" id="L645">    <span class="tok-kw">pub</span> algorithmic_latency_ms: f64,</span>
+<span class="ln" id="L646">    <span class="tok-com">/// Frames until the next seed roll, as last drawn.</span></span>
+<span class="ln" id="L647">    <span class="tok-com">///</span></span>
+<span class="ln" id="L648">    <span class="tok-com">/// With a randomised range this changes at every roll; with a fixed</span></span>
+<span class="ln" id="L649">    <span class="tok-com">/// interval it is constant, and it is zero when rolling is off.</span></span>
+<span class="ln" id="L650">    <span class="tok-kw">pub</span> reseed_frames: u32,</span>
+<span class="ln" id="L651">    <span class="tok-com">/// The same figure in milliseconds -- the interval **actually** in force.</span></span>
+<span class="ln" id="L652">    <span class="tok-com">///</span></span>
+<span class="ln" id="L653">    <span class="tok-com">/// This is the number to show a user, not the one they typed: the request</span></span>
+<span class="ln" id="L654">    <span class="tok-com">/// is quantised to whole frames, and at the default frame size a frame is</span></span>
+<span class="ln" id="L655">    <span class="tok-com">/// 5.33 ms.</span></span>
+<span class="ln" id="L656">    <span class="tok-kw">pub</span> reseed_interval_ms: f64,</span>
+<span class="ln" id="L657">}</span>
 </span>
-<span class="ln" id="L659"></span>
-<span class="ln" id="L660"><span class="tok-kw">impl</span> ProcessStats {</span>
+<span class="ln" id="L658"></span>
+<span class="ln" id="L659"><span class="tok-kw">impl</span> ProcessStats {</span>
 <span class="src-item" id="fn-processstats-last_block_ms">
-<span class="ln" id="L661">    <span class="tok-com">/// Most recent block processing time in milliseconds.</span></span>
-<span class="ln" id="L662">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">last_block_ms</span>(&amp;<span class="tok-kw">self</span>) -&gt; f64 {</span>
-<span class="ln" id="L663">        <span class="tok-kw">self</span>.last_block_us / <span class="tok-num">1000.0</span></span>
-<span class="ln" id="L664">    }</span>
+<span class="ln" id="L660">    <span class="tok-com">/// Most recent block processing time in milliseconds.</span></span>
+<span class="ln" id="L661">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">last_block_ms</span>(&amp;<span class="tok-kw">self</span>) -&gt; f64 {</span>
+<span class="ln" id="L662">        <span class="tok-kw">self</span>.last_block_us / <span class="tok-num">1000.0</span></span>
+<span class="ln" id="L663">    }</span>
 </span>
 <span class="src-item" id="fn-processstats-worst_block_ms">
-<span class="ln" id="L665">    <span class="tok-com">/// Worst block processing time in milliseconds.</span></span>
-<span class="ln" id="L666">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">worst_block_ms</span>(&amp;<span class="tok-kw">self</span>) -&gt; f64 {</span>
-<span class="ln" id="L667">        <span class="tok-kw">self</span>.worst_block_us / <span class="tok-num">1000.0</span></span>
-<span class="ln" id="L668">    }</span>
+<span class="ln" id="L664">    <span class="tok-com">/// Worst block processing time in milliseconds.</span></span>
+<span class="ln" id="L665">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">worst_block_ms</span>(&amp;<span class="tok-kw">self</span>) -&gt; f64 {</span>
+<span class="ln" id="L666">        <span class="tok-kw">self</span>.worst_block_us / <span class="tok-num">1000.0</span></span>
+<span class="ln" id="L667">    }</span>
 </span>
 <span class="src-item" id="fn-processstats-ema_block_ms">
-<span class="ln" id="L669">    <span class="tok-com">/// Smoothed block processing time in milliseconds.</span></span>
-<span class="ln" id="L670">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ema_block_ms</span>(&amp;<span class="tok-kw">self</span>) -&gt; f64 {</span>
-<span class="ln" id="L671">        <span class="tok-kw">self</span>.ema_block_us / <span class="tok-num">1000.0</span></span>
-<span class="ln" id="L672">    }</span>
+<span class="ln" id="L668">    <span class="tok-com">/// Smoothed block processing time in milliseconds.</span></span>
+<span class="ln" id="L669">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">ema_block_ms</span>(&amp;<span class="tok-kw">self</span>) -&gt; f64 {</span>
+<span class="ln" id="L670">        <span class="tok-kw">self</span>.ema_block_us / <span class="tok-num">1000.0</span></span>
+<span class="ln" id="L671">    }</span>
 </span>
 <span class="src-item" id="fn-processstats-last_realtime_factor">
-<span class="ln" id="L673">    <span class="tok-com">/// Processing time divided by the block&#x27;s real-time duration. &lt; 1.0 means</span></span>
-<span class="ln" id="L674">    <span class="tok-com">/// the machine keeps up with real time; the headroom is `1 - factor`.</span></span>
-<span class="ln" id="L675">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">last_realtime_factor</span>(&amp;<span class="tok-kw">self</span>) -&gt; f64 {</span>
-<span class="ln" id="L676">        <span class="tok-kw">let</span> audio_us = <span class="tok-kw">self</span>.last_block_samples <span class="tok-kw">as</span> f64 / <span class="tok-kw">self</span>.sample_rate <span class="tok-kw">as</span> f64 * 1e6;</span>
-<span class="ln" id="L677">        <span class="tok-kw">if</span> audio_us &gt; <span class="tok-num">0.0</span> {</span>
-<span class="ln" id="L678">            <span class="tok-kw">self</span>.last_block_us / audio_us</span>
-<span class="ln" id="L679">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L680">            <span class="tok-num">0.0</span></span>
-<span class="ln" id="L681">        }</span>
-<span class="ln" id="L682">    }</span>
+<span class="ln" id="L672">    <span class="tok-com">/// Processing time divided by the block&#x27;s real-time duration. &lt; 1.0 means</span></span>
+<span class="ln" id="L673">    <span class="tok-com">/// the machine keeps up with real time; the headroom is `1 - factor`.</span></span>
+<span class="ln" id="L674">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">last_realtime_factor</span>(&amp;<span class="tok-kw">self</span>) -&gt; f64 {</span>
+<span class="ln" id="L675">        <span class="tok-kw">let</span> audio_us = <span class="tok-kw">self</span>.last_block_samples <span class="tok-kw">as</span> f64 / <span class="tok-kw">self</span>.sample_rate <span class="tok-kw">as</span> f64 * 1e6;</span>
+<span class="ln" id="L676">        <span class="tok-kw">if</span> audio_us &gt; <span class="tok-num">0.0</span> {</span>
+<span class="ln" id="L677">            <span class="tok-kw">self</span>.last_block_us / audio_us</span>
+<span class="ln" id="L678">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L679">            <span class="tok-num">0.0</span></span>
+<span class="ln" id="L680">        }</span>
+<span class="ln" id="L681">    }</span>
 </span>
-<span class="ln" id="L683">}</span>
-<span class="ln" id="L684"></span>
+<span class="ln" id="L682">}</span>
+<span class="ln" id="L683"></span>
 <span class="src-item" id="fn-deidentifier">
-<span class="ln" id="L685"><span class="tok-com">/// The complete, irreversible voice de-identification chain.</span></span>
-<span class="ln" id="L686"><span class="tok-com">///</span></span>
-<span class="ln" id="L687"><span class="tok-com">/// Feed it mono `f32` samples; it returns mono `f32` samples of equal length,</span></span>
-<span class="ln" id="L688"><span class="tok-com">/// delayed by [`Deidentifier::latency_samples`]. Not real-time-thread cheap to</span></span>
-<span class="ln" id="L689"><span class="tok-com">/// *construct* (allocates FFT plans), but `process` performs no heap</span></span>
-<span class="ln" id="L690"><span class="tok-com">/// allocation and is safe to run inside an audio callback.</span></span>
-<span class="ln" id="L691"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Deidentifier {</span>
-<span class="ln" id="L692">    stft: StftEngine,</span>
-<span class="ln" id="L693">    spectral: SpectralState,</span>
-<span class="ln" id="L694">    modulator: Modulator,</span>
-<span class="ln" id="L695">    accent: AccentNeutralizer,</span>
-<span class="ln" id="L696">    pitch: PitchTracker,</span>
-<span class="ln" id="L697">    softclip: SoftClip,</span>
-<span class="ln" id="L698">    chorus: Chorus,</span>
-<span class="ln" id="L699">    reverb: Reverb,</span>
-<span class="ln" id="L700">    stats: ProcessStats,</span>
-<span class="ln" id="L701">    latency_samples: usize,</span>
-<span class="ln" id="L702">    hop: usize,</span>
-<span class="ln" id="L703">    <span class="tok-com">/// One frame in milliseconds, kept so the per-block statistics need no</span></span>
-<span class="ln" id="L704">    <span class="tok-com">/// division by a sample rate inside the hot path.</span></span>
-<span class="ln" id="L705">    frame_ms: f64,</span>
-<span class="ln" id="L706">    <span class="tok-com">/// Frames between seed rolls; 0 disables rolling entirely.</span></span>
-<span class="ln" id="L707">    <span class="tok-com">///</span></span>
-<span class="ln" id="L708">    <span class="tok-com">/// With a randomised range this is the *last drawn* interval rather than a</span></span>
-<span class="ln" id="L709">    <span class="tok-com">/// constant, and `reseed_span` is the range each new one is drawn from.</span></span>
-<span class="ln" id="L710">    reseed_frames: u32,</span>
-<span class="ln" id="L711">    <span class="tok-com">/// The inclusive frame range each interval is drawn from, or `None` for a</span></span>
-<span class="ln" id="L712">    <span class="tok-com">/// fixed interval.</span></span>
-<span class="ln" id="L713">    reseed_span: Option&lt;(u32, u32)&gt;,</span>
-<span class="ln" id="L714">    frames_until_reseed: u32,</span>
-<span class="ln" id="L715">    <span class="tok-com">/// Pre-allocated, so a roll never allocates inside an audio callback.</span></span>
-<span class="ln" id="L716">    phase_scratch: Vec&lt;f32&gt;,</span>
-<span class="ln" id="L717">}</span>
+<span class="ln" id="L684"><span class="tok-com">/// The complete, irreversible voice de-identification chain.</span></span>
+<span class="ln" id="L685"><span class="tok-com">///</span></span>
+<span class="ln" id="L686"><span class="tok-com">/// Feed it mono `f32` samples; it returns mono `f32` samples of equal length,</span></span>
+<span class="ln" id="L687"><span class="tok-com">/// delayed by [`Deidentifier::latency_samples`]. Not real-time-thread cheap to</span></span>
+<span class="ln" id="L688"><span class="tok-com">/// *construct* (allocates FFT plans), but `process` performs no heap</span></span>
+<span class="ln" id="L689"><span class="tok-com">/// allocation and is safe to run inside an audio callback.</span></span>
+<span class="ln" id="L690"><span class="tok-kw">pub</span> <span class="tok-kw">struct</span> Deidentifier {</span>
+<span class="ln" id="L691">    stft: StftEngine,</span>
+<span class="ln" id="L692">    spectral: SpectralState,</span>
+<span class="ln" id="L693">    modulator: Modulator,</span>
+<span class="ln" id="L694">    accent: AccentNeutralizer,</span>
+<span class="ln" id="L695">    pitch: PitchTracker,</span>
+<span class="ln" id="L696">    softclip: SoftClip,</span>
+<span class="ln" id="L697">    chorus: Chorus,</span>
+<span class="ln" id="L698">    reverb: Reverb,</span>
+<span class="ln" id="L699">    stats: ProcessStats,</span>
+<span class="ln" id="L700">    latency_samples: usize,</span>
+<span class="ln" id="L701">    hop: usize,</span>
+<span class="ln" id="L702">    <span class="tok-com">/// One frame in milliseconds, kept so the per-block statistics need no</span></span>
+<span class="ln" id="L703">    <span class="tok-com">/// division by a sample rate inside the hot path.</span></span>
+<span class="ln" id="L704">    frame_ms: f64,</span>
+<span class="ln" id="L705">    <span class="tok-com">/// Frames between seed rolls; 0 disables rolling entirely.</span></span>
+<span class="ln" id="L706">    <span class="tok-com">///</span></span>
+<span class="ln" id="L707">    <span class="tok-com">/// With a randomised range this is the *last drawn* interval rather than a</span></span>
+<span class="ln" id="L708">    <span class="tok-com">/// constant, and `reseed_span` is the range each new one is drawn from.</span></span>
+<span class="ln" id="L709">    reseed_frames: u32,</span>
+<span class="ln" id="L710">    <span class="tok-com">/// The inclusive frame range each interval is drawn from, or `None` for a</span></span>
+<span class="ln" id="L711">    <span class="tok-com">/// fixed interval.</span></span>
+<span class="ln" id="L712">    reseed_span: Option&lt;(u32, u32)&gt;,</span>
+<span class="ln" id="L713">    frames_until_reseed: u32,</span>
+<span class="ln" id="L714">    <span class="tok-com">/// Pre-allocated, so a roll never allocates inside an audio callback.</span></span>
+<span class="ln" id="L715">    phase_scratch: Vec&lt;f32&gt;,</span>
+<span class="ln" id="L716">}</span>
 </span>
-<span class="ln" id="L718"></span>
-<span class="ln" id="L719"><span class="tok-kw">impl</span> Deidentifier {</span>
+<span class="ln" id="L717"></span>
+<span class="ln" id="L718"><span class="tok-kw">impl</span> Deidentifier {</span>
 <span class="src-item" id="fn-deidentifier-new">
-<span class="ln" id="L720">    <span class="tok-com">/// Build with a fresh, unpredictable seed from the OS CSPRNG.</span></span>
-<span class="ln" id="L721">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(config: DeidConfig) -&gt; Result&lt;Self, String&gt; {</span>
-<span class="ln" id="L722">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seed = [0u8; <span class="tok-num">32</span>];</span>
-<span class="ln" id="L723">        getrandom::<span class="tok-fn">getrandom</span>(&amp;<span class="tok-kw">mut</span> seed).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;OS CSPRNG: {e}&quot;</span>))?;</span>
-<span class="ln" id="L724">        Self::<span class="tok-fn">from_seed</span>(config, seed)</span>
-<span class="ln" id="L725">    }</span>
+<span class="ln" id="L719">    <span class="tok-com">/// Build with a fresh, unpredictable seed from the OS CSPRNG.</span></span>
+<span class="ln" id="L720">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">new</span>(config: DeidConfig) -&gt; Result&lt;Self, String&gt; {</span>
+<span class="ln" id="L721">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> seed = [0u8; <span class="tok-num">32</span>];</span>
+<span class="ln" id="L722">        getrandom::<span class="tok-fn">getrandom</span>(&amp;<span class="tok-kw">mut</span> seed).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;OS CSPRNG: {e}&quot;</span>))?;</span>
+<span class="ln" id="L723">        Self::<span class="tok-fn">from_seed</span>(config, seed)</span>
+<span class="ln" id="L724">    }</span>
 </span>
-<span class="ln" id="L726"></span>
+<span class="ln" id="L725"></span>
 <span class="src-item" id="fn-deidentifier-from_seed">
-<span class="ln" id="L727">    <span class="tok-com">/// Build with an explicit seed (deterministic; for tests or seed-from-key).</span></span>
-<span class="ln" id="L728">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">from_seed</span>(config: DeidConfig, seed: [u8; <span class="tok-num">32</span>]) -&gt; Result&lt;Self, String&gt; {</span>
-<span class="ln" id="L729">        <span class="tok-kw">let</span> config = config.<span class="tok-fn">checked</span>()?;</span>
-<span class="ln" id="L730">        <span class="tok-kw">let</span> n = config.frame_size;</span>
-<span class="ln" id="L731">        <span class="tok-kw">let</span> hop = config.<span class="tok-fn">hop</span>();</span>
-<span class="ln" id="L732">        <span class="tok-kw">let</span> half = n / <span class="tok-num">2</span> + <span class="tok-num">1</span>;</span>
-<span class="ln" id="L733"></span>
-<span class="ln" id="L734">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> modulator = Modulator::<span class="tok-fn">from_seed</span>(</span>
-<span class="ln" id="L735">            seed,</span>
-<span class="ln" id="L736">            config.<span class="tok-fn">scaled</span>(config.pitch_bounds),</span>
-<span class="ln" id="L737">            config.<span class="tok-fn">scaled</span>(config.formant_bounds),</span>
-<span class="ln" id="L738">            config.frames_per_target,</span>
-<span class="ln" id="L739">            config.mod_smooth,</span>
-<span class="ln" id="L740">        );</span>
-<span class="ln" id="L741"></span>
-<span class="ln" id="L742">        <span class="tok-com">// Draw the fixed per-bin phase offsets from the same CSPRNG stream.</span></span>
-<span class="ln" id="L743">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> phase = vec![<span class="tok-num">0</span>.0f32; half];</span>
-<span class="ln" id="L744">        modulator.<span class="tok-fn">fill_phase_offsets</span>(&amp;<span class="tok-kw">mut</span> phase);</span>
-<span class="ln" id="L745"></span>
-<span class="ln" id="L746">        <span class="tok-kw">let</span> stft = StftEngine::<span class="tok-fn">new</span>(n, hop);</span>
-<span class="ln" id="L747">        <span class="tok-kw">let</span> latency_samples = stft.<span class="tok-fn">latency_samples</span>();</span>
-<span class="ln" id="L748">        <span class="tok-kw">let</span> spectral = SpectralState::<span class="tok-fn">new</span>(n, hop, config.sample_rate, &amp;phase);</span>
-<span class="ln" id="L749">        <span class="tok-kw">let</span> accent = AccentNeutralizer::<span class="tok-fn">new</span>(config.accent, config.sample_rate, n, hop, half);</span>
-<span class="ln" id="L750">        <span class="tok-kw">let</span> pitch = PitchTracker::<span class="tok-fn">new</span>(config.sample_rate);</span>
-<span class="ln" id="L751"></span>
-<span class="ln" id="L752">        <span class="tok-com">// Rolls are counted in frames so the audio thread never touches a clock.</span></span>
+<span class="ln" id="L726">    <span class="tok-com">/// Build with an explicit seed (deterministic; for tests or seed-from-key).</span></span>
+<span class="ln" id="L727">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">from_seed</span>(config: DeidConfig, seed: [u8; <span class="tok-num">32</span>]) -&gt; Result&lt;Self, String&gt; {</span>
+<span class="ln" id="L728">        <span class="tok-kw">let</span> config = config.<span class="tok-fn">checked</span>()?;</span>
+<span class="ln" id="L729">        <span class="tok-kw">let</span> n = config.frame_size;</span>
+<span class="ln" id="L730">        <span class="tok-kw">let</span> hop = config.<span class="tok-fn">hop</span>();</span>
+<span class="ln" id="L731">        <span class="tok-kw">let</span> half = n / <span class="tok-num">2</span> + <span class="tok-num">1</span>;</span>
+<span class="ln" id="L732"></span>
+<span class="ln" id="L733">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> modulator = Modulator::<span class="tok-fn">from_seed</span>(</span>
+<span class="ln" id="L734">            seed,</span>
+<span class="ln" id="L735">            config.<span class="tok-fn">scaled</span>(config.pitch_bounds),</span>
+<span class="ln" id="L736">            config.<span class="tok-fn">scaled</span>(config.formant_bounds),</span>
+<span class="ln" id="L737">            config.frames_per_target,</span>
+<span class="ln" id="L738">            config.mod_smooth,</span>
+<span class="ln" id="L739">        );</span>
+<span class="ln" id="L740"></span>
+<span class="ln" id="L741">        <span class="tok-com">// Draw the fixed per-bin phase offsets from the same CSPRNG stream.</span></span>
+<span class="ln" id="L742">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> phase = vec![<span class="tok-num">0</span>.0f32; half];</span>
+<span class="ln" id="L743">        modulator.<span class="tok-fn">fill_phase_offsets</span>(&amp;<span class="tok-kw">mut</span> phase);</span>
+<span class="ln" id="L744"></span>
+<span class="ln" id="L745">        <span class="tok-kw">let</span> stft = StftEngine::<span class="tok-fn">new</span>(n, hop);</span>
+<span class="ln" id="L746">        <span class="tok-kw">let</span> latency_samples = stft.<span class="tok-fn">latency_samples</span>();</span>
+<span class="ln" id="L747">        <span class="tok-kw">let</span> spectral = SpectralState::<span class="tok-fn">new</span>(n, hop, config.sample_rate, &amp;phase);</span>
+<span class="ln" id="L748">        <span class="tok-kw">let</span> accent = AccentNeutralizer::<span class="tok-fn">new</span>(config.accent, config.sample_rate, n, hop, half);</span>
+<span class="ln" id="L749">        <span class="tok-kw">let</span> pitch = PitchTracker::<span class="tok-fn">new</span>(config.sample_rate);</span>
+<span class="ln" id="L750"></span>
+<span class="ln" id="L751">        <span class="tok-com">// Rolls are counted in frames, so deciding when to roll never reads a</span></span>
+<span class="ln" id="L752">        <span class="tok-com">// clock on the audio thread.</span></span>
 <span class="ln" id="L753">        <span class="tok-kw">let</span> reseed_span = config</span>
 <span class="ln" id="L754">            .reseed_range_ms</span>
 <span class="ln" id="L755">            .<span class="tok-fn">map</span>(|(lo, hi)| (config.<span class="tok-fn">frames_for_ms</span>(lo), config.<span class="tok-fn">frames_for_ms</span>(hi)));</span>

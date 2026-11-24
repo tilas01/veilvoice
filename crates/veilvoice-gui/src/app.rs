@@ -1063,8 +1063,8 @@ impl eframe::App for VeilVoiceApp {
             self.integrity.start(Some(passphrase));
         }
         // The obfuscated program folder, opened with the key the unlock
-        // derived. Everything VeilVoice keeps about itself moves in on the
-        // first unlock after a lock is set, and the audit that comes back says
+        // derived. The records the store keeps (see `vault_store::records`)
+        // move in on the first unlock after a lock is set, and the audit that comes back says
         // whether anything in there was edited or removed while the window was
         // shut. See `crate::vault_store` for what that is worth and, just as
         // importantly, what it is not.

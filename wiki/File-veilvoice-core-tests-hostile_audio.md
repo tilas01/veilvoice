@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/tests/hostile_audio.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 389 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs)
+[veilvoice-core](Crate-veilvoice-core) &middot; 389 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/tests/hostile_audio.rs)
 
 ## Contents
 

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/autolock.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 369 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs)
+[veilvoice-gui](Crate-veilvoice-gui) &middot; 369 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/autolock.rs)
 
 ## Contents
 

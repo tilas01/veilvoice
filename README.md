@@ -269,8 +269,9 @@ cd veilvoice-$V-macos-arm64
 ./veilvoice-gui
 ```
 
-macOS will refuse an unsigned download the first time. Right-click the program
-and choose Open, rather than turning Gatekeeper off.
+macOS will refuse an unsigned download the first time. Allow it in System
+Settings, under Privacy & Security, with **Open Anyway**, rather than turning
+Gatekeeper off.
 
 </details>
 
@@ -311,9 +312,11 @@ exactly as it does there. Two differences worth knowing:
 <details>
 <summary><b>FreeBSD, OpenBSD, NetBSD</b></summary>
 
-The command line only. The audio library has no BSD backend, so live capture
-cannot work and the window is not shipped. Everything that operates on a file
-runs exactly as it does elsewhere.
+The audio library has no BSD backend, so live capture cannot work on any of
+them. Everything that operates on a file runs exactly as it does elsewhere.
+FreeBSD's archive carries the window as well whenever it builds, as v0.1.23's
+does, though its Studio cannot record or play back there. The OpenBSD and
+NetBSD archives are the command line only.
 
 ```sh
 V=v0.1.23
@@ -686,9 +689,12 @@ writes with no extra work.
 ## Design pillars
 
 - **Offline by construction.** Zero servers, enforced in CI.
-- **No `unsafe` anywhere.** Every crate carries `#![forbid(unsafe_code)]`,
-  including the page-locking path.
-- **78321 functional lines of Rust**, across 28 crates. A *functional line* is
+- **No `unsafe` anywhere.** Every crate in the workspace carries
+  `#![forbid(unsafe_code)]`, including the page-locking path. The fuzzing
+  harnesses in `fuzz/` are the one exception: `libfuzzer-sys` needs an unsafe
+  entry point.
+- **79244 functional lines of Rust**, across the 13 crates of the workspace
+  and the fuzzing harnesses. A *functional line* is
   a line holding code: blank lines and lines holding only a comment are not
   counted, and a line with code and a trailing comment counts once. Each
   crate's own README states its share of that total under **The files**.
@@ -698,7 +704,7 @@ writes with no extra work.
   counts printed on the generated pages, in the artwork and in the reference
   links are the other measure, the length of the file. Both are stated with
   their definitions rather than one being quietly redefined to match the other,
-  and both come from `tools/loc/count.py`. The 28 includes `fuzz/`, the
+  and both come from `tools/loc/count.py`. The count includes `fuzz/`, the
   harnesses, which is a Cargo project of its own rather than a workspace
   member.
 - **Irreversible.** Each frame's measured phase is discarded and resynthesised,
@@ -750,8 +756,8 @@ Artwork is **generated, not committed as opaque blobs**:
 
 **v0.1.23: early but real.** The engine, cryptography, audio path, metadata
 cleaning, at-rest encryption, app lock, tamper detection, encrypted-volume
-destinations, CLI and GUI are implemented and tested (1965 tests across 13
-crates plus doctests, and 21 website suites, clippy clean, no `unsafe`), with
+destinations, CLI and GUI are implemented and tested (1999 tests across 13
+crates plus doctests, and 22 website suites, clippy clean, no `unsafe`), with
 randomised campaigns against every parser that reads untrusted input and
 against the website's Markdown renderer. Release binaries are built for eleven
 targets, each one built twice from a copy of the source at a different path and
@@ -765,7 +771,7 @@ worth: a maintainer audit catches what the author can see, and **no external
 firm or independent researcher has reviewed this code**. Read the source before
 relying on it for anything that matters. It is written to be read.
 
-Thirty-seven audit rounds have found and fixed **308 defects**.
+**345 defects** have been found and fixed across forty-one audit rounds.
 Among them: a four-kilobyte file that killed the process, a configuration value that made every output sample silent, a secure erase that
 destroyed a file other than the one named, a locked encrypted volume that went
 on accepting recordings onto the ordinary disk, and two ways to freeze a
@@ -795,20 +801,21 @@ program does and refuses to do, and a great deal of the code are theirs
 directly.
 
 Some of the code, the documentation and this website were drafted with the help
-of **Claude**, Anthropic's assistant, working to that direction. Nothing reaches
-a release unread: every change is reviewed, built and tested before it is
-committed, and the audit rounds in [`docs/AUDIT.md`](docs/AUDIT.md) are the
-record of that review finding its own mistakes.
+of **Claude Code**, Anthropic's coding assistant, working to that direction.
+Nothing reaches a release unread: every change is reviewed, built and tested
+before it is committed, and the audit rounds in [`docs/AUDIT.md`](docs/AUDIT.md)
+are the record of that review finding its own mistakes.
 
-The credit is stated here, and once more in the "Who wrote it" answer on the
-[questions page](https://tilas01.github.io/veilvoice/faq.html). Those are the
-two places somebody looking for it will look. It is deliberately not repeated
-in the footer of every page or scattered through the commit log, where an
-acknowledgement turns into a badge.
+The credit is stated here and in the "Who wrote it" answer on the
+[questions page](https://tilas01.github.io/veilvoice/faq.html). It is not
+scattered through the commit log, where an acknowledgement turns into a badge.
 
 ## Licence
 
-GPL-3.0-or-later. See [`LICENSE`](LICENSE).
+Copyright (C) tilas01. VeilVoice is free software under the GNU General
+Public License, version 3 or (at your option) any later version. The full text is
+in [`LICENSE`](LICENSE), and every source file carries its SPDX identifier,
+`GPL-3.0-or-later`.
 
 None of the virtual audio cables listed under
 [Route it into a call](#route-it-into-a-call) is bundled here, and none of them

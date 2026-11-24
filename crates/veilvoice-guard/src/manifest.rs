@@ -389,25 +389,36 @@ impl Manifest {
             // full of false positives is one nobody reads, which defeats the
             // only thing this module does.
             let path = path.replace('\\', "/");
-            entries.insert(
-                path,
-                Entry {
-                    size,
-                    digest: digest.to_ascii_lowercase(),
-                },
-            );
+            // **F-319.** A path listed twice is refused. Keeping the last one
+            // meant a reader of the file saw the first digest while the check
+            // used the second, so the record said one thing and did another.
+            let entry = Entry {
+                size,
+                digest: digest.to_ascii_lowercase(),
+            };
+            if entries.insert(path.clone(), entry).is_some() {
+                return Err(Error::Malformed(format!(
+                    "line {}: {path:?} is listed more than once",
+                    number + 2
+                )));
+            }
         }
         Ok(Self { entries })
     }
 
     /// Write the manifest to `path` in the clear.
+    ///
+    /// The old manifest is replaced in one step rather than rewritten where it
+    /// is, so a crash part-way through leaves the old one. A truncated manifest
+    /// would read as tampering, and a false alarm teaches people to dismiss the
+    /// true one.
     pub fn save(&self, path: &Path) -> Result<(), Error> {
         if let Some(parent) = path.parent() {
             if !parent.as_os_str().is_empty() {
                 std::fs::create_dir_all(parent)?;
             }
         }
-        std::fs::write(path, self.to_text())?;
+        veilvoice_crypto::privatefile::replace(path, self.to_text().as_bytes())?;
         Ok(())
     }
 
@@ -487,6 +498,45 @@ pub fn files_in(dir: &Path) -> Result<Vec<PathBuf>, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-319.** A record that lists one path twice is refused, whichever
+    /// spelling of the separator the second uses.
+    #[test]
+    fn a_path_listed_twice_is_refused() {
+        let line =
+            |digest: char, path: &str| format!("{}  1  {path}\n", digest.to_string().repeat(64));
+        let text = format!(
+            "{MAGIC}\n{}{}",
+            line('a', "bin/veilvoice"),
+            line('b', "bin\\veilvoice")
+        );
+        let error = Manifest::parse(&text).expect_err("a duplicate must not parse");
+        assert!(error.to_string().contains("more than once"), "{error}");
+        let once = format!("{MAGIC}\n{}", line('a', "bin/veilvoice"));
+        assert!(Manifest::parse(&once).is_ok());
+    }
+
+    /// **F-309.** A save replaces the manifest rather than truncating it and
+    /// writing it again, so a crash part-way through cannot leave half of one.
+    /// A new inode is what a rename leaves and an in-place write does not.
+    #[cfg(unix)]
+    #[test]
+    fn a_save_replaces_the_manifest_rather_than_rewriting_it() {
+        use std::os::unix::fs::MetadataExt;
+        let dir = tempfile::tempdir().unwrap();
+        let watched = dir.path().join("watched");
+        std::fs::write(&watched, b"a program").unwrap();
+        let store = dir.path().join("manifest.txt");
+        let manifest = Manifest::of(&[&watched]).unwrap();
+        manifest.save(&store).unwrap();
+        let before = std::fs::metadata(&store).unwrap().ino();
+        manifest.save(&store).unwrap();
+        assert_ne!(std::fs::metadata(&store).unwrap().ino(), before);
+        assert_eq!(
+            Manifest::load(&store).unwrap().to_text(),
+            manifest.to_text()
+        );
+    }
 
     /// **F-83.** A record somebody hands you cannot contain a character that
     /// rewrites the report.

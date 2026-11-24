@@ -3,7 +3,7 @@
 
 # `fuzz/fuzz_targets/container_header.rs`
 
-[[fuzz|Crate-fuzz]] &middot; 52 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/container_header.rs)
+[fuzz](Crate-fuzz) &middot; 52 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/container_header.rs)
 
 ## Contents
 

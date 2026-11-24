@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/tests/release_manifest.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 208 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs)
+[veilvoice-verify](Crate-veilvoice-verify) &middot; 208 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/release_manifest.rs)
 
 ## Contents
 

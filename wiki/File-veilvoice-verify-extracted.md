@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/src/extracted.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 316 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs)
+[veilvoice-verify](Crate-veilvoice-verify) &middot; 316 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/extracted.rs)
 
 ## Contents
 

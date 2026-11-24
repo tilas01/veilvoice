@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-verify/fetch.svg" alt="fetch.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-verify/src/fetch.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 382 lines &middot; <a href="fetch.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-verify.html">veilvoice-verify</a> &middot; 447 lines &middot; <a href="fetch.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#the-constraint-this-is-written-around">The constraint this is written around</a>
@@ -86,34 +86,35 @@
 <h2 id="what-is-deliberately-not-done-here">What is deliberately not done here</h2>
 <p><strong>No downloader is resolved by bare name.</strong> Finding <code>curl</code> by searching <code>PATH</code> on Windows includes the current directory, so running this from a folder containing a hostile <code>curl.exe</code> would run that instead -- finding F-13, in the one program whose job is deciding whether a download is genuine. Absolute paths are tried first, and a bare name is only ever a last resort on platforms where the search order does not include the working directory.</p>
 <p><strong>Nothing is fetched implicitly.</strong> A download happens because the user passed a subcommand that says so. There is no update check, no telemetry, and no &quot;just in case&quot; request.</p>
-<p><strong>Only one host is ever contacted</strong>, and it is compiled in. A URL cannot be supplied on the command line, so this cannot be turned into a general downloader by an argument.</p>
+<p><strong>Only one address is ever asked for</strong>, and it is compiled in. A URL cannot be supplied on the command line, so this cannot be turned into a general downloader by an argument. GitHub answers a release download by sending it on to its own file host, and that redirect is followed over HTTPS only, at most five times.</p>
+<p>Neither downloader reads its user&#x27;s configuration file. A <code>.curlrc</code> or <code>.wgetrc</code> can turn off certificate checks or send the request through a proxy, and a verifier whose download depends on a file it never shows is not saying what it did.</p>
 <h2 id="in-plain-words">In plain words</h2>
 <p>Downloads a release, without VeilVoice containing any networking code.</p>
 <p>It asks the tool your system already has to do the fetching. That is what keeps a real promise the rest of the project makes: there is no HTTP client anywhere in what VeilVoice is built from, which you can check yourself, and this is the one command that touches the network at all.</p>
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>382 lines defining <strong>7 functions</strong> (6 public), <strong>2 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>447 lines defining <strong>8 functions</strong> (6 public), <strong>2 types</strong> and <strong>6 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Downloader</code> <span style="color:var(--muted)">line 113</span> &middot; Where a downloader was found, and what to call it.</li>
-<li><code>enum Style</code> <span style="color:var(--muted)">line 125</span> &middot; Which downloader is being driven, since the two want different arguments for the same job.</li>
+<li><code>struct Downloader</code> <span style="color:var(--muted)">line 120</span> &middot; Where a downloader was found, and what to call it.</li>
+<li><code>enum Style</code> <span style="color:var(--muted)">line 132</span> &middot; Which downloader is being driven, since the two want different arguments for the same job.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>download</code> <span style="color:var(--muted)">line 198</span> &middot; Fetch one URL into into.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>at_a_known_origin</code>, <code>find_downloader</code>, <code>no_downloader_message</code></span>
+<li><code>download</code> <span style="color:var(--muted)">line 205</span> &middot; Fetch one URL into into.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>arguments</code>, <code>at_a_known_origin</code>, <code>find_downloader</code>, <code>no_downloader_message</code></span>
 </li>
-<li><code>asset_url</code> <span style="color:var(--muted)">line 266</span> &middot; The URL of one file in one release.
+<li><code>asset_url</code> <span style="color:var(--muted)">line 296</span> &middot; The URL of one file in one release.
 </li>
-<li><code>valid_tag</code> <span style="color:var(--muted)">line 285</span> &middot; A release tag, rejected unless it looks like one.
+<li><code>valid_tag</code> <span style="color:var(--muted)">line 315</span> &middot; A release tag, rejected unless it looks like one.
 </li>
-<li><code>valid_asset</code> <span style="color:var(--muted)">line 294</span> &middot; An asset filename, rejected unless it looks like one.
+<li><code>valid_asset</code> <span style="color:var(--muted)">line 324</span> &middot; An asset filename, rejected unless it looks like one.
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 619 331" width="619" height="331" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 619 431" width="619" height="431" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -122,85 +123,94 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="619" height="331" fill="var(--bg-inset, #16161e)" rx="8"/>
+<rect x="0" y="0" width="619" height="431" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M111.7 174.0 C 111.7 194.0, 309.6 200.0, 309.6 217.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M158.0 147.0 C 215.0 147.0, 215.0 47.0, 196.0 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M158.0 147.0 C 389.9 147.0, 389.9 47.0, 370.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <path d="M158.0 147.0 C 613.2 147.0, 613.2 47.0, 594.2 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
 <a href="fetch.src.html#fn-at_a_known_origin">
 <rect x="28.0" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="110.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">at_a_known_origin</text>
-<text x="110.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 95</text>
+<text x="110.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 102</text>
 </a>
 <a href="fetch.src.html#fn-find_downloader">
 <rect x="219.0" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="293.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">find_downloader</text>
-<text x="293.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 140</text>
+<text x="293.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 147</text>
 </a>
 <a href="fetch.src.html#fn-no_downloader_message">
 <rect x="393.9" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="492.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">no_downloader_message</text>
-<text x="492.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 181</text>
+<text x="492.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 188</text>
 </a>
 <a href="fetch.src.html#fn-download">
 <rect x="65.5" y="120.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="111.7" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">download</text>
-<text x="111.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 198</text>
+<text x="111.7" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 205</text>
+</a>
+<a href="fetch.src.html#fn-arguments">
+<rect x="259.3" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="309.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">arguments</text>
+<text x="309.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 256</text>
 </a>
 <a href="fetch.src.html#fn-asset_url">
 <rect x="184.0" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="234.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">asset_url</text>
-<text x="234.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 266</text>
+<text x="234.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 296</text>
 </a>
 <a href="fetch.src.html#fn-valid_tag">
 <rect x="310.5" y="120.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="360.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">valid_tag</text>
-<text x="360.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 285</text>
+<text x="360.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 315</text>
 </a>
 <a href="fetch.src.html#fn-valid_asset">
 <rect x="437.0" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="495.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">valid_asset</text>
-<text x="495.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 294</text>
+<text x="495.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 324</text>
 </a>
-<rect x="20.0" y="204.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
-<text x="35.0" y="213.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
-<rect x="20.0" y="220.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
-<text x="35.0" y="229.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
-<rect x="20.0" y="236.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
-<text x="35.0" y="245.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
-<path d="M20.0 256.5 L29.0 256.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
-<text x="35.0" y="261.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="283.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
-<text x="20.0" y="298.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
-<text x="20.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
+<rect x="20.0" y="304.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
+<text x="35.0" y="313.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
+<rect x="20.0" y="320.0" width="9" height="9" rx="2" fill="var(--cyan, #7dcfff)"/>
+<text x="35.0" y="329.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">api: public, and also used inside this file</text>
+<rect x="20.0" y="336.0" width="9" height="9" rx="2" fill="var(--accent-2, #bb9af7)"/>
+<text x="35.0" y="345.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
+<path d="M20.0 356.5 L29.0 356.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text x="35.0" y="361.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
+<text x="20.0" y="383.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="398.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic</text>
+<text x="20.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">reading, not a type-resolved one.</text>
 </svg>
 </div>
 <p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_at_a_known_origin[&quot;at_a_known_origin&lt;br/&gt;line 95&quot;]
-    n_find_downloader[&quot;find_downloader&lt;br/&gt;line 140&quot;]
-    n_no_downloader_message[&quot;no_downloader_message&lt;br/&gt;line 181&quot;]
-    n_download([&quot;download&lt;br/&gt;line 198&quot;])
-    n_asset_url([&quot;asset_url&lt;br/&gt;line 266&quot;])
-    n_valid_tag([&quot;valid_tag&lt;br/&gt;line 285&quot;])
-    n_valid_asset([&quot;valid_asset&lt;br/&gt;line 294&quot;])
+    n_at_a_known_origin[&quot;at_a_known_origin&lt;br/&gt;line 102&quot;]
+    n_find_downloader[&quot;find_downloader&lt;br/&gt;line 147&quot;]
+    n_no_downloader_message[&quot;no_downloader_message&lt;br/&gt;line 188&quot;]
+    n_download([&quot;download&lt;br/&gt;line 205&quot;])
+    n_arguments[&quot;arguments&lt;br/&gt;line 256&quot;]
+    n_asset_url([&quot;asset_url&lt;br/&gt;line 296&quot;])
+    n_valid_tag([&quot;valid_tag&lt;br/&gt;line 315&quot;])
+    n_valid_asset([&quot;valid_asset&lt;br/&gt;line 324&quot;])
+    n_download --&gt; n_arguments
     n_download --&gt; n_at_a_known_origin
     n_download --&gt; n_find_downloader
     n_download --&gt; n_no_downloader_message
-    click n_at_a_known_origin href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L95&quot; &quot;open the source&quot;
-    click n_find_downloader href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L140&quot; &quot;open the source&quot;
-    click n_no_downloader_message href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L181&quot; &quot;open the source&quot;
-    click n_download href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L198&quot; &quot;open the source&quot;
-    click n_asset_url href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L266&quot; &quot;open the source&quot;
-    click n_valid_tag href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L285&quot; &quot;open the source&quot;
-    click n_valid_asset href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L294&quot; &quot;open the source&quot;
+    click n_at_a_known_origin href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L102&quot; &quot;open the source&quot;
+    click n_find_downloader href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L147&quot; &quot;open the source&quot;
+    click n_no_downloader_message href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L188&quot; &quot;open the source&quot;
+    click n_download href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L205&quot; &quot;open the source&quot;
+    click n_arguments href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L256&quot; &quot;open the source&quot;
+    click n_asset_url href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L296&quot; &quot;open the source&quot;
+    click n_valid_tag href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L315&quot; &quot;open the source&quot;
+    click n_valid_asset href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/src/fetch.rs#L324&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_download,n_asset_url,n_valid_tag,n_valid_asset entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_at_a_known_origin,n_no_downloader_message api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_find_downloader helper
+    class n_find_downloader,n_arguments helper
     subgraph chart_key [&quot;Key&quot;]
         direction LR
         key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
@@ -216,21 +226,22 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>HOST</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-host">71</a></td><td>Where a VeilVoice release is fetched from.</td></tr>
-<tr><td><code>ORIGINS</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-origins">84</a></td><td>Every origin this program will ever fetch from.</td></tr>
-<tr><td><code>at_a_known_origin</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-at_a_known_origin">95</a></td><td>Whether a URL is at one of the origins above.</td></tr>
-<tr><td><code>REPO</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-repo">102</a></td><td>The repository releases are fetched from.</td></tr>
-<tr><td><code>MAX_BYTES</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-max_bytes">110</a></td><td>The largest file this will accept.</td></tr>
-<tr><td><code>Downloader</code> <sub>struct</sub></td><td><a href="fetch.src.html#fn-downloader">113</a></td><td>Where a downloader was found, and what to call it.</td></tr>
-<tr><td><code>Style</code> <sub>enum</sub></td><td><a href="fetch.src.html#fn-style">125</a></td><td>Which downloader is being driven, since the two want different arguments for the same job.</td></tr>
-<tr><td><code>find_downloader</code> <sub>fn</sub></td><td><a href="fetch.src.html#fn-find_downloader">140</a></td><td>Absolute paths first, and a bare name only where that is safe.</td></tr>
-<tr><td><code>no_downloader_message</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-no_downloader_message">181</a></td><td>Say what could not be found, and what to do instead.</td></tr>
-<tr><td><code>download</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-download">198</a></td><td>Fetch one URL into into.</td></tr>
-<tr><td><code>asset_url</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-asset_url">266</a></td><td>The URL of one file in one release.</td></tr>
-<tr><td><code>SUMS</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-sums">271</a></td><td>The list of hashes every release publishes, one line per file.</td></tr>
-<tr><td><code>SIGNATURE</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-signature">274</a></td><td>The detached signature over that list, which is what ties it to the signing key rather than to whoever served the page.</td></tr>
-<tr><td><code>valid_tag</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-valid_tag">285</a></td><td>A release tag, rejected unless it looks like one.</td></tr>
-<tr><td><code>valid_asset</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-valid_asset">294</a></td><td>An asset filename, rejected unless it looks like one.</td></tr>
+<tr><td><code>HOST</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-host">78</a></td><td>Where a VeilVoice release is fetched from.</td></tr>
+<tr><td><code>ORIGINS</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-origins">91</a></td><td>Every origin this program will ever fetch from.</td></tr>
+<tr><td><code>at_a_known_origin</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-at_a_known_origin">102</a></td><td>Whether a URL is at one of the origins above.</td></tr>
+<tr><td><code>REPO</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-repo">109</a></td><td>The repository releases are fetched from.</td></tr>
+<tr><td><code>MAX_BYTES</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-max_bytes">117</a></td><td>The largest file this will accept.</td></tr>
+<tr><td><code>Downloader</code> <sub>struct</sub></td><td><a href="fetch.src.html#fn-downloader">120</a></td><td>Where a downloader was found, and what to call it.</td></tr>
+<tr><td><code>Style</code> <sub>enum</sub></td><td><a href="fetch.src.html#fn-style">132</a></td><td>Which downloader is being driven, since the two want different arguments for the same job.</td></tr>
+<tr><td><code>find_downloader</code> <sub>fn</sub></td><td><a href="fetch.src.html#fn-find_downloader">147</a></td><td>Absolute paths first, and a bare name only where that is safe.</td></tr>
+<tr><td><code>no_downloader_message</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-no_downloader_message">188</a></td><td>Say what could not be found, and what to do instead.</td></tr>
+<tr><td><code>download</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-download">205</a></td><td>Fetch one URL into into.</td></tr>
+<tr><td><code>arguments</code> <sub>fn</sub></td><td><a href="fetch.src.html#fn-arguments">256</a></td><td>What one downloader is told, to fetch url into into and nothing else.</td></tr>
+<tr><td><code>asset_url</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-asset_url">296</a></td><td>The URL of one file in one release.</td></tr>
+<tr><td><code>SUMS</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-sums">301</a></td><td>The list of hashes every release publishes, one line per file.</td></tr>
+<tr><td><code>SIGNATURE</code> <sub>pub const</sub></td><td><a href="fetch.src.html#fn-signature">304</a></td><td>The detached signature over that list, which is what ties it to the signing key rather than to whoever served the page.</td></tr>
+<tr><td><code>valid_tag</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-valid_tag">315</a></td><td>A release tag, rejected unless it looks like one.</td></tr>
+<tr><td><code>valid_asset</code> <sub>pub fn</sub></td><td><a href="fetch.src.html#fn-valid_asset">324</a></td><td>An asset filename, rejected unless it looks like one.</td></tr>
 </tbody></table>
 </section>
 </div></div>

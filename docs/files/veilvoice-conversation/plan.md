@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-conversation/src/plan.rs`
 
-[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 1244 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs)
+[`veilvoice-conversation`](../../../crates/veilvoice-conversation/README.md) &middot; 1245 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs)
 
 ## Contents
 
@@ -84,7 +84,7 @@ find out by listening, because the result would sound perfectly fine.
 
 ## What this file contains
 
-1244 lines defining **25 functions** (22 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+1245 lines defining **25 functions** (22 public), **3 types** and **2 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -113,7 +113,7 @@ find out by listening, because the result would sound perfectly fine.
   - reaches: `named`, `new`
 - `Conversation::save` (line 668) -- Write the plan to path.
   - reaches: `to_text`
-- `Conversation::load` (line 684) -- Read a plan written by Conversation::save.
+- `Conversation::load` (line 685) -- Read a plan written by Conversation::save.
   - reaches: `parse`, `new`, `split_word`
 
 ## What calls what
@@ -160,7 +160,7 @@ flowchart TD
     n_to_text["Conversation::to_text<br/>line 476"]
     n_parse["Conversation::parse<br/>line 520"]
     n_save(["Conversation::save<br/>line 668"])
-    n_load(["Conversation::load<br/>line 684"])
+    n_load(["Conversation::load<br/>line 685"])
     n_from_channels --> n_named
     n_from_channels --> n_new
     n_load --> n_parse
@@ -188,7 +188,7 @@ flowchart TD
     click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L476" "open the source"
     click n_parse href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L520" "open the source"
     click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L668" "open the source"
-    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L684" "open the source"
+    click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L685" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_duration,n_add_speaker,n_add_turn,n_rename_speakers,n_speakers,n_turns,n_len,n_is_empty,n_colour_of,n_voice,n_mode,n_set_mode,n_duration,n_overlaps,n_from_channels,n_save,n_load entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -241,8 +241,8 @@ flowchart TD
 | `Conversation::to_text` <sub>pub fn</sub> | [476](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L476) | Serialise to the text format described at the top of this module. |
 | `Conversation::parse` <sub>pub fn</sub> | [520](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L520) | Parse the text format. |
 | `Conversation::save` <sub>pub fn</sub> | [668](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L668) | Write the plan to path. |
-| `Conversation::load` <sub>pub fn</sub> | [684](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L684) | Read a plan written by Conversation::save. |
-| `guide_tests` <sub>mod</sub> | [1147](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L1147) |  |
+| `Conversation::load` <sub>pub fn</sub> | [685](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L685) | Read a plan written by Conversation::save. |
+| `guide_tests` <sub>mod</sub> | [1148](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs#L1148) |  |
 
 ---
 

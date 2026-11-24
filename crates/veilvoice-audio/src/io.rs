@@ -345,7 +345,9 @@ pub fn wav_bytes(audio: &Audio) -> Result<Vec<u8>, Error> {
 
 /// Write mono `f32` audio to a 16-bit PCM WAV file.
 pub fn save_wav(path: &Path, audio: &Audio) -> Result<(), Error> {
-    std::fs::write(path, wav_bytes(audio)?)?;
+    // Replaced in one step: a WAV cut short by a crash still parses, as a
+    // shorter recording than the one that was asked for. **F-315.**
+    veilvoice_crypto::privatefile::replace(path, &wav_bytes(audio)?)?;
     Ok(())
 }
 

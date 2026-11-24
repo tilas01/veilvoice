@@ -5,7 +5,7 @@
 
 > Detect which applications are currently using the microphone and camera, with alerts on change.
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/README.md)
 
 ## Contents
 
@@ -31,8 +31,8 @@ how long it has held the device.
 
 ## What it can actually see, per platform
 
-Detection is honest about its limits, because a monitor that quietly sees
-nothing is worse than no monitor at all, because it produces false confidence.
+Detection is honest about its limits. A monitor that quietly sees nothing
+is worse than no monitor at all, because it gives false confidence.
 `support` reports what the current platform can do before you rely on it.
 
 | Platform | Microphone | Camera | How |
@@ -72,7 +72,7 @@ flowchart TD
     n_appctl["appctl.rs<br/>798 lines"]
     n_input["input.rs<br/>605 lines"]
     n_linux["linux.rs<br/>218 lines"]
-    n_privilege["privilege.rs<br/>404 lines"]
+    n_privilege["privilege.rs<br/>407 lines"]
     n_proc["proc.rs<br/>274 lines"]
     n_windows["windows.rs<br/>622 lines"]
     n_input --> n_proc
@@ -99,7 +99,7 @@ flowchart TD
 | [`input.rs`](File-veilvoice-watch-input) | 605 | What on this machine could be watching the keyboard and the mouse. |
 | [`lib.rs`](File-veilvoice-watch-lib) | 423 | Find out which applications are using your microphone and camera, right now. |
 | [`linux.rs`](File-veilvoice-watch-linux) | 218 | Linux detection, via open file handles in /proc. |
-| [`privilege.rs`](File-veilvoice-watch-privilege) | 404 | What privilege VeilVoice is running with, and what each level can actually see. |
+| [`privilege.rs`](File-veilvoice-watch-privilege) | 407 | What privilege VeilVoice is running with, and what each level can actually see. |
 | [`proc.rs`](File-veilvoice-watch-proc) | 274 | Which processes are running, per platform, and what that cannot tell you. |
 | [`windows.rs`](File-veilvoice-watch-windows) | 622 | Windows detection, via the Capability Access Manager. |
 | [`scan_once.rs`](File-veilvoice-watch-examples-scan_once) | 30 | Print what is using the microphone and camera right now. |

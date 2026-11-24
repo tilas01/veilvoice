@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/examples/veil_a_buffer.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 54 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/veil_a_buffer.rs)
+[veilvoice-core](Crate-veilvoice-core) &middot; 54 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/veil_a_buffer.rs)
 
 ## Contents
 

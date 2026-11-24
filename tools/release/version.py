@@ -74,6 +74,12 @@ PLACES: list[tuple[str, str, str]] = [
     ("README.md", r"^sh reproduce-veilvoice\.sh v([0-9]+\.[0-9]+\.[0-9]+)$", "the reproducible-build example"),
     ("README.md", r"^\*\*v([0-9]+\.[0-9]+\.[0-9]+): early but real\.\*\*", "the status section"),
     ("docs/USER_GUIDE.md", r"^sh reproduce-veilvoice\.sh v([0-9]+\.[0-9]+\.[0-9]+)$", "the reproducible-build example"),
+    # F-340: the install scripts' examples and the crate guide's Cargo line said
+    # v0.1.9 fourteen releases on, because nothing here watched them.
+    ("install/install.sh", r"--version v([0-9]+\.[0-9]+\.[0-9]+)", "the usage and fallback examples"),
+    ("install/install.ps1", r"-Version v([0-9]+\.[0-9]+\.[0-9]+)", "the usage and fallback examples"),
+    ("install/install.bat", r"-Version v([0-9]+\.[0-9]+\.[0-9]+)", "the usage example"),
+    ("docs/USING_THE_CRATES.md", r'tag = "v([0-9]+\.[0-9]+\.[0-9]+)"', "the Cargo dependency example"),
     # This one had gone three releases stale saying "v0.1.14 is released",
     # which is what a roadmap is read for.
     ("ROADMAP.md", r"\*\*v([0-9]+\.[0-9]+\.[0-9]+) is released\*\*", "the where-we-are-now line"),

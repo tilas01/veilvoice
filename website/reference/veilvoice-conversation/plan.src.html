@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-conversation/src/plan.rs</code></h1>
-<p style="color:var(--muted)"><a href="plan.html">what this file is for</a> &middot; <a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 1244 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="plan.html">what this file is for</a> &middot; <a href="../veilvoice-conversation.html">veilvoice-conversation</a> &middot; 1245 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/plan.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -801,576 +801,577 @@
 <span class="ln" id="L676">        <span class="tok-com">// subtitle tracks worth protecting. Writing the subtitles 0600 and the</span></span>
 <span class="ln" id="L677">        <span class="tok-com">// file they are generated from 0644 would protect the copy and leave</span></span>
 <span class="ln" id="L678">        <span class="tok-com">// the original.</span></span>
-<span class="ln" id="L679">        veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>())?;</span>
-<span class="ln" id="L680">        <span class="tok-fn">Ok</span>(())</span>
-<span class="ln" id="L681">    }</span>
+<span class="ln" id="L679">        <span class="tok-com">// Replaced in one step, so a crash part-way leaves the old record. F-335.</span></span>
+<span class="ln" id="L680">        veilvoice_crypto::privatefile::<span class="tok-fn">replace_owner_only</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>())?;</span>
+<span class="ln" id="L681">        <span class="tok-fn">Ok</span>(())</span>
+<span class="ln" id="L682">    }</span>
 </span>
-<span class="ln" id="L682"></span>
+<span class="ln" id="L683"></span>
 <span class="src-item" id="fn-conversation-load">
-<span class="ln" id="L683">    <span class="tok-com">/// Read a plan written by [`Conversation::save`].</span></span>
-<span class="ln" id="L684">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">load</span>(path: &amp;std::path::Path) -&gt; Result&lt;Self, Error&gt; {</span>
-<span class="ln" id="L685">        Self::<span class="tok-fn">parse</span>(&amp;std::fs::<span class="tok-fn">read_to_string</span>(path)?)</span>
-<span class="ln" id="L686">    }</span>
+<span class="ln" id="L684">    <span class="tok-com">/// Read a plan written by [`Conversation::save`].</span></span>
+<span class="ln" id="L685">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">load</span>(path: &amp;std::path::Path) -&gt; Result&lt;Self, Error&gt; {</span>
+<span class="ln" id="L686">        Self::<span class="tok-fn">parse</span>(&amp;std::fs::<span class="tok-fn">read_to_string</span>(path)?)</span>
+<span class="ln" id="L687">    }</span>
 </span>
-<span class="ln" id="L687">}</span>
-<span class="ln" id="L688"></span>
-<span class="ln" id="L689"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L690"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L691">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L692"></span>
-<span class="ln" id="L693">    <span class="tok-kw">fn</span> <span class="tok-fn">two_people</span>() -&gt; Conversation {</span>
-<span class="ln" id="L694">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L695">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L696">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Sam&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L697">        conversation</span>
-<span class="ln" id="L698">            .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L699">                start: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L700">                end: <span class="tok-num">4.2</span>,</span>
-<span class="ln" id="L701">                speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L702">                text: <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Hello -- how did it go?&quot;</span>.<span class="tok-fn">into</span>()),</span>
-<span class="ln" id="L703">            })</span>
-<span class="ln" id="L704">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L705">        conversation</span>
-<span class="ln" id="L706">            .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L707">                start: <span class="tok-num">4.5</span>,</span>
-<span class="ln" id="L708">                end: <span class="tok-num">9.05</span>,</span>
-<span class="ln" id="L709">                speaker: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L710">                text: None,</span>
-<span class="ln" id="L711">            })</span>
-<span class="ln" id="L712">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L713">        conversation</span>
-<span class="ln" id="L714">    }</span>
-<span class="ln" id="L715"></span>
-<span class="ln" id="L716">    <span class="tok-com">/// F-279. A turn that ends past twelve hours is refused, so nothing</span></span>
-<span class="ln" id="L717">    <span class="tok-com">/// downstream is asked to step through a duration that never ends.</span></span>
-<span class="ln" id="L718">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L719">    <span class="tok-kw">fn</span> <span class="tok-fn">a_turn_cannot_end_past_twelve_hours</span>() {</span>
-<span class="ln" id="L720">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L721">        <span class="tok-kw">for</span> end <span class="tok-kw">in</span> [LATEST_END_SECS + <span class="tok-num">1.0</span>, 1e300] {</span>
-<span class="ln" id="L722">            <span class="tok-kw">let</span> refused = conversation.<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L723">                start: <span class="tok-num">10.0</span>,</span>
-<span class="ln" id="L724">                end,</span>
-<span class="ln" id="L725">                speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L726">                text: None,</span>
-<span class="ln" id="L727">            });</span>
-<span class="ln" id="L728">            assert!(</span>
-<span class="ln" id="L729">                matches!(refused, <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(_))),</span>
-<span class="ln" id="L730">                <span class="tok-str">&quot;{end}: {refused:?}&quot;</span></span>
-<span class="ln" id="L731">            );</span>
-<span class="ln" id="L732">        }</span>
-<span class="ln" id="L733">        conversation</span>
-<span class="ln" id="L734">            .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L735">                start: LATEST_END_SECS - <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L736">                end: LATEST_END_SECS,</span>
-<span class="ln" id="L737">                speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L738">                text: None,</span>
-<span class="ln" id="L739">            })</span>
-<span class="ln" id="L740">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a turn ending exactly at twelve hours is allowed&quot;</span>);</span>
-<span class="ln" id="L741">    }</span>
-<span class="ln" id="L742"></span>
-<span class="ln" id="L743">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L744">    <span class="tok-kw">fn</span> <span class="tok-fn">speakers_are_numbered_in_the_order_they_are_added</span>() {</span>
-<span class="ln" id="L745">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L746">        assert_eq!(conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>(), <span class="tok-num">0</span>);</span>
-<span class="ln" id="L747">        assert_eq!(conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Sam&quot;</span>)).<span class="tok-fn">unwrap</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L748">        assert_eq!(conversation.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L749">        assert!(!conversation.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L750">    }</span>
-<span class="ln" id="L751"></span>
-<span class="ln" id="L752">    <span class="tok-com">/// The first two speakers must get the two voices furthest apart in the</span></span>
-<span class="ln" id="L753">    <span class="tok-com">/// table, because two people is the common case.</span></span>
-<span class="ln" id="L754">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L755">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_two_speakers_get_the_two_most_distinct_voices</span>() {</span>
-<span class="ln" id="L756">        <span class="tok-kw">let</span> conversation = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L757">        assert_eq!(conversation.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), veilvoice_core::voices::<span class="tok-fn">voice</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L758">        assert_eq!(conversation.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>), veilvoice_core::voices::<span class="tok-fn">voice</span>(<span class="tok-num">1</span>));</span>
-<span class="ln" id="L759">        assert_ne!(conversation.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), conversation.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>));</span>
-<span class="ln" id="L760">    }</span>
-<span class="ln" id="L761"></span>
-<span class="ln" id="L762">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L763">    <span class="tok-kw">fn</span> <span class="tok-fn">there_can_be_no_more_speakers_than_there_are_voices</span>() {</span>
-<span class="ln" id="L764">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L765">        <span class="tok-kw">for</span> index <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES {</span>
-<span class="ln" id="L766">            conversation</span>
-<span class="ln" id="L767">                .<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(&amp;format!(<span class="tok-str">&quot;Person {index}&quot;</span>)))</span>
-<span class="ln" id="L768">                .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L769">        }</span>
-<span class="ln" id="L770">        <span class="tok-kw">let</span> error = conversation</span>
-<span class="ln" id="L771">            .<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;One too many&quot;</span>))</span>
-<span class="ln" id="L772">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;the eleventh must be refused, not given a reused voice&quot;</span>);</span>
-<span class="ln" id="L773">        assert!(matches!(error, Error::<span class="tok-fn">TooManySpeakers</span>(MAX_VOICES)));</span>
-<span class="ln" id="L774">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;10&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L775">    }</span>
-<span class="ln" id="L776"></span>
-<span class="ln" id="L777">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L778">    <span class="tok-kw">fn</span> <span class="tok-fn">a_nameless_speaker_is_refused</span>() {</span>
-<span class="ln" id="L779">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L780">        assert!(conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;   &quot;</span>)).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L781">        assert!(conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;a\nb&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L782">        assert!(conversation.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L783">    }</span>
-<span class="ln" id="L784"></span>
-<span class="ln" id="L785">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L786">    <span class="tok-kw">fn</span> <span class="tok-fn">a_turn_naming_an_undeclared_speaker_is_refused</span>() {</span>
-<span class="ln" id="L787">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L788">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L789">        <span class="tok-kw">let</span> error = conversation</span>
-<span class="ln" id="L790">            .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L791">                start: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L792">                end: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L793">                speaker: <span class="tok-num">4</span>,</span>
-<span class="ln" id="L794">                text: None,</span>
-<span class="ln" id="L795">            })</span>
-<span class="ln" id="L796">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;speaker 4 does not exist&quot;</span>);</span>
-<span class="ln" id="L797">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;only 1&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L798">    }</span>
-<span class="ln" id="L799"></span>
-<span class="ln" id="L800">    <span class="tok-com">/// A zero-length turn would leave that speech in whichever voice was next,</span></span>
-<span class="ln" id="L801">    <span class="tok-com">/// silently. Refused.</span></span>
-<span class="ln" id="L802">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L803">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_turn_is_refused</span>() {</span>
-<span class="ln" id="L804">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L805">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L806">        <span class="tok-kw">for</span> (start, end) <span class="tok-kw">in</span> [(<span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>), (<span class="tok-num">2.0</span>, <span class="tok-num">1.0</span>), (-<span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>)] {</span>
-<span class="ln" id="L807">            assert!(</span>
-<span class="ln" id="L808">                conversation</span>
-<span class="ln" id="L809">                    .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L810">                        start,</span>
-<span class="ln" id="L811">                        end,</span>
-<span class="ln" id="L812">                        speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L813">                        text: None,</span>
-<span class="ln" id="L814">                    })</span>
-<span class="ln" id="L815">                    .<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L816">                <span class="tok-str">&quot;{start} to {end} should be refused&quot;</span></span>
-<span class="ln" id="L817">            );</span>
-<span class="ln" id="L818">        }</span>
-<span class="ln" id="L819">        assert!(conversation</span>
-<span class="ln" id="L820">            .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L821">                start: f64::NAN,</span>
-<span class="ln" id="L822">                end: <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L823">                speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L824">                text: None,</span>
-<span class="ln" id="L825">            })</span>
-<span class="ln" id="L826">            .<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L827">        assert!(conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L828">    }</span>
-<span class="ln" id="L829"></span>
-<span class="ln" id="L830">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L831">    <span class="tok-kw">fn</span> <span class="tok-fn">turns_are_kept_in_time_order_however_they_arrive</span>() {</span>
-<span class="ln" id="L832">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L833">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L834">        <span class="tok-kw">for</span> start <span class="tok-kw">in</span> [<span class="tok-num">8.0</span>, <span class="tok-num">2.0</span>, <span class="tok-num">5.0</span>, <span class="tok-num">0.0</span>] {</span>
-<span class="ln" id="L835">            conversation</span>
-<span class="ln" id="L836">                .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L837">                    start,</span>
-<span class="ln" id="L838">                    end: start + <span class="tok-num">1.0</span>,</span>
-<span class="ln" id="L839">                    speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L840">                    text: None,</span>
-<span class="ln" id="L841">                })</span>
-<span class="ln" id="L842">                .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L843">        }</span>
-<span class="ln" id="L844">        <span class="tok-kw">let</span> starts: Vec&lt;f64&gt; = conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|t| t.start).<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L845">        assert_eq!(starts, vec![<span class="tok-num">0.0</span>, <span class="tok-num">2.0</span>, <span class="tok-num">5.0</span>, <span class="tok-num">8.0</span>]);</span>
-<span class="ln" id="L846">        assert_eq!(conversation.<span class="tok-fn">duration</span>(), <span class="tok-num">9.0</span>);</span>
-<span class="ln" id="L847">    }</span>
-<span class="ln" id="L848"></span>
-<span class="ln" id="L849">    <span class="tok-com">/// People talk over each other, so an overlap is reported and not refused.</span></span>
-<span class="ln" id="L850">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L851">    <span class="tok-kw">fn</span> <span class="tok-fn">an_overlap_between_two_people_is_reported_rather_than_refused</span>() {</span>
-<span class="ln" id="L852">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L853">        <span class="tok-com">// Sam cuts in while Alex is still talking, and well before Sam&#x27;s own</span></span>
-<span class="ln" id="L854">        <span class="tok-com">// later turn -- an interruption, and not Sam overlapping Sam.</span></span>
-<span class="ln" id="L855">        conversation</span>
-<span class="ln" id="L856">            .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L857">                start: <span class="tok-num">2.0</span>,</span>
-<span class="ln" id="L858">                end: <span class="tok-num">3.0</span>,</span>
-<span class="ln" id="L859">                speaker: <span class="tok-num">1</span>,</span>
-<span class="ln" id="L860">                text: None,</span>
-<span class="ln" id="L861">            })</span>
-<span class="ln" id="L862">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;an interruption is a real thing that happens&quot;</span>);</span>
-<span class="ln" id="L863">        <span class="tok-kw">let</span> overlaps = conversation.<span class="tok-fn">overlaps</span>();</span>
-<span class="ln" id="L864">        assert!(!overlaps.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the interruption should be reported&quot;</span>);</span>
-<span class="ln" id="L865">        assert!(conversation.<span class="tok-fn">self_overlaps</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L866">    }</span>
-<span class="ln" id="L867"></span>
-<span class="ln" id="L868">    <span class="tok-com">/// One person cannot be in two places in their own recording, so this is</span></span>
-<span class="ln" id="L869">    <span class="tok-com">/// almost always a typed time -- reported separately, and more loudly.</span></span>
-<span class="ln" id="L870">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L871">    <span class="tok-kw">fn</span> <span class="tok-fn">a_speaker_overlapping_themselves_is_reported_separately</span>() {</span>
-<span class="ln" id="L872">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L873">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L874">        conversation</span>
-<span class="ln" id="L875">            .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L876">                start: <span class="tok-num">0.0</span>,</span>
-<span class="ln" id="L877">                end: <span class="tok-num">5.0</span>,</span>
-<span class="ln" id="L878">                speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L879">                text: None,</span>
-<span class="ln" id="L880">            })</span>
-<span class="ln" id="L881">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L882">        conversation</span>
-<span class="ln" id="L883">            .<span class="tok-fn">add_turn</span>(Turn {</span>
-<span class="ln" id="L884">                start: <span class="tok-num">3.0</span>,</span>
-<span class="ln" id="L885">                end: <span class="tok-num">8.0</span>,</span>
-<span class="ln" id="L886">                speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L887">                text: None,</span>
-<span class="ln" id="L888">            })</span>
-<span class="ln" id="L889">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L890">        assert_eq!(conversation.<span class="tok-fn">self_overlaps</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L891">        assert!(conversation.<span class="tok-fn">overlaps</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L892">    }</span>
-<span class="ln" id="L893"></span>
-<span class="ln" id="L894">    <span class="tok-com">/// The one split VeilVoice can make on its own, because it is not a guess.</span></span>
-<span class="ln" id="L895">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L896">    <span class="tok-kw">fn</span> <span class="tok-fn">a_channel_per_person_needs_no_diarisation</span>() {</span>
-<span class="ln" id="L897">        <span class="tok-kw">let</span> conversation = Conversation::<span class="tok-fn">from_channels</span>(&amp;[<span class="tok-str">&quot;Alex&quot;</span>, <span class="tok-str">&quot;Sam&quot;</span>], <span class="tok-num">30.0</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L898">        assert_eq!(conversation.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L899">        assert_eq!(conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
-<span class="ln" id="L900">        assert_eq!(conversation.<span class="tok-fn">duration</span>(), <span class="tok-num">30.0</span>);</span>
-<span class="ln" id="L901">        <span class="tok-com">// Both talk for the whole recording, which is what a channel each</span></span>
-<span class="ln" id="L902">        <span class="tok-com">// means -- and which is an overlap by construction.</span></span>
-<span class="ln" id="L903">        assert!(!conversation.<span class="tok-fn">overlaps</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L904"></span>
-<span class="ln" id="L905">        assert!(Conversation::<span class="tok-fn">from_channels</span>(&amp;[], <span class="tok-num">30.0</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L906">        assert!(Conversation::<span class="tok-fn">from_channels</span>(&amp;[<span class="tok-str">&quot;Alex&quot;</span>], <span class="tok-num">0.0</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L907">        assert!(Conversation::<span class="tok-fn">from_channels</span>(&amp;[<span class="tok-str">&quot;Alex&quot;</span>], f64::NAN).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L908">    }</span>
-<span class="ln" id="L909"></span>
-<span class="ln" id="L910">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L911">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_survives_a_round_trip_through_text</span>() {</span>
-<span class="ln" id="L912">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L913">        conversation.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Two people, one microphone&quot;</span>.<span class="tok-fn">into</span>());</span>
-<span class="ln" id="L914">        <span class="tok-kw">let</span> text = conversation.<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L915">        <span class="tok-kw">let</span> read_back = Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its own output must parse&quot;</span>);</span>
-<span class="ln" id="L916">        assert_eq!(read_back.title, conversation.title);</span>
-<span class="ln" id="L917">        assert_eq!(read_back.<span class="tok-fn">speakers</span>(), conversation.<span class="tok-fn">speakers</span>());</span>
-<span class="ln" id="L918">        assert_eq!(read_back.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>(), conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>());</span>
-<span class="ln" id="L919">        assert_eq!(read_back.<span class="tok-fn">to_text</span>(), text, <span class="tok-str">&quot;and byte for byte&quot;</span>);</span>
-<span class="ln" id="L920">    }</span>
-<span class="ln" id="L921"></span>
-<span class="ln" id="L922">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L923">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_survives_a_round_trip_through_a_file</span>() {</span>
-<span class="ln" id="L924">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L925">        <span class="tok-kw">let</span> conversation = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L926">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;deeper&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;plan.txt&quot;</span>);</span>
-<span class="ln" id="L927">        conversation.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L928">        assert_eq!(Conversation::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>(), conversation);</span>
-<span class="ln" id="L929">    }</span>
-<span class="ln" id="L930"></span>
-<span class="ln" id="L931">    <span class="tok-com">/// A saved plan is readable only by the account that saved it.</span></span>
-<span class="ln" id="L932">    <span class="tok-com">///</span></span>
-<span class="ln" id="L933">    <span class="tok-com">/// A plan holds every speaker&#x27;s name and every word typed into it, which</span></span>
-<span class="ln" id="L934">    <span class="tok-com">/// is the same content as the subtitle tracks a render produces from it.</span></span>
-<span class="ln" id="L935">    <span class="tok-com">/// Those are written owner-only; writing the source of them 0644 would</span></span>
-<span class="ln" id="L936">    <span class="tok-com">/// protect the copy and leave the original.</span></span>
-<span class="ln" id="L937">    <span class="tok-attr">#[cfg</span>(unix)]</span>
-<span class="ln" id="L938">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L939">    <span class="tok-kw">fn</span> <span class="tok-fn">a_saved_plan_is_readable_only_by_this_account</span>() {</span>
-<span class="ln" id="L940">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
-<span class="ln" id="L941">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L942">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;plan.txt&quot;</span>);</span>
-<span class="ln" id="L943">        <span class="tok-fn">two_people</span>().<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L944">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
-<span class="ln" id="L945">        assert_eq!(</span>
-<span class="ln" id="L946">            mode, 0o600,</span>
-<span class="ln" id="L947">            <span class="tok-str">&quot;a plan is {mode:o}, so anyone with an account here can read the names in it&quot;</span></span>
-<span class="ln" id="L948">        );</span>
-<span class="ln" id="L949">        assert_eq!(Conversation::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>(), <span class="tok-fn">two_people</span>());</span>
-<span class="ln" id="L950">    }</span>
-<span class="ln" id="L951"></span>
-<span class="ln" id="L952">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L953">    <span class="tok-kw">fn</span> <span class="tok-fn">a_picture_survives_the_round_trip</span>() {</span>
-<span class="ln" id="L954">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L955">        conversation</span>
-<span class="ln" id="L956">            .<span class="tok-fn">add_speaker</span>(Speaker {</span>
-<span class="ln" id="L957">                name: <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>(),</span>
-<span class="ln" id="L958">                picture: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;portraits/sam.png&quot;</span>)),</span>
-<span class="ln" id="L959">                colour: None,</span>
-<span class="ln" id="L960">            })</span>
-<span class="ln" id="L961">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L962">        <span class="tok-kw">let</span> read_back = Conversation::<span class="tok-fn">parse</span>(&amp;conversation.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L963">        assert_eq!(</span>
-<span class="ln" id="L964">            read_back.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].picture,</span>
-<span class="ln" id="L965">            <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;portraits/sam.png&quot;</span>))</span>
-<span class="ln" id="L966">        );</span>
-<span class="ln" id="L967">    }</span>
-<span class="ln" id="L968"></span>
-<span class="ln" id="L969">    <span class="tok-com">/// A file that lists its turns before its speakers must still read.</span></span>
-<span class="ln" id="L970">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L971">    <span class="tok-kw">fn</span> <span class="tok-fn">turns_before_speakers_still_parse</span>() {</span>
-<span class="ln" id="L972">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nturn  0.000  1.000  0\nspeaker  0  Alex\n&quot;</span>);</span>
-<span class="ln" id="L973">        <span class="tok-kw">let</span> conversation = Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L974">        assert_eq!(conversation.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L975">        assert_eq!(conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L976">    }</span>
-<span class="ln" id="L977"></span>
-<span class="ln" id="L978">    <span class="tok-com">/// A hand-edited file with two speakers numbered 0 would otherwise give</span></span>
-<span class="ln" id="L979">    <span class="tok-com">/// one of them the other&#x27;s voice, silently.</span></span>
-<span class="ln" id="L980">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L981">    <span class="tok-kw">fn</span> <span class="tok-fn">a_repeated_speaker_number_is_refused</span>() {</span>
-<span class="ln" id="L982">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nspeaker  0  Alex\nspeaker  0  Sam\n&quot;</span>);</span>
-<span class="ln" id="L983">        <span class="tok-kw">let</span> error = Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;must refuse&quot;</span>);</span>
-<span class="ln" id="L984">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;numbered from zero&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L985">    }</span>
-<span class="ln" id="L986"></span>
-<span class="ln" id="L987">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L988">    <span class="tok-kw">fn</span> <span class="tok-fn">a_malformed_plan_is_refused_rather_than_half_read</span>() {</span>
-<span class="ln" id="L989">        assert!(Conversation::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;empty&quot;</span>);</span>
-<span class="ln" id="L990">        assert!(</span>
-<span class="ln" id="L991">            Conversation::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;NOT-THE-MAGIC\n&quot;</span>).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L992">            <span class="tok-str">&quot;wrong magic&quot;</span></span>
-<span class="ln" id="L993">        );</span>
-<span class="ln" id="L994">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L995">            <span class="tok-str">&quot;speaker  x  Alex&quot;</span>,</span>
-<span class="ln" id="L996">            <span class="tok-str">&quot;speaker  0  Alex\nturn  x  1.0  0&quot;</span>,</span>
-<span class="ln" id="L997">            <span class="tok-str">&quot;speaker  0  Alex\nturn  0.0  x  0&quot;</span>,</span>
-<span class="ln" id="L998">            <span class="tok-str">&quot;speaker  0  Alex\nturn  0.0  1.0  x&quot;</span>,</span>
-<span class="ln" id="L999">            <span class="tok-str">&quot;speaker  0  Alex\nturn  0.0  1.0  9&quot;</span>,</span>
-<span class="ln" id="L1000">            <span class="tok-str">&quot;whatever  1&quot;</span>,</span>
-<span class="ln" id="L1001">            <span class="tok-str">&quot;nokeyword&quot;</span>,</span>
-<span class="ln" id="L1002">        ] {</span>
-<span class="ln" id="L1003">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\n{bad}\n&quot;</span>);</span>
-<span class="ln" id="L1004">            assert!(</span>
-<span class="ln" id="L1005">                Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">is_err</span>(),</span>
-<span class="ln" id="L1006">                <span class="tok-str">&quot;should have been refused: {bad:?}&quot;</span></span>
-<span class="ln" id="L1007">            );</span>
-<span class="ln" id="L1008">        }</span>
-<span class="ln" id="L1009">    }</span>
-<span class="ln" id="L1010"></span>
-<span class="ln" id="L1011">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1012">    <span class="tok-kw">fn</span> <span class="tok-fn">blank_lines_are_tolerated</span>() {</span>
-<span class="ln" id="L1013">        <span class="tok-kw">let</span> conversation = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L1014">        <span class="tok-kw">let</span> padded = conversation.<span class="tok-fn">to_text</span>().<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;\n&#x27;</span>, <span class="tok-str">&quot;\n\n&quot;</span>);</span>
-<span class="ln" id="L1015">        assert_eq!(Conversation::<span class="tok-fn">parse</span>(&amp;padded).<span class="tok-fn">unwrap</span>(), conversation);</span>
-<span class="ln" id="L1016">    }</span>
-<span class="ln" id="L1017"></span>
-<span class="ln" id="L1018">    <span class="tok-com">/// Renaming keeps the turns exactly where they were.</span></span>
-<span class="ln" id="L1019">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1020">    <span class="tok-kw">fn</span> <span class="tok-fn">renaming_leaves_every_turn_alone</span>() {</span>
-<span class="ln" id="L1021">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L1022">        <span class="tok-kw">let</span> before = plan.<span class="tok-fn">turns</span>().<span class="tok-fn">to_vec</span>();</span>
-<span class="ln" id="L1023">        plan.<span class="tok-fn">rename_speakers</span>(&amp;[<span class="tok-str">&quot;Robin&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;Jules&quot;</span>.<span class="tok-fn">to_string</span>()])</span>
-<span class="ln" id="L1024">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1025">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Robin&quot;</span>);</span>
-<span class="ln" id="L1026">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">1</span>].name, <span class="tok-str">&quot;Jules&quot;</span>);</span>
-<span class="ln" id="L1027">        assert_eq!(plan.<span class="tok-fn">turns</span>(), before.<span class="tok-fn">as_slice</span>(), <span class="tok-str">&quot;the turns must not move&quot;</span>);</span>
-<span class="ln" id="L1028">    }</span>
-<span class="ln" id="L1029"></span>
-<span class="ln" id="L1030">    <span class="tok-com">/// The one mistake here that cannot be heard in the result: a mismatch</span></span>
-<span class="ln" id="L1031">    <span class="tok-com">/// would put somebody&#x27;s audio in another person&#x27;s voice, and both voices</span></span>
-<span class="ln" id="L1032">    <span class="tok-com">/// are unfamiliar, so nobody would notice.</span></span>
-<span class="ln" id="L1033">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1034">    <span class="tok-kw">fn</span> <span class="tok-fn">a_different_number_of_names_is_refused</span>() {</span>
-<span class="ln" id="L1035">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L1036">        <span class="tok-kw">let</span> error = plan</span>
-<span class="ln" id="L1037">            .<span class="tok-fn">rename_speakers</span>(&amp;[<span class="tok-str">&quot;Only one&quot;</span>.<span class="tok-fn">to_string</span>()])</span>
-<span class="ln" id="L1038">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;two speakers, one name&quot;</span>);</span>
-<span class="ln" id="L1039">        assert!(format!(<span class="tok-str">&quot;{error}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;2&#x27;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
-<span class="ln" id="L1040">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Alex&quot;</span>, <span class="tok-str">&quot;nothing may have changed&quot;</span>);</span>
-<span class="ln" id="L1041">    }</span>
-<span class="ln" id="L1042"></span>
-<span class="ln" id="L1043">    <span class="tok-com">/// Every name is checked the way `add_speaker` checks one, and nothing is</span></span>
-<span class="ln" id="L1044">    <span class="tok-com">/// changed unless all of them pass.</span></span>
-<span class="ln" id="L1045">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1046">    <span class="tok-kw">fn</span> <span class="tok-fn">a_bad_name_leaves_the_plan_exactly_as_it_was</span>() {</span>
-<span class="ln" id="L1047">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L1048">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;   &quot;</span>, <span class="tok-str">&quot;Robin\nspeaker  9  Mallory&quot;</span>] {</span>
-<span class="ln" id="L1049">            <span class="tok-kw">let</span> error = plan</span>
-<span class="ln" id="L1050">                .<span class="tok-fn">rename_speakers</span>(&amp;[<span class="tok-str">&quot;Robin&quot;</span>.<span class="tok-fn">to_string</span>(), bad.<span class="tok-fn">to_string</span>()])</span>
-<span class="ln" id="L1051">                .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;{bad:?} should be refused&quot;</span>);</span>
-<span class="ln" id="L1052">            <span class="tok-kw">let</span> _ = error;</span>
-<span class="ln" id="L1053">            assert_eq!(</span>
-<span class="ln" id="L1054">                plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name,</span>
-<span class="ln" id="L1055">                <span class="tok-str">&quot;Alex&quot;</span>,</span>
-<span class="ln" id="L1056">                <span class="tok-str">&quot;a refusal must not half-rename&quot;</span></span>
-<span class="ln" id="L1057">            );</span>
-<span class="ln" id="L1058">            assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">1</span>].name, <span class="tok-str">&quot;Sam&quot;</span>);</span>
-<span class="ln" id="L1059">        }</span>
-<span class="ln" id="L1060">    }</span>
-<span class="ln" id="L1061"></span>
-<span class="ln" id="L1062">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1063">    <span class="tok-kw">fn</span> <span class="tok-fn">names_are_trimmed_the_same_way_they_are_when_added</span>() {</span>
-<span class="ln" id="L1064">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L1065">        plan.<span class="tok-fn">rename_speakers</span>(&amp;[<span class="tok-str">&quot;  Robin  &quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;Jules&quot;</span>.<span class="tok-fn">to_string</span>()])</span>
-<span class="ln" id="L1066">            .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1067">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Robin&quot;</span>);</span>
-<span class="ln" id="L1068">    }</span>
-<span class="ln" id="L1069"></span>
-<span class="ln" id="L1070">    <span class="tok-com">/// Uniform mode gives every speaker the same voice. This is the whole of</span></span>
-<span class="ln" id="L1071">    <span class="tok-com">/// what the mode does to the sound, so it is asserted directly.</span></span>
-<span class="ln" id="L1072">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1073">    <span class="tok-kw">fn</span> <span class="tok-fn">uniform_mode_gives_every_speaker_one_voice</span>() {</span>
-<span class="ln" id="L1074">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::mode::VoiceMode;</span>
-<span class="ln" id="L1075">        <span class="tok-kw">let</span> config = veilvoice_core::DeidConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1076">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L1077">        assert_ne!(plan.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), plan.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>), <span class="tok-str">&quot;distinct by default&quot;</span>);</span>
-<span class="ln" id="L1078"></span>
-<span class="ln" id="L1079">        plan.<span class="tok-fn">set_mode</span>(VoiceMode::Uniform, &amp;config).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1080">        assert_eq!(plan.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), plan.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>), <span class="tok-str">&quot;one voice between them&quot;</span>);</span>
-<span class="ln" id="L1081">        assert_eq!(plan.<span class="tok-fn">mode</span>(), VoiceMode::Uniform);</span>
-<span class="ln" id="L1082"></span>
-<span class="ln" id="L1083">        plan.<span class="tok-fn">set_mode</span>(VoiceMode::Distinct, &amp;config).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1084">        assert_ne!(plan.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), plan.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>), <span class="tok-str">&quot;and back again&quot;</span>);</span>
-<span class="ln" id="L1085">    }</span>
-<span class="ln" id="L1086"></span>
-<span class="ln" id="L1087">    <span class="tok-com">/// A plan with more speakers than there are separable voices cannot be put</span></span>
-<span class="ln" id="L1088">    <span class="tok-com">/// into distinct mode, and the refusal says what to do instead.</span></span>
-<span class="ln" id="L1089">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1090">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_mode_is_refused_past_the_measured_limit</span>() {</span>
-<span class="ln" id="L1091">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::mode::VoiceMode;</span>
-<span class="ln" id="L1092">        <span class="tok-kw">let</span> config = veilvoice_core::DeidConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1093">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1094">        <span class="tok-kw">for</span> index <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">9</span> {</span>
-<span class="ln" id="L1095">            plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(&amp;format!(<span class="tok-str">&quot;P{index}&quot;</span>)))</span>
-<span class="ln" id="L1096">                .<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1097">        }</span>
-<span class="ln" id="L1098">        <span class="tok-com">// Nine is past the eight that are clearly separable...</span></span>
-<span class="ln" id="L1099">        <span class="tok-kw">let</span> error = plan</span>
-<span class="ln" id="L1100">            .<span class="tok-fn">set_mode</span>(VoiceMode::Distinct, &amp;config)</span>
-<span class="ln" id="L1101">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;nine speakers, eight clear voices&quot;</span>);</span>
-<span class="ln" id="L1102">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one voice for everybody&quot;</span>));</span>
-<span class="ln" id="L1103">        <span class="tok-com">// ...and uniform mode carries them, which is the point of the refusal</span></span>
-<span class="ln" id="L1104">        <span class="tok-com">// naming it.</span></span>
-<span class="ln" id="L1105">        plan.<span class="tok-fn">set_mode</span>(VoiceMode::Uniform, &amp;config).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1106">        assert_eq!(plan.<span class="tok-fn">mode</span>(), VoiceMode::Uniform);</span>
-<span class="ln" id="L1107">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">9</span> {</span>
-<span class="ln" id="L1108">            assert_eq!(plan.<span class="tok-fn">voice</span>(slot), plan.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>));</span>
-<span class="ln" id="L1109">        }</span>
-<span class="ln" id="L1110">    }</span>
-<span class="ln" id="L1111"></span>
-<span class="ln" id="L1112">    <span class="tok-com">/// The mode is not written to the plan file. A plan says who speaks when;</span></span>
-<span class="ln" id="L1113">    <span class="tok-com">/// how it is rendered is the renderer&#x27;s decision, and a mode hidden in a</span></span>
-<span class="ln" id="L1114">    <span class="tok-com">/// shared file would change what somebody else&#x27;s render sounds like.</span></span>
-<span class="ln" id="L1115">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1116">    <span class="tok-kw">fn</span> <span class="tok-fn">the_mode_is_not_carried_in_the_file</span>() {</span>
-<span class="ln" id="L1117">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::mode::VoiceMode;</span>
-<span class="ln" id="L1118">        <span class="tok-kw">let</span> config = veilvoice_core::DeidConfig::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L1119">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
-<span class="ln" id="L1120">        plan.<span class="tok-fn">set_mode</span>(VoiceMode::Uniform, &amp;config).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1121"></span>
-<span class="ln" id="L1122">        <span class="tok-kw">let</span> text = plan.<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L1123">        assert!(!text.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;uniform&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
-<span class="ln" id="L1124">        assert!(!text.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;mode&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
-<span class="ln" id="L1125"></span>
-<span class="ln" id="L1126">        <span class="tok-kw">let</span> read_back = Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L1127">        assert_eq!(</span>
-<span class="ln" id="L1128">            read_back.<span class="tok-fn">mode</span>(),</span>
-<span class="ln" id="L1129">            VoiceMode::Distinct,</span>
-<span class="ln" id="L1130">            <span class="tok-str">&quot;a plan read from disk renders distinct until told otherwise&quot;</span></span>
-<span class="ln" id="L1131">        );</span>
-<span class="ln" id="L1132">    }</span>
-<span class="ln" id="L1133"></span>
-<span class="ln" id="L1134">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1135">    <span class="tok-kw">fn</span> <span class="tok-fn">a_turn_reports_its_own_length</span>() {</span>
-<span class="ln" id="L1136">        <span class="tok-kw">let</span> turn = Turn {</span>
-<span class="ln" id="L1137">            start: <span class="tok-num">1.5</span>,</span>
-<span class="ln" id="L1138">            end: <span class="tok-num">4.0</span>,</span>
-<span class="ln" id="L1139">            speaker: <span class="tok-num">0</span>,</span>
-<span class="ln" id="L1140">            text: None,</span>
-<span class="ln" id="L1141">        };</span>
-<span class="ln" id="L1142">        assert!((turn.<span class="tok-fn">duration</span>() - <span class="tok-num">2.5</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">9</span>);</span>
-<span class="ln" id="L1143">    }</span>
-<span class="ln" id="L1144">}</span>
-<span class="ln" id="L1145"></span>
+<span class="ln" id="L688">}</span>
+<span class="ln" id="L689"></span>
+<span class="ln" id="L690"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L691"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L692">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L693"></span>
+<span class="ln" id="L694">    <span class="tok-kw">fn</span> <span class="tok-fn">two_people</span>() -&gt; Conversation {</span>
+<span class="ln" id="L695">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L696">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L697">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Sam&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L698">        conversation</span>
+<span class="ln" id="L699">            .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L700">                start: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L701">                end: <span class="tok-num">4.2</span>,</span>
+<span class="ln" id="L702">                speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L703">                text: <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Hello -- how did it go?&quot;</span>.<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L704">            })</span>
+<span class="ln" id="L705">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L706">        conversation</span>
+<span class="ln" id="L707">            .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L708">                start: <span class="tok-num">4.5</span>,</span>
+<span class="ln" id="L709">                end: <span class="tok-num">9.05</span>,</span>
+<span class="ln" id="L710">                speaker: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L711">                text: None,</span>
+<span class="ln" id="L712">            })</span>
+<span class="ln" id="L713">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L714">        conversation</span>
+<span class="ln" id="L715">    }</span>
+<span class="ln" id="L716"></span>
+<span class="ln" id="L717">    <span class="tok-com">/// F-279. A turn that ends past twelve hours is refused, so nothing</span></span>
+<span class="ln" id="L718">    <span class="tok-com">/// downstream is asked to step through a duration that never ends.</span></span>
+<span class="ln" id="L719">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L720">    <span class="tok-kw">fn</span> <span class="tok-fn">a_turn_cannot_end_past_twelve_hours</span>() {</span>
+<span class="ln" id="L721">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L722">        <span class="tok-kw">for</span> end <span class="tok-kw">in</span> [LATEST_END_SECS + <span class="tok-num">1.0</span>, 1e300] {</span>
+<span class="ln" id="L723">            <span class="tok-kw">let</span> refused = conversation.<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L724">                start: <span class="tok-num">10.0</span>,</span>
+<span class="ln" id="L725">                end,</span>
+<span class="ln" id="L726">                speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L727">                text: None,</span>
+<span class="ln" id="L728">            });</span>
+<span class="ln" id="L729">            assert!(</span>
+<span class="ln" id="L730">                matches!(refused, <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Malformed</span>(_))),</span>
+<span class="ln" id="L731">                <span class="tok-str">&quot;{end}: {refused:?}&quot;</span></span>
+<span class="ln" id="L732">            );</span>
+<span class="ln" id="L733">        }</span>
+<span class="ln" id="L734">        conversation</span>
+<span class="ln" id="L735">            .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L736">                start: LATEST_END_SECS - <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L737">                end: LATEST_END_SECS,</span>
+<span class="ln" id="L738">                speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L739">                text: None,</span>
+<span class="ln" id="L740">            })</span>
+<span class="ln" id="L741">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a turn ending exactly at twelve hours is allowed&quot;</span>);</span>
+<span class="ln" id="L742">    }</span>
+<span class="ln" id="L743"></span>
+<span class="ln" id="L744">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L745">    <span class="tok-kw">fn</span> <span class="tok-fn">speakers_are_numbered_in_the_order_they_are_added</span>() {</span>
+<span class="ln" id="L746">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L747">        assert_eq!(conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>(), <span class="tok-num">0</span>);</span>
+<span class="ln" id="L748">        assert_eq!(conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Sam&quot;</span>)).<span class="tok-fn">unwrap</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L749">        assert_eq!(conversation.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L750">        assert!(!conversation.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L751">    }</span>
+<span class="ln" id="L752"></span>
+<span class="ln" id="L753">    <span class="tok-com">/// The first two speakers must get the two voices furthest apart in the</span></span>
+<span class="ln" id="L754">    <span class="tok-com">/// table, because two people is the common case.</span></span>
+<span class="ln" id="L755">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L756">    <span class="tok-kw">fn</span> <span class="tok-fn">the_first_two_speakers_get_the_two_most_distinct_voices</span>() {</span>
+<span class="ln" id="L757">        <span class="tok-kw">let</span> conversation = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L758">        assert_eq!(conversation.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), veilvoice_core::voices::<span class="tok-fn">voice</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L759">        assert_eq!(conversation.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>), veilvoice_core::voices::<span class="tok-fn">voice</span>(<span class="tok-num">1</span>));</span>
+<span class="ln" id="L760">        assert_ne!(conversation.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), conversation.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>));</span>
+<span class="ln" id="L761">    }</span>
+<span class="ln" id="L762"></span>
+<span class="ln" id="L763">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L764">    <span class="tok-kw">fn</span> <span class="tok-fn">there_can_be_no_more_speakers_than_there_are_voices</span>() {</span>
+<span class="ln" id="L765">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L766">        <span class="tok-kw">for</span> index <span class="tok-kw">in</span> <span class="tok-num">0</span>..MAX_VOICES {</span>
+<span class="ln" id="L767">            conversation</span>
+<span class="ln" id="L768">                .<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(&amp;format!(<span class="tok-str">&quot;Person {index}&quot;</span>)))</span>
+<span class="ln" id="L769">                .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L770">        }</span>
+<span class="ln" id="L771">        <span class="tok-kw">let</span> error = conversation</span>
+<span class="ln" id="L772">            .<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;One too many&quot;</span>))</span>
+<span class="ln" id="L773">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;the eleventh must be refused, not given a reused voice&quot;</span>);</span>
+<span class="ln" id="L774">        assert!(matches!(error, Error::<span class="tok-fn">TooManySpeakers</span>(MAX_VOICES)));</span>
+<span class="ln" id="L775">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;10&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L776">    }</span>
+<span class="ln" id="L777"></span>
+<span class="ln" id="L778">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L779">    <span class="tok-kw">fn</span> <span class="tok-fn">a_nameless_speaker_is_refused</span>() {</span>
+<span class="ln" id="L780">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L781">        assert!(conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;   &quot;</span>)).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L782">        assert!(conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;a\nb&quot;</span>)).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L783">        assert!(conversation.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L784">    }</span>
+<span class="ln" id="L785"></span>
+<span class="ln" id="L786">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L787">    <span class="tok-kw">fn</span> <span class="tok-fn">a_turn_naming_an_undeclared_speaker_is_refused</span>() {</span>
+<span class="ln" id="L788">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L789">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L790">        <span class="tok-kw">let</span> error = conversation</span>
+<span class="ln" id="L791">            .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L792">                start: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L793">                end: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L794">                speaker: <span class="tok-num">4</span>,</span>
+<span class="ln" id="L795">                text: None,</span>
+<span class="ln" id="L796">            })</span>
+<span class="ln" id="L797">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;speaker 4 does not exist&quot;</span>);</span>
+<span class="ln" id="L798">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;only 1&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L799">    }</span>
+<span class="ln" id="L800"></span>
+<span class="ln" id="L801">    <span class="tok-com">/// A zero-length turn would leave that speech in whichever voice was next,</span></span>
+<span class="ln" id="L802">    <span class="tok-com">/// silently. Refused.</span></span>
+<span class="ln" id="L803">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L804">    <span class="tok-kw">fn</span> <span class="tok-fn">an_impossible_turn_is_refused</span>() {</span>
+<span class="ln" id="L805">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L806">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L807">        <span class="tok-kw">for</span> (start, end) <span class="tok-kw">in</span> [(<span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>), (<span class="tok-num">2.0</span>, <span class="tok-num">1.0</span>), (-<span class="tok-num">1.0</span>, <span class="tok-num">1.0</span>)] {</span>
+<span class="ln" id="L808">            assert!(</span>
+<span class="ln" id="L809">                conversation</span>
+<span class="ln" id="L810">                    .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L811">                        start,</span>
+<span class="ln" id="L812">                        end,</span>
+<span class="ln" id="L813">                        speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L814">                        text: None,</span>
+<span class="ln" id="L815">                    })</span>
+<span class="ln" id="L816">                    .<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L817">                <span class="tok-str">&quot;{start} to {end} should be refused&quot;</span></span>
+<span class="ln" id="L818">            );</span>
+<span class="ln" id="L819">        }</span>
+<span class="ln" id="L820">        assert!(conversation</span>
+<span class="ln" id="L821">            .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L822">                start: f64::NAN,</span>
+<span class="ln" id="L823">                end: <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L824">                speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L825">                text: None,</span>
+<span class="ln" id="L826">            })</span>
+<span class="ln" id="L827">            .<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L828">        assert!(conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L829">    }</span>
+<span class="ln" id="L830"></span>
+<span class="ln" id="L831">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L832">    <span class="tok-kw">fn</span> <span class="tok-fn">turns_are_kept_in_time_order_however_they_arrive</span>() {</span>
+<span class="ln" id="L833">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L834">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L835">        <span class="tok-kw">for</span> start <span class="tok-kw">in</span> [<span class="tok-num">8.0</span>, <span class="tok-num">2.0</span>, <span class="tok-num">5.0</span>, <span class="tok-num">0.0</span>] {</span>
+<span class="ln" id="L836">            conversation</span>
+<span class="ln" id="L837">                .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L838">                    start,</span>
+<span class="ln" id="L839">                    end: start + <span class="tok-num">1.0</span>,</span>
+<span class="ln" id="L840">                    speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L841">                    text: None,</span>
+<span class="ln" id="L842">                })</span>
+<span class="ln" id="L843">                .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L844">        }</span>
+<span class="ln" id="L845">        <span class="tok-kw">let</span> starts: Vec&lt;f64&gt; = conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">iter</span>().<span class="tok-fn">map</span>(|t| t.start).<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L846">        assert_eq!(starts, vec![<span class="tok-num">0.0</span>, <span class="tok-num">2.0</span>, <span class="tok-num">5.0</span>, <span class="tok-num">8.0</span>]);</span>
+<span class="ln" id="L847">        assert_eq!(conversation.<span class="tok-fn">duration</span>(), <span class="tok-num">9.0</span>);</span>
+<span class="ln" id="L848">    }</span>
+<span class="ln" id="L849"></span>
+<span class="ln" id="L850">    <span class="tok-com">/// People talk over each other, so an overlap is reported and not refused.</span></span>
+<span class="ln" id="L851">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L852">    <span class="tok-kw">fn</span> <span class="tok-fn">an_overlap_between_two_people_is_reported_rather_than_refused</span>() {</span>
+<span class="ln" id="L853">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L854">        <span class="tok-com">// Sam cuts in while Alex is still talking, and well before Sam&#x27;s own</span></span>
+<span class="ln" id="L855">        <span class="tok-com">// later turn -- an interruption, and not Sam overlapping Sam.</span></span>
+<span class="ln" id="L856">        conversation</span>
+<span class="ln" id="L857">            .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L858">                start: <span class="tok-num">2.0</span>,</span>
+<span class="ln" id="L859">                end: <span class="tok-num">3.0</span>,</span>
+<span class="ln" id="L860">                speaker: <span class="tok-num">1</span>,</span>
+<span class="ln" id="L861">                text: None,</span>
+<span class="ln" id="L862">            })</span>
+<span class="ln" id="L863">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;an interruption is a real thing that happens&quot;</span>);</span>
+<span class="ln" id="L864">        <span class="tok-kw">let</span> overlaps = conversation.<span class="tok-fn">overlaps</span>();</span>
+<span class="ln" id="L865">        assert!(!overlaps.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;the interruption should be reported&quot;</span>);</span>
+<span class="ln" id="L866">        assert!(conversation.<span class="tok-fn">self_overlaps</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L867">    }</span>
+<span class="ln" id="L868"></span>
+<span class="ln" id="L869">    <span class="tok-com">/// One person cannot be in two places in their own recording, so this is</span></span>
+<span class="ln" id="L870">    <span class="tok-com">/// almost always a typed time -- reported separately, and more loudly.</span></span>
+<span class="ln" id="L871">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L872">    <span class="tok-kw">fn</span> <span class="tok-fn">a_speaker_overlapping_themselves_is_reported_separately</span>() {</span>
+<span class="ln" id="L873">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L874">        conversation.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(<span class="tok-str">&quot;Alex&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L875">        conversation</span>
+<span class="ln" id="L876">            .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L877">                start: <span class="tok-num">0.0</span>,</span>
+<span class="ln" id="L878">                end: <span class="tok-num">5.0</span>,</span>
+<span class="ln" id="L879">                speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L880">                text: None,</span>
+<span class="ln" id="L881">            })</span>
+<span class="ln" id="L882">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L883">        conversation</span>
+<span class="ln" id="L884">            .<span class="tok-fn">add_turn</span>(Turn {</span>
+<span class="ln" id="L885">                start: <span class="tok-num">3.0</span>,</span>
+<span class="ln" id="L886">                end: <span class="tok-num">8.0</span>,</span>
+<span class="ln" id="L887">                speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L888">                text: None,</span>
+<span class="ln" id="L889">            })</span>
+<span class="ln" id="L890">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L891">        assert_eq!(conversation.<span class="tok-fn">self_overlaps</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L892">        assert!(conversation.<span class="tok-fn">overlaps</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L893">    }</span>
+<span class="ln" id="L894"></span>
+<span class="ln" id="L895">    <span class="tok-com">/// The one split VeilVoice can make on its own, because it is not a guess.</span></span>
+<span class="ln" id="L896">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L897">    <span class="tok-kw">fn</span> <span class="tok-fn">a_channel_per_person_needs_no_diarisation</span>() {</span>
+<span class="ln" id="L898">        <span class="tok-kw">let</span> conversation = Conversation::<span class="tok-fn">from_channels</span>(&amp;[<span class="tok-str">&quot;Alex&quot;</span>, <span class="tok-str">&quot;Sam&quot;</span>], <span class="tok-num">30.0</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L899">        assert_eq!(conversation.<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L900">        assert_eq!(conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>(), <span class="tok-num">2</span>);</span>
+<span class="ln" id="L901">        assert_eq!(conversation.<span class="tok-fn">duration</span>(), <span class="tok-num">30.0</span>);</span>
+<span class="ln" id="L902">        <span class="tok-com">// Both talk for the whole recording, which is what a channel each</span></span>
+<span class="ln" id="L903">        <span class="tok-com">// means -- and which is an overlap by construction.</span></span>
+<span class="ln" id="L904">        assert!(!conversation.<span class="tok-fn">overlaps</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L905"></span>
+<span class="ln" id="L906">        assert!(Conversation::<span class="tok-fn">from_channels</span>(&amp;[], <span class="tok-num">30.0</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L907">        assert!(Conversation::<span class="tok-fn">from_channels</span>(&amp;[<span class="tok-str">&quot;Alex&quot;</span>], <span class="tok-num">0.0</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L908">        assert!(Conversation::<span class="tok-fn">from_channels</span>(&amp;[<span class="tok-str">&quot;Alex&quot;</span>], f64::NAN).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L909">    }</span>
+<span class="ln" id="L910"></span>
+<span class="ln" id="L911">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L912">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_survives_a_round_trip_through_text</span>() {</span>
+<span class="ln" id="L913">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L914">        conversation.title = <span class="tok-fn">Some</span>(<span class="tok-str">&quot;Two people, one microphone&quot;</span>.<span class="tok-fn">into</span>());</span>
+<span class="ln" id="L915">        <span class="tok-kw">let</span> text = conversation.<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L916">        <span class="tok-kw">let</span> read_back = Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;its own output must parse&quot;</span>);</span>
+<span class="ln" id="L917">        assert_eq!(read_back.title, conversation.title);</span>
+<span class="ln" id="L918">        assert_eq!(read_back.<span class="tok-fn">speakers</span>(), conversation.<span class="tok-fn">speakers</span>());</span>
+<span class="ln" id="L919">        assert_eq!(read_back.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>(), conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>());</span>
+<span class="ln" id="L920">        assert_eq!(read_back.<span class="tok-fn">to_text</span>(), text, <span class="tok-str">&quot;and byte for byte&quot;</span>);</span>
+<span class="ln" id="L921">    }</span>
+<span class="ln" id="L922"></span>
+<span class="ln" id="L923">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L924">    <span class="tok-kw">fn</span> <span class="tok-fn">a_plan_survives_a_round_trip_through_a_file</span>() {</span>
+<span class="ln" id="L925">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L926">        <span class="tok-kw">let</span> conversation = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L927">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;deeper&quot;</span>).<span class="tok-fn">join</span>(<span class="tok-str">&quot;plan.txt&quot;</span>);</span>
+<span class="ln" id="L928">        conversation.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L929">        assert_eq!(Conversation::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>(), conversation);</span>
+<span class="ln" id="L930">    }</span>
+<span class="ln" id="L931"></span>
+<span class="ln" id="L932">    <span class="tok-com">/// A saved plan is readable only by the account that saved it.</span></span>
+<span class="ln" id="L933">    <span class="tok-com">///</span></span>
+<span class="ln" id="L934">    <span class="tok-com">/// A plan holds every speaker&#x27;s name and every word typed into it, which</span></span>
+<span class="ln" id="L935">    <span class="tok-com">/// is the same content as the subtitle tracks a render produces from it.</span></span>
+<span class="ln" id="L936">    <span class="tok-com">/// Those are written owner-only; writing the source of them 0644 would</span></span>
+<span class="ln" id="L937">    <span class="tok-com">/// protect the copy and leave the original.</span></span>
+<span class="ln" id="L938">    <span class="tok-attr">#[cfg</span>(unix)]</span>
+<span class="ln" id="L939">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L940">    <span class="tok-kw">fn</span> <span class="tok-fn">a_saved_plan_is_readable_only_by_this_account</span>() {</span>
+<span class="ln" id="L941">        <span class="tok-kw">use</span> std::os::unix::fs::PermissionsExt;</span>
+<span class="ln" id="L942">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L943">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;plan.txt&quot;</span>);</span>
+<span class="ln" id="L944">        <span class="tok-fn">two_people</span>().<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L945">        <span class="tok-kw">let</span> mode = std::fs::<span class="tok-fn">metadata</span>(&amp;path).<span class="tok-fn">unwrap</span>().<span class="tok-fn">permissions</span>().<span class="tok-fn">mode</span>() &amp; 0o777;</span>
+<span class="ln" id="L946">        assert_eq!(</span>
+<span class="ln" id="L947">            mode, 0o600,</span>
+<span class="ln" id="L948">            <span class="tok-str">&quot;a plan is {mode:o}, so anyone with an account here can read the names in it&quot;</span></span>
+<span class="ln" id="L949">        );</span>
+<span class="ln" id="L950">        assert_eq!(Conversation::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>(), <span class="tok-fn">two_people</span>());</span>
+<span class="ln" id="L951">    }</span>
+<span class="ln" id="L952"></span>
+<span class="ln" id="L953">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L954">    <span class="tok-kw">fn</span> <span class="tok-fn">a_picture_survives_the_round_trip</span>() {</span>
+<span class="ln" id="L955">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> conversation = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L956">        conversation</span>
+<span class="ln" id="L957">            .<span class="tok-fn">add_speaker</span>(Speaker {</span>
+<span class="ln" id="L958">                name: <span class="tok-str">&quot;Sam&quot;</span>.<span class="tok-fn">into</span>(),</span>
+<span class="ln" id="L959">                picture: <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;portraits/sam.png&quot;</span>)),</span>
+<span class="ln" id="L960">                colour: None,</span>
+<span class="ln" id="L961">            })</span>
+<span class="ln" id="L962">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L963">        <span class="tok-kw">let</span> read_back = Conversation::<span class="tok-fn">parse</span>(&amp;conversation.<span class="tok-fn">to_text</span>()).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L964">        assert_eq!(</span>
+<span class="ln" id="L965">            read_back.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].picture,</span>
+<span class="ln" id="L966">            <span class="tok-fn">Some</span>(PathBuf::<span class="tok-fn">from</span>(<span class="tok-str">&quot;portraits/sam.png&quot;</span>))</span>
+<span class="ln" id="L967">        );</span>
+<span class="ln" id="L968">    }</span>
+<span class="ln" id="L969"></span>
+<span class="ln" id="L970">    <span class="tok-com">/// A file that lists its turns before its speakers must still read.</span></span>
+<span class="ln" id="L971">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L972">    <span class="tok-kw">fn</span> <span class="tok-fn">turns_before_speakers_still_parse</span>() {</span>
+<span class="ln" id="L973">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nturn  0.000  1.000  0\nspeaker  0  Alex\n&quot;</span>);</span>
+<span class="ln" id="L974">        <span class="tok-kw">let</span> conversation = Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L975">        assert_eq!(conversation.<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L976">        assert_eq!(conversation.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L977">    }</span>
+<span class="ln" id="L978"></span>
+<span class="ln" id="L979">    <span class="tok-com">/// A hand-edited file with two speakers numbered 0 would otherwise give</span></span>
+<span class="ln" id="L980">    <span class="tok-com">/// one of them the other&#x27;s voice, silently.</span></span>
+<span class="ln" id="L981">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L982">    <span class="tok-kw">fn</span> <span class="tok-fn">a_repeated_speaker_number_is_refused</span>() {</span>
+<span class="ln" id="L983">        <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\nspeaker  0  Alex\nspeaker  0  Sam\n&quot;</span>);</span>
+<span class="ln" id="L984">        <span class="tok-kw">let</span> error = Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;must refuse&quot;</span>);</span>
+<span class="ln" id="L985">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;numbered from zero&quot;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L986">    }</span>
+<span class="ln" id="L987"></span>
+<span class="ln" id="L988">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L989">    <span class="tok-kw">fn</span> <span class="tok-fn">a_malformed_plan_is_refused_rather_than_half_read</span>() {</span>
+<span class="ln" id="L990">        assert!(Conversation::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;&quot;</span>).<span class="tok-fn">is_err</span>(), <span class="tok-str">&quot;empty&quot;</span>);</span>
+<span class="ln" id="L991">        assert!(</span>
+<span class="ln" id="L992">            Conversation::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;NOT-THE-MAGIC\n&quot;</span>).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L993">            <span class="tok-str">&quot;wrong magic&quot;</span></span>
+<span class="ln" id="L994">        );</span>
+<span class="ln" id="L995">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L996">            <span class="tok-str">&quot;speaker  x  Alex&quot;</span>,</span>
+<span class="ln" id="L997">            <span class="tok-str">&quot;speaker  0  Alex\nturn  x  1.0  0&quot;</span>,</span>
+<span class="ln" id="L998">            <span class="tok-str">&quot;speaker  0  Alex\nturn  0.0  x  0&quot;</span>,</span>
+<span class="ln" id="L999">            <span class="tok-str">&quot;speaker  0  Alex\nturn  0.0  1.0  x&quot;</span>,</span>
+<span class="ln" id="L1000">            <span class="tok-str">&quot;speaker  0  Alex\nturn  0.0  1.0  9&quot;</span>,</span>
+<span class="ln" id="L1001">            <span class="tok-str">&quot;whatever  1&quot;</span>,</span>
+<span class="ln" id="L1002">            <span class="tok-str">&quot;nokeyword&quot;</span>,</span>
+<span class="ln" id="L1003">        ] {</span>
+<span class="ln" id="L1004">            <span class="tok-kw">let</span> text = format!(<span class="tok-str">&quot;{MAGIC}\n{bad}\n&quot;</span>);</span>
+<span class="ln" id="L1005">            assert!(</span>
+<span class="ln" id="L1006">                Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">is_err</span>(),</span>
+<span class="ln" id="L1007">                <span class="tok-str">&quot;should have been refused: {bad:?}&quot;</span></span>
+<span class="ln" id="L1008">            );</span>
+<span class="ln" id="L1009">        }</span>
+<span class="ln" id="L1010">    }</span>
+<span class="ln" id="L1011"></span>
+<span class="ln" id="L1012">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1013">    <span class="tok-kw">fn</span> <span class="tok-fn">blank_lines_are_tolerated</span>() {</span>
+<span class="ln" id="L1014">        <span class="tok-kw">let</span> conversation = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L1015">        <span class="tok-kw">let</span> padded = conversation.<span class="tok-fn">to_text</span>().<span class="tok-fn">replace</span>(<span class="tok-str">&#x27;\n&#x27;</span>, <span class="tok-str">&quot;\n\n&quot;</span>);</span>
+<span class="ln" id="L1016">        assert_eq!(Conversation::<span class="tok-fn">parse</span>(&amp;padded).<span class="tok-fn">unwrap</span>(), conversation);</span>
+<span class="ln" id="L1017">    }</span>
+<span class="ln" id="L1018"></span>
+<span class="ln" id="L1019">    <span class="tok-com">/// Renaming keeps the turns exactly where they were.</span></span>
+<span class="ln" id="L1020">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1021">    <span class="tok-kw">fn</span> <span class="tok-fn">renaming_leaves_every_turn_alone</span>() {</span>
+<span class="ln" id="L1022">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L1023">        <span class="tok-kw">let</span> before = plan.<span class="tok-fn">turns</span>().<span class="tok-fn">to_vec</span>();</span>
+<span class="ln" id="L1024">        plan.<span class="tok-fn">rename_speakers</span>(&amp;[<span class="tok-str">&quot;Robin&quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;Jules&quot;</span>.<span class="tok-fn">to_string</span>()])</span>
+<span class="ln" id="L1025">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1026">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Robin&quot;</span>);</span>
+<span class="ln" id="L1027">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">1</span>].name, <span class="tok-str">&quot;Jules&quot;</span>);</span>
+<span class="ln" id="L1028">        assert_eq!(plan.<span class="tok-fn">turns</span>(), before.<span class="tok-fn">as_slice</span>(), <span class="tok-str">&quot;the turns must not move&quot;</span>);</span>
+<span class="ln" id="L1029">    }</span>
+<span class="ln" id="L1030"></span>
+<span class="ln" id="L1031">    <span class="tok-com">/// The one mistake here that cannot be heard in the result: a mismatch</span></span>
+<span class="ln" id="L1032">    <span class="tok-com">/// would put somebody&#x27;s audio in another person&#x27;s voice, and both voices</span></span>
+<span class="ln" id="L1033">    <span class="tok-com">/// are unfamiliar, so nobody would notice.</span></span>
+<span class="ln" id="L1034">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1035">    <span class="tok-kw">fn</span> <span class="tok-fn">a_different_number_of_names_is_refused</span>() {</span>
+<span class="ln" id="L1036">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L1037">        <span class="tok-kw">let</span> error = plan</span>
+<span class="ln" id="L1038">            .<span class="tok-fn">rename_speakers</span>(&amp;[<span class="tok-str">&quot;Only one&quot;</span>.<span class="tok-fn">to_string</span>()])</span>
+<span class="ln" id="L1039">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;two speakers, one name&quot;</span>);</span>
+<span class="ln" id="L1040">        assert!(format!(<span class="tok-str">&quot;{error}&quot;</span>).<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;2&#x27;</span>), <span class="tok-str">&quot;{error}&quot;</span>);</span>
+<span class="ln" id="L1041">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Alex&quot;</span>, <span class="tok-str">&quot;nothing may have changed&quot;</span>);</span>
+<span class="ln" id="L1042">    }</span>
+<span class="ln" id="L1043"></span>
+<span class="ln" id="L1044">    <span class="tok-com">/// Every name is checked the way `add_speaker` checks one, and nothing is</span></span>
+<span class="ln" id="L1045">    <span class="tok-com">/// changed unless all of them pass.</span></span>
+<span class="ln" id="L1046">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1047">    <span class="tok-kw">fn</span> <span class="tok-fn">a_bad_name_leaves_the_plan_exactly_as_it_was</span>() {</span>
+<span class="ln" id="L1048">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L1049">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [<span class="tok-str">&quot;&quot;</span>, <span class="tok-str">&quot;   &quot;</span>, <span class="tok-str">&quot;Robin\nspeaker  9  Mallory&quot;</span>] {</span>
+<span class="ln" id="L1050">            <span class="tok-kw">let</span> error = plan</span>
+<span class="ln" id="L1051">                .<span class="tok-fn">rename_speakers</span>(&amp;[<span class="tok-str">&quot;Robin&quot;</span>.<span class="tok-fn">to_string</span>(), bad.<span class="tok-fn">to_string</span>()])</span>
+<span class="ln" id="L1052">                .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;{bad:?} should be refused&quot;</span>);</span>
+<span class="ln" id="L1053">            <span class="tok-kw">let</span> _ = error;</span>
+<span class="ln" id="L1054">            assert_eq!(</span>
+<span class="ln" id="L1055">                plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name,</span>
+<span class="ln" id="L1056">                <span class="tok-str">&quot;Alex&quot;</span>,</span>
+<span class="ln" id="L1057">                <span class="tok-str">&quot;a refusal must not half-rename&quot;</span></span>
+<span class="ln" id="L1058">            );</span>
+<span class="ln" id="L1059">            assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">1</span>].name, <span class="tok-str">&quot;Sam&quot;</span>);</span>
+<span class="ln" id="L1060">        }</span>
+<span class="ln" id="L1061">    }</span>
+<span class="ln" id="L1062"></span>
+<span class="ln" id="L1063">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1064">    <span class="tok-kw">fn</span> <span class="tok-fn">names_are_trimmed_the_same_way_they_are_when_added</span>() {</span>
+<span class="ln" id="L1065">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L1066">        plan.<span class="tok-fn">rename_speakers</span>(&amp;[<span class="tok-str">&quot;  Robin  &quot;</span>.<span class="tok-fn">to_string</span>(), <span class="tok-str">&quot;Jules&quot;</span>.<span class="tok-fn">to_string</span>()])</span>
+<span class="ln" id="L1067">            .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1068">        assert_eq!(plan.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Robin&quot;</span>);</span>
+<span class="ln" id="L1069">    }</span>
+<span class="ln" id="L1070"></span>
+<span class="ln" id="L1071">    <span class="tok-com">/// Uniform mode gives every speaker the same voice. This is the whole of</span></span>
+<span class="ln" id="L1072">    <span class="tok-com">/// what the mode does to the sound, so it is asserted directly.</span></span>
+<span class="ln" id="L1073">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1074">    <span class="tok-kw">fn</span> <span class="tok-fn">uniform_mode_gives_every_speaker_one_voice</span>() {</span>
+<span class="ln" id="L1075">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::mode::VoiceMode;</span>
+<span class="ln" id="L1076">        <span class="tok-kw">let</span> config = veilvoice_core::DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1077">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L1078">        assert_ne!(plan.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), plan.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>), <span class="tok-str">&quot;distinct by default&quot;</span>);</span>
+<span class="ln" id="L1079"></span>
+<span class="ln" id="L1080">        plan.<span class="tok-fn">set_mode</span>(VoiceMode::Uniform, &amp;config).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1081">        assert_eq!(plan.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), plan.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>), <span class="tok-str">&quot;one voice between them&quot;</span>);</span>
+<span class="ln" id="L1082">        assert_eq!(plan.<span class="tok-fn">mode</span>(), VoiceMode::Uniform);</span>
+<span class="ln" id="L1083"></span>
+<span class="ln" id="L1084">        plan.<span class="tok-fn">set_mode</span>(VoiceMode::Distinct, &amp;config).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1085">        assert_ne!(plan.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>), plan.<span class="tok-fn">voice</span>(<span class="tok-num">1</span>), <span class="tok-str">&quot;and back again&quot;</span>);</span>
+<span class="ln" id="L1086">    }</span>
+<span class="ln" id="L1087"></span>
+<span class="ln" id="L1088">    <span class="tok-com">/// A plan with more speakers than there are separable voices cannot be put</span></span>
+<span class="ln" id="L1089">    <span class="tok-com">/// into distinct mode, and the refusal says what to do instead.</span></span>
+<span class="ln" id="L1090">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1091">    <span class="tok-kw">fn</span> <span class="tok-fn">distinct_mode_is_refused_past_the_measured_limit</span>() {</span>
+<span class="ln" id="L1092">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::mode::VoiceMode;</span>
+<span class="ln" id="L1093">        <span class="tok-kw">let</span> config = veilvoice_core::DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1094">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = Conversation::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1095">        <span class="tok-kw">for</span> index <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">9</span> {</span>
+<span class="ln" id="L1096">            plan.<span class="tok-fn">add_speaker</span>(Speaker::<span class="tok-fn">named</span>(&amp;format!(<span class="tok-str">&quot;P{index}&quot;</span>)))</span>
+<span class="ln" id="L1097">                .<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1098">        }</span>
+<span class="ln" id="L1099">        <span class="tok-com">// Nine is past the eight that are clearly separable...</span></span>
+<span class="ln" id="L1100">        <span class="tok-kw">let</span> error = plan</span>
+<span class="ln" id="L1101">            .<span class="tok-fn">set_mode</span>(VoiceMode::Distinct, &amp;config)</span>
+<span class="ln" id="L1102">            .<span class="tok-fn">expect_err</span>(<span class="tok-str">&quot;nine speakers, eight clear voices&quot;</span>);</span>
+<span class="ln" id="L1103">        assert!(error.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;one voice for everybody&quot;</span>));</span>
+<span class="ln" id="L1104">        <span class="tok-com">// ...and uniform mode carries them, which is the point of the refusal</span></span>
+<span class="ln" id="L1105">        <span class="tok-com">// naming it.</span></span>
+<span class="ln" id="L1106">        plan.<span class="tok-fn">set_mode</span>(VoiceMode::Uniform, &amp;config).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1107">        assert_eq!(plan.<span class="tok-fn">mode</span>(), VoiceMode::Uniform);</span>
+<span class="ln" id="L1108">        <span class="tok-kw">for</span> slot <span class="tok-kw">in</span> <span class="tok-num">0</span>..<span class="tok-num">9</span> {</span>
+<span class="ln" id="L1109">            assert_eq!(plan.<span class="tok-fn">voice</span>(slot), plan.<span class="tok-fn">voice</span>(<span class="tok-num">0</span>));</span>
+<span class="ln" id="L1110">        }</span>
+<span class="ln" id="L1111">    }</span>
+<span class="ln" id="L1112"></span>
+<span class="ln" id="L1113">    <span class="tok-com">/// The mode is not written to the plan file. A plan says who speaks when;</span></span>
+<span class="ln" id="L1114">    <span class="tok-com">/// how it is rendered is the renderer&#x27;s decision, and a mode hidden in a</span></span>
+<span class="ln" id="L1115">    <span class="tok-com">/// shared file would change what somebody else&#x27;s render sounds like.</span></span>
+<span class="ln" id="L1116">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1117">    <span class="tok-kw">fn</span> <span class="tok-fn">the_mode_is_not_carried_in_the_file</span>() {</span>
+<span class="ln" id="L1118">        <span class="tok-kw">use</span> <span class="tok-kw">crate</span>::mode::VoiceMode;</span>
+<span class="ln" id="L1119">        <span class="tok-kw">let</span> config = veilvoice_core::DeidConfig::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L1120">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> plan = <span class="tok-fn">two_people</span>();</span>
+<span class="ln" id="L1121">        plan.<span class="tok-fn">set_mode</span>(VoiceMode::Uniform, &amp;config).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1122"></span>
+<span class="ln" id="L1123">        <span class="tok-kw">let</span> text = plan.<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L1124">        assert!(!text.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;uniform&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
+<span class="ln" id="L1125">        assert!(!text.<span class="tok-fn">to_lowercase</span>().<span class="tok-fn">contains</span>(<span class="tok-str">&quot;mode&quot;</span>), <span class="tok-str">&quot;{text}&quot;</span>);</span>
+<span class="ln" id="L1126"></span>
+<span class="ln" id="L1127">        <span class="tok-kw">let</span> read_back = Conversation::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L1128">        assert_eq!(</span>
+<span class="ln" id="L1129">            read_back.<span class="tok-fn">mode</span>(),</span>
+<span class="ln" id="L1130">            VoiceMode::Distinct,</span>
+<span class="ln" id="L1131">            <span class="tok-str">&quot;a plan read from disk renders distinct until told otherwise&quot;</span></span>
+<span class="ln" id="L1132">        );</span>
+<span class="ln" id="L1133">    }</span>
+<span class="ln" id="L1134"></span>
+<span class="ln" id="L1135">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1136">    <span class="tok-kw">fn</span> <span class="tok-fn">a_turn_reports_its_own_length</span>() {</span>
+<span class="ln" id="L1137">        <span class="tok-kw">let</span> turn = Turn {</span>
+<span class="ln" id="L1138">            start: <span class="tok-num">1.5</span>,</span>
+<span class="ln" id="L1139">            end: <span class="tok-num">4.0</span>,</span>
+<span class="ln" id="L1140">            speaker: <span class="tok-num">0</span>,</span>
+<span class="ln" id="L1141">            text: None,</span>
+<span class="ln" id="L1142">        };</span>
+<span class="ln" id="L1143">        assert!((turn.<span class="tok-fn">duration</span>() - <span class="tok-num">2.5</span>).<span class="tok-fn">abs</span>() &lt; 1e-<span class="tok-num">9</span>);</span>
+<span class="ln" id="L1144">    }</span>
+<span class="ln" id="L1145">}</span>
+<span class="ln" id="L1146"></span>
 <span class="src-item" id="fn-guide_tests">
-<span class="ln" id="L1146"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L1147"><span class="tok-kw">mod</span> guide_tests {</span>
-<span class="ln" id="L1148">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L1149"></span>
-<span class="ln" id="L1150">    <span class="tok-com">/// **F-110.** The plan printed in the user guide has to parse.</span></span>
-<span class="ln" id="L1151">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1152">    <span class="tok-com">/// The guide is where somebody writing their first plan copies from, and</span></span>
-<span class="ln" id="L1153">    <span class="tok-com">/// the example it prints was rejected: `unknown keyword &quot;turn 19.000&quot;`.</span></span>
-<span class="ln" id="L1154">    <span class="tok-com">/// The parser wanted exactly two spaces between every field, and the</span></span>
-<span class="ln" id="L1155">    <span class="tok-com">/// guide&#x27;s third turn line uses one, because `19.000` is a digit wider</span></span>
-<span class="ln" id="L1156">    <span class="tok-com">/// than `4.100` and the columns were lined up by eye.</span></span>
-<span class="ln" id="L1157">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1158">    <span class="tok-com">/// Neither was wrong on its own. The example is what a person would write</span></span>
-<span class="ln" id="L1159">    <span class="tok-com">/// and the parser was stricter than it needed to be about the fields that</span></span>
-<span class="ln" id="L1160">    <span class="tok-com">/// cannot contain a space, and nothing compared the two.</span></span>
-<span class="ln" id="L1161">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1162">    <span class="tok-com">/// So this reads the guide rather than a copy of it. A copy would drift,</span></span>
-<span class="ln" id="L1163">    <span class="tok-com">/// which is the failure it is here to prevent: F-71 is the same shape, and</span></span>
-<span class="ln" id="L1164">    <span class="tok-com">/// so is F-103.</span></span>
-<span class="ln" id="L1165">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1166">    <span class="tok-kw">fn</span> <span class="tok-fn">the_plan_in_the_user_guide_parses</span>() {</span>
-<span class="ln" id="L1167">        <span class="tok-kw">let</span> guide = include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L1168">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> blocks = Vec::<span class="tok-fn">new</span>();</span>
-<span class="ln" id="L1169">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current: Option&lt;Vec&lt;&amp;str&gt;&gt; = None;</span>
-<span class="ln" id="L1170">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> guide.<span class="tok-fn">lines</span>() {</span>
-<span class="ln" id="L1171">            <span class="tok-kw">if</span> line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;```&quot;</span>) {</span>
-<span class="ln" id="L1172">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(block) = current.<span class="tok-fn">take</span>() {</span>
-<span class="ln" id="L1173">                    blocks.<span class="tok-fn">push</span>(block.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>));</span>
-<span class="ln" id="L1174">                } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L1175">                    current = <span class="tok-fn">Some</span>(Vec::<span class="tok-fn">new</span>());</span>
-<span class="ln" id="L1176">                }</span>
-<span class="ln" id="L1177">                continue;</span>
-<span class="ln" id="L1178">            }</span>
-<span class="ln" id="L1179">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(block) = current.<span class="tok-fn">as_mut</span>() {</span>
-<span class="ln" id="L1180">                block.<span class="tok-fn">push</span>(line);</span>
-<span class="ln" id="L1181">            }</span>
-<span class="ln" id="L1182">        }</span>
-<span class="ln" id="L1183"></span>
-<span class="ln" id="L1184">        <span class="tok-kw">let</span> plans: Vec&lt;&amp;String&gt; = blocks</span>
-<span class="ln" id="L1185">            .<span class="tok-fn">iter</span>()</span>
-<span class="ln" id="L1186">            .<span class="tok-fn">filter</span>(|b| b.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(MAGIC))</span>
-<span class="ln" id="L1187">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L1188">        assert!(</span>
-<span class="ln" id="L1189">            !plans.<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1190">            <span class="tok-str">&quot;the user guide no longer shows a plan beginning {MAGIC}, so either \</span></span>
-<span class="ln" id="L1191"><span class="tok-str">             the format changed or this test has stopped reading the guide&quot;</span></span>
-<span class="ln" id="L1192">        );</span>
-<span class="ln" id="L1193"></span>
-<span class="ln" id="L1194">        <span class="tok-kw">for</span> plan <span class="tok-kw">in</span> plans {</span>
-<span class="ln" id="L1195">            <span class="tok-kw">let</span> parsed = Conversation::<span class="tok-fn">parse</span>(plan).<span class="tok-fn">unwrap_or_else</span>(|e| {</span>
-<span class="ln" id="L1196">                panic!(</span>
-<span class="ln" id="L1197">                    <span class="tok-str">&quot;the plan printed in docs/USER_GUIDE.md does not parse: {e}\n\</span></span>
-<span class="ln" id="L1198"><span class="tok-str">                     Somebody copying it to write their first plan gets this.\n\</span></span>
-<span class="ln" id="L1199"><span class="tok-str">                     ---\n{plan}\n---&quot;</span></span>
-<span class="ln" id="L1200">                )</span>
-<span class="ln" id="L1201">            });</span>
-<span class="ln" id="L1202">            assert!(</span>
-<span class="ln" id="L1203">                !parsed.<span class="tok-fn">speakers</span>().<span class="tok-fn">is_empty</span>() &amp;&amp; !parsed.<span class="tok-fn">turns</span>().<span class="tok-fn">is_empty</span>(),</span>
-<span class="ln" id="L1204">                <span class="tok-str">&quot;the guide&#x27;s plan parsed to nothing useful&quot;</span></span>
-<span class="ln" id="L1205">            );</span>
-<span class="ln" id="L1206">        }</span>
-<span class="ln" id="L1207">    }</span>
-<span class="ln" id="L1208"></span>
-<span class="ln" id="L1209">    <span class="tok-com">/// One space, two spaces, and a tab all separate the numbers.</span></span>
-<span class="ln" id="L1210">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1211">    <span class="tok-com">/// The columns in a hand-written plan are lined up by eye, so what falls</span></span>
-<span class="ln" id="L1212">    <span class="tok-com">/// between two numbers is whatever made them line up that day.</span></span>
-<span class="ln" id="L1213">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1214">    <span class="tok-kw">fn</span> <span class="tok-fn">the_numbers_may_be_separated_by_any_whitespace</span>() {</span>
-<span class="ln" id="L1215">        <span class="tok-kw">let</span> plans = [</span>
-<span class="ln" id="L1216">            <span class="tok-str">&quot;VEILCONV1\nspeaker 0 Me\nturn 0.0 1.0 0 hello\n&quot;</span>,</span>
-<span class="ln" id="L1217">            <span class="tok-str">&quot;VEILCONV1\nspeaker  0  Me\nturn  0.0  1.0  0  hello\n&quot;</span>,</span>
-<span class="ln" id="L1218">            <span class="tok-str">&quot;VEILCONV1\nspeaker\t0\tMe\nturn\t0.0\t1.0\t0\thello\n&quot;</span>,</span>
-<span class="ln" id="L1219">            <span class="tok-str">&quot;VEILCONV1\nspeaker   0   Me\nturn 0.0    1.0  0   hello\n&quot;</span>,</span>
-<span class="ln" id="L1220">        ];</span>
-<span class="ln" id="L1221">        <span class="tok-kw">for</span> plan <span class="tok-kw">in</span> plans {</span>
-<span class="ln" id="L1222">            <span class="tok-kw">let</span> parsed =</span>
-<span class="ln" id="L1223">                Conversation::<span class="tok-fn">parse</span>(plan).<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{plan:?} did not parse: {e}&quot;</span>));</span>
-<span class="ln" id="L1224">            assert_eq!(parsed.<span class="tok-fn">speakers</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;{plan:?}&quot;</span>);</span>
-<span class="ln" id="L1225">            assert_eq!(parsed.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;{plan:?}&quot;</span>);</span>
-<span class="ln" id="L1226">            assert_eq!(parsed.<span class="tok-fn">turns</span>()[<span class="tok-num">0</span>].text.<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;hello&quot;</span>), <span class="tok-str">&quot;{plan:?}&quot;</span>);</span>
-<span class="ln" id="L1227">        }</span>
-<span class="ln" id="L1228">    }</span>
-<span class="ln" id="L1229"></span>
-<span class="ln" id="L1230">    <span class="tok-com">/// A name and a subtitle keep the single spaces inside them.</span></span>
-<span class="ln" id="L1231">    <span class="tok-com">///</span></span>
-<span class="ln" id="L1232">    <span class="tok-com">/// This is what the two-space rule was for, and it still holds: the fields</span></span>
-<span class="ln" id="L1233">    <span class="tok-com">/// that can contain a space are still separated by two.</span></span>
-<span class="ln" id="L1234">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L1235">    <span class="tok-kw">fn</span> <span class="tok-fn">names_and_subtitles_keep_their_own_spaces</span>() {</span>
-<span class="ln" id="L1236">        <span class="tok-kw">let</span> plan = <span class="tok-str">&quot;VEILCONV1\nspeaker  0  Sam Smith\nturn  0.0  1.0  0  So, how did it go?\n&quot;</span>;</span>
-<span class="ln" id="L1237">        <span class="tok-kw">let</span> parsed = Conversation::<span class="tok-fn">parse</span>(plan).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;parses&quot;</span>);</span>
-<span class="ln" id="L1238">        assert_eq!(parsed.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Sam Smith&quot;</span>);</span>
-<span class="ln" id="L1239">        assert_eq!(</span>
-<span class="ln" id="L1240">            parsed.<span class="tok-fn">turns</span>()[<span class="tok-num">0</span>].text.<span class="tok-fn">as_deref</span>(),</span>
-<span class="ln" id="L1241">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;So, how did it go?&quot;</span>)</span>
-<span class="ln" id="L1242">        );</span>
-<span class="ln" id="L1243">    }</span>
-<span class="ln" id="L1244">}</span>
+<span class="ln" id="L1147"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L1148"><span class="tok-kw">mod</span> guide_tests {</span>
+<span class="ln" id="L1149">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L1150"></span>
+<span class="ln" id="L1151">    <span class="tok-com">/// **F-110.** The plan printed in the user guide has to parse.</span></span>
+<span class="ln" id="L1152">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1153">    <span class="tok-com">/// The guide is where somebody writing their first plan copies from, and</span></span>
+<span class="ln" id="L1154">    <span class="tok-com">/// the example it prints was rejected: `unknown keyword &quot;turn 19.000&quot;`.</span></span>
+<span class="ln" id="L1155">    <span class="tok-com">/// The parser wanted exactly two spaces between every field, and the</span></span>
+<span class="ln" id="L1156">    <span class="tok-com">/// guide&#x27;s third turn line uses one, because `19.000` is a digit wider</span></span>
+<span class="ln" id="L1157">    <span class="tok-com">/// than `4.100` and the columns were lined up by eye.</span></span>
+<span class="ln" id="L1158">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1159">    <span class="tok-com">/// Neither was wrong on its own. The example is what a person would write</span></span>
+<span class="ln" id="L1160">    <span class="tok-com">/// and the parser was stricter than it needed to be about the fields that</span></span>
+<span class="ln" id="L1161">    <span class="tok-com">/// cannot contain a space, and nothing compared the two.</span></span>
+<span class="ln" id="L1162">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1163">    <span class="tok-com">/// So this reads the guide rather than a copy of it. A copy would drift,</span></span>
+<span class="ln" id="L1164">    <span class="tok-com">/// which is the failure it is here to prevent: F-71 is the same shape, and</span></span>
+<span class="ln" id="L1165">    <span class="tok-com">/// so is F-103.</span></span>
+<span class="ln" id="L1166">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1167">    <span class="tok-kw">fn</span> <span class="tok-fn">the_plan_in_the_user_guide_parses</span>() {</span>
+<span class="ln" id="L1168">        <span class="tok-kw">let</span> guide = include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L1169">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> blocks = Vec::<span class="tok-fn">new</span>();</span>
+<span class="ln" id="L1170">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> current: Option&lt;Vec&lt;&amp;str&gt;&gt; = None;</span>
+<span class="ln" id="L1171">        <span class="tok-kw">for</span> line <span class="tok-kw">in</span> guide.<span class="tok-fn">lines</span>() {</span>
+<span class="ln" id="L1172">            <span class="tok-kw">if</span> line.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;```&quot;</span>) {</span>
+<span class="ln" id="L1173">                <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(block) = current.<span class="tok-fn">take</span>() {</span>
+<span class="ln" id="L1174">                    blocks.<span class="tok-fn">push</span>(block.<span class="tok-fn">join</span>(<span class="tok-str">&quot;\n&quot;</span>));</span>
+<span class="ln" id="L1175">                } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L1176">                    current = <span class="tok-fn">Some</span>(Vec::<span class="tok-fn">new</span>());</span>
+<span class="ln" id="L1177">                }</span>
+<span class="ln" id="L1178">                continue;</span>
+<span class="ln" id="L1179">            }</span>
+<span class="ln" id="L1180">            <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(block) = current.<span class="tok-fn">as_mut</span>() {</span>
+<span class="ln" id="L1181">                block.<span class="tok-fn">push</span>(line);</span>
+<span class="ln" id="L1182">            }</span>
+<span class="ln" id="L1183">        }</span>
+<span class="ln" id="L1184"></span>
+<span class="ln" id="L1185">        <span class="tok-kw">let</span> plans: Vec&lt;&amp;String&gt; = blocks</span>
+<span class="ln" id="L1186">            .<span class="tok-fn">iter</span>()</span>
+<span class="ln" id="L1187">            .<span class="tok-fn">filter</span>(|b| b.<span class="tok-fn">trim_start</span>().<span class="tok-fn">starts_with</span>(MAGIC))</span>
+<span class="ln" id="L1188">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L1189">        assert!(</span>
+<span class="ln" id="L1190">            !plans.<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1191">            <span class="tok-str">&quot;the user guide no longer shows a plan beginning {MAGIC}, so either \</span></span>
+<span class="ln" id="L1192"><span class="tok-str">             the format changed or this test has stopped reading the guide&quot;</span></span>
+<span class="ln" id="L1193">        );</span>
+<span class="ln" id="L1194"></span>
+<span class="ln" id="L1195">        <span class="tok-kw">for</span> plan <span class="tok-kw">in</span> plans {</span>
+<span class="ln" id="L1196">            <span class="tok-kw">let</span> parsed = Conversation::<span class="tok-fn">parse</span>(plan).<span class="tok-fn">unwrap_or_else</span>(|e| {</span>
+<span class="ln" id="L1197">                panic!(</span>
+<span class="ln" id="L1198">                    <span class="tok-str">&quot;the plan printed in docs/USER_GUIDE.md does not parse: {e}\n\</span></span>
+<span class="ln" id="L1199"><span class="tok-str">                     Somebody copying it to write their first plan gets this.\n\</span></span>
+<span class="ln" id="L1200"><span class="tok-str">                     ---\n{plan}\n---&quot;</span></span>
+<span class="ln" id="L1201">                )</span>
+<span class="ln" id="L1202">            });</span>
+<span class="ln" id="L1203">            assert!(</span>
+<span class="ln" id="L1204">                !parsed.<span class="tok-fn">speakers</span>().<span class="tok-fn">is_empty</span>() &amp;&amp; !parsed.<span class="tok-fn">turns</span>().<span class="tok-fn">is_empty</span>(),</span>
+<span class="ln" id="L1205">                <span class="tok-str">&quot;the guide&#x27;s plan parsed to nothing useful&quot;</span></span>
+<span class="ln" id="L1206">            );</span>
+<span class="ln" id="L1207">        }</span>
+<span class="ln" id="L1208">    }</span>
+<span class="ln" id="L1209"></span>
+<span class="ln" id="L1210">    <span class="tok-com">/// One space, two spaces, and a tab all separate the numbers.</span></span>
+<span class="ln" id="L1211">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1212">    <span class="tok-com">/// The columns in a hand-written plan are lined up by eye, so what falls</span></span>
+<span class="ln" id="L1213">    <span class="tok-com">/// between two numbers is whatever made them line up that day.</span></span>
+<span class="ln" id="L1214">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1215">    <span class="tok-kw">fn</span> <span class="tok-fn">the_numbers_may_be_separated_by_any_whitespace</span>() {</span>
+<span class="ln" id="L1216">        <span class="tok-kw">let</span> plans = [</span>
+<span class="ln" id="L1217">            <span class="tok-str">&quot;VEILCONV1\nspeaker 0 Me\nturn 0.0 1.0 0 hello\n&quot;</span>,</span>
+<span class="ln" id="L1218">            <span class="tok-str">&quot;VEILCONV1\nspeaker  0  Me\nturn  0.0  1.0  0  hello\n&quot;</span>,</span>
+<span class="ln" id="L1219">            <span class="tok-str">&quot;VEILCONV1\nspeaker\t0\tMe\nturn\t0.0\t1.0\t0\thello\n&quot;</span>,</span>
+<span class="ln" id="L1220">            <span class="tok-str">&quot;VEILCONV1\nspeaker   0   Me\nturn 0.0    1.0  0   hello\n&quot;</span>,</span>
+<span class="ln" id="L1221">        ];</span>
+<span class="ln" id="L1222">        <span class="tok-kw">for</span> plan <span class="tok-kw">in</span> plans {</span>
+<span class="ln" id="L1223">            <span class="tok-kw">let</span> parsed =</span>
+<span class="ln" id="L1224">                Conversation::<span class="tok-fn">parse</span>(plan).<span class="tok-fn">unwrap_or_else</span>(|e| panic!(<span class="tok-str">&quot;{plan:?} did not parse: {e}&quot;</span>));</span>
+<span class="ln" id="L1225">            assert_eq!(parsed.<span class="tok-fn">speakers</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;{plan:?}&quot;</span>);</span>
+<span class="ln" id="L1226">            assert_eq!(parsed.<span class="tok-fn">turns</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>, <span class="tok-str">&quot;{plan:?}&quot;</span>);</span>
+<span class="ln" id="L1227">            assert_eq!(parsed.<span class="tok-fn">turns</span>()[<span class="tok-num">0</span>].text.<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;hello&quot;</span>), <span class="tok-str">&quot;{plan:?}&quot;</span>);</span>
+<span class="ln" id="L1228">        }</span>
+<span class="ln" id="L1229">    }</span>
+<span class="ln" id="L1230"></span>
+<span class="ln" id="L1231">    <span class="tok-com">/// A name and a subtitle keep the single spaces inside them.</span></span>
+<span class="ln" id="L1232">    <span class="tok-com">///</span></span>
+<span class="ln" id="L1233">    <span class="tok-com">/// This is what the two-space rule was for, and it still holds: the fields</span></span>
+<span class="ln" id="L1234">    <span class="tok-com">/// that can contain a space are still separated by two.</span></span>
+<span class="ln" id="L1235">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L1236">    <span class="tok-kw">fn</span> <span class="tok-fn">names_and_subtitles_keep_their_own_spaces</span>() {</span>
+<span class="ln" id="L1237">        <span class="tok-kw">let</span> plan = <span class="tok-str">&quot;VEILCONV1\nspeaker  0  Sam Smith\nturn  0.0  1.0  0  So, how did it go?\n&quot;</span>;</span>
+<span class="ln" id="L1238">        <span class="tok-kw">let</span> parsed = Conversation::<span class="tok-fn">parse</span>(plan).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;parses&quot;</span>);</span>
+<span class="ln" id="L1239">        assert_eq!(parsed.<span class="tok-fn">speakers</span>()[<span class="tok-num">0</span>].name, <span class="tok-str">&quot;Sam Smith&quot;</span>);</span>
+<span class="ln" id="L1240">        assert_eq!(</span>
+<span class="ln" id="L1241">            parsed.<span class="tok-fn">turns</span>()[<span class="tok-num">0</span>].text.<span class="tok-fn">as_deref</span>(),</span>
+<span class="ln" id="L1242">            <span class="tok-fn">Some</span>(<span class="tok-str">&quot;So, how did it go?&quot;</span>)</span>
+<span class="ln" id="L1243">        );</span>
+<span class="ln" id="L1244">    }</span>
+<span class="ln" id="L1245">}</span>
 </span>
 </code></pre>
 </main>

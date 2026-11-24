@@ -230,7 +230,9 @@ pub fn places() -> Vec<(PathBuf, Where)> {
     );
 
     if let Some(path) = std::env::var_os("PATH") {
-        for entry in std::env::split_paths(&path) {
+        // Absolute entries only, for the reason `program_files` gives: a
+        // relative one is wherever this happened to be started.
+        for entry in std::env::split_paths(&path).filter(|entry| entry.is_absolute()) {
             add(Some(entry), Where::OnPath);
         }
     }

@@ -428,6 +428,15 @@ NOTES = {
                    "directly; a video container is this command first"),
         "example": "veilvoice import stream.mkv -o stream.wav",
     },
+    "studio": {
+        "use": "The Recording Studio's vault from the command line: list what "
+               "it keeps, export one recording as an ordinary WAV, or remove "
+               "one. It asks for both passphrases the window asks for, checks "
+               "the app lock the way the window does, and never makes a vault.",
+        "window": ("browser", "the **Browser**, which lists, plays and exports "
+                   "the same vault"),
+        "example": "veilvoice studio list",
+    },
     "volumes": {
         "use": "Which encrypted volumes this machine has, Cryptomator and "
                "VeraCrypt, and which are mounted right now. It never opens, "

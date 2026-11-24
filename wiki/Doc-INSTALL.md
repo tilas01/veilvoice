@@ -353,11 +353,13 @@ network except cargo fetching the dependencies named in `Cargo.lock`.
 
 ### What you need first
 
-**Rust 1.96.0 or newer.** The repository pins that version in
-`rust-toolchain.toml`, so if you install Rust through
-[rustup](https://rustup.rs) the right compiler is fetched for you the first
-time you build, whatever else you have. If your Rust came from a distribution
-package it may be older, and the desktop application will not compile on it.
+**Rust 1.94 or newer.** That is the oldest compiler every crate, the desktop
+application included, is checked against, and it is the `rust-version` in
+`Cargo.toml`. Release builds use 1.96.0, which `rust-toolchain.toml` pins, so
+if you install Rust through [rustup](https://rustup.rs) that compiler is
+fetched for you the first time you build, whatever else you have. If your Rust
+came from a distribution package it may be older than 1.94, and then nothing
+will compile.
 `rustc --version` tells you which one you have.
 
 **Git**, to clone. Or download the source archive from the releases page and
@@ -543,8 +545,8 @@ install` both say so if it is not, and print the line to add. Neither edits a
 shell profile for you.
 
 **macOS Gatekeeper.** The binaries are not notarised, because notarisation requires an
-Apple Developer account, which requires a legal identity, which this project
-does not have. macOS will refuse to run them until you allow it explicitly in
+Apple Developer account, which costs 99 US dollars a year and requires a legal
+identity, which this project does not have. macOS will refuse to run them until you allow it explicitly in
 *System Settings → Privacy & Security*. This is stated rather than worked
 around: a project that publishes under a pseudonym cannot also be notarised,
 and pretending otherwise would be worse than the inconvenience.
@@ -570,10 +572,11 @@ Recorded here rather than left for you to discover:
 
   Running it found one defect, F-79, in what it says rather than in what it
   checks. macOS is still unrun, and its `sh` is not Linux's.
-- **The packaged installers (WiX, `.deb`, `.rpm`, Flatpak, Homebrew), the
-  OpenBSD and NetBSD builds and the Gentoo ebuild are not built yet.** They are
-  specified in [`ROADMAP.md`](Doc-ROADMAP). macOS Intel and Apple Silicon are already
-  separate builds, and a single Windows executable already covers 10 and 11.
+- **The packaged installers are at different stages.** The `.deb` and `.rpm`
+  packages have been built, and [`PACKAGING.md`](Doc-PACKAGING) keeps a table of
+  which formats have been built and which installed. FreeBSD, OpenBSD and
+  NetBSD archives are built with each release. macOS Intel and Apple Silicon
+  are separate builds, and a single Windows executable covers 10 and 11.
 - **The portable verifier exists and is tested**, including against the real
   published v0.1.8 signature, but like the scripts it has only been run by its
   author.

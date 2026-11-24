@@ -5,7 +5,7 @@
 
 > Strip or spoof identifying metadata: audio tags, and image EXIF/GPS.
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/README.md)
 
 ## Contents
 

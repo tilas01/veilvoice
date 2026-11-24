@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-policy/src/policy.rs`
 
-[[veilvoice-policy|Crate-veilvoice-policy]] &middot; 991 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs)
+[veilvoice-policy](Crate-veilvoice-policy) &middot; 991 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs)
 
 ## Contents
 

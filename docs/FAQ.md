@@ -151,8 +151,8 @@ rather than describing them as future work.
 
 tilas01 is the developer: the architecture, the decisions about what this does
 and refuses to do, and a great deal of the code are theirs directly. Some of the
-code, the documentation and this website were drafted with the help of Claude,
-Anthropic's assistant, working to that direction. Nothing reaches a release
+code, the documentation and this website were drafted with the help of Claude
+Code, Anthropic's coding assistant, working to that direction. Nothing reaches a release
 unread. Every change is reviewed, built and tested first, and the audit rounds
 in `docs/AUDIT.md` are the record of that review finding its own mistakes.
 

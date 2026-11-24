@@ -3,7 +3,7 @@
 
 # fuzz
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/fuzz/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/fuzz/README.md)
 
 ## Contents
 

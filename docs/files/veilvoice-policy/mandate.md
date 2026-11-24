@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-policy/src/mandate.rs`
 
-[`veilvoice-policy`](../../../crates/veilvoice-policy/README.md) &middot; 539 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs)
+[`veilvoice-policy`](../../../crates/veilvoice-policy/README.md) &middot; 540 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs)
 
 ## Contents
 
@@ -63,7 +63,7 @@ what it was before, so the choice is never a mystery later.
 
 ## What this file contains
 
-539 lines defining **24 functions** (16 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
+540 lines defining **24 functions** (16 public), **3 types** and **1 constant**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -87,8 +87,8 @@ what it was before, so the choice is never a mystery later.
   - reaches: `default`, `parse`, `from_key`, `parse_bool`
 - `Mandate::save` (line 294) -- Write to path, owner-only.
   - reaches: `to_text`, `yesno`
-- `default_path` (line 304) -- Where the mandate file lives: beside the app lock, under its own name.
-- `Change::describe` (line 336) -- A whole sentence describing the change, for a log a person reads.
+- `default_path` (line 305) -- Where the mandate file lives: beside the app lock, under its own name.
+- `Change::describe` (line 337) -- A whole sentence describing the change, for a log a person reads.
   - reaches: `when`, `utc`, `civil_from_days`
 
 ## What calls what
@@ -130,12 +130,12 @@ flowchart TD
     n_to_text["Mandate::to_text<br/>line 255"]
     n_load(["Mandate::load<br/>line 285"])
     n_save(["Mandate::save<br/>line 294"])
-    n_parse_bool["parse_bool<br/>line 312"]
-    n_yesno["yesno<br/>line 321"]
-    n_when["Change::when<br/>line 331"]
-    n_describe(["Change::describe<br/>line 336"])
-    n_utc["utc<br/>line 359"]
-    n_civil_from_days["civil_from_days<br/>line 380"]
+    n_parse_bool["parse_bool<br/>line 313"]
+    n_yesno["yesno<br/>line 322"]
+    n_when["Change::when<br/>line 332"]
+    n_describe(["Change::describe<br/>line 337"])
+    n_utc["utc<br/>line 360"]
+    n_civil_from_days["civil_from_days<br/>line 381"]
     n_describe --> n_when
     n_load --> n_default
     n_load --> n_parse
@@ -166,12 +166,12 @@ flowchart TD
     click n_to_text href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L255" "open the source"
     click n_load href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L285" "open the source"
     click n_save href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L294" "open the source"
-    click n_parse_bool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L312" "open the source"
-    click n_yesno href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L321" "open the source"
-    click n_when href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L331" "open the source"
-    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L336" "open the source"
-    click n_utc href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L359" "open the source"
-    click n_civil_from_days href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L380" "open the source"
+    click n_parse_bool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L313" "open the source"
+    click n_yesno href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L322" "open the source"
+    click n_when href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L332" "open the source"
+    click n_describe href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L337" "open the source"
+    click n_utc href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L360" "open the source"
+    click n_civil_from_days href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L381" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_key,n_requires_app_lock,n_requires_encryption,n_requires,n_is_default,n_set,n_reset,n_load,n_save,n_describe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
@@ -216,13 +216,13 @@ flowchart TD
 | `Mandate::to_text` <sub>pub fn</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L255) | Render the file format. |
 | `Mandate::load` <sub>pub fn</sub> | [285](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L285) | Load from path, or the default if it is not there. |
 | `Mandate::save` <sub>pub fn</sub> | [294](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L294) | Write to path, owner-only. |
-| `default_path` <sub>pub fn</sub> | [304](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L304) | Where the mandate file lives: beside the app lock, under its own name. |
-| `parse_bool` <sub>fn</sub> | [312](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L312) | A yes or no in any of the spellings a person might write, or None. |
-| `yesno` <sub>fn</sub> | [321](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L321) | A boolean in the spelling this file is written in. |
-| `Change::when` <sub>pub fn</sub> | [331](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L331) | When the change was made, as a UTC civil timestamp. |
-| `Change::describe` <sub>pub fn</sub> | [336](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L336) | A whole sentence describing the change, for a log a person reads. |
-| `utc` <sub>pub fn</sub> | [359](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L359) | Unix seconds as YYYY-MM-DD HH:MM:SS UTC. |
-| `civil_from_days` <sub>fn</sub> | [380](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L380) | Days since 1970-01-01 to a civil year, month and day. |
+| `default_path` <sub>pub fn</sub> | [305](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L305) | Where the mandate file lives: beside the app lock, under its own name. |
+| `parse_bool` <sub>fn</sub> | [313](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L313) | A yes or no in any of the spellings a person might write, or None. |
+| `yesno` <sub>fn</sub> | [322](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L322) | A boolean in the spelling this file is written in. |
+| `Change::when` <sub>pub fn</sub> | [332](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L332) | When the change was made, as a UTC civil timestamp. |
+| `Change::describe` <sub>pub fn</sub> | [337](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L337) | A whole sentence describing the change, for a log a person reads. |
+| `utc` <sub>pub fn</sub> | [360](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L360) | Unix seconds as YYYY-MM-DD HH:MM:SS UTC. |
+| `civil_from_days` <sub>fn</sub> | [381](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs#L381) | Days since 1970-01-01 to a civil year, month and day. |
 
 ---
 

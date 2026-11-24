@@ -531,12 +531,17 @@ CHECKS = [
     ("per-program guides match the user guide",
      [sys.executable, "tools/docs/guides.py", "--check"]),
     # Two questions in one: whether the wiki's prose pages still match the
-    # documents they are converted from, and whether every `[[link]]` in the
-    # whole wiki names a page that exists. The second matters because a wiki
-    # link to a missing page does not fail loudly: GitHub renders it as an
+    # documents they are converted from, and whether every link between its
+    # pages names a page that exists. The second matters because a wiki link
+    # to a missing page does not fail loudly: GitHub renders it as an
     # invitation to create that page, so a typo looks like a feature.
     ("the wiki matches the documents, and every link in it resolves",
      [sys.executable, "tools/docs/wiki.py", "--check"]),
+    # F-341. The pages link to each other as `[text](Page)` now, because the
+    # `[[Page]]` they used showed as bare brackets wherever `wiki/` is read
+    # outside the wiki. The link reader has to see both forms.
+    ("the wiki's link reader finds the links it should",
+     [sys.executable, "tools/docs/wiki.py", "--self-test"]),
     ("website source pages match their files",
      [sys.executable, "tools/docs/sources.py", "--check"]),
     # Every item on a published page has a sentence under it. This only

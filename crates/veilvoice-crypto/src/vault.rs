@@ -165,9 +165,23 @@ impl Vault {
         };
 
         let primary = base.join(name_for(&site, LABEL_PRIMARY));
+        // **F-321.** The administrator's folder holds the spare only when this
+        // process can write there, or when a spare for this lock is already
+        // there to be read. Once anybody had made `/etc/veilvoice`, every
+        // other user's lock pointed its spare at a folder they could not
+        // write: the lock was made with no spare anywhere, and every password
+        // change after that was reported as leaving a stale one.
+        let at_home = base.join(name_for(&site, LABEL_SHADOW));
         let shadow = match admin {
-            Some(dir) => dir.join(name_for(&site, LABEL_SHADOW)),
-            None => base.join(name_for(&site, LABEL_SHADOW)),
+            Some(dir) => {
+                let there = dir.join(name_for(&site, LABEL_SHADOW));
+                if there.exists() || writable(dir) {
+                    there
+                } else {
+                    at_home
+                }
+            }
+            None => at_home,
         };
         Ok(Self {
             index,
@@ -299,10 +313,14 @@ impl Vault {
         Ok(self.write_one(&self.shadow, &bytes).is_ok())
     }
 
-    /// Remove both copies, and the index with them.
+    /// Remove both copies, the decoy record and the index with them.
+    ///
+    /// **F-323.** The decoy record used to stay. Once the index was gone its
+    /// name could not be worked out again, so it sat in the folder for good,
+    /// saying that this machine once had a decoy passphrase.
     pub fn clear(&self) -> Result<(), Error> {
         let gone = |e: &std::io::Error| e.kind() == std::io::ErrorKind::NotFound;
-        for path in [&self.primary, &self.shadow, &self.index] {
+        for path in [&self.primary, &self.shadow, &self.decoy, &self.index] {
             if let Err(e) = std::fs::remove_file(path) {
                 if !gone(&e) {
                     // The shadow may be administrator-owned, in which case an
@@ -378,6 +396,25 @@ fn mask(site: &[u8; SITE_LEN], bytes: &mut [u8]) {
             *b ^= k;
         }
         counter = counter.wrapping_add(1);
+    }
+}
+
+/// Whether this process can create a file in `dir`, found out by doing it.
+///
+/// The same test [`admin_dir`] describes: asking the attempt rather than the
+/// operating system. The probe is removed straight away.
+fn writable(dir: &Path) -> bool {
+    let probe = dir.join(format!(".veilvoice-probe-{}", std::process::id()));
+    match std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&probe)
+    {
+        Ok(_) => {
+            let _ = std::fs::remove_file(&probe);
+            true
+        }
+        Err(_) => false,
     }
 }
 
@@ -475,11 +512,10 @@ pub fn admin_dir() -> Option<PathBuf> {
         // this succeeded under /etc.
         let _ = std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o755));
     }
-    // Creating it is not proof of much on its own: a machine where /etc is
-    // writable by the user would pass. Prove the useful half instead, that the
-    // directory's owner is not this process's ordinary reach, by checking that
-    // a plain user could not have made it -- the parent is root-owned and this
-    // call succeeded.
+    // Creating it proves little when it was already there: `create_dir_all`
+    // succeeds for anybody on a folder that exists. Whether this process can
+    // write the spare there is settled in `Vault::at`, which also knows
+    // whether a spare for the lock is already there to be read. **F-321.**
     Some(dir)
 }
 
@@ -494,6 +530,53 @@ mod tests {
 
     fn vault(dir: &Path) -> Vault {
         Vault::at(dir, None).unwrap()
+    }
+
+    /// Make `dir` read-only, and say whether that took. Running as root, it
+    /// does not, and the two tests below have nothing to show.
+    #[cfg(unix)]
+    fn read_only(dir: &Path) -> bool {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(dir, std::fs::Permissions::from_mode(0o555)).unwrap();
+        !writable(dir)
+    }
+
+    #[cfg(unix)]
+    fn writable_again(dir: &Path) {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(dir, std::fs::Permissions::from_mode(0o755)).unwrap();
+    }
+
+    /// **F-321.** An administrator's folder this user cannot write, holding no
+    /// spare for this lock, is not where the spare goes.
+    #[cfg(unix)]
+    #[test]
+    fn an_unwritable_admin_folder_with_no_spare_leaves_the_spare_at_home() {
+        let home = tempfile::tempdir().unwrap();
+        let admin = tempfile::tempdir().unwrap();
+        if read_only(admin.path()) {
+            let v = Vault::at(home.path(), Some(admin.path())).unwrap();
+            assert!(v.shadow().starts_with(home.path()), "{:?}", v.shadow());
+        }
+        writable_again(admin.path());
+    }
+
+    /// **F-321.** A spare that is already in the administrator's folder is still
+    /// the one read, even by a process that cannot rewrite it, so a change it
+    /// cannot carry there is still reported as incomplete.
+    #[cfg(unix)]
+    #[test]
+    fn a_spare_already_in_the_admin_folder_is_still_the_spare() {
+        let home = tempfile::tempdir().unwrap();
+        let admin = tempfile::tempdir().unwrap();
+        let first = Vault::at(home.path(), Some(admin.path())).unwrap();
+        assert!(first.shadow().starts_with(admin.path()));
+        std::fs::write(first.shadow(), b"a spare").unwrap();
+        if read_only(admin.path()) {
+            let again = Vault::at(home.path(), Some(admin.path())).unwrap();
+            assert_eq!(again.shadow(), first.shadow());
+        }
+        writable_again(admin.path());
     }
 
     /// Removing nothing is not a failure, and removing it twice is not either.
@@ -670,10 +753,12 @@ mod tests {
         let mut record = lock::AppLock::create(b"a passphrase", weak()).unwrap();
         record.retag(b"a passphrase").unwrap();
         v.store(&record).unwrap();
+        std::fs::write(v.decoy(), b"a decoy record").unwrap();
         v.clear().unwrap();
 
         assert!(!v.primary().exists());
         assert!(!v.shadow().exists());
+        assert!(!v.decoy().exists(), "the decoy outlived the lock");
         assert!(!v.index().exists());
     }
 
@@ -730,11 +815,10 @@ mod tests {
         let v = Vault::at(dir.path(), Some(&unreachable)).unwrap();
 
         let record = lock::AppLock::create(b"a passphrase", weak()).unwrap();
-        v.store(&record).unwrap();
-        assert!(
-            !v.shadow().exists(),
-            "the spare should not be writable here"
-        );
+        // Since F-321 the spare goes home, rather than nowhere, when the
+        // administrator's folder cannot take it.
+        assert!(v.store(&record).unwrap());
+        assert!(v.shadow().starts_with(dir.path()));
 
         for _ in 0..3 {
             let (found_lock, found) = v.load().unwrap();
@@ -785,10 +869,14 @@ mod tests {
             "both copies were writable"
         );
 
-        let blocked = dir.path().join("blocked");
-        std::fs::write(&blocked, b"a file, not a directory").unwrap();
+        // A spare already in the administrator's folder that this process
+        // cannot replace: a directory in its place makes the rename fail.
+        let admin = tempfile::tempdir().unwrap();
         let two = tempfile::tempdir().unwrap();
-        let v = Vault::at(two.path(), Some(&blocked)).unwrap();
+        let first = Vault::at(two.path(), Some(admin.path())).unwrap();
+        std::fs::create_dir(first.shadow()).unwrap();
+        let v = Vault::at(two.path(), Some(admin.path())).unwrap();
+        assert_eq!(v.shadow(), first.shadow());
         assert!(!v.store(&record).unwrap(), "the spare could not be written");
     }
 

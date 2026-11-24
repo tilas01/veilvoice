@@ -312,7 +312,10 @@
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) { return; }
       var link = event.target.closest ? event.target.closest('a[href^="#"]') : null;
       if (!link) { return; }
-      var id = decodeURIComponent(link.getAttribute("href").slice(1));
+      var raw = link.getAttribute("href").slice(1);
+      var id;
+      // As in `named()`: a malformed escape is not an id, and must not throw.
+      try { id = decodeURIComponent(raw); } catch (e) { id = raw; }
       var el = id && document.getElementById(id);
       if (!el) { return; }
       settleReveal(el);

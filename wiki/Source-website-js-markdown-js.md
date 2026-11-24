@@ -3,7 +3,7 @@
 
 # `website/js/markdown.js`
 
-[[The website's source|Source-index]] &middot; 591 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/markdown.js)
+[The website's source](Source-index) &middot; 591 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/markdown.js)
 
 ## What it does
 

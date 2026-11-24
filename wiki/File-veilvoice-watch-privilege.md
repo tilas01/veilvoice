@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-watch/src/privilege.rs`
 
-[[veilvoice-watch|Crate-veilvoice-watch]] &middot; 404 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs)
+[veilvoice-watch](Crate-veilvoice-watch) &middot; 407 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs)
 
 ## Contents
 
@@ -77,7 +77,7 @@ does.
 
 ## What this file contains
 
-404 lines defining **8 functions** (6 public), **1 type** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+407 lines defining **8 functions** (6 public), **1 type** and **3 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -91,7 +91,7 @@ does.
 - `Level::is_full_view` (line 138) -- Whether the monitoring features are seeing everything they could.
 - `level` (line 146) -- What VeilVoice is running with right now.
   - reaches: `unix_level`, `windows_level`
-- `service_installed` (line 238) -- Whether a background service is installed.
+- `service_installed` (line 241) -- Whether a background service is installed.
 
 ## What calls what
 
@@ -114,7 +114,7 @@ flowchart TD
     n_level(["level<br/>line 146"])
     n_windows_level["windows_level<br/>line 164"]
     n_unix_level["unix_level<br/>line 213"]
-    n_service_installed(["service_installed<br/>line 238"])
+    n_service_installed(["service_installed<br/>line 241"])
     n_level --> n_unix_level
     n_level --> n_windows_level
     click n_label href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L84" "open the source"
@@ -124,7 +124,7 @@ flowchart TD
     click n_level href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L146" "open the source"
     click n_windows_level href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L164" "open the source"
     click n_unix_level href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L213" "open the source"
-    click n_service_installed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L238" "open the source"
+    click n_service_installed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L241" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_what_it_sees,n_how_to_raise,n_is_full_view,n_level,n_service_installed entry
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
@@ -152,7 +152,7 @@ flowchart TD
 | `level` <sub>pub fn</sub> | [146](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L146) | What VeilVoice is running with right now. |
 | `windows_level` <sub>fn</sub> | [164](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L164) | On Windows, ask whoami /groups for the administrators SID. |
 | `unix_level` <sub>fn</sub> | [213](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L213) | Everywhere else, ask id -u. |
-| `service_installed` <sub>pub fn</sub> | [238](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L238) | Whether a background service is installed. |
-| `NO_SERVICE` <sub>pub const</sub> | [243](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L243) | Why the opt-in service is not shipped, in the words to show. |
-| `NO_KERNEL` <sub>pub const</sub> | [252](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L252) | What kernel level would need, and why it is not here. |
-| `NEVER_ELEVATES` <sub>pub const</sub> | [263](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L263) | What this crate will not do, and why that is deliberate. |
+| `service_installed` <sub>pub fn</sub> | [241](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L241) | Whether a background service is installed. |
+| `NO_SERVICE` <sub>pub const</sub> | [246](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L246) | Why the opt-in service is not shipped, in the words to show. |
+| `NO_KERNEL` <sub>pub const</sub> | [255](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L255) | What kernel level would need, and why it is not here. |
+| `NEVER_ELEVATES` <sub>pub const</sub> | [266](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/privilege.rs#L266) | What this crate will not do, and why that is deliberate. |

@@ -365,7 +365,7 @@ def self_test():
     expect("and so is a program that no longer makes the claim",
            len(problems("Some other description entirely.\n", pages())), 1)
 
-    # The F-235 shape, and the reason this reads a paragraph rather than a page:
+    # The F-246 shape, and the reason this reads a paragraph rather than a page:
     # docs/COMMANDS.md is a table of every command, so a page-wide search finds
     # every name in it and reports that nothing is wrong.
     found = problems(HELP_SAMPLE, pages(**{"docs/COMMANDS.md": COMMANDS_SAMPLE.replace(

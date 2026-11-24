@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/examples/seal_and_open.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 80 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs)
+[veilvoice-crypto](Crate-veilvoice-crypto) &middot; 80 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/examples/seal_and_open.rs)
 
 ## Contents
 

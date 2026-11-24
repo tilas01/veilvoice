@@ -10,7 +10,7 @@ fails the build instead of ageing quietly.
 
 **The test count is a number about one machine.** Some tests are compiled only
 on one operating system, so running the same tree on another gives a different
-total: this tree measures 996 on Windows and 988 on Linux. The row below says
+total. The row below says
 which machine produced the number in it, because a count with no platform
 beside it reads as a fact about the tree and is a fact about a computer. See
 F-77 in `docs/AUDIT.md`.
@@ -24,18 +24,18 @@ left exactly as they are: this project is written with a high comment-to-code
 ratio, so the two numbers are far apart, and quietly redefining one to match
 the other would alter every page and link that carries it.
 
-The line count covers **28 crates**, one more than the workspace row above:
+The line count covers one crate more than the workspace row above:
 `fuzz/` is a separate Cargo project at the root holding the fuzzing harnesses,
 and it is Rust written and maintained here. `tools/docs/generate.py` documents
 it beside the workspace members for the same reason.
 
 | What | Measured |
 |---|---:|
-| Tests, measured by running them | 1965 |
+| Tests, measured by running them | 1999 |
 | Crates in the workspace | 13 |
-| Website suites | 21 |
-| Functional lines of Rust | 78321 |
-| Findings written up in the audit | 308 |
-| Highest finding number used | 308 |
-| Audit rounds, as the verdict states them | forty |
+| Website suites | 22 |
+| Functional lines of Rust | 79244 |
+| Findings written up in the audit | 345 |
+| Highest finding number used | 345 |
+| Audit rounds, as the verdict states them | forty-one |
 | Measured on | `x86_64-unknown-linux-gnu` |

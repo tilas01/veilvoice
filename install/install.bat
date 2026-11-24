@@ -12,7 +12,7 @@ REM and the stale one is the one that will be running when it matters.
 REM
 REM   install.bat                 interactive
 REM   install.bat -Yes            no prompts, no optional components
-REM   install.bat -Version v0.1.9
+REM   install.bat -Version v0.1.23
 REM
 REM Arguments are passed through to install.ps1 unchanged.
 

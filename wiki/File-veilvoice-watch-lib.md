@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-watch/src/lib.rs`
 
-[[veilvoice-watch|Crate-veilvoice-watch]] &middot; 423 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs)
+[veilvoice-watch](Crate-veilvoice-watch) &middot; 423 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-watch/src/lib.rs)
 
 ## Contents
 
@@ -29,8 +29,8 @@ how long it has held the device.
 
 ## What it can actually see, per platform
 
-Detection is honest about its limits, because a monitor that quietly sees
-nothing is worse than no monitor at all, because it produces false confidence.
+Detection is honest about its limits. A monitor that quietly sees nothing
+is worse than no monitor at all, because it gives false confidence.
 `support` reports what the current platform can do before you rely on it.
 
 | Platform | Microphone | Camera | How |

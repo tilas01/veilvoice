@@ -213,9 +213,12 @@ fn windows_level() -> Level {
 fn unix_level() -> Level {
     let output = match Command::new("/usr/bin/id").arg("-u").output() {
         Ok(output) if output.status.success() => output,
-        // Not every system puts it there. One fallback, through PATH, and then
-        // the answer is that this does not know.
-        _ => match Command::new("id").arg("-u").output() {
+        // Not every system puts it there. One fallback, `/bin/id`, and then
+        // the answer is that this does not know. **F-333.** The fallback used
+        // to be a bare `id` through PATH, where a relative entry finds one in
+        // the starting folder, and a fake one answering 0 would make an
+        // ordinary account read as root: the dangerous direction.
+        _ => match Command::new("/bin/id").arg("-u").output() {
             Ok(output) if output.status.success() => output,
             _ => return Level::Unknown,
         },

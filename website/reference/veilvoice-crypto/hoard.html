@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-crypto/hoard.svg" alt="hoard.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-crypto/src/hoard.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1099 lines &middot; <a href="hoard.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-crypto.html">veilvoice-crypto</a> &middot; 1109 lines &middot; <a href="hoard.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#what-this-buys-stated-before-anything-else">What this buys, stated before anything else</a>
@@ -92,14 +92,12 @@
 <p>What it does buy is the thing the app lock could not previously offer: a reason to exist beyond a password prompt. Before this, the lock verified a passphrase and guarded a window; the files behind it sat in the clear under their own names, and deleting the lock file removed the whole obstacle. Now the passphrase derives the key that names and opens these records, so deleting the lock does not reveal them -- it destroys the only copy of the salt they were derived through, and takes them with it. That is a real change in what the lock is worth, and also a real way to lose your data, which is why <code>crate::lock</code> keeps a second copy and the interface says so.</p>
 <h2 id="how-a-record-is-found">How a record is found</h2>
 <p>Every record has a <em>logical</em> name that only the program uses: <code>settings</code>, <code>measured</code>, <code>tour</code>. The file it lives in is named</p>
-<pre><code>base64url(weave(HMAC-SHA256(store_key, &quot;veilvoice/hoard/name&quot; || logical)[..18]))</code></pre>
-<p>where <code>weave</code> is one of a dozen byte-level encodings chosen from the name&#x27;s own bytes, so it is stable across launches. The result is twenty-four characters of base64 with no padding and no extension.</p>
-<p>Only length-preserving encodings are allowed there, and that restriction is load-bearing: a name that came out longer or shorter would announce which encoding produced it, and would separate records from decoys at a glance. Eighteen bytes rather than a round sixteen so the encoding comes out exact: twenty-four characters with nothing to pad, which is one less thing to tell a name apart from a decoy.</p>
+<pre><code>base64url(HMAC-SHA256(store_key, &quot;veilvoice/hoard/name&quot; || logical)[..18])</code></pre>
+<p>which is twenty-four characters of base64 with no padding and no extension. Eighteen bytes rather than a round sixteen so the encoding comes out exact: nothing to pad, which is one less thing to tell a name apart from a decoy.</p>
 <p>The derivation is deterministic, so the program does not search: it computes the name it wants and opens that file. This is what makes the selection <em>cryptographic</em> rather than a lookup table. There is no index mapping <code>settings</code> to a filename, because an index is exactly the thing an attacker would want. Without the key there is no way to run the derivation, and with the key there is no need to store it.</p>
 <h2 id="what-is-inside-one">What is inside one</h2>
-<pre><code>[24-byte nonce][ChaCha20-Poly1305 over: [2-byte marker][4-byte length][data][junk]]</code></pre>
-<p>The data is first put through one of twenty-seven encodings drawn at random on every write -- base91, z-base-32, yEnc, a move-to-front transform, and two dozen others -- and the marker says which, from inside the sealed region so the choice is not visible either. <code>crate::weave</code> carries the full argument; the short version is that <strong>it adds no cryptographic strength</strong>, because the AEAD already makes this indistinguishable from random. What it adds is that plaintext escaping by some route that is not the cipher -- a core dump, a swap file, a future bug in this framing -- does not read as anything.</p>
-<p>The padding is computed from the <em>original</em> length rather than the encoded one, so a file&#x27;s size never depends on which encoding was drawn. Otherwise a record rewritten repeatedly would move between buckets and the smallest one ever seen would pin its true length, which is exactly what the padding is there to prevent.</p>
+<pre><code>[&quot;V&quot; 2][24-byte nonce][ChaCha20-Poly1305 over: [4-byte length][data][junk]]</code></pre>
+<p>The first two bytes say which format the rest is in. <strong>F-337.</strong> Records used to be put through one of thirty-one reversible encodings before the cipher and another after it, and their names through one more. None of it added strength: the AEAD already makes a record indistinguishable from random, and the encodings are published here, so anybody who can read the source can undo them. What they did cost was compute and room, since every record was padded for the widest encoding at eight times its length. New records are written without them. <code>crate::weave</code> is kept only to open a record an older VeilVoice wrote, and that record is rewritten in the current format, under its current name, the first time it is read.</p>
 <p>The junk pads every record up to one of a few fixed sizes, so a file&#x27;s length says which bucket it fell in and nothing finer. The additional data for the AEAD is the filename itself, which binds a record to its name: two real files cannot be swapped without the swap being detected, because each one authenticates the name it is supposed to be under.</p>
 <p>The per-record key is a separate HKDF branch, so one record&#x27;s key says nothing about another&#x27;s.</p>
 <h2 id="the-roster-and-the-one-deletion-claim-this-can-honestly-make">The roster, and the one deletion claim this can honestly make</h2>
@@ -112,40 +110,43 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>1099 lines defining <strong>19 functions</strong> (11 public), <strong>3 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>1109 lines defining <strong>25 functions</strong> (11 public), <strong>3 types</strong> and <strong>9 constants</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct StoreKey</code> <span style="color:var(--muted)">line 193</span> &middot; The key that names and opens everything in the hoard.</li>
-<li><code>struct Audit</code> <span style="color:var(--muted)">line 249</span> &middot; What an audit found.</li>
-<li><code>struct Hoard</code> <span style="color:var(--muted)">line 271</span> &middot; An obfuscated store rooted at a directory.</li>
+<li><code>struct StoreKey</code> <span style="color:var(--muted)">line 170</span> &middot; The key that names and opens everything in the hoard.</li>
+<li><code>struct Audit</code> <span style="color:var(--muted)">line 226</span> &middot; What an audit found.</li>
+<li><code>struct Hoard</code> <span style="color:var(--muted)">line 248</span> &middot; An obfuscated store rooted at a directory.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>StoreKey::from_secret</code> <span style="color:var(--muted)">line 197</span> &middot; Wrap raw key material.
+<li><code>StoreKey::from_secret</code> <span style="color:var(--muted)">line 174</span> &middot; Wrap raw key material.
 </li>
-<li><code>Audit::is_clean</code> <span style="color:var(--muted)">line 265</span> &middot; Whether anything was found that a user should be told about.
+<li><code>Audit::is_clean</code> <span style="color:var(--muted)">line 242</span> &middot; Whether anything was found that a user should be told about.
 </li>
-<li><code>Hoard::open</code> <span style="color:var(--muted)">line 278</span> &middot; Open the hoard in dir.
+<li><code>Hoard::open</code> <span style="color:var(--muted)">line 255</span> &middot; Open the hoard in dir.
 </li>
-<li><code>Hoard::write</code> <span style="color:var(--muted)">line 316</span> &middot; Encrypt and store data under logical, padded and named so that neither its content nor its purpose is visible from outside.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>roster</code>, <code>save_roster</code>, <code>write_raw</code>, <code>open_bytes</code>, <code>path_for</code>, <code>fill_random</code>, <code>name_for</code>, <code>base64url</code></span>
+<li><code>Hoard::path_for</code> <span style="color:var(--muted)">line 286</span> &middot; The full path of a logical record.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>name_for</code>, <code>base64url</code></span>
 </li>
-<li><code>Hoard::read</code> <span style="color:var(--muted)">line 425</span> &middot; Read a record back, or None if it was never written.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>open_bytes</code>, <code>path_for</code>, <code>name_for</code>, <code>base64url</code></span>
+<li><code>Hoard::write</code> <span style="color:var(--muted)">line 294</span> &middot; Encrypt and store data under logical, padded and named so that neither its content nor its purpose is visible from outside.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>roster</code>, <code>save_roster</code>, <code>write_raw</code>, <code>fetch</code>, <code>fill_random</code>, <code>legacy_name_for</code>, <code>name_for</code>, <code>remove_if_present</code>, <code>open_bytes</code>, <code>read_if_present</code>, <code>base64url</code>, <code>open_legacy</code></span>
 </li>
-<li><code>Hoard::remove</code> <span style="color:var(--muted)">line 479</span> &middot; Remove a record and drop it from the roster.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>path_for</code>, <code>roster</code>, <code>save_roster</code>, <code>name_for</code>, <code>open_bytes</code>, <code>write_raw</code>, <code>base64url</code>, <code>fill_random</code></span>
+<li><code>Hoard::read</code> <span style="color:var(--muted)">line 388</span> &middot; Read a record back, or None if it was never written.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>fetch</code>, <code>write_raw</code>, <code>legacy_name_for</code>, <code>name_for</code>, <code>open_bytes</code>, <code>read_if_present</code>, <code>fill_random</code>, <code>remove_if_present</code>, <code>base64url</code>, <code>open_legacy</code>, <code>unseal</code></span>
 </li>
-<li><code>Hoard::sow_decoys</code> <span style="color:var(--muted)">line 534</span> &middot; Write decoy files: names of the same shape, contents of the same character, holding nothing.
+<li><code>Hoard::remove</code> <span style="color:var(--muted)">line 466</span> &middot; Remove a record, under either name it may have, and drop it from the roster.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>legacy_name_for</code>, <code>name_for</code>, <code>remove_if_present</code>, <code>roster</code>, <code>save_roster</code>, <code>base64url</code>, <code>fetch</code>, <code>write_raw</code>, <code>open_bytes</code>, <code>read_if_present</code>, <code>fill_random</code>, <code>open_legacy</code></span>
+</li>
+<li><code>Hoard::sow_decoys</code> <span style="color:var(--muted)">line 520</span> &middot; Write decoy files: names of the same shape, contents of the same character, holding nothing.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>base64url</code>, <code>fill_random</code></span>
 </li>
-<li><code>Hoard::audit</code> <span style="color:var(--muted)">line 565</span> &middot; Check every record the roster knows about, and count what else is here.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>is_hoard_shaped</code>, <code>name_for</code>, <code>open_bytes</code>, <code>roster</code>, <code>base64url</code>, <code>path_for</code></span>
+<li><code>Hoard::audit</code> <span style="color:var(--muted)">line 551</span> &middot; Check every record the roster knows about, and count what else is here.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>fetch</code>, <code>is_hoard_shaped</code>, <code>legacy_name_for</code>, <code>name_for</code>, <code>roster</code>, <code>open_bytes</code>, <code>read_if_present</code>, <code>base64url</code>, <code>save_roster</code>, <code>open_legacy</code>, <code>unseal</code>, <code>write_raw</code></span>
 </li>
 </ul>
 </section>
 <section id="s-calls">
 <h2 id="what-calls-what">WHAT CALLS WHAT</h2>
 <div class="diagram">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 563 931" width="563" height="931" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 633 946" width="633" height="946" style="max-width:100%;height:auto" role="img" aria-label="flowchart">
 <!-- GENERATED by tools/docs/generate.py. Do not edit. -->
 <defs>
 <marker id="a-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--muted, #737aa2)"/></marker>
@@ -154,123 +155,150 @@
 <marker id="a-cyan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--cyan, #7dcfff)"/></marker>
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
-<rect x="0" y="0" width="563" height="931" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M281.4 474.0 C 281.4 494.0, 380.9 600.0, 380.9 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M343.7 447.0 C 365.7 447.0, 365.7 247.0, 196.0 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M281.4 474.0 C 281.4 494.0, 293.5 500.0, 293.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M281.4 474.0 C 281.4 494.0, 468.4 500.0, 468.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M193.0 247.0 C 556.8 247.0, 556.8 47.0, 537.8 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M376.0 547.0 C 398.0 547.0, 398.0 247.0, 196.0 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M367.9 247.0 C 389.9 247.0, 389.9 247.0, 196.0 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M106.5 374.0 C 106.5 394.0, 293.5 500.0, 293.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M164.8 347.0 C 389.9 347.0, 389.9 247.0, 370.9 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M323.6 347.0 C 389.9 347.0, 389.9 247.0, 370.9 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M257.2 374.0 C 257.2 394.0, 468.4 500.0, 468.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M257.2 374.0 C 257.2 394.0, 193.9 600.0, 193.9 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M534.8 547.0 C 556.8 547.0, 556.8 547.0, 379.0 547.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M534.8 547.0 C 556.8 547.0, 556.8 247.0, 370.9 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M280.5 647.0 C 302.5 647.0, 302.5 547.0, 188.0 547.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M514.6 347.0 C 556.8 347.0, 556.8 47.0, 537.8 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M432.1 374.0 C 432.1 394.0, 281.4 700.0, 281.4 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M456.3 274.0 C 456.3 294.0, 468.4 500.0, 468.4 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M456.3 274.0 C 456.3 294.0, 193.9 600.0, 193.9 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M456.3 274.0 C 456.3 294.0, 106.5 500.0, 106.5 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M106.5 574.0 C 106.5 594.0, 281.4 700.0, 281.4 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
-<path d="M185.0 547.0 C 215.0 547.0, 215.0 247.0, 196.0 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<rect x="0" y="0" width="633" height="946" fill="var(--bg-inset, #16161e)" rx="8"/>
+<path d="M474.3 347.0 C 496.3 347.0, 496.3 247.0, 306.4 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M412.0 374.0 C 412.0 394.0, 403.9 500.0, 403.9 517.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M474.3 347.0 C 496.3 347.0, 496.3 147.0, 422.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M474.3 347.0 C 496.3 347.0, 496.3 147.0, 190.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M412.0 374.0 C 412.0 394.0, 503.4 400.0, 503.4 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M303.4 247.0 C 441.1 247.0, 441.1 147.0, 422.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M303.4 247.0 C 325.4 247.0, 325.4 147.0, 190.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M241.1 274.0 C 241.1 294.0, 328.5 400.0, 328.5 417.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M241.1 274.0 C 241.1 294.0, 229.0 500.0, 229.0 517.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M419.1 147.0 C 441.1 147.0, 441.1 47.0, 393.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M187.8 147.0 C 412.9 147.0, 412.9 47.0, 393.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M328.5 474.0 C 328.5 494.0, 296.3 600.0, 296.3 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M328.5 474.0 C 328.5 494.0, 117.4 600.0, 117.4 617.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M382.8 647.0 C 404.8 647.0, 404.8 647.0, 186.7 647.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M594.0 147.0 C 616.0 147.0, 616.0 147.0, 190.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M446.1 247.0 C 468.1 247.0, 468.1 247.0, 306.4 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M387.8 274.0 C 387.8 294.0, 141.5 400.0, 141.5 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M604.9 247.0 C 626.9 247.0, 626.9 147.0, 422.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M604.9 247.0 C 626.9 247.0, 626.9 147.0, 190.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M538.5 274.0 C 538.5 294.0, 245.1 700.0, 245.1 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M538.5 274.0 C 538.5 294.0, 503.4 400.0, 503.4 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M538.5 274.0 C 538.5 294.0, 495.4 600.0, 495.4 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M569.8 447.0 C 591.8 447.0, 591.8 247.0, 306.4 247.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M503.4 474.0 C 503.4 494.0, 495.4 600.0, 495.4 617.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
+<path d="M581.9 647.0 C 603.9 647.0, 603.9 447.0, 223.0 447.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M323.6 347.0 C 412.9 347.0, 412.9 47.0, 393.9 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M241.1 374.0 C 241.1 394.0, 411.9 700.0, 411.9 717.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M90.4 274.0 C 90.4 294.0, 503.4 400.0, 503.4 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M90.4 274.0 C 90.4 294.0, 495.4 600.0, 495.4 617.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M90.4 274.0 C 90.4 294.0, 141.5 400.0, 141.5 417.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M141.5 474.0 C 141.5 494.0, 411.9 700.0, 411.9 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
+<path d="M220.0 447.0 C 441.1 447.0, 441.1 147.0, 422.1 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M220.0 447.0 C 242.0 447.0, 242.0 147.0, 190.8 147.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
+<path d="M141.5 474.0 C 141.5 494.0, 245.1 700.0, 245.1 717.0" fill="none" stroke="var(--accent-2, #bb9af7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent-2)"/>
 <a href="hoard.src.html#fn-storekey-from_secret">
-<rect x="28.0" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="126.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StoreKey::from_secret</text>
-<text x="126.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 197</text>
-</a>
-<a href="hoard.src.html#fn-storekey-expand">
-<rect x="251.3" y="20.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="329.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StoreKey::expand</text>
-<text x="329.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 202</text>
+<rect x="67.1" y="20.0" width="197.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="165.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">StoreKey::from_secret</text>
+<text x="165.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 174</text>
 </a>
 <a href="hoard.src.html#fn-base64url">
-<rect x="434.2" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="484.5" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base64url</text>
-<text x="484.5" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 214</text>
-</a>
-<a href="hoard.src.html#fn-bucket_for">
-<rect x="68.3" y="120.0" width="108.6" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="122.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">bucket_for</text>
-<text x="122.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 235</text>
+<rect x="290.4" y="20.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="340.6" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">base64url</text>
+<text x="340.6" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 191</text>
 </a>
 <a href="hoard.src.html#fn-audit-is_clean">
-<rect x="202.9" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="277.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Audit::is_clean</text>
-<text x="277.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 265</text>
-</a>
-<a href="hoard.src.html#fn-hoard-open">
-<rect x="377.8" y="120.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="436.1" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::open</text>
-<text x="436.1" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 278</text>
+<rect x="416.9" y="20.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="491.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Audit::is_clean</text>
+<text x="491.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 242</text>
 </a>
 <a href="hoard.src.html#fn-hoard-name_for">
-<rect x="44.1" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="118.6" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::name_for</text>
-<text x="118.6" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 289</text>
+<rect x="38.9" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="113.3" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::name_for</text>
+<text x="113.3" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 266</text>
+</a>
+<a href="hoard.src.html#fn-hoard-legacy_name_for">
+<rect x="213.8" y="120.0" width="205.3" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="316.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::legacy_name_for</text>
+<text x="316.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 278</text>
 </a>
 <a href="hoard.src.html#fn-hoard-path_for">
-<rect x="219.0" y="220.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="293.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::path_for</text>
-<text x="293.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 308</text>
+<rect x="445.1" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="519.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::path_for</text>
+<text x="519.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 286</text>
 </a>
 <a href="hoard.src.html#fn-hoard-write">
-<rect x="393.9" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="456.3" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::write</text>
-<text x="456.3" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 316</text>
+<rect x="28.0" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="90.4" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::write</text>
+<text x="90.4" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 294</text>
 </a>
 <a href="hoard.src.html#fn-hoard-write_raw">
-<rect x="28.0" y="520.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="106.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::write_raw</text>
-<text x="106.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 332</text>
+<rect x="63.1" y="420.0" width="157.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="141.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::write_raw</text>
+<text x="141.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 310</text>
+</a>
+<a href="hoard.src.html#fn-hoard-fetch">
+<rect x="178.7" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="241.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::fetch</text>
+<text x="241.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 362</text>
 </a>
 <a href="hoard.src.html#fn-hoard-read">
-<rect x="48.1" y="320.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="106.5" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::read</text>
-<text x="106.5" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 425</text>
+<rect x="329.4" y="220.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="387.8" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::read</text>
+<text x="387.8" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 388</text>
 </a>
 <a href="hoard.src.html#fn-hoard-open_bytes">
-<rect x="211.0" y="520.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="293.5" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::open_bytes</text>
-<text x="293.5" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 439</text>
+<rect x="246.0" y="420.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="328.5" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::open_bytes</text>
+<text x="328.5" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 404</text>
+</a>
+<a href="hoard.src.html#fn-hoard-unseal">
+<rect x="51.0" y="620.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="117.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::unseal</text>
+<text x="117.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 425</text>
+</a>
+<a href="hoard.src.html#fn-hoard-open_legacy">
+<rect x="209.7" y="620.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="296.3" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::open_legacy</text>
+<text x="296.3" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 444</text>
 </a>
 <a href="hoard.src.html#fn-hoard-remove">
-<rect x="190.8" y="320.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="257.2" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::remove</text>
-<text x="257.2" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 479</text>
+<rect x="472.1" y="220.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="538.5" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::remove</text>
+<text x="538.5" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 466</text>
 </a>
 <a href="hoard.src.html#fn-hoard-roster">
-<rect x="402.0" y="520.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
-<text x="468.4" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::roster</text>
-<text x="468.4" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 494</text>
+<rect x="437.0" y="420.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
+<text x="503.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::roster</text>
+<text x="503.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 480</text>
 </a>
 <a href="hoard.src.html#fn-hoard-save_roster">
-<rect x="107.4" y="620.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="193.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::save_roster</text>
-<text x="193.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 515</text>
+<rect x="408.8" y="620.0" width="173.1" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="495.4" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::save_roster</text>
+<text x="495.4" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 501</text>
 </a>
 <a href="hoard.src.html#fn-hoard-sow_decoys">
-<rect x="349.6" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="432.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::sow_decoys</text>
-<text x="432.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 534</text>
+<rect x="158.6" y="320.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="241.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::sow_decoys</text>
+<text x="241.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 520</text>
 </a>
 <a href="hoard.src.html#fn-hoard-audit">
-<rect x="219.0" y="420.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
-<text x="281.4" y="442.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::audit</text>
-<text x="281.4" y="459.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 565</text>
+<rect x="349.6" y="320.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
+<text x="412.0" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Hoard::audit</text>
+<text x="412.0" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 551</text>
+</a>
+<a href="hoard.src.html#fn-read_if_present">
+<rect x="154.5" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="229.0" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">read_if_present</text>
+<text x="229.0" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 585</text>
+</a>
+<a href="hoard.src.html#fn-remove_if_present">
+<rect x="162.6" y="720.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="245.1" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">remove_if_present</text>
+<text x="245.1" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 594</text>
 </a>
 <a href="hoard.src.html#fn-is_hoard_shaped">
-<rect x="306.5" y="620.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="380.9" y="642.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">is_hoard_shaped</text>
-<text x="380.9" y="659.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 602</text>
+<rect x="329.4" y="520.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="403.9" y="542.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">is_hoard_shaped</text>
+<text x="403.9" y="559.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 606</text>
 </a>
 <a href="hoard.src.html#fn-fill_random">
-<rect x="223.0" y="720.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="281.4" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fill_random</text>
-<text x="281.4" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 614</text>
+<rect x="353.6" y="720.0" width="116.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="411.9" y="742.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">fill_random</text>
+<text x="411.9" y="759.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 618</text>
 </a>
 <rect x="20.0" y="804.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="813.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -280,48 +308,62 @@
 <text x="35.0" y="845.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">helper: private to this file</text>
 <path d="M20.0 856.5 L29.0 856.5" stroke="var(--warn, #e0af68)" stroke-width="1.1" stroke-dasharray="4 3"/>
 <text x="35.0" y="861.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">dashed: a call that goes back up, or across a wrapped rank</text>
-<text x="20.0" y="883.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means</text>
-<text x="20.0" y="898.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">the callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a</text>
-<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">syntactic reading, not a type-resolved one.</text>
+<text x="20.0" y="883.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">The functions this file defines, and the calls between them. An edge means the</text>
+<text x="20.0" y="898.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">callee&#x27;s name appears, called, inside the caller&#x27;s body. This is a syntactic reading,</text>
+<text x="20.0" y="913.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">not a type-resolved one. 22 of 25 functions are drawn; the diagram is bounded at 22 so</text>
+<text x="20.0" y="928.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">it stays readable.</text>
 </svg>
 </div>
-<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one.</p>
+<p class="muted" style="color:var(--muted);font-size:13px">The functions this file defines, and the calls between them. An edge means the callee's name appears, called, inside the caller's body. This is a syntactic reading, not a type-resolved one. 22 of 25 functions are drawn; the diagram is bounded at 22 so it stays readable.</p>
 <details><summary>The same graph as Mermaid source</summary>
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
-    n_from_secret([&quot;StoreKey::from_secret&lt;br/&gt;line 197&quot;])
-    n_expand[&quot;StoreKey::expand&lt;br/&gt;line 202&quot;]
-    n_base64url[&quot;base64url&lt;br/&gt;line 214&quot;]
-    n_bucket_for[&quot;bucket_for&lt;br/&gt;line 235&quot;]
-    n_is_clean([&quot;Audit::is_clean&lt;br/&gt;line 265&quot;])
-    n_open([&quot;Hoard::open&lt;br/&gt;line 278&quot;])
-    n_name_for[&quot;Hoard::name_for&lt;br/&gt;line 289&quot;]
-    n_path_for[&quot;Hoard::path_for&lt;br/&gt;line 308&quot;]
-    n_write([&quot;Hoard::write&lt;br/&gt;line 316&quot;])
-    n_write_raw[&quot;Hoard::write_raw&lt;br/&gt;line 332&quot;]
-    n_read([&quot;Hoard::read&lt;br/&gt;line 425&quot;])
-    n_open_bytes[&quot;Hoard::open_bytes&lt;br/&gt;line 439&quot;]
-    n_remove([&quot;Hoard::remove&lt;br/&gt;line 479&quot;])
-    n_roster[&quot;Hoard::roster&lt;br/&gt;line 494&quot;]
-    n_save_roster[&quot;Hoard::save_roster&lt;br/&gt;line 515&quot;]
-    n_sow_decoys([&quot;Hoard::sow_decoys&lt;br/&gt;line 534&quot;])
-    n_audit([&quot;Hoard::audit&lt;br/&gt;line 565&quot;])
-    n_is_hoard_shaped[&quot;is_hoard_shaped&lt;br/&gt;line 602&quot;]
-    n_fill_random[&quot;fill_random&lt;br/&gt;line 614&quot;]
+    n_from_secret([&quot;StoreKey::from_secret&lt;br/&gt;line 174&quot;])
+    n_base64url[&quot;base64url&lt;br/&gt;line 191&quot;]
+    n_is_clean([&quot;Audit::is_clean&lt;br/&gt;line 242&quot;])
+    n_name_for[&quot;Hoard::name_for&lt;br/&gt;line 266&quot;]
+    n_legacy_name_for[&quot;Hoard::legacy_name_for&lt;br/&gt;line 278&quot;]
+    n_path_for([&quot;Hoard::path_for&lt;br/&gt;line 286&quot;])
+    n_write([&quot;Hoard::write&lt;br/&gt;line 294&quot;])
+    n_write_raw[&quot;Hoard::write_raw&lt;br/&gt;line 310&quot;]
+    n_fetch[&quot;Hoard::fetch&lt;br/&gt;line 362&quot;]
+    n_read([&quot;Hoard::read&lt;br/&gt;line 388&quot;])
+    n_open_bytes[&quot;Hoard::open_bytes&lt;br/&gt;line 404&quot;]
+    n_unseal[&quot;Hoard::unseal&lt;br/&gt;line 425&quot;]
+    n_open_legacy[&quot;Hoard::open_legacy&lt;br/&gt;line 444&quot;]
+    n_remove([&quot;Hoard::remove&lt;br/&gt;line 466&quot;])
+    n_roster[&quot;Hoard::roster&lt;br/&gt;line 480&quot;]
+    n_save_roster[&quot;Hoard::save_roster&lt;br/&gt;line 501&quot;]
+    n_sow_decoys([&quot;Hoard::sow_decoys&lt;br/&gt;line 520&quot;])
+    n_audit([&quot;Hoard::audit&lt;br/&gt;line 551&quot;])
+    n_read_if_present[&quot;read_if_present&lt;br/&gt;line 585&quot;]
+    n_remove_if_present[&quot;remove_if_present&lt;br/&gt;line 594&quot;]
+    n_is_hoard_shaped[&quot;is_hoard_shaped&lt;br/&gt;line 606&quot;]
+    n_fill_random[&quot;fill_random&lt;br/&gt;line 618&quot;]
+    n_audit --&gt; n_fetch
     n_audit --&gt; n_is_hoard_shaped
+    n_audit --&gt; n_legacy_name_for
     n_audit --&gt; n_name_for
-    n_audit --&gt; n_open_bytes
     n_audit --&gt; n_roster
+    n_fetch --&gt; n_legacy_name_for
+    n_fetch --&gt; n_name_for
+    n_fetch --&gt; n_open_bytes
+    n_fetch --&gt; n_read_if_present
+    n_legacy_name_for --&gt; n_base64url
     n_name_for --&gt; n_base64url
-    n_open_bytes --&gt; n_name_for
+    n_open_bytes --&gt; n_open_legacy
+    n_open_bytes --&gt; n_unseal
+    n_open_legacy --&gt; n_unseal
     n_path_for --&gt; n_name_for
-    n_read --&gt; n_open_bytes
-    n_read --&gt; n_path_for
-    n_remove --&gt; n_path_for
+    n_read --&gt; n_fetch
+    n_read --&gt; n_write_raw
+    n_remove --&gt; n_legacy_name_for
+    n_remove --&gt; n_name_for
+    n_remove --&gt; n_remove_if_present
     n_remove --&gt; n_roster
     n_remove --&gt; n_save_roster
-    n_roster --&gt; n_open_bytes
-    n_roster --&gt; n_path_for
+    n_roster --&gt; n_fetch
+    n_roster --&gt; n_save_roster
     n_save_roster --&gt; n_write_raw
     n_sow_decoys --&gt; n_base64url
     n_sow_decoys --&gt; n_fill_random
@@ -329,32 +371,37 @@ flowchart TD
     n_write --&gt; n_save_roster
     n_write --&gt; n_write_raw
     n_write_raw --&gt; n_fill_random
+    n_write_raw --&gt; n_legacy_name_for
     n_write_raw --&gt; n_name_for
-    click n_from_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L197&quot; &quot;open the source&quot;
-    click n_expand href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L202&quot; &quot;open the source&quot;
-    click n_base64url href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L214&quot; &quot;open the source&quot;
-    click n_bucket_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L235&quot; &quot;open the source&quot;
-    click n_is_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L265&quot; &quot;open the source&quot;
-    click n_open href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L278&quot; &quot;open the source&quot;
-    click n_name_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L289&quot; &quot;open the source&quot;
-    click n_path_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L308&quot; &quot;open the source&quot;
-    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L316&quot; &quot;open the source&quot;
-    click n_write_raw href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L332&quot; &quot;open the source&quot;
-    click n_read href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L425&quot; &quot;open the source&quot;
-    click n_open_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L439&quot; &quot;open the source&quot;
-    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L479&quot; &quot;open the source&quot;
-    click n_roster href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L494&quot; &quot;open the source&quot;
-    click n_save_roster href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L515&quot; &quot;open the source&quot;
-    click n_sow_decoys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L534&quot; &quot;open the source&quot;
-    click n_audit href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L565&quot; &quot;open the source&quot;
-    click n_is_hoard_shaped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L602&quot; &quot;open the source&quot;
-    click n_fill_random href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L614&quot; &quot;open the source&quot;
+    n_write_raw --&gt; n_remove_if_present
+    click n_from_secret href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L174&quot; &quot;open the source&quot;
+    click n_base64url href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L191&quot; &quot;open the source&quot;
+    click n_is_clean href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L242&quot; &quot;open the source&quot;
+    click n_name_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L266&quot; &quot;open the source&quot;
+    click n_legacy_name_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L278&quot; &quot;open the source&quot;
+    click n_path_for href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L286&quot; &quot;open the source&quot;
+    click n_write href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L294&quot; &quot;open the source&quot;
+    click n_write_raw href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L310&quot; &quot;open the source&quot;
+    click n_fetch href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L362&quot; &quot;open the source&quot;
+    click n_read href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L388&quot; &quot;open the source&quot;
+    click n_open_bytes href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L404&quot; &quot;open the source&quot;
+    click n_unseal href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L425&quot; &quot;open the source&quot;
+    click n_open_legacy href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L444&quot; &quot;open the source&quot;
+    click n_remove href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L466&quot; &quot;open the source&quot;
+    click n_roster href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L480&quot; &quot;open the source&quot;
+    click n_save_roster href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L501&quot; &quot;open the source&quot;
+    click n_sow_decoys href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L520&quot; &quot;open the source&quot;
+    click n_audit href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L551&quot; &quot;open the source&quot;
+    click n_read_if_present href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L585&quot; &quot;open the source&quot;
+    click n_remove_if_present href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L594&quot; &quot;open the source&quot;
+    click n_is_hoard_shaped href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L606&quot; &quot;open the source&quot;
+    click n_fill_random href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/src/hoard.rs#L618&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
-    class n_from_secret,n_is_clean,n_open,n_write,n_read,n_remove,n_sow_decoys,n_audit entry
+    class n_from_secret,n_is_clean,n_path_for,n_write,n_read,n_remove,n_sow_decoys,n_audit entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
-    class n_name_for,n_path_for,n_roster api
+    class n_name_for,n_roster api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_expand,n_base64url,n_bucket_for,n_write_raw,n_open_bytes,n_save_roster,n_is_hoard_shaped,n_fill_random helper
+    class n_base64url,n_legacy_name_for,n_write_raw,n_fetch,n_open_bytes,n_unseal,n_open_legacy,n_save_roster,n_read_if_present,n_remove_if_present,n_is_hoard_shaped,n_fill_random helper
     subgraph chart_key [&quot;Key&quot;]
         direction LR
         key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
@@ -370,37 +417,43 @@ flowchart TD
 <section id="s-items">
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
-<tr><td><code>INFO_NAME</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-info_name">138</a></td><td>HKDF label for the filename key.</td></tr>
-<tr><td><code>INFO_REC</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-info_rec">140</a></td><td>HKDF label prefix for a record&#x27;s own encryption key.</td></tr>
-<tr><td><code>NAME_BYTES</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-name_bytes">147</a></td><td>How many bytes of the name HMAC end up in the filename.</td></tr>
-<tr><td><code>LEN_PREFIX</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-len_prefix">150</a></td><td>The length prefix inside the padded plaintext.</td></tr>
-<tr><td><code>MAX_EXPANSION</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-max_expansion">164</a></td><td>The most any encoding in crate::weave can grow its input.</td></tr>
-<tr><td><code>MARKER</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-marker">170</a></td><td>The inner encoding marker, which sits before the length.</td></tr>
-<tr><td><code>OUTER_MARKER</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-outer_marker">177</a></td><td>The outer encoding marker, the first two bytes of the file.</td></tr>
-<tr><td><code>BUCKETS</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-buckets">183</a></td><td>The sizes a record is padded up to, in bytes of plaintext.</td></tr>
-<tr><td><code>ROSTER</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-roster">186</a></td><td>The logical name of the roster record.</td></tr>
-<tr><td><code>StoreKey</code> <sub>pub struct</sub></td><td><a href="hoard.src.html#fn-storekey">193</a></td><td>The key that names and opens everything in the hoard.</td></tr>
-<tr><td><code>StoreKey::from_secret</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-storekey-from_secret">197</a></td><td>Wrap raw key material.</td></tr>
-<tr><td><code>StoreKey::expand</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-storekey-expand">202</a></td><td>Derive a subkey under a label.</td></tr>
-<tr><td><code>base64url</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-base64url">214</a></td><td>Base64url, no padding.</td></tr>
-<tr><td><code>bucket_for</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-bucket_for">235</a></td><td>The bucket a payload of this length pads up to.</td></tr>
-<tr><td><code>Audit</code> <sub>pub struct</sub></td><td><a href="hoard.src.html#fn-audit">249</a></td><td>What an audit found.</td></tr>
-<tr><td><code>Audit::is_clean</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-audit-is_clean">265</a></td><td>Whether anything was found that a user should be told about.</td></tr>
-<tr><td><code>Hoard</code> <sub>pub struct</sub></td><td><a href="hoard.src.html#fn-hoard">271</a></td><td>An obfuscated store rooted at a directory.</td></tr>
-<tr><td><code>Hoard::open</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-open">278</a></td><td>Open the hoard in dir.</td></tr>
-<tr><td><code>Hoard::name_for</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-name_for">289</a></td><td>The filename a logical record lives under.</td></tr>
-<tr><td><code>Hoard::path_for</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-path_for">308</a></td><td>The full path of a logical record.</td></tr>
-<tr><td><code>Hoard::write</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-write">316</a></td><td>Encrypt and store data under logical, padded and named so that neither its content nor its purpose is visible from outside.</td></tr>
-<tr><td><code>Hoard::write_raw</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-write_raw">332</a></td><td>Encode, seal and write one record under its obfuscated name.</td></tr>
-<tr><td><code>Hoard::read</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-read">425</a></td><td>Read a record back, or None if it was never written.</td></tr>
-<tr><td><code>Hoard::open_bytes</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-open_bytes">439</a></td><td>Undo Hoard::write_raw for bytes already read off the disk.</td></tr>
-<tr><td><code>Hoard::remove</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-remove">479</a></td><td>Remove a record and drop it from the roster.</td></tr>
-<tr><td><code>Hoard::roster</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-roster">494</a></td><td>The logical names the roster says should exist.</td></tr>
-<tr><td><code>Hoard::save_roster</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-save_roster">515</a></td><td>Write the list of logical names, itself as an ordinary record.</td></tr>
-<tr><td><code>Hoard::sow_decoys</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-sow_decoys">534</a></td><td>Write decoy files: names of the same shape, contents of the same character, holding nothing.</td></tr>
-<tr><td><code>Hoard::audit</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-audit">565</a></td><td>Check every record the roster knows about, and count what else is here.</td></tr>
-<tr><td><code>is_hoard_shaped</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-is_hoard_shaped">602</a></td><td>Whether a filename has the shape this module writes.</td></tr>
-<tr><td><code>fill_random</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-fill_random">614</a></td><td>Fill buf from the operating system, treating a refusal as an error rather than falling back to anything.</td></tr>
+<tr><td><code>INFO_NAME</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-info_name">127</a></td><td>HKDF label for the filename key.</td></tr>
+<tr><td><code>INFO_REC</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-info_rec">129</a></td><td>HKDF label prefix for a record&#x27;s own encryption key.</td></tr>
+<tr><td><code>NAME_BYTES</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-name_bytes">136</a></td><td>How many bytes of the name HMAC end up in the filename.</td></tr>
+<tr><td><code>LEN_PREFIX</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-len_prefix">139</a></td><td>The length prefix inside the padded plaintext.</td></tr>
+<tr><td><code>FORMAT</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-format">146</a></td><td>The first two bytes of every record this version writes.</td></tr>
+<tr><td><code>OUTER_MARKER</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-outer_marker">150</a></td><td>The length of FORMAT, which is also the length of the outer marker the older format began with.</td></tr>
+<tr><td><code>LEGACY_MARKER</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-legacy_marker">154</a></td><td>The older format&#x27;s inner marker, which sat inside the sealed region before the length.</td></tr>
+<tr><td><code>BUCKETS</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-buckets">160</a></td><td>The sizes a record is padded up to, in bytes of plaintext.</td></tr>
+<tr><td><code>ROSTER</code> <sub>const</sub></td><td><a href="hoard.src.html#fn-roster">163</a></td><td>The logical name of the roster record.</td></tr>
+<tr><td><code>StoreKey</code> <sub>pub struct</sub></td><td><a href="hoard.src.html#fn-storekey">170</a></td><td>The key that names and opens everything in the hoard.</td></tr>
+<tr><td><code>StoreKey::from_secret</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-storekey-from_secret">174</a></td><td>Wrap raw key material.</td></tr>
+<tr><td><code>StoreKey::expand</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-storekey-expand">179</a></td><td>Derive a subkey under a label.</td></tr>
+<tr><td><code>base64url</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-base64url">191</a></td><td>Base64url, no padding.</td></tr>
+<tr><td><code>bucket_for</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-bucket_for">212</a></td><td>The bucket a payload of this length pads up to.</td></tr>
+<tr><td><code>Audit</code> <sub>pub struct</sub></td><td><a href="hoard.src.html#fn-audit">226</a></td><td>What an audit found.</td></tr>
+<tr><td><code>Audit::is_clean</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-audit-is_clean">242</a></td><td>Whether anything was found that a user should be told about.</td></tr>
+<tr><td><code>Hoard</code> <sub>pub struct</sub></td><td><a href="hoard.src.html#fn-hoard">248</a></td><td>An obfuscated store rooted at a directory.</td></tr>
+<tr><td><code>Hoard::open</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-open">255</a></td><td>Open the hoard in dir.</td></tr>
+<tr><td><code>Hoard::name_for</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-name_for">266</a></td><td>The filename a logical record lives under.</td></tr>
+<tr><td><code>Hoard::legacy_name_for</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-legacy_name_for">278</a></td><td>The name an older VeilVoice gave the same record: the same HMAC put through one of the length-preserving encodings in crate::weave.</td></tr>
+<tr><td><code>Hoard::path_for</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-path_for">286</a></td><td>The full path of a logical record.</td></tr>
+<tr><td><code>Hoard::write</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-write">294</a></td><td>Encrypt and store data under logical, padded and named so that neither its content nor its purpose is visible from outside.</td></tr>
+<tr><td><code>Hoard::write_raw</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-write_raw">310</a></td><td>Seal and write one record under its name, in the current format.</td></tr>
+<tr><td><code>Hoard::fetch</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-fetch">362</a></td><td>Find and open a record, in whichever format it was written.</td></tr>
+<tr><td><code>Hoard::read</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-read">388</a></td><td>Read a record back, or None if it was never written.</td></tr>
+<tr><td><code>Hoard::open_bytes</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-open_bytes">404</a></td><td>Undo Hoard::write_raw for bytes already read off the disk, which were stored under name.</td></tr>
+<tr><td><code>Hoard::unseal</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-unseal">425</a></td><td>Open the AEAD around a record: the nonce, then the sealed body, with the file&#x27;s own name as the additional data.</td></tr>
+<tr><td><code>Hoard::open_legacy</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-open_legacy">444</a></td><td>Open a record in the format VeilVoice wrote before F-337: an outer encoding around the sealed blob, and an inner one around the data.</td></tr>
+<tr><td><code>Hoard::remove</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-remove">466</a></td><td>Remove a record, under either name it may have, and drop it from the roster.</td></tr>
+<tr><td><code>Hoard::roster</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-roster">480</a></td><td>The logical names the roster says should exist.</td></tr>
+<tr><td><code>Hoard::save_roster</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-hoard-save_roster">501</a></td><td>Write the list of logical names, itself as an ordinary record.</td></tr>
+<tr><td><code>Hoard::sow_decoys</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-sow_decoys">520</a></td><td>Write decoy files: names of the same shape, contents of the same character, holding nothing.</td></tr>
+<tr><td><code>Hoard::audit</code> <sub>pub fn</sub></td><td><a href="hoard.src.html#fn-hoard-audit">551</a></td><td>Check every record the roster knows about, and count what else is here.</td></tr>
+<tr><td><code>read_if_present</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-read_if_present">585</a></td><td>The file&#x27;s bytes, None if there is no such file, and an error for any other reason it cannot be read.</td></tr>
+<tr><td><code>remove_if_present</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-remove_if_present">594</a></td><td>Remove a file, treating one that is already gone as removed.</td></tr>
+<tr><td><code>is_hoard_shaped</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-is_hoard_shaped">606</a></td><td>Whether a filename has the shape this module writes.</td></tr>
+<tr><td><code>fill_random</code> <sub>fn</sub></td><td><a href="hoard.src.html#fn-fill_random">618</a></td><td>Fill buf from the operating system, treating a refusal as an error rather than falling back to anything.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -1,4 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+//! **Kept only to open old records.** Since F-337 the hoard writes without
+//! any of these encodings, and nothing in VeilVoice encodes with them. This
+//! module stays so that a record an older version wrote can still be opened,
+//! and the hoard rewrites each such record in the current format the first
+//! time it is read. It can go once no supported version is likely to have
+//! left one behind.
+//!
 //! Thirty-one reversible encodings, chosen at random, applied around the
 //! encryption -- before it, after it, or both.
 //!

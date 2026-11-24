@@ -5,7 +5,7 @@
 #
 #   sh install.sh                 # interactive
 #   sh install.sh --yes           # no prompts, no optional components
-#   sh install.sh --version v0.1.9
+#   sh install.sh --version v0.1.23
 #   sh install.sh --prefix ~/.local
 #   sh install.sh --help
 #
@@ -202,18 +202,53 @@ EXT="tar.gz"
 # ---------------------------------------------------------------------------
 # Which version
 # ---------------------------------------------------------------------------
+
+# Whether release $1 is older than release $2, comparing the three numbers.
+# awk rather than `sort -V`, which the macOS sort does not have.
+is_older() {
+    awk -v a="${1#v}" -v b="${2#v}" 'BEGIN {
+        split(a, x, "."); split(b, y, ".")
+        for (i = 1; i <= 3; i++) {
+            if (x[i] + 0 < y[i] + 0) exit 0
+            if (x[i] + 0 > y[i] + 0) exit 1
+        }
+        exit 1
+    }'
+}
+
+# Kept, so the check below knows whether a version was asked for.
+ASKED_VERSION="$VERSION"
 if [ -z "$VERSION" ]; then
     step "Asking GitHub for the latest release"
     TMP_TAG=$(mktemp)
     if ! fetch "https://api.github.com/repos/$REPO/releases/latest" "$TMP_TAG"; then
         rm -f "$TMP_TAG"
         refuse "could not reach the GitHub API to find the latest release" \
-            "Pass one explicitly instead:  $0 --version v0.1.9"
+            "Pass one explicitly instead:  $0 --version v0.1.23"
     fi
     VERSION=$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$TMP_TAG" | head -1)
     rm -f "$TMP_TAG"
     [ -n "$VERSION" ] || refuse "could not read a tag name from the GitHub API reply" \
-        "Pass one explicitly instead:  $0 --version v0.1.9"
+        "Pass one explicitly instead:  $0 --version v0.1.23"
+fi
+
+# An older release, asked for by name, is installed and said out loud. F-340.
+# Asking can fail without stopping anything: the version was chosen already.
+if [ -n "$ASKED_VERSION" ]; then
+    TMP_TAG=$(mktemp)
+    if fetch "https://api.github.com/repos/$REPO/releases/latest" "$TMP_TAG"; then
+        LATEST=$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$TMP_TAG" | head -1)
+        if [ -n "$LATEST" ] && is_older "$VERSION" "$LATEST"; then
+            say ""
+            say "  NOTE: $VERSION is an older release. The newest is $LATEST."
+            say "  It is installed because you asked for it by name. Older releases"
+            say "  lack fixes, some of them for security; run without --version for"
+            say "  the newest."
+        fi
+    else
+        say "  NOTE: could not check whether $VERSION is the newest release."
+    fi
+    rm -f "$TMP_TAG"
 fi
 
 ARCHIVE="veilvoice-$VERSION-$LABEL.$EXT"

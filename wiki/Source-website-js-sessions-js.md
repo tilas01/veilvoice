@@ -3,7 +3,7 @@
 
 # `website/js/sessions.js`
 
-[[The website's source|Source-index]] &middot; 219 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/sessions.js)
+[The website's source](Source-index) &middot; 219 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/sessions.js)
 
 ## What it does
 

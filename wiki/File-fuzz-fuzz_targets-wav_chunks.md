@@ -3,7 +3,7 @@
 
 # `fuzz/fuzz_targets/wav_chunks.rs`
 
-[[fuzz|Crate-fuzz]] &middot; 46 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/wav_chunks.rs)
+[fuzz](Crate-fuzz) &middot; 46 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/wav_chunks.rs)
 
 ## Contents
 

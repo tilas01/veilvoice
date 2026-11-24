@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-policy/src/mandate.rs</code></h1>
-<p style="color:var(--muted)"><a href="mandate.html">what this file is for</a> &middot; <a href="../veilvoice-policy.html">veilvoice-policy</a> &middot; 539 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="mandate.html">what this file is for</a> &middot; <a href="../veilvoice-policy.html">veilvoice-policy</a> &middot; 540 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -404,263 +404,264 @@
 <span class="ln" id="L295">        <span class="tok-kw">if</span> <span class="tok-kw">let</span> <span class="tok-fn">Some</span>(parent) = path.<span class="tok-fn">parent</span>() {</span>
 <span class="ln" id="L296">            std::fs::<span class="tok-fn">create_dir_all</span>(parent).<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
 <span class="ln" id="L297">        }</span>
-<span class="ln" id="L298">        veilvoice_crypto::privatefile::<span class="tok-fn">write_owner_only</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>())</span>
-<span class="ln" id="L299">            .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
-<span class="ln" id="L300">    }</span>
+<span class="ln" id="L298">        <span class="tok-com">// Replaced in one step, so a crash part-way leaves the old record. F-335.</span></span>
+<span class="ln" id="L299">        veilvoice_crypto::privatefile::<span class="tok-fn">replace_owner_only</span>(path, <span class="tok-kw">self</span>.<span class="tok-fn">to_text</span>().<span class="tok-fn">as_bytes</span>())</span>
+<span class="ln" id="L300">            .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())</span>
+<span class="ln" id="L301">    }</span>
 </span>
-<span class="ln" id="L301">}</span>
-<span class="ln" id="L302"></span>
+<span class="ln" id="L302">}</span>
+<span class="ln" id="L303"></span>
 <span class="src-item" id="fn-default_path">
-<span class="ln" id="L303"><span class="tok-com">/// Where the mandate file lives: beside the app lock, under its own name.</span></span>
-<span class="ln" id="L304"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">default_path</span>() -&gt; Option&lt;PathBuf&gt; {</span>
-<span class="ln" id="L305">    veilvoice_crypto::lock::<span class="tok-fn">default_path</span>().<span class="tok-fn">map</span>(|lock| lock.<span class="tok-fn">with_file_name</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>))</span>
-<span class="ln" id="L306">}</span>
+<span class="ln" id="L304"><span class="tok-com">/// Where the mandate file lives: beside the app lock, under its own name.</span></span>
+<span class="ln" id="L305"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">default_path</span>() -&gt; Option&lt;PathBuf&gt; {</span>
+<span class="ln" id="L306">    veilvoice_crypto::lock::<span class="tok-fn">default_path</span>().<span class="tok-fn">map</span>(|lock| lock.<span class="tok-fn">with_file_name</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>))</span>
+<span class="ln" id="L307">}</span>
 </span>
-<span class="ln" id="L307"></span>
+<span class="ln" id="L308"></span>
 <span class="src-item" id="fn-parse_bool">
-<span class="ln" id="L308"><span class="tok-com">/// A yes or no in any of the spellings a person might write, or `None`.</span></span>
-<span class="ln" id="L309"><span class="tok-com">///</span></span>
-<span class="ln" id="L310"><span class="tok-com">/// Anything unrecognised is refused rather than read as false: a policy file</span></span>
-<span class="ln" id="L311"><span class="tok-com">/// with a typo in it must not quietly become a policy that requires nothing.</span></span>
-<span class="ln" id="L312"><span class="tok-kw">fn</span> <span class="tok-fn">parse_bool</span>(value: &amp;str) -&gt; Option&lt;bool&gt; {</span>
-<span class="ln" id="L313">    <span class="tok-kw">match</span> value.<span class="tok-fn">to_ascii_lowercase</span>().<span class="tok-fn">as_str</span>() {</span>
-<span class="ln" id="L314">        <span class="tok-str">&quot;yes&quot;</span> | <span class="tok-str">&quot;true&quot;</span> | <span class="tok-str">&quot;on&quot;</span> | <span class="tok-str">&quot;1&quot;</span> =&gt; <span class="tok-fn">Some</span>(true),</span>
-<span class="ln" id="L315">        <span class="tok-str">&quot;no&quot;</span> | <span class="tok-str">&quot;false&quot;</span> | <span class="tok-str">&quot;off&quot;</span> | <span class="tok-str">&quot;0&quot;</span> =&gt; <span class="tok-fn">Some</span>(false),</span>
-<span class="ln" id="L316">        _ =&gt; None,</span>
-<span class="ln" id="L317">    }</span>
-<span class="ln" id="L318">}</span>
+<span class="ln" id="L309"><span class="tok-com">/// A yes or no in any of the spellings a person might write, or `None`.</span></span>
+<span class="ln" id="L310"><span class="tok-com">///</span></span>
+<span class="ln" id="L311"><span class="tok-com">/// Anything unrecognised is refused rather than read as false: a policy file</span></span>
+<span class="ln" id="L312"><span class="tok-com">/// with a typo in it must not quietly become a policy that requires nothing.</span></span>
+<span class="ln" id="L313"><span class="tok-kw">fn</span> <span class="tok-fn">parse_bool</span>(value: &amp;str) -&gt; Option&lt;bool&gt; {</span>
+<span class="ln" id="L314">    <span class="tok-kw">match</span> value.<span class="tok-fn">to_ascii_lowercase</span>().<span class="tok-fn">as_str</span>() {</span>
+<span class="ln" id="L315">        <span class="tok-str">&quot;yes&quot;</span> | <span class="tok-str">&quot;true&quot;</span> | <span class="tok-str">&quot;on&quot;</span> | <span class="tok-str">&quot;1&quot;</span> =&gt; <span class="tok-fn">Some</span>(true),</span>
+<span class="ln" id="L316">        <span class="tok-str">&quot;no&quot;</span> | <span class="tok-str">&quot;false&quot;</span> | <span class="tok-str">&quot;off&quot;</span> | <span class="tok-str">&quot;0&quot;</span> =&gt; <span class="tok-fn">Some</span>(false),</span>
+<span class="ln" id="L317">        _ =&gt; None,</span>
+<span class="ln" id="L318">    }</span>
+<span class="ln" id="L319">}</span>
 </span>
-<span class="ln" id="L319"></span>
+<span class="ln" id="L320"></span>
 <span class="src-item" id="fn-yesno">
-<span class="ln" id="L320"><span class="tok-com">/// A boolean in the spelling this file is written in.</span></span>
-<span class="ln" id="L321"><span class="tok-kw">fn</span> <span class="tok-fn">yesno</span>(value: bool) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
-<span class="ln" id="L322">    <span class="tok-kw">if</span> value {</span>
-<span class="ln" id="L323">        <span class="tok-str">&quot;yes&quot;</span></span>
-<span class="ln" id="L324">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L325">        <span class="tok-str">&quot;no&quot;</span></span>
-<span class="ln" id="L326">    }</span>
-<span class="ln" id="L327">}</span>
+<span class="ln" id="L321"><span class="tok-com">/// A boolean in the spelling this file is written in.</span></span>
+<span class="ln" id="L322"><span class="tok-kw">fn</span> <span class="tok-fn">yesno</span>(value: bool) -&gt; &amp;&#x27;<span class="tok-kw">static</span> str {</span>
+<span class="ln" id="L323">    <span class="tok-kw">if</span> value {</span>
+<span class="ln" id="L324">        <span class="tok-str">&quot;yes&quot;</span></span>
+<span class="ln" id="L325">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L326">        <span class="tok-str">&quot;no&quot;</span></span>
+<span class="ln" id="L327">    }</span>
+<span class="ln" id="L328">}</span>
 </span>
-<span class="ln" id="L328"></span>
-<span class="ln" id="L329"><span class="tok-kw">impl</span> Change {</span>
+<span class="ln" id="L329"></span>
+<span class="ln" id="L330"><span class="tok-kw">impl</span> Change {</span>
 <span class="src-item" id="fn-change-when">
-<span class="ln" id="L330">    <span class="tok-com">/// When the change was made, as a UTC civil timestamp.</span></span>
-<span class="ln" id="L331">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">when</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L332">        <span class="tok-fn">utc</span>(<span class="tok-kw">self</span>.at)</span>
-<span class="ln" id="L333">    }</span>
+<span class="ln" id="L331">    <span class="tok-com">/// When the change was made, as a UTC civil timestamp.</span></span>
+<span class="ln" id="L332">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">when</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L333">        <span class="tok-fn">utc</span>(<span class="tok-kw">self</span>.at)</span>
+<span class="ln" id="L334">    }</span>
 </span>
-<span class="ln" id="L334"></span>
+<span class="ln" id="L335"></span>
 <span class="src-item" id="fn-change-describe">
-<span class="ln" id="L335">    <span class="tok-com">/// A whole sentence describing the change, for a log a person reads.</span></span>
-<span class="ln" id="L336">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
-<span class="ln" id="L337">        <span class="tok-kw">let</span> what = <span class="tok-kw">match</span> <span class="tok-kw">self</span>.field {</span>
-<span class="ln" id="L338">            Field::AppLock =&gt; <span class="tok-str">&quot;the app lock&quot;</span>,</span>
-<span class="ln" id="L339">            Field::Encryption =&gt; <span class="tok-str">&quot;encryption of recordings at rest&quot;</span>,</span>
-<span class="ln" id="L340">        };</span>
-<span class="ln" id="L341">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.to {</span>
-<span class="ln" id="L342">            format!(<span class="tok-str">&quot;{}  insisted on {what} again&quot;</span>, <span class="tok-kw">self</span>.<span class="tok-fn">when</span>())</span>
-<span class="ln" id="L343">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L344">            format!(<span class="tok-str">&quot;{}  stopped insisting on {what}&quot;</span>, <span class="tok-kw">self</span>.<span class="tok-fn">when</span>())</span>
-<span class="ln" id="L345">        }</span>
-<span class="ln" id="L346">    }</span>
+<span class="ln" id="L336">    <span class="tok-com">/// A whole sentence describing the change, for a log a person reads.</span></span>
+<span class="ln" id="L337">    <span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">describe</span>(&amp;<span class="tok-kw">self</span>) -&gt; String {</span>
+<span class="ln" id="L338">        <span class="tok-kw">let</span> what = <span class="tok-kw">match</span> <span class="tok-kw">self</span>.field {</span>
+<span class="ln" id="L339">            Field::AppLock =&gt; <span class="tok-str">&quot;the app lock&quot;</span>,</span>
+<span class="ln" id="L340">            Field::Encryption =&gt; <span class="tok-str">&quot;encryption of recordings at rest&quot;</span>,</span>
+<span class="ln" id="L341">        };</span>
+<span class="ln" id="L342">        <span class="tok-kw">if</span> <span class="tok-kw">self</span>.to {</span>
+<span class="ln" id="L343">            format!(<span class="tok-str">&quot;{}  insisted on {what} again&quot;</span>, <span class="tok-kw">self</span>.<span class="tok-fn">when</span>())</span>
+<span class="ln" id="L344">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L345">            format!(<span class="tok-str">&quot;{}  stopped insisting on {what}&quot;</span>, <span class="tok-kw">self</span>.<span class="tok-fn">when</span>())</span>
+<span class="ln" id="L346">        }</span>
+<span class="ln" id="L347">    }</span>
 </span>
-<span class="ln" id="L347">}</span>
-<span class="ln" id="L348"></span>
+<span class="ln" id="L348">}</span>
+<span class="ln" id="L349"></span>
 <span class="src-item" id="fn-utc">
-<span class="ln" id="L349"><span class="tok-com">/// Unix seconds as `YYYY-MM-DD HH:MM:SS UTC`.</span></span>
-<span class="ln" id="L350"><span class="tok-com">///</span></span>
-<span class="ln" id="L351"><span class="tok-com">/// Written out rather than pulled from a date crate. The history is the one</span></span>
-<span class="ln" id="L352"><span class="tok-com">/// place this program shows a wall-clock time it did not get from the operating</span></span>
-<span class="ln" id="L353"><span class="tok-com">/// system&#x27;s own formatter, and a dependency whose whole job is this line would</span></span>
-<span class="ln" id="L354"><span class="tok-com">/// be a supply chain nobody has read, for one line.</span></span>
-<span class="ln" id="L355"><span class="tok-com">///</span></span>
-<span class="ln" id="L356"><span class="tok-com">/// UTC, always, and it says so. A local time here would be a time whose meaning</span></span>
-<span class="ln" id="L357"><span class="tok-com">/// depends on where the reader was standing when they read it, in a log whose</span></span>
-<span class="ln" id="L358"><span class="tok-com">/// entire purpose is to settle when something happened.</span></span>
-<span class="ln" id="L359"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">utc</span>(seconds: i64) -&gt; String {</span>
-<span class="ln" id="L360">    <span class="tok-com">// `div_euclid` rather than `/`: a timestamp before 1970 is negative, and</span></span>
-<span class="ln" id="L361">    <span class="tok-com">// truncating division would put it in the wrong day and then compute a</span></span>
-<span class="ln" id="L362">    <span class="tok-com">// negative time of day from it.</span></span>
-<span class="ln" id="L363">    <span class="tok-kw">let</span> days = seconds.<span class="tok-fn">div_euclid</span>(<span class="tok-num">86_400</span>);</span>
-<span class="ln" id="L364">    <span class="tok-kw">let</span> rest = seconds.<span class="tok-fn">rem_euclid</span>(<span class="tok-num">86_400</span>);</span>
-<span class="ln" id="L365">    <span class="tok-kw">let</span> (y, m, d) = <span class="tok-fn">civil_from_days</span>(days);</span>
-<span class="ln" id="L366">    format!(</span>
-<span class="ln" id="L367">        <span class="tok-str">&quot;{y:04}-{m:02}-{d:02} {:02}:{:02}:{:02} UTC&quot;</span>,</span>
-<span class="ln" id="L368">        rest / <span class="tok-num">3600</span>,</span>
-<span class="ln" id="L369">        (rest % <span class="tok-num">3600</span>) / <span class="tok-num">60</span>,</span>
-<span class="ln" id="L370">        rest % <span class="tok-num">60</span></span>
-<span class="ln" id="L371">    )</span>
-<span class="ln" id="L372">}</span>
+<span class="ln" id="L350"><span class="tok-com">/// Unix seconds as `YYYY-MM-DD HH:MM:SS UTC`.</span></span>
+<span class="ln" id="L351"><span class="tok-com">///</span></span>
+<span class="ln" id="L352"><span class="tok-com">/// Written out rather than pulled from a date crate. The history is the one</span></span>
+<span class="ln" id="L353"><span class="tok-com">/// place this program shows a wall-clock time it did not get from the operating</span></span>
+<span class="ln" id="L354"><span class="tok-com">/// system&#x27;s own formatter, and a dependency whose whole job is this line would</span></span>
+<span class="ln" id="L355"><span class="tok-com">/// be a supply chain nobody has read, for one line.</span></span>
+<span class="ln" id="L356"><span class="tok-com">///</span></span>
+<span class="ln" id="L357"><span class="tok-com">/// UTC, always, and it says so. A local time here would be a time whose meaning</span></span>
+<span class="ln" id="L358"><span class="tok-com">/// depends on where the reader was standing when they read it, in a log whose</span></span>
+<span class="ln" id="L359"><span class="tok-com">/// entire purpose is to settle when something happened.</span></span>
+<span class="ln" id="L360"><span class="tok-kw">pub</span> <span class="tok-kw">fn</span> <span class="tok-fn">utc</span>(seconds: i64) -&gt; String {</span>
+<span class="ln" id="L361">    <span class="tok-com">// `div_euclid` rather than `/`: a timestamp before 1970 is negative, and</span></span>
+<span class="ln" id="L362">    <span class="tok-com">// truncating division would put it in the wrong day and then compute a</span></span>
+<span class="ln" id="L363">    <span class="tok-com">// negative time of day from it.</span></span>
+<span class="ln" id="L364">    <span class="tok-kw">let</span> days = seconds.<span class="tok-fn">div_euclid</span>(<span class="tok-num">86_400</span>);</span>
+<span class="ln" id="L365">    <span class="tok-kw">let</span> rest = seconds.<span class="tok-fn">rem_euclid</span>(<span class="tok-num">86_400</span>);</span>
+<span class="ln" id="L366">    <span class="tok-kw">let</span> (y, m, d) = <span class="tok-fn">civil_from_days</span>(days);</span>
+<span class="ln" id="L367">    format!(</span>
+<span class="ln" id="L368">        <span class="tok-str">&quot;{y:04}-{m:02}-{d:02} {:02}:{:02}:{:02} UTC&quot;</span>,</span>
+<span class="ln" id="L369">        rest / <span class="tok-num">3600</span>,</span>
+<span class="ln" id="L370">        (rest % <span class="tok-num">3600</span>) / <span class="tok-num">60</span>,</span>
+<span class="ln" id="L371">        rest % <span class="tok-num">60</span></span>
+<span class="ln" id="L372">    )</span>
+<span class="ln" id="L373">}</span>
 </span>
-<span class="ln" id="L373"></span>
+<span class="ln" id="L374"></span>
 <span class="src-item" id="fn-civil_from_days">
-<span class="ln" id="L374"><span class="tok-com">/// Days since 1970-01-01 to a civil year, month and day.</span></span>
-<span class="ln" id="L375"><span class="tok-com">///</span></span>
-<span class="ln" id="L376"><span class="tok-com">/// Howard Hinnant&#x27;s `civil_from_days`, which is exact for the whole proleptic</span></span>
-<span class="ln" id="L377"><span class="tok-com">/// Gregorian calendar and needs no table of month lengths or leap years: the</span></span>
-<span class="ln" id="L378"><span class="tok-com">/// era arithmetic makes 1 March the start of the year, so the leap day lands at</span></span>
-<span class="ln" id="L379"><span class="tok-com">/// the end where it stops being a special case.</span></span>
-<span class="ln" id="L380"><span class="tok-kw">fn</span> <span class="tok-fn">civil_from_days</span>(z: i64) -&gt; (i64, u32, u32) {</span>
-<span class="ln" id="L381">    <span class="tok-kw">let</span> z = z + <span class="tok-num">719_468</span>;</span>
-<span class="ln" id="L382">    <span class="tok-kw">let</span> era = <span class="tok-kw">if</span> z &gt;= <span class="tok-num">0</span> { z } <span class="tok-kw">else</span> { z - <span class="tok-num">146_096</span> } / <span class="tok-num">146_097</span>;</span>
-<span class="ln" id="L383">    <span class="tok-kw">let</span> doe = z - era * <span class="tok-num">146_097</span>; <span class="tok-com">// [0, 146096]</span></span>
-<span class="ln" id="L384">    <span class="tok-kw">let</span> yoe = (doe - doe / <span class="tok-num">1460</span> + doe / <span class="tok-num">36_524</span> - doe / <span class="tok-num">146_096</span>) / <span class="tok-num">365</span>; <span class="tok-com">// [0, 399]</span></span>
-<span class="ln" id="L385">    <span class="tok-kw">let</span> y = yoe + era * <span class="tok-num">400</span>;</span>
-<span class="ln" id="L386">    <span class="tok-kw">let</span> doy = doe - (<span class="tok-num">365</span> * yoe + yoe / <span class="tok-num">4</span> - yoe / <span class="tok-num">100</span>); <span class="tok-com">// [0, 365]</span></span>
-<span class="ln" id="L387">    <span class="tok-kw">let</span> mp = (<span class="tok-num">5</span> * doy + <span class="tok-num">2</span>) / <span class="tok-num">153</span>; <span class="tok-com">// [0, 11], March-based</span></span>
-<span class="ln" id="L388">    <span class="tok-kw">let</span> d = (doy - (<span class="tok-num">153</span> * mp + <span class="tok-num">2</span>) / <span class="tok-num">5</span> + <span class="tok-num">1</span>) <span class="tok-kw">as</span> u32; <span class="tok-com">// [1, 31]</span></span>
-<span class="ln" id="L389">    <span class="tok-kw">let</span> m = <span class="tok-kw">if</span> mp &lt; <span class="tok-num">10</span> { mp + <span class="tok-num">3</span> } <span class="tok-kw">else</span> { mp - <span class="tok-num">9</span> } <span class="tok-kw">as</span> u32; <span class="tok-com">// [1, 12]</span></span>
-<span class="ln" id="L390">    (<span class="tok-kw">if</span> m &lt;= <span class="tok-num">2</span> { y + <span class="tok-num">1</span> } <span class="tok-kw">else</span> { y }, m, d)</span>
-<span class="ln" id="L391">}</span>
+<span class="ln" id="L375"><span class="tok-com">/// Days since 1970-01-01 to a civil year, month and day.</span></span>
+<span class="ln" id="L376"><span class="tok-com">///</span></span>
+<span class="ln" id="L377"><span class="tok-com">/// Howard Hinnant&#x27;s `civil_from_days`, which is exact for the whole proleptic</span></span>
+<span class="ln" id="L378"><span class="tok-com">/// Gregorian calendar and needs no table of month lengths or leap years: the</span></span>
+<span class="ln" id="L379"><span class="tok-com">/// era arithmetic makes 1 March the start of the year, so the leap day lands at</span></span>
+<span class="ln" id="L380"><span class="tok-com">/// the end where it stops being a special case.</span></span>
+<span class="ln" id="L381"><span class="tok-kw">fn</span> <span class="tok-fn">civil_from_days</span>(z: i64) -&gt; (i64, u32, u32) {</span>
+<span class="ln" id="L382">    <span class="tok-kw">let</span> z = z + <span class="tok-num">719_468</span>;</span>
+<span class="ln" id="L383">    <span class="tok-kw">let</span> era = <span class="tok-kw">if</span> z &gt;= <span class="tok-num">0</span> { z } <span class="tok-kw">else</span> { z - <span class="tok-num">146_096</span> } / <span class="tok-num">146_097</span>;</span>
+<span class="ln" id="L384">    <span class="tok-kw">let</span> doe = z - era * <span class="tok-num">146_097</span>; <span class="tok-com">// [0, 146096]</span></span>
+<span class="ln" id="L385">    <span class="tok-kw">let</span> yoe = (doe - doe / <span class="tok-num">1460</span> + doe / <span class="tok-num">36_524</span> - doe / <span class="tok-num">146_096</span>) / <span class="tok-num">365</span>; <span class="tok-com">// [0, 399]</span></span>
+<span class="ln" id="L386">    <span class="tok-kw">let</span> y = yoe + era * <span class="tok-num">400</span>;</span>
+<span class="ln" id="L387">    <span class="tok-kw">let</span> doy = doe - (<span class="tok-num">365</span> * yoe + yoe / <span class="tok-num">4</span> - yoe / <span class="tok-num">100</span>); <span class="tok-com">// [0, 365]</span></span>
+<span class="ln" id="L388">    <span class="tok-kw">let</span> mp = (<span class="tok-num">5</span> * doy + <span class="tok-num">2</span>) / <span class="tok-num">153</span>; <span class="tok-com">// [0, 11], March-based</span></span>
+<span class="ln" id="L389">    <span class="tok-kw">let</span> d = (doy - (<span class="tok-num">153</span> * mp + <span class="tok-num">2</span>) / <span class="tok-num">5</span> + <span class="tok-num">1</span>) <span class="tok-kw">as</span> u32; <span class="tok-com">// [1, 31]</span></span>
+<span class="ln" id="L390">    <span class="tok-kw">let</span> m = <span class="tok-kw">if</span> mp &lt; <span class="tok-num">10</span> { mp + <span class="tok-num">3</span> } <span class="tok-kw">else</span> { mp - <span class="tok-num">9</span> } <span class="tok-kw">as</span> u32; <span class="tok-com">// [1, 12]</span></span>
+<span class="ln" id="L391">    (<span class="tok-kw">if</span> m &lt;= <span class="tok-num">2</span> { y + <span class="tok-num">1</span> } <span class="tok-kw">else</span> { y }, m, d)</span>
+<span class="ln" id="L392">}</span>
 </span>
-<span class="ln" id="L392"></span>
-<span class="ln" id="L393"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L394"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L395">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L396"></span>
-<span class="ln" id="L397">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L398">    <span class="tok-kw">fn</span> <span class="tok-fn">the_epoch_and_the_dates_that_usually_break_this</span>() {</span>
-<span class="ln" id="L399">        <span class="tok-com">// Checked against a calendar, not against another run of this code.</span></span>
-<span class="ln" id="L400">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">0</span>), <span class="tok-str">&quot;1970-01-01 00:00:00 UTC&quot;</span>);</span>
-<span class="ln" id="L401">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">86_399</span>), <span class="tok-str">&quot;1970-01-01 23:59:59 UTC&quot;</span>);</span>
-<span class="ln" id="L402">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">86_400</span>), <span class="tok-str">&quot;1970-01-02 00:00:00 UTC&quot;</span>);</span>
-<span class="ln" id="L403">        <span class="tok-com">// A leap day, in a year divisible by four.</span></span>
-<span class="ln" id="L404">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">1_709_164_800</span>), <span class="tok-str">&quot;2024-02-29 00:00:00 UTC&quot;</span>);</span>
-<span class="ln" id="L405">        <span class="tok-com">// 2000 is a leap year (divisible by 400) and 1900 was not (divisible</span></span>
-<span class="ln" id="L406">        <span class="tok-com">// by 100 but not 400). Both are where naive leap-year code goes wrong.</span></span>
-<span class="ln" id="L407">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">951_782_400</span>), <span class="tok-str">&quot;2000-02-29 00:00:00 UTC&quot;</span>);</span>
-<span class="ln" id="L408">        assert_eq!(<span class="tok-fn">utc</span>(-<span class="tok-num">2_203_891_200</span>), <span class="tok-str">&quot;1900-03-01 00:00:00 UTC&quot;</span>);</span>
-<span class="ln" id="L409">        <span class="tok-com">// The end of a year, and the start of the next.</span></span>
-<span class="ln" id="L410">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">1_767_225_599</span>), <span class="tok-str">&quot;2025-12-31 23:59:59 UTC&quot;</span>);</span>
-<span class="ln" id="L411">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">1_767_225_600</span>), <span class="tok-str">&quot;2026-01-01 00:00:00 UTC&quot;</span>);</span>
-<span class="ln" id="L412">    }</span>
-<span class="ln" id="L413"></span>
-<span class="ln" id="L414">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L415">    <span class="tok-kw">fn</span> <span class="tok-fn">a_time_before_the_epoch_does_not_wrap_into_a_negative_clock</span>() {</span>
-<span class="ln" id="L416">        <span class="tok-com">// Truncating division would render this as the wrong day with a</span></span>
-<span class="ln" id="L417">        <span class="tok-com">// negative hour. Every field has to stay in range.</span></span>
-<span class="ln" id="L418">        <span class="tok-kw">let</span> text = <span class="tok-fn">utc</span>(-<span class="tok-num">1</span>);</span>
-<span class="ln" id="L419">        assert_eq!(text, <span class="tok-str">&quot;1969-12-31 23:59:59 UTC&quot;</span>);</span>
-<span class="ln" id="L420">        assert!(!text.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;-&#x27;</span>) || text.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;1969&quot;</span>));</span>
-<span class="ln" id="L421">    }</span>
-<span class="ln" id="L422"></span>
-<span class="ln" id="L423">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L424">    <span class="tok-kw">fn</span> <span class="tok-fn">a_change_describes_itself_in_both_directions</span>() {</span>
-<span class="ln" id="L425">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L426">        m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">1_767_225_600</span>);</span>
-<span class="ln" id="L427">        <span class="tok-kw">let</span> off = m.<span class="tok-fn">history</span>()[<span class="tok-num">0</span>].<span class="tok-fn">describe</span>();</span>
-<span class="ln" id="L428">        assert!(off.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;2026-01-01&quot;</span>), <span class="tok-str">&quot;{off}&quot;</span>);</span>
-<span class="ln" id="L429">        assert!(off.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped insisting&quot;</span>), <span class="tok-str">&quot;{off}&quot;</span>);</span>
-<span class="ln" id="L430">        assert!(off.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;encryption&quot;</span>), <span class="tok-str">&quot;{off}&quot;</span>);</span>
-<span class="ln" id="L431"></span>
-<span class="ln" id="L432">        m.<span class="tok-fn">set_at</span>(Field::Encryption, true, <span class="tok-num">1_767_225_600</span>);</span>
-<span class="ln" id="L433">        <span class="tok-kw">let</span> on = m.<span class="tok-fn">history</span>()[<span class="tok-num">1</span>].<span class="tok-fn">describe</span>();</span>
-<span class="ln" id="L434">        assert!(on.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;insisted on&quot;</span>), <span class="tok-str">&quot;{on}&quot;</span>);</span>
-<span class="ln" id="L435">        assert!(!on.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped&quot;</span>), <span class="tok-str">&quot;{on}&quot;</span>);</span>
-<span class="ln" id="L436">    }</span>
-<span class="ln" id="L437"></span>
-<span class="ln" id="L438">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L439">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_requires_both</span>() {</span>
-<span class="ln" id="L440">        <span class="tok-kw">let</span> m = Mandate::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L441">        assert!(m.<span class="tok-fn">requires_app_lock</span>());</span>
-<span class="ln" id="L442">        assert!(m.<span class="tok-fn">requires_encryption</span>());</span>
-<span class="ln" id="L443">        assert!(m.<span class="tok-fn">is_default</span>());</span>
-<span class="ln" id="L444">        assert!(m.<span class="tok-fn">history</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L445">    }</span>
-<span class="ln" id="L446"></span>
-<span class="ln" id="L447">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L448">    <span class="tok-kw">fn</span> <span class="tok-fn">turning_one_off_records_it</span>() {</span>
-<span class="ln" id="L449">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L450">        assert!(m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">1000</span>));</span>
-<span class="ln" id="L451">        assert!(!m.<span class="tok-fn">requires_encryption</span>());</span>
-<span class="ln" id="L452">        assert!(m.<span class="tok-fn">requires_app_lock</span>());</span>
-<span class="ln" id="L453">        assert!(!m.<span class="tok-fn">is_default</span>());</span>
-<span class="ln" id="L454">        assert_eq!(m.<span class="tok-fn">history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
-<span class="ln" id="L455">        assert_eq!(</span>
-<span class="ln" id="L456">            m.<span class="tok-fn">history</span>()[<span class="tok-num">0</span>],</span>
-<span class="ln" id="L457">            Change {</span>
-<span class="ln" id="L458">                at: <span class="tok-num">1000</span>,</span>
-<span class="ln" id="L459">                field: Field::Encryption,</span>
-<span class="ln" id="L460">                from: true,</span>
-<span class="ln" id="L461">                to: false</span>
-<span class="ln" id="L462">            }</span>
-<span class="ln" id="L463">        );</span>
-<span class="ln" id="L464">    }</span>
-<span class="ln" id="L465"></span>
-<span class="ln" id="L466">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L467">    <span class="tok-kw">fn</span> <span class="tok-fn">setting_a_field_to_what_it_already_is_changes_nothing</span>() {</span>
-<span class="ln" id="L468">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L469">        assert!(!m.<span class="tok-fn">set_at</span>(Field::AppLock, true, <span class="tok-num">1</span>));</span>
-<span class="ln" id="L470">        assert!(m.<span class="tok-fn">history</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L471">    }</span>
-<span class="ln" id="L472"></span>
-<span class="ln" id="L473">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L474">    <span class="tok-kw">fn</span> <span class="tok-fn">reset_puts_both_back_and_logs_only_what_moved</span>() {</span>
-<span class="ln" id="L475">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L476">        m.<span class="tok-fn">set_at</span>(Field::AppLock, false, <span class="tok-num">10</span>);</span>
-<span class="ln" id="L477">        m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">20</span>);</span>
-<span class="ln" id="L478">        <span class="tok-kw">let</span> reset = m.<span class="tok-fn">reset_at</span>(<span class="tok-num">30</span>);</span>
-<span class="ln" id="L479">        assert!(reset);</span>
-<span class="ln" id="L480">        assert!(m.<span class="tok-fn">is_default</span>());</span>
-<span class="ln" id="L481">        <span class="tok-com">// Two off-changes, then two on-changes at reset.</span></span>
-<span class="ln" id="L482">        assert_eq!(m.<span class="tok-fn">history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">4</span>);</span>
-<span class="ln" id="L483">        assert!(m.<span class="tok-fn">history</span>()[<span class="tok-num">2</span>..].<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|c| c.to));</span>
-<span class="ln" id="L484">    }</span>
-<span class="ln" id="L485"></span>
-<span class="ln" id="L486">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L487">    <span class="tok-kw">fn</span> <span class="tok-fn">reset_from_default_does_nothing</span>() {</span>
-<span class="ln" id="L488">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L489">        assert!(!m.<span class="tok-fn">reset_at</span>(<span class="tok-num">1</span>));</span>
-<span class="ln" id="L490">        assert!(m.<span class="tok-fn">history</span>().<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L491">    }</span>
-<span class="ln" id="L492"></span>
-<span class="ln" id="L493">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L494">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_its_text_format</span>() {</span>
-<span class="ln" id="L495">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L496">        m.<span class="tok-fn">set_at</span>(Field::AppLock, false, <span class="tok-num">111</span>);</span>
-<span class="ln" id="L497">        m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">222</span>);</span>
-<span class="ln" id="L498">        m.<span class="tok-fn">set_at</span>(Field::Encryption, true, <span class="tok-num">333</span>);</span>
-<span class="ln" id="L499">        <span class="tok-kw">let</span> text = m.<span class="tok-fn">to_text</span>();</span>
-<span class="ln" id="L500">        <span class="tok-kw">let</span> back = Mandate::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L501">        assert_eq!(back, m);</span>
-<span class="ln" id="L502">    }</span>
-<span class="ln" id="L503"></span>
-<span class="ln" id="L504">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L505">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_without_the_magic_is_refused</span>() {</span>
-<span class="ln" id="L506">        assert!(Mandate::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;require app-lock no\n&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L507">    }</span>
-<span class="ln" id="L508"></span>
-<span class="ln" id="L509">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L510">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_file_is_the_default_not_an_error</span>() {</span>
-<span class="ln" id="L511">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L512">        <span class="tok-kw">let</span> m = Mandate::<span class="tok-fn">load</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nope.conf&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L513">        assert!(m.<span class="tok-fn">is_default</span>());</span>
-<span class="ln" id="L514">    }</span>
-<span class="ln" id="L515"></span>
-<span class="ln" id="L516">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L517">    <span class="tok-kw">fn</span> <span class="tok-fn">it_survives_a_real_file</span>() {</span>
-<span class="ln" id="L518">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L519">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>);</span>
-<span class="ln" id="L520">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
-<span class="ln" id="L521">        m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">999</span>);</span>
-<span class="ln" id="L522">        m.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L523">        <span class="tok-kw">let</span> back = Mandate::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L524">        assert_eq!(back, m);</span>
-<span class="ln" id="L525">    }</span>
-<span class="ln" id="L526"></span>
-<span class="ln" id="L527">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L528">    <span class="tok-kw">fn</span> <span class="tok-fn">a_corrupt_file_is_an_error_rather_than_a_silent_default</span>() {</span>
-<span class="ln" id="L529">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L530">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>);</span>
-<span class="ln" id="L531">        std::fs::<span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;garbage that is not a mandate&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
-<span class="ln" id="L532">        assert!(Mandate::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L533">    }</span>
-<span class="ln" id="L534"></span>
-<span class="ln" id="L535">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L536">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_requirements_are_refused_rather_than_ignored</span>() {</span>
-<span class="ln" id="L537">        assert!(Mandate::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;VEILMANDATE1\nrequire telepathy no\n&quot;</span>).<span class="tok-fn">is_err</span>());</span>
-<span class="ln" id="L538">    }</span>
-<span class="ln" id="L539">}</span>
+<span class="ln" id="L393"></span>
+<span class="ln" id="L394"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L395"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L396">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L397"></span>
+<span class="ln" id="L398">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L399">    <span class="tok-kw">fn</span> <span class="tok-fn">the_epoch_and_the_dates_that_usually_break_this</span>() {</span>
+<span class="ln" id="L400">        <span class="tok-com">// Checked against a calendar, not against another run of this code.</span></span>
+<span class="ln" id="L401">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">0</span>), <span class="tok-str">&quot;1970-01-01 00:00:00 UTC&quot;</span>);</span>
+<span class="ln" id="L402">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">86_399</span>), <span class="tok-str">&quot;1970-01-01 23:59:59 UTC&quot;</span>);</span>
+<span class="ln" id="L403">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">86_400</span>), <span class="tok-str">&quot;1970-01-02 00:00:00 UTC&quot;</span>);</span>
+<span class="ln" id="L404">        <span class="tok-com">// A leap day, in a year divisible by four.</span></span>
+<span class="ln" id="L405">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">1_709_164_800</span>), <span class="tok-str">&quot;2024-02-29 00:00:00 UTC&quot;</span>);</span>
+<span class="ln" id="L406">        <span class="tok-com">// 2000 is a leap year (divisible by 400) and 1900 was not (divisible</span></span>
+<span class="ln" id="L407">        <span class="tok-com">// by 100 but not 400). Both are where naive leap-year code goes wrong.</span></span>
+<span class="ln" id="L408">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">951_782_400</span>), <span class="tok-str">&quot;2000-02-29 00:00:00 UTC&quot;</span>);</span>
+<span class="ln" id="L409">        assert_eq!(<span class="tok-fn">utc</span>(-<span class="tok-num">2_203_891_200</span>), <span class="tok-str">&quot;1900-03-01 00:00:00 UTC&quot;</span>);</span>
+<span class="ln" id="L410">        <span class="tok-com">// The end of a year, and the start of the next.</span></span>
+<span class="ln" id="L411">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">1_767_225_599</span>), <span class="tok-str">&quot;2025-12-31 23:59:59 UTC&quot;</span>);</span>
+<span class="ln" id="L412">        assert_eq!(<span class="tok-fn">utc</span>(<span class="tok-num">1_767_225_600</span>), <span class="tok-str">&quot;2026-01-01 00:00:00 UTC&quot;</span>);</span>
+<span class="ln" id="L413">    }</span>
+<span class="ln" id="L414"></span>
+<span class="ln" id="L415">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L416">    <span class="tok-kw">fn</span> <span class="tok-fn">a_time_before_the_epoch_does_not_wrap_into_a_negative_clock</span>() {</span>
+<span class="ln" id="L417">        <span class="tok-com">// Truncating division would render this as the wrong day with a</span></span>
+<span class="ln" id="L418">        <span class="tok-com">// negative hour. Every field has to stay in range.</span></span>
+<span class="ln" id="L419">        <span class="tok-kw">let</span> text = <span class="tok-fn">utc</span>(-<span class="tok-num">1</span>);</span>
+<span class="ln" id="L420">        assert_eq!(text, <span class="tok-str">&quot;1969-12-31 23:59:59 UTC&quot;</span>);</span>
+<span class="ln" id="L421">        assert!(!text.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;-&#x27;</span>) || text.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;1969&quot;</span>));</span>
+<span class="ln" id="L422">    }</span>
+<span class="ln" id="L423"></span>
+<span class="ln" id="L424">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L425">    <span class="tok-kw">fn</span> <span class="tok-fn">a_change_describes_itself_in_both_directions</span>() {</span>
+<span class="ln" id="L426">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L427">        m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">1_767_225_600</span>);</span>
+<span class="ln" id="L428">        <span class="tok-kw">let</span> off = m.<span class="tok-fn">history</span>()[<span class="tok-num">0</span>].<span class="tok-fn">describe</span>();</span>
+<span class="ln" id="L429">        assert!(off.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;2026-01-01&quot;</span>), <span class="tok-str">&quot;{off}&quot;</span>);</span>
+<span class="ln" id="L430">        assert!(off.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped insisting&quot;</span>), <span class="tok-str">&quot;{off}&quot;</span>);</span>
+<span class="ln" id="L431">        assert!(off.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;encryption&quot;</span>), <span class="tok-str">&quot;{off}&quot;</span>);</span>
+<span class="ln" id="L432"></span>
+<span class="ln" id="L433">        m.<span class="tok-fn">set_at</span>(Field::Encryption, true, <span class="tok-num">1_767_225_600</span>);</span>
+<span class="ln" id="L434">        <span class="tok-kw">let</span> on = m.<span class="tok-fn">history</span>()[<span class="tok-num">1</span>].<span class="tok-fn">describe</span>();</span>
+<span class="ln" id="L435">        assert!(on.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;insisted on&quot;</span>), <span class="tok-str">&quot;{on}&quot;</span>);</span>
+<span class="ln" id="L436">        assert!(!on.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;stopped&quot;</span>), <span class="tok-str">&quot;{on}&quot;</span>);</span>
+<span class="ln" id="L437">    }</span>
+<span class="ln" id="L438"></span>
+<span class="ln" id="L439">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L440">    <span class="tok-kw">fn</span> <span class="tok-fn">the_default_requires_both</span>() {</span>
+<span class="ln" id="L441">        <span class="tok-kw">let</span> m = Mandate::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L442">        assert!(m.<span class="tok-fn">requires_app_lock</span>());</span>
+<span class="ln" id="L443">        assert!(m.<span class="tok-fn">requires_encryption</span>());</span>
+<span class="ln" id="L444">        assert!(m.<span class="tok-fn">is_default</span>());</span>
+<span class="ln" id="L445">        assert!(m.<span class="tok-fn">history</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L446">    }</span>
+<span class="ln" id="L447"></span>
+<span class="ln" id="L448">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L449">    <span class="tok-kw">fn</span> <span class="tok-fn">turning_one_off_records_it</span>() {</span>
+<span class="ln" id="L450">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L451">        assert!(m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">1000</span>));</span>
+<span class="ln" id="L452">        assert!(!m.<span class="tok-fn">requires_encryption</span>());</span>
+<span class="ln" id="L453">        assert!(m.<span class="tok-fn">requires_app_lock</span>());</span>
+<span class="ln" id="L454">        assert!(!m.<span class="tok-fn">is_default</span>());</span>
+<span class="ln" id="L455">        assert_eq!(m.<span class="tok-fn">history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">1</span>);</span>
+<span class="ln" id="L456">        assert_eq!(</span>
+<span class="ln" id="L457">            m.<span class="tok-fn">history</span>()[<span class="tok-num">0</span>],</span>
+<span class="ln" id="L458">            Change {</span>
+<span class="ln" id="L459">                at: <span class="tok-num">1000</span>,</span>
+<span class="ln" id="L460">                field: Field::Encryption,</span>
+<span class="ln" id="L461">                from: true,</span>
+<span class="ln" id="L462">                to: false</span>
+<span class="ln" id="L463">            }</span>
+<span class="ln" id="L464">        );</span>
+<span class="ln" id="L465">    }</span>
+<span class="ln" id="L466"></span>
+<span class="ln" id="L467">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L468">    <span class="tok-kw">fn</span> <span class="tok-fn">setting_a_field_to_what_it_already_is_changes_nothing</span>() {</span>
+<span class="ln" id="L469">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L470">        assert!(!m.<span class="tok-fn">set_at</span>(Field::AppLock, true, <span class="tok-num">1</span>));</span>
+<span class="ln" id="L471">        assert!(m.<span class="tok-fn">history</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L472">    }</span>
+<span class="ln" id="L473"></span>
+<span class="ln" id="L474">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L475">    <span class="tok-kw">fn</span> <span class="tok-fn">reset_puts_both_back_and_logs_only_what_moved</span>() {</span>
+<span class="ln" id="L476">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L477">        m.<span class="tok-fn">set_at</span>(Field::AppLock, false, <span class="tok-num">10</span>);</span>
+<span class="ln" id="L478">        m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">20</span>);</span>
+<span class="ln" id="L479">        <span class="tok-kw">let</span> reset = m.<span class="tok-fn">reset_at</span>(<span class="tok-num">30</span>);</span>
+<span class="ln" id="L480">        assert!(reset);</span>
+<span class="ln" id="L481">        assert!(m.<span class="tok-fn">is_default</span>());</span>
+<span class="ln" id="L482">        <span class="tok-com">// Two off-changes, then two on-changes at reset.</span></span>
+<span class="ln" id="L483">        assert_eq!(m.<span class="tok-fn">history</span>().<span class="tok-fn">len</span>(), <span class="tok-num">4</span>);</span>
+<span class="ln" id="L484">        assert!(m.<span class="tok-fn">history</span>()[<span class="tok-num">2</span>..].<span class="tok-fn">iter</span>().<span class="tok-fn">all</span>(|c| c.to));</span>
+<span class="ln" id="L485">    }</span>
+<span class="ln" id="L486"></span>
+<span class="ln" id="L487">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L488">    <span class="tok-kw">fn</span> <span class="tok-fn">reset_from_default_does_nothing</span>() {</span>
+<span class="ln" id="L489">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L490">        assert!(!m.<span class="tok-fn">reset_at</span>(<span class="tok-num">1</span>));</span>
+<span class="ln" id="L491">        assert!(m.<span class="tok-fn">history</span>().<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L492">    }</span>
+<span class="ln" id="L493"></span>
+<span class="ln" id="L494">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L495">    <span class="tok-kw">fn</span> <span class="tok-fn">it_round_trips_through_its_text_format</span>() {</span>
+<span class="ln" id="L496">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L497">        m.<span class="tok-fn">set_at</span>(Field::AppLock, false, <span class="tok-num">111</span>);</span>
+<span class="ln" id="L498">        m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">222</span>);</span>
+<span class="ln" id="L499">        m.<span class="tok-fn">set_at</span>(Field::Encryption, true, <span class="tok-num">333</span>);</span>
+<span class="ln" id="L500">        <span class="tok-kw">let</span> text = m.<span class="tok-fn">to_text</span>();</span>
+<span class="ln" id="L501">        <span class="tok-kw">let</span> back = Mandate::<span class="tok-fn">parse</span>(&amp;text).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L502">        assert_eq!(back, m);</span>
+<span class="ln" id="L503">    }</span>
+<span class="ln" id="L504"></span>
+<span class="ln" id="L505">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L506">    <span class="tok-kw">fn</span> <span class="tok-fn">a_file_without_the_magic_is_refused</span>() {</span>
+<span class="ln" id="L507">        assert!(Mandate::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;require app-lock no\n&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L508">    }</span>
+<span class="ln" id="L509"></span>
+<span class="ln" id="L510">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L511">    <span class="tok-kw">fn</span> <span class="tok-fn">a_missing_file_is_the_default_not_an_error</span>() {</span>
+<span class="ln" id="L512">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L513">        <span class="tok-kw">let</span> m = Mandate::<span class="tok-fn">load</span>(&amp;dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;nope.conf&quot;</span>)).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L514">        assert!(m.<span class="tok-fn">is_default</span>());</span>
+<span class="ln" id="L515">    }</span>
+<span class="ln" id="L516"></span>
+<span class="ln" id="L517">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L518">    <span class="tok-kw">fn</span> <span class="tok-fn">it_survives_a_real_file</span>() {</span>
+<span class="ln" id="L519">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L520">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>);</span>
+<span class="ln" id="L521">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> m = Mandate::<span class="tok-fn">default</span>();</span>
+<span class="ln" id="L522">        m.<span class="tok-fn">set_at</span>(Field::Encryption, false, <span class="tok-num">999</span>);</span>
+<span class="ln" id="L523">        m.<span class="tok-fn">save</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L524">        <span class="tok-kw">let</span> back = Mandate::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L525">        assert_eq!(back, m);</span>
+<span class="ln" id="L526">    }</span>
+<span class="ln" id="L527"></span>
+<span class="ln" id="L528">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L529">    <span class="tok-kw">fn</span> <span class="tok-fn">a_corrupt_file_is_an_error_rather_than_a_silent_default</span>() {</span>
+<span class="ln" id="L530">        <span class="tok-kw">let</span> dir = tempfile::<span class="tok-fn">tempdir</span>().<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L531">        <span class="tok-kw">let</span> path = dir.<span class="tok-fn">path</span>().<span class="tok-fn">join</span>(<span class="tok-str">&quot;mandate.conf&quot;</span>);</span>
+<span class="ln" id="L532">        std::fs::<span class="tok-fn">write</span>(&amp;path, <span class="tok-str">&quot;garbage that is not a mandate&quot;</span>).<span class="tok-fn">unwrap</span>();</span>
+<span class="ln" id="L533">        assert!(Mandate::<span class="tok-fn">load</span>(&amp;path).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L534">    }</span>
+<span class="ln" id="L535"></span>
+<span class="ln" id="L536">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L537">    <span class="tok-kw">fn</span> <span class="tok-fn">unknown_requirements_are_refused_rather_than_ignored</span>() {</span>
+<span class="ln" id="L538">        assert!(Mandate::<span class="tok-fn">parse</span>(<span class="tok-str">&quot;VEILMANDATE1\nrequire telepathy no\n&quot;</span>).<span class="tok-fn">is_err</span>());</span>
+<span class="ln" id="L539">    }</span>
+<span class="ln" id="L540">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

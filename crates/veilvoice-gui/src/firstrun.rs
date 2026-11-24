@@ -17,10 +17,9 @@
 //! anything:
 //!
 //! 1. **Appearance.** The two animation choices, kept from the old panel.
-//! 2. **The app lock.** A passphrase for the window, and -- since 0.1.18 --
-//!    the key that names and encrypts VeilVoice's own files. The card says
-//!    both, and says the sentence that has to be said out loud: forget it and
-//!    those files are gone.
+//! 2. **The app lock.** A passphrase for the window. The card also says what
+//!    it does not do: it does not encrypt VeilVoice's own files (see
+//!    [`OWN_FILES`]).
 //! 3. **The recording passphrase.** What veiled recordings are encrypted
 //!    with. Separate from the app lock by default, with the option to use one
 //!    passphrase for both and a plain statement of what that trades.
@@ -45,6 +44,7 @@
 
 use crate::theme::palette as p;
 use egui::{RichText, Ui};
+use zeroize::Zeroize;
 
 /// Which card is showing.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -54,7 +54,7 @@ pub enum Step {
     /// the one question with no security consequence.
     #[default]
     Appearance,
-    /// A passphrase for the window, and for VeilVoice's own files.
+    /// A passphrase for the window.
     AppLock,
     /// A passphrase for the recordings themselves.
     Recording,
@@ -108,6 +108,19 @@ impl Step {
     const COUNT: usize = 5;
 }
 
+/// What the app lock does not do for VeilVoice's own files, said on the lock
+/// card here and again in the tour.
+///
+/// **F-313.** Both cards used to say the lock encrypts the program's own files
+/// and hides them under meaningless names among decoys. The store that would
+/// do that, [`crate::vault_store`], keeps one record, the measurements file,
+/// and nothing writes it. The settings and the integrity record are written in
+/// the open. The test beside this fails when the store gains a record, so the
+/// sentence is looked at again on the day it could become true.
+pub const OWN_FILES: &str = "It does not encrypt VeilVoice's own files. Its settings and the \
+     record it keeps of its own programs stay in its folder under their own \
+     names, readable only by your account.";
+
 /// What the setup is holding while it runs.
 #[derive(Default)]
 pub struct FirstRun {
@@ -128,6 +141,21 @@ pub struct FirstRun {
     /// Not a set of fields here, because the point is that none of them exists
     /// until a worker has been and got them. See [`Reading`] and F-216.
     reading: crate::offthread::Answer<Reading>,
+}
+
+/// The typed passphrases are wiped when the setup goes away, including any on a
+/// card that was skipped with something already typed into it. **F-314.**
+impl Drop for FirstRun {
+    fn drop(&mut self) {
+        for typed in [
+            &mut self.lock_entry,
+            &mut self.lock_repeat,
+            &mut self.rec_entry,
+            &mut self.rec_repeat,
+        ] {
+            typed.zeroize();
+        }
+    }
 }
 
 /// What the panel wants the application to do after drawing.
@@ -245,15 +273,7 @@ impl FirstRun {
                  a live scramble.",
             ));
             ui.add_space(8.0);
-            ui.label(
-                RichText::new(
-                    "It also encrypts VeilVoice's own files and gives them \
-                     meaningless names, with decoy files among them, so the \
-                     folder says nothing about what you have done. Without a \
-                     password none of that is possible: there is no key.",
-                )
-                .color(p::muted()),
-            );
+            ui.label(RichText::new(OWN_FILES).color(p::muted()));
             ui.add_space(8.0);
             ui.label(
                 RichText::new(
@@ -297,7 +317,8 @@ impl FirstRun {
                 .clicked()
             {
                 let entry = std::mem::take(&mut self.lock_entry);
-                self.lock_repeat.clear();
+                // Wiped, not cleared: `clear` leaves the bytes in the buffer.
+                self.lock_repeat.zeroize();
                 security.set_lock_from_setup(entry);
                 self.lock_requested = true;
             }
@@ -371,7 +392,7 @@ impl FirstRun {
                 .clicked()
             {
                 let entry = std::mem::take(&mut self.rec_entry);
-                self.rec_repeat.clear();
+                self.rec_repeat.zeroize();
                 security.set_recording_passphrase(entry);
                 advance = true;
             }
@@ -667,6 +688,15 @@ fn buttons(ui: &mut Ui, forward: &str, _unused: Option<&str>) -> (bool, bool) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-313.** The lock card promises nothing the store does not do.
+    #[test]
+    fn the_lock_card_promises_no_encryption_the_store_does_not_do() {
+        assert!(!OWN_FILES.contains("encrypts"));
+        // One record today, and nothing writes it. When that changes, so may
+        // what the card is allowed to say.
+        assert_eq!(crate::vault_store::records::ALL.len(), 1);
+    }
 
     #[test]
     fn the_steps_run_in_order_and_then_stop() {

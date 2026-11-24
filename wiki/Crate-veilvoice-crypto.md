@@ -5,7 +5,7 @@
 
 > Argon2id KDF, X25519+ML-KEM-768 hybrid KEM, XChaCha20-Poly1305 at-rest encryption and page-locked amnesic secrets for VeilVoice.
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/README.md)
 
 ## Contents
 
@@ -21,7 +21,7 @@ and amnesic secret storage for VeilVoice.
 
 ## What this crate is for
 
-[[`veilvoice_core`|Crate-veilvoice-core]] makes a voice
+[`veilvoice_core`](Crate-veilvoice-core) makes a voice
 unrecognisable; it does not hide the *words*, and it is not meant to. When a
 recording needs to stay secret as well, at rest on disk or in transit to
 someone else, that is this crate's job.
@@ -99,20 +99,20 @@ flowchart TD
     n_aead["aead.rs<br/>280 lines"]
     n_amnesia["amnesia.rs<br/>472 lines"]
     n_container["container.rs<br/>627 lines"]
-    n_decoy["decoy.rs<br/>1097 lines"]
-    n_hoard["hoard.rs<br/>1099 lines"]
+    n_decoy["decoy.rs<br/>1096 lines"]
+    n_hoard["hoard.rs<br/>1109 lines"]
     n_hybrid["hybrid.rs<br/>531 lines"]
-    n_kdf["kdf.rs<br/>649 lines"]
+    n_kdf["kdf.rs<br/>650 lines"]
     n_layout["layout.rs<br/>331 lines"]
     n_lock["lock.rs<br/>2384 lines"]
-    n_privatefile["privatefile.rs<br/>313 lines"]
+    n_privatefile["privatefile.rs<br/>411 lines"]
     n_reseal["reseal.rs<br/>538 lines"]
     n_reset["reset.rs<br/>903 lines"]
     n_shred["shred.rs<br/>417 lines"]
     n_studio["studio.rs<br/>1522 lines"]
     n_tape["tape.rs<br/>391 lines"]
-    n_vault["vault.rs<br/>816 lines"]
-    n_weave["weave.rs<br/>1811 lines"]
+    n_vault["vault.rs<br/>904 lines"]
+    n_weave["weave.rs<br/>1818 lines"]
     n_decoy --> n_kdf
     n_decoy --> n_lock
     n_decoy --> n_vault
@@ -168,26 +168,26 @@ flowchart TD
 | [`aead.rs`](File-veilvoice-crypto-aead) | 280 | Authenticated encryption with XChaCha20-Poly1305. |
 | [`amnesia.rs`](File-veilvoice-crypto-amnesia) | 472 | Amnesic secret storage: page-locked, zeroized, and never printed. |
 | [`container.rs`](File-veilvoice-crypto-container) | 627 | The .veil encrypted container format. |
-| [`decoy.rs`](File-veilvoice-crypto-decoy) | 1097 | A second passphrase that opens a different, empty VeilVoice. |
-| [`hoard.rs`](File-veilvoice-crypto-hoard) | 1099 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
+| [`decoy.rs`](File-veilvoice-crypto-decoy) | 1096 | A second passphrase that opens a different, empty VeilVoice. |
+| [`hoard.rs`](File-veilvoice-crypto-hoard) | 1109 | The obfuscated program folder: what VeilVoice keeps on disk, under names that mean nothing and beside files that hold nothing. |
 | [`hybrid.rs`](File-veilvoice-crypto-hybrid) | 531 | Post-quantum hybrid key encapsulation: X25519 + ML-KEM-768. |
-| [`kdf.rs`](File-veilvoice-crypto-kdf) | 649 | Password-based key derivation with Argon2id. |
+| [`kdf.rs`](File-veilvoice-crypto-kdf) | 650 | Password-based key derivation with Argon2id. |
 | [`layout.rs`](File-veilvoice-crypto-layout) | 331 | Everything VeilVoice keeps between runs, in one list. |
 | [`lib.rs`](File-veilvoice-crypto-lib) | 289 | Key derivation, post-quantum-hybrid key agreement, authenticated encryption and amnesic secret storage for VeilVoice. |
 | [`lock.rs`](File-veilvoice-crypto-lock) | 2384 | The application lock: an Argon2id password verifier with a rate limit. |
-| [`privatefile.rs`](File-veilvoice-crypto-privatefile) | 313 | Writing a file that only its owner can read. |
+| [`privatefile.rs`](File-veilvoice-crypto-privatefile) | 411 | Writing a file that only its owner can read. |
 | [`reseal.rs`](File-veilvoice-crypto-reseal) | 538 | Finding files that were sealed under no passphrase at all, and sealing them again under a real one. |
 | [`reset.rs`](File-veilvoice-crypto-reset) | 903 | Putting this machine back to a new install. |
 | [`shred.rs`](File-veilvoice-crypto-shred) | 417 | Secure erasure, the self-destruct. |
 | [`studio.rs`](File-veilvoice-crypto-studio) | 1522 | The studio vault: a key that exists only when both locks have been opened. |
 | [`tape.rs`](File-veilvoice-crypto-tape) | 391 | A recording held in locked, zeroizing memory while it is still being made. |
-| [`vault.rs`](File-veilvoice-crypto-vault) | 816 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
-| [`weave.rs`](File-veilvoice-crypto-weave) | 1811 | Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both. |
+| [`vault.rs`](File-veilvoice-crypto-vault) | 904 | Where the app lock is kept: two copies, unpredictable names, and a restore. |
+| [`weave.rs`](File-veilvoice-crypto-weave) | 1818 | Kept only to open old records. |
 | [`seal_and_open.rs`](File-veilvoice-crypto-examples-seal_and_open) | 80 | _no module documentation yet_ |
 | [`parser_fuzz.rs`](File-veilvoice-crypto-tests-parser_fuzz) | 368 | Randomised robustness testing for the two parsers that read untrusted input. |
 | [`timing.rs`](File-veilvoice-crypto-tests-timing) | 249 | Timing measurement of the password paths. |
 
-**8,830 functional lines of Rust** in this crate. A functional line is a line
+**9,017 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

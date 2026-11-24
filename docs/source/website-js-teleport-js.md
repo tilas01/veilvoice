@@ -11,7 +11,7 @@
 
 # `website/js/teleport.js`
 
-[the source](https://github.com/tilas01/veilvoice/blob/main/website/js/teleport.js) &middot; 346 lines
+[the source](https://github.com/tilas01/veilvoice/blob/main/website/js/teleport.js) &middot; 349 lines
 
 ## What it does
 

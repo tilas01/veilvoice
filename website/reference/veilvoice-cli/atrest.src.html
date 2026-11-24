@@ -181,7 +181,7 @@
 <span class="ln" id="L108">    };</span>
 <span class="ln" id="L109"></span>
 <span class="ln" id="L110">    <span class="tok-kw">let</span> out = container::<span class="tok-fn">veil_path</span>(path);</span>
-<span class="ln" id="L111">    std::fs::<span class="tok-fn">write</span>(&amp;out, &amp;sealed).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, out.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L111">    <span class="tok-kw">crate</span>::<span class="tok-fn">write_named</span>(&amp;out, &amp;sealed)?;</span>
 <span class="ln" id="L112">    <span class="tok-fn">Ok</span>(out)</span>
 <span class="ln" id="L113">}</span>
 </span>

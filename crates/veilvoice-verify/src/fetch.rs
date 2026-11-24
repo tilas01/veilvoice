@@ -46,9 +46,16 @@
 //! passed a subcommand that says so. There is no update check, no telemetry,
 //! and no "just in case" request.
 //!
-//! **Only one host is ever contacted**, and it is compiled in. A URL cannot be
-//! supplied on the command line, so this cannot be turned into a general
-//! downloader by an argument.
+//! **Only one address is ever asked for**, and it is compiled in. A URL cannot
+//! be supplied on the command line, so this cannot be turned into a general
+//! downloader by an argument. GitHub answers a release download by sending it
+//! on to its own file host, and that redirect is followed over HTTPS only, at
+//! most five times.
+//!
+//! Neither downloader reads its user's configuration file. A `.curlrc` or
+//! `.wgetrc` can turn off certificate checks or send the request through a
+//! proxy, and a verifier whose download depends on a file it never shows is
+//! not saying what it did.
 //!
 //! # In plain words
 //!
@@ -209,28 +216,7 @@ pub fn download(url: &str, into: &Path) -> Result<PathBuf, String> {
     };
 
     let mut command = Command::new(&downloader.program);
-    match downloader.style {
-        Style::Curl => {
-            command.args([
-                "--fail",     // an HTTP error is a failure, not a saved error page
-                "--location", // GitHub redirects release assets to its CDN
-                "--silent",
-                "--show-error",
-                "--proto",
-                "=https", // never downgrade, never another scheme
-                "--max-time",
-                "600",
-                "--output",
-            ]);
-            command.arg(into);
-            command.arg(url);
-        }
-        Style::Wget => {
-            command.args(["--quiet", "--https-only", "--timeout=600", "-O"]);
-            command.arg(into);
-            command.arg(url);
-        }
-    }
+    command.args(arguments(&downloader.style, url, into));
 
     let output = command
         .output()
@@ -260,6 +246,50 @@ pub fn download(url: &str, into: &Path) -> Result<PathBuf, String> {
         ));
     }
     Ok(into.to_path_buf())
+}
+
+/// What one downloader is told, to fetch `url` into `into` and nothing else.
+///
+/// The size limit is passed to curl as well as checked afterwards, so a reply
+/// that says it is too big is refused before it is written. wget has no such
+/// option, so for wget the check after the download is the only one.
+fn arguments(style: &Style, url: &str, into: &Path) -> Vec<std::ffi::OsString> {
+    let words: Vec<String> = match style {
+        Style::Curl => [
+            "-q",         // first, or curl reads ~/.curlrc before anything else
+            "--fail",     // an HTTP error is a failure, not a saved error page
+            "--location", // GitHub redirects release assets to its CDN
+            "--max-redirs",
+            "5",
+            "--silent",
+            "--show-error",
+            "--proto",
+            "=https", // never downgrade, never another scheme
+            "--max-time",
+            "600",
+            "--max-filesize",
+            &MAX_BYTES.to_string(),
+            "--output",
+        ]
+        .iter()
+        .map(|word| word.to_string())
+        .collect(),
+        Style::Wget => [
+            "--no-config", // no ~/.wgetrc and no /etc/wgetrc
+            "--quiet",
+            "--https-only",
+            "--max-redirect=5",
+            "--timeout=600",
+            "-O",
+        ]
+        .iter()
+        .map(|word| word.to_string())
+        .collect(),
+    };
+    let mut arguments: Vec<std::ffi::OsString> = words.into_iter().map(Into::into).collect();
+    arguments.push(into.as_os_str().to_owned());
+    arguments.push(url.into());
+    arguments
 }
 
 /// The URL of one file in one release.
@@ -303,6 +333,41 @@ pub fn valid_asset(name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-317.** Neither downloader reads its user's configuration, curl is
+    /// told the size limit, and both refuse plain HTTP and long redirect
+    /// chains.
+    #[test]
+    fn the_downloaders_are_told_everything_and_read_nothing_else() {
+        let into = Path::new("release.tar.gz");
+        let url = "https://github.com/tilas01/veilvoice/releases/download/v1/x";
+        let curl = arguments(&Style::Curl, url, into);
+        assert_eq!(curl[0], "-q", "-q only works as curl's first argument");
+        let limit = curl
+            .iter()
+            .position(|a| a == "--max-filesize")
+            .expect("a limit");
+        assert_eq!(curl[limit + 1], MAX_BYTES.to_string().as_str());
+        assert!(curl
+            .windows(2)
+            .any(|w| w[0] == "--proto" && w[1] == "=https"));
+        assert!(curl
+            .windows(2)
+            .any(|w| w[0] == "--max-redirs" && w[1] == "5"));
+        assert_eq!(
+            curl[curl.len() - 2..],
+            [into.as_os_str().to_owned(), url.into()]
+        );
+
+        let wget = arguments(&Style::Wget, url, into);
+        for needed in ["--no-config", "--https-only", "--max-redirect=5"] {
+            assert!(wget.iter().any(|a| a == needed), "wget is missing {needed}");
+        }
+        assert_eq!(
+            wget[wget.len() - 2..],
+            [into.as_os_str().to_owned(), url.into()]
+        );
+    }
 
     /// A host whose name merely begins with ours is a different host.
     ///

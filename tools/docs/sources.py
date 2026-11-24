@@ -448,7 +448,7 @@ def wiki_page(rel, text):
     out.append("![%s](%sassets/sources/%s.svg)\n" % (rel, docs.RAW, slug))
     out.append("# `%s`\n" % rel)
     out.append(
-        "[[The website's source|Source-index]] &middot; %d lines &middot; "
+        "[The website's source](Source-index) &middot; %d lines &middot; "
         "[read the source](https://github.com/%s/blob/%s/%s)\n"
         % (lines, docs.REPO, docs.REF, rel)
     )

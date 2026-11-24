@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //! Writing a file that only its owner can read.
 //!
+//! It also holds [`replace`], the same all-or-nothing replacement for a file
+//! that is not secret, so the workspace has one way of doing that and not two.
+//!
 //! Returns [`std::io::Result`] rather than this crate's [`Error`](crate::Error),
 //! which is `Copy` and therefore cannot carry the underlying reason. A caller
 //! reporting "could not write the key" is far more useful when it can say why.
@@ -54,7 +57,7 @@ use std::path::Path;
 /// An existing file is truncated and rewritten. Use
 /// [`write_owner_only_new`] when the file must not already exist.
 pub fn write_owner_only(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
-    write_inner(path, bytes, false)
+    write_inner(path, bytes, false, Access::OwnerOnly).map(drop)
 }
 
 /// As [`write_owner_only`], but fail if anything is already at `path`.
@@ -65,7 +68,7 @@ pub fn write_owner_only(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
 /// followed, so the write would land on whatever it points at. `create_new`
 /// asks the kernel for one atomic answer to both.
 pub fn write_owner_only_new(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
-    write_inner(path, bytes, true)
+    write_inner(path, bytes, true, Access::OwnerOnly).map(drop)
 }
 
 /// Replace `path` with `bytes` in one step, or leave what was there.
@@ -83,11 +86,32 @@ pub fn write_owner_only_new(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
 /// The temporary file is created owner-only, and the rename carries that
 /// permission to the destination, so there is no moment at which the contents
 /// are readable by anybody else.
+///
+/// The temporary file reaches the disk before the rename, and on Unix the
+/// folder is synced after it. Without both, a filesystem may commit the rename
+/// before the data, and after a power cut the file comes back empty, which is
+/// the half-written state this exists to rule out.
 pub fn replace_owner_only(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
+    replace_inner(path, bytes, Access::OwnerOnly)
+}
+
+/// As [`replace_owner_only`], for a file anybody on the machine may read.
+///
+/// This is for a record that is not secret but must never be seen half
+/// written. The integrity manifest is the example: a truncated manifest reads
+/// as tampering. The file gets the permissions any new file of this process
+/// gets.
+pub fn replace(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
+    replace_inner(path, bytes, Access::Default)
+}
+
+/// The replacement both public functions make, with the permissions `access`
+/// asks for.
+fn replace_inner(path: &Path, bytes: &[u8], access: Access) -> std::io::Result<()> {
     let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) else {
         // Nowhere to put a temporary file beside it, so nowhere to rename from:
         // a rename across filesystems is not atomic and may not be permitted.
-        return write_inner(path, bytes, false);
+        return write_inner(path, bytes, false, access)?.sync_all();
     };
     let mut name = std::ffi::OsString::from(".");
     name.push(path.file_name().unwrap_or_default());
@@ -97,14 +121,48 @@ pub fn replace_owner_only(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
     // Not `create_new`: a temporary left by a previous crash must not stop the
     // write for ever. It is in a directory this process owns and its name is
     // derived from the destination, so there is nothing here to be raced for.
-    write_inner(&temporary, bytes, false)?;
+    // A temporary that failed part-way is removed too: for an owner-only file
+    // it is a partial copy of the secret with nothing left to watch it.
+    let written = write_inner(&temporary, bytes, false, access).and_then(|f| f.sync_all());
+    if let Err(e) = written {
+        let _ = std::fs::remove_file(&temporary);
+        return Err(e);
+    }
     match std::fs::rename(&temporary, path) {
-        Ok(()) => Ok(()),
+        Ok(()) => {
+            sync_folder(parent);
+            Ok(())
+        }
         Err(e) => {
             let _ = std::fs::remove_file(&temporary);
             Err(e)
         }
     }
+}
+
+/// Make a rename in `folder` survive a power cut, where the system allows it.
+///
+/// On Unix a rename is only on the disk once the folder holding it is. The
+/// rename has already happened when this runs, so a failure here is not a
+/// failed write and is not reported as one: some filesystems refuse to sync a
+/// folder at all. Windows has no portable way to open a folder for this, and
+/// NTFS journals the rename itself.
+fn sync_folder(folder: &Path) {
+    #[cfg(unix)]
+    if let Ok(handle) = std::fs::File::open(folder) {
+        let _ = handle.sync_all();
+    }
+    #[cfg(not(unix))]
+    let _ = folder;
+}
+
+/// Who may read a file this module writes.
+#[derive(Clone, Copy)]
+enum Access {
+    /// Only the current user, from the moment the file exists.
+    OwnerOnly,
+    /// Whatever the process umask gives any new file.
+    Default,
 }
 
 /// Make an existing file readable only by its owner.
@@ -145,7 +203,17 @@ pub fn tighten(path: &Path) -> std::io::Result<()> {
 /// `exclusive` refuses to replace an existing file. The Unix mode is set in the
 /// open itself rather than afterwards, so there is no window in which the file
 /// exists and is readable by anybody else.
-fn write_inner(path: &Path, bytes: &[u8], exclusive: bool) -> std::io::Result<()> {
+///
+/// With [`Access::Default`] none of the permission work applies, and it is an
+/// ordinary write for [`replace`]. The open file is returned so a caller can
+/// sync it.
+fn write_inner(
+    path: &Path,
+    bytes: &[u8],
+    exclusive: bool,
+    access: Access,
+) -> std::io::Result<std::fs::File> {
+    let owner_only = matches!(access, Access::OwnerOnly);
     let mut options = std::fs::OpenOptions::new();
     options.write(true);
     if exclusive {
@@ -154,7 +222,7 @@ fn write_inner(path: &Path, bytes: &[u8], exclusive: bool) -> std::io::Result<()
         options.create(true).truncate(true);
     }
     #[cfg(unix)]
-    {
+    if owner_only {
         use std::os::unix::fs::OpenOptionsExt;
         options.mode(0o600);
     }
@@ -165,14 +233,16 @@ fn write_inner(path: &Path, bytes: &[u8], exclusive: bool) -> std::io::Result<()
     // older build, or by a looser umask, still needs tightening. This is the
     // fix-up for that case, not the defence.
     #[cfg(unix)]
-    {
+    if owner_only {
         use std::os::unix::fs::PermissionsExt;
         let _ = file.set_permissions(std::fs::Permissions::from_mode(0o600));
     }
+    #[cfg(not(unix))]
+    let _ = owner_only;
 
     file.write_all(bytes)?;
     file.flush()?;
-    Ok(())
+    Ok(file)
 }
 
 #[cfg(test)]
@@ -201,6 +271,34 @@ mod tests {
         );
         // And the contents are untouched: this changes the mode, not the file.
         assert_eq!(std::fs::read(&path).unwrap(), b"the original audio");
+    }
+
+    #[test]
+    fn a_plain_replacement_lands_whole_and_leaves_nothing_beside_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("manifest.txt");
+        replace(&path, b"first").unwrap();
+        replace(&path, b"second and longer").unwrap();
+        assert_eq!(std::fs::read(&path).unwrap(), b"second and longer");
+        let names: Vec<_> = std::fs::read_dir(dir.path())
+            .unwrap()
+            .filter_map(|e| e.ok())
+            .map(|e| e.file_name())
+            .collect();
+        assert_eq!(names, ["manifest.txt"]);
+    }
+
+    /// A replacement that cannot be written leaves the old file exactly as it
+    /// was. A folder in the temporary's place makes the write fail before any
+    /// rename could happen.
+    #[test]
+    fn a_failed_replacement_leaves_the_old_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("record.bin");
+        replace_owner_only(&path, b"the old record").unwrap();
+        std::fs::create_dir(dir.path().join(".record.bin.new")).unwrap();
+        assert!(replace_owner_only(&path, b"the new record").is_err());
+        assert_eq!(std::fs::read(&path).unwrap(), b"the old record");
     }
 
     #[test]

@@ -352,7 +352,10 @@ fn write_private(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
             std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         }
     }
-    veilvoice_crypto::privatefile::write_owner_only(path, bytes).map_err(|e| e.to_string())
+    // **F-334.** Replaced in one step. Rewritten in place, a crash part-way
+    // left a sealed record cut short, which will not open and so reads as
+    // interference at the next launch.
+    veilvoice_crypto::privatefile::replace_owner_only(path, bytes).map_err(|e| e.to_string())
 }
 
 #[cfg(test)]
@@ -419,6 +422,23 @@ mod tests {
             check_decoy(&plain, &sealed, &files),
             State::Changed(_)
         ));
+    }
+
+    /// **F-334.** The record is replaced by a rename, never rewritten where it
+    /// is, and stays owner-only.
+    #[cfg(unix)]
+    #[test]
+    fn the_record_is_replaced_rather_than_rewritten() {
+        use std::os::unix::fs::{MetadataExt, PermissionsExt};
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("integrity.manifest.veil");
+        write_private(&path, b"the first record").unwrap();
+        let before = std::fs::metadata(&path).unwrap().ino();
+        write_private(&path, b"the second record").unwrap();
+        let after = std::fs::metadata(&path).unwrap();
+        assert_ne!(after.ino(), before);
+        assert_eq!(after.permissions().mode() & 0o077, 0);
+        assert_eq!(std::fs::read(&path).unwrap(), b"the second record");
     }
 
     #[test]

@@ -405,16 +405,20 @@ fn on_path(stem: &str) -> Option<PathBuf> {
     } else {
         vec![stem.to_string()]
     };
-    let path = std::env::var_os("PATH")?;
-    for directory in std::env::split_paths(&path) {
-        for name in &names {
-            let candidate = directory.join(name);
-            if candidate.is_file() {
-                return Some(candidate);
-            }
-        }
-    }
-    None
+    find_in(&std::env::var_os("PATH")?, &names)
+}
+
+/// The first of `names` in an absolute entry of `path`, a `PATH` value.
+///
+/// A relative entry, including the empty one a stray `::` leaves, means the
+/// current folder: wherever this happened to be started. A program planted in
+/// a downloads folder would be found there before the real one, so those
+/// entries are skipped. Shells accept them; this does not.
+fn find_in(path: &std::ffi::OsStr, names: &[String]) -> Option<PathBuf> {
+    std::env::split_paths(path)
+        .filter(|directory| directory.is_absolute())
+        .flat_map(|directory| names.iter().map(move |name| directory.join(name)))
+        .find(|candidate| candidate.is_file())
 }
 
 /// The first of `candidates` that exists.
@@ -726,6 +730,33 @@ const UNIX_PACKAGE_MANAGERS: &[(&str, &[&str])] = &[
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-312.** A relative `PATH` entry is the folder this was started from,
+    /// so a program planted there is never the one found.
+    #[cfg(unix)]
+    #[test]
+    fn a_relative_path_entry_is_never_searched() {
+        let dir =
+            std::env::temp_dir().join(format!("veilvoice-path-{}-companions", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let program = dir.join("tool");
+        std::fs::write(&program, b"").unwrap();
+        let mut relative = std::path::PathBuf::new();
+        for _ in std::env::current_dir().unwrap().components().skip(1) {
+            relative.push("..");
+        }
+        let relative = relative.join(dir.strip_prefix("/").unwrap());
+        assert!(
+            relative.join("tool").is_file(),
+            "the test's own path is wrong"
+        );
+        assert_eq!(find_in(relative.as_os_str(), &["tool".to_string()]), None);
+        assert_eq!(
+            find_in(dir.as_os_str(), &["tool".to_string()]),
+            Some(program)
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 
     /// Every probe and every offer says what it is for, on itself.
     ///

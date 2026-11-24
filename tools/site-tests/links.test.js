@@ -53,6 +53,21 @@ const GENERATED = new Set([
 const MD_LINK = /\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
 const HREF = /(?:href|src)\s*=\s*["']([^"']+)["']/gi;
 
+// A link to a file on this repository's main branch, written out in full.
+// A wiki page cannot reach the repository by a relative path, so it links this
+// way, and so does anything meant to be read away from GitHub. Such a link
+// breaks the moment its file moves to the website's repository, exactly as a
+// relative one would, but it is an external URL and so was never checked.
+const OWN_URL = new RegExp(
+  "^https://(?:github\\.com/tilas01/veilvoice/(?:blob|tree|raw)/main" +
+  "|raw\\.githubusercontent\\.com/tilas01/veilvoice/main)/([^?#]+)"
+);
+
+// `[[Page]]` is a link only inside a GitHub wiki. Anywhere else GitHub shows
+// it as the brackets and the page name, which reads as a leftover from
+// whatever wrote the document. Quoted as code it is an example, and fine.
+const WIKI_LINK = /\[\[[^\]\n]+\]\]/g;
+
 /**
  * Remove quoted code before looking for links.
  *
@@ -93,6 +108,39 @@ function isLocal(target) {
   return true;
 }
 
+/**
+ * The repository path a full URL to this repository's main branch names, or
+ * null if the URL points anywhere else (another repository included).
+ */
+function ownPath(target) {
+  const found = OWN_URL.exec(target);
+  if (!found) { return null; }
+  let rel;
+  try {
+    rel = decodeURIComponent(found[1]);
+  } catch {
+    return found[1];   // A malformed escape cannot name a real file.
+  }
+  return rel.replace(/\/+$/, "");
+}
+
+/**
+ * Every `[[wiki link]]` left in a document's prose. HTML has its scripts and
+ * styles taken out as well, since `[[1, 2]]` is an ordinary nested array, and
+ * its inline drawings, whose text is a picture of a line written elsewhere
+ * (the roadmap's rows are drawn this way, quoting the code spans as text).
+ */
+function strayWikiLinks(prose, isHtml) {
+  const blank = m => " ".repeat(m.length);
+  const text = isHtml
+    ? prose
+      .replace(/<script\b[\s\S]*?<\/script>/gi, blank)
+      .replace(/<style\b[\s\S]*?<\/style>/gi, blank)
+      .replace(/<svg\b[\s\S]*?<\/svg>/gi, blank)
+    : prose;
+  return [...text.matchAll(WIKI_LINK)].map(m => m[0]);
+}
+
 /** Where a link resolves to on disk, or null if it leaves the repository. */
 function resolveTarget(fromFile, target) {
   const clean = target.split("#")[0].split("?")[0];
@@ -119,7 +167,10 @@ function run() {
   );
 
   const broken = [];
+  const moved = [];
+  const wikiLeftovers = [];
   let checked = 0;
+  let ownChecked = 0;
 
   for (const rel of files) {
     let text;
@@ -129,13 +180,27 @@ function run() {
       continue;
     }
 
-    const prose = stripQuotedCode(text, /\.html$/i.test(rel));
+    const isHtml = /\.html$/i.test(rel);
+    const prose = stripQuotedCode(text, isHtml);
+
+    for (const found of strayWikiLinks(prose, isHtml)) {
+      wikiLeftovers.push(`${rel}: ${found}`);
+    }
 
     const targets = [];
     for (const m of prose.matchAll(MD_LINK)) { targets.push(m[1]); }
     for (const m of prose.matchAll(HREF)) { targets.push(m[1]); }
 
     for (const target of targets) {
+      const own = ownPath(target.replace(/&amp;/g, "&"));
+      if (own !== null) {
+        ownChecked++;
+        const resolved = path.resolve(ROOT, own);
+        if (!resolved.startsWith(ROOT + path.sep) || !fs.existsSync(resolved)) {
+          moved.push(`${rel} -> ${target}`);
+        }
+        continue;
+      }
       if (!isLocal(target)) { continue; }
       const resolved = resolveTarget(rel, target);
       if (resolved === null) {
@@ -170,6 +235,36 @@ function run() {
   // The check must not be vacuous: if the extraction silently matched nothing,
   // the suite above would pass while testing exactly zero links.
   check("the link extraction actually found links", checked > 50);
+
+  check(`every full link to a file on main names one that is here ` +
+        `(${ownChecked} checked)`, moved.length === 0);
+  for (const line of moved.slice(0, 20)) {
+    console.log("     gone: " + line);
+  }
+
+  check("no [[wiki link]] shows as plain text outside the wiki",
+        wikiLeftovers.length === 0);
+  for (const line of wikiLeftovers.slice(0, 20)) {
+    console.log("     left: " + line);
+  }
+
+  // The two checks above are only worth anything if they notice what they
+  // claim to, so each is shown a case it must catch and one it must let by.
+  check("a full link into this repository is read as a repository path",
+        ownPath("https://github.com/tilas01/veilvoice/blob/main/docs/A%20B.md#x")
+          === "docs/A B.md" &&
+        ownPath("https://raw.githubusercontent.com/tilas01/veilvoice/main/assets/a.svg")
+          === "assets/a.svg");
+  check("a link into the website's repository is not mistaken for one of ours",
+        ownPath("https://github.com/tilas01/veilvoice-website/blob/main/a.svg")
+          === null);
+  check("a plain-text [[wiki link]] is found and a quoted one is not",
+        strayWikiLinks(stripQuotedCode("See [[Reference]].", false), false)
+          .length === 1 &&
+        strayWikiLinks(stripQuotedCode("Write `[[Reference]]`.", false), false)
+          .length === 0 &&
+        strayWikiLinks("<script>const a = [[1, 2]];</script>", true)
+          .length === 0);
 
   return fails;
 }

@@ -189,12 +189,11 @@ def destination(name, already, ours):
     return None
 
 
-# A link to a wiki page written the ordinary way, which is what
-# `tools/docs/wiki.py` produces for a document that links to its neighbour:
-# `](Doc-INSTALL)` or `](Doc-INSTALL#the-fingerprint)`. In a wiki that is a
-# page reference and resolves; on this site a page is a file and it does not,
-# so it is resolved here the same way a `[[link]]` is.
-PAGE_LINK = re.compile(r"\]\((?!https?:|#|/)([A-Za-z0-9_-]+)(#[^)]*)?\)")
+# A link to a wiki page written the ordinary way, which is how every wiki page
+# links to another: `](Doc-INSTALL)` or `](Doc-INSTALL#the-fingerprint)`. In a
+# wiki that is a page reference and resolves; on this site a page is a file
+# and it does not, so it is resolved here the same way a `[[link]]` is.
+PAGE_LINK = wikigen.PAGE_LINK
 
 
 def resolve_links(text, page, already, ours):

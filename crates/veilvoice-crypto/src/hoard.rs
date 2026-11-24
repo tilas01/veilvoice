@@ -45,19 +45,13 @@
 //! `measured`, `tour`. The file it lives in is named
 //!
 //! ```text
-//! base64url(weave(HMAC-SHA256(store_key, "veilvoice/hoard/name" || logical)[..18]))
+//! base64url(HMAC-SHA256(store_key, "veilvoice/hoard/name" || logical)[..18])
 //! ```
 //!
-//! where `weave` is one of a dozen byte-level encodings chosen from the name's
-//! own bytes, so it is stable across launches. The result is twenty-four
-//! characters of base64 with no padding and no extension.
-//!
-//! Only length-preserving encodings are allowed there, and that restriction is
-//! load-bearing: a name that came out longer or shorter would announce which
-//! encoding produced it, and would separate records from decoys at a glance.
-//! Eighteen bytes rather than a round sixteen so the encoding comes out exact:
-//! twenty-four characters with nothing to pad, which is one less thing to tell
-//! a name apart from a decoy.
+//! which is twenty-four characters of base64 with no padding and no
+//! extension. Eighteen bytes rather than a round sixteen so the encoding comes
+//! out exact: nothing to pad, which is one less thing to tell a name apart
+//! from a decoy.
 //!
 //! The derivation is deterministic, so the program does not search: it
 //! computes the name it wants and opens that file. This is what makes the
@@ -69,24 +63,19 @@
 //! # What is inside one
 //!
 //! ```text
-//! [24-byte nonce][ChaCha20-Poly1305 over: [2-byte marker][4-byte length][data][junk]]
+//! ["V" 2][24-byte nonce][ChaCha20-Poly1305 over: [4-byte length][data][junk]]
 //! ```
 //!
-//! The data is first put through one of twenty-seven encodings drawn at random
-//! on every write -- base91, z-base-32, yEnc, a move-to-front transform, and
-//! two dozen others -- and the marker says which, from inside the sealed
-//! region so the choice is not visible either. [`crate::weave`] carries the
-//! full argument; the short version is that **it adds no cryptographic
-//! strength**, because the AEAD already makes this indistinguishable from
-//! random. What it adds is that plaintext escaping by some route that is not
-//! the cipher -- a core dump, a swap file, a future bug in this framing -- does
-//! not read as anything.
-//!
-//! The padding is computed from the *original* length rather than the encoded
-//! one, so a file's size never depends on which encoding was drawn. Otherwise
-//! a record rewritten repeatedly would move between buckets and the smallest
-//! one ever seen would pin its true length, which is exactly what the padding
-//! is there to prevent.
+//! The first two bytes say which format the rest is in. **F-337.** Records
+//! used to be put through one of thirty-one reversible encodings before the
+//! cipher and another after it, and their names through one more. None of it
+//! added strength: the AEAD already makes a record indistinguishable from
+//! random, and the encodings are published here, so anybody who can read the
+//! source can undo them. What they did cost was compute and room, since every
+//! record was padded for the widest encoding at eight times its length. New
+//! records are written without them. [`crate::weave`] is kept only to open a
+//! record an older VeilVoice wrote, and that record is rewritten in the current
+//! format, under its current name, the first time it is read.
 //!
 //! The junk pads every record up to one of a few fixed sizes, so a file's
 //! length says which bucket it fell in and nothing finer. The additional data
@@ -149,32 +138,20 @@ const NAME_BYTES: usize = 18;
 /// The length prefix inside the padded plaintext.
 const LEN_PREFIX: usize = 4;
 
-/// The most any encoding in [`crate::weave`] can grow its input.
+/// The first two bytes of every record this version writes.
 ///
-/// Morse is the widest, at eight bytes out per byte in -- each byte spelled as
-/// eight dots and dashes. Used to size the padding from the *original* length,
-/// so a file's on-disk size never depends on which encoding was drawn.
-///
-/// The cost is real and small: a record is padded for the worst-case
-/// expansion even when a compact encoding was chosen, so these files reserve
-/// more room than they use. They are settings and measurements -- kilobytes --
-/// and a size that gives nothing away is worth more than a tight one.
-/// `no_encoding_expands_past_the_allowance` measures every encoding against
-/// this so it cannot quietly become a lie.
-const MAX_EXPANSION: usize = 8;
+/// Outside the seal, and saying nothing secret: which format the rest is in.
+/// Its first byte is one no encoding in [`crate::weave`] ever used as its
+/// marker, so a record from before F-337 is never taken for a current one.
+const FORMAT: [u8; 2] = [b'V', 2];
 
-/// The inner encoding marker, which sits before the length.
-///
-/// Inside the sealed region rather than beside it, so which of the encodings
-/// in [`crate::weave`] was used before encryption is not visible from outside.
-const MARKER: usize = 2;
-
-/// The outer encoding marker, the first two bytes of the file.
-///
-/// Outside the seal, because the outer encoding is applied after encryption
-/// and has to be undone before the seal can be opened. It says nothing secret:
-/// which length-preserving transform was applied to already-random ciphertext.
+/// The length of [`FORMAT`], which is also the length of the outer marker the
+/// older format began with.
 const OUTER_MARKER: usize = 2;
+
+/// The older format's inner marker, which sat inside the sealed region before
+/// the length.
+const LEGACY_MARKER: usize = 2;
 
 /// The sizes a record is padded up to, in bytes of plaintext.
 ///
@@ -289,17 +266,18 @@ impl Hoard {
     pub fn name_for(&self, logical: &str) -> Result<String, Error> {
         let mut out = [0u8; NAME_BYTES];
         self.key.expand(INFO_NAME, logical, &mut out)?;
+        Ok(base64url(&out))
+    }
 
-        // One of a dozen byte-level encodings, before the base64. Which one is
-        // derived from the name's own bytes, so it is stable across launches --
-        // a filename has to be computable again or the record is lost.
-        //
-        // Length-preserving only. An encoding that changed the byte count would
-        // change the filename's length, and a filename whose length announces
-        // its encoding separates records from decoys at a glance, which is the
-        // one thing the decoys exist to prevent. `weave::LENGTH_PRESERVING` is
-        // the restricted set and there is a test that every member of it keeps
-        // the count.
+    /// The name an older VeilVoice gave the same record: the same HMAC put
+    /// through one of the length-preserving encodings in [`crate::weave`].
+    ///
+    /// Only ever used to find a record written before F-337 so it can be read
+    /// and moved to [`Hoard::name_for`]. For some records the encoding drawn
+    /// was the identity, and then the two names are the same.
+    fn legacy_name_for(&self, logical: &str) -> Result<String, Error> {
+        let mut out = [0u8; NAME_BYTES];
+        self.key.expand(INFO_NAME, logical, &mut out)?;
         let woven = crate::weave::Weave::for_name(&out).apply(&out);
         Ok(base64url(&woven))
     }
@@ -324,165 +302,170 @@ impl Hoard {
         Ok(())
     }
 
-    /// Encode, seal and write one record under its obfuscated name.
+    /// Seal and write one record under its name, in the current format.
     ///
-    /// The steps and the reason for each are in the body: what is written is not
-    /// the caller's bytes, is not stored under the caller's name, and is not the
-    /// size of the caller's data.
+    /// What is written is not the caller's bytes, is not stored under the
+    /// caller's name, and is not the size of the caller's data: it is sealed,
+    /// named by the key, and padded to a bucket.
     fn write_raw(&self, logical: &str, data: &[u8]) -> Result<(), Error> {
         let name = self.name_for(logical)?;
 
-        // The *inner* encoding, applied to the plaintext before it is sealed.
-        // One of `weave::ALL`, drawn fresh on every write, its marker inside
-        // the sealed region so which one was used is not visible from outside.
-        // `crate::weave` says what this does and does not buy.
-        let (chosen, body) = crate::weave::encode(data)?;
-        let marker = chosen.id();
-
-        // The bucket is chosen from the **original** length, not the encoded
-        // one, and that is the whole point of `MAX_EXPANSION`.
-        //
-        // Choosing it from the encoded length would make a file's size depend
-        // on which encoding was drawn, and the draw is fresh on every write.
-        // Somebody watching one record rewritten would see it move between
-        // buckets, and the smallest bucket they ever saw would pin the true
-        // length far more tightly than a single bucket was ever meant to
-        // allow. Padding is supposed to hide length; that would have quietly
-        // handed it back.
-        //
-        // So the bucket is a function of `data.len()` alone. The cost is real
-        // and worth stating: a record padded for the worst-case expansion can
-        // be up to three times the size it strictly needs. These files are
-        // settings and measurements, a few kilobytes at most, and a stable
-        // size is worth more than a small one.
-        // Checked, because this is a length from a caller multiplied by a
-        // constant. On the 32-bit targets this project ships, a record over
-        // about 512 MiB wraps it, and `bucket_for` would then size the buffer
-        // from a number smaller than the data.
+        // The bucket comes from the data's length alone, so a file's size says
+        // which bucket it fell in and nothing finer. Checked, because this is a
+        // length from a caller and the project ships 32-bit builds.
         let padded_len = data
             .len()
-            .checked_mul(MAX_EXPANSION)
-            .and_then(|n| n.checked_add(MARKER + LEN_PREFIX))
+            .checked_add(LEN_PREFIX)
             .map(bucket_for)
             .ok_or(Error::Encrypt)?;
-        if MARKER + LEN_PREFIX + body.len() > padded_len {
-            // Unreachable while `MAX_EXPANSION` is honest, and checked rather
-            // than trusted: a new encoding that expands further would
-            // otherwise silently overflow into a larger bucket and reopen the
-            // leak above. `no_encoding_expands_past_the_allowance` is the test
-            // that keeps this unreachable.
-            return Err(Error::Encrypt);
-        }
+        let len = u32::try_from(data.len()).map_err(|_| Error::Encrypt)?;
         let mut plain = vec![0u8; padded_len];
-        plain[..MARKER].copy_from_slice(&marker);
-        let len = u32::try_from(body.len()).map_err(|_| Error::Encrypt)?;
-        plain[MARKER..MARKER + LEN_PREFIX].copy_from_slice(&len.to_le_bytes());
-        let start = MARKER + LEN_PREFIX;
-        plain[start..start + body.len()].copy_from_slice(&body);
-        fill_random(&mut plain[start + body.len()..])?;
+        plain[..LEN_PREFIX].copy_from_slice(&len.to_le_bytes());
+        plain[LEN_PREFIX..LEN_PREFIX + data.len()].copy_from_slice(data);
+        fill_random(&mut plain[LEN_PREFIX + data.len()..])?;
 
         let mut record_key = Secret::zeroed(kdf::KEY_LEN);
         self.key
             .expand(INFO_REC, logical, record_key.expose_mut())?;
         let nonce = aead::random_nonce()?;
-        let sealed = aead::seal(&record_key, &nonce, name.as_bytes(), &plain)?;
+        let sealed = aead::seal(&record_key, &nonce, name.as_bytes(), &plain);
+        // The record in the clear, until a moment ago.
+        {
+            use zeroize::Zeroize;
+            plain.zeroize();
+        }
+        let sealed = sealed?;
 
-        let mut blob = Vec::with_capacity(nonce.len() + sealed.len());
-        blob.extend_from_slice(&nonce);
-        blob.extend_from_slice(&sealed);
-
-        // The *outer* encoding, applied to the sealed blob after encryption.
-        // Together with the inner one this is the "before or after" the user
-        // asked for, and more: the inner weave can be the identity and the
-        // outer one non-trivial (encoding purely after the cipher), or the
-        // reverse, or both, or neither -- every combination, chosen at random.
-        //
-        // Restricted to the length-preserving set, and its marker sits in two
-        // bytes on the outside because it has to be undone before the blob can
-        // even be decrypted. Outside the seal means unauthenticated, which is
-        // harmless: tampering with it corrupts the unweave and the AEAD then
-        // refuses to open, so it fails closed.
-        //
-        // Length preserving so the file's size stays a function of the data
-        // length alone -- an outer encoding that grew the blob would reopen
-        // the size leak the padding exists to close.
-        let outer = crate::weave::Weave::random_length_preserving()?;
-        let woven = outer.apply(&blob);
-        let mut bytes = Vec::with_capacity(OUTER_MARKER + woven.len());
-        bytes.extend_from_slice(&outer.id());
-        bytes.extend_from_slice(&woven);
+        let mut bytes = Vec::with_capacity(OUTER_MARKER + nonce.len() + sealed.len());
+        bytes.extend_from_slice(&FORMAT);
+        bytes.extend_from_slice(&nonce);
+        bytes.extend_from_slice(&sealed);
 
         std::fs::create_dir_all(&self.dir).map_err(|_| Error::AppLockStore)?;
-        crate::privatefile::write_owner_only(&self.dir.join(&name), &bytes)
-            .map_err(|_| Error::AppLockStore)
+        // Replaced in one step, so a crash part-way leaves the old record. F-335.
+        crate::privatefile::replace_owner_only(&self.dir.join(&name), &bytes)
+            .map_err(|_| Error::AppLockStore)?;
+
+        // A copy an older VeilVoice wrote under its old name is stale now.
+        let legacy = self.legacy_name_for(logical)?;
+        if legacy != name {
+            remove_if_present(&self.dir.join(legacy))?;
+        }
+        Ok(())
+    }
+
+    /// Find and open a record, in whichever format it was written.
+    ///
+    /// The current name first, then the name an older VeilVoice used. The flag
+    /// is true when the record is in the older format, wherever it was found,
+    /// so the caller can move it.
+    fn fetch(&self, logical: &str) -> Result<Option<(Vec<u8>, bool)>, Error> {
+        let name = self.name_for(logical)?;
+        if let Some(bytes) = read_if_present(&self.dir.join(&name))? {
+            let older = bytes.get(..OUTER_MARKER) != Some(&FORMAT[..]);
+            return self
+                .open_bytes(logical, &name, &bytes)
+                .map(|data| Some((data, older)));
+        }
+        let legacy = self.legacy_name_for(logical)?;
+        if legacy == name {
+            return Ok(None);
+        }
+        match read_if_present(&self.dir.join(&legacy))? {
+            Some(bytes) => self
+                .open_bytes(logical, &legacy, &bytes)
+                .map(|data| Some((data, true))),
+            None => Ok(None),
+        }
     }
 
     /// Read a record back, or `None` if it was never written.
     ///
     /// A file that is present but does not authenticate returns
     /// [`Error::Decrypt`] rather than `None`: that is tampering, and it must
-    /// not be reported as absence.
+    /// not be reported as absence. A record in the older format is rewritten
+    /// in the current one as it is read.
     pub fn read(&self, logical: &str) -> Result<Option<Vec<u8>>, Error> {
-        let path = self.path_for(logical)?;
-        let bytes = match std::fs::read(&path) {
-            Ok(b) => b,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
-            Err(_) => return Err(Error::AppLockStore),
-        };
-        self.open_bytes(logical, &bytes).map(Some)
+        match self.fetch(logical)? {
+            Some((data, true)) => {
+                self.write_raw(logical, &data)?;
+                Ok(Some(data))
+            }
+            Some((data, false)) => Ok(Some(data)),
+            None => Ok(None),
+        }
     }
 
-    /// Undo [`Hoard::write_raw`] for bytes already read off the disk.
+    /// Undo [`Hoard::write_raw`] for bytes already read off the disk, which
+    /// were stored under `name`.
     ///
     /// Split out from the read so that a record can be opened from memory, which
     /// is what the tests do rather than going through the filesystem.
-    fn open_bytes(&self, logical: &str, bytes: &[u8]) -> Result<Vec<u8>, Error> {
-        if bytes.len() < OUTER_MARKER + aead::NONCE_LEN + aead::TAG_LEN + MARKER + LEN_PREFIX {
+    fn open_bytes(&self, logical: &str, name: &str, bytes: &[u8]) -> Result<Vec<u8>, Error> {
+        if bytes.len() < OUTER_MARKER + aead::NONCE_LEN + aead::TAG_LEN + LEN_PREFIX {
             return Err(Error::Truncated);
         }
-        // Undo the outer encoding first: it was applied after the seal, so it
-        // has to come off before the seal can be opened. Its marker is the
-        // first two bytes, on the outside.
-        let outer = crate::weave::Weave::from_id([bytes[0], bytes[1]])?;
-        let blob = outer.undo(&bytes[OUTER_MARKER..])?;
+        if bytes[..OUTER_MARKER] != FORMAT {
+            return self.open_legacy(logical, name, bytes);
+        }
+        let plain = self.unseal(logical, name, &bytes[OUTER_MARKER..])?;
+        let len = u32::from_le_bytes([plain[0], plain[1], plain[2], plain[3]]) as usize;
+        // Compared without adding: `len` comes from the record, and on the
+        // 32-bit ARM build, where release builds do not check for overflow,
+        // `LEN_PREFIX + len` could wrap. `plain` is at least `LEN_PREFIX` long,
+        // because the length check above leaves room for it.
+        if len > plain.len() - LEN_PREFIX {
+            return Err(Error::BadHeader);
+        }
+        Ok(plain[LEN_PREFIX..LEN_PREFIX + len].to_vec())
+    }
+
+    /// Open the AEAD around a record: the nonce, then the sealed body, with the
+    /// file's own name as the additional data.
+    fn unseal(&self, logical: &str, name: &str, blob: &[u8]) -> Result<Vec<u8>, Error> {
         if blob.len() < aead::NONCE_LEN + aead::TAG_LEN {
             return Err(Error::Truncated);
         }
-
-        let name = self.name_for(logical)?;
         let mut nonce = [0u8; aead::NONCE_LEN];
         nonce.copy_from_slice(&blob[..aead::NONCE_LEN]);
-
         let mut record_key = Secret::zeroed(kdf::KEY_LEN);
         self.key
             .expand(INFO_REC, logical, record_key.expose_mut())?;
-        let plain = aead::open(
+        aead::open(
             &record_key,
             &nonce,
             name.as_bytes(),
             &blob[aead::NONCE_LEN..],
-        )?;
+        )
+    }
 
-        if plain.len() < MARKER + LEN_PREFIX {
+    /// Open a record in the format VeilVoice wrote before F-337: an outer
+    /// encoding around the sealed blob, and an inner one around the data.
+    fn open_legacy(&self, logical: &str, name: &str, bytes: &[u8]) -> Result<Vec<u8>, Error> {
+        if bytes.len() < OUTER_MARKER + aead::NONCE_LEN + aead::TAG_LEN + LEGACY_MARKER + LEN_PREFIX
+        {
+            return Err(Error::Truncated);
+        }
+        let outer = crate::weave::Weave::from_id([bytes[0], bytes[1]])?;
+        let blob = outer.undo(&bytes[OUTER_MARKER..])?;
+        let plain = self.unseal(logical, name, &blob)?;
+        if plain.len() < LEGACY_MARKER + LEN_PREFIX {
             return Err(Error::Truncated);
         }
         let chosen = crate::weave::Weave::from_id([plain[0], plain[1]])?;
         let len = u32::from_le_bytes([plain[2], plain[3], plain[4], plain[5]]) as usize;
-        let start = MARKER + LEN_PREFIX;
-        if start + len > plain.len() {
+        let start = LEGACY_MARKER + LEN_PREFIX;
+        if len > plain.len() - start {
             return Err(Error::BadHeader);
         }
         crate::weave::decode(chosen, &plain[start..start + len])
     }
 
-    /// Remove a record and drop it from the roster.
+    /// Remove a record, under either name it may have, and drop it from the
+    /// roster.
     pub fn remove(&self, logical: &str) -> Result<(), Error> {
-        let path = self.path_for(logical)?;
-        match std::fs::remove_file(&path) {
-            Ok(()) => {}
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-            Err(_) => return Err(Error::AppLockStore),
-        }
+        remove_if_present(&self.dir.join(self.name_for(logical)?))?;
+        remove_if_present(&self.dir.join(self.legacy_name_for(logical)?))?;
         let mut names = self.roster()?;
         if names.remove(logical) {
             self.save_roster(&names)?;
@@ -491,26 +474,29 @@ impl Hoard {
     }
 
     /// The logical names the roster says should exist.
+    ///
+    /// A roster in the older format is rewritten in the current one as it is
+    /// read, like any other record.
     pub fn roster(&self) -> Result<BTreeSet<String>, Error> {
-        let path = self.path_for(ROSTER)?;
-        let bytes = match std::fs::read(&path) {
-            Ok(b) => b,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(BTreeSet::new()),
-            Err(_) => return Err(Error::AppLockStore),
+        let Some((plain, older)) = self.fetch(ROSTER)? else {
+            return Ok(BTreeSet::new());
         };
-        let plain = self.open_bytes(ROSTER, &bytes)?;
         let text = String::from_utf8(plain).map_err(|_| Error::BadHeader)?;
-        Ok(text
+        let names: BTreeSet<String> = text
             .lines()
             .filter(|l| !l.is_empty())
             .map(|l| l.to_string())
-            .collect())
+            .collect();
+        if older {
+            self.save_roster(&names)?;
+        }
+        Ok(names)
     }
 
     /// Write the list of logical names, itself as an ordinary record.
     ///
-    /// The roster goes through the same encoding, sealing and padding as anything
-    /// else, so the file that says what is stored is not distinguishable from the
+    /// The roster goes through the same sealing and padding as anything else,
+    /// so the file that says what is stored is not distinguishable from the
     /// files it names.
     fn save_roster(&self, names: &BTreeSet<String>) -> Result<(), Error> {
         let text = names
@@ -566,20 +552,19 @@ impl Hoard {
         let mut report = Audit::default();
         let roster = self.roster()?;
 
+        // Both names count as ours: a record an older version wrote is not a
+        // stranger in the folder before it has been moved.
         let mut ours = BTreeSet::new();
-        ours.insert(self.name_for(ROSTER)?);
+        for logical in std::iter::once(ROSTER).chain(roster.iter().map(String::as_str)) {
+            ours.insert(self.name_for(logical)?);
+            ours.insert(self.legacy_name_for(logical)?);
+        }
         for logical in &roster {
-            let name = self.name_for(logical)?;
-            ours.insert(name.clone());
-            match std::fs::read(self.dir.join(&name)) {
-                Ok(bytes) => match self.open_bytes(logical, &bytes) {
-                    Ok(_) => report.intact.push(logical.clone()),
-                    Err(_) => report.tampered.push(logical.clone()),
-                },
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    report.missing.push(logical.clone())
-                }
-                Err(_) => return Err(Error::AppLockStore),
+            match self.fetch(logical) {
+                Ok(Some(_)) => report.intact.push(logical.clone()),
+                Ok(None) => report.missing.push(logical.clone()),
+                Err(Error::AppLockStore) => return Err(Error::AppLockStore),
+                Err(_) => report.tampered.push(logical.clone()),
             }
         }
 
@@ -592,6 +577,25 @@ impl Hoard {
             }
         }
         Ok(report)
+    }
+}
+
+/// The file's bytes, `None` if there is no such file, and an error for any
+/// other reason it cannot be read.
+fn read_if_present(path: &std::path::Path) -> Result<Option<Vec<u8>>, Error> {
+    match std::fs::read(path) {
+        Ok(bytes) => Ok(Some(bytes)),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(_) => Err(Error::AppLockStore),
+    }
+}
+
+/// Remove a file, treating one that is already gone as removed.
+fn remove_if_present(path: &std::path::Path) -> Result<(), Error> {
+    match std::fs::remove_file(path) {
+        Ok(()) => Ok(()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(_) => Err(Error::AppLockStore),
     }
 }
 
@@ -623,32 +627,22 @@ mod tests {
     use super::*;
 
     /// Sizing the padded buffer cannot wrap on a 32-bit target.
-    ///
-    /// `bucket_for` is fed a record length times eight, and this project ships
-    /// i686 and armv7 builds where that wraps above about 512 MiB. No test can
-    /// allocate that much, so the arithmetic is checked here directly.
     #[test]
     fn the_padding_size_is_refused_rather_than_wrapping() {
-        // What the real path computes, at a length that wraps on 32 bits.
-        let huge = usize::MAX / 4;
         assert!(
-            huge.checked_mul(MAX_EXPANSION).is_none(),
-            "this length is meant to overflow the multiplication"
+            usize::MAX.checked_add(LEN_PREFIX).is_none(),
+            "this length is meant to overflow the addition"
         );
-
-        // And a workable length still rounds up to a bucket that holds it.
         for len in [0usize, 1, 100, 4096, 1_000_000] {
             let padded = len
-                .checked_mul(MAX_EXPANSION)
-                .and_then(|n| n.checked_add(MARKER + LEN_PREFIX))
+                .checked_add(LEN_PREFIX)
                 .map(bucket_for)
                 .expect("an ordinary record size must not overflow");
             assert!(
-                padded >= MARKER + LEN_PREFIX + len,
+                padded >= LEN_PREFIX + len,
                 "a {len} byte record was padded to {padded}, which cannot hold it"
             );
         }
-
         // `bucket_for`'s own rounding saturates rather than wrapping to zero.
         assert!(bucket_for(usize::MAX) >= usize::MAX - 1_048_576);
     }
@@ -661,6 +655,25 @@ mod tests {
     fn other_hoard(dir: &std::path::Path) -> Hoard {
         let mut raw = [9u8; kdf::KEY_LEN];
         Hoard::open(dir, StoreKey::from_secret(Secret::new(&mut raw)))
+    }
+
+    /// **F-335.** Writing a record that is already there replaces it by a
+    /// rename, so a crash part-way cannot leave half of one.
+    #[cfg(unix)]
+    #[test]
+    fn rewriting_a_record_replaces_it_rather_than_rewriting_it() {
+        use std::os::unix::fs::MetadataExt;
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        h.write("settings", b"the first").unwrap();
+        let path = h.path_for("settings").unwrap();
+        let before = std::fs::metadata(&path).unwrap().ino();
+        h.write("settings", b"the second").unwrap();
+        assert_ne!(std::fs::metadata(&path).unwrap().ino(), before);
+        assert_eq!(
+            h.read("settings").unwrap().as_deref(),
+            Some(&b"the second"[..])
+        );
     }
 
     #[test]
@@ -724,15 +737,10 @@ mod tests {
         assert_eq!(a, b, "one byte and twenty fall in the same bucket");
     }
 
-    /// A file's size must depend on the data's length and nothing else.
-    ///
-    /// The encoding is drawn fresh on every write. If the bucket were chosen
-    /// from the *encoded* length, a record rewritten repeatedly would move
-    /// between buckets, and the smallest bucket ever seen would pin the true
-    /// length far more tightly than one bucket was meant to allow. Padding is
-    /// supposed to hide length; that would have handed it back.
+    /// A file's size depends on the data's length and nothing else, however
+    /// many times the record is rewritten.
     #[test]
-    fn the_file_size_does_not_move_when_the_encoding_does() {
+    fn the_file_size_does_not_move_between_writes() {
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
         let data = vec![0x41u8; 200];
@@ -753,23 +761,18 @@ mod tests {
         );
     }
 
+    /// **F-337.** A record is padded for its own length, not for the widest
+    /// of the encodings the old format could draw.
     #[test]
-    fn no_encoding_expands_past_the_allowance() {
-        // `MAX_EXPANSION` is what makes the bucket independent of the choice.
-        // A new encoding that grew further would overflow into a larger bucket
-        // and reopen the leak, so the allowance is measured rather than
-        // assumed.
-        for weave in crate::weave::ALL {
-            for len in [0usize, 1, 2, 3, 5, 17, 64, 255, 1000] {
-                let input = vec![0x5au8; len];
-                let out = weave.apply(&crate::weave::Weave::Substitute.apply(&input));
-                assert!(
-                    out.len() <= len * MAX_EXPANSION + MAX_EXPANSION,
-                    "{weave:?} turned {len} bytes into {}, past the {MAX_EXPANSION}x allowance",
-                    out.len()
-                );
-            }
-        }
+    fn a_small_record_is_padded_to_the_smallest_bucket() {
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        h.write("settings", &[0x41u8; 200]).unwrap();
+        let size = std::fs::metadata(h.path_for("settings").unwrap())
+            .unwrap()
+            .len();
+        let expected = OUTER_MARKER + aead::NONCE_LEN + BUCKETS[0] + aead::TAG_LEN;
+        assert_eq!(size, expected as u64);
     }
 
     #[test]
@@ -887,40 +890,79 @@ mod tests {
         assert_eq!(h.roster().unwrap().len(), 1);
     }
 
-    /// Every record is written through a different encoding, over time.
-    ///
-    /// The choice is drawn fresh on each write, so the same record written
-    /// many times should not keep landing on the same one. A scheme that says
-    /// it picks at random and does not is worse than one that never claimed to.
+    /// A record the way VeilVoice wrote one before F-337: encoded, sealed,
+    /// encoded again, and stored under the woven name.
+    fn write_legacy(h: &Hoard, logical: &str, data: &[u8]) {
+        let name = h.legacy_name_for(logical).unwrap();
+        let (chosen, body) = crate::weave::encode(data).unwrap();
+        let padded_len = bucket_for(data.len() * 8 + LEGACY_MARKER + LEN_PREFIX);
+        let mut plain = vec![0u8; padded_len];
+        plain[..LEGACY_MARKER].copy_from_slice(&chosen.id());
+        plain[LEGACY_MARKER..LEGACY_MARKER + LEN_PREFIX]
+            .copy_from_slice(&(body.len() as u32).to_le_bytes());
+        let start = LEGACY_MARKER + LEN_PREFIX;
+        plain[start..start + body.len()].copy_from_slice(&body);
+        let mut key = Secret::zeroed(kdf::KEY_LEN);
+        h.key.expand(INFO_REC, logical, key.expose_mut()).unwrap();
+        let nonce = aead::random_nonce().unwrap();
+        let sealed = aead::seal(&key, &nonce, name.as_bytes(), &plain).unwrap();
+        let mut blob = nonce.to_vec();
+        blob.extend_from_slice(&sealed);
+        let outer = crate::weave::Weave::random_length_preserving().unwrap();
+        let mut bytes = outer.id().to_vec();
+        bytes.extend_from_slice(&outer.apply(&blob));
+        std::fs::create_dir_all(dir_of(h)).unwrap();
+        std::fs::write(dir_of(h).join(&name), bytes).unwrap();
+    }
+
+    fn dir_of(h: &Hoard) -> &std::path::Path {
+        &h.dir
+    }
+
+    /// **F-337.** A record an older VeilVoice wrote still opens, and is moved
+    /// to the current format and name the first time it is read.
     #[test]
-    fn the_encoding_changes_from_one_write_to_the_next() {
+    fn a_record_in_the_old_format_opens_and_moves_to_the_new_one() {
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
-        let mut shapes = std::collections::BTreeSet::new();
-        for _ in 0..60 {
-            h.write("settings", b"theme=dark, and a little more to encode")
-                .unwrap();
-            let raw = std::fs::read(h.path_for("settings").unwrap()).unwrap();
-            // The nonce differs every time, so hash the whole file rather than
-            // comparing bytes: what is being checked is that the *encoding*
-            // varies, which shows up as a varying sealed length.
-            shapes.insert(raw.len());
-            assert_eq!(
-                h.read("settings").unwrap().unwrap(),
-                b"theme=dark, and a little more to encode",
-                "whichever encoding was drawn, the record has to come back"
-            );
+        for round in 0..20 {
+            let logical = format!("settings {round}");
+            write_legacy(&h, &logical, b"theme=dark");
+            assert_eq!(h.read(&logical).unwrap().unwrap(), b"theme=dark");
+            let now = std::fs::read(h.path_for(&logical).unwrap()).unwrap();
+            assert_eq!(&now[..OUTER_MARKER], &FORMAT, "it was not moved");
+            let legacy = h.legacy_name_for(&logical).unwrap();
+            if legacy != h.name_for(&logical).unwrap() {
+                assert!(!dir.path().join(legacy).exists(), "the old copy was left");
+            }
+            assert_eq!(h.read(&logical).unwrap().unwrap(), b"theme=dark");
         }
-        // Bucket padding hides most of the variation, which is deliberate --
-        // so this asserts the weaker, true thing: it still round trips every
-        // time, across sixty independent draws.
-        assert!(!shapes.is_empty());
+    }
+
+    /// **F-337.** A folder an older VeilVoice wrote, roster and all, audits
+    /// clean, and its old files are not counted as strangers.
+    #[test]
+    fn a_folder_in_the_old_format_audits_clean() {
+        let dir = tempfile::tempdir().unwrap();
+        let h = hoard(dir.path());
+        write_legacy(&h, "measured", b"3 runs");
+        write_legacy(&h, ROSTER, b"measured");
+        let report = h.audit().unwrap();
+        assert!(report.is_clean(), "{report:?}");
+        assert_eq!(report.intact, vec!["measured".to_string()]);
+        assert_eq!(report.unrecognised, 0);
+        assert_eq!(h.read("measured").unwrap().unwrap(), b"3 runs");
+    }
+
+    /// The current format's marker can never be read as an old one.
+    #[test]
+    fn the_format_marker_is_no_old_encoding() {
+        assert!(crate::weave::Weave::from_id(FORMAT).is_err());
     }
 
     #[test]
     fn a_records_plaintext_is_never_on_disk_even_before_the_cipher() {
-        // The property `crate::weave` exists for, checked at this level rather
-        // than only at its own: nothing recognisable reaches the file.
+        // Nothing recognisable reaches the file: the AEAD covers it.
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
         for _ in 0..40 {
@@ -937,11 +979,9 @@ mod tests {
     }
 
     #[test]
-    fn a_woven_name_is_still_twenty_four_characters() {
-        // Names go through a length-preserving encoding before the base64. If
-        // one of them ever changed the byte count, the filename length would
-        // announce which encoding was used, and would separate records from
-        // decoys at a glance.
+    fn a_name_is_always_twenty_four_characters() {
+        // A filename whose length varied would separate records from decoys at
+        // a glance.
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
         for logical in [
@@ -960,9 +1000,8 @@ mod tests {
 
     #[test]
     fn a_name_is_the_same_every_time_it_is_derived() {
-        // The encoding for a name is chosen from the name's own bytes, so it
-        // has to be stable: an unstable one loses the record on the next
-        // launch, which is F-141 in a new costume.
+        // A name has to be the same every time it is derived: an unstable one
+        // loses the record on the next launch, which is F-141 in a new costume.
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
         let first = h.name_for("settings").unwrap();
@@ -974,7 +1013,7 @@ mod tests {
     }
 
     #[test]
-    fn decoys_are_still_the_same_shape_as_woven_records() {
+    fn decoys_and_records_share_one_name_shape() {
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
         h.write("settings", b"theme=dark").unwrap();
@@ -989,49 +1028,20 @@ mod tests {
         assert!(h.audit().unwrap().is_clean());
     }
 
-    /// The outer encoding varies, and the record still comes back.
-    ///
-    /// The whole "before or after the cipher" ask: an outer length-preserving
-    /// weave is applied after sealing, drawn fresh each time, and the record
-    /// round trips whichever one was drawn.
     #[test]
-    fn a_record_survives_whatever_outer_encoding_was_drawn() {
+    fn the_format_marker_is_the_first_two_bytes() {
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());
-        // Enough writes that many different outer encodings are exercised.
-        for i in 0..80 {
-            let payload = format!("run {i}: theme=dark, sessions={i}");
-            h.write("settings", payload.as_bytes()).unwrap();
-            assert_eq!(
-                h.read("settings").unwrap().unwrap(),
-                payload.as_bytes(),
-                "a record did not survive its outer encoding"
-            );
-        }
-    }
-
-    #[test]
-    fn the_outer_marker_is_the_first_two_bytes_and_varies() {
-        let dir = tempfile::tempdir().unwrap();
-        let h = hoard(dir.path());
-        let mut markers = std::collections::BTreeSet::new();
-        for _ in 0..120 {
-            h.write("settings", b"some bytes to encode and seal")
-                .unwrap();
-            let raw = std::fs::read(h.path_for("settings").unwrap()).unwrap();
-            markers.insert(raw[0]);
-        }
-        assert!(
-            markers.len() > 1,
-            "the outer encoding never changed across 120 writes"
-        );
+        h.write("settings", b"some bytes to seal").unwrap();
+        let raw = std::fs::read(h.path_for("settings").unwrap()).unwrap();
+        assert_eq!(&raw[..OUTER_MARKER], &FORMAT);
     }
 
     #[test]
     fn nothing_on_disk_is_a_long_run_of_one_byte() {
         // A well-formed record is sealed ciphertext with a fixed-size frame:
         // no long constant runs, even from all-zero input. This checks the
-        // padding and the outer transform do not accidentally introduce one,
+        // padding and the framing do not accidentally introduce one,
         // which would be a framing bug worth catching regardless.
         let dir = tempfile::tempdir().unwrap();
         let h = hoard(dir.path());

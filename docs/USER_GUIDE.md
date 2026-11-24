@@ -682,8 +682,8 @@ Where every choice the window remembers is made, and where they are kept.
 | Page | What is on it |
 |---|---|
 | **Interface** | The colour scheme, which is every palette the website has. Whether the mark in the header animates, and whether the window icon does. How often the window draws while something is moving, and whether the header carries a live frame-rate readout. Whether the **install** tab is shown at all. |
-| **Locking** | The app lock and the idle timer that turns it on. See §5 and §5.5. |
-| **At rest** | Whether a result is sealed with the app-lock password as well, and where a vault lives if you keep one. See §5.7. |
+| **Locking** | The app lock and the idle timer that turns it on. See §5 and §5.6. |
+| **At rest** | Whether a result is sealed with the app-lock password as well, and where a vault lives if you keep one. See §5.8. |
 | **Notifications** | How the window tells you a job has finished. |
 
 The file itself is plain text, one `key = value` a line, at
@@ -948,8 +948,9 @@ which, because two of the four things below are speed bumps and two are not.
   becomes cheap, the next time you unlock, VeilVoice tells you. The report is
   written down, so it survives a restart, and clearing it asks for your
   passphrase, so the person who caused it cannot dismiss it.
-- The lock is kept in **two copies**, in two directories. Deleting one does not
-  remove the lock: the other puts it back, and you are told it happened.
+- The lock is kept in **two copies** (where they live is in 5.2). Deleting one
+  does not remove the lock: the other puts it back, and you are told it
+  happened.
 - On Linux and macOS, when VeilVoice is run with administrator rights, the
   second copy is written under `/etc/veilvoice` and is thereafter not writable
   by an ordinary user. Removing the lock then needs `sudo`. VeilVoice never
@@ -1015,7 +1016,7 @@ everything it had ever written. VeilVoice keeps the two derivations domain
 separated, so typing the same passphrase in both places still does not produce
 two copies of one value, though one guess would then open both.
 
-**You can now choose to have one.** On the security tab, under how recordings
+**You can now choose to have one.** On the **Lock** tab, under how recordings
 are sealed, there is a third option beside *passphrase* and *public key*: **app
 lock**. With it on, every recording VeilVoice writes is sealed with your
 app-lock password automatically, with nothing else to set up and nothing else
@@ -1062,7 +1063,7 @@ design.
 
 ---
 
-## 5.5 Locking the window when you walk away
+## 5.6 Locking the window when you walk away
 
 Off unless you turn it on, under **Settings, Locking**.
 
@@ -1079,11 +1080,11 @@ worth locking away.
 The countdown runs on the window's own clock, not the system one, so changing
 the machine's time neither brings the lock forward nor pushes it back.
 
-## 5.6 VeilVoice checking its own files
+## 5.7 VeilVoice checking its own files
 
 The first time VeilVoice runs it writes down what its own program file looks
 like: the size and a SHA-256. Every launch after that it checks the file against
-that record and shows the answer on the security tab. Nothing has to be turned
+that record and shows the answer on the **Lock** tab. Nothing has to be turned
 on and there is no command to remember, which was the whole problem with
 `veilvoice guard init` being a command.
 
@@ -1093,7 +1094,7 @@ passphrase exists. Somebody who changes the program file then has to change the
 record too, and to do that they need your passphrase.
 
 **With no app lock**, there is no passphrase to seal it with, so the record is
-written in the clear and the security tab says so in those words. It still
+written in the clear and the **Lock** tab says so in those words. It still
 catches a file that changed by accident, a half-finished update, or a careless
 overwrite. It does not catch somebody who thought to rewrite the record as
 well, and a record sealed under a key kept beside it would be a decoration
@@ -1111,10 +1112,10 @@ configuration directory would describe nothing anybody checks.
 `veilvoice guard init`, `check` and `status` still work, read the same record,
 and can watch more files than the window does. See §4.
 
-## 5.7 Saving into a Cryptomator vault or a VeraCrypt volume
+## 5.8 Saving into a Cryptomator vault or a VeraCrypt volume
 
 VeilVoice can write every veiled recording straight into an encrypted folder you
-already have, instead of leaving it beside the original. The security tab has a
+already have, instead of leaving it beside the original. The **Lock** tab has a
 section called **Where recordings go**.
 
 It looks for a mounted Cryptomator vault or VeraCrypt volume and offers what it
@@ -1163,7 +1164,7 @@ vault while you believe it is inside one is exactly what this is here to
 prevent. If the volume is locked when you come to use it, VeilVoice says so
 rather than writing into the empty mount point.
 
-### 5.8 Encrypt the disk as well
+### 5.9 Encrypt the disk as well
 
 An encrypted volume protects the files inside it. It does not protect the
 temporary files, swap or hibernation image, thumbnails or recently-opened lists
@@ -1185,7 +1186,7 @@ without being asked. A veiled recording inside a Cryptomator vault on an
 encrypted disk is encrypted by two independent tools, and what that buys is not
 extra strength so much as independence: a defect in one is not a defect in both.
 
-## 5.9 An interview, start to finish
+## 5.10 An interview, start to finish
 
 The commonest thing people ask VeilVoice to do, in the order it happens. This is
 also how to veil the person you were interviewing rather than only yourself.
@@ -1291,7 +1292,7 @@ If your recording already has one channel per person, the split is exact and
 there is no plan to write. That is the better arrangement whenever you can
 manage it: no times to type, and no chance of typing them wrong.
 
-## 5.10 Policies: settings somebody else decided
+## 5.11 Policies: settings somebody else decided
 
 For a newsroom, a clinic, a legal team: one person writes down what VeilVoice
 must do on every machine, and the machines hold to it.
@@ -1383,7 +1384,7 @@ but the person using it.
 
 ---
 
-## 5.11 A whole session in the desktop app, start to finish
+## 5.12 A whole session in the desktop app, start to finish
 
 The path most people actually want, in the window rather than the terminal.
 
@@ -1409,7 +1410,7 @@ figure nobody measured.
 **3. Pick where output goes.** Settings, or the Anonymise tab. If you keep a
 Cryptomator vault or a VeraCrypt volume, point VeilVoice at it now and answer
 the hidden-volume question, because it will not write anything until you have
-(section 5.7).
+(section 5.8).
 
 **4. Veil the recording.** Anonymise tab: choose the file, choose an intensity,
 render. With a recording password set, what lands on disk is encrypted.
@@ -1421,12 +1422,12 @@ substitutes for this.
 **6. Check it back.** Verify tab again if you are sending it somewhere, and
 `veilvoice guard` if you want VeilVoice to notice its own files changing.
 
-For several speakers at once, that is the Group tab and section 5.9, which
+For several speakers at once, that is the Group tab and section 5.10, which
 walks through an interview from the raw file to a finished render.
 
 ---
 
-## 5.12 If VeilVoice keeps closing on Windows
+## 5.13 If VeilVoice keeps closing on Windows
 
 A brand-new application that few people have run yet has, in antivirus terms, a
 low reputation, and a low-reputation program that reads a microphone and writes

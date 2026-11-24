@@ -431,7 +431,8 @@ impl Workspace {
         // was writing it readable by every account on the machine.
         //
         // The same slip as the group render's four files, in a third program.
-        veilvoice_crypto::privatefile::write_owner_only(path, self.to_text().as_bytes())
+        // Replaced in one step, so a crash part-way leaves the old record. F-335.
+        veilvoice_crypto::privatefile::replace_owner_only(path, self.to_text().as_bytes())
             .map_err(|e| Error::Io(format!("cannot write {}: {e}", path.display())))
     }
 

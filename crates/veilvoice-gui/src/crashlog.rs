@@ -102,12 +102,14 @@ pub fn write(path: &Path, kind: &str, detail: &str) {
     text.push_str(std::env::consts::ARCH);
     text.push_str("\n\ndetail:\n");
     // Bounded: a panic message can carry a formatted value of any size, and
-    // this file is read by a person.
-    let detail = if detail.len() > 4000 {
-        &detail[..4000]
-    } else {
-        detail
-    };
+    // this file is read by a person. **F-336.** Cut on a character boundary:
+    // slicing at byte 4000 panics when a character straddles it, and a panic
+    // here, inside the panic hook, is an abort that writes nothing at all.
+    let cut = (0..=detail.len().min(4000))
+        .rev()
+        .find(|&at| detail.is_char_boundary(at))
+        .unwrap_or(0);
+    let detail = &detail[..cut];
     text.push_str(detail);
     text.push_str(
         "\n\n\
@@ -241,6 +243,20 @@ pub fn clear() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-336.** A long message with a character across the cut is written,
+    /// cut short, rather than panicking in the hook.
+    #[test]
+    fn a_long_message_is_cut_on_a_character_boundary() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("crash.txt");
+        // 3999 bytes, then a two-byte character over the 4000th.
+        let detail = format!("{}\u{e9}{}", "a".repeat(3999), "b".repeat(100));
+        write(&path, "panic", &detail);
+        let text = std::fs::read_to_string(&path).expect("the log is written");
+        assert!(text.contains(&"a".repeat(3999)));
+        assert!(!text.contains("\u{e9}b"), "the message was not cut");
+    }
 
     /// No panic VeilVoice writes itself puts a path in its message.
     ///

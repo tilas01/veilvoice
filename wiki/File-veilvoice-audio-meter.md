@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/meter.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 166 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs)
+[veilvoice-audio](Crate-veilvoice-audio) &middot; 166 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/meter.rs)
 
 ## Contents
 

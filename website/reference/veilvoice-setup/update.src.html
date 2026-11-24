@@ -63,7 +63,7 @@
 </header>
 <main class="wrap" style="padding-top:30px">
 <h1><code>crates/veilvoice-setup/src/update.rs</code></h1>
-<p style="color:var(--muted)"><a href="update.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 908 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
+<p style="color:var(--muted)"><a href="update.html">what this file is for</a> &middot; <a href="../veilvoice-setup.html">veilvoice-setup</a> &middot; 945 lines &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs" rel="noopener noreferrer">the same file on GitHub</a></p>
 <p style="color:var(--muted)">The file as it is in the tree, in the colours you chose. A line number is a link, and so is every box in this file&#8217;s diagram: it opens here with the function it names marked.</p>
 <pre class="src"><code>
 <span class="ln" id="L1"><span class="tok-com">// SPDX-License-Identifier: GPL-3.0-or-later</span></span>
@@ -596,438 +596,479 @@
 <span class="ln" id="L477"><span class="tok-com">/// `url` is the page for this build&#x27;s own stream, and which page it is decides</span></span>
 <span class="ln" id="L478"><span class="tok-com">/// how curl is driven: see the note beside the two argument lists.</span></span>
 <span class="ln" id="L479"><span class="tok-kw">fn</span> <span class="tok-fn">fetch</span>(tool: &amp;Tool, url: &amp;str) -&gt; Result&lt;String, Error&gt; {</span>
-<span class="ln" id="L480">    <span class="tok-kw">let</span> seconds = TIMEOUT.<span class="tok-fn">as_secs</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L481">    <span class="tok-com">// `/releases/latest` answers with a redirect whose target *is* the tag, so</span></span>
-<span class="ln" id="L482">    <span class="tok-com">// the body can be thrown away. `/releases`, which an early build reads</span></span>
-<span class="ln" id="L483">    <span class="tok-com">// because the first page never names a prerelease, answers with itself:</span></span>
-<span class="ln" id="L484">    <span class="tok-com">// there is no redirect to read and the tag is in the body. Asking curl for</span></span>
-<span class="ln" id="L485">    <span class="tok-com">// the effective URL of that page would return the page&#x27;s own address every</span></span>
-<span class="ln" id="L486">    <span class="tok-com">// time, which parses as no version at all, so the body is what is read.</span></span>
-<span class="ln" id="L487">    <span class="tok-kw">let</span> redirect_carries_the_answer = url == LATEST_URL;</span>
-<span class="ln" id="L488">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(&amp;tool.program);</span>
-<span class="ln" id="L489">    <span class="tok-kw">if</span> tool.wget {</span>
-<span class="ln" id="L490">        command.<span class="tok-fn">args</span>([</span>
-<span class="ln" id="L491">            <span class="tok-str">&quot;--quiet&quot;</span>,</span>
-<span class="ln" id="L492">            <span class="tok-str">&quot;--max-redirect=5&quot;</span>,</span>
-<span class="ln" id="L493">            <span class="tok-str">&quot;--timeout&quot;</span>,</span>
-<span class="ln" id="L494">            &amp;seconds,</span>
-<span class="ln" id="L495">            <span class="tok-str">&quot;--tries=1&quot;</span>,</span>
-<span class="ln" id="L496">            <span class="tok-str">&quot;-O&quot;</span>,</span>
-<span class="ln" id="L497">            <span class="tok-str">&quot;-&quot;</span>,</span>
-<span class="ln" id="L498">            url,</span>
-<span class="ln" id="L499">        ]);</span>
-<span class="ln" id="L500">    } <span class="tok-kw">else</span> <span class="tok-kw">if</span> !redirect_carries_the_answer {</span>
-<span class="ln" id="L501">        command.<span class="tok-fn">args</span>([</span>
-<span class="ln" id="L502">            <span class="tok-str">&quot;-L&quot;</span>,</span>
-<span class="ln" id="L503">            <span class="tok-str">&quot;--max-redirs&quot;</span>,</span>
-<span class="ln" id="L504">            <span class="tok-str">&quot;5&quot;</span>,</span>
-<span class="ln" id="L505">            <span class="tok-str">&quot;--silent&quot;</span>,</span>
-<span class="ln" id="L506">            <span class="tok-str">&quot;--show-error&quot;</span>,</span>
-<span class="ln" id="L507">            <span class="tok-str">&quot;--max-time&quot;</span>,</span>
+<span class="ln" id="L480">    <span class="tok-kw">let</span> <span class="tok-kw">mut</span> command = <span class="tok-kw">crate</span>::<span class="tok-fn">command</span>(&amp;tool.program);</span>
+<span class="ln" id="L481">    command.<span class="tok-fn">args</span>(<span class="tok-fn">fetch_arguments</span>(tool.wget, url));</span>
+<span class="ln" id="L482">    <span class="tok-kw">let</span> output = command.<span class="tok-fn">output</span>().<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Failed</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
+<span class="ln" id="L483">    <span class="tok-fn">fetched</span>(tool, output)</span>
+<span class="ln" id="L484">}</span>
+</span>
+<span class="ln" id="L485"></span>
+<span class="src-item" id="fn-fetch_arguments">
+<span class="ln" id="L486"><span class="tok-com">/// What the downloader is told, to read one page of the releases.</span></span>
+<span class="ln" id="L487"><span class="tok-com">///</span></span>
+<span class="ln" id="L488"><span class="tok-com">/// **F-317.** curl&#x27;s `-q` comes first and wget gets `--no-config`, so neither</span></span>
+<span class="ln" id="L489"><span class="tok-com">/// reads its user&#x27;s configuration file, which can turn off certificate checks</span></span>
+<span class="ln" id="L490"><span class="tok-com">/// or add a proxy. wget is held to HTTPS as curl already was: a redirect onto</span></span>
+<span class="ln" id="L491"><span class="tok-com">/// plain HTTP is refused rather than followed.</span></span>
+<span class="ln" id="L492"><span class="tok-kw">fn</span> <span class="tok-fn">fetch_arguments</span>(wget: bool, url: &amp;str) -&gt; Vec&lt;String&gt; {</span>
+<span class="ln" id="L493">    <span class="tok-kw">let</span> seconds = TIMEOUT.<span class="tok-fn">as_secs</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L494">    <span class="tok-com">// `/releases/latest` answers with a redirect whose target *is* the tag, so</span></span>
+<span class="ln" id="L495">    <span class="tok-com">// the body can be thrown away. `/releases`, which an early build reads</span></span>
+<span class="ln" id="L496">    <span class="tok-com">// because the first page never names a prerelease, answers with itself:</span></span>
+<span class="ln" id="L497">    <span class="tok-com">// there is no redirect to read and the tag is in the body. Asking curl for</span></span>
+<span class="ln" id="L498">    <span class="tok-com">// the effective URL of that page would return the page&#x27;s own address every</span></span>
+<span class="ln" id="L499">    <span class="tok-com">// time, which parses as no version at all, so the body is what is read.</span></span>
+<span class="ln" id="L500">    <span class="tok-kw">let</span> redirect_carries_the_answer = url == LATEST_URL;</span>
+<span class="ln" id="L501">    <span class="tok-kw">let</span> words: Vec&lt;&amp;str&gt; = <span class="tok-kw">if</span> wget {</span>
+<span class="ln" id="L502">        vec![</span>
+<span class="ln" id="L503">            <span class="tok-str">&quot;--no-config&quot;</span>,</span>
+<span class="ln" id="L504">            <span class="tok-str">&quot;--quiet&quot;</span>,</span>
+<span class="ln" id="L505">            <span class="tok-str">&quot;--https-only&quot;</span>,</span>
+<span class="ln" id="L506">            <span class="tok-str">&quot;--max-redirect=5&quot;</span>,</span>
+<span class="ln" id="L507">            <span class="tok-str">&quot;--timeout&quot;</span>,</span>
 <span class="ln" id="L508">            &amp;seconds,</span>
-<span class="ln" id="L509">            <span class="tok-str">&quot;--proto&quot;</span>,</span>
-<span class="ln" id="L510">            <span class="tok-str">&quot;=https&quot;</span>,</span>
-<span class="ln" id="L511">            url,</span>
-<span class="ln" id="L512">        ]);</span>
-<span class="ln" id="L513">    } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L514">        <span class="tok-com">// The body is thrown away and only the **final URL** is printed. The</span></span>
-<span class="ln" id="L515">        <span class="tok-com">// redirect target of `/releases/latest` *is* the tag -- one line</span></span>
-<span class="ln" id="L516">        <span class="tok-com">// instead of two hundred kilobytes of a page, nothing of the reply</span></span>
-<span class="ln" id="L517">        <span class="tok-com">// reaching the scanner, and no way for markup to be mistaken for a</span></span>
-<span class="ln" id="L518">        <span class="tok-com">// version. Measured on the real page: 205,538 bytes against 54.</span></span>
-<span class="ln" id="L519">        command.<span class="tok-fn">args</span>([</span>
-<span class="ln" id="L520">            <span class="tok-str">&quot;-L&quot;</span>,</span>
-<span class="ln" id="L521">            <span class="tok-str">&quot;--max-redirs&quot;</span>,</span>
-<span class="ln" id="L522">            <span class="tok-str">&quot;5&quot;</span>,</span>
-<span class="ln" id="L523">            <span class="tok-str">&quot;--silent&quot;</span>,</span>
-<span class="ln" id="L524">            <span class="tok-str">&quot;--show-error&quot;</span>,</span>
-<span class="ln" id="L525">            <span class="tok-str">&quot;--max-time&quot;</span>,</span>
-<span class="ln" id="L526">            &amp;seconds,</span>
-<span class="ln" id="L527">            <span class="tok-com">// `--proto =https` refuses to be redirected onto a plain-text or a</span></span>
-<span class="ln" id="L528">            <span class="tok-com">// file scheme. Without it a redirect chain decides the protocol.</span></span>
-<span class="ln" id="L529">            <span class="tok-str">&quot;--proto&quot;</span>,</span>
-<span class="ln" id="L530">            <span class="tok-str">&quot;=https&quot;</span>,</span>
-<span class="ln" id="L531">            <span class="tok-str">&quot;-o&quot;</span>,</span>
-<span class="ln" id="L532">            NULL_DEVICE,</span>
-<span class="ln" id="L533">            <span class="tok-str">&quot;-w&quot;</span>,</span>
-<span class="ln" id="L534">            <span class="tok-str">&quot;%{url_effective}&quot;</span>,</span>
-<span class="ln" id="L535">            url,</span>
-<span class="ln" id="L536">        ]);</span>
-<span class="ln" id="L537">    }</span>
-<span class="ln" id="L538">    <span class="tok-kw">let</span> output = command.<span class="tok-fn">output</span>().<span class="tok-fn">map_err</span>(|e| Error::<span class="tok-fn">Failed</span>(e.<span class="tok-fn">to_string</span>()))?;</span>
-<span class="ln" id="L539">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
-<span class="ln" id="L540">        <span class="tok-kw">let</span> said = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L541">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Failed</span>(<span class="tok-kw">if</span> said.<span class="tok-fn">is_empty</span>() {</span>
-<span class="ln" id="L542">            format!(<span class="tok-str">&quot;{} exited with {}&quot;</span>, tool.program.<span class="tok-fn">display</span>(), output.status)</span>
-<span class="ln" id="L543">        } <span class="tok-kw">else</span> {</span>
-<span class="ln" id="L544">            said</span>
-<span class="ln" id="L545">        }));</span>
-<span class="ln" id="L546">    }</span>
-<span class="ln" id="L547">    <span class="tok-com">// Bounded before it is looked at. A reply is a public release page; a</span></span>
-<span class="ln" id="L548">    <span class="tok-com">// reply the size of a film is something else, and reading all of it into</span></span>
-<span class="ln" id="L549">    <span class="tok-com">// a string to search for one substring is the wrong thing to do with it.</span></span>
-<span class="ln" id="L550">    <span class="tok-kw">const</span> MAX: usize = <span class="tok-num">4</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>;</span>
-<span class="ln" id="L551">    <span class="tok-kw">let</span> body = &amp;output.stdout[..output.stdout.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(MAX)];</span>
-<span class="ln" id="L552">    <span class="tok-fn">Ok</span>(String::<span class="tok-fn">from_utf8_lossy</span>(body).<span class="tok-fn">into_owned</span>())</span>
-<span class="ln" id="L553">}</span>
+<span class="ln" id="L509">            <span class="tok-str">&quot;--tries=1&quot;</span>,</span>
+<span class="ln" id="L510">            <span class="tok-str">&quot;-O&quot;</span>,</span>
+<span class="ln" id="L511">            <span class="tok-str">&quot;-&quot;</span>,</span>
+<span class="ln" id="L512">            url,</span>
+<span class="ln" id="L513">        ]</span>
+<span class="ln" id="L514">    } <span class="tok-kw">else</span> <span class="tok-kw">if</span> !redirect_carries_the_answer {</span>
+<span class="ln" id="L515">        vec![</span>
+<span class="ln" id="L516">            <span class="tok-str">&quot;-q&quot;</span>,</span>
+<span class="ln" id="L517">            <span class="tok-str">&quot;-L&quot;</span>,</span>
+<span class="ln" id="L518">            <span class="tok-str">&quot;--max-redirs&quot;</span>,</span>
+<span class="ln" id="L519">            <span class="tok-str">&quot;5&quot;</span>,</span>
+<span class="ln" id="L520">            <span class="tok-str">&quot;--silent&quot;</span>,</span>
+<span class="ln" id="L521">            <span class="tok-str">&quot;--show-error&quot;</span>,</span>
+<span class="ln" id="L522">            <span class="tok-str">&quot;--max-time&quot;</span>,</span>
+<span class="ln" id="L523">            &amp;seconds,</span>
+<span class="ln" id="L524">            <span class="tok-str">&quot;--proto&quot;</span>,</span>
+<span class="ln" id="L525">            <span class="tok-str">&quot;=https&quot;</span>,</span>
+<span class="ln" id="L526">            url,</span>
+<span class="ln" id="L527">        ]</span>
+<span class="ln" id="L528">    } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L529">        <span class="tok-com">// The body is thrown away and only the **final URL** is printed. The</span></span>
+<span class="ln" id="L530">        <span class="tok-com">// redirect target of `/releases/latest` *is* the tag -- one line</span></span>
+<span class="ln" id="L531">        <span class="tok-com">// instead of two hundred kilobytes of a page, nothing of the reply</span></span>
+<span class="ln" id="L532">        <span class="tok-com">// reaching the scanner, and no way for markup to be mistaken for a</span></span>
+<span class="ln" id="L533">        <span class="tok-com">// version. Measured on the real page: 205,538 bytes against 54.</span></span>
+<span class="ln" id="L534">        vec![</span>
+<span class="ln" id="L535">            <span class="tok-str">&quot;-q&quot;</span>,</span>
+<span class="ln" id="L536">            <span class="tok-str">&quot;-L&quot;</span>,</span>
+<span class="ln" id="L537">            <span class="tok-str">&quot;--max-redirs&quot;</span>,</span>
+<span class="ln" id="L538">            <span class="tok-str">&quot;5&quot;</span>,</span>
+<span class="ln" id="L539">            <span class="tok-str">&quot;--silent&quot;</span>,</span>
+<span class="ln" id="L540">            <span class="tok-str">&quot;--show-error&quot;</span>,</span>
+<span class="ln" id="L541">            <span class="tok-str">&quot;--max-time&quot;</span>,</span>
+<span class="ln" id="L542">            &amp;seconds,</span>
+<span class="ln" id="L543">            <span class="tok-com">// `--proto =https` refuses to be redirected onto a plain-text or a</span></span>
+<span class="ln" id="L544">            <span class="tok-com">// file scheme. Without it a redirect chain decides the protocol.</span></span>
+<span class="ln" id="L545">            <span class="tok-str">&quot;--proto&quot;</span>,</span>
+<span class="ln" id="L546">            <span class="tok-str">&quot;=https&quot;</span>,</span>
+<span class="ln" id="L547">            <span class="tok-str">&quot;-o&quot;</span>,</span>
+<span class="ln" id="L548">            NULL_DEVICE,</span>
+<span class="ln" id="L549">            <span class="tok-str">&quot;-w&quot;</span>,</span>
+<span class="ln" id="L550">            <span class="tok-str">&quot;%{url_effective}&quot;</span>,</span>
+<span class="ln" id="L551">            url,</span>
+<span class="ln" id="L552">        ]</span>
+<span class="ln" id="L553">    };</span>
+<span class="ln" id="L554">    words.<span class="tok-fn">into_iter</span>().<span class="tok-fn">map</span>(str::to_owned).<span class="tok-fn">collect</span>()</span>
+<span class="ln" id="L555">}</span>
 </span>
-<span class="ln" id="L554"></span>
+<span class="ln" id="L556"></span>
+<span class="src-item" id="fn-fetched">
+<span class="ln" id="L557"><span class="tok-com">/// What a finished fetch said, or why it failed.</span></span>
+<span class="ln" id="L558"><span class="tok-kw">fn</span> <span class="tok-fn">fetched</span>(tool: &amp;Tool, output: std::process::Output) -&gt; Result&lt;String, Error&gt; {</span>
+<span class="ln" id="L559">    <span class="tok-kw">if</span> !output.status.<span class="tok-fn">success</span>() {</span>
+<span class="ln" id="L560">        <span class="tok-kw">let</span> said = String::<span class="tok-fn">from_utf8_lossy</span>(&amp;output.stderr).<span class="tok-fn">trim</span>().<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L561">        <span class="tok-kw">return</span> <span class="tok-fn">Err</span>(Error::<span class="tok-fn">Failed</span>(<span class="tok-kw">if</span> said.<span class="tok-fn">is_empty</span>() {</span>
+<span class="ln" id="L562">            format!(<span class="tok-str">&quot;{} exited with {}&quot;</span>, tool.program.<span class="tok-fn">display</span>(), output.status)</span>
+<span class="ln" id="L563">        } <span class="tok-kw">else</span> {</span>
+<span class="ln" id="L564">            said</span>
+<span class="ln" id="L565">        }));</span>
+<span class="ln" id="L566">    }</span>
+<span class="ln" id="L567">    <span class="tok-com">// Bounded before it is looked at. A reply is a public release page; a</span></span>
+<span class="ln" id="L568">    <span class="tok-com">// reply the size of a film is something else, and reading all of it into</span></span>
+<span class="ln" id="L569">    <span class="tok-com">// a string to search for one substring is the wrong thing to do with it.</span></span>
+<span class="ln" id="L570">    <span class="tok-kw">const</span> MAX: usize = <span class="tok-num">4</span> * <span class="tok-num">1024</span> * <span class="tok-num">1024</span>;</span>
+<span class="ln" id="L571">    <span class="tok-kw">let</span> body = &amp;output.stdout[..output.stdout.<span class="tok-fn">len</span>().<span class="tok-fn">min</span>(MAX)];</span>
+<span class="ln" id="L572">    <span class="tok-fn">Ok</span>(String::<span class="tok-fn">from_utf8_lossy</span>(body).<span class="tok-fn">into_owned</span>())</span>
+<span class="ln" id="L573">}</span>
+</span>
+<span class="ln" id="L574"></span>
 <span class="src-item" id="fn-scope">
-<span class="ln" id="L555"><span class="tok-com">/// What **the check** does and does not do, in one paragraph, for a front end</span></span>
-<span class="ln" id="L556"><span class="tok-com">/// to show beside the button.</span></span>
-<span class="ln" id="L557"><span class="tok-com">///</span></span>
-<span class="ln" id="L558"><span class="tok-com">/// Every sentence names the check as its subject, and that is deliberate. This</span></span>
-<span class="ln" id="L559"><span class="tok-com">/// paragraph is shown by `veilvoice update` as well, on the two paths where</span></span>
-<span class="ln" id="L560"><span class="tok-com">/// nothing will be installed, and an unqualified &quot;it does not install</span></span>
-<span class="ln" id="L561"><span class="tok-com">/// anything&quot; read there is a claim about the command rather than about the</span></span>
-<span class="ln" id="L562"><span class="tok-com">/// check. The command does install; that is what it is for. `veilvoice update</span></span>
-<span class="ln" id="L563"><span class="tok-com">/// --check` used to print &quot;Run `veilvoice update` to fetch it, check it and</span></span>
-<span class="ln" id="L564"><span class="tok-com">/// install it&quot; and then, four lines lower, &quot;It does not download a release,</span></span>
-<span class="ln" id="L565"><span class="tok-com">/// install anything&quot;. Both sentences were true of different things and the</span></span>
-<span class="ln" id="L566"><span class="tok-com">/// screen contradicted itself.</span></span>
-<span class="ln" id="L567"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SCOPE: &amp;str = <span class="tok-str">&quot;\</span></span>
-<span class="ln" id="L568"><span class="tok-str">This check happens because you pressed the button, and at no other time. There \</span></span>
-<span class="ln" id="L569"><span class="tok-str">is no timer, no check at startup, and nothing runs in the background. VeilVoice \</span></span>
-<span class="ln" id="L570"><span class="tok-str">contains no HTTP client: this borrows the transfer tool your operating system \</span></span>
-<span class="ln" id="L571"><span class="tok-str">already ships and reads a public page anybody can open. It sends nothing about \</span></span>
-<span class="ln" id="L572"><span class="tok-str">you or this machine. The check itself downloads no release, installs nothing \</span></span>
-<span class="ln" id="L573"><span class="tok-str">and restarts nothing: it reports a version number, and every decision after \</span></span>
-<span class="ln" id="L574"><span class="tok-str">that is yours. A version number on a page is not a signature: check a download \</span></span>
-<span class="ln" id="L575"><span class="tok-str">with `veilvoice verify` before running it.&quot;</span>;</span>
+<span class="ln" id="L575"><span class="tok-com">/// What **the check** does and does not do, in one paragraph, for a front end</span></span>
+<span class="ln" id="L576"><span class="tok-com">/// to show beside the button.</span></span>
+<span class="ln" id="L577"><span class="tok-com">///</span></span>
+<span class="ln" id="L578"><span class="tok-com">/// Every sentence names the check as its subject, and that is deliberate. This</span></span>
+<span class="ln" id="L579"><span class="tok-com">/// paragraph is shown by `veilvoice update` as well, on the two paths where</span></span>
+<span class="ln" id="L580"><span class="tok-com">/// nothing will be installed, and an unqualified &quot;it does not install</span></span>
+<span class="ln" id="L581"><span class="tok-com">/// anything&quot; read there is a claim about the command rather than about the</span></span>
+<span class="ln" id="L582"><span class="tok-com">/// check. The command does install; that is what it is for. `veilvoice update</span></span>
+<span class="ln" id="L583"><span class="tok-com">/// --check` used to print &quot;Run `veilvoice update` to fetch it, check it and</span></span>
+<span class="ln" id="L584"><span class="tok-com">/// install it&quot; and then, four lines lower, &quot;It does not download a release,</span></span>
+<span class="ln" id="L585"><span class="tok-com">/// install anything&quot;. Both sentences were true of different things and the</span></span>
+<span class="ln" id="L586"><span class="tok-com">/// screen contradicted itself.</span></span>
+<span class="ln" id="L587"><span class="tok-kw">pub</span> <span class="tok-kw">const</span> SCOPE: &amp;str = <span class="tok-str">&quot;\</span></span>
+<span class="ln" id="L588"><span class="tok-str">This check happens because you pressed the button, and at no other time. There \</span></span>
+<span class="ln" id="L589"><span class="tok-str">is no timer, no check at startup, and nothing runs in the background. VeilVoice \</span></span>
+<span class="ln" id="L590"><span class="tok-str">contains no HTTP client: this borrows the transfer tool your operating system \</span></span>
+<span class="ln" id="L591"><span class="tok-str">already ships and reads a public page anybody can open. It sends nothing about \</span></span>
+<span class="ln" id="L592"><span class="tok-str">you or this machine. The check itself downloads no release, installs nothing \</span></span>
+<span class="ln" id="L593"><span class="tok-str">and restarts nothing: it reports a version number, and every decision after \</span></span>
+<span class="ln" id="L594"><span class="tok-str">that is yours. A version number on a page is not a signature: check a download \</span></span>
+<span class="ln" id="L595"><span class="tok-str">with `veilvoice verify` before running it.&quot;</span>;</span>
 </span>
-<span class="ln" id="L576"></span>
-<span class="ln" id="L577"><span class="tok-attr">#[cfg</span>(test)]</span>
-<span class="ln" id="L578"><span class="tok-kw">mod</span> tests {</span>
-<span class="ln" id="L579">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
-<span class="ln" id="L580"></span>
-<span class="ln" id="L581">    <span class="tok-com">/// **Roadmap item 165.** Semantic versioning&#x27;s own precedence examples, section</span></span>
-<span class="ln" id="L582">    <span class="tok-com">/// 11, taken from the specification rather than invented here.</span></span>
-<span class="ln" id="L583">    <span class="tok-com">///</span></span>
-<span class="ln" id="L584">    <span class="tok-com">/// The one that matters to this project is the middle of the chain:</span></span>
-<span class="ln" id="L585">    <span class="tok-com">/// `1.0.0-rc.1` is **lower** than `1.0.0`. An approximation that compared</span></span>
-<span class="ln" id="L586">    <span class="tok-com">/// the numbers and ignored the suffix would call an early build newer</span></span>
-<span class="ln" id="L587">    <span class="tok-com">/// than the release it precedes and tell everybody on the stable channel</span></span>
-<span class="ln" id="L588">    <span class="tok-com">/// to downgrade, which is the reason this was refused outright until</span></span>
-<span class="ln" id="L589">    <span class="tok-com">/// there were prereleases to order.</span></span>
-<span class="ln" id="L590">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L591">    <span class="tok-kw">fn</span> <span class="tok-fn">prerelease_precedence_is_the_specifications</span>() {</span>
-<span class="ln" id="L592">        <span class="tok-kw">let</span> chain = [</span>
-<span class="ln" id="L593">            <span class="tok-str">&quot;1.0.0-alpha&quot;</span>,</span>
-<span class="ln" id="L594">            <span class="tok-str">&quot;1.0.0-alpha.1&quot;</span>,</span>
-<span class="ln" id="L595">            <span class="tok-str">&quot;1.0.0-alpha.beta&quot;</span>,</span>
-<span class="ln" id="L596">            <span class="tok-str">&quot;1.0.0-beta&quot;</span>,</span>
-<span class="ln" id="L597">            <span class="tok-str">&quot;1.0.0-beta.2&quot;</span>,</span>
-<span class="ln" id="L598">            <span class="tok-str">&quot;1.0.0-beta.11&quot;</span>,</span>
-<span class="ln" id="L599">            <span class="tok-str">&quot;1.0.0-rc.1&quot;</span>,</span>
-<span class="ln" id="L600">            <span class="tok-str">&quot;1.0.0&quot;</span>,</span>
-<span class="ln" id="L601">        ];</span>
-<span class="ln" id="L602">        <span class="tok-kw">for</span> pair <span class="tok-kw">in</span> chain.<span class="tok-fn">windows</span>(<span class="tok-num">2</span>) {</span>
-<span class="ln" id="L603">            <span class="tok-kw">let</span> (lower, higher) = (<span class="tok-fn">parse</span>(pair[<span class="tok-num">0</span>]).<span class="tok-fn">unwrap</span>(), <span class="tok-fn">parse</span>(pair[<span class="tok-num">1</span>]).<span class="tok-fn">unwrap</span>());</span>
-<span class="ln" id="L604">            assert_eq!(</span>
-<span class="ln" id="L605">                <span class="tok-fn">precedence</span>(&amp;lower, &amp;higher),</span>
-<span class="ln" id="L606">                std::cmp::Ordering::Less,</span>
-<span class="ln" id="L607">                <span class="tok-str">&quot;{} should be lower than {}&quot;</span>,</span>
-<span class="ln" id="L608">                pair[<span class="tok-num">0</span>],</span>
-<span class="ln" id="L609">                pair[<span class="tok-num">1</span>]</span>
-<span class="ln" id="L610">            );</span>
-<span class="ln" id="L611">            assert_eq!(</span>
-<span class="ln" id="L612">                <span class="tok-fn">precedence</span>(&amp;higher, &amp;lower),</span>
-<span class="ln" id="L613">                std::cmp::Ordering::Greater,</span>
-<span class="ln" id="L614">                <span class="tok-str">&quot;and {} higher than {}&quot;</span>,</span>
-<span class="ln" id="L615">                pair[<span class="tok-num">1</span>],</span>
-<span class="ln" id="L616">                pair[<span class="tok-num">0</span>]</span>
-<span class="ln" id="L617">            );</span>
-<span class="ln" id="L618">        }</span>
-<span class="ln" id="L619">        <span class="tok-com">// `1.0.0-beta.11` against `1.0.0-beta.2` is the case a text comparison</span></span>
-<span class="ln" id="L620">        <span class="tok-com">// gets wrong, and it is in the chain above for that reason. Stated</span></span>
-<span class="ln" id="L621">        <span class="tok-com">// again here so a rewrite that drops the chain still has it.</span></span>
-<span class="ln" id="L622">        assert_eq!(</span>
-<span class="ln" id="L623">            <span class="tok-fn">precedence</span>(</span>
-<span class="ln" id="L624">                &amp;<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.0.0-beta.2&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
-<span class="ln" id="L625">                &amp;<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.0.0-beta.11&quot;</span>).<span class="tok-fn">unwrap</span>()</span>
-<span class="ln" id="L626">            ),</span>
-<span class="ln" id="L627">            std::cmp::Ordering::Less</span>
-<span class="ln" id="L628">        );</span>
-<span class="ln" id="L629">    }</span>
-<span class="ln" id="L630"></span>
-<span class="ln" id="L631">    <span class="tok-com">/// Build metadata takes no part in precedence, and a malformed version is</span></span>
-<span class="ln" id="L632">    <span class="tok-com">/// refused rather than read as something.</span></span>
-<span class="ln" id="L633">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L634">    <span class="tok-kw">fn</span> <span class="tok-fn">what_a_version_is_and_is_not</span>() {</span>
-<span class="ln" id="L635">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;v0.1.23+build.5&quot;</span>), <span class="tok-fn">parse</span>(<span class="tok-str">&quot;0.1.23&quot;</span>));</span>
-<span class="ln" id="L636">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L637">            <span class="tok-str">&quot;&quot;</span>,</span>
-<span class="ln" id="L638">            <span class="tok-str">&quot;1.0&quot;</span>,</span>
-<span class="ln" id="L639">            <span class="tok-str">&quot;1.0.0.0&quot;</span>,</span>
-<span class="ln" id="L640">            <span class="tok-str">&quot;1.0.0-&quot;</span>,</span>
-<span class="ln" id="L641">            <span class="tok-str">&quot;1.0.0-beta..1&quot;</span>,</span>
-<span class="ln" id="L642">            <span class="tok-str">&quot;banana&quot;</span>,</span>
-<span class="ln" id="L643">            <span class="tok-str">&quot;1.0.0-b^ta&quot;</span>,</span>
-<span class="ln" id="L644">        ] {</span>
-<span class="ln" id="L645">            assert!(<span class="tok-fn">parse</span>(bad).<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{bad:?} is not a version&quot;</span>);</span>
-<span class="ln" id="L646">        }</span>
-<span class="ln" id="L647">    }</span>
-<span class="ln" id="L648"></span>
-<span class="ln" id="L649">    <span class="tok-com">/// A build reports the stream it came from, read from its own version.</span></span>
-<span class="ln" id="L650">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L651">    <span class="tok-kw">fn</span> <span class="tok-fn">the_channel_comes_from_the_version</span>() {</span>
-<span class="ln" id="L652">        assert_eq!(Channel::<span class="tok-fn">of</span>(<span class="tok-str">&quot;0.1.23&quot;</span>), Channel::Stable);</span>
-<span class="ln" id="L653">        assert_eq!(Channel::<span class="tok-fn">of</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>), Channel::Stable);</span>
-<span class="ln" id="L654">        assert_eq!(Channel::<span class="tok-fn">of</span>(<span class="tok-str">&quot;0.1.23-beta.1&quot;</span>), Channel::Early);</span>
-<span class="ln" id="L655">        <span class="tok-com">// Unreadable is treated as stable rather than as early: a build whose</span></span>
-<span class="ln" id="L656">        <span class="tok-com">// version cannot be parsed has said nothing about its stream, and</span></span>
-<span class="ln" id="L657">        <span class="tok-com">// quietly moving somebody to the prerelease page on the strength of a</span></span>
-<span class="ln" id="L658">        <span class="tok-com">// string nobody could read is the wrong way round.</span></span>
-<span class="ln" id="L659">        assert_eq!(Channel::<span class="tok-fn">of</span>(<span class="tok-str">&quot;nonsense&quot;</span>), Channel::Stable);</span>
-<span class="ln" id="L660">        assert_eq!(Channel::Stable.<span class="tok-fn">url</span>(), LATEST_URL);</span>
-<span class="ln" id="L661">        assert_eq!(Channel::Early.<span class="tok-fn">url</span>(), RELEASES_URL);</span>
-<span class="ln" id="L662">    }</span>
-<span class="ln" id="L663"></span>
-<span class="ln" id="L664">    <span class="tok-com">/// An update check looks along its own stream and says which.</span></span>
-<span class="ln" id="L665">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L666">    <span class="tok-kw">fn</span> <span class="tok-fn">a_check_stays_on_its_own_channel</span>() {</span>
-<span class="ln" id="L667">        <span class="tok-kw">let</span> early = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.23-beta.1&quot;</span>, <span class="tok-str">&quot;0.1.23-beta.2&quot;</span>);</span>
-<span class="ln" id="L668">        assert_eq!(early.channel, Channel::Early);</span>
-<span class="ln" id="L669">        assert_eq!(early.verdict, Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.1.23-beta.2&quot;</span>.<span class="tok-fn">into</span>()));</span>
-<span class="ln" id="L670"></span>
-<span class="ln" id="L671">        <span class="tok-com">// The release this build precedes is newer than it, which is the</span></span>
-<span class="ln" id="L672">        <span class="tok-com">// answer somebody on an early build wants when the release lands.</span></span>
-<span class="ln" id="L673">        <span class="tok-kw">let</span> landed = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.23-beta.1&quot;</span>, <span class="tok-str">&quot;0.1.23&quot;</span>);</span>
-<span class="ln" id="L674">        assert_eq!(landed.verdict, Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.1.23&quot;</span>.<span class="tok-fn">into</span>()));</span>
-<span class="ln" id="L675"></span>
-<span class="ln" id="L676">        <span class="tok-com">// And a stable build is never told about a prerelease, because it</span></span>
-<span class="ln" id="L677">        <span class="tok-com">// never reads the page that names one.</span></span>
-<span class="ln" id="L678">        <span class="tok-kw">let</span> stable = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.23&quot;</span>, <span class="tok-str">&quot;0.1.23&quot;</span>);</span>
-<span class="ln" id="L679">        assert_eq!(stable.channel, Channel::Stable);</span>
-<span class="ln" id="L680">        assert_eq!(stable.verdict, Verdict::UpToDate);</span>
-<span class="ln" id="L681"></span>
-<span class="ln" id="L682">        <span class="tok-com">// A source build ahead of everything published still says so.</span></span>
-<span class="ln" id="L683">        assert_eq!(</span>
-<span class="ln" id="L684">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.2.0&quot;</span>, <span class="tok-str">&quot;0.1.23&quot;</span>).verdict,</span>
-<span class="ln" id="L685">            Verdict::<span class="tok-fn">Ahead</span>(<span class="tok-str">&quot;0.1.23&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L686">        );</span>
-<span class="ln" id="L687">    }</span>
-<span class="ln" id="L688"></span>
-<span class="ln" id="L689">    <span class="tok-com">/// The guide describes the tool this actually looks for.</span></span>
-<span class="ln" id="L690">    <span class="tok-com">///</span></span>
-<span class="ln" id="L691">    <span class="tok-com">/// Written after the guide said &quot;PowerShell&#x27;s web request on Windows&quot;,</span></span>
-<span class="ln" id="L692">    <span class="tok-com">/// which this has never used: it looks for `System32\\curl.exe` by</span></span>
-<span class="ln" id="L693">    <span class="tok-com">/// absolute path. That was a sentence about the program, written beside</span></span>
-<span class="ln" id="L694">    <span class="tok-com">/// the program, wrong on the day it was written -- which is the shape of</span></span>
-<span class="ln" id="L695">    <span class="tok-com">/// finding after finding in this repository, and is why the two are</span></span>
-<span class="ln" id="L696">    <span class="tok-com">/// compared here rather than trusted to agree.</span></span>
-<span class="ln" id="L697">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L698">    <span class="tok-kw">fn</span> <span class="tok-fn">the_guide_names_the_tool_this_looks_for</span>() {</span>
-<span class="ln" id="L699">        <span class="tok-kw">let</span> guide = include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
-<span class="ln" id="L700">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>);</span>
-<span class="ln" id="L701">        <span class="tok-kw">let</span> looking = source</span>
-<span class="ln" id="L702">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn find_tool()&quot;</span>)</span>
-<span class="ln" id="L703">            .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
-<span class="ln" id="L704">            .<span class="tok-fn">and_then</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n}&quot;</span>).<span class="tok-fn">next</span>())</span>
-<span class="ln" id="L705">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;find_tool exists&quot;</span>);</span>
-<span class="ln" id="L706"></span>
-<span class="ln" id="L707">        <span class="tok-com">// Every absolute path the program will actually try.</span></span>
-<span class="ln" id="L708">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> paths: Vec&lt;&amp;str&gt; = looking</span>
-<span class="ln" id="L709">            .<span class="tok-fn">match_indices</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>)</span>
-<span class="ln" id="L710">            .<span class="tok-fn">map</span>(|(at, _)| &amp;looking[at + <span class="tok-num">1</span>..])</span>
-<span class="ln" id="L711">            .<span class="tok-fn">filter_map</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">next</span>())</span>
-<span class="ln" id="L712">            .<span class="tok-fn">filter</span>(|candidate| candidate.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;/&#x27;</span>) || candidate.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\\&#x27;</span>))</span>
-<span class="ln" id="L713">            .<span class="tok-fn">collect</span>();</span>
-<span class="ln" id="L714">        paths.<span class="tok-fn">sort</span>();</span>
-<span class="ln" id="L715">        paths.<span class="tok-fn">dedup</span>();</span>
-<span class="ln" id="L716">        assert!(!paths.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;find_tool names no paths&quot;</span>);</span>
-<span class="ln" id="L717"></span>
-<span class="ln" id="L718">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> paths {</span>
-<span class="ln" id="L719">            <span class="tok-com">// The guide writes Windows paths with the environment variable</span></span>
-<span class="ln" id="L720">            <span class="tok-com">// spelled out, so compare on the part that identifies the tool.</span></span>
-<span class="ln" id="L721">            <span class="tok-kw">let</span> needle = path.<span class="tok-fn">rsplit</span>([<span class="tok-str">&#x27;/&#x27;</span>, <span class="tok-str">&#x27;\\&#x27;</span>]).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(path);</span>
-<span class="ln" id="L722">            assert!(</span>
-<span class="ln" id="L723">                guide.<span class="tok-fn">contains</span>(needle),</span>
-<span class="ln" id="L724">                <span class="tok-str">&quot;the update check looks for {path:?} and docs/USER_GUIDE.md \</span></span>
-<span class="ln" id="L725"><span class="tok-str">                 never mentions {needle:?}&quot;</span></span>
-<span class="ln" id="L726">            );</span>
-<span class="ln" id="L727">        }</span>
-<span class="ln" id="L728"></span>
-<span class="ln" id="L729">        assert!(</span>
-<span class="ln" id="L730">            !guide.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;PowerShell&#x27;s web request&quot;</span>),</span>
-<span class="ln" id="L731">            <span class="tok-str">&quot;the guide credits PowerShell for the update check; this has never \</span></span>
-<span class="ln" id="L732"><span class="tok-str">             used it&quot;</span></span>
-<span class="ln" id="L733">        );</span>
-<span class="ln" id="L734">    }</span>
-<span class="ln" id="L735"></span>
-<span class="ln" id="L736">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L737">    <span class="tok-kw">fn</span> <span class="tok-fn">a_higher_published_version_is_newer</span>() {</span>
-<span class="ln" id="L738">        <span class="tok-kw">let</span> report = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>);</span>
-<span class="ln" id="L739">        assert_eq!(report.verdict, Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.2.0&quot;</span>.<span class="tok-fn">into</span>()));</span>
-<span class="ln" id="L740">        assert_eq!(report.current, <span class="tok-str">&quot;0.1.12&quot;</span>);</span>
-<span class="ln" id="L741">    }</span>
-<span class="ln" id="L742"></span>
-<span class="ln" id="L743">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L744">    <span class="tok-kw">fn</span> <span class="tok-fn">the_same_version_is_up_to_date</span>() {</span>
-<span class="ln" id="L745">        assert_eq!(<span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;v0.1.12&quot;</span>).verdict, Verdict::UpToDate);</span>
-<span class="ln" id="L746">    }</span>
-<span class="ln" id="L747"></span>
-<span class="ln" id="L748">    <span class="tok-com">/// An unreleased build is ahead, and is told so rather than told it is</span></span>
-<span class="ln" id="L749">    <span class="tok-com">/// current. Saying &quot;up to date&quot; to somebody running `main` hides the one</span></span>
-<span class="ln" id="L750">    <span class="tok-com">/// fact that matters about what they are running.</span></span>
-<span class="ln" id="L751">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L752">    <span class="tok-kw">fn</span> <span class="tok-fn">a_build_ahead_of_the_newest_release_is_told_so</span>() {</span>
-<span class="ln" id="L753">        assert_eq!(</span>
-<span class="ln" id="L754">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.2.0&quot;</span>, <span class="tok-str">&quot;0.1.12&quot;</span>).verdict,</span>
-<span class="ln" id="L755">            Verdict::<span class="tok-fn">Ahead</span>(<span class="tok-str">&quot;0.1.12&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L756">        );</span>
-<span class="ln" id="L757">    }</span>
-<span class="ln" id="L758"></span>
-<span class="ln" id="L759">    <span class="tok-com">/// Ordering is refused rather than guessed, and what counts as</span></span>
-<span class="ln" id="L760">    <span class="tok-com">/// unorderable has narrowed.</span></span>
-<span class="ln" id="L761">    <span class="tok-com">///</span></span>
-<span class="ln" id="L762">    <span class="tok-com">/// This used to assert that **any** prerelease was unreadable, which was</span></span>
-<span class="ln" id="L763">    <span class="tok-com">/// right while nothing published one: a checker that gets prerelease</span></span>
-<span class="ln" id="L764">    <span class="tok-com">/// precedence subtly wrong tells people to downgrade. Roadmap item 165 publishes</span></span>
-<span class="ln" id="L765">    <span class="tok-com">/// them, so they are ordered now, by the specification&#x27;s rules and against</span></span>
-<span class="ln" id="L766">    <span class="tok-com">/// the specification&#x27;s own examples. A string that is not a version at all</span></span>
-<span class="ln" id="L767">    <span class="tok-com">/// is still refused, and that is the half worth keeping.</span></span>
-<span class="ln" id="L768">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L769">    <span class="tok-kw">fn</span> <span class="tok-fn">a_version_that_cannot_be_compared_is_refused_rather_than_ordered</span>() {</span>
-<span class="ln" id="L770">        assert_eq!(</span>
-<span class="ln" id="L771">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;nightly&quot;</span>).verdict,</span>
-<span class="ln" id="L772">            Verdict::<span class="tok-fn">Unreadable</span>(<span class="tok-str">&quot;nightly&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L773">        );</span>
-<span class="ln" id="L774">        assert_eq!(</span>
-<span class="ln" id="L775">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2&quot;</span>).verdict,</span>
-<span class="ln" id="L776">            Verdict::<span class="tok-fn">Unreadable</span>(<span class="tok-str">&quot;0.2&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L777">        );</span>
-<span class="ln" id="L778">        assert!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.2&quot;</span>).<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;three numbers or nothing&quot;</span>);</span>
-<span class="ln" id="L779">        assert!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.2.3.4&quot;</span>).<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;three numbers or nothing&quot;</span>);</span>
-<span class="ln" id="L780">        <span class="tok-com">// And the one that changed: a prerelease is now ordered rather than</span></span>
-<span class="ln" id="L781">        <span class="tok-com">// refused, and ordered *below* the release it precedes.</span></span>
-<span class="ln" id="L782">        assert_eq!(</span>
-<span class="ln" id="L783">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0-rc1&quot;</span>).verdict,</span>
-<span class="ln" id="L784">            Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.2.0-rc1&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L785">        );</span>
-<span class="ln" id="L786">        assert_eq!(</span>
-<span class="ln" id="L787">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.2.0&quot;</span>, <span class="tok-str">&quot;0.2.0-rc1&quot;</span>).verdict,</span>
-<span class="ln" id="L788">            Verdict::<span class="tok-fn">Ahead</span>(<span class="tok-str">&quot;0.2.0-rc1&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L789">        );</span>
-<span class="ln" id="L790">    }</span>
-<span class="ln" id="L791"></span>
-<span class="ln" id="L792">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L793">    <span class="tok-kw">fn</span> <span class="tok-fn">the_leading_v_is_optional_on_both_sides</span>() {</span>
-<span class="ln" id="L794">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;v1.2.3&quot;</span>), <span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.2.3&quot;</span>));</span>
-<span class="ln" id="L795">        assert_eq!(</span>
-<span class="ln" id="L796">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;v1.0.0&quot;</span>, <span class="tok-str">&quot;1.0.1&quot;</span>).verdict,</span>
-<span class="ln" id="L797">            Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;1.0.1&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L798">        );</span>
-<span class="ln" id="L799">    }</span>
-<span class="ln" id="L800"></span>
-<span class="ln" id="L801">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L802">    <span class="tok-kw">fn</span> <span class="tok-fn">the_tag_is_read_out_of_a_release_page</span>() {</span>
-<span class="ln" id="L803">        <span class="tok-kw">let</span> body = <span class="tok-str">r#&quot;&lt;a href=&quot;/tilas01/veilvoice/releases/tag/v0.1.12&quot;&gt;v0.1.12&lt;/a&gt;&quot;#</span>;</span>
-<span class="ln" id="L804">        assert_eq!(<span class="tok-fn">tag_in</span>(body).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;v0.1.12&quot;</span>));</span>
-<span class="ln" id="L805">    }</span>
-<span class="ln" id="L806"></span>
-<span class="ln" id="L807">    <span class="tok-com">/// A page that is not a release page yields nothing, rather than a</span></span>
-<span class="ln" id="L808">    <span class="tok-com">/// fragment of somebody&#x27;s markup shown to the user as a version.</span></span>
-<span class="ln" id="L809">    <span class="tok-com">/// The real page carries an empty `/releases/tag/` before any real one.</span></span>
-<span class="ln" id="L810">    <span class="tok-com">/// Taking the first match returned nothing against a page that plainly had</span></span>
-<span class="ln" id="L811">    <span class="tok-com">/// a version on it, which is how this was found: by running it.</span></span>
-<span class="ln" id="L812">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L813">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_tag_link_before_a_real_one_is_stepped_over</span>() {</span>
-<span class="ln" id="L814">        <span class="tok-kw">let</span> body = <span class="tok-str">r#&quot;&lt;a href=&quot;/tilas01/veilvoice/releases/tag/&quot;&gt;&lt;/a&gt;</span></span>
-<span class="ln" id="L815"><span class="tok-str">                      &lt;a href=&quot;/tilas01/veilvoice/releases/tag/v0.1.12&quot;&gt;v0.1.12&lt;/a&gt;&quot;#</span>;</span>
-<span class="ln" id="L816">        assert_eq!(<span class="tok-fn">tag_in</span>(body).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;v0.1.12&quot;</span>));</span>
-<span class="ln" id="L817">    }</span>
-<span class="ln" id="L818"></span>
-<span class="ln" id="L819">    <span class="tok-com">/// curl is asked for the redirect target rather than the page, so what the</span></span>
-<span class="ln" id="L820">    <span class="tok-com">/// scanner sees is one line. This is the shape it has to handle.</span></span>
-<span class="ln" id="L821">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L822">    <span class="tok-kw">fn</span> <span class="tok-fn">the_redirect_target_alone_is_enough</span>() {</span>
-<span class="ln" id="L823">        <span class="tok-kw">let</span> url = <span class="tok-str">&quot;https://github.com/tilas01/veilvoice/releases/tag/v0.1.12&quot;</span>;</span>
-<span class="ln" id="L824">        assert_eq!(<span class="tok-fn">tag_in</span>(url).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;v0.1.12&quot;</span>));</span>
-<span class="ln" id="L825">    }</span>
-<span class="ln" id="L826"></span>
-<span class="ln" id="L827">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L828">    <span class="tok-kw">fn</span> <span class="tok-fn">a_page_with_no_tag_yields_nothing</span>() {</span>
-<span class="ln" id="L829">        assert_eq!(<span class="tok-fn">tag_in</span>(<span class="tok-str">&quot;&lt;html&gt;&lt;body&gt;hello&lt;/body&gt;&lt;/html&gt;&quot;</span>), None);</span>
-<span class="ln" id="L830">        assert_eq!(<span class="tok-fn">tag_in</span>(<span class="tok-str">&quot;&quot;</span>), None);</span>
-<span class="ln" id="L831">        assert_eq!(<span class="tok-fn">tag_in</span>(<span class="tok-str">&quot;/releases/tag/&quot;</span>), None);</span>
-<span class="ln" id="L832">        assert_eq!(<span class="tok-fn">tag_in</span>(<span class="tok-str">&quot;/releases/tag/&lt;script&gt;&quot;</span>), None);</span>
-<span class="ln" id="L833">    }</span>
-<span class="ln" id="L834"></span>
-<span class="ln" id="L835">    <span class="tok-com">/// Whatever comes back, what is shown is short and made of characters a</span></span>
-<span class="ln" id="L836">    <span class="tok-com">/// version number is made of.</span></span>
-<span class="ln" id="L837">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L838">    <span class="tok-kw">fn</span> <span class="tok-fn">a_hostile_tag_is_bounded_in_length_and_alphabet</span>() {</span>
-<span class="ln" id="L839">        <span class="tok-kw">let</span> long = format!(<span class="tok-str">&quot;/releases/tag/{}&quot;</span>, <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">500</span>));</span>
-<span class="ln" id="L840">        <span class="tok-kw">let</span> tag = <span class="tok-fn">tag_in</span>(&amp;long).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a tag is found&quot;</span>);</span>
-<span class="ln" id="L841">        assert_eq!(tag.<span class="tok-fn">len</span>(), <span class="tok-num">32</span>, <span class="tok-str">&quot;bounded to 32 characters&quot;</span>);</span>
-<span class="ln" id="L842"></span>
-<span class="ln" id="L843">        <span class="tok-kw">let</span> markup = <span class="tok-str">&quot;/releases/tag/v1.0.0\&quot;&gt;&lt;img src=x onerror=alert(1)&gt;&quot;</span>;</span>
-<span class="ln" id="L844">        assert_eq!(<span class="tok-fn">tag_in</span>(markup).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;v1.0.0&quot;</span>));</span>
-<span class="ln" id="L845">    }</span>
-<span class="ln" id="L846"></span>
-<span class="ln" id="L847">    <span class="tok-com">/// The URL asked about is this project&#x27;s own, over TLS, and is a page a</span></span>
-<span class="ln" id="L848">    <span class="tok-com">/// person can open and compare by hand.</span></span>
+<span class="ln" id="L596"></span>
+<span class="ln" id="L597"><span class="tok-attr">#[cfg</span>(test)]</span>
+<span class="ln" id="L598"><span class="tok-kw">mod</span> tests {</span>
+<span class="ln" id="L599">    <span class="tok-kw">use</span> <span class="tok-kw">super</span>::*;</span>
+<span class="ln" id="L600"></span>
+<span class="ln" id="L601">    <span class="tok-com">/// **F-317.** Neither downloader reads its user&#x27;s configuration, and both</span></span>
+<span class="ln" id="L602">    <span class="tok-com">/// are held to HTTPS, on every one of the three ways a page is read.</span></span>
+<span class="ln" id="L603">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L604">    <span class="tok-kw">fn</span> <span class="tok-fn">every_fetch_reads_no_configuration_and_stays_on_https</span>() {</span>
+<span class="ln" id="L605">        <span class="tok-kw">for</span> url <span class="tok-kw">in</span> [LATEST_URL, <span class="tok-str">&quot;https://github.com/tilas01/veilvoice/releases&quot;</span>] {</span>
+<span class="ln" id="L606">            <span class="tok-kw">let</span> curl = <span class="tok-fn">fetch_arguments</span>(false, url);</span>
+<span class="ln" id="L607">            assert_eq!(curl[<span class="tok-num">0</span>], <span class="tok-str">&quot;-q&quot;</span>, <span class="tok-str">&quot;-q only works as curl&#x27;s first argument&quot;</span>);</span>
+<span class="ln" id="L608">            assert!(curl</span>
+<span class="ln" id="L609">                .<span class="tok-fn">windows</span>(<span class="tok-num">2</span>)</span>
+<span class="ln" id="L610">                .<span class="tok-fn">any</span>(|w| w[<span class="tok-num">0</span>] == <span class="tok-str">&quot;--proto&quot;</span> &amp;&amp; w[<span class="tok-num">1</span>] == <span class="tok-str">&quot;=https&quot;</span>));</span>
+<span class="ln" id="L611">            <span class="tok-kw">let</span> wget = <span class="tok-fn">fetch_arguments</span>(true, url);</span>
+<span class="ln" id="L612">            assert_eq!(wget[<span class="tok-num">0</span>], <span class="tok-str">&quot;--no-config&quot;</span>);</span>
+<span class="ln" id="L613">            assert!(wget.<span class="tok-fn">iter</span>().<span class="tok-fn">any</span>(|a| a == <span class="tok-str">&quot;--https-only&quot;</span>));</span>
+<span class="ln" id="L614">            assert_eq!(wget.<span class="tok-fn">last</span>().<span class="tok-fn">map</span>(String::as_str), <span class="tok-fn">Some</span>(url));</span>
+<span class="ln" id="L615">        }</span>
+<span class="ln" id="L616">    }</span>
+<span class="ln" id="L617"></span>
+<span class="ln" id="L618">    <span class="tok-com">/// **Roadmap item 165.** Semantic versioning&#x27;s own precedence examples, section</span></span>
+<span class="ln" id="L619">    <span class="tok-com">/// 11, taken from the specification rather than invented here.</span></span>
+<span class="ln" id="L620">    <span class="tok-com">///</span></span>
+<span class="ln" id="L621">    <span class="tok-com">/// The one that matters to this project is the middle of the chain:</span></span>
+<span class="ln" id="L622">    <span class="tok-com">/// `1.0.0-rc.1` is **lower** than `1.0.0`. An approximation that compared</span></span>
+<span class="ln" id="L623">    <span class="tok-com">/// the numbers and ignored the suffix would call an early build newer</span></span>
+<span class="ln" id="L624">    <span class="tok-com">/// than the release it precedes and tell everybody on the stable channel</span></span>
+<span class="ln" id="L625">    <span class="tok-com">/// to downgrade, which is the reason this was refused outright until</span></span>
+<span class="ln" id="L626">    <span class="tok-com">/// there were prereleases to order.</span></span>
+<span class="ln" id="L627">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L628">    <span class="tok-kw">fn</span> <span class="tok-fn">prerelease_precedence_is_the_specifications</span>() {</span>
+<span class="ln" id="L629">        <span class="tok-kw">let</span> chain = [</span>
+<span class="ln" id="L630">            <span class="tok-str">&quot;1.0.0-alpha&quot;</span>,</span>
+<span class="ln" id="L631">            <span class="tok-str">&quot;1.0.0-alpha.1&quot;</span>,</span>
+<span class="ln" id="L632">            <span class="tok-str">&quot;1.0.0-alpha.beta&quot;</span>,</span>
+<span class="ln" id="L633">            <span class="tok-str">&quot;1.0.0-beta&quot;</span>,</span>
+<span class="ln" id="L634">            <span class="tok-str">&quot;1.0.0-beta.2&quot;</span>,</span>
+<span class="ln" id="L635">            <span class="tok-str">&quot;1.0.0-beta.11&quot;</span>,</span>
+<span class="ln" id="L636">            <span class="tok-str">&quot;1.0.0-rc.1&quot;</span>,</span>
+<span class="ln" id="L637">            <span class="tok-str">&quot;1.0.0&quot;</span>,</span>
+<span class="ln" id="L638">        ];</span>
+<span class="ln" id="L639">        <span class="tok-kw">for</span> pair <span class="tok-kw">in</span> chain.<span class="tok-fn">windows</span>(<span class="tok-num">2</span>) {</span>
+<span class="ln" id="L640">            <span class="tok-kw">let</span> (lower, higher) = (<span class="tok-fn">parse</span>(pair[<span class="tok-num">0</span>]).<span class="tok-fn">unwrap</span>(), <span class="tok-fn">parse</span>(pair[<span class="tok-num">1</span>]).<span class="tok-fn">unwrap</span>());</span>
+<span class="ln" id="L641">            assert_eq!(</span>
+<span class="ln" id="L642">                <span class="tok-fn">precedence</span>(&amp;lower, &amp;higher),</span>
+<span class="ln" id="L643">                std::cmp::Ordering::Less,</span>
+<span class="ln" id="L644">                <span class="tok-str">&quot;{} should be lower than {}&quot;</span>,</span>
+<span class="ln" id="L645">                pair[<span class="tok-num">0</span>],</span>
+<span class="ln" id="L646">                pair[<span class="tok-num">1</span>]</span>
+<span class="ln" id="L647">            );</span>
+<span class="ln" id="L648">            assert_eq!(</span>
+<span class="ln" id="L649">                <span class="tok-fn">precedence</span>(&amp;higher, &amp;lower),</span>
+<span class="ln" id="L650">                std::cmp::Ordering::Greater,</span>
+<span class="ln" id="L651">                <span class="tok-str">&quot;and {} higher than {}&quot;</span>,</span>
+<span class="ln" id="L652">                pair[<span class="tok-num">1</span>],</span>
+<span class="ln" id="L653">                pair[<span class="tok-num">0</span>]</span>
+<span class="ln" id="L654">            );</span>
+<span class="ln" id="L655">        }</span>
+<span class="ln" id="L656">        <span class="tok-com">// `1.0.0-beta.11` against `1.0.0-beta.2` is the case a text comparison</span></span>
+<span class="ln" id="L657">        <span class="tok-com">// gets wrong, and it is in the chain above for that reason. Stated</span></span>
+<span class="ln" id="L658">        <span class="tok-com">// again here so a rewrite that drops the chain still has it.</span></span>
+<span class="ln" id="L659">        assert_eq!(</span>
+<span class="ln" id="L660">            <span class="tok-fn">precedence</span>(</span>
+<span class="ln" id="L661">                &amp;<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.0.0-beta.2&quot;</span>).<span class="tok-fn">unwrap</span>(),</span>
+<span class="ln" id="L662">                &amp;<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.0.0-beta.11&quot;</span>).<span class="tok-fn">unwrap</span>()</span>
+<span class="ln" id="L663">            ),</span>
+<span class="ln" id="L664">            std::cmp::Ordering::Less</span>
+<span class="ln" id="L665">        );</span>
+<span class="ln" id="L666">    }</span>
+<span class="ln" id="L667"></span>
+<span class="ln" id="L668">    <span class="tok-com">/// Build metadata takes no part in precedence, and a malformed version is</span></span>
+<span class="ln" id="L669">    <span class="tok-com">/// refused rather than read as something.</span></span>
+<span class="ln" id="L670">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L671">    <span class="tok-kw">fn</span> <span class="tok-fn">what_a_version_is_and_is_not</span>() {</span>
+<span class="ln" id="L672">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;v0.1.23+build.5&quot;</span>), <span class="tok-fn">parse</span>(<span class="tok-str">&quot;0.1.23&quot;</span>));</span>
+<span class="ln" id="L673">        <span class="tok-kw">for</span> bad <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L674">            <span class="tok-str">&quot;&quot;</span>,</span>
+<span class="ln" id="L675">            <span class="tok-str">&quot;1.0&quot;</span>,</span>
+<span class="ln" id="L676">            <span class="tok-str">&quot;1.0.0.0&quot;</span>,</span>
+<span class="ln" id="L677">            <span class="tok-str">&quot;1.0.0-&quot;</span>,</span>
+<span class="ln" id="L678">            <span class="tok-str">&quot;1.0.0-beta..1&quot;</span>,</span>
+<span class="ln" id="L679">            <span class="tok-str">&quot;banana&quot;</span>,</span>
+<span class="ln" id="L680">            <span class="tok-str">&quot;1.0.0-b^ta&quot;</span>,</span>
+<span class="ln" id="L681">        ] {</span>
+<span class="ln" id="L682">            assert!(<span class="tok-fn">parse</span>(bad).<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;{bad:?} is not a version&quot;</span>);</span>
+<span class="ln" id="L683">        }</span>
+<span class="ln" id="L684">    }</span>
+<span class="ln" id="L685"></span>
+<span class="ln" id="L686">    <span class="tok-com">/// A build reports the stream it came from, read from its own version.</span></span>
+<span class="ln" id="L687">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L688">    <span class="tok-kw">fn</span> <span class="tok-fn">the_channel_comes_from_the_version</span>() {</span>
+<span class="ln" id="L689">        assert_eq!(Channel::<span class="tok-fn">of</span>(<span class="tok-str">&quot;0.1.23&quot;</span>), Channel::Stable);</span>
+<span class="ln" id="L690">        assert_eq!(Channel::<span class="tok-fn">of</span>(<span class="tok-str">&quot;v0.1.23&quot;</span>), Channel::Stable);</span>
+<span class="ln" id="L691">        assert_eq!(Channel::<span class="tok-fn">of</span>(<span class="tok-str">&quot;0.1.23-beta.1&quot;</span>), Channel::Early);</span>
+<span class="ln" id="L692">        <span class="tok-com">// Unreadable is treated as stable rather than as early: a build whose</span></span>
+<span class="ln" id="L693">        <span class="tok-com">// version cannot be parsed has said nothing about its stream, and</span></span>
+<span class="ln" id="L694">        <span class="tok-com">// quietly moving somebody to the prerelease page on the strength of a</span></span>
+<span class="ln" id="L695">        <span class="tok-com">// string nobody could read is the wrong way round.</span></span>
+<span class="ln" id="L696">        assert_eq!(Channel::<span class="tok-fn">of</span>(<span class="tok-str">&quot;nonsense&quot;</span>), Channel::Stable);</span>
+<span class="ln" id="L697">        assert_eq!(Channel::Stable.<span class="tok-fn">url</span>(), LATEST_URL);</span>
+<span class="ln" id="L698">        assert_eq!(Channel::Early.<span class="tok-fn">url</span>(), RELEASES_URL);</span>
+<span class="ln" id="L699">    }</span>
+<span class="ln" id="L700"></span>
+<span class="ln" id="L701">    <span class="tok-com">/// An update check looks along its own stream and says which.</span></span>
+<span class="ln" id="L702">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L703">    <span class="tok-kw">fn</span> <span class="tok-fn">a_check_stays_on_its_own_channel</span>() {</span>
+<span class="ln" id="L704">        <span class="tok-kw">let</span> early = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.23-beta.1&quot;</span>, <span class="tok-str">&quot;0.1.23-beta.2&quot;</span>);</span>
+<span class="ln" id="L705">        assert_eq!(early.channel, Channel::Early);</span>
+<span class="ln" id="L706">        assert_eq!(early.verdict, Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.1.23-beta.2&quot;</span>.<span class="tok-fn">into</span>()));</span>
+<span class="ln" id="L707"></span>
+<span class="ln" id="L708">        <span class="tok-com">// The release this build precedes is newer than it, which is the</span></span>
+<span class="ln" id="L709">        <span class="tok-com">// answer somebody on an early build wants when the release lands.</span></span>
+<span class="ln" id="L710">        <span class="tok-kw">let</span> landed = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.23-beta.1&quot;</span>, <span class="tok-str">&quot;0.1.23&quot;</span>);</span>
+<span class="ln" id="L711">        assert_eq!(landed.verdict, Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.1.23&quot;</span>.<span class="tok-fn">into</span>()));</span>
+<span class="ln" id="L712"></span>
+<span class="ln" id="L713">        <span class="tok-com">// And a stable build is never told about a prerelease, because it</span></span>
+<span class="ln" id="L714">        <span class="tok-com">// never reads the page that names one.</span></span>
+<span class="ln" id="L715">        <span class="tok-kw">let</span> stable = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.23&quot;</span>, <span class="tok-str">&quot;0.1.23&quot;</span>);</span>
+<span class="ln" id="L716">        assert_eq!(stable.channel, Channel::Stable);</span>
+<span class="ln" id="L717">        assert_eq!(stable.verdict, Verdict::UpToDate);</span>
+<span class="ln" id="L718"></span>
+<span class="ln" id="L719">        <span class="tok-com">// A source build ahead of everything published still says so.</span></span>
+<span class="ln" id="L720">        assert_eq!(</span>
+<span class="ln" id="L721">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.2.0&quot;</span>, <span class="tok-str">&quot;0.1.23&quot;</span>).verdict,</span>
+<span class="ln" id="L722">            Verdict::<span class="tok-fn">Ahead</span>(<span class="tok-str">&quot;0.1.23&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L723">        );</span>
+<span class="ln" id="L724">    }</span>
+<span class="ln" id="L725"></span>
+<span class="ln" id="L726">    <span class="tok-com">/// The guide describes the tool this actually looks for.</span></span>
+<span class="ln" id="L727">    <span class="tok-com">///</span></span>
+<span class="ln" id="L728">    <span class="tok-com">/// Written after the guide said &quot;PowerShell&#x27;s web request on Windows&quot;,</span></span>
+<span class="ln" id="L729">    <span class="tok-com">/// which this has never used: it looks for `System32\\curl.exe` by</span></span>
+<span class="ln" id="L730">    <span class="tok-com">/// absolute path. That was a sentence about the program, written beside</span></span>
+<span class="ln" id="L731">    <span class="tok-com">/// the program, wrong on the day it was written -- which is the shape of</span></span>
+<span class="ln" id="L732">    <span class="tok-com">/// finding after finding in this repository, and is why the two are</span></span>
+<span class="ln" id="L733">    <span class="tok-com">/// compared here rather than trusted to agree.</span></span>
+<span class="ln" id="L734">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L735">    <span class="tok-kw">fn</span> <span class="tok-fn">the_guide_names_the_tool_this_looks_for</span>() {</span>
+<span class="ln" id="L736">        <span class="tok-kw">let</span> guide = include_str!(<span class="tok-str">&quot;../../../docs/USER_GUIDE.md&quot;</span>).<span class="tok-fn">replace</span>(<span class="tok-str">&quot;\r\n&quot;</span>, <span class="tok-str">&quot;\n&quot;</span>);</span>
+<span class="ln" id="L737">        <span class="tok-kw">let</span> source = include_str!(<span class="tok-str">&quot;update.rs&quot;</span>);</span>
+<span class="ln" id="L738">        <span class="tok-kw">let</span> looking = source</span>
+<span class="ln" id="L739">            .<span class="tok-fn">split</span>(<span class="tok-str">&quot;fn find_tool()&quot;</span>)</span>
+<span class="ln" id="L740">            .<span class="tok-fn">nth</span>(<span class="tok-num">1</span>)</span>
+<span class="ln" id="L741">            .<span class="tok-fn">and_then</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&quot;\n}&quot;</span>).<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L742">            .<span class="tok-fn">expect</span>(<span class="tok-str">&quot;find_tool exists&quot;</span>);</span>
+<span class="ln" id="L743"></span>
+<span class="ln" id="L744">        <span class="tok-com">// Every absolute path the program will actually try.</span></span>
+<span class="ln" id="L745">        <span class="tok-kw">let</span> <span class="tok-kw">mut</span> paths: Vec&lt;&amp;str&gt; = looking</span>
+<span class="ln" id="L746">            .<span class="tok-fn">match_indices</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>)</span>
+<span class="ln" id="L747">            .<span class="tok-fn">map</span>(|(at, _)| &amp;looking[at + <span class="tok-num">1</span>..])</span>
+<span class="ln" id="L748">            .<span class="tok-fn">filter_map</span>(|rest| rest.<span class="tok-fn">split</span>(<span class="tok-str">&#x27;&quot;&#x27;</span>).<span class="tok-fn">next</span>())</span>
+<span class="ln" id="L749">            .<span class="tok-fn">filter</span>(|candidate| candidate.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;/&#x27;</span>) || candidate.<span class="tok-fn">contains</span>(<span class="tok-str">&#x27;\\&#x27;</span>))</span>
+<span class="ln" id="L750">            .<span class="tok-fn">collect</span>();</span>
+<span class="ln" id="L751">        paths.<span class="tok-fn">sort</span>();</span>
+<span class="ln" id="L752">        paths.<span class="tok-fn">dedup</span>();</span>
+<span class="ln" id="L753">        assert!(!paths.<span class="tok-fn">is_empty</span>(), <span class="tok-str">&quot;find_tool names no paths&quot;</span>);</span>
+<span class="ln" id="L754"></span>
+<span class="ln" id="L755">        <span class="tok-kw">for</span> path <span class="tok-kw">in</span> paths {</span>
+<span class="ln" id="L756">            <span class="tok-com">// The guide writes Windows paths with the environment variable</span></span>
+<span class="ln" id="L757">            <span class="tok-com">// spelled out, so compare on the part that identifies the tool.</span></span>
+<span class="ln" id="L758">            <span class="tok-kw">let</span> needle = path.<span class="tok-fn">rsplit</span>([<span class="tok-str">&#x27;/&#x27;</span>, <span class="tok-str">&#x27;\\&#x27;</span>]).<span class="tok-fn">next</span>().<span class="tok-fn">unwrap_or</span>(path);</span>
+<span class="ln" id="L759">            assert!(</span>
+<span class="ln" id="L760">                guide.<span class="tok-fn">contains</span>(needle),</span>
+<span class="ln" id="L761">                <span class="tok-str">&quot;the update check looks for {path:?} and docs/USER_GUIDE.md \</span></span>
+<span class="ln" id="L762"><span class="tok-str">                 never mentions {needle:?}&quot;</span></span>
+<span class="ln" id="L763">            );</span>
+<span class="ln" id="L764">        }</span>
+<span class="ln" id="L765"></span>
+<span class="ln" id="L766">        assert!(</span>
+<span class="ln" id="L767">            !guide.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;PowerShell&#x27;s web request&quot;</span>),</span>
+<span class="ln" id="L768">            <span class="tok-str">&quot;the guide credits PowerShell for the update check; this has never \</span></span>
+<span class="ln" id="L769"><span class="tok-str">             used it&quot;</span></span>
+<span class="ln" id="L770">        );</span>
+<span class="ln" id="L771">    }</span>
+<span class="ln" id="L772"></span>
+<span class="ln" id="L773">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L774">    <span class="tok-kw">fn</span> <span class="tok-fn">a_higher_published_version_is_newer</span>() {</span>
+<span class="ln" id="L775">        <span class="tok-kw">let</span> report = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>);</span>
+<span class="ln" id="L776">        assert_eq!(report.verdict, Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.2.0&quot;</span>.<span class="tok-fn">into</span>()));</span>
+<span class="ln" id="L777">        assert_eq!(report.current, <span class="tok-str">&quot;0.1.12&quot;</span>);</span>
+<span class="ln" id="L778">    }</span>
+<span class="ln" id="L779"></span>
+<span class="ln" id="L780">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L781">    <span class="tok-kw">fn</span> <span class="tok-fn">the_same_version_is_up_to_date</span>() {</span>
+<span class="ln" id="L782">        assert_eq!(<span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;v0.1.12&quot;</span>).verdict, Verdict::UpToDate);</span>
+<span class="ln" id="L783">    }</span>
+<span class="ln" id="L784"></span>
+<span class="ln" id="L785">    <span class="tok-com">/// An unreleased build is ahead, and is told so rather than told it is</span></span>
+<span class="ln" id="L786">    <span class="tok-com">/// current. Saying &quot;up to date&quot; to somebody running `main` hides the one</span></span>
+<span class="ln" id="L787">    <span class="tok-com">/// fact that matters about what they are running.</span></span>
+<span class="ln" id="L788">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L789">    <span class="tok-kw">fn</span> <span class="tok-fn">a_build_ahead_of_the_newest_release_is_told_so</span>() {</span>
+<span class="ln" id="L790">        assert_eq!(</span>
+<span class="ln" id="L791">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.2.0&quot;</span>, <span class="tok-str">&quot;0.1.12&quot;</span>).verdict,</span>
+<span class="ln" id="L792">            Verdict::<span class="tok-fn">Ahead</span>(<span class="tok-str">&quot;0.1.12&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L793">        );</span>
+<span class="ln" id="L794">    }</span>
+<span class="ln" id="L795"></span>
+<span class="ln" id="L796">    <span class="tok-com">/// Ordering is refused rather than guessed, and what counts as</span></span>
+<span class="ln" id="L797">    <span class="tok-com">/// unorderable has narrowed.</span></span>
+<span class="ln" id="L798">    <span class="tok-com">///</span></span>
+<span class="ln" id="L799">    <span class="tok-com">/// This used to assert that **any** prerelease was unreadable, which was</span></span>
+<span class="ln" id="L800">    <span class="tok-com">/// right while nothing published one: a checker that gets prerelease</span></span>
+<span class="ln" id="L801">    <span class="tok-com">/// precedence subtly wrong tells people to downgrade. Roadmap item 165 publishes</span></span>
+<span class="ln" id="L802">    <span class="tok-com">/// them, so they are ordered now, by the specification&#x27;s rules and against</span></span>
+<span class="ln" id="L803">    <span class="tok-com">/// the specification&#x27;s own examples. A string that is not a version at all</span></span>
+<span class="ln" id="L804">    <span class="tok-com">/// is still refused, and that is the half worth keeping.</span></span>
+<span class="ln" id="L805">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L806">    <span class="tok-kw">fn</span> <span class="tok-fn">a_version_that_cannot_be_compared_is_refused_rather_than_ordered</span>() {</span>
+<span class="ln" id="L807">        assert_eq!(</span>
+<span class="ln" id="L808">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;nightly&quot;</span>).verdict,</span>
+<span class="ln" id="L809">            Verdict::<span class="tok-fn">Unreadable</span>(<span class="tok-str">&quot;nightly&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L810">        );</span>
+<span class="ln" id="L811">        assert_eq!(</span>
+<span class="ln" id="L812">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2&quot;</span>).verdict,</span>
+<span class="ln" id="L813">            Verdict::<span class="tok-fn">Unreadable</span>(<span class="tok-str">&quot;0.2&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L814">        );</span>
+<span class="ln" id="L815">        assert!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.2&quot;</span>).<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;three numbers or nothing&quot;</span>);</span>
+<span class="ln" id="L816">        assert!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.2.3.4&quot;</span>).<span class="tok-fn">is_none</span>(), <span class="tok-str">&quot;three numbers or nothing&quot;</span>);</span>
+<span class="ln" id="L817">        <span class="tok-com">// And the one that changed: a prerelease is now ordered rather than</span></span>
+<span class="ln" id="L818">        <span class="tok-com">// refused, and ordered *below* the release it precedes.</span></span>
+<span class="ln" id="L819">        assert_eq!(</span>
+<span class="ln" id="L820">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0-rc1&quot;</span>).verdict,</span>
+<span class="ln" id="L821">            Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;0.2.0-rc1&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L822">        );</span>
+<span class="ln" id="L823">        assert_eq!(</span>
+<span class="ln" id="L824">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.2.0&quot;</span>, <span class="tok-str">&quot;0.2.0-rc1&quot;</span>).verdict,</span>
+<span class="ln" id="L825">            Verdict::<span class="tok-fn">Ahead</span>(<span class="tok-str">&quot;0.2.0-rc1&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L826">        );</span>
+<span class="ln" id="L827">    }</span>
+<span class="ln" id="L828"></span>
+<span class="ln" id="L829">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L830">    <span class="tok-kw">fn</span> <span class="tok-fn">the_leading_v_is_optional_on_both_sides</span>() {</span>
+<span class="ln" id="L831">        assert_eq!(<span class="tok-fn">parse</span>(<span class="tok-str">&quot;v1.2.3&quot;</span>), <span class="tok-fn">parse</span>(<span class="tok-str">&quot;1.2.3&quot;</span>));</span>
+<span class="ln" id="L832">        assert_eq!(</span>
+<span class="ln" id="L833">            <span class="tok-fn">report</span>(<span class="tok-str">&quot;v1.0.0&quot;</span>, <span class="tok-str">&quot;1.0.1&quot;</span>).verdict,</span>
+<span class="ln" id="L834">            Verdict::<span class="tok-fn">Newer</span>(<span class="tok-str">&quot;1.0.1&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L835">        );</span>
+<span class="ln" id="L836">    }</span>
+<span class="ln" id="L837"></span>
+<span class="ln" id="L838">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L839">    <span class="tok-kw">fn</span> <span class="tok-fn">the_tag_is_read_out_of_a_release_page</span>() {</span>
+<span class="ln" id="L840">        <span class="tok-kw">let</span> body = <span class="tok-str">r#&quot;&lt;a href=&quot;/tilas01/veilvoice/releases/tag/v0.1.12&quot;&gt;v0.1.12&lt;/a&gt;&quot;#</span>;</span>
+<span class="ln" id="L841">        assert_eq!(<span class="tok-fn">tag_in</span>(body).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;v0.1.12&quot;</span>));</span>
+<span class="ln" id="L842">    }</span>
+<span class="ln" id="L843"></span>
+<span class="ln" id="L844">    <span class="tok-com">/// A page that is not a release page yields nothing, rather than a</span></span>
+<span class="ln" id="L845">    <span class="tok-com">/// fragment of somebody&#x27;s markup shown to the user as a version.</span></span>
+<span class="ln" id="L846">    <span class="tok-com">/// The real page carries an empty `/releases/tag/` before any real one.</span></span>
+<span class="ln" id="L847">    <span class="tok-com">/// Taking the first match returned nothing against a page that plainly had</span></span>
+<span class="ln" id="L848">    <span class="tok-com">/// a version on it, which is how this was found: by running it.</span></span>
 <span class="ln" id="L849">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L850">    <span class="tok-kw">fn</span> <span class="tok-fn">the_url_is_this_project_over_tls</span>() {</span>
-<span class="ln" id="L851">        assert!(LATEST_URL.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>));</span>
-<span class="ln" id="L852">        assert!(LATEST_URL.<span class="tok-fn">contains</span>(REPO));</span>
-<span class="ln" id="L853">        assert!(RELEASES_URL.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>));</span>
-<span class="ln" id="L854">        assert!(RELEASES_URL.<span class="tok-fn">contains</span>(REPO));</span>
-<span class="ln" id="L855">    }</span>
-<span class="ln" id="L856"></span>
-<span class="ln" id="L857">    <span class="tok-com">/// The scope note has to state the limits, not only the capability. This</span></span>
-<span class="ln" id="L858">    <span class="tok-com">/// is the wording the front page&#x27;s claim now depends on.</span></span>
-<span class="ln" id="L859">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L860">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_states_what_it_does_not_do</span>() {</span>
-<span class="ln" id="L861">        <span class="tok-kw">let</span> scope = SCOPE.<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L862">        <span class="tok-kw">for</span> phrase <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L863">            <span class="tok-str">&quot;you pressed the button&quot;</span>,</span>
-<span class="ln" id="L864">            <span class="tok-str">&quot;no timer&quot;</span>,</span>
-<span class="ln" id="L865">            <span class="tok-str">&quot;no http client&quot;</span>,</span>
-<span class="ln" id="L866">            <span class="tok-str">&quot;sends nothing about you&quot;</span>,</span>
-<span class="ln" id="L867">            <span class="tok-com">// The subject of this sentence is the check, not the command that</span></span>
-<span class="ln" id="L868">            <span class="tok-com">// shows it. `veilvoice update` prints this paragraph on the paths</span></span>
-<span class="ln" id="L869">            <span class="tok-com">// where nothing is installed, and an unqualified &quot;it installs</span></span>
-<span class="ln" id="L870">            <span class="tok-com">// nothing&quot; read there is a claim about the command, which does</span></span>
-<span class="ln" id="L871">            <span class="tok-com">// install. See the note on `SCOPE`.</span></span>
-<span class="ln" id="L872">            <span class="tok-str">&quot;the check itself downloads no release&quot;</span>,</span>
-<span class="ln" id="L873">            <span class="tok-str">&quot;installs nothing&quot;</span>,</span>
-<span class="ln" id="L874">            <span class="tok-str">&quot;not a signature&quot;</span>,</span>
-<span class="ln" id="L875">        ] {</span>
-<span class="ln" id="L876">            assert!(scope.<span class="tok-fn">contains</span>(phrase), <span class="tok-str">&quot;the scope note must say {phrase:?}&quot;</span>);</span>
-<span class="ln" id="L877">        }</span>
-<span class="ln" id="L878">    }</span>
+<span class="ln" id="L850">    <span class="tok-kw">fn</span> <span class="tok-fn">an_empty_tag_link_before_a_real_one_is_stepped_over</span>() {</span>
+<span class="ln" id="L851">        <span class="tok-kw">let</span> body = <span class="tok-str">r#&quot;&lt;a href=&quot;/tilas01/veilvoice/releases/tag/&quot;&gt;&lt;/a&gt;</span></span>
+<span class="ln" id="L852"><span class="tok-str">                      &lt;a href=&quot;/tilas01/veilvoice/releases/tag/v0.1.12&quot;&gt;v0.1.12&lt;/a&gt;&quot;#</span>;</span>
+<span class="ln" id="L853">        assert_eq!(<span class="tok-fn">tag_in</span>(body).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;v0.1.12&quot;</span>));</span>
+<span class="ln" id="L854">    }</span>
+<span class="ln" id="L855"></span>
+<span class="ln" id="L856">    <span class="tok-com">/// curl is asked for the redirect target rather than the page, so what the</span></span>
+<span class="ln" id="L857">    <span class="tok-com">/// scanner sees is one line. This is the shape it has to handle.</span></span>
+<span class="ln" id="L858">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L859">    <span class="tok-kw">fn</span> <span class="tok-fn">the_redirect_target_alone_is_enough</span>() {</span>
+<span class="ln" id="L860">        <span class="tok-kw">let</span> url = <span class="tok-str">&quot;https://github.com/tilas01/veilvoice/releases/tag/v0.1.12&quot;</span>;</span>
+<span class="ln" id="L861">        assert_eq!(<span class="tok-fn">tag_in</span>(url).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;v0.1.12&quot;</span>));</span>
+<span class="ln" id="L862">    }</span>
+<span class="ln" id="L863"></span>
+<span class="ln" id="L864">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L865">    <span class="tok-kw">fn</span> <span class="tok-fn">a_page_with_no_tag_yields_nothing</span>() {</span>
+<span class="ln" id="L866">        assert_eq!(<span class="tok-fn">tag_in</span>(<span class="tok-str">&quot;&lt;html&gt;&lt;body&gt;hello&lt;/body&gt;&lt;/html&gt;&quot;</span>), None);</span>
+<span class="ln" id="L867">        assert_eq!(<span class="tok-fn">tag_in</span>(<span class="tok-str">&quot;&quot;</span>), None);</span>
+<span class="ln" id="L868">        assert_eq!(<span class="tok-fn">tag_in</span>(<span class="tok-str">&quot;/releases/tag/&quot;</span>), None);</span>
+<span class="ln" id="L869">        assert_eq!(<span class="tok-fn">tag_in</span>(<span class="tok-str">&quot;/releases/tag/&lt;script&gt;&quot;</span>), None);</span>
+<span class="ln" id="L870">    }</span>
+<span class="ln" id="L871"></span>
+<span class="ln" id="L872">    <span class="tok-com">/// Whatever comes back, what is shown is short and made of characters a</span></span>
+<span class="ln" id="L873">    <span class="tok-com">/// version number is made of.</span></span>
+<span class="ln" id="L874">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L875">    <span class="tok-kw">fn</span> <span class="tok-fn">a_hostile_tag_is_bounded_in_length_and_alphabet</span>() {</span>
+<span class="ln" id="L876">        <span class="tok-kw">let</span> long = format!(<span class="tok-str">&quot;/releases/tag/{}&quot;</span>, <span class="tok-str">&quot;a&quot;</span>.<span class="tok-fn">repeat</span>(<span class="tok-num">500</span>));</span>
+<span class="ln" id="L877">        <span class="tok-kw">let</span> tag = <span class="tok-fn">tag_in</span>(&amp;long).<span class="tok-fn">expect</span>(<span class="tok-str">&quot;a tag is found&quot;</span>);</span>
+<span class="ln" id="L878">        assert_eq!(tag.<span class="tok-fn">len</span>(), <span class="tok-num">32</span>, <span class="tok-str">&quot;bounded to 32 characters&quot;</span>);</span>
 <span class="ln" id="L879"></span>
-<span class="ln" id="L880">    <span class="tok-com">/// Every report carries the caveat, so no front end can show the answer</span></span>
-<span class="ln" id="L881">    <span class="tok-com">/// without it.</span></span>
-<span class="ln" id="L882">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L883">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_carries_what_the_answer_is_worth</span>() {</span>
-<span class="ln" id="L884">        <span class="tok-kw">let</span> caveat = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>).<span class="tok-fn">caveat</span>().<span class="tok-fn">to_lowercase</span>();</span>
-<span class="ln" id="L885">        assert!(caveat.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not a signature&quot;</span>));</span>
-<span class="ln" id="L886">        assert!(caveat.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice verify&quot;</span>));</span>
-<span class="ln" id="L887">    }</span>
-<span class="ln" id="L888"></span>
-<span class="ln" id="L889">    <span class="tok-com">/// Errors explain what to do instead rather than only that something</span></span>
-<span class="ln" id="L890">    <span class="tok-com">/// failed. A tool that cannot reach the network still has a user who wants</span></span>
-<span class="ln" id="L891">    <span class="tok-com">/// to know whether there is an update.</span></span>
-<span class="ln" id="L892">    <span class="tok-attr">#[test</span>]</span>
-<span class="ln" id="L893">    <span class="tok-kw">fn</span> <span class="tok-fn">every_failure_says_what_to_do_instead</span>() {</span>
-<span class="ln" id="L894">        <span class="tok-kw">for</span> error <span class="tok-kw">in</span> [</span>
-<span class="ln" id="L895">            Error::NoTransferTool,</span>
-<span class="ln" id="L896">            Error::NoVersionFound,</span>
-<span class="ln" id="L897">            Error::<span class="tok-fn">Failed</span>(<span class="tok-str">&quot;connection refused&quot;</span>.<span class="tok-fn">into</span>()),</span>
-<span class="ln" id="L898">        ] {</span>
-<span class="ln" id="L899">            <span class="tok-kw">let</span> text = error.<span class="tok-fn">to_string</span>();</span>
-<span class="ln" id="L900">            assert!(!text.<span class="tok-fn">is_empty</span>());</span>
-<span class="ln" id="L901">        }</span>
-<span class="ln" id="L902">        assert!(Error::NoTransferTool.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(RELEASES_URL));</span>
-<span class="ln" id="L903">        assert!(Error::NoVersionFound.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(RELEASES_URL));</span>
-<span class="ln" id="L904">        assert!(Error::<span class="tok-fn">Failed</span>(<span class="tok-str">&quot;refused&quot;</span>.<span class="tok-fn">into</span>())</span>
-<span class="ln" id="L905">            .<span class="tok-fn">to_string</span>()</span>
-<span class="ln" id="L906">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;refused&quot;</span>));</span>
-<span class="ln" id="L907">    }</span>
-<span class="ln" id="L908">}</span>
+<span class="ln" id="L880">        <span class="tok-kw">let</span> markup = <span class="tok-str">&quot;/releases/tag/v1.0.0\&quot;&gt;&lt;img src=x onerror=alert(1)&gt;&quot;</span>;</span>
+<span class="ln" id="L881">        assert_eq!(<span class="tok-fn">tag_in</span>(markup).<span class="tok-fn">as_deref</span>(), <span class="tok-fn">Some</span>(<span class="tok-str">&quot;v1.0.0&quot;</span>));</span>
+<span class="ln" id="L882">    }</span>
+<span class="ln" id="L883"></span>
+<span class="ln" id="L884">    <span class="tok-com">/// The URL asked about is this project&#x27;s own, over TLS, and is a page a</span></span>
+<span class="ln" id="L885">    <span class="tok-com">/// person can open and compare by hand.</span></span>
+<span class="ln" id="L886">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L887">    <span class="tok-kw">fn</span> <span class="tok-fn">the_url_is_this_project_over_tls</span>() {</span>
+<span class="ln" id="L888">        assert!(LATEST_URL.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>));</span>
+<span class="ln" id="L889">        assert!(LATEST_URL.<span class="tok-fn">contains</span>(REPO));</span>
+<span class="ln" id="L890">        assert!(RELEASES_URL.<span class="tok-fn">starts_with</span>(<span class="tok-str">&quot;https://&quot;</span>));</span>
+<span class="ln" id="L891">        assert!(RELEASES_URL.<span class="tok-fn">contains</span>(REPO));</span>
+<span class="ln" id="L892">    }</span>
+<span class="ln" id="L893"></span>
+<span class="ln" id="L894">    <span class="tok-com">/// The scope note has to state the limits, not only the capability. This</span></span>
+<span class="ln" id="L895">    <span class="tok-com">/// is the wording the front page&#x27;s claim now depends on.</span></span>
+<span class="ln" id="L896">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L897">    <span class="tok-kw">fn</span> <span class="tok-fn">the_scope_note_states_what_it_does_not_do</span>() {</span>
+<span class="ln" id="L898">        <span class="tok-kw">let</span> scope = SCOPE.<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L899">        <span class="tok-kw">for</span> phrase <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L900">            <span class="tok-str">&quot;you pressed the button&quot;</span>,</span>
+<span class="ln" id="L901">            <span class="tok-str">&quot;no timer&quot;</span>,</span>
+<span class="ln" id="L902">            <span class="tok-str">&quot;no http client&quot;</span>,</span>
+<span class="ln" id="L903">            <span class="tok-str">&quot;sends nothing about you&quot;</span>,</span>
+<span class="ln" id="L904">            <span class="tok-com">// The subject of this sentence is the check, not the command that</span></span>
+<span class="ln" id="L905">            <span class="tok-com">// shows it. `veilvoice update` prints this paragraph on the paths</span></span>
+<span class="ln" id="L906">            <span class="tok-com">// where nothing is installed, and an unqualified &quot;it installs</span></span>
+<span class="ln" id="L907">            <span class="tok-com">// nothing&quot; read there is a claim about the command, which does</span></span>
+<span class="ln" id="L908">            <span class="tok-com">// install. See the note on `SCOPE`.</span></span>
+<span class="ln" id="L909">            <span class="tok-str">&quot;the check itself downloads no release&quot;</span>,</span>
+<span class="ln" id="L910">            <span class="tok-str">&quot;installs nothing&quot;</span>,</span>
+<span class="ln" id="L911">            <span class="tok-str">&quot;not a signature&quot;</span>,</span>
+<span class="ln" id="L912">        ] {</span>
+<span class="ln" id="L913">            assert!(scope.<span class="tok-fn">contains</span>(phrase), <span class="tok-str">&quot;the scope note must say {phrase:?}&quot;</span>);</span>
+<span class="ln" id="L914">        }</span>
+<span class="ln" id="L915">    }</span>
+<span class="ln" id="L916"></span>
+<span class="ln" id="L917">    <span class="tok-com">/// Every report carries the caveat, so no front end can show the answer</span></span>
+<span class="ln" id="L918">    <span class="tok-com">/// without it.</span></span>
+<span class="ln" id="L919">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L920">    <span class="tok-kw">fn</span> <span class="tok-fn">a_report_carries_what_the_answer_is_worth</span>() {</span>
+<span class="ln" id="L921">        <span class="tok-kw">let</span> caveat = <span class="tok-fn">report</span>(<span class="tok-str">&quot;0.1.12&quot;</span>, <span class="tok-str">&quot;0.2.0&quot;</span>).<span class="tok-fn">caveat</span>().<span class="tok-fn">to_lowercase</span>();</span>
+<span class="ln" id="L922">        assert!(caveat.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;not a signature&quot;</span>));</span>
+<span class="ln" id="L923">        assert!(caveat.<span class="tok-fn">contains</span>(<span class="tok-str">&quot;veilvoice verify&quot;</span>));</span>
+<span class="ln" id="L924">    }</span>
+<span class="ln" id="L925"></span>
+<span class="ln" id="L926">    <span class="tok-com">/// Errors explain what to do instead rather than only that something</span></span>
+<span class="ln" id="L927">    <span class="tok-com">/// failed. A tool that cannot reach the network still has a user who wants</span></span>
+<span class="ln" id="L928">    <span class="tok-com">/// to know whether there is an update.</span></span>
+<span class="ln" id="L929">    <span class="tok-attr">#[test</span>]</span>
+<span class="ln" id="L930">    <span class="tok-kw">fn</span> <span class="tok-fn">every_failure_says_what_to_do_instead</span>() {</span>
+<span class="ln" id="L931">        <span class="tok-kw">for</span> error <span class="tok-kw">in</span> [</span>
+<span class="ln" id="L932">            Error::NoTransferTool,</span>
+<span class="ln" id="L933">            Error::NoVersionFound,</span>
+<span class="ln" id="L934">            Error::<span class="tok-fn">Failed</span>(<span class="tok-str">&quot;connection refused&quot;</span>.<span class="tok-fn">into</span>()),</span>
+<span class="ln" id="L935">        ] {</span>
+<span class="ln" id="L936">            <span class="tok-kw">let</span> text = error.<span class="tok-fn">to_string</span>();</span>
+<span class="ln" id="L937">            assert!(!text.<span class="tok-fn">is_empty</span>());</span>
+<span class="ln" id="L938">        }</span>
+<span class="ln" id="L939">        assert!(Error::NoTransferTool.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(RELEASES_URL));</span>
+<span class="ln" id="L940">        assert!(Error::NoVersionFound.<span class="tok-fn">to_string</span>().<span class="tok-fn">contains</span>(RELEASES_URL));</span>
+<span class="ln" id="L941">        assert!(Error::<span class="tok-fn">Failed</span>(<span class="tok-str">&quot;refused&quot;</span>.<span class="tok-fn">into</span>())</span>
+<span class="ln" id="L942">            .<span class="tok-fn">to_string</span>()</span>
+<span class="ln" id="L943">            .<span class="tok-fn">contains</span>(<span class="tok-str">&quot;refused&quot;</span>));</span>
+<span class="ln" id="L944">    }</span>
+<span class="ln" id="L945">}</span>
 </code></pre>
 </main>
 <footer class="wrap" style="padding:40px 20px;color:var(--muted)">

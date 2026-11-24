@@ -3,7 +3,7 @@
 
 # `fuzz/fuzz_targets/hybrid_keys.rs`
 
-[[fuzz|Crate-fuzz]] &middot; 36 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/hybrid_keys.rs)
+[fuzz](Crate-fuzz) &middot; 36 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/hybrid_keys.rs)
 
 ## Contents
 

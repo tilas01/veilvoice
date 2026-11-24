@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-setup/src/space.rs`
 
-[[veilvoice-setup|Crate-veilvoice-setup]] &middot; 170 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs)
+[veilvoice-setup](Crate-veilvoice-setup) &middot; 170 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/space.rs)
 
 ## Contents
 

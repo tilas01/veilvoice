@@ -676,7 +676,8 @@ impl Conversation {
         // subtitle tracks worth protecting. Writing the subtitles 0600 and the
         // file they are generated from 0644 would protect the copy and leave
         // the original.
-        veilvoice_crypto::privatefile::write_owner_only(path, self.to_text().as_bytes())?;
+        // Replaced in one step, so a crash part-way leaves the old record. F-335.
+        veilvoice_crypto::privatefile::replace_owner_only(path, self.to_text().as_bytes())?;
         Ok(())
     }
 

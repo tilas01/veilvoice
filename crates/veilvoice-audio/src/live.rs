@@ -140,7 +140,11 @@ impl Troubles {
             return;
         }
         eprintln!("veilvoice: {} stream error: {error}", side.word());
-        if let Ok(mut held) = self.kept.lock() {
+        // **F-320.** `try_lock`, as the glitch path above never locks at all:
+        // this runs on the audio thread on ALSA, and a reader holding the lock
+        // must not stall it. The count is already taken, so a report that
+        // loses this race is still counted and only its wording is lost.
+        if let Ok(mut held) = self.kept.try_lock() {
             *held = Some(Interference {
                 side,
                 device_gone: matches!(
@@ -872,5 +876,26 @@ mod tests {
         troubles.report(Side::Input, &cpal::Error::new(cpal::ErrorKind::Xrun));
         let newest = troubles.latest().expect("described");
         assert_eq!((newest.said.as_str(), newest.count), (GLITCH, 3));
+    }
+
+    /// **F-320.** A device error reported while somebody reads the last one
+    /// does not wait for them. It would have waited for ever here.
+    #[test]
+    fn a_device_error_does_not_wait_for_a_reader() {
+        let troubles = std::sync::Arc::new(Troubles::default());
+        let _held = troubles.kept.lock().expect("a fresh lock");
+        let (done, finished) = std::sync::mpsc::channel();
+        let reporter = std::sync::Arc::clone(&troubles);
+        std::thread::spawn(move || {
+            reporter.report(
+                Side::Input,
+                &cpal::Error::new(cpal::ErrorKind::DeviceNotAvailable),
+            );
+            let _ = done.send(());
+        });
+        finished
+            .recv_timeout(std::time::Duration::from_secs(5))
+            .expect("the report waited on the reader's lock");
+        assert_eq!(troubles.count(), 1, "still counted");
     }
 }

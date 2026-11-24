@@ -5,7 +5,7 @@
 
 > egui/eframe front-end for VeilVoice: Tokyo Night, monospace, three modes.
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/README.md)
 
 ## Contents
 
@@ -86,15 +86,15 @@ flowchart TD
     n_app["app.rs<br/>3700 lines"]
     n_autolock["autolock.rs<br/>369 lines"]
     n_avnotice["avnotice.rs<br/>305 lines"]
-    n_crashlog["crashlog.rs<br/>450 lines"]
+    n_crashlog["crashlog.rs<br/>466 lines"]
     n_crashreport["crashreport.rs<br/>306 lines"]
     n_decoys["decoys.rs<br/>230 lines"]
     n_dialog["dialog.rs<br/>430 lines"]
     n_exporting["exporting.rs<br/>1168 lines"]
-    n_firstrun["firstrun.rs<br/>871 lines"]
+    n_firstrun["firstrun.rs<br/>901 lines"]
     n_graphics["graphics.rs<br/>214 lines"]
     n_group["group.rs<br/>2129 lines"]
-    n_integrity["integrity.rs<br/>514 lines"]
+    n_integrity["integrity.rs<br/>534 lines"]
     n_layout["layout.rs<br/>632 lines"]
     n_monitor["monitor.rs<br/>579 lines"]
     n_notify["notify.rs<br/>460 lines"]
@@ -103,21 +103,21 @@ flowchart TD
     n_palettes["palettes.rs<br/>714 lines"]
     n_paths["paths.rs<br/>248 lines"]
     n_policy["policy.rs<br/>320 lines"]
-    n_prefs["prefs.rs<br/>1012 lines"]
+    n_prefs["prefs.rs<br/>1015 lines"]
     n_probe["probe.rs<br/>426 lines"]
     n_progress["progress.rs<br/>539 lines"]
     n_reduced_motion["reduced_motion.rs<br/>285 lines"]
     n_reset["reset.rs<br/>604 lines"]
-    n_security["security.rs<br/>3258 lines"]
+    n_security["security.rs<br/>3261 lines"]
     n_settings["settings.rs<br/>1686 lines"]
     n_setup["setup.rs<br/>1144 lines"]
     n_soundbar["soundbar.rs<br/>796 lines"]
     n_storage["storage.rs<br/>661 lines"]
     n_studio["studio.rs<br/>2845 lines"]
     n_theme["theme.rs<br/>813 lines"]
-    n_tour["tour.rs<br/>1347 lines"]
+    n_tour["tour.rs<br/>1339 lines"]
     n_updates["updates.rs<br/>276 lines"]
-    n_vault_store["vault_store.rs<br/>943 lines"]
+    n_vault_store["vault_store.rs<br/>945 lines"]
     n_verify["verify.rs<br/>1836 lines"]
     n_watchfeed["watchfeed.rs<br/>412 lines"]
     n_window["window.rs<br/>249 lines"]
@@ -170,6 +170,7 @@ flowchart TD
     n_firstrun --> n_settings
     n_firstrun --> n_studio
     n_firstrun --> n_theme
+    n_firstrun --> n_vault_store
     n_group --> n_dialog
     n_group --> n_layout
     n_group --> n_monitor
@@ -249,6 +250,7 @@ flowchart TD
     n_studio --> n_progress
     n_studio --> n_theme
     n_theme --> n_palettes
+    n_tour --> n_firstrun
     n_tour --> n_security
     n_tour --> n_settings
     n_tour --> n_theme
@@ -317,15 +319,15 @@ flowchart TD
 | [`app.rs`](File-veilvoice-gui-app) | 3700 | The VeilVoice desktop application: seven tabs, one window, no menus. |
 | [`autolock.rs`](File-veilvoice-gui-autolock) | 369 | Locking the window again after a period of no use. |
 | [`avnotice.rs`](File-veilvoice-gui-avnotice) | 305 | Noticing when antivirus software has closed VeilVoice, and saying so kindly. |
-| [`crashlog.rs`](File-veilvoice-gui-crashlog) | 450 | Make a failure that produces no output produce some. |
+| [`crashlog.rs`](File-veilvoice-gui-crashlog) | 466 | Make a failure that produces no output produce some. |
 | [`crashreport.rs`](File-veilvoice-gui-crashreport) | 306 | Offering the report from the last crash, on the run after it. |
 | [`decoys.rs`](File-veilvoice-gui-decoys) | 230 | Decoy vaults: how many there is room for, and the panel that offers them. |
 | [`dialog.rs`](File-veilvoice-gui-dialog) | 430 | Asking for a file without stopping the window. |
 | [`exporting.rs`](File-veilvoice-gui-exporting) | 1168 | The Browser's export, the way a recording tool does it, and its thumbnails. |
-| [`firstrun.rs`](File-veilvoice-gui-firstrun) | 871 | The first run: the four things worth deciding before anything else. |
+| [`firstrun.rs`](File-veilvoice-gui-firstrun) | 901 | The first run: the four things worth deciding before anything else. |
 | [`graphics.rs`](File-veilvoice-gui-graphics) | 214 | What the window is drawn with, asked for explicitly and then reported. |
 | [`group.rs`](File-veilvoice-gui-group) | 2129 | Group mode: several people in one recording, each with a name and a colour. |
-| [`integrity.rs`](File-veilvoice-gui-integrity) | 514 | The integrity record, taken and checked by the window rather than by hand. |
+| [`integrity.rs`](File-veilvoice-gui-integrity) | 534 | The integrity record, taken and checked by the window rather than by hand. |
 | [`layout.rs`](File-veilvoice-gui-layout) | 632 | Centring a row of widgets, which egui does not do by nesting. |
 | [`lib.rs`](File-veilvoice-gui-lib) | 1824 | The VeilVoice desktop application: an egui/eframe front-end, monospace throughout: anonymise a file, scramble a microphone live, watch what is listening, manage the app lock, choose how the app looks, and an about panel that states the honest scope. |
 | [`main.rs`](File-veilvoice-gui-main) | 281 | Entry point for the desktop application: open a window, hand it to veilvoice_gui::VeilVoiceApp, and get out of the way. |
@@ -336,26 +338,26 @@ flowchart TD
 | [`palettes.rs`](File-veilvoice-gui-palettes) | 714 | User-defined colour schemes, and the contrast check that keeps them usable. |
 | [`paths.rs`](File-veilvoice-gui-paths) | 248 | Exactly where this copy of VeilVoice is keeping things. |
 | [`policy.rs`](File-veilvoice-gui-policy) | 320 | The policy in force, and what the interface does about it. |
-| [`prefs.rs`](File-veilvoice-gui-prefs) | 1012 | What the user has chosen about how the app looks and moves. |
+| [`prefs.rs`](File-veilvoice-gui-prefs) | 1015 | What the user has chosen about how the app looks and moves. |
 | [`probe.rs`](File-veilvoice-gui-probe) | 426 | What this machine answers, so the settings it starts on were measured here. |
 | [`progress.rs`](File-veilvoice-gui-progress) | 539 | How far through a job is, in the two cases that exist: the ones that can honestly say, and the ones that cannot. |
 | [`reduced_motion.rs`](File-veilvoice-gui-reduced_motion) | 285 | Whether the operating system has been asked to reduce motion. |
 | [`reset.rs`](File-veilvoice-gui-reset) | 604 | Starting again from the window: what would go, then going. |
-| [`security.rs`](File-veilvoice-gui-security) | 3258 | The application lock, and the at-rest encryption of what VeilVoice writes. |
+| [`security.rs`](File-veilvoice-gui-security) | 3261 | The application lock, and the at-rest encryption of what VeilVoice writes. |
 | [`settings.rs`](File-veilvoice-gui-settings) | 1686 | The settings panel: a menu of pages, each a titled group of choices. |
 | [`setup.rs`](File-veilvoice-gui-setup) | 1144 | The setup tab: install this copy, undo that, and the optional companions. |
 | [`soundbar.rs`](File-veilvoice-gui-soundbar) | 796 | The animated mark: a row of bars that rise and fall. |
 | [`storage.rs`](File-veilvoice-gui-storage) | 661 | Where veiled recordings are written, and the encrypted volume that may hold them. |
 | [`studio.rs`](File-veilvoice-gui-studio) | 2845 | The Recording Studio and the Recording Browser. |
 | [`theme.rs`](File-veilvoice-gui-theme) | 813 | Colour schemes for the desktop app. |
-| [`tour.rs`](File-veilvoice-gui-tour) | 1347 | The short walkthrough on a first run, and after an upgrade. |
+| [`tour.rs`](File-veilvoice-gui-tour) | 1339 | The short walkthrough on a first run, and after an upgrade. |
 | [`updates.rs`](File-veilvoice-gui-updates) | 276 | The manual update check, as the window shows it. |
-| [`vault_store.rs`](File-veilvoice-gui-vault_store) | 943 | Where the desktop application keeps its own files, and what the app lock buys for them. |
+| [`vault_store.rs`](File-veilvoice-gui-vault_store) | 945 | Where the desktop application keeps its own files, and what the app lock buys for them. |
 | [`verify.rs`](File-veilvoice-gui-verify) | 1836 | The verify tab: drop a download on the window and be told what it is. |
 | [`watchfeed.rs`](File-veilvoice-gui-watchfeed) | 412 | The device monitor, moved off the thread that paints. |
 | [`window.rs`](File-veilvoice-gui-window) | 249 | How big the window opens, and why it is not a constant. |
 
-**24,627 functional lines of Rust** in this crate. A functional line is a line
+**24,657 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

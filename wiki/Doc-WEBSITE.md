@@ -7,7 +7,7 @@
 <https://tilas01.github.io/veilvoice/>
 
 A static site with no framework, no build step and no bundler. Every page is
-HTML on disk, every script is a plain ES module the browser loads directly, and
+HTML on disk, every script is a plain classic script the browser loads directly, and
 nothing is minified. That is deliberate: a site about a program whose whole
 claim is that you can check what it does should itself be something you can read
 without tooling.

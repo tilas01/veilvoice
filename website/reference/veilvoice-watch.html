@@ -81,7 +81,7 @@
 <p>VeilVoice protects the audio you choose to send. This answers a different and more basic question: <em>is something listening that you did not choose?</em> A de-identified voice on a call is worth very little if a second program is recording the raw microphone at the same time.</p>
 <p>Operating systems have grown indicators for this, the orange dot and the taskbar icon, but they are small, easily missed, and tell you only that <em>something</em> is active, rarely what. This reports the process, its PID and how long it has held the device.</p>
 <h3 id="what-it-can-actually-see-per-platform">What it can actually see, per platform</h3>
-<p>Detection is honest about its limits, because a monitor that quietly sees nothing is worse than no monitor at all, because it produces false confidence. <code>support</code> reports what the current platform can do before you rely on it.</p>
+<p>Detection is honest about its limits. A monitor that quietly sees nothing is worse than no monitor at all, because it gives false confidence. <code>support</code> reports what the current platform can do before you rely on it.</p>
 <p>| Platform | Microphone | Camera | How | |---|---|---|---| | Windows | &#9989; | &#9989; | The same <code>CapabilityAccessManager</code> records the OS privacy indicator uses | | Linux | &#9989; | &#9989; | <code>/proc/*/fd</code> handles open on <code>/dev/snd/pcm*</code> and <code>/dev/video*</code> | | macOS | &#10060; | &#10060; | No public API exposes it; anything claiming otherwise on macOS is guessing |</p>
 <p>On Linux you see every process you have permission to inspect. Without root that means your own; other users&#x27; processes are invisible, and that is a kernel permission boundary rather than something this crate can work around.</p>
 <h2 id="in-plain-words">In plain words</h2>
@@ -126,7 +126,7 @@
 <a href="veilvoice-watch/privilege.src.html">
 <rect x="130.4" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
 <text x="192.8" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">privilege.rs</text>
-<text x="192.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">404 lines</text>
+<text x="192.8" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">407 lines</text>
 </a>
 <a href="veilvoice-watch/proc.src.html">
 <rect x="209.8" y="220.0" width="100.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--border, #2f3549)" stroke-width="1.5"/>
@@ -154,7 +154,7 @@ flowchart TD
     n_appctl[&quot;appctl.rs&lt;br/&gt;798 lines&quot;]
     n_input[&quot;input.rs&lt;br/&gt;605 lines&quot;]
     n_linux[&quot;linux.rs&lt;br/&gt;218 lines&quot;]
-    n_privilege[&quot;privilege.rs&lt;br/&gt;404 lines&quot;]
+    n_privilege[&quot;privilege.rs&lt;br/&gt;407 lines&quot;]
     n_proc[&quot;proc.rs&lt;br/&gt;274 lines&quot;]
     n_windows[&quot;windows.rs&lt;br/&gt;622 lines&quot;]
     n_input --&gt; n_proc
@@ -179,7 +179,7 @@ flowchart TD
 <tr><td><a href="veilvoice-watch/input.html"><code>input.rs</code></a></td><td>605</td><td>What on this machine could be watching the keyboard and the mouse.</td></tr>
 <tr><td><a href="veilvoice-watch/lib.html"><code>lib.rs</code></a></td><td>423</td><td>Find out which applications are using your microphone and camera, right now.</td></tr>
 <tr><td><a href="veilvoice-watch/linux.html"><code>linux.rs</code></a></td><td>218</td><td>Linux detection, via open file handles in /proc.</td></tr>
-<tr><td><a href="veilvoice-watch/privilege.html"><code>privilege.rs</code></a></td><td>404</td><td>What privilege VeilVoice is running with, and what each level can actually see.</td></tr>
+<tr><td><a href="veilvoice-watch/privilege.html"><code>privilege.rs</code></a></td><td>407</td><td>What privilege VeilVoice is running with, and what each level can actually see.</td></tr>
 <tr><td><a href="veilvoice-watch/proc.html"><code>proc.rs</code></a></td><td>274</td><td>Which processes are running, per platform, and what that cannot tell you.</td></tr>
 <tr><td><a href="veilvoice-watch/windows.html"><code>windows.rs</code></a></td><td>622</td><td>Windows detection, via the Capability Access Manager.</td></tr>
 <tr><td><a href="veilvoice-watch/examples-scan_once.html"><code>scan_once.rs</code></a></td><td>30</td><td>Print what is using the microphone and camera right now.</td></tr>

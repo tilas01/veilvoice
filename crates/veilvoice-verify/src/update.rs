@@ -979,7 +979,8 @@ fn write_beside(path: &Path, bytes: &[u8]) -> Result<(), String> {
             std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         }
     }
-    veilvoice_crypto::privatefile::write_owner_only(path, bytes).map_err(|e| e.to_string())
+    // Replaced in one step, so a crash part-way leaves the old record. F-335.
+    veilvoice_crypto::privatefile::replace_owner_only(path, bytes).map_err(|e| e.to_string())
 }
 
 /// Start the updated program and return.

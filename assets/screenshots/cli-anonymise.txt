@@ -8,7 +8,7 @@ Arguments:
 
 Options:
   -o, --output <OUTPUT>
-          Where to write the result. Defaults to `<input>.veiled.wav`
+          Where to write the result. Defaults to the input's name with `.veiled.wav` in place of its extension: `talk.m4a` gives `talk.veiled.wav`
 
       --intensity <INTENSITY>
           How far pitch and formants are pushed from the original, 0.0–1.0

@@ -11,7 +11,7 @@
 
 # `crates/veilvoice-setup/src/update.rs`
 
-[`veilvoice-setup`](../../../crates/veilvoice-setup/README.md) &middot; 908 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs)
+[`veilvoice-setup`](../../../crates/veilvoice-setup/README.md) &middot; 945 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs)
 
 ## Contents
 
@@ -91,7 +91,7 @@ anything.
 
 ## What this file contains
 
-908 lines defining **13 functions** (8 public), **6 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+945 lines defining **15 functions** (8 public), **6 types** and **8 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 
@@ -109,7 +109,7 @@ anything.
 - `Channel::url` (line 152) -- The page an update check reads for this stream.
 - `Report::caveat` (line 196) -- What this answer is worth, in the words the user should see.
 - `check` (line 242) -- Ask whether anything newer than current has been published.
-  - reaches: `fetch`, `find_tool`, `of`, `report`, `tag_in`, `parse`, `precedence`
+  - reaches: `fetch`, `find_tool`, `of`, `report`, `tag_in`, `fetch_arguments`, `fetched`, `parse`, `precedence`
 
 ## What calls what
 
@@ -144,11 +144,15 @@ flowchart TD
     n_tag_in["tag_in<br/>line 406"]
     n_find_tool["find_tool<br/>line 438"]
     n_fetch["fetch<br/>line 479"]
+    n_fetch_arguments["fetch_arguments<br/>line 492"]
+    n_fetched["fetched<br/>line 558"]
     n_check --> n_fetch
     n_check --> n_find_tool
     n_check --> n_of
     n_check --> n_report
     n_check --> n_tag_in
+    n_fetch --> n_fetch_arguments
+    n_fetch --> n_fetched
     n_of --> n_parse
     n_report --> n_of
     n_report --> n_parse
@@ -166,12 +170,14 @@ flowchart TD
     click n_tag_in href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L406" "open the source"
     click n_find_tool href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L438" "open the source"
     click n_fetch href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L479" "open the source"
+    click n_fetch_arguments href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L492" "open the source"
+    click n_fetched href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L558" "open the source"
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_label,n_describe,n_url,n_caveat,n_check entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_of,n_report,n_tag_in api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_fmt,n_parse,n_precedence,n_find_tool,n_fetch helper
+    class n_fmt,n_parse,n_precedence,n_find_tool,n_fetch,n_fetch_arguments,n_fetched helper
     subgraph chart_key ["Key"]
         direction LR
         key_entry["entry: a way in: public, and nothing in this file calls it"]
@@ -215,7 +221,9 @@ flowchart TD
 | `Tool` <sub>struct</sub> | [432](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L432) | Where a transfer tool was found, and how to drive it. |
 | `find_tool` <sub>fn</sub> | [438](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L438) | Absolute paths only. |
 | `fetch` <sub>fn</sub> | [479](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L479) | Run the tool and hand back what it printed. |
-| `SCOPE` <sub>pub const</sub> | [567](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L567) | What the check does and does not do, in one paragraph, for a front end to show beside the button. |
+| `fetch_arguments` <sub>fn</sub> | [492](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L492) | What the downloader is told, to read one page of the releases. |
+| `fetched` <sub>fn</sub> | [558](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L558) | What a finished fetch said, or why it failed. |
+| `SCOPE` <sub>pub const</sub> | [587](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-setup/src/update.rs#L587) | What the check does and does not do, in one paragraph, for a front end to show beside the button. |
 
 ---
 

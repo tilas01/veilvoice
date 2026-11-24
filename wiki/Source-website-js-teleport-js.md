@@ -3,7 +3,7 @@
 
 # `website/js/teleport.js`
 
-[[The website's source|Source-index]] &middot; 346 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/teleport.js)
+[The website's source](Source-index) &middot; 349 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/teleport.js)
 
 ## What it does
 

@@ -80,11 +80,13 @@ mod gui;
 mod input;
 mod lock;
 mod mandate;
+mod pipe;
 mod priv_mode;
 #[cfg(feature = "live")]
 mod record;
 mod reseal;
 mod reset;
+mod studio;
 // Only the live path draws a meter, and the crate builds without that path on
 // the BSDs, where `cpal` has no backend.
 #[cfg(feature = "live")]
@@ -96,7 +98,7 @@ mod update;
 
 use atrest::{prompt_secret, read_new_password};
 use clap::{Parser, Subcommand, ValueEnum};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use theme::{colour, err, field, heading, ok, paint, warn};
 #[cfg(feature = "live")]
@@ -144,7 +146,9 @@ enum Command {
     Anonymise {
         /// Audio file to read (wav, mp3, flac, ogg, m4a, ...).
         input: PathBuf,
-        /// Where to write the result. Defaults to `<input>.veiled.wav`.
+        /// Where to write the result. Defaults to the input's name with
+        /// `.veiled.wav` in place of its extension: `talk.m4a` gives
+        /// `talk.veiled.wav`.
         #[arg(short, long)]
         output: Option<PathBuf>,
         /// How far pitch and formants are pushed from the original, 0.0–1.0.
@@ -811,6 +815,15 @@ enum Command {
         dry_run: bool,
     },
 
+    /// The Recording Studio's vault: list, export or remove what it keeps.
+    ///
+    /// The same vault the window's Browser opens, through the same code. It
+    /// asks for the app-lock passphrase and then the recording passphrase, and
+    /// never makes a vault of its own.
+    Studio {
+        #[command(subcommand)]
+        action: studio::Action,
+    },
     /// Encrypted volumes this machine has: Cryptomator and VeraCrypt
     ///
     /// Reports what is installed and what is mounted right now. It never opens,
@@ -1450,6 +1463,7 @@ fn explain_verification(
 
 /// Parse the command line and turn a failure into an exit code and a message.
 fn main() -> ExitCode {
+    pipe::quiet_on_closed_pipe();
     let cli = Cli::parse();
 
     // The verifier is answered here rather than in `run` because it does not
@@ -1504,22 +1518,31 @@ fn run(command: Command) -> Result<(), String> {
             encrypt,
             encrypt_to,
             yes,
-        } => anonymise(
-            input,
-            output,
-            Tuning {
+        } => {
+            let posture = policy::apply(veilvoice_policy::Posture {
+                encrypt_recordings: encrypt,
+                clean_metadata,
+                neutralise_accent: !keep_accent,
+                app_lock: false,
                 intensity,
-                keep_accent,
-                reseed_secs,
-                reseed_range: reseed_range_from(reseed_range.as_deref())?,
-            },
-            clean_metadata,
-            AtRest {
-                encrypt,
-                to: encrypt_to,
-                yes,
-            },
-        ),
+            });
+            anonymise(
+                input,
+                output,
+                Tuning {
+                    intensity: posture.intensity,
+                    keep_accent: !posture.neutralise_accent,
+                    reseed_secs,
+                    reseed_range: reseed_range_from(reseed_range.as_deref())?,
+                },
+                posture.clean_metadata,
+                AtRest {
+                    encrypt: posture.encrypt_recordings,
+                    to: encrypt_to,
+                    yes,
+                },
+            )
+        }
         #[cfg(feature = "live")]
         Command::Live {
             input,
@@ -1530,18 +1553,26 @@ fn run(command: Command) -> Result<(), String> {
             reseed_range,
             preview,
             no_monitor,
-        } => live(
-            input,
-            output,
-            preview,
-            !no_monitor,
-            Tuning {
+        } => {
+            // Live keeps nothing, so only the voice settings apply here.
+            let posture = policy::apply(veilvoice_policy::Posture {
+                neutralise_accent: !keep_accent,
                 intensity,
-                keep_accent,
-                reseed_secs,
-                reseed_range: reseed_range_from(reseed_range.as_deref())?,
-            },
-        ),
+                ..veilvoice_policy::Posture::default()
+            });
+            live(
+                input,
+                output,
+                preview,
+                !no_monitor,
+                Tuning {
+                    intensity: posture.intensity,
+                    keep_accent: !posture.neutralise_accent,
+                    reseed_secs,
+                    reseed_range: reseed_range_from(reseed_range.as_deref())?,
+                },
+            )
+        }
         #[cfg(feature = "live")]
         Command::Record {
             input,
@@ -1562,6 +1593,12 @@ fn run(command: Command) -> Result<(), String> {
             // of an hour's recording is the one moment the answer is least
             // useful.
             say_what_a_video_will_need();
+            let posture = policy::apply(veilvoice_policy::Posture {
+                encrypt_recordings: !plaintext,
+                neutralise_accent: !keep_accent,
+                intensity,
+                ..veilvoice_policy::Posture::default()
+            });
             record::run(
                 input,
                 output,
@@ -1570,12 +1607,12 @@ fn run(command: Command) -> Result<(), String> {
                 !no_monitor,
                 record::Sealing {
                     public_key: to_public_key,
-                    plaintext,
+                    plaintext: !posture.encrypt_recordings,
                     yes,
                 },
                 Tuning {
-                    intensity,
-                    keep_accent,
+                    intensity: posture.intensity,
+                    keep_accent: !posture.neutralise_accent,
                     reseed_secs,
                     reseed_range: reseed_range_from(reseed_range.as_deref())?,
                 },
@@ -2051,6 +2088,7 @@ fn run(command: Command) -> Result<(), String> {
                 Some(name) => install_companion(&name),
             }
         }
+        Command::Studio { action } => studio::run(action),
         Command::Volumes => {
             list_volumes();
             Ok(())
@@ -2555,11 +2593,7 @@ fn anonymise(
         return Err("--encrypt-to and --encrypt false ask for opposite things".into());
     }
 
-    let out_path = output.unwrap_or_else(|| {
-        let mut p = input.clone();
-        p.set_extension("veiled.wav");
-        p
-    });
+    let out_path = output.unwrap_or_else(|| default_veiled_path(&input));
 
     let audio = audio_io::load(&input).map_err(|e| e.to_string())?;
     println!("{}", heading("Input"));
@@ -3002,8 +3036,26 @@ pub(crate) fn video_plan(size: &str, fps: u32) -> Result<veilvoice_video::size::
 /// The failures here are the ones a person can act on: a directory that does
 /// not exist, a read-only disk, a name they cannot write to. All of them need
 /// the path to be actionable at all.
+///
+/// An existing file is replaced in one step rather than rewritten where it
+/// is, so a crash or a full disk part-way through leaves the old one whole.
 pub(crate) fn write_named(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
-    std::fs::write(path, bytes).map_err(|e| format!("{}: {e}", path.display()))
+    veilvoice_crypto::privatefile::replace(path, bytes)
+        .map_err(|e| format!("{}: {e}", path.display()))
+}
+
+/// Create `path` with `bytes`, failing if anything is already there.
+///
+/// For a file that is not secret but must never be written over, the public
+/// half of a key pair. A check-then-write would race and would follow a
+/// symbolic link planted at the path; `create_new` is one atomic answer.
+fn write_new(path: &std::path::Path, bytes: &[u8]) -> std::io::Result<()> {
+    use std::io::Write;
+    std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(path)?
+        .write_all(bytes)
 }
 
 /// `veilvoice clean`: strip the metadata a file carries, in place.
@@ -3141,13 +3193,22 @@ fn keygen(public: PathBuf, secret: PathBuf) -> Result<(), String> {
     )
     .map_err(|e| e.to_string())?;
 
-    // The public key is meant to be shared, so it is written normally. The
-    // private key is created owner-only and *exclusively*: the permission is
-    // applied by the creation rather than by a chmod afterwards, and the
-    // creation fails rather than overwriting anything already at the path.
-    std::fs::write(&public, pk.to_bytes()).map_err(|e| format!("{}: {e}", public.display()))?;
+    // Both files are created *exclusively*, so neither write can replace a
+    // key file that appeared after the check above. The private key is also
+    // owner-only from its creation; the public one is meant to be shared.
+    //
+    // **F-316.** The public key used to be written with `std::fs::write`,
+    // which replaces whatever is there. A private key that turned up in the
+    // meantime then failed its own exclusive write, leaving an old private
+    // key beside a new public one that did not match it, and anything sealed
+    // to that public key could never be opened. The private key now goes
+    // first, and is removed again if the public one cannot be made.
     veilvoice_crypto::privatefile::write_owner_only_new(&secret, &sealed)
         .map_err(|e| format!("{}: {e}", secret.display()))?;
+    if let Err(e) = write_new(&public, &pk.to_bytes()) {
+        let _ = std::fs::remove_file(&secret);
+        return Err(format!("{}: {e}", public.display()));
+    }
 
     println!("{}", ok(&format!("public key  {}", public.display())));
     println!(
@@ -3332,6 +3393,19 @@ fn shred(file: PathBuf, passes: u8, yes: bool) -> Result<(), String> {
     Ok(())
 }
 
+/// Where `anonymise` writes when no `--output` is given: the input's name with
+/// `.veiled.wav` in place of its extension, as its help says.
+fn default_veiled_path(input: &Path) -> PathBuf {
+    input.with_extension("veiled.wav")
+}
+
+/// What `veilvoice info` says about the network.
+///
+/// It said "none, by construction", which is true of VeilVoice's own code and
+/// not of the program: `update` and `verify release` run the system's `curl`
+/// when somebody types them. The help names both, and so does this.
+const NETWORK_ACCESS: &str = "none, except when you ask by name: update and verify release";
+
 /// `veilvoice info`: the versions, and what this build was compiled to do.
 fn info() {
     println!("{}", heading("VeilVoice"));
@@ -3359,7 +3433,7 @@ fn info() {
     // stays only where it is part of the proper name "GNU General Public
     // License" or an SPDX identifier.
     println!("{}", field("Licence", "GPL-3.0-or-later"));
-    println!("{}", field("Network access", "none, by construction"));
+    println!("{}", field("Network access", NETWORK_ACCESS));
     println!(
         "{}",
         field(
@@ -3392,6 +3466,74 @@ fn info() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-315.** An output is replaced in one step, never truncated and
+    /// written again where it is. A new inode is what a rename leaves.
+    #[cfg(unix)]
+    #[test]
+    fn a_named_write_replaces_the_file_rather_than_rewriting_it() {
+        use std::os::unix::fs::MetadataExt;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("take.veil");
+        write_named(&path, b"the first seal").unwrap();
+        let before = std::fs::metadata(&path).unwrap().ino();
+        write_named(&path, b"the second seal").unwrap();
+        assert_ne!(std::fs::metadata(&path).unwrap().ino(), before);
+        assert_eq!(std::fs::read(&path).unwrap(), b"the second seal");
+    }
+
+    /// **F-316.** A public key file is never written over, so it cannot end up
+    /// beside a private key it does not match.
+    #[test]
+    fn a_new_key_file_is_never_written_over_an_existing_one() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("key.pub");
+        write_new(&path, b"the first public key").unwrap();
+        let again = write_new(&path, b"a second public key").unwrap_err();
+        assert_eq!(again.kind(), std::io::ErrorKind::AlreadyExists);
+        assert_eq!(std::fs::read(&path).unwrap(), b"the first public key");
+    }
+
+    /// **F-344.** The help said the default was `<input>.veiled.wav`, which
+    /// reads as `talk.m4a.veiled.wav`. The extension is replaced, as it now says.
+    #[test]
+    fn the_default_output_replaces_the_extension_as_the_help_says() {
+        assert_eq!(
+            default_veiled_path(Path::new("talk.m4a")),
+            PathBuf::from("talk.veiled.wav")
+        );
+        assert_eq!(
+            default_veiled_path(Path::new("notes/raw")),
+            PathBuf::from("notes/raw.veiled.wav")
+        );
+    }
+
+    /// **F-343.** `veilvoice info` names every command the help says reaches
+    /// the network, rather than claiming there are none.
+    #[test]
+    fn the_info_screen_names_the_commands_that_reach_the_network() {
+        let about = Cli::command()
+            .get_long_about()
+            .map(|text| text.to_string())
+            .unwrap_or_default();
+        let named: Vec<&str> = about
+            .split('`')
+            .skip(1)
+            .step_by(2)
+            .filter_map(|quoted| quoted.strip_prefix("veilvoice "))
+            .collect();
+        assert!(
+            named.contains(&"update") && named.contains(&"verify release"),
+            "the help no longer names the network commands the way this reads them: {named:?}"
+        );
+        for command in named {
+            assert!(
+                NETWORK_ACCESS.contains(command),
+                "`veilvoice info` does not name `{command}`, which the help says reaches the network"
+            );
+        }
+        assert!(!NETWORK_ACCESS.contains("by construction"));
+    }
     use clap::CommandFactory;
 
     /// Every command the documentation shows is a command this program has.

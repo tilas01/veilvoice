@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-meta/tests/wav_fuzz.rs`
 
-[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 299 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs)
+[veilvoice-meta](Crate-veilvoice-meta) &middot; 299 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/tests/wav_fuzz.rs)
 
 ## Contents
 

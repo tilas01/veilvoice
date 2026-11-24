@@ -108,7 +108,7 @@ pub fn seal_to_disk(
     };
 
     let out = container::veil_path(path);
-    std::fs::write(&out, &sealed).map_err(|e| format!("{}: {e}", out.display()))?;
+    crate::write_named(&out, &sealed)?;
     Ok(out)
 }
 

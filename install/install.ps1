@@ -4,7 +4,7 @@
 #
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #   .\install.ps1 -Yes                  # no prompts, no optional components
-#   .\install.ps1 -Version v0.1.9
+#   .\install.ps1 -Version v0.1.23
 #   .\install.ps1 -Prefix "D:\Tools\VeilVoice"
 #
 # ---------------------------------------------------------------------------
@@ -185,6 +185,8 @@ Write-Say "  VeilVoice installer"
 # ---------------------------------------------------------------------------
 # Which version
 # ---------------------------------------------------------------------------
+# Kept, so the check below knows whether a version was asked for.
+$Asked = [bool]$Version
 if (-not $Version) {
     Write-Step "Asking GitHub for the latest release"
     try {
@@ -192,14 +194,34 @@ if (-not $Version) {
         $Version = $latest.tag_name
     } catch {
         Deny "could not reach the GitHub API to find the latest release" @(
-            "Pass one explicitly instead:  .\install.ps1 -Version v0.1.9"
+            "Pass one explicitly instead:  .\install.ps1 -Version v0.1.23"
         )
     }
 }
 if (-not $Version) {
     Deny "could not read a tag name from the GitHub API reply" @(
-        "Pass one explicitly instead:  .\install.ps1 -Version v0.1.9"
+        "Pass one explicitly instead:  .\install.ps1 -Version v0.1.23"
     )
+}
+
+# An older release, asked for by name, is installed and said out loud. F-340.
+# Asking can fail without stopping anything: the version was chosen already.
+function ConvertTo-Release([string] $tag) {
+    [version](($tag.TrimStart('v')) -replace '-.*$', '')
+}
+if ($Asked) {
+    try {
+        $newest = (Invoke-RestMethod -Uri "https://api.github.com/repos/$REPO/releases/latest" -UseBasicParsing).tag_name
+        if ($newest -and (ConvertTo-Release $Version) -lt (ConvertTo-Release $newest)) {
+            Write-Say ""
+            Write-Say "  NOTE: $Version is an older release. The newest is $newest."
+            Write-Say "  It is installed because you asked for it by name. Older releases"
+            Write-Say "  lack fixes, some of them for security; run without -Version for"
+            Write-Say "  the newest."
+        }
+    } catch {
+        Write-Say "  NOTE: could not check whether $Version is the newest release."
+    }
 }
 
 $ARCHIVE = "veilvoice-$Version-$LABEL.zip"

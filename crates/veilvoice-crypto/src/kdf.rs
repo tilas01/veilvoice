@@ -70,10 +70,11 @@ pub struct KdfParams {
 }
 
 impl Default for KdfParams {
-    /// RFC 9106's "first recommended" profile: 2 GiB is the second option, but
-    /// 256 MiB with three passes is the sweet spot for an interactive desktop
-    /// unlock: strong against offline cracking while still opening a file in
-    /// well under a second on ordinary hardware.
+    /// Three passes and four lanes, as in RFC 9106's second recommended
+    /// profile, with 256 MiB of memory where that profile has 64 MiB. The first
+    /// profile's 2 GiB in one pass is too much for an interactive desktop
+    /// unlock; this is strong against offline cracking while still opening a
+    /// file in well under a second on ordinary hardware.
     fn default() -> Self {
         Self {
             m_cost: 256 * 1024,

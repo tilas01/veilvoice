@@ -183,7 +183,7 @@ fn init(store: &Path, files: Vec<PathBuf>, sealed: bool) -> Result<(), String> {
             .seal(password.expose())
             .map_err(|e| e.to_string())?;
         let out = sealed_path(store);
-        std::fs::write(&out, bytes).map_err(|e| format!("{}: {e}", out.display()))?;
+        crate::write_named(&out, &bytes)?;
         println!(
             "{}",
             ok(&format!("sealed record written to {}", out.display()))

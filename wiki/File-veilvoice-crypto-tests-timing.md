@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-crypto/tests/timing.rs`
 
-[[veilvoice-crypto|Crate-veilvoice-crypto]] &middot; 249 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs)
+[veilvoice-crypto](Crate-veilvoice-crypto) &middot; 249 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-crypto/tests/timing.rs)
 
 ## Contents
 

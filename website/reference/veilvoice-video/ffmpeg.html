@@ -64,7 +64,7 @@
 <main class="wrap" style="padding-top:30px">
 <p><img src="../../assets/banners/veilvoice-video/ffmpeg.svg" alt="ffmpeg.rs" width="1200" height="150" style="width:100%;height:auto"></p>
 <h1><code>crates/veilvoice-video/src/ffmpeg.rs</code></h1>
-<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 792 lines &middot; <a href="ffmpeg.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" rel="noopener noreferrer">or on GitHub</a></p>
+<p style="color:var(--muted)"><a href="../veilvoice-video.html">veilvoice-video</a> &middot; 818 lines &middot; <a href="ffmpeg.src.html">read the source here</a> &middot; <a href="https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs" rel="noopener noreferrer">or on GitHub</a></p>
 <div class="wiki-layout">
 <nav class="toc" aria-label="Contents">
   <a href="#why-there-is-no-encoder-here">Why there is no encoder here</a>
@@ -91,29 +91,29 @@
 </section>
 <section id="s-contains">
 <h2 id="what-this-file-contains">WHAT THIS FILE CONTAINS</h2>
-<p>792 lines defining <strong>10 functions</strong> (8 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
+<p>818 lines defining <strong>11 functions</strong> (8 public), <strong>1 type</strong> and <strong>1 constant</strong>. Everything below is read out of the source, so it cannot disagree with the code.</p>
 <p><strong>The types it owns.</strong></p><ul>
-<li><code>struct Encoding</code> <span style="color:var(--muted)">line 70</span> &middot; How to render the file.</li>
+<li><code>struct Encoding</code> <span style="color:var(--muted)">line 74</span> &middot; How to render the file.</li>
 </ul>
 <p><strong>What happens when it runs.</strong> These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.</p><ul>
-<li><code>command</code> <span style="color:var(--muted)">line 127</span> &middot; The command that turns a directory of numbered frames and a WAV into a video file.
+<li><code>command</code> <span style="color:var(--muted)">line 131</span> &middot; The command that turns a directory of numbered frames and a WAV into a video file.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>file_arg</code></span>
 </li>
-<li><code>concat_command</code> <span style="color:var(--muted)">line 211</span> &middot; The command that turns a concat list of held pictures and a WAV into a video file.
+<li><code>concat_command</code> <span style="color:var(--muted)">line 215</span> &middot; The command that turns a concat list of held pictures and a WAV into a video file.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>file_arg</code></span>
 </li>
-<li><code>black_command</code> <span style="color:var(--muted)">line 280</span> &middot; The command that turns a veiled recording into a video with a black frame.
+<li><code>black_command</code> <span style="color:var(--muted)">line 284</span> &middot; The command that turns a veiled recording into a video with a black frame.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>file_arg</code></span>
 </li>
-<li><code>extract_command</code> <span style="color:var(--muted)">line 339</span> &middot; The command that takes the sound out of a recording made somewhere else.
+<li><code>extract_command</code> <span style="color:var(--muted)">line 343</span> &middot; The command that takes the sound out of a recording made somewhere else.
 <br><span style="color:var(--muted);font-size:12px">reaches <code>file_arg</code></span>
 </li>
-<li><code>is_container</code> <span style="color:var(--muted)">line 370</span> &middot; Whether a file looks like something extract_command should be offered for.
+<li><code>is_container</code> <span style="color:var(--muted)">line 374</span> &middot; Whether a file looks like something extract_command should be offered for.
 </li>
-<li><code>command_line</code> <span style="color:var(--muted)">line 401</span> &middot; The command as one line, for printing.
+<li><code>command_line</code> <span style="color:var(--muted)">line 405</span> &middot; The command as one line, for printing.
 </li>
-<li><code>describe</code> <span style="color:var(--muted)">line 415</span> &middot; What to tell the user about their machine&#x27;s ffmpeg.
-<br><span style="color:var(--muted);font-size:12px">reaches <code>found</code></span>
+<li><code>describe</code> <span style="color:var(--muted)">line 419</span> &middot; What to tell the user about their machine&#x27;s ffmpeg.
+<br><span style="color:var(--muted);font-size:12px">reaches <code>found</code>, <code>find_in</code></span>
 </li>
 </ul>
 </section>
@@ -130,60 +130,66 @@
 <marker id="a-accent-2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--accent-2, #bb9af7)"/></marker>
 </defs>
 <rect x="0" y="0" width="601" height="531" fill="var(--bg-inset, #16161e)" rx="8"/>
-<path d="M137.6 174.0 C 137.6 194.0, 300.4 300.0, 300.4 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M367.7 74.0 C 367.7 94.0, 300.4 300.0, 300.4 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
-<path d="M510.3 74.0 C 510.3 94.0, 300.4 300.0, 300.4 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M137.6 174.0 C 137.6 194.0, 355.6 300.0, 355.6 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M367.7 74.0 C 367.7 94.0, 355.6 300.0, 355.6 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M510.3 74.0 C 510.3 94.0, 355.6 300.0, 355.6 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
 <path d="M422.0 247.0 C 444.0 247.0, 444.0 47.0, 107.4 47.0" fill="none" stroke="var(--warn, #e0af68)" stroke-width="1.1" opacity="0.7" stroke-dasharray="4 3" marker-end="url(#a-warn)"/>
-<path d="M304.4 174.0 C 304.4 194.0, 300.4 300.0, 300.4 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M304.4 174.0 C 304.4 194.0, 355.6 300.0, 355.6 317.0" fill="none" stroke="var(--accent, #7aa2f7)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-accent)"/>
+<path d="M62.2 74.0 C 62.2 94.0, 241.1 300.0, 241.1 317.0" fill="none" stroke="var(--cyan, #7dcfff)" stroke-width="1.4" opacity="0.85" marker-end="url(#a-cyan)"/>
 <a href="ffmpeg.src.html#fn-found">
 <rect x="20.0" y="20.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--cyan, #7dcfff)" stroke-width="1.5"/>
 <text x="62.2" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">found</text>
 <text x="62.2" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 50</text>
 </a>
+<a href="ffmpeg.src.html#fn-find_in">
+<rect x="198.9" y="320.0" width="84.4" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="241.1" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">find_in</text>
+<text x="241.1" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 65</text>
+</a>
 <a href="ffmpeg.src.html#fn-encoding-default">
 <rect x="130.4" y="20.0" width="165.0" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
 <text x="212.9" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">Encoding::default</text>
-<text x="212.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 98</text>
+<text x="212.9" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 102</text>
 </a>
 <a href="ffmpeg.src.html#fn-command">
 <rect x="321.4" y="20.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="367.7" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command</text>
-<text x="367.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 127</text>
+<text x="367.7" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 131</text>
 </a>
 <a href="ffmpeg.src.html#fn-concat_command">
 <rect x="439.9" y="20.0" width="140.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="510.3" y="42.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">concat_command</text>
-<text x="510.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 211</text>
+<text x="510.3" y="59.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 215</text>
 </a>
 <a href="ffmpeg.src.html#fn-black_command">
 <rect x="71.2" y="120.0" width="132.8" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="137.6" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">black_command</text>
-<text x="137.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 280</text>
+<text x="137.6" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 284</text>
 </a>
 <a href="ffmpeg.src.html#fn-extract_command">
 <rect x="230.0" y="120.0" width="148.9" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="304.4" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">extract_command</text>
-<text x="304.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 339</text>
+<text x="304.4" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 343</text>
 </a>
 <a href="ffmpeg.src.html#fn-is_container">
 <rect x="404.9" y="120.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="467.2" y="142.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">is_container</text>
-<text x="467.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 370</text>
+<text x="467.2" y="159.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 374</text>
 </a>
 <a href="ffmpeg.src.html#fn-file_arg">
-<rect x="254.1" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
-<text x="300.4" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">file_arg</text>
-<text x="300.4" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 386</text>
+<rect x="309.4" y="320.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent-2, #bb9af7)" stroke-width="1.5"/>
+<text x="355.6" y="342.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">file_arg</text>
+<text x="355.6" y="359.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 390</text>
 </a>
 <a href="ffmpeg.src.html#fn-command_line">
 <rect x="178.8" y="220.0" width="124.7" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="241.1" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">command_line</text>
-<text x="241.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 401</text>
+<text x="241.1" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 405</text>
 </a>
 <a href="ffmpeg.src.html#fn-describe">
 <rect x="329.5" y="220.0" width="92.5" height="54.0" rx="7" fill="var(--bg-soft, #1f2335)" stroke="var(--accent, #7aa2f7)" stroke-width="1.5"/>
 <text x="375.7" y="242.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--fg, #c0caf5)" text-anchor="middle">describe</text>
-<text x="375.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 415</text>
+<text x="375.7" y="259.8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="var(--muted, #737aa2)" text-anchor="middle">line 419</text>
 </a>
 <rect x="20.0" y="404.0" width="9" height="9" rx="2" fill="var(--accent, #7aa2f7)"/>
 <text x="35.0" y="413.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="var(--muted, #737aa2)">entry: a way in: public, and nothing in this file calls it</text>
@@ -203,36 +209,39 @@
 <pre><code>%%{init: {&quot;theme&quot;:&quot;base&quot;,&quot;themeVariables&quot;:{&quot;background&quot;:&quot;#1a1b26&quot;,&quot;primaryColor&quot;:&quot;#1f2335&quot;,&quot;primaryTextColor&quot;:&quot;#c0caf5&quot;,&quot;primaryBorderColor&quot;:&quot;#7aa2f7&quot;,&quot;secondaryColor&quot;:&quot;#16161e&quot;,&quot;tertiaryColor&quot;:&quot;#16161e&quot;,&quot;lineColor&quot;:&quot;#737aa2&quot;,&quot;textColor&quot;:&quot;#c0caf5&quot;,&quot;mainBkg&quot;:&quot;#1f2335&quot;,&quot;nodeBorder&quot;:&quot;#7aa2f7&quot;,&quot;clusterBkg&quot;:&quot;#16161e&quot;,&quot;clusterBorder&quot;:&quot;#2f3549&quot;,&quot;fontFamily&quot;:&quot;ui-monospace, SFMono-Regular, Consolas, monospace&quot;,&quot;fontSize&quot;:&quot;14px&quot;}}}%%
 flowchart TD
     n_found[&quot;found&lt;br/&gt;line 50&quot;]
-    n_default[&quot;Encoding::default&lt;br/&gt;line 98&quot;]
-    n_command([&quot;command&lt;br/&gt;line 127&quot;])
-    n_concat_command([&quot;concat_command&lt;br/&gt;line 211&quot;])
-    n_black_command([&quot;black_command&lt;br/&gt;line 280&quot;])
-    n_extract_command([&quot;extract_command&lt;br/&gt;line 339&quot;])
-    n_is_container([&quot;is_container&lt;br/&gt;line 370&quot;])
-    n_file_arg[&quot;file_arg&lt;br/&gt;line 386&quot;]
-    n_command_line([&quot;command_line&lt;br/&gt;line 401&quot;])
-    n_describe([&quot;describe&lt;br/&gt;line 415&quot;])
+    n_find_in[&quot;find_in&lt;br/&gt;line 65&quot;]
+    n_default[&quot;Encoding::default&lt;br/&gt;line 102&quot;]
+    n_command([&quot;command&lt;br/&gt;line 131&quot;])
+    n_concat_command([&quot;concat_command&lt;br/&gt;line 215&quot;])
+    n_black_command([&quot;black_command&lt;br/&gt;line 284&quot;])
+    n_extract_command([&quot;extract_command&lt;br/&gt;line 343&quot;])
+    n_is_container([&quot;is_container&lt;br/&gt;line 374&quot;])
+    n_file_arg[&quot;file_arg&lt;br/&gt;line 390&quot;]
+    n_command_line([&quot;command_line&lt;br/&gt;line 405&quot;])
+    n_describe([&quot;describe&lt;br/&gt;line 419&quot;])
     n_black_command --&gt; n_file_arg
     n_command --&gt; n_file_arg
     n_concat_command --&gt; n_file_arg
     n_describe --&gt; n_found
     n_extract_command --&gt; n_file_arg
+    n_found --&gt; n_find_in
     click n_found href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L50&quot; &quot;open the source&quot;
-    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L98&quot; &quot;open the source&quot;
-    click n_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L127&quot; &quot;open the source&quot;
-    click n_concat_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L211&quot; &quot;open the source&quot;
-    click n_black_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L280&quot; &quot;open the source&quot;
-    click n_extract_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L339&quot; &quot;open the source&quot;
-    click n_is_container href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L370&quot; &quot;open the source&quot;
-    click n_file_arg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L386&quot; &quot;open the source&quot;
-    click n_command_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L401&quot; &quot;open the source&quot;
-    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L415&quot; &quot;open the source&quot;
+    click n_find_in href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L65&quot; &quot;open the source&quot;
+    click n_default href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L102&quot; &quot;open the source&quot;
+    click n_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L131&quot; &quot;open the source&quot;
+    click n_concat_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L215&quot; &quot;open the source&quot;
+    click n_black_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L284&quot; &quot;open the source&quot;
+    click n_extract_command href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L343&quot; &quot;open the source&quot;
+    click n_is_container href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L374&quot; &quot;open the source&quot;
+    click n_file_arg href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L390&quot; &quot;open the source&quot;
+    click n_command_line href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L405&quot; &quot;open the source&quot;
+    click n_describe href &quot;https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/ffmpeg.rs#L419&quot; &quot;open the source&quot;
     classDef entry fill:#1f2335,stroke:#7aa2f7,color:#c0caf5
     class n_command,n_concat_command,n_black_command,n_extract_command,n_is_container,n_command_line,n_describe entry
     classDef api fill:#1f2335,stroke:#7dcfff,color:#c0caf5
     class n_found api
     classDef helper fill:#1f2335,stroke:#bb9af7,color:#c0caf5
-    class n_default,n_file_arg helper
+    class n_find_in,n_default,n_file_arg helper
     subgraph chart_key [&quot;Key&quot;]
         direction LR
         key_entry[&quot;entry: a way in: public, and nothing in this file calls it&quot;]
@@ -249,17 +258,18 @@ flowchart TD
 <h2 id="items">ITEMS</h2>
 <table><thead><tr><th>Item</th><th>Line</th><th>Documentation</th></tr></thead><tbody>
 <tr><td><code>found</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-found">50</a></td><td>Where ffmpeg is, if this machine has one.</td></tr>
-<tr><td><code>Encoding</code> <sub>pub struct</sub></td><td><a href="ffmpeg.src.html#fn-encoding">70</a></td><td>How to render the file.</td></tr>
-<tr><td><code>Encoding::default</code> <sub>fn</sub></td><td><a href="ffmpeg.src.html#fn-encoding-default">98</a></td><td></td></tr>
-<tr><td><code>command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-command">127</a></td><td>The command that turns a directory of numbered frames and a WAV into a video file.</td></tr>
-<tr><td><code>concat_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-concat_command">211</a></td><td>The command that turns a concat list of held pictures and a WAV into a video file.</td></tr>
-<tr><td><code>black_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-black_command">280</a></td><td>The command that turns a veiled recording into a video with a black frame.</td></tr>
-<tr><td><code>extract_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-extract_command">339</a></td><td>The command that takes the sound out of a recording made somewhere else.</td></tr>
-<tr><td><code>OBS_CONTAINERS</code> <sub>pub const</sub></td><td><a href="ffmpeg.src.html#fn-obs_containers">363</a></td><td>Containers OBS writes, which extract_command can take the sound out of.</td></tr>
-<tr><td><code>is_container</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-is_container">370</a></td><td>Whether a file looks like something extract_command should be offered for.</td></tr>
-<tr><td><code>file_arg</code> <sub>pub(crate) fn</sub></td><td><a href="ffmpeg.src.html#fn-file_arg">386</a></td><td>A path as ffmpeg must be given it: whole, and read as a file.</td></tr>
-<tr><td><code>command_line</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-command_line">401</a></td><td>The command as one line, for printing.</td></tr>
-<tr><td><code>describe</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-describe">415</a></td><td>What to tell the user about their machine&#x27;s ffmpeg.</td></tr>
+<tr><td><code>find_in</code> <sub>fn</sub></td><td><a href="ffmpeg.src.html#fn-find_in">65</a></td><td>The first of names in an absolute entry of path, a PATH value.</td></tr>
+<tr><td><code>Encoding</code> <sub>pub struct</sub></td><td><a href="ffmpeg.src.html#fn-encoding">74</a></td><td>How to render the file.</td></tr>
+<tr><td><code>Encoding::default</code> <sub>fn</sub></td><td><a href="ffmpeg.src.html#fn-encoding-default">102</a></td><td></td></tr>
+<tr><td><code>command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-command">131</a></td><td>The command that turns a directory of numbered frames and a WAV into a video file.</td></tr>
+<tr><td><code>concat_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-concat_command">215</a></td><td>The command that turns a concat list of held pictures and a WAV into a video file.</td></tr>
+<tr><td><code>black_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-black_command">284</a></td><td>The command that turns a veiled recording into a video with a black frame.</td></tr>
+<tr><td><code>extract_command</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-extract_command">343</a></td><td>The command that takes the sound out of a recording made somewhere else.</td></tr>
+<tr><td><code>OBS_CONTAINERS</code> <sub>pub const</sub></td><td><a href="ffmpeg.src.html#fn-obs_containers">367</a></td><td>Containers OBS writes, which extract_command can take the sound out of.</td></tr>
+<tr><td><code>is_container</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-is_container">374</a></td><td>Whether a file looks like something extract_command should be offered for.</td></tr>
+<tr><td><code>file_arg</code> <sub>pub(crate) fn</sub></td><td><a href="ffmpeg.src.html#fn-file_arg">390</a></td><td>A path as ffmpeg must be given it: whole, and read as a file.</td></tr>
+<tr><td><code>command_line</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-command_line">405</a></td><td>The command as one line, for printing.</td></tr>
+<tr><td><code>describe</code> <sub>pub fn</sub></td><td><a href="ffmpeg.src.html#fn-describe">419</a></td><td>What to tell the user about their machine&#x27;s ffmpeg.</td></tr>
 </tbody></table>
 </section>
 </div></div>

@@ -3,7 +3,7 @@
 
 # `fuzz/fuzz_targets/guard_manifest.rs`
 
-[[fuzz|Crate-fuzz]] &middot; 53 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/guard_manifest.rs)
+[fuzz](Crate-fuzz) &middot; 53 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/fuzz/fuzz_targets/guard_manifest.rs)
 
 ## Contents
 

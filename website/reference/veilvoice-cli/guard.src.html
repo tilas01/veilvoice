@@ -264,7 +264,7 @@
 <span class="ln" id="L183">            .<span class="tok-fn">seal</span>(password.<span class="tok-fn">expose</span>())</span>
 <span class="ln" id="L184">            .<span class="tok-fn">map_err</span>(|e| e.<span class="tok-fn">to_string</span>())?;</span>
 <span class="ln" id="L185">        <span class="tok-kw">let</span> out = <span class="tok-fn">sealed_path</span>(store);</span>
-<span class="ln" id="L186">        std::fs::<span class="tok-fn">write</span>(&amp;out, bytes).<span class="tok-fn">map_err</span>(|e| format!(<span class="tok-str">&quot;{}: {e}&quot;</span>, out.<span class="tok-fn">display</span>()))?;</span>
+<span class="ln" id="L186">        <span class="tok-kw">crate</span>::<span class="tok-fn">write_named</span>(&amp;out, &amp;bytes)?;</span>
 <span class="ln" id="L187">        println!(</span>
 <span class="ln" id="L188">            <span class="tok-str">&quot;{}&quot;</span>,</span>
 <span class="ln" id="L189">            <span class="tok-fn">ok</span>(&amp;format!(<span class="tok-str">&quot;sealed record written to {}&quot;</span>, out.<span class="tok-fn">display</span>()))</span>

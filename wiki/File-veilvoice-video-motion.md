@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-video/src/motion.rs`
 
-[[veilvoice-video|Crate-veilvoice-video]] &middot; 1162 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs)
+[veilvoice-video](Crate-veilvoice-video) &middot; 1162 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/src/motion.rs)
 
 ## Contents
 

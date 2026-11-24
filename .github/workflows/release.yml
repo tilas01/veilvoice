@@ -460,9 +460,13 @@ jobs:
           # banners travel with the pages they belong to. About 100 KB of text.
           mkdir -p "dist/$out/assets"
           cp -r assets/banners "dist/$out/assets/banners"
-          # FreeBSD, OpenBSD and NetBSD use the same freedesktop launcher
-          # conventions as Linux, so they get the same icon set.
-          cp -r assets/linux "dist/$out/desktop"
+          # FreeBSD uses the same freedesktop launcher conventions as Linux,
+          # so it gets the same icon set, but only beside the window: the
+          # entry starts veilvoice-gui, and a launcher for a program that is
+          # not in the archive is a menu item that does nothing.
+          if [ -f "dist/$out/veilvoice-gui" ]; then
+            cp -r assets/linux "dist/$out/desktop"
+          fi
           {
             echo "This FreeBSD build has no live audio: cpal, the audio device"
             echo "library, has no BSD backend. So there is no live microphone"
@@ -557,9 +561,8 @@ jobs:
           # banners travel with the pages they belong to. About 100 KB of text.
           mkdir -p "dist/$out/assets"
           cp -r assets/banners "dist/$out/assets/banners"
-          # FreeBSD, OpenBSD and NetBSD use the same freedesktop launcher
-          # conventions as Linux, so they get the same icon set.
-          cp -r assets/linux "dist/$out/desktop"
+          # No launcher entry or icons: they start veilvoice-gui, which is
+          # not built here, so they would be a menu item that does nothing.
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
             echo "device library, has no BSD backend. Everything else works:"
@@ -655,9 +658,8 @@ jobs:
           # banners travel with the pages they belong to. About 100 KB of text.
           mkdir -p "dist/$out/assets"
           cp -r assets/banners "dist/$out/assets/banners"
-          # FreeBSD, OpenBSD and NetBSD use the same freedesktop launcher
-          # conventions as Linux, so they get the same icon set.
-          cp -r assets/linux "dist/$out/desktop"
+          # No launcher entry or icons: they start veilvoice-gui, which is
+          # not built here, so they would be a menu item that does nothing.
           {
             echo "This build has no live microphone scrambling: cpal, the audio"
             echo "device library, has no BSD backend. Everything else works:"

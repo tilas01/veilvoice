@@ -1784,7 +1784,10 @@ impl Plan {
             }
         };
         let out = container::veil_path(path);
-        std::fs::write(&out, &sealed).map_err(|e| format!("{}: {e}", out.display()))?;
+        // Replaced in one step, so a failed write leaves an older sealed copy
+        // whole rather than half of a new one. **F-315.**
+        veilvoice_crypto::privatefile::replace(&out, &sealed)
+            .map_err(|e| format!("{}: {e}", out.display()))?;
         Ok(out)
     }
 }

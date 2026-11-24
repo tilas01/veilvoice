@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-cli/src/priv_mode.rs`
 
-[[veilvoice-cli|Crate-veilvoice-cli]] &middot; 46 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/priv_mode.rs)
+[veilvoice-cli](Crate-veilvoice-cli) &middot; 46 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-cli/src/priv_mode.rs)
 
 ## Contents
 

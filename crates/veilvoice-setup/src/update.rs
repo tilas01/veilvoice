@@ -477,6 +477,19 @@ fn find_tool() -> Option<Tool> {
 /// `url` is the page for this build's own stream, and which page it is decides
 /// how curl is driven: see the note beside the two argument lists.
 fn fetch(tool: &Tool, url: &str) -> Result<String, Error> {
+    let mut command = crate::command(&tool.program);
+    command.args(fetch_arguments(tool.wget, url));
+    let output = command.output().map_err(|e| Error::Failed(e.to_string()))?;
+    fetched(tool, output)
+}
+
+/// What the downloader is told, to read one page of the releases.
+///
+/// **F-317.** curl's `-q` comes first and wget gets `--no-config`, so neither
+/// reads its user's configuration file, which can turn off certificate checks
+/// or add a proxy. wget is held to HTTPS as curl already was: a redirect onto
+/// plain HTTP is refused rather than followed.
+fn fetch_arguments(wget: bool, url: &str) -> Vec<String> {
     let seconds = TIMEOUT.as_secs().to_string();
     // `/releases/latest` answers with a redirect whose target *is* the tag, so
     // the body can be thrown away. `/releases`, which an early build reads
@@ -485,10 +498,11 @@ fn fetch(tool: &Tool, url: &str) -> Result<String, Error> {
     // the effective URL of that page would return the page's own address every
     // time, which parses as no version at all, so the body is what is read.
     let redirect_carries_the_answer = url == LATEST_URL;
-    let mut command = crate::command(&tool.program);
-    if tool.wget {
-        command.args([
+    let words: Vec<&str> = if wget {
+        vec![
+            "--no-config",
             "--quiet",
+            "--https-only",
             "--max-redirect=5",
             "--timeout",
             &seconds,
@@ -496,9 +510,10 @@ fn fetch(tool: &Tool, url: &str) -> Result<String, Error> {
             "-O",
             "-",
             url,
-        ]);
+        ]
     } else if !redirect_carries_the_answer {
-        command.args([
+        vec![
+            "-q",
             "-L",
             "--max-redirs",
             "5",
@@ -509,14 +524,15 @@ fn fetch(tool: &Tool, url: &str) -> Result<String, Error> {
             "--proto",
             "=https",
             url,
-        ]);
+        ]
     } else {
         // The body is thrown away and only the **final URL** is printed. The
         // redirect target of `/releases/latest` *is* the tag -- one line
         // instead of two hundred kilobytes of a page, nothing of the reply
         // reaching the scanner, and no way for markup to be mistaken for a
         // version. Measured on the real page: 205,538 bytes against 54.
-        command.args([
+        vec![
+            "-q",
             "-L",
             "--max-redirs",
             "5",
@@ -533,9 +549,13 @@ fn fetch(tool: &Tool, url: &str) -> Result<String, Error> {
             "-w",
             "%{url_effective}",
             url,
-        ]);
-    }
-    let output = command.output().map_err(|e| Error::Failed(e.to_string()))?;
+        ]
+    };
+    words.into_iter().map(str::to_owned).collect()
+}
+
+/// What a finished fetch said, or why it failed.
+fn fetched(tool: &Tool, output: std::process::Output) -> Result<String, Error> {
     if !output.status.success() {
         let said = String::from_utf8_lossy(&output.stderr).trim().to_string();
         return Err(Error::Failed(if said.is_empty() {
@@ -577,6 +597,23 @@ with `veilvoice verify` before running it.";
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-317.** Neither downloader reads its user's configuration, and both
+    /// are held to HTTPS, on every one of the three ways a page is read.
+    #[test]
+    fn every_fetch_reads_no_configuration_and_stays_on_https() {
+        for url in [LATEST_URL, "https://github.com/tilas01/veilvoice/releases"] {
+            let curl = fetch_arguments(false, url);
+            assert_eq!(curl[0], "-q", "-q only works as curl's first argument");
+            assert!(curl
+                .windows(2)
+                .any(|w| w[0] == "--proto" && w[1] == "=https"));
+            let wget = fetch_arguments(true, url);
+            assert_eq!(wget[0], "--no-config");
+            assert!(wget.iter().any(|a| a == "--https-only"));
+            assert_eq!(wget.last().map(String::as_str), Some(url));
+        }
+    }
 
     /// **Roadmap item 165.** Semantic versioning's own precedence examples, section
     /// 11, taken from the specification rather than invented here.

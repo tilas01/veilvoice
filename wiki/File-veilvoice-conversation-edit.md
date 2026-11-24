@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-conversation/src/edit.rs`
 
-[[veilvoice-conversation|Crate-veilvoice-conversation]] &middot; 649 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs)
+[veilvoice-conversation](Crate-veilvoice-conversation) &middot; 649 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-conversation/src/edit.rs)
 
 ## Contents
 

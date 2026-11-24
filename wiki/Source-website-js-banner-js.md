@@ -3,7 +3,7 @@
 
 # `website/js/banner.js`
 
-[[The website's source|Source-index]] &middot; 39 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/banner.js)
+[The website's source](Source-index) &middot; 39 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/banner.js)
 
 ## What it does
 

@@ -442,14 +442,18 @@ impl Nest {
         Ok(Self { canaries })
     }
 
-    /// Write the nest to `path`.
+    /// Write the nest to `path`, replacing any old one in a single step.
+    ///
+    /// As with the manifest, a crash part-way through leaves the old nest. A
+    /// truncated one would forget canaries, and a forgotten canary is one that
+    /// can be read without anybody being told.
     pub fn save(&self, path: &Path) -> Result<(), Error> {
         if let Some(parent) = path.parent() {
             if !parent.as_os_str().is_empty() {
                 std::fs::create_dir_all(parent)?;
             }
         }
-        std::fs::write(path, self.to_text())?;
+        veilvoice_crypto::privatefile::replace(path, self.to_text().as_bytes())?;
         Ok(())
     }
 
@@ -487,6 +491,22 @@ mod tests {
         let mut nest = Nest::new();
         let path = nest.plant(dir, None).expect("planting should work");
         (nest, path)
+    }
+
+    /// **F-309.** As the manifest: a save is a rename, never a rewrite in
+    /// place, so the nest on disk is always a whole one.
+    #[cfg(unix)]
+    #[test]
+    fn a_save_replaces_the_nest_rather_than_rewriting_it() {
+        use std::os::unix::fs::MetadataExt;
+        let dir = tempfile::tempdir().unwrap();
+        let (nest, _) = nest_in(dir.path());
+        let file = dir.path().join("nest.txt");
+        nest.save(&file).unwrap();
+        let before = std::fs::metadata(&file).unwrap().ino();
+        nest.save(&file).unwrap();
+        assert_ne!(std::fs::metadata(&file).unwrap().ino(), before);
+        assert_eq!(Nest::load(&file).unwrap().to_text(), nest.to_text());
     }
 
     #[test]

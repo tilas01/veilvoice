@@ -890,7 +890,7 @@ player beside it. Nothing needed building. What was missing was that nobody
 could find it, which is roadmap item 93, and the two are answered by the same
 page rather than by two.
 
-So `USER_GUIDE.md` section 5.9 is the whole sequence in the order it happens:
+So `USER_GUIDE.md` section 5.10 is the whole sequence in the order it happens:
 take the sound out of the OBS recording, write a plan, check the plan, render
 it, make a video of it. Each step names the one before it. A person who has
 just finished recording an interview now has a path to follow instead of five

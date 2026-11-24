@@ -53,16 +53,20 @@ pub fn found() -> Option<PathBuf> {
     } else {
         &["ffmpeg"]
     };
-    let path = std::env::var_os("PATH")?;
-    for directory in std::env::split_paths(&path) {
-        for name in names {
-            let candidate = directory.join(name);
-            if candidate.is_file() {
-                return Some(candidate);
-            }
-        }
-    }
-    None
+    find_in(&std::env::var_os("PATH")?, names)
+}
+
+/// The first of `names` in an absolute entry of `path`, a `PATH` value.
+///
+/// A relative entry, including the empty one a stray `::` leaves, means the
+/// current folder: wherever this happened to be started. A program planted in
+/// a downloads folder would be found there before the real one, so those
+/// entries are skipped. Shells accept them; this does not.
+fn find_in(path: &std::ffi::OsStr, names: &[&str]) -> Option<PathBuf> {
+    std::env::split_paths(path)
+        .filter(|directory| directory.is_absolute())
+        .flat_map(|directory| names.iter().map(move |name| directory.join(name)))
+        .find(|candidate| candidate.is_file())
 }
 
 /// How to render the file.
@@ -429,6 +433,28 @@ pub fn describe() -> String {
 
 #[cfg(test)]
 mod tests {
+
+    /// **F-312.** A relative `PATH` entry is the folder this was started from,
+    /// so a program planted there is never the one found.
+    #[cfg(unix)]
+    #[test]
+    fn a_relative_path_entry_is_never_searched() {
+        let dir = tempfile::tempdir().unwrap();
+        let dir = dir.path();
+        let program = dir.join("ffmpeg");
+        std::fs::write(&program, b"").unwrap();
+        let mut relative = std::path::PathBuf::new();
+        for _ in std::env::current_dir().unwrap().components().skip(1) {
+            relative.push("..");
+        }
+        let relative = relative.join(dir.strip_prefix("/").unwrap());
+        assert!(
+            relative.join("ffmpeg").is_file(),
+            "the test's own path is wrong"
+        );
+        assert_eq!(super::find_in(relative.as_os_str(), &["ffmpeg"]), None);
+        assert_eq!(super::find_in(dir.as_os_str(), &["ffmpeg"]), Some(program));
+    }
 
     /// Roadmap item 87. A synthesised colour source never ends, so without
     /// `-shortest` ffmpeg encodes black for ever and the only thing that stops

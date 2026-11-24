@@ -5,7 +5,7 @@
 
 > Settings that can only be tightened, sealed with the project's own post-quantum cryptography.
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/README.md)
 
 ## Contents
 
@@ -92,9 +92,9 @@ is a rule they will trip over.
 %%{init: {"theme":"base","themeVariables":{"background":"#1a1b26","primaryColor":"#1f2335","primaryTextColor":"#c0caf5","primaryBorderColor":"#7aa2f7","secondaryColor":"#16161e","tertiaryColor":"#16161e","lineColor":"#737aa2","textColor":"#c0caf5","mainBkg":"#1f2335","nodeBorder":"#7aa2f7","clusterBkg":"#16161e","clusterBorder":"#2f3549","fontFamily":"ui-monospace, SFMono-Regular, Consolas, monospace","fontSize":"14px"}}}%%
 flowchart TD
     n_lib(["lib.rs<br/>168 lines"])
-    n_mandate["mandate.rs<br/>539 lines"]
+    n_mandate["mandate.rs<br/>540 lines"]
     n_policy["policy.rs<br/>991 lines"]
-    n_workspace["workspace.rs<br/>817 lines"]
+    n_workspace["workspace.rs<br/>818 lines"]
     click n_lib href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/lib.rs" "open the source"
     click n_mandate href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/mandate.rs" "open the source"
     click n_policy href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-policy/src/policy.rs" "open the source"
@@ -112,9 +112,9 @@ flowchart TD
 | File | Lines | What it is |
 |---|---:|---|
 | [`lib.rs`](File-veilvoice-policy-lib) | 168 | Settings somebody else decided, sealed so they cannot be edited without a passphrase, and, more importantly, built so that editing them without one buys nothing worth having. |
-| [`mandate.rs`](File-veilvoice-policy-mandate) | 539 | The two things VeilVoice insists on unless you say otherwise. |
+| [`mandate.rs`](File-veilvoice-policy-mandate) | 540 | The two things VeilVoice insists on unless you say otherwise. |
 | [`policy.rs`](File-veilvoice-policy-policy) | 991 | The policy itself: what can be required, and what requiring it does. |
-| [`workspace.rs`](File-veilvoice-policy-workspace) | 817 | Named profiles and saved projects. |
+| [`workspace.rs`](File-veilvoice-policy-workspace) | 818 | Named profiles and saved projects. |
 
 **1,689 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,

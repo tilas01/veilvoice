@@ -204,7 +204,7 @@ fn status(site: &Site) -> Result<(), String> {
             // seal could have reached, and this is where they look. A pointer
             // rather than the check itself: the check costs an Argon2id
             // derivation per sealed file, which is not what a status command
-            // should spend somebody's wait on. **F-NNN.**
+            // should spend somebody's wait on. **F-231.**
             println!();
             for line in wrap(reseal::NOTICE, 66) {
                 println!("{}", warn(&line));

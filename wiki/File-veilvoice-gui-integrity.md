@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-gui/src/integrity.rs`
 
-[[veilvoice-gui|Crate-veilvoice-gui]] &middot; 514 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs)
+[veilvoice-gui](Crate-veilvoice-gui) &middot; 534 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-gui/src/integrity.rs)
 
 ## Contents
 
@@ -64,7 +64,7 @@ accident but not one changed by somebody covering their tracks.
 
 ## What this file contains
 
-514 lines defining **13 functions** (7 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
+534 lines defining **13 functions** (7 public), **2 types** and **0 constants**. Everything below is read out of the source, so it cannot disagree with the code.
 
 **The types it owns.**
 

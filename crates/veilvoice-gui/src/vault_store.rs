@@ -4,12 +4,12 @@
 //!
 //! # The short version, and it is the honest one
 //!
-//! **With an app lock set**, everything VeilVoice writes about itself lives in
+//! **With an app lock set**, the records listed in [`records::ALL`] live in
 //! [`veilvoice_crypto::hoard`]: encrypted, padded to a few fixed sizes, under
 //! filenames derived from the lock passphrase, with decoy files sown among
-//! them. Somebody who opens the folder without the passphrase cannot tell
-//! which file is the settings, which is the integrity record, which holds
-//! anything, and which is junk.
+//! them. Today that is one record, the measurements file, and nothing writes
+//! it yet. The settings and the integrity record are still written in the
+//! open, owner-only, under their own names, and the lock card says so.
 //!
 //! **With no app lock**, none of that is possible and none of it is claimed.
 //! There is no passphrase, so there is no key, so there is nothing to derive a
@@ -17,11 +17,12 @@
 //! exactly as they did before this module existed, and the security tab says
 //! so in those words.
 //!
-//! That is the whole bargain, and it is the answer to a fair question about
-//! the app lock: what is it actually *for*, if it is only a password prompt on
-//! a window whose files anybody can read? This is what it is for. Setting a
-//! passphrase is what turns the folder from a set of labelled files into a set
-//! of indistinguishable ones.
+//! That is the bargain this module is built for, and the answer it was written
+//! to give to a fair question about the app lock: what is it actually *for*,
+//! if it is only a password prompt on a window whose files anybody can read?
+//! It can only give that answer for the records that have moved in, so until
+//! the settings and the integrity record do, the honest answer is still
+//! "mostly the window".
 //!
 //! # What it still does not buy
 //!
@@ -311,7 +312,8 @@ impl VaultStore {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         }
-        veilvoice_crypto::privatefile::write_owner_only(&path, bytes).map_err(|e| e.to_string())
+        // Replaced in one step, so a crash part-way leaves the old record. F-335.
+        veilvoice_crypto::privatefile::replace_owner_only(&path, bytes).map_err(|e| e.to_string())
     }
 
     /// Where a record sits when nothing is obfuscating it.

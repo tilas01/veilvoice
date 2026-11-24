@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/examples/spectrum_report.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 107 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs)
+[veilvoice-core](Crate-veilvoice-core) &middot; 107 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/examples/spectrum_report.rs)
 
 ## Contents
 

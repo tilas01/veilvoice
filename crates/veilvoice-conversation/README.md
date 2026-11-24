@@ -107,7 +107,7 @@ flowchart TD
     n_lib(["lib.rs<br/>182 lines"])
     n_edit["edit.rs<br/>649 lines"]
     n_mode["mode.rs<br/>592 lines"]
-    n_plan["plan.rs<br/>1244 lines"]
+    n_plan["plan.rs<br/>1245 lines"]
     n_render["render.rs<br/>1111 lines"]
     n_subtitles["subtitles.rs<br/>276 lines"]
     n_edit --> n_plan
@@ -134,7 +134,7 @@ flowchart TD
 | [`edit.rs`](../../docs/files/veilvoice-conversation/edit.md) | 649 | Correcting a plan: who is speaking when, what they are called, and in what colour. |
 | [`lib.rs`](../../docs/files/veilvoice-conversation/lib.md) | 182 | Several people in one recording: a plan of who spoke when, a distinct destination voice for each of them, and subtitles that carry their names. |
 | [`mode.rs`](../../docs/files/veilvoice-conversation/mode.md) | 592 | How many voices a group gets, and the trade between the two answers. |
-| [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 1244 | Who is in the recording, and who is speaking when. |
+| [`plan.rs`](../../docs/files/veilvoice-conversation/plan.md) | 1245 | Who is in the recording, and who is speaking when. |
 | [`render.rs`](../../docs/files/veilvoice-conversation/render.md) | 1111 | Turning a plan and a recording into veiled audio, one engine per speaker. |
 | [`subtitles.rs`](../../docs/files/veilvoice-conversation/subtitles.md) | 276 | Subtitles, from the same plan the audio is rendered from. |
 

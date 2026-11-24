@@ -156,12 +156,14 @@ The changes come from the commit history, recorded through 10 Nov 2026 by `pytho
 - [`main.rs`](files/crates/veilvoice-cli/src/main.rs.svg): veilvoice, the command-line interface.
 - [`mandate.rs`](files/crates/veilvoice-cli/src/mandate.rs.svg): veilvoice mandate -- the two things VeilVoice insists on, and how to stop.
 - [`meter.rs`](files/crates/veilvoice-cli/src/meter.rs.svg): Level meters for veilvoice live, on a scale that means something.
+- [`pipe.rs`](files/crates/veilvoice-cli/src/pipe.rs.svg): A reader who stops reading is not a crash.
 - [`policy.rs`](files/crates/veilvoice-cli/src/policy.rs.svg): veilvoice policy -- settings that can only be tightened.
 - [`priv_mode.rs`](files/crates/veilvoice-cli/src/priv_mode.rs.svg): veilvoice privilege shows what VeilVoice runs with, and what it can see.
 - [`record.rs`](files/crates/veilvoice-cli/src/record.rs.svg): veilvoice record -- capture the veiled voice straight into an encrypted file.
 - [`reseal.rs`](files/crates/veilvoice-cli/src/reseal.rs.svg): veilvoice reseal: repairing files that were sealed under no passphrase.
 - [`reset.rs`](files/crates/veilvoice-cli/src/reset.rs.svg): veilvoice reset: putting this machine back to a new install.
 - [`sentry.rs`](files/crates/veilvoice-cli/src/sentry.rs.svg): veilvoice sentry -- canaries, baselines, and what changed since.
+- [`studio.rs`](files/crates/veilvoice-cli/src/studio.rs.svg): veilvoice studio: the Recording Studio's vault, from the command line.
 - [`theme.rs`](files/crates/veilvoice-cli/src/theme.rs.svg): Tokyo Night colouring for the terminal.
 - [`update.rs`](files/crates/veilvoice-cli/src/update.rs.svg): veilvoice update: fetch the new release, check it, and put it in place.
 
@@ -231,7 +233,7 @@ The changes come from the commit history, recorded through 10 Nov 2026 by `pytho
 - [`studio.rs`](files/crates/veilvoice-crypto/src/studio.rs.svg): The studio vault: a key that exists only when both locks have been opened.
 - [`tape.rs`](files/crates/veilvoice-crypto/src/tape.rs.svg): A recording held in locked, zeroizing memory while it is still being made.
 - [`vault.rs`](files/crates/veilvoice-crypto/src/vault.rs.svg): Where the app lock is kept: two copies, unpredictable names, and a restore.
-- [`weave.rs`](files/crates/veilvoice-crypto/src/weave.rs.svg): Thirty-one reversible encodings, chosen at random, applied around the encryption -- before it, after it, or both.
+- [`weave.rs`](files/crates/veilvoice-crypto/src/weave.rs.svg): Kept only to open old records.
 
 ### crates/veilvoice-crypto/tests
 

@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-audio/src/record.rs`
 
-[[veilvoice-audio|Crate-veilvoice-audio]] &middot; 543 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs)
+[veilvoice-audio](Crate-veilvoice-audio) &middot; 543 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-audio/src/record.rs)
 
 ## Contents
 
@@ -37,7 +37,7 @@ taken.
 Nothing here writes to disk at all. The caller seals the `Secret` and
 writes the result. A recorder that wrote a WAV and encrypted it afterwards
 would leave a plaintext file that
-[[`veilvoice_crypto::shred`|Crate-veilvoice-crypto]] explains
+[`veilvoice_crypto::shred`](Crate-veilvoice-crypto) explains
 cannot be
 reliably taken back on flash storage, which is the whole reason at-rest
 encryption is the default rather than an option.

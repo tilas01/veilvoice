@@ -212,7 +212,7 @@ pub const CARDS: &[(&str, &str, &str)] = &[
 /// should have been offered the decisions first.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Stage {
-    /// A passphrase on the window, and on VeilVoice's own files.
+    /// A passphrase on the window.
     AppLock,
     /// Sealing every recording with it.
     AtRest,
@@ -611,15 +611,7 @@ impl Tour {
              live scramble.",
         ));
         ui.add_space(8.0);
-        ui.label(
-            RichText::new(
-                "It also encrypts VeilVoice's own files and gives them \
-                 meaningless names, with decoy files among them, so the folder \
-                 says nothing about what you have done. Without a password \
-                 none of that is possible: there is no key.",
-            )
-            .color(p::muted()),
-        );
+        ui.label(RichText::new(crate::firstrun::OWN_FILES).color(p::muted()));
         ui.add_space(8.0);
         ui.label(
             RichText::new(

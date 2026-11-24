@@ -3,7 +3,7 @@
 
 # `website/js/prefetch.js`
 
-[[The website's source|Source-index]] &middot; 146 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/prefetch.js)
+[The website's source](Source-index) &middot; 146 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/website/js/prefetch.js)
 
 ## What it does
 

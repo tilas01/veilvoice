@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-verify/tests/inside_the_archive.rs`
 
-[[veilvoice-verify|Crate-veilvoice-verify]] &middot; 498 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs)
+[veilvoice-verify](Crate-veilvoice-verify) &middot; 498 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-verify/tests/inside_the_archive.rs)
 
 ## Contents
 

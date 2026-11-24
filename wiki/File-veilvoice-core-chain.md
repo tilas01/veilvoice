@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-core/src/chain.rs`
 
-[[veilvoice-core|Crate-veilvoice-core]] &middot; 1741 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs)
+[veilvoice-core](Crate-veilvoice-core) &middot; 1741 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs)
 
 ## Contents
 
@@ -155,8 +155,8 @@ needs in order to tell you honestly if the computer is not keeping up.
 
 - `struct DeidConfig` (line 142) -- User-facing configuration for the de-identifier.
 - `enum RangeError` (line 256) -- Why a ratchet range typed by a person was not accepted.
-- `struct ProcessStats` (line 630) -- Rolling performance statistics, surfaced live to the UI.
-- `struct Deidentifier` (line 691) -- The complete, irreversible voice de-identification chain.
+- `struct ProcessStats` (line 629) -- Rolling performance statistics, surfaced live to the UI.
+- `struct Deidentifier` (line 690) -- The complete, irreversible voice de-identification chain.
 
 **What happens when it runs.** These are the ways in: public, and nothing else in this file calls them, so they are what an outside caller reaches first.
 
@@ -167,13 +167,13 @@ needs in order to tell you honestly if the computer is not keeping up.
   - reaches: `frames_for_ms`, `frame_ms`, `hop`
 - `DeidConfig::with_random_reseed_range` (line 455) -- This configuration with a roll range drawn from the OS CSPRNG.
   - reaches: `frame_ms`, `reseed_range_from`, `hop`
-- `DeidConfig::checked` (line 526) -- Validate and normalise; returns an error string on impossible values.
+- `DeidConfig::checked` (line 525) -- Validate and normalise; returns an error string on impossible values.
   - reaches: `clamp_ratio_bounds`
-- `ProcessStats::last_block_ms` (line 662) -- Most recent block processing time in milliseconds.
-- `ProcessStats::worst_block_ms` (line 666) -- Worst block processing time in milliseconds.
-- `ProcessStats::ema_block_ms` (line 670) -- Smoothed block processing time in milliseconds.
-- `ProcessStats::last_realtime_factor` (line 675) -- Processing time divided by the block's real-time duration.
-- `Deidentifier::new` (line 721) -- Build with a fresh, unpredictable seed from the OS CSPRNG.
+- `ProcessStats::last_block_ms` (line 661) -- Most recent block processing time in milliseconds.
+- `ProcessStats::worst_block_ms` (line 665) -- Worst block processing time in milliseconds.
+- `ProcessStats::ema_block_ms` (line 669) -- Smoothed block processing time in milliseconds.
+- `ProcessStats::last_realtime_factor` (line 674) -- Processing time divided by the block's real-time duration.
+- `Deidentifier::new` (line 720) -- Build with a fresh, unpredictable seed from the OS CSPRNG.
   - reaches: `from_seed`
 - `Deidentifier::latency_samples` (line 796) -- Fixed algorithmic latency in samples.
 - `Deidentifier::stats` (line 801) -- Live performance statistics (copy).
@@ -205,14 +205,14 @@ flowchart TD
     n_effective_reseed_range_ms(["DeidConfig::<br/>effective_reseed_range_ms<br/>line 420"])
     n_reseed_range_is_finer_than_a_frame(["DeidConfig::<br/>reseed_range_is_finer_than_a_frame<br/>line 434"])
     n_with_random_reseed_range(["DeidConfig::<br/>with_random_reseed_range<br/>line 455"])
-    n_checked(["DeidConfig::checked<br/>line 526"])
-    n_clamp_ratio_bounds["clamp_ratio_bounds<br/>line 616"]
-    n_last_block_ms(["ProcessStats::last_block_ms<br/>line 662"])
-    n_worst_block_ms(["ProcessStats::worst_block_ms<br/>line 666"])
-    n_ema_block_ms(["ProcessStats::ema_block_ms<br/>line 670"])
-    n_last_realtime_factor(["ProcessStats::<br/>last_realtime_factor<br/>line 675"])
-    n_new(["Deidentifier::new<br/>line 721"])
-    n_from_seed["Deidentifier::from_seed<br/>line 728"]
+    n_checked(["DeidConfig::checked<br/>line 525"])
+    n_clamp_ratio_bounds["clamp_ratio_bounds<br/>line 615"]
+    n_last_block_ms(["ProcessStats::last_block_ms<br/>line 661"])
+    n_worst_block_ms(["ProcessStats::worst_block_ms<br/>line 665"])
+    n_ema_block_ms(["ProcessStats::ema_block_ms<br/>line 669"])
+    n_last_realtime_factor(["ProcessStats::<br/>last_realtime_factor<br/>line 674"])
+    n_new(["Deidentifier::new<br/>line 720"])
+    n_from_seed["Deidentifier::from_seed<br/>line 727"]
     n_latency_samples(["Deidentifier::latency_samples<br/>line 796"])
     n_stats(["Deidentifier::stats<br/>line 801"])
     n_accent_stats(["Deidentifier::accent_stats<br/>line 806"])
@@ -237,14 +237,14 @@ flowchart TD
     click n_effective_reseed_range_ms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L420" "open the source"
     click n_reseed_range_is_finer_than_a_frame href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L434" "open the source"
     click n_with_random_reseed_range href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L455" "open the source"
-    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L526" "open the source"
-    click n_clamp_ratio_bounds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L616" "open the source"
-    click n_last_block_ms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L662" "open the source"
-    click n_worst_block_ms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L666" "open the source"
-    click n_ema_block_ms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L670" "open the source"
-    click n_last_realtime_factor href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L675" "open the source"
-    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L721" "open the source"
-    click n_from_seed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L728" "open the source"
+    click n_checked href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L525" "open the source"
+    click n_clamp_ratio_bounds href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L615" "open the source"
+    click n_last_block_ms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L661" "open the source"
+    click n_worst_block_ms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L665" "open the source"
+    click n_ema_block_ms href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L669" "open the source"
+    click n_last_realtime_factor href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L674" "open the source"
+    click n_new href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L720" "open the source"
+    click n_from_seed href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L727" "open the source"
     click n_latency_samples href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L796" "open the source"
     click n_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L801" "open the source"
     click n_accent_stats href "https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L806" "open the source"
@@ -287,19 +287,19 @@ flowchart TD
 | `DeidConfig::effective_reseed_range_ms` <sub>pub fn</sub> | [420](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L420) | What DeidConfig::reseed_range_ms actually comes to on this configuration, after quantising to whole frames. |
 | `DeidConfig::reseed_range_is_finer_than_a_frame` <sub>pub fn</sub> | [434](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L434) | Whether the requested range is finer than one frame, so the whole of it collapses onto a single interval. |
 | `DeidConfig::with_random_reseed_range` <sub>pub fn</sub> | [455](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L455) | This configuration with a roll range drawn from the OS CSPRNG. |
-| `DeidConfig::scaled` <sub>fn</sub> | [487](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L487) | Scale a (lo, hi) ratio range toward 1.0 by intensity. |
-| `DeidConfig::MAX_SAMPLE_RATE` <sub>pub const</sub> | [507](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L507) | The largest sample rate this engine will build for, in Hz. |
-| `DeidConfig::MAX_FRAME_SIZE` <sub>pub const</sub> | [515](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L515) | The largest FFT size this engine will build for. |
-| `DeidConfig::checked` <sub>pub fn</sub> | [526](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L526) | Validate and normalise; returns an error string on impossible values. |
-| `clamp_ratio_bounds` <sub>fn</sub> | [616](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L616) | Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order. |
-| `ProcessStats` <sub>pub struct</sub> | [630](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L630) | Rolling performance statistics, surfaced live to the UI. |
-| `ProcessStats::last_block_ms` <sub>pub fn</sub> | [662](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L662) | Most recent block processing time in milliseconds. |
-| `ProcessStats::worst_block_ms` <sub>pub fn</sub> | [666](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L666) | Worst block processing time in milliseconds. |
-| `ProcessStats::ema_block_ms` <sub>pub fn</sub> | [670](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L670) | Smoothed block processing time in milliseconds. |
-| `ProcessStats::last_realtime_factor` <sub>pub fn</sub> | [675](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L675) | Processing time divided by the block's real-time duration. |
-| `Deidentifier` <sub>pub struct</sub> | [691](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L691) | The complete, irreversible voice de-identification chain. |
-| `Deidentifier::new` <sub>pub fn</sub> | [721](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L721) | Build with a fresh, unpredictable seed from the OS CSPRNG. |
-| `Deidentifier::from_seed` <sub>pub fn</sub> | [728](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L728) | Build with an explicit seed (deterministic; for tests or seed-from-key). |
+| `DeidConfig::scaled` <sub>fn</sub> | [486](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L486) | Scale a (lo, hi) ratio range toward 1.0 by intensity. |
+| `DeidConfig::MAX_SAMPLE_RATE` <sub>pub const</sub> | [506](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L506) | The largest sample rate this engine will build for, in Hz. |
+| `DeidConfig::MAX_FRAME_SIZE` <sub>pub const</sub> | [514](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L514) | The largest FFT size this engine will build for. |
+| `DeidConfig::checked` <sub>pub fn</sub> | [525](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L525) | Validate and normalise; returns an error string on impossible values. |
+| `clamp_ratio_bounds` <sub>fn</sub> | [615](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L615) | Keep a (lo, hi) ratio pair inside a range a resampler can act on, and in the right order. |
+| `ProcessStats` <sub>pub struct</sub> | [629](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L629) | Rolling performance statistics, surfaced live to the UI. |
+| `ProcessStats::last_block_ms` <sub>pub fn</sub> | [661](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L661) | Most recent block processing time in milliseconds. |
+| `ProcessStats::worst_block_ms` <sub>pub fn</sub> | [665](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L665) | Worst block processing time in milliseconds. |
+| `ProcessStats::ema_block_ms` <sub>pub fn</sub> | [669](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L669) | Smoothed block processing time in milliseconds. |
+| `ProcessStats::last_realtime_factor` <sub>pub fn</sub> | [674](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L674) | Processing time divided by the block's real-time duration. |
+| `Deidentifier` <sub>pub struct</sub> | [690](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L690) | The complete, irreversible voice de-identification chain. |
+| `Deidentifier::new` <sub>pub fn</sub> | [720](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L720) | Build with a fresh, unpredictable seed from the OS CSPRNG. |
+| `Deidentifier::from_seed` <sub>pub fn</sub> | [727](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L727) | Build with an explicit seed (deterministic; for tests or seed-from-key). |
 | `Deidentifier::latency_samples` <sub>pub fn</sub> | [796](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L796) | Fixed algorithmic latency in samples. |
 | `Deidentifier::stats` <sub>pub fn</sub> | [801](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L801) | Live performance statistics (copy). |
 | `Deidentifier::accent_stats` <sub>pub fn</sub> | [806](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-core/src/chain.rs#L806) | Live accent-neutralisation read-out (detected f0, applied ratios). |

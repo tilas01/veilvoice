@@ -3,7 +3,7 @@
 
 # `crates/veilvoice-meta/src/lib.rs`
 
-[[veilvoice-meta|Crate-veilvoice-meta]] &middot; 230 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs)
+[veilvoice-meta](Crate-veilvoice-meta) &middot; 230 lines &middot; [read the source](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-meta/src/lib.rs)
 
 ## Contents
 

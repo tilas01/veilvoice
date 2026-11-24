@@ -95,16 +95,23 @@ pub mod script;
 ///
 /// A lookup and nothing else: it never runs the program to find out.
 pub fn on_path() -> Option<PathBuf> {
-    let path = std::env::var_os("PATH")?;
-    for dir in std::env::split_paths(&path) {
-        for name in ["gpg", "gpg2", "gpg.exe", "gpg2.exe"] {
-            let candidate = dir.join(name);
-            if candidate.is_file() {
-                return Some(candidate);
-            }
-        }
-    }
-    None
+    find_in(
+        &std::env::var_os("PATH")?,
+        &["gpg", "gpg2", "gpg.exe", "gpg2.exe"],
+    )
+}
+
+/// The first of `names` in an absolute entry of `path`, a `PATH` value.
+///
+/// A relative entry, including the empty one a stray `::` leaves, means the
+/// current folder: wherever this happened to be started. A program planted in
+/// a downloads folder would be found there before the real one, so those
+/// entries are skipped. Shells accept them; this does not.
+fn find_in(path: &std::ffi::OsStr, names: &[&str]) -> Option<PathBuf> {
+    std::env::split_paths(path)
+        .filter(|dir| dir.is_absolute())
+        .flat_map(|dir| names.iter().map(move |name| dir.join(name)))
+        .find(|candidate| candidate.is_file())
 }
 
 /// What GnuPG made of a signature.
@@ -493,6 +500,28 @@ pub fn commands(sums: &Path, signature: &Path, key: Option<&Path>) -> Vec<String
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// **F-312.** A relative `PATH` entry is the folder this was started from,
+    /// so a program planted there is never the one found.
+    #[cfg(unix)]
+    #[test]
+    fn a_relative_path_entry_is_never_searched() {
+        let dir = tempfile::tempdir().unwrap();
+        let dir = dir.path();
+        let program = dir.join("gpg");
+        std::fs::write(&program, b"").unwrap();
+        let mut relative = std::path::PathBuf::new();
+        for _ in std::env::current_dir().unwrap().components().skip(1) {
+            relative.push("..");
+        }
+        let relative = relative.join(dir.strip_prefix("/").unwrap());
+        assert!(
+            relative.join("gpg").is_file(),
+            "the test's own path is wrong"
+        );
+        assert_eq!(find_in(relative.as_os_str(), &["gpg"]), None);
+        assert_eq!(find_in(dir.as_os_str(), &["gpg"]), Some(program));
+    }
 
     /// The project's own key, so the import test imports the real thing.
     const KEY: &str = include_str!(concat!(

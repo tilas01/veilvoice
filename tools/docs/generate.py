@@ -765,8 +765,8 @@ def link_targets(known):
 
     def wiki(label, crate, stem):
         if stem:
-            return "[[%s|%s]]" % (label, wiki_file_page(crate, stem))
-        return "[[%s|%s]]" % (label, wiki_crate_page(crate))
+            return "[%s](%s)" % (label, wiki_file_page(crate, stem))
+        return "[%s](%s)" % (label, wiki_crate_page(crate))
 
     return {"readme": readme, "filepage": filepage, "site_crate": site_crate,
             "site_file": site_file, "wiki": wiki}
@@ -2963,14 +2963,14 @@ def html_index(colours, models, fingerprint, covered, uncovered):
 # repository rendering in exactly three mechanical ways, and in nothing else:
 #
 #   * page names are flattened (`File-veilvoice-core-accent`),
-#   * links between pages use the wiki's own `[[Page]]` syntax,
+#   * links between pages name the page, as in `[text](Page)`,
 #   * images are absolute `raw.githubusercontent.com` URLs.
 #
-# `[[Page]]` is used rather than `[text](Page)` deliberately: the second is a
-# relative Markdown link, and `tools/site-tests/links.test.js` would correctly
-# report every one of them as pointing at a file that does not exist in this
-# repository -- because it does not. The wiki syntax is not a Markdown link at
-# all, so the checker and the wiki both read it the way it is meant.
+# The wiki's own `[[Page]]` syntax used to be written here instead. It is a
+# link only inside the wiki: the same pages are also read in `wiki/` in this
+# repository, where GitHub showed every one of them as brackets around a page
+# name. An ordinary link reads as a link in both places, and
+# `tools/site-tests/links.test.js` checks that the page it names exists.
 
 RAW = "https://raw.githubusercontent.com/%s/%s/" % (REPO, REF)
 
@@ -2996,7 +2996,7 @@ def wiki_crate(colours, model, links):
     out.append("# %s\n" % crate)
     if model["description"]:
         out.append("> %s\n" % model["description"])
-    out.append("[[Reference]] &middot; "
+    out.append("[Reference](Reference) &middot; "
                "[the same page in the repository]"
                "(https://github.com/%s/blob/%s/%s/README.md)\n"
                % (REPO, REF, crate_dir(crate)))
@@ -3047,7 +3047,7 @@ def wiki_file(colours, model, entry, links):
     out.append("![%s](%sassets/banners/%s/%s.svg)\n"
                % (entry["name"], RAW, crate, entry["stem"]))
     out.append("# `%s`\n" % entry["rel"])
-    out.append("[[%s|%s]] &middot; %d lines &middot; "
+    out.append("[%s](%s) &middot; %d lines &middot; "
                "[read the source](https://github.com/%s/blob/%s/%s)\n"
                % (crate, wiki_crate_page(crate), entry["lines"], REPO, REF,
                   entry["rel"]))
@@ -3104,10 +3104,10 @@ def wiki_index(models):
                "out of one generator, so they cannot disagree.\n")
     for model in models:
         crate = model["crate"]
-        out.append("## [[%s|%s]]\n" % (crate, wiki_crate_page(crate)))
+        out.append("## [%s](%s)\n" % (crate, wiki_crate_page(crate)))
         out.append("%s\n" % model["description"])
         for entry in model["files"]:
-            out.append("- [[`%s`|%s]] &middot; %s"
+            out.append("- [`%s`](%s) &middot; %s"
                        % (entry["name"], wiki_file_page(crate, entry["stem"]),
                           entry["summary"] or "no module documentation yet"))
         out.append("")

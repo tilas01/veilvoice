@@ -41,6 +41,429 @@ recorded as such rather than as a promise to be redeemed later. An outside
 reviewer would still be worth having. The difference is that their absence is no
 longer offered as the explanation for anything.
 
+## The forty-first round: every file, read with every skill
+
+The one-time audit read both repositories in full, the riskiest code first,
+with the review skills installed for the purpose, among them rust-review,
+zeroize-audit, sharp-edges and the house writing rules. Five of its findings
+went into v0.1.23 as F-304 to F-308. The rest are here, F-309 to F-345,
+together with the stale facts the wiki work found while checking its pages
+against the code.
+
+### F-309: the integrity manifest and the canary nest were rewritten in place
+
+**Where:** `crates/veilvoice-guard/src/manifest.rs` (`Manifest::save`) and `crates/veilvoice-guard/src/sentry/canary.rs` (`Nest::save`).
+
+**What happened:** Both saved with `std::fs::write`, which truncates the file and writes it again. A crash or a full disk part-way through left a cut-off manifest, which then read as tampering, or a nest that had forgotten some of its canaries. A false alarm teaches people to dismiss the true one.
+
+**Fix:** Both save through `veilvoice_crypto::privatefile::replace`, a new sibling of `replace_owner_only` for files that are not secret. It writes a temporary beside the file and renames it over.
+
+**Regression test:** `a_save_replaces_the_manifest_rather_than_rewriting_it` and `a_save_replaces_the_nest_rather_than_rewriting_it` check that a second save leaves a new inode, which only a rename does.
+
+### F-310: the app lock's copy could come back empty after a power cut
+
+**Where:** `crates/veilvoice-crypto/src/privatefile.rs`, `replace_owner_only`.
+
+**What happened:** The temporary was renamed over the destination without being synced first, and the folder was never synced after. Some filesystems commit the rename before the data, so after a power cut the file could be empty, which is exactly the half-written state the function exists to rule out. A temporary that failed part-way was also left behind, a partial copy of a secret with nothing watching it.
+
+**Fix:** The temporary is synced before the rename and removed if writing it fails. On Unix the folder is synced after the rename, as a best effort, because the rename has already happened by then and some filesystems refuse to sync a folder.
+
+**Regression test:** A sync cannot be observed from a test without cutting the power. `a_failed_replacement_leaves_the_old_file` and `a_plain_replacement_lands_whole_and_leaves_nothing_beside_it` pin the behaviour around it.
+
+### F-311: the decoy check copied both passphrases and never wiped them
+
+**Where:** `crates/veilvoice-crypto/src/decoy.rs`, `differences`.
+
+**What happened:** Comparing the real passphrase with a proposed decoy collected both into `Vec<char>`, leaving two copies of each on the heap that nothing zeroised.
+
+**Fix:** It walks both strings in place, so there are no copies to wipe. The count is unchanged.
+
+**Regression test:** The existing cases, plus two with characters two bytes long, show that it still counts characters and not bytes.
+
+### F-312: a program in the starting folder could be run in place of GnuPG or ffmpeg
+
+**Where:** `on_path` in `crates/veilvoice-verify/src/gnupg/mod.rs`, `found` in `crates/veilvoice-video/src/ffmpeg.rs`, `on_path` in `crates/veilvoice-setup/src/companions.rs` and `volumes.rs`, `wsl_program` in `crates/veilvoice-verify/src/gnupg/backend.rs`, and `places` in `crates/veilvoice-verify/src/check/machine.rs`.
+
+**What happened:** All six walked `PATH` and accepted relative entries, including the empty one a stray `::` leaves. A relative entry means the current folder, wherever VeilVoice was started from. A `gpg` or `ffmpeg` sitting in a downloads folder would be found there and run, and the signature check would be answered by whatever that program said. The verifier would also check copies in that folder as if they were installed ones.
+
+**Fix:** Only absolute entries are searched. The four searches that start a program are now pure functions of the `PATH` value.
+
+**Regression test:** `a_relative_path_entry_is_never_searched`, in each of the four, puts the program in a folder named only by a relative entry. It shows that the program is not found that way and is found through the absolute path.
+
+### F-313: the app-lock card promised encryption the program does not do
+
+**Where:** `crates/veilvoice-gui/src/firstrun.rs` and `tour.rs`, the app-lock cards; the docs of `vault_store.rs` and `firstrun.rs`.
+
+**What happened:** Both cards said the lock "encrypts VeilVoice's own files and gives them meaningless names, with decoy files among them". The store that would do that keeps one record, the measurements file, and nothing writes it. The settings and the integrity record are written in the open, owner-only, under their own names. Somebody choosing a lock on the strength of that sentence was choosing it for a protection they did not get.
+
+**Fix:** One sentence, `OWN_FILES`, says what is true, and both cards show it. The module docs no longer claim more than the store keeps.
+
+**Regression test:** `the_lock_card_promises_no_encryption_the_store_does_not_do` fails if the sentence claims encryption. It also fails when the store gains a record, so the sentence is read again on the day it could become true.
+
+### F-314: typed first-run passphrases were emptied, not wiped
+
+**Where:** `crates/veilvoice-gui/src/firstrun.rs`.
+
+**What happened:** The confirmation fields were emptied with `String::clear`, which leaves the bytes in the buffer, and the four passphrase fields were never wiped at all if a card was skipped with something typed in it.
+
+**Fix:** The confirmations are zeroised when used, and `FirstRun` zeroises all four fields when it is dropped.
+
+**Regression test:** Wiping freed memory cannot be observed from safe code, so there is none. The change is two lines and a `Drop`, and it follows the pattern `security.rs` already uses.
+
+### F-315: sealed outputs and saved recordings were rewritten in place
+
+**Where:** `write_named` in `crates/veilvoice-cli/src/main.rs` and its callers in `atrest.rs` and `guard.rs`; the sealing in `crates/veilvoice-gui/src/security.rs`; `crates/veilvoice-audio/src/io.rs`, the WAV writer.
+
+**What happened:** Each wrote with `std::fs::write`, so a failed write over an existing file left neither the old one nor the new one.
+
+**Fix:** All go through `privatefile::replace`.
+
+**Regression test:** `a_named_write_replaces_the_file_rather_than_rewriting_it`.
+
+### F-316: keygen could leave a public key that matched no private key
+
+**Where:** `keygen` in `crates/veilvoice-cli/src/main.rs`.
+
+**What happened:** After checking that neither key file existed, keygen wrote the public key with `std::fs::write`, which replaces whatever is there and follows a symbolic link, and then created the private key exclusively. A private key file that appeared between the check and the writes made the second write fail after the first had succeeded. That left an old private key beside a new public key it did not match, and anything sealed to that public key could never be opened.
+
+**Fix:** Both files are created exclusively. The private key goes first, and it is removed again if the public key cannot be made.
+
+**Regression test:** `a_new_key_file_is_never_written_over_an_existing_one`.
+
+### F-317: the downloads read the user's curl and wget settings
+
+**Where:** `download` in `crates/veilvoice-verify/src/fetch.rs`, and `fetch` in `crates/veilvoice-setup/src/update.rs`.
+
+**What happened:** curl was not started with `-q`, and wget was not started with `--no-config`, so a `.curlrc` or `.wgetrc` applied to every release download and update check. One line in either can turn off certificate checks or send the request through a proxy. The updater's wget fallback also followed a redirect onto plain HTTP, which its curl path and the verifier's wget path already refused. The verifier's 512 MB limit was checked only after the whole file had been written, and its redirects were not capped.
+
+**Fix:** Both downloaders are told everything and read nothing else: `-q` first for curl, `--no-config` for wget, `--https-only` for the updater's wget, at most five redirects, and `--max-filesize` for curl so a reply that says it is too big is refused before it is written. wget has no size option, so for wget the check afterwards stays the only one. The argument lists are now functions of their inputs.
+
+**Regression test:** `the_downloaders_are_told_everything_and_read_nothing_else` and `every_fetch_reads_no_configuration_and_stays_on_https`.
+
+### F-318: "only one host is ever contacted" was not true
+
+**Where:** The module note in `crates/veilvoice-verify/src/fetch.rs`, and `veilvoice verify --help` in `crates/veilvoice-verify/src/lib.rs`.
+
+**What happened:** Both said only one host is ever contacted. Only one address is ever asked for, but GitHub answers a release download by redirecting to its own file host, and the downloader follows it.
+
+**Fix:** Both now say what happens: one compiled-in address, with GitHub's redirect followed over HTTPS only. The generated pages that quote the module note pick this up when `tools/docs/generate.py` runs.
+
+**Regression test:** None for the wording. The behaviour it describes is pinned by the test above.
+
+### F-319: a manifest could list the same file twice
+
+**Where:** `Manifest::parse` in `crates/veilvoice-guard/src/manifest.rs`.
+
+**What happened:** A path listed twice was accepted, and the last entry won. Somebody reading the record saw the first digest while the check used the second, so the file said one thing and did another.
+
+**Fix:** A second listing of a path, with either separator, is refused as malformed, naming the line.
+
+**Regression test:** `a_path_listed_twice_is_refused`.
+
+### F-320: a device error could stall the audio thread on a lock
+
+**Where:** `Troubles::report` in `crates/veilvoice-audio/src/live.rs`.
+
+**What happened:** A glitch never took the lock, but any other stream error did, with a blocking `lock`. On ALSA that runs on the audio thread, so a reader holding the lock stalled it.
+
+**Fix:** It uses `try_lock`. The count is taken before that, so a report that loses the race is still counted and only its wording is lost.
+
+**Regression test:** `a_device_error_does_not_wait_for_a_reader` holds the lock while a device error is reported, and fails if the report waits.
+
+### F-321: on a shared machine, a user's app lock had no spare at all
+
+**Where:** `Vault::at` and `admin_dir` in `crates/veilvoice-crypto/src/vault.rs`.
+
+**What happened:** `admin_dir` decides whether the spare goes in `/etc/veilvoice` by creating that folder, and creating a folder that already exists succeeds for anybody. Once one administrator run had made it, every other user's lock pointed its spare at a folder they could not write. Their lock was made with no spare anywhere, and every password change after that was refused as "the spare is stale". A comment in `admin_dir` described an ownership check the code did not make.
+
+**Fix:** `Vault::at` puts the spare in the administrator's folder only when this process can write there, which it finds out by trying, or when a spare for this lock is already there to be read. Otherwise the spare goes beside the lock, as it does on a machine with no such folder. A spare an administrator made is still read and still reported as stale when it cannot be updated. The comment now says what the code does.
+
+**Regression test:** `an_unwritable_admin_folder_with_no_spare_leaves_the_spare_at_home` and `a_spare_already_in_the_admin_folder_is_still_the_spare`. The F-86 and F-87 tests are adjusted to build the situations they test the way they can now arise.
+
+### F-322: the reseed comment gave collision figures the code cannot reach
+
+**Where:** `with_random_reseed_range` in `crates/veilvoice-core/src/chain.rs`.
+
+**What happened:** The comment said four bytes per end moved a repeated interval from 2^32 to 2^64. Both ends are rounded to whole frames before use, and between one frame and two seconds there are only a few hundred frame counts, so the pair can take about 2^16 values whatever the draw. Two launches share an interval after a few hundred of them, before the change and after it. A comment beside the clock also said the audio thread "never touches a clock", which is more than the code it sits on shows.
+
+**Fix:** The comment gives the real figure and why. The clock comment now says only what that code does: deciding when to roll never reads a clock.
+
+**Regression test:** None; the change is to comments only.
+
+### F-323: removing the app lock left its decoy record behind for good
+
+**Where:** `Vault::clear` in `crates/veilvoice-crypto/src/vault.rs`, reached from `LockStore::remove`.
+
+**What happened:** Removing the lock removed both copies and the index, but not the decoy record. With the index gone, the decoy's name could never be worked out again, so the file stayed in the folder for good, saying that this machine once had a decoy passphrase.
+
+**Fix:** `clear` removes the decoy record with the rest.
+
+**Regression test:** `clearing_leaves_nothing_behind` now plants a decoy record first and checks that it goes too.
+
+### F-324: a volume with a name that is not ASCII was never found
+
+**Where:** `unescape_mount` in `crates/veilvoice-setup/src/volumes.rs`.
+
+**What happened:** Reading `/proc/mounts`, it pushed each byte of the mount path as a `char`, which reads UTF-8 as Latin-1. A Cryptomator or VeraCrypt volume mounted at `/media/ryder/Clé` came out with its é as two Latin-1 characters, a path that does not exist, so the volume was not offered. Its escape handling also sliced the string by bytes, which panics if a backslash is ever followed by a character longer than one byte.
+
+**Fix:** It works on bytes, accepts an escape only as exactly three octal digits, and decodes the result once at the end.
+
+**Regression test:** `an_escaped_mount_point_is_read_back_whole` gains a name with é in it, an escape beside it, and two near-escapes that must be kept as written.
+
+### F-325: a hoard record's length check could wrap on the 32-bit build
+
+**Where:** `Hoard::open_bytes` in `crates/veilvoice-crypto/src/hoard.rs`.
+
+**What happened:** The check was `start + len > plain.len()`, with `len` read from the record. Release builds do not check for overflow, so on the 32-bit ARM build a length near `u32::MAX` wraps the sum to a small number. The check then passes and the slice after it panics. The record is authenticated before this point, so only a record written under the right key could do it.
+
+**Fix:** `len > plain.len() - start`, which cannot wrap because `plain` is already known to be at least `start` long.
+
+**Regression test:** None. A 64-bit host cannot reach the wrap, and the record would have to be sealed under the user's key.
+
+### F-326: unsigned commits still passed CI
+
+**Where:** `SIGNATURES_REQUIRED` in `tools/audit/authorship.py`; `docs/CONTRIBUTING.md`.
+
+**What happened:** The switch was still off, so an unsigned or wrongly signed commit was printed as a note and passed. The condition CONTRIBUTING set for turning it on had been met for some time: all 524 commits on `main` are signed by the release key's signing subkey, both on tilas01's computer and in the workflows. CONTRIBUTING also named `F8ADBAB7A4FB333C` as the key his machine signs with, which nothing on `main` is signed by any more.
+
+**Fix:** The switch is on. The key comments and CONTRIBUTING name the release key, `9CC1C7E7A9B5833A` with signing subkey `BD752A144704C231`, and say the older key is still accepted.
+
+**Regression test:** The guard's self-test now checks that an unsigned commit fails by default, not only when signatures are asked for explicitly.
+
+### F-327: the authorship guard read "Opus 6 kbps" as a model's name
+
+**Where:** `ASSISTANT` in `tools/audit/authorship.py`.
+
+**What happened:** The pattern for a model name followed by a version also matched Opus the audio codec at a bitrate, which VeilVoice's own changelog talks about, so such a commit message was refused.
+
+**Fix:** A bitrate after the number means the codec.
+
+**Regression test:** The self-test checks that "Opus 6 kbps" passes and "Opus 5.5" is still caught.
+
+### F-328: the licence gate implied a non-commercial limit and credited the AI help a fourth time
+
+**Where:** `website/js/legal.js`, the first-visit gate.
+
+**What happened:** The opening paragraph repeated half a sentence, so it read "provided with non-commercially, and it is provided with absolutely no warranty". That reads as a non-commercial limit the GPL does not have, and the gate's own list three paragraphs down says the opposite. It also credited "AI assistance (Claude, by Anthropic)", a fourth credit beyond the places it is agreed to live.
+
+**Fix:** The sentence says what the licence says. The paragraph keeps the useful half, that this is a maintainer audit and nobody independent has reviewed the code, without the credit. The heading is in sentence case, and the gate's dash stand-ins are rewritten.
+
+**Regression test:** "the licence gate says only what the licence says", in `tools/site-tests/scripts.test.js`, fails on "non-commercially", on Claude or Anthropic named in the gate, and on "provided with" twice in one sentence.
+
+### F-329: the README said the credit is deliberately not in the footer
+
+**Where:** `README.md` (Credits), `docs/FAQ.md` ("Who wrote it"), `docs/CONTRIBUTING.md`.
+
+**What happened:** The README said the credit was deliberately kept out of the website's footer, while CONTRIBUTING said it was in the footer of every page, and no footer carried it. Both named the tool only as "Claude".
+
+**Fix:** The README and the FAQ credit Claude Code, Anthropic's coding assistant, and the README and CONTRIBUTING say where the credit is today: the README and the FAQ. The footer credit, the third agreed place, arrives with the website redesign, and those two sentences change with it.
+
+**Regression test:** None; the change is wording.
+
+### F-330: the README counted 28 crates in a workspace of 13
+
+**Where:** `README.md` (Design pillars) and `tools/measured/generate.py`, which writes `docs/MEASURED.md`.
+
+**What happened:** Both said the functional line count covers 28 crates. It covers the 13 workspace crates and the fuzzing harnesses. The generator wrote its 28 as a constant, and no check read the README's sentence. `MEASURED.md` also gave 996 and 988 as this tree's test counts on Windows and Linux, numbers from long ago.
+
+**Fix:** The README names the 13 workspace crates and the fuzzing harnesses, and a new claim in `generate.py` checks that 13 against the workspace. The generator says "one crate more than the workspace row" without a number to drift, and drops the stale test counts.
+
+**Regression test:** The new `CLAIMS` entry fails `verify` when the README's crate count and the workspace disagree.
+
+### F-331: "every crate forbids unsafe" did not hold for the fuzzing harnesses
+
+**Where:** `README.md` (Design pillars).
+
+**What happened:** It said every crate carries `#![forbid(unsafe_code)]`. The fuzz targets cannot, because `libfuzzer-sys` generates an unsafe entry point.
+
+**Fix:** The claim is about the workspace's crates, and it names the harnesses as the one exception and says why.
+
+**Regression test:** None; the change is wording.
+
+### F-332: a malformed fragment link threw in the landing handler
+
+**Where:** The click handler in `website/js/teleport.js`.
+
+**What happened:** `decodeURIComponent` throws on an escape such as `#%E0`. `named()` caught that, and the click handler did not, so one malformed link threw instead of landing.
+
+**Fix:** The handler decodes inside a `try`, as `named()` does, and falls back to the raw fragment.
+
+**Regression test:** "every fragment teleport.js decodes is decoded inside a try".
+
+### F-333: `veilvoice gui` could open a window program planted in the starting folder
+
+**Where:** `on_path` in `crates/veilvoice-cli/src/gui.rs`; the fallback in `unix_level`, `crates/veilvoice-watch/src/privilege.rs`.
+
+**What happened:** To find the window's program, the CLI asked `where.exe` on Windows and `sh -c "command -v"` elsewhere, then ran what came back. `where.exe` searches the current folder before `PATH`, and `command -v` follows a relative `PATH` entry, so a `veilvoice-gui` sitting in a downloads folder could be the one opened. The privilege check's fallback ran a bare `id` through `PATH` for the same reason, and a fake one answering 0 would make an ordinary account read as root, which its own comments call the dangerous direction.
+
+**Fix:** The CLI walks `PATH` itself and searches only absolute entries, as every other program lookup in VeilVoice now does. The `id` fallback is `/bin/id`.
+
+**Regression test:** `a_relative_path_entry_is_never_searched` in `gui.rs`. `the_application_is_never_started_by_a_bare_name` now requires that no other program is asked: it used to require `where.exe`.
+
+### F-334: the window's sealed integrity record and its settings were rewritten in place
+
+**Where:** `write_private` in `crates/veilvoice-gui/src/integrity.rs`; `Settings::save` in `crates/veilvoice-gui/src/prefs.rs`.
+
+**What happened:** Both wrote with `write_owner_only`, which truncates the file and writes it again. A crash part-way through left a sealed integrity record cut short, which will not open and so reads as interference at the next launch. The same crash could cost the settings, including where the encrypted volume is.
+
+**Fix:** Both use `replace_owner_only`, which writes a synced temporary file and renames it over the old one.
+
+**Regression test:** `the_record_is_replaced_rather_than_rewritten` checks for a new inode and owner-only permissions.
+
+### F-335: seven more records were rewritten in place
+
+**Where:** `Hoard::write` (`crates/veilvoice-crypto/src/hoard.rs`), the updater's sealed record (`crates/veilvoice-verify/src/update.rs`), the program baseline (`crates/veilvoice-cli/src/appctl.rs`), the workspace and mandate files (`crates/veilvoice-policy/src/workspace.rs`, `mandate.rs`), the conversation plan (`crates/veilvoice-conversation/src/plan.rs`), and the window's plain records (`crates/veilvoice-gui/src/vault_store.rs`).
+
+**What happened:** Each file is rewritten over its previous version with `write_owner_only`, so a crash part-way through left a truncated record. For the hoard and the sealed records that reads as interference, and for the others the user's setup is lost.
+
+**Fix:** All seven use `replace_owner_only`. Files that are only ever created once, and exports to a name the user chose, are unchanged.
+
+**Regression test:** `rewriting_a_record_replaces_it_rather_than_rewriting_it` for the hoard. The others now make the same single call, which `privatefile`'s own tests cover.
+
+### F-336: a long panic message with a character across byte 4000 aborted the crash log
+
+**Where:** `write` in `crates/veilvoice-gui/src/crashlog.rs`.
+
+**What happened:** The crash log bounded a panic message by slicing it at byte 4000. When a character longer than one byte straddled that point, the slice panicked. That happens inside the panic hook, so the process aborted and wrote no log at all, which is exactly what the function's own note says must not happen.
+
+**Fix:** The message is cut at the last character boundary at or before byte 4000.
+
+**Regression test:** `a_long_message_is_cut_on_a_character_boundary` puts é across the cut and checks that the log is written, cut short.
+
+### F-337: the hoard spent compute and room on encodings that added nothing
+
+**Where:** `crates/veilvoice-crypto/src/hoard.rs`; `crates/veilvoice-crypto/src/weave.rs`.
+
+**What happened:** Every hoard record was put through one of thirty-one reversible encodings before it was sealed and through another after, and every record's name through one more. The module said itself that this added no cryptographic strength: ChaCha20-Poly1305 already makes a record indistinguishable from random, and the encodings are published in the source. What they did cost was compute on every write, and room on disk, because each record was padded for the widest encoding at eight times its length.
+
+**Fix:** New records are sealed and padded with no encoding at all, in a new format marked by its first two bytes. Names are the HMAC alone, still twenty-four characters. `weave.rs` is kept read-only, to open records an older VeilVoice wrote, and the hoard rewrites each such record in the new format and under its new name the first time it is read. A record that small now pads to 256 bytes rather than 4 KiB.
+
+**What it breaks:** No user data: the hoard holds the roster, decoy files and one measurements record that nothing writes yet. A version older than this one cannot open a record this one has written, so going back to an older VeilVoice after upgrading would report the folder as interfered with.
+
+**Regression test:** `a_record_in_the_old_format_opens_and_moves_to_the_new_one`, `a_folder_in_the_old_format_audits_clean`, `a_small_record_is_padded_to_the_smallest_bucket` and `the_format_marker_is_no_old_encoding`. The tests that measured the encodings are gone with them.
+
+### F-338: a sealed policy did not apply to the command line
+
+**Where:** `crates/veilvoice-cli/src/policy.rs` (new `apply`) and the `anonymise`, `live` and `record` arms in `crates/veilvoice-cli/src/main.rs`.
+
+**What happened:** Only the window called `Policy::constrain`. Every command that processes a recording took its flags as given, so a policy requiring encryption at rest, metadata cleaning, accent neutralisation or a minimum intensity stopped nobody who had a terminal: `veilvoice anonymise --encrypt false --intensity 0.1` did exactly that under any policy.
+
+**Fix:** Each of those commands passes its flags through `policy::apply` before it starts. As in the window, it only tightens and never changes the policy, and it says on standard error what it overruled. A policy that cannot be read is reported and not applied, which matches the window.
+
+**Regression test:** `a_policy_tightens_what_the_command_line_asked_for`, `without_a_policy_the_flags_stand`, `what_a_policy_overruled_is_said`, and `every_processing_command_applies_the_policy`, which fails if any of the three commands stops going through the policy.
+
+### F-339: the Recording Studio's vault had no command
+
+**Where:** New `crates/veilvoice-cli/src/studio.rs`; `crates/veilvoice-cli/src/main.rs`; `tools/docs/commands.py`. Roadmap item 225, parity between the command line and the window.
+
+**What happened:** The window's Browser lists, plays, exports and removes what the Recording Studio keeps. The command line could not reach the vault at all, so a machine with no display had no way to get a recording out of it.
+
+**Fix:** `veilvoice studio list | export | remove` opens the same vault through the same code. It asks for both passphrases the window asks for, checks the app lock through the decoy store as the window does (so the decoy opens an empty studio), and never makes a vault. An export is owner-only, never written over an existing file, and needs `--yes` because what leaves the vault is not sealed. A removal needs `--yes` as well.
+
+**Regression test:** `an_empty_folder_is_not_given_a_vault`, `the_windows_vault_opens_with_the_same_pair`, `an_export_never_writes_over_a_file` and `dates_and_sizes_read_the_way_a_person_reads_them`. `every_command_the_program_has_is_documented` covers the new page in `docs/COMMANDS.md`.
+
+### F-340: the installers' examples named v0.1.9, and an old release went in without a word
+
+**Where:** `install/install.sh`, `install/install.ps1`, `install/install.bat`, `docs/USING_THE_CRATES.md` and `tools/release/version.py`.
+
+**What happened:** The installers' usage lines and their fallback advice ("pass one explicitly instead") said `--version v0.1.9`, fourteen releases old, and the crate guide pinned `tag = "v0.1.9"`. Nothing watched those lines, so a release never updated them. Somebody who asked for an older release by name got it with no sign that it was old.
+
+**Fix:** Every example names the current release, and `version.py` now watches all of them, so the release bump moves them and `--check` fails while any is stale. When a version is asked for by name, both installers ask GitHub for the newest release and say plainly when the requested one is older, without stopping the install. If GitHub cannot be reached, they say that the check could not be made.
+
+**Regression test:** `version.py --check` fails on any stale example. The release comparison was checked by hand on both platforms (v0.1.9 and a release candidate against newer releases, and the same release against itself); the installers have no test harness of their own.
+
+### F-341: the wiki pages in the repository showed their links as brackets
+
+**Where:** `tools/docs/generate.py`, `tools/docs/wiki.py` and `tools/docs/sources.py`, which write `wiki/`; `tools/site/wiki_site.py`; `tools/site-tests/links.test.js`.
+
+**What happened:** Every crate page in `wiki/` opened with `[[Reference]]`, and the file pages, the reference index, the landing page and the sidebar linked to each other the same way. That syntax is a link only inside a GitHub wiki. The same pages are tracked in this repository, and anyone reading them there, on GitHub or in a Markdown editor, saw the brackets and the page name as plain text, which reads as something left behind by whatever wrote the page. Ryder found it.
+
+**Fix:** The generators write ordinary links, `[Reference](https://github.com/tilas01/veilvoice/blob/main/docs/Reference)`, which the wiki resolves the same way and which read as links everywhere else. `wiki.py`'s dead-link check reads both forms, and `wiki_site.py` uses its pattern rather than keeping a copy.
+
+**Regression test:** `links.test.js` now fails on any `[[link]]` outside code in a tracked Markdown or HTML file, and shows itself a plain one it must catch and a quoted one it must not. `wiki.py --self-test` checks that the dead-link reader sees both forms of link and skips quoted ones. The same file also checks every full link to a file on main, such as `raw.githubusercontent.com/tilas01/veilvoice/main/...`, against the tree, so a file moved to veilvoice-website cannot leave a link behind. It found none of those.
+
+### F-342: the OpenBSD and NetBSD archives had a launcher for a window they do not carry
+
+**Where:** `.github/workflows/release.yml`, the `freebsd`, `openbsd` and `netbsd` jobs.
+
+**What happened:** All three copied the freedesktop launcher entry and its icons into the archive. The entry starts `veilvoice-gui`, which OpenBSD and NetBSD never build, and which FreeBSD builds only when it can. A desktop that installed those files showed a VeilVoice menu item that did nothing.
+
+**Fix:** OpenBSD and NetBSD no longer ship the launcher. FreeBSD copies it only when `veilvoice-gui` is in the archive.
+
+**Regression test:** `packaging.test.js` reads each BSD job and fails if it copies the launcher without first checking that the window is there.
+
+### F-343: `veilvoice info` said the program has no network access at all
+
+**Where:** `crates/veilvoice-cli/src/main.rs`, `info`.
+
+**What happened:** It printed "Network access: none, by construction". That is true of VeilVoice's own code and not of the program, because `update` and `verify release` run the system's `curl` when somebody types them. The help names both, and the window's version screen was corrected long ago to "none, except the update check you press". The command line was the one place still saying none.
+
+**Fix:** It says "none, except when you ask by name: update and verify release".
+
+**Regression test:** `the_info_screen_names_the_commands_that_reach_the_network` reads the commands the help names and fails if `info` leaves any of them out.
+
+### F-344: the help for `anonymise` gave the wrong default file name
+
+**Where:** `crates/veilvoice-cli/src/main.rs`, the `--output` option of `anonymise`.
+
+**What happened:** The help said the result defaults to `<input>.veiled.wav`, which reads as `talk.m4a.veiled.wav`. The program replaces the extension, so it writes `talk.veiled.wav`.
+
+**Fix:** The help says what happens, with that example. The default is worked out in one small function, `default_veiled_path`.
+
+**Regression test:** `the_default_output_replaces_the_extension_as_the_help_says`.
+
+### F-345: piping a command into `head` ended it with a panic
+
+**Where:** New `crates/veilvoice-cli/src/pipe.rs`; `main` in `crates/veilvoice-cli/src/main.rs`.
+
+**What happened:** `veilvoice policy status | head` printed a panic message and a hint about backtraces once `head` had read its ten lines. `println!` panics when the reader of a pipe has gone. A C program would be ended quietly by `SIGPIPE`, but Rust ignores that signal, and restoring it needs `unsafe`, which the crate forbids. Every command with more than a screenful of output did the same.
+
+**Fix:** A panic hook, installed first thing in `main`, recognises the standard library's report of a closed pipe on standard output and exits quietly with status 141, the status a shell gives a program `SIGPIPE` ended, so a script using `pipefail` still sees that the output was cut short. Every other panic goes to the default hook as before.
+
+**Regression test:** `a_closed_pipe_is_recognised_on_unix_and_on_windows` and `every_other_panic_is_still_reported`, which includes a full disk and a closed standard error.
+
+### Words items also fixed
+
+- The README's Licence section now carries the notice the GPL's "How to Apply These Terms" appendix asks for: copyright tilas01, version 3 or any later version, with a pointer to LICENSE and the SPDX identifier every source file carries. `LICENSE` itself is the verbatim GPL-3.0 text (sha256 3972dc97...), and its unfilled lines 634 and 635 belong to that appendix's example, so it stays byte-identical.
+
+- `tools/audit/network_claims.py` cited F-235 where it meant F-246, the commands page that said no command reaches the network.
+- `crates/veilvoice-watch/src/lib.rs` said "because" twice in one sentence.
+- Found while checking the wiki against the code:
+  - The README's BSD section said the window is not shipped. FreeBSD's v0.1.23 archive carries it.
+  - The README told macOS users to right-click and Open. macOS 15 removed that, so it now points to **Open Anyway** in System Settings, as INSTALL.md does.
+  - INSTALL.md asked for Rust 1.96.0. The oldest compiler every crate is checked against is 1.94, the `rust-version`. 1.96.0 is what release builds pin.
+  - INSTALL.md gave the legal identity as the reason there is no notarisation. It now gives the 99 US dollar yearly cost as well.
+  - INSTALL.md's "What is not finished" said the OpenBSD, NetBSD, `.deb` and `.rpm` builds do not exist. They do, and it now points to PACKAGING.md's table rather than keeping a second list.
+  - WEBSITE.md called the site's scripts ES modules. They are classic scripts.
+  - USING_THE_CRATES.md, and the comment on the default in `kdf.rs`, called the KDF defaults "the RFC 9106 profile". 256 MiB, three passes and four lanes is RFC 9106's second profile with four times its memory, and the comment had the two profiles the wrong way round.
+  - The user guide had two sections numbered 5.5. The second and everything after it moved up by one, along with the four references to them.
+  - The user guide said the lock's two copies are in two directories, then that they share one unless VeilVoice runs as an administrator. The second is right, and the first now points to it.
+  - The user guide called the Lock tab "the security tab" four times.
+- In veilvoice-website, in a separate patch: its SECURITY.md promised a reply within a few days, which VeilVoice's own policy deliberately does not, and its README's licence notice now reads as the main README's does.
+
+### Tooling items closed on main without a change here
+
+- zizmor 1.31.1 on main d4316b90 reports nothing. The `workflow_run` triggers in `pages.yml` and `wiki.yml` and the kept checkout credentials in `rewrite.yml` and `signing.yml` carry ignore notes that give their reasons, and every Dependabot group has a seven-day cooldown (F-297).
+- CI now builds and tests the audio crate without default features (F-288).
+- The stale "CLI-only" FreeBSD comment in `release.yml` was corrected for v0.1.23.
+- The ten leftover Dependabot branches go through the branch clean-up script Ryder runs.
+
+### Also in the patch
+
+- `crates/veilvoice-cli/src/lock.rs` cites F-231, the empty-passphrase finding, in place of the unnumbered placeholder the reseal commit left.
+
+### Closed without a change
+
+- The duplicate `safe_stem`: `studio.rs` already delegates to `exporting::safe_stem`.
+- The CLI reset removing keys by default: fixed by F-291.
+- The tests writing to `/etc/veilvoice`: `vault.rs` now lets a test say where the administrator's folder is.
+- U5, the decoy record's own Argon2id parameters: they are bounded by `KdfParams::within` when the record is read, so an edited record can cost at most what an unattended unlock may.
+
+### Still open in Rust, for the next batch
+
+- The decoy session's integrity panel, the kept plain voice that stopped when the callback's scratch buffer filled, and the decoy record's telling size were found by this read and fixed before v0.1.23, as F-304, F-305 and F-306.
+- Still to do: the fresh read of every crate with rust-review, constant-time-analysis and sharp-edges.
+
 ## The fortieth round: the path from main to a published release
 
 v0.1.23 is the first release cut by `promote.yml`, so this round walked the
@@ -11003,7 +11426,7 @@ setup). Those are now done or built. The rest were not on anybody's list.
 | `cargo clippy --workspace --all-targets` | **0 warnings**, both with and without the `live` feature. |
 | `cargo fmt --all --check` | Clean. |
 | `cargo audit` | **1 vulnerability, accepted on a narrow and enforced ground** -- see A-6. Two `unmaintained` advisories accepted with written reasoning in `.cargo/audit.toml`. |
-| Test suite | 1965 tests across 13 crates, plus doctests and 21 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
+| Test suite | 1999 tests across 13 crates, plus doctests and 22 site-test suites in `tools/site-tests`. These three numbers are measured into `docs/MEASURED.md` and written into this line from it by the same tool, because the previous guard compared them against the front page -- one hand-typed number against another -- and both drifted together (F-71). The site suite still checks this line independently, so the writer failing silently is not a way for the claim to go wrong (roadmap item 152). The test count is measured on one machine and is not the same on every platform: see F-77. |
 | Coverage-guided fuzzing | 6 libFuzzer targets in `fuzz/`, one per parser that reads untrusted bytes. Built and type-checked; **not run to convergence** -- see section 5.2. |
 | Networking crates in the graph | **None.** CI fails the build if `reqwest`/`hyper`/`curl`/`ureq`/`tungstenite`/`isahc`/`surf` appears. |
 | `TODO`/`FIXME`/`HACK` markers | None. |
@@ -12673,8 +13096,8 @@ the top of this document now says.
 
 ## 6. Verdict
 
-**Three hundred and eight defects found and fixed (F-1 to F-308), across
-forty rounds.** Sixty of them, from the earliest rounds, are written up together in
+**Three hundred and forty-five defects found and fixed (F-1 to F-345), across
+forty-one rounds.** Sixty of them, from the earliest rounds, are written up together in
 §2 rather than each under a round of its own, which is why no per-round
 breakdown is kept here: the document's structure cannot support one, and the
 breakdown that used to stand in this place was written when there were seven

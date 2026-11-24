@@ -5,7 +5,7 @@
 
 > A watchable version of a veiled conversation: a waveform, a circle per speaker, subtitles, and an honest account of what needs ffmpeg.
 
-[[Reference]] &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/README.md)
+[Reference](Reference) &middot; [the same page in the repository](https://github.com/tilas01/veilvoice/blob/main/crates/veilvoice-video/README.md)
 
 ## Contents
 
@@ -91,7 +91,7 @@ flowchart TD
     n_lib(["lib.rs<br/>180 lines"])
     n_accel["accel.rs<br/>652 lines"]
     n_export["export.rs<br/>942 lines"]
-    n_ffmpeg["ffmpeg.rs<br/>792 lines"]
+    n_ffmpeg["ffmpeg.rs<br/>818 lines"]
     n_font["font.rs<br/>418 lines"]
     n_frames["frames.rs<br/>695 lines"]
     n_motion["motion.rs<br/>1162 lines"]
@@ -143,7 +143,7 @@ flowchart TD
 |---|---:|---|
 | [`accel.rs`](File-veilvoice-video-accel) | 652 | What hardware this machine has, and the one place VeilVoice can use it. |
 | [`export.rs`](File-veilvoice-video-export) | 942 | What an export asks, and the ffmpeg command each answer turns into. |
-| [`ffmpeg.rs`](File-veilvoice-video-ffmpeg) | 792 | The video file, which needs a codec this project does not ship. |
+| [`ffmpeg.rs`](File-veilvoice-video-ffmpeg) | 818 | The video file, which needs a codec this project does not ship. |
 | [`font.rs`](File-veilvoice-video-font) | 418 | A monospace face, five pixels by seven, drawn here. |
 | [`frames.rs`](File-veilvoice-video-frames) | 695 | The video's pictures, and how many of them there really are. |
 | [`lib.rs`](File-veilvoice-video-lib) | 180 | A watchable version of a veiled conversation: the waveform, a circle per speaker, the title, the subtitles, and a background. |
@@ -154,7 +154,7 @@ flowchart TD
 | [`size.rs`](File-veilvoice-video-size) | 732 | The size and frame rate a video is rendered at. |
 | [`waveform.rs`](File-veilvoice-video-waveform) | 298 | The shape of the audio, reduced to something a page can draw. |
 
-**6,138 functional lines of Rust** in this crate. A functional line is a line
+**6,154 functional lines of Rust** in this crate. A functional line is a line
 holding code: blank lines and lines holding only a comment are not counted,
 and a line with code and a trailing comment counts once. That is a different
 measure from the **Lines** column above, which is the length of each file and

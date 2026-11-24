@@ -220,16 +220,12 @@ impl std::error::Error for Refused {}
 ///
 /// Length difference counts, so `"hunter2"` against `"hunter2222"` is three
 /// apart rather than zero.
+///
+/// It walks both strings in place. Collecting them into vectors first left two
+/// copies of both passphrases on the heap that nothing ever zeroised.
 fn differences(a: &str, b: &str) -> usize {
-    let (a, b): (Vec<char>, Vec<char>) = (a.chars().collect(), b.chars().collect());
-    let shared = a.len().min(b.len());
-    let mut count = a.len().abs_diff(b.len());
-    for i in 0..shared {
-        if a[i] != b[i] {
-            count += 1;
-        }
-    }
-    count
+    let lengths = a.chars().count().abs_diff(b.chars().count());
+    lengths + a.chars().zip(b.chars()).filter(|(x, y)| x != y).count()
 }
 
 /// A decoy passphrase's stored form, on its own.
@@ -735,6 +731,9 @@ mod tests {
         assert_eq!(differences("hunter2", "hunter2222"), 3);
         assert_eq!(differences("abcd", "abcd"), 0);
         assert_eq!(differences("abcd", "wxyz"), 4);
+        // Counted in characters, not bytes: each of these is two bytes long.
+        assert_eq!(differences("\u{e9}t\u{e9}", "\u{e8}t\u{e9}"), 1);
+        assert_eq!(differences("", "\u{e9}\u{e9}"), 2);
         assert!(Decoy::create("hunter2", "hunter222", params()).is_err());
         assert!(Decoy::create("hunter2", "totally different", params()).is_ok());
     }
