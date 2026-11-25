@@ -424,7 +424,7 @@ against the code.
 
 ### Words items also fixed
 
-- The README's Licence section now carries the notice the GPL's "How to Apply These Terms" appendix asks for: copyright tilas01, version 3 or any later version, with a pointer to LICENSE and the SPDX identifier every source file carries. `LICENSE` itself is the verbatim GPL-3.0 text (sha256 3972dc97...), and its unfilled lines 634 and 635 belong to that appendix's example, so it stays byte-identical.
+- The README's Licence section now carries the notice the GPL's "How to Apply These Terms" appendix asks for: copyright tilas01, version 3 or any later version, with a pointer to LICENSE and the SPDX identifier every source file carries. `LICENSE` has that appendix's example filled in for this repository, with its name, the year 2026 and tilas01, as Ryder asked. Its three placeholder lines are the only change, so the licence terms above them are still exactly the FSF's text.
 
 - `tools/audit/network_claims.py` cited F-235 where it meant F-246, the commands page that said no command reaches the network.
 - `crates/veilvoice-watch/src/lib.rs` said "because" twice in one sentence.
